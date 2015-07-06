@@ -38,22 +38,22 @@ if [ "$?" -ne "0" ]; then
 fi
 
 
-bindir=$GRSISYS/bin
-libdir=$GRSISYS/libraries
-incdir=$GRSISYS/include
-utildir=$GRSISYS/etc
+bindir=$GRUTSYS/bin
+libdir=$GRUTSYS/libraries
+incdir=$GRUTSYS/include
+#utildir=$GRUTSYS/etc
 
 
-grsilibs="-lGRSIDetector -lGRSIFormat -lNucleus -lKinematics -lSRIM -lBetaDecay -lTGRSIFit -lTCal -lGROOT"
-detlibs="-lTigress -lGriffin -lSharc -lTriFoil -lCSM -lSceptar -lPaces -lDescant -lTip"
-grsimore="-lMidasFormat -lDataParser -lGRSILoop -lTGRSIint -lGRSIRootIO -lAnalysisTreeBuilder"
+grutlibs="-lGEBFormat " #-lNucleus -lKinematics -lSRIM -lGROOT"
+detlibs= #"-lGretina"
+grutmore="-lTGRUTint"
 
 cflags="-std=c++0x -I$incdir"
 
 
 
 usage="\
-Usage: grsi-config [--version] [--cflags] [--libs] [--all-libs] [--help]"
+Usage: grut-config [--version] [--cflags] [--libs] [--all-libs] [--help]"
 
 if test $# -eq 0; then
   echo "${usage}" 1>&2
@@ -101,7 +101,7 @@ while test $# -gt 0; do
         shift
         continue
       fi
-      out=$"$out -L${libdir} $grsilibs $detlibs "
+      out=$"$out -L${libdir} $grutlibs $detlibs "
       ;;
     --all-libs)
       if test "x$alllibsout" = "xyes" ; then
@@ -110,9 +110,9 @@ while test $# -gt 0; do
       fi
       alllibsout="yes"
       if test "x$libsout" = "xyes" ; then
-        out=$"$out $grsimore "
+        out=$"$out $grutmore "
       else
-        out=$"$out -L${libdir} $grsilibs $detlibs $grsimore -lXMLParser -lXMLIO -lX11 -lXpm -lProof -lGuiHtml "
+        out=$"$out -L${libdir} $grutlibs $detlibs $grutmore -lXMLParser -lXMLIO -lX11 -lXpm -lProof -lGuiHtml "
       fi
       ;;
     --root)
@@ -131,7 +131,7 @@ while test $# -gt 0; do
       echo "  --cflags        Print compiler flags and header path."
       echo "  --libs          Print libdir + most used GRSI libraries ."
       echo "  --all-libs      Print libdir + all GRSI libraries ."
-      echo "  --root          Print root-config output need for most grsi compulations."
+      echo "  --root          Print root-config output need for most grut compulations."
       echo "  --help          Print what you see here."
       exit 0
       ;;

@@ -65,6 +65,7 @@ $(ALLDIRS):
 
 grutinizer: libraries/src
 	@mv $</$@ bin/$@
+	@cp util/grut-config bin/
 
 bin:
 ifeq ($(wildcard ./bin),) 
