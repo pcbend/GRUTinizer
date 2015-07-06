@@ -1,10 +1,11 @@
 
-OBJECTS = TGRUTint.o TGRUTintDict.o grutxx.o
+OBJECTS = TGEBFile.o TGEBMultiFile.o TGEBEvent.o TGEBFormatDict.o 
 INCDIR = $(BASE)/include
-DICTOBJ = $(INCDIR)/TGRUTint.h
-DICTNAM = TGRUTint
+DICTOBJ = $(INCDIR)/TGEBFile.h $(INCDIR)/TGEBMultiFile.h $(INCDIR)/TGEBEvent.h $(INCDIR)/TGEBEventHeader.h 
+DICTNAM = TGEBFormat
 
 CFLAGS += -fPIC
+#LFLAGS = `root-config --glibs`
 
 #COMP_STRING="Now Compling "
 DICT_STRING="Now Making Dict for ${OBJ_COLOR}$< ${NO_COLOR}"
@@ -13,12 +14,12 @@ CAT=cat
 
 .PHONY: all clean gone
 
-all: libTGRUTint.so
+all: libGEBFormat.so
 	@printf "\r ${FIN_COLOR}%s${FIN_OBJ_COLOR}%-30s ${NO_COLOR}\n" $(FIN_STRING) $^ ;
 
-libTGRUTint.so: $(OBJECTS)
+%.so: $(OBJECTS)
 	@printf " ${COM_COLOR}%s${OBJ_COLOR}%s${NO_COLOR}" $(COMP_STRING) "$@"
-	@$(COMPILESHARED)$@ $(CFLAGS) -o$@ $(OBJECTS) 2> temp.log || touch temp.errors
+	@$(COMPILESHARED)$@ $(CFLAGS) $(LFLAGS) -o$@ $(OBJECTS) 2> temp.log || touch temp.errors
 	@if test -e temp.errors; then \
 		printf "\r ${COM_COLOR}%s${OBJ_COLOR}%-30s ${ERROR_COLOR}%*s${NO_COLOR}\n" $(COMP_STRING) $@ 10 $(ERROR_STRING) \
 		&& $(CAT) temp.log && \

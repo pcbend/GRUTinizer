@@ -1,4 +1,4 @@
-SUBDIRS = src libraries
+SUBDIRS = libraries
 ALLDIRS = $(SUBDIRS)
 
 PLATFORM = $(shell uname)
@@ -46,7 +46,7 @@ MAKE=make --no-print-directory
 
 .PHONY: all subdirs $(ALLDIRS) clean util
 
-all: print subdirs bin gruthist grutinizer end
+all: print subdirs bin gruthist sandbox grutinizer end
 
 #docs: print subdirs bin grsihist grsisort html end
 
@@ -63,12 +63,17 @@ src: print libraries
 $(ALLDIRS):
 	@$(MAKE) -C $@
 
-grutinizer: src
+grutinizer: libraries/src
 	@mv $</$@ bin/$@
 
 bin:
 ifeq ($(wildcard ./bin),) 
 	@mkdir bin	 
+endif
+
+bin:
+ifeq ($(wildcard ./sandbox),) 
+	@mkdir sandbox
 endif
 
 gruthist:
