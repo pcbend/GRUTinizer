@@ -28,10 +28,9 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
         :TRint(appClassName, &argc, argv, options, numOptions,noLogo) {
       
    fGRUTEnv = gEnv;
-   //SetPrompt( DYELLOW "GRETINA [%d] " RESET_COLOR);
 
+   SetPrompt("GRizer [%d] ");
 
-   SetPrompt( DYELLOW "GRizer [%d] " RESET_COLOR);
    Init();
 
 }

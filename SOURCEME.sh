@@ -28,7 +28,7 @@ echo
 echo "To avoid running this script every session add the following to your ~/.bashrc file"
 echo "export GRUTSYS=$GRUTSYS"
 echo "export PATH=\$GRUTSYS/bin:\$PATH" 
-echo "export LD_LIBRARY_PATH=\$GRSISYS/libraries:\$LD_LIBRARY_PATH"
+echo "export LD_LIBRARY_PATH=\$GRUTSYS/libraries:\$LD_LIBRARY_PATH"
 
 
 # clean up variables
