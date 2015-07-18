@@ -2,15 +2,29 @@
 .SECONDARY:
 .SECONDEXPANSION:
 
+
+PLATFORM:=$(PLATFORM)
 # EDIT THIS SECTION
 
 INCLUDES   = include
-CPP        = g++
-CFLAGS     = -g -std=c++11 -O2 -Wall -Wextra -pedantic -Wno-unused-parameter
+CFLAGS     = -g -std=c++11 -O2 #-Wall -Wextra -pedantic -Wno-unused-parameter
 LINKFLAGS  = -L/opt/X11/lib -lX11 -lXpm
 SRC_SUFFIX = cxx
 
 # EVERYTHING PAST HERE SHOULD WORK AUTOMATICALLY
+
+ifeq ($(PLATFORM),Darwin)
+export __APPLE__:= 1
+CFLAGS     += -DOS_DARWIN -DHAVE_ZLIB
+CFLAGS     += -I/opt/X11/include -Qunused-arguments
+CPP        = clang++
+SHAREDSWITCH = -install_name # ENDING SPACE
+else 
+export __LINUX__:= 1
+CPP        = g++
+CFLAGS     += -Wl,--no-as-needed
+SHAREDSWITCH = -shared -Wl,-soname,# NO ENDING SPACE
+endif
 
 COM_COLOR=\033[0;34m
 OBJ_COLOR=\033[0;36m
@@ -87,7 +101,7 @@ lib_linkdef     = $(wildcard $(call libdir,$(1))/LinkDef.h)
 lib_dictionary  = $(patsubst %/LinkDef.h,build/%/Dictionary.o,$(call lib_linkdef,$(1)))
 
 libraries/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%)
-	$(call run_and_test,$(CPP) -fPIC -shared -o $@ $^,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,$(CPP) -fPIC $(SHAREDSWITCH)% -o $@ $^,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 build/%.o: %.$(SRC_SUFFIX)
 	@mkdir -p $(dir $@)
