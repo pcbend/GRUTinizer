@@ -78,8 +78,6 @@ all: $(EXECUTABLES) $(LIBRARY_OUTPUT)
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
 
 bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT) bin
-	@echo "$(LINKFLAGS)" 
-	@echo "$(LIBRARY_NAMES)" 
 	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 bin/%: build/sandbox/%.o | $(LIBRARY_OUTPUT) bin
@@ -104,7 +102,7 @@ lib_linkdef     = $(wildcard $(call libdir,$(1))/LinkDef.h)
 lib_dictionary  = $(patsubst %/LinkDef.h,build/%/Dictionary.o,$(call lib_linkdef,$(1)))
 
 libraries/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%) 
-	$(call run_and_test,$(CPP) -fPIC $(SHAREDSWITCH)$* -o $@ $^,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,$(CPP) -fPIC $(SHAREDSWITCH)lib$*.so -o $@ $^,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 build/%.o: %.$(SRC_SUFFIX)
 	@mkdir -p $(dir $@)

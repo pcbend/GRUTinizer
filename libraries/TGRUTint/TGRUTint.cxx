@@ -6,7 +6,6 @@
 
 #include <TROOT.h>
 
-#include <Globals.h>
 
 extern void PopupLogo(bool);
 extern void WaitLogo();
@@ -28,6 +27,9 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
         :TRint(appClassName, &argc, argv, options, numOptions,noLogo) {
       
    fGRUTEnv = gEnv;
+   GetSignalHandler()->Remove();
+   TGRUTInterruptHandler *ih = new TGRUTInterruptHandler();
+   ih->Add();
 
    SetPrompt("GRizer [%d] ");
 
