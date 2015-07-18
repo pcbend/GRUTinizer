@@ -53,6 +53,8 @@ LINKFLAGS += -Llibraries $(addprefix -l,$(LIBRARY_NAMES))
 #-Wl,-rpath,\$$ORIGIN/../libraries
 LINKFLAGS += $(shell root-config --glibs) -lSpectrum
 
+ROOT_LIBFLAGS := $(shell root-config --glibs)
+
 UTIL_O_FILES    := $(patsubst %.$(SRC_SUFFIX),build/%.o,$(wildcard util/*.$(SRC_SUFFIX)))
 SANDBOX_O_FILES := $(patsubst %.$(SRC_SUFFIX),build/%.o,$(wildcard sandbox/*.$(SRC_SUFFIX)))
 MAIN_O_FILES    := $(patsubst %.$(SRC_SUFFIX),build/%.o,$(wildcard src/*.$(SRC_SUFFIX)))
@@ -99,23 +101,23 @@ libdir          = $(shell find libraries -name $(1) -type d)
 lib_src_files   = $(shell find $(call libdir,$(1)) -name "*.$(SRC_SUFFIX)")
 lib_o_files     = $(patsubst %.$(SRC_SUFFIX),build/%.o,$(call lib_src_files,$(1)))
 lib_linkdef     = $(wildcard $(call libdir,$(1))/LinkDef.h)
-lib_dictionary  = $(patsubst %/LinkDef.h,build/%/Dictionary.o,$(call lib_linkdef,$(1)))
+lib_dictionary  = $(patsubst %/LinkDef.h,build/%/LibDictionary.o,$(call lib_linkdef,$(1)))
 
 libraries/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%) 
-	$(call run_and_test,$(CPP) -fPIC $(SHAREDSWITCH)lib$*.so -o $@ $^,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,$(CPP) -fPIC $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@ $^,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 build/%.o: %.$(SRC_SUFFIX)
 	@mkdir -p $(dir $@)
 	$(call run_and_test,$(CPP) -fPIC -c $< -o $@ $(CFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
-build/%/Dictionary.o: build/%/Dictionary.cxx
+build/%/LibDictionary.o: build/%/LibDictionary.cxx
 	$(call run_and_test,$(CPP) -fPIC -c $< -o $@ $(CFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 dict_header_files = $(subst //,,$(shell head $(1) -n 1))
 
-build/%/Dictionary.cxx: %/LinkDef.h
+build/%/LibDictionary.cxx: %/LinkDef.h $$(call dic_header_files.%/LinkDef.h)
 	@mkdir -p $(dir $@)
-	$(call run_and_test,rootcint -f $@ -c $(INCLUDES) $(ROOTCFLAGS) -I$(dir $<) $(call dict_header_files,$<) $(notdir $<),$@,$(COM_COLOR),$(BLD_STRING),$(OBJ_COLOR))
+	$(call run_and_test,rootcint -f $@ -c $(INCLUDES) $(notdir $(call dict_header_files,$<)) $<,$@,$(COM_COLOR),$(BLD_STRING),$(OBJ_COLOR))
 
 -include $(shell find build -name '*.d' 2> /dev/null)
 

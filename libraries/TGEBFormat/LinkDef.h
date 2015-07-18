@@ -1,4 +1,4 @@
-// TGEBFile.h TGEBMultiFile.h TGEBEvent.h
+// include/TGEBFile.h include/TGEBMultiFile.h include/TGEBEvent.h
 
 #ifdef __CINT__
 
