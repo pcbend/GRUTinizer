@@ -2,15 +2,29 @@
 .SECONDARY:
 .SECONDEXPANSION:
 
+
+PLATFORM:=$(PLATFORM)
 # EDIT THIS SECTION
 
 INCLUDES   = include
-CPP        = g++
-CFLAGS     = -g -std=c++11 -O2 # -Wall -Wextra -pedantic -Wno-unused-parameter
+CFLAGS     = -g -std=c++11 -O2 #-Wall -Wextra -pedantic -Wno-unused-parameter
 LINKFLAGS  = -L/opt/X11/lib -lX11 -lXpm
 SRC_SUFFIX = cxx
 
 # EVERYTHING PAST HERE SHOULD WORK AUTOMATICALLY
+
+ifeq ($(PLATFORM),Darwin)
+export __APPLE__:= 1
+CFLAGS     += -DOS_DARWIN -DHAVE_ZLIB
+CFLAGS     += -I/opt/X11/include -Qunused-arguments
+CPP        = clang++
+SHAREDSWITCH = -install_name # ENDING SPACE
+else 
+export __LINUX__:= 1
+CPP        = g++
+CFLAGS     += -Wl,--no-as-needed
+SHAREDSWITCH = -shared -Wl,-soname,# NO ENDING SPACE
+endif
 
 COM_COLOR=\033[0;34m
 OBJ_COLOR=\033[0;36m
@@ -35,7 +49,8 @@ LIBRARY_OUTPUT := $(patsubst %,libraries/lib%.so,$(LIBRARY_NAMES))
 INCLUDES  := $(addprefix -I,$(INCLUDES))
 CFLAGS    += $(shell root-config --cflags)
 CFLAGS    += -MMD $(INCLUDES)
-LINKFLAGS += -Llibraries $(addprefix -l,$(LIBRARY_NAMES)) -Wl,-rpath,\$$ORIGIN/../libraries
+LINKFLAGS += -Llibraries $(addprefix -l,$(LIBRARY_NAMES)) 
+#-Wl,-rpath,\$$ORIGIN/../libraries
 LINKFLAGS += $(shell root-config --glibs) -lSpectrum
 
 UTIL_O_FILES    := $(patsubst %.$(SRC_SUFFIX),build/%.o,$(wildcard util/*.$(SRC_SUFFIX)))
@@ -63,6 +78,8 @@ all: $(EXECUTABLES) $(LIBRARY_OUTPUT)
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
 
 bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT) bin
+	@echo "$(LINKFLAGS)" 
+	@echo "$(LIBRARY_NAMES)" 
 	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 bin/%: build/sandbox/%.o | $(LIBRARY_OUTPUT) bin
@@ -86,20 +103,19 @@ lib_o_files     = $(patsubst %.$(SRC_SUFFIX),build/%.o,$(call lib_src_files,$(1)
 lib_linkdef     = $(wildcard $(call libdir,$(1))/LinkDef.h)
 lib_dictionary  = $(patsubst %/LinkDef.h,build/%/Dictionary.o,$(call lib_linkdef,$(1)))
 
-libraries/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%)
-	$(call run_and_test,$(CPP) -fPIC -shared -o $@ $^,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
+libraries/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%) 
+	$(call run_and_test,$(CPP) -fPIC $(SHAREDSWITCH)$* -o $@ $^,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 build/%.o: %.$(SRC_SUFFIX)
 	@mkdir -p $(dir $@)
 	$(call run_and_test,$(CPP) -fPIC -c $< -o $@ $(CFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
-build/%/Dictionary.o: build/%/Dictionary.cc
+build/%/Dictionary.o: build/%/Dictionary.cxx
 	$(call run_and_test,$(CPP) -fPIC -c $< -o $@ $(CFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
-
 
 dict_header_files = $(subst //,,$(shell head $(1) -n 1))
 
-build/%/Dictionary.cc: %/LinkDef.h
+build/%/Dictionary.cxx: %/LinkDef.h
 	@mkdir -p $(dir $@)
 	$(call run_and_test,rootcint -f $@ -c $(INCLUDES) $(ROOTCFLAGS) -I$(dir $<) $(call dict_header_files,$<) $(notdir $<),$@,$(COM_COLOR),$(BLD_STRING),$(OBJ_COLOR))
 
