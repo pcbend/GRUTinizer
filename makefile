@@ -6,7 +6,7 @@
 
 INCLUDES   = include
 CPP        = g++
-CFLAGS     = -g -std=c++11 -O2 -Wall -Wextra -pedantic -Wno-unused-parameter
+CFLAGS     = -g -std=c++11 -O2 # -Wall -Wextra -pedantic -Wno-unused-parameter
 LINKFLAGS  = -L/opt/X11/lib -lX11 -lXpm
 SRC_SUFFIX = cxx
 
