@@ -1,4 +1,4 @@
-// include/TGRUTint.h
+// TGRUTint.h
 
 #ifdef __CINT__
 

@@ -1,22 +1,22 @@
-#ifndef TGEBFILE_H
-#define TGEBFILE_H
+#ifndef TRawFILE_H
+#define TRawFILE_H
 
 //#include "Globals.h"
 
 #include <TObject.h>
 
-//#include "TGEBBanks.h"
+//#include "TRawBanks.h"
 
 
-class TGEBEvent;
+class TRawEvent;
 
 
-class TGEBFile : public TObject {
+class TRawFile : public TObject {
 
   public:
-    TGEBFile();
-    TGEBFile(const char *fname);
-    virtual ~TGEBFile();
+    TRawFile();
+    TRawFile(const char *fname);
+    virtual ~TRawFile();
 
     bool Open(const char *fname);
     bool OpenOut(const char *fname);
@@ -24,25 +24,24 @@ class TGEBFile : public TObject {
     void Close();
     void CloseOut();
 
-    int Read(TGEBEvent*); 
-    int Write(TGEBEvent*);
+    int Read(TRawEvent*); 
+    int Write(TRawEvent*);
 
     const char *GetFileName()  const { return fFilename.c_str();  }
     int         GetLastErrno() const { return fLastErrno;         }
     const char *GetLastError() const { return fLastError.c_str(); }
   
-    void Print(Option_t *opt = "");
+    void Print(Option_t *opt = "") const;
     void Clear(Option_t *opt = "");
 
     size_t GetFileSize(); 
     static size_t FindFileSize(const char*);
-    int GetRunNumber();
 
   private:
     std::string fFilename;
     std::string fOutFilename;
 
-    void InitTGEBFile();
+    void InitTRawFile();
 
     int         fLastErrno;
     std::string fLastError;
@@ -53,10 +52,6 @@ class TGEBFile : public TObject {
     size_t fBytesRead;
     size_t fBytesWritten;
 
-    Int_t  fExperimentNumber;
-    Int_t  fRunNumber;
-
-   
     int    fFile;
     void*  fGzFile;
     void*  fPoFile;
@@ -64,7 +59,7 @@ class TGEBFile : public TObject {
     void*  fOutGzFile;
 
 
-  ClassDef(TGEBFile,0)
+  ClassDef(TRawFile,0)
 };
 
 #endif

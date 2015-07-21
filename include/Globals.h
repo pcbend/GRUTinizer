@@ -1,9 +1,8 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+
 #ifndef __CINT__
-
-
 
 #define GRUT_RELEASE "0.01 "
 

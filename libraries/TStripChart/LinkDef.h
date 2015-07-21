@@ -1,4 +1,4 @@
-// include/TStripChart.h include/TStripChartItem.h
+// TStripChart.h TStripChartItem.h
 
 #ifdef __CINT__
 #pragma link off all globals;

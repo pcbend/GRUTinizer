@@ -1,8 +1,8 @@
 
-OBJECTS = TGEBFile.o TGEBMultiFile.o TGEBEvent.o TGEBFormatDict.o 
+OBJECTS = TRawFile.o TRawEvent.o TRawFormatDict.o #TGEBMultiFile.o TGEBFormatDict.o
 INCDIR = $(BASE)/include
-DICTOBJ = $(INCDIR)/TGEBFile.h $(INCDIR)/TGEBMultiFile.h $(INCDIR)/TGEBEvent.h $(INCDIR)/TGEBEventHeader.h 
-DICTNAM = TGEBFormat
+DICTOBJ = $(INCDIR)/TRawFile.h $(INCDIR)/TRawEvent.h $(INCDIR)/TRawEventHeader.h $(INCDIR)/TRawBanks.h #$(INCDIR)/TGEBMultiFile.h
+DICTNAM = TRawFormat
 
 CFLAGS += -fPIC
 #LFLAGS = `root-config --glibs`
@@ -14,10 +14,10 @@ CAT=cat
 
 .PHONY: all clean gone
 
-all: libGEBFormat.so
+all: libTRawFormat.so
 	@printf "\r ${FIN_COLOR}%s${FIN_OBJ_COLOR}%-30s ${NO_COLOR}\n" $(FIN_STRING) $^ ;
 
-%.so: $(OBJECTS)
+libTRawFormat.so: $(OBJECTS)
 	@printf " ${COM_COLOR}%s${OBJ_COLOR}%s${NO_COLOR}" $(COMP_STRING) "$@"
 	@$(COMPILESHARED)$@ $(CFLAGS) $(LFLAGS) -o$@ $(OBJECTS) 2> temp.log || touch temp.errors
 	@if test -e temp.errors; then \
@@ -33,7 +33,7 @@ all: libGEBFormat.so
 	@cp $@ ..
 
 %.o: %.cxx
-	@printf " ${COM_COLOR}%s ${OBJ_COLOR}%s${NO_COLOR}" $(COMP_STRING) $@ 
+	@printf " ${COM_COLOR}%s ${OBJ_COLOR}%s${NO_COLOR}" $(COMP_STRING) $@
 	@$(CXX) -c $^ $(CFLAGS) $(CPPFLAGS) 2> temp.log || touch temp.errors
 	@if test -e temp.errors; then \
 		printf "\r ${COM_COLOR}%s${OBJ_COLOR}%-30s ${ERROR_COLOR}%*s${NO_COLOR}\n" $(COMP_STRING) $@ 10 $(ERROR_STRING) \
@@ -61,7 +61,4 @@ $(DICTNAM)Dict.cxx: $(DICTOBJ)
 	@$(RM) -f temp.errors temp.log
 
 clean:
-	$(RM) $(OBJECTS) *~ *Dict* *so 
-
-
-
+	$(RM) $(OBJECTS) *~ *Dict* *so
