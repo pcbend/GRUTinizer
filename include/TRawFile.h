@@ -31,7 +31,7 @@ public:
   static size_t FindFileSize(const char*);
 
   const kFileType GetFileType()                     { return fFileType; }
-        void      SetFileType(const kFileType type) { fFileType = type; } 
+        void      SetFileType(const kFileType type) { fFileType = type; }
 
 
 protected:
@@ -64,10 +64,11 @@ class TRawFileIn  : public TRawFile {
 public:
   TRawFileIn() : TRawFile()  { }
   virtual ~TRawFileIn()      { }
-  
+
   TRawFileIn(const char *fname, kFileType file_type);
   bool Open(const char *fname, kFileType file_type);
   int Read(TRawEvent*);
+  TRawEvent Read();
 
 private:
 
@@ -79,7 +80,7 @@ class TRawFileOut : public TRawFile {
 public:
   TRawFileOut() : TRawFile() { }
   virtual ~TRawFileOut()     { }
-  
+
   TRawFileOut(const char *fname, kFileType file_type);
   bool Open(const char *fname, kFileType file_type);
   int Write(TRawEvent*);

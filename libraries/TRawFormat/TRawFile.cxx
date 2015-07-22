@@ -172,14 +172,18 @@ static int readpipe(int fd, char *buf, int length) {
   return count;
 }
 
+TRawEvent TRawFileIn::Read(){
+  TRawEvent output;
+  Read(&output);
+  return output;
+}
+
 int TRawFileIn::Read(TRawEvent *rawevent) {
 
    if(!rawevent) {
     fprintf(stderr,"TGEBFILE::Read;  Trying to filee NULL TRawEvent.");
     return -1;
    }
-
-
 
    switch(GetFileType()) {
      case kFileType::NSCL_EVT:
@@ -196,17 +200,15 @@ int TRawFileIn::Read(TRawEvent *rawevent) {
    }
 
    rawevent->Clear();
-
    rawevent->SetFileType(GetFileType());
 
    int rd = 0;
    int rd_head = 0;
    char buffer[sizeof(int[2])];
-   if(fGzFile) 
+   if(fGzFile)
      rd_head = gzread(*(gzFile*)fGzFile,(char*)rawevent->GetRawHeader(),sizeof(TRawEvent::RawHeader));
-   else 
+   else
      rd_head = readpipe(fFile,(char*)rawevent->GetRawHeader(),sizeof(TRawEvent::RawHeader));
-
    if(rd_head==0) {
      fLastErrno = 0;
      fLastError = "EOF";
@@ -220,40 +222,27 @@ int TRawFileIn::Read(TRawEvent *rawevent) {
    if(fDoByteSwap) {
      //do byte swap.
    }
-   
+
    if(!rawevent->IsGoodSize()) {
      fLastErrno = -1;
      fLastError = "Invalid event size";
      return -1;
    }
-   if((GetFileType() == kFileType::GRETINA_MODE2) || (GetFileType() == kFileType::GRETINA_MODE3)) {
-     if(fGzFile)
-      rd = gzread(*(gzFile*)fGzFile,rawevent->GetData(),rawevent->GetBodySize()+sizeof(uint64_t));
-     else
-       rd = readpipe(fFile,rawevent->GetData(),rawevent->GetBodySize()+sizeof(uint64_t));
-     rawevent->fTimeStamp = *((uint64_t*)rawevent->GetData());
-     rawevent->AdvanceDataPtr(8);
-     if(rd != (int)rawevent->GetBodySize()+sizeof(uint64_t)) {
-       fLastErrno = errno;
-       fLastError = strerror(errno);
-       return -1;
-     }
+
+   if(fGzFile) {
+     rd = gzread(*(gzFile*)fGzFile,rawevent->GetBody(),rawevent->GetBodySize());
    } else {
-     if(fGzFile)
-      rd = gzread(*(gzFile*)fGzFile,rawevent->GetData(),rawevent->GetBodySize());
-     else
-       rd = readpipe(fFile,rawevent->GetData(),rawevent->GetBodySize());
-     if(rd != (int)rawevent->GetBodySize()) {
-       fLastErrno = errno;
-       fLastError = strerror(errno);
-       return -1;
-     }
+     rd = readpipe(fFile,rawevent->GetBody(),rawevent->GetBodySize());
    }
 
-
+   if(rd != (int)rawevent->GetBodySize()) {
+     fLastErrno = errno;
+     fLastError = strerror(errno);
+     return -1;
+   }
 
   return rd + rd_head;
-  
+
 }
 
 int TRawFileOut::Write(TRawEvent *rawevent) {
@@ -269,9 +258,9 @@ int TRawFileOut::Write(TRawEvent *rawevent) {
   }
 
   if(fOutGzFile)
-    wr = gzwrite(*(gzFile*)fOutGzFile,(char*)rawevent->GetData(),rawevent->GetBodySize());
+    wr = gzwrite(*(gzFile*)fOutGzFile,(char*)rawevent->GetBody(),rawevent->GetBodySize());
   else
-    wr = write(fOutFile,(char*)rawevent->GetData(),rawevent->GetBodySize());
+    wr = write(fOutFile,(char*)rawevent->GetBody(),rawevent->GetBodySize());
 
 
   if(wr != rawevent->GetBodySize()) {
@@ -288,8 +277,10 @@ void TRawFile::Close() {
     pclose((FILE*)fPoFile);
   fPoFile = NULL;
 
-  if(fGzFile)
+  if(fGzFile){
     gzclose(*(gzFile*)fGzFile);
+    delete (gzFile*)fGzFile;
+  }
   fGzFile = NULL;
 
   //Any output files

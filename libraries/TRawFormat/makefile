@@ -1,7 +1,7 @@
 
-OBJECTS = TRawFile.o TRawEvent.o TRawFormatDict.o #TGEBMultiFile.o TGEBFormatDict.o
+OBJECTS = TRawFile.o TRawEvent.o TRawFormatDict.o TRawBanks.o  #TGEBMultiFile.o TGEBFormatDict.o
 INCDIR = $(BASE)/include
-DICTOBJ = $(INCDIR)/TRawFile.h $(INCDIR)/TRawEvent.h #$(INCDIR)/TGEBMultiFile.h
+DICTOBJ = $(INCDIR)/TRawFile.h $(INCDIR)/TRawEvent.h $(INCDIR)/TGEBEvent.h $(INCDIR)/TNSCLEvent.h #$(INCDIR)/TGEBMultiFile.h
 DICTNAM = TRawFormat
 
 CFLAGS += -fPIC

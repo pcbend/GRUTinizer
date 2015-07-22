@@ -1,4 +1,4 @@
-// TRawFile.h TRawMultiFile.h TRawEvent.h
+// TRawFile.h TRawEvent.h TGEBEvent.h TNSCLEvent.h
 
 #ifdef __CINT__
 
@@ -15,7 +15,13 @@
 #pragma link C++ class TRawFileIn+;
 #pragma link C++ class TRawFileOut+;
 
+#pragma link C++ enum kNSCLEventType;
 
+#pragma link C++ class TNSCLEvent+;
+#pragma link C++ class TNSCLFragment+;
+#pragma link C++ class TNSCLScaler+;
+#pragma link C++ class TNSCLBuiltRingItem+;
+#pragma link C++ class TGEBEvent+;
 
 
 //#pragma link C++ class TRawMultiFile+;

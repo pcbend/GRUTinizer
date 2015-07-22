@@ -53,6 +53,12 @@ void TGRUTint::Init() {
 /*********************************/
 
 bool TGRUTInterruptHandler::Notify() {
+   static int timespressed  = 0;
+   timespressed++;
+   if(timespressed>3) {
+     printf("\n" DRED BG_WHITE  "   Committing suicide.   " RESET_COLOR "\n");
+     exit(1);
+   }
    printf("\n" DRED BG_WHITE  "   Control-c was pressed.   " RESET_COLOR "\n");
    gApplication->Terminate();
    return true;

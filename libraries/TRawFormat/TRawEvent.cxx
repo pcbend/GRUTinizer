@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <iostream>
 #include <string.h>
 #include <assert.h>
 
@@ -17,7 +18,7 @@ TRawEvent::TRawEvent() {
   //fEventHeader.size      =  0;
   fEventHeader.datum1      = -1;
   fEventHeader.datum2      =  0;
-  //fEventHeader.timestamp = -1;
+  fFileType = kFileType::UNKNOWN;
 }
 
 void TRawEvent::Copy(const TRawEvent &rhs) {
@@ -30,7 +31,6 @@ void TRawEvent::Copy(const TRawEvent &rhs) {
     printf("\n\n\n\n\n");
     printf("\tfEventHeader.type  = %i\n",GetEventType());
     printf("\tfEventHeader.size  = %i\n",GetBodySize());
-    printf("\tfTimeStamp         = %lu\n",fTimeStamp);
   }
   assert(fData);
   memcpy(fData,rhs.fData,GetBodySize());
@@ -56,30 +56,24 @@ TRawEvent &TRawEvent::operator=(const TRawEvent &rhs) {
 }
 
 void TRawEvent::Clear(Option_t *opt) {
-  printf("RawEvent Clear.\n");
-  printf("\tfData  = 0x%08x\n",fData);
-  printf("\tBodySize  = 0x%08x\n",GetBodySize());
-  printf("\tfAllocatedByUs  = 0x%08x\n",fAllocatedByUs);
-//  if(fData && fAllocatedByUs)
-//    free(fData);
-  printf("I am Here.\n");
+  if(fData && fAllocatedByUs) {
+    free(fData);
+  }
   fData=NULL;
   fAllocatedByUs = false;
-  fFileType = kFileType::UNKNOWN;
   fEventHeader.datum1      =  0;
   fEventHeader.datum2      =  0;
-  fTimeStamp = -1;
-
+  fFileType = kFileType::UNKNOWN;
 }
 
 void TRawEvent::SetData(Int_t size, char *data) {
-  
+
   //fEventHeader.size = size;
   assert(!fAllocatedByUs);
   assert(IsGoodSize());
   fData = data;
   fAllocatedByUs = false;
-  
+
 }
 
 
@@ -101,27 +95,22 @@ Int_t TRawEvent::GetEventType() const {
 }
 
 Int_t TRawEvent::GetBodySize() const {
-  assert(fFileType != kFileType::UNKNOWN);
-
   switch(fFileType){
   case NSCL_EVT:
     return ((EVTHeader*)(&fEventHeader))->size() - sizeof(RawHeader); //Size in nscldaq is inclusive
 
   case GRETINA_MODE2:
   case GRETINA_MODE3:
-    return ((GEBHeader*)(&fEventHeader))->size();  //Size in gretinadaq is exclusive
+    return ((GEBHeader*)(&fEventHeader))->size() + sizeof(Long_t);  //Size in gretinadaq is exclusive, plus timestamp
 
+  default:
+    return 0;
   }
 
   return 0;
 }
 
-Long_t TRawEvent::GetTimeStamp() const {
-  return fTimeStamp;
-}
-
-
-char *TRawEvent::GetData() const {
+char *TRawEvent::GetBody() const {
   if(!fData)
     AllocateData();
   return fData;
@@ -137,40 +126,33 @@ bool TRawEvent::IsGoodSize() const {
 
 
 void TRawEvent::Print(Option_t *opt) const {
-  
-  //std::cout << fEventHeader;
+
+  std::cout << fEventHeader;
   printf("\t");
   int counter=0;
-  for(int x=0;x<GetBodySize();x+=4) {
-    printf("0x%08x  ",*(((int*)GetData())+x));
+  for(int x=0;x<GetBodySize();x+=2) {
+    printf("0x%04x  ",*((unsigned short*)(GetBody()+x)));
     if((((++counter)%8)==0) && ((counter)!=GetBodySize()))
       printf("\n\t");
 
   }
   printf("\n--------------------------\n");
-  
+
 }
 
 
 void TRawEvent::AllocateData()  const {
   assert(!fAllocatedByUs);
   assert(IsGoodSize());
-  fData = (char*)malloc(GetBodySize());
+  assert(fFileType != kFileType::UNKNOWN);
+
+  size_t bytes = GetBodySize();
+  if(fFileType == GRETINA_MODE2 ||
+     fFileType == GRETINA_MODE3){
+    bytes += sizeof(Long_t);
+  }
+
+  fData = (char*)malloc(bytes);
   assert(fData);
   fAllocatedByUs = true;
-  
 }
-
-
-//std::ostream& operator<<(std::ostream& os, const TRawEventHeader& head){
-//  return os;
-//}
-
-//std::ostream& operator<<(std::ostream& os, const TGEBEventHeader &head) {
-   //time_t t = (time_t)head.timestamp;
-//   return os << "Bank @ " << std::hex << &head << std::dec << std::endl
-//             << "\ttype      = " << std::setw(8) << head.type << std::endl
-//             << "\tsize      = " << std::setw(8) << head.size << std::endl
-//             << "\ttimestamp = " << head.timestamp << std::endl;
-//};
-

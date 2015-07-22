@@ -16,7 +16,7 @@
 
 
 typedef struct { // HPGe Segment Hit Type 1;
-   Float_t     x;
+    Float_t     x;
    Float_t     y;
    Float_t     z;
    Float_t     e;        //fraction of the energy
@@ -131,5 +131,8 @@ typedef struct EVTHeader : public RawHeader {
   Int_t type()      { return datum2; } //Int_t  type;       //int32_t
   ClassDef(EVTHeader, 0);
 } __attribute__((__packed__)) EVTHeader;
+
+friend std::ostream& operator<<(std::ostream& os, const RawHeader &head);
+
 
 #endif
