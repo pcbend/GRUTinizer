@@ -1,0 +1,19 @@
+var searchData=
+[
+  ['baseline',['baseline',['../struct____attribute____.html#a3af76f85b7d5f2c188ec7817def2f226',1,'__attribute__::baseline()'],['../structTRawEvent_1_1____attribute____.html#a0a956a764ed6affac3445482ba4f6ea0',1,'TRawEvent::__attribute__::baseline()']]],
+  ['begin_5frun',['BEGIN_RUN',['../TNSCLEvent_8h.html#aa2a6ece2af44a2cb0a376ef7d1b6f40aab0f06e4126b9f6e99a30646d21a0355d',1,'TNSCLEvent.h']]],
+  ['bg_5fblue',['BG_BLUE',['../Globals_8h.html#a9afd14c731aa8c62d9471913c1b23b9f',1,'Globals.h']]],
+  ['bg_5fcyan',['BG_CYAN',['../Globals_8h.html#a21ef237e1c4d69656729da4b34c31d8b',1,'Globals.h']]],
+  ['bg_5fgreen',['BG_GREEN',['../Globals_8h.html#ac351fb4567ed6655a5b39769cc5dfd04',1,'Globals.h']]],
+  ['bg_5fmagenta',['BG_MAGENTA',['../Globals_8h.html#ac08aa3f07e012f1b0edafa632d5300ba',1,'Globals.h']]],
+  ['bg_5fred',['BG_RED',['../Globals_8h.html#ac317d04c219b630f9c36b0241d9d4be7',1,'Globals.h']]],
+  ['bg_5fwhite',['BG_WHITE',['../Globals_8h.html#a6beded3f171517df3902c52f79f6fea2',1,'Globals.h']]],
+  ['bg_5fyellow',['BG_YELLOW',['../Globals_8h.html#ab31fe3e74b1137650d30ede5c9b86218',1,'Globals.h']]],
+  ['bin_5fwidth',['bin_width',['../classTStripChartItem.html#ad0d2c58234cabad115437668d1545d35',1,'TStripChartItem']]],
+  ['bitflags',['bitflags',['../classTStripChart.html#adc40a261b72906d03c02647920ae752e',1,'TStripChart::bitflags()'],['../classTStripChartItem.html#ab7a5944d8a6f1a4bde50b68938b22639',1,'TStripChartItem::bitflags()']]],
+  ['black',['BLACK',['../Globals_8h.html#a7b3b25cba33b07c303f3060fe41887f6',1,'Globals.h']]],
+  ['blue',['BLUE',['../Globals_8h.html#a79d10e672abb49ad63eeaa8aaef57c38',1,'Globals.h']]],
+  ['buffcheck',['buffcheck',['../structSpeHeader.html#a1d60719234622b15d575248b436e8092',1,'SpeHeader::buffcheck()'],['../Root2Rad_8cxx.html#afcf4f3834209bf3fceb821761f59f6ee',1,'buffcheck():&#160;Root2Rad.cxx']]],
+  ['buffsize',['buffsize',['../structSpeHeader.html#a30df92306060b501ff77f671f213af84',1,'SpeHeader::buffsize()'],['../Root2Rad_8cxx.html#a6ff34bb43ab67b376662116d5d3b7906',1,'buffsize():&#160;Root2Rad.cxx']]],
+  ['buildfragments',['BuildFragments',['../classTNSCLBuiltRingItem.html#aaca75bf19b87d715c17c61d66ab8d4fa',1,'TNSCLBuiltRingItem']]]
+];
