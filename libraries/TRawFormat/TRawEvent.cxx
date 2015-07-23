@@ -110,6 +110,10 @@ Int_t TRawEvent::GetBodySize() const {
   return 0;
 }
 
+Int_t TRawEvent::GetTotalSize() const {
+  return GetBodySize() + sizeof(RawHeader);
+}
+
 char *TRawEvent::GetBody() const {
   if(!fData)
     AllocateData();

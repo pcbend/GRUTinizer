@@ -1,4 +1,4 @@
-// TGRUTint.h
+// TGRUTint.h TGRUTOptions.h
 
 #ifdef __CINT__
 
@@ -8,6 +8,7 @@
 #pragma link C++ nestedclasses;
 
 //#pragma link C++ class std::vector<Short_t>+;
+#pragma link C++ class TGRUTOptions+;
 #pragma link C++ class TGRUTInterruptHandler+;
 #pragma link C++ class TGRUTint+;
 

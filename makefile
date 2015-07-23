@@ -90,6 +90,7 @@ bin/%: .build/sandbox/%.o | $(LIBRARY_OUTPUT) bin
 bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) bin
 	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
+
 bin:
 	@mkdir -p $@
 

@@ -5,7 +5,6 @@
 
 #include <TObject.h>
 
-
 //#include "TRawBanks.h"
 
 class TRawEvent;
@@ -59,7 +58,6 @@ protected:
   ClassDef(TRawFile,0);
 };
 
-
 class TRawFileIn  : public TRawFile {
 public:
   TRawFileIn() : TRawFile()  { }
@@ -89,60 +87,5 @@ private:
 
   ClassDef(TRawFileOut,0);
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #endif
