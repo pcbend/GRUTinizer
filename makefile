@@ -63,18 +63,18 @@ MAIN_O_FILES    := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard src/*.$(SRC_
 EXE_O_FILES     := $(UTIL_O_FILES) $(SANDBOX_O_FILES)
 EXECUTABLES     := $(patsubst %.o,bin/%,$(notdir $(EXE_O_FILES))) bin/grutinizer
 
-run_and_test =@printf "%b" " $(3)$(4)$(5)$(2)$(NO_COLOR)\r";  \
+run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  \
                 $(1) 2> $(2).log || touch $(2).error; \
                 if test -e $(2).error; then \
-                      printf "%-80b%b%s%b" "$(3)$(4)$(5)$(2)" "$(ERROR_COLOR)" "$(ERROR_STRING)" "$(NO_COLOR)\n"   ; \
+                      printf "%-60b%b%s%b" "$(3)$(4)$(5)$(2)" "$(ERROR_COLOR)" "$(ERROR_STRING)" "$(NO_COLOR)\n"   ; \
                       cat $(2).log; \
                       rm -f $(2).log $(2).error; \
                       exit 1; \
                 elif test -s $(2).log; then \
-                      printf "%-80b%b%s%b" "$(3)$(4)$(5)$(2)" "$(WARN_COLOR)" "$(WARN_STRING)" "$(NO_COLOR)\n"   ; \
+                      printf "%-60b%b%s%b" "$(3)$(4)$(5)$(2)" "$(WARN_COLOR)" "$(WARN_STRING)" "$(NO_COLOR)\n"   ; \
                       cat $(2).log; \
                 else  \
-                      printf "%-80b%b%s%b" "$(3)$(4)$(5)$(2)" "$(OK_COLOR)" "$(OK_STRING)" "$(NO_COLOR)\n"   ; \
+                      printf "%b%-60s%b%s%b" "$(3)$(4)$(5)" $(notdir $(2)) "$(OK_COLOR)" "$(OK_STRING)" "$(NO_COLOR)\n"   ; \
                 fi; \
                 rm -f $(2).log $(2).error
 
@@ -123,7 +123,7 @@ find_linkdef = $(shell find $(1) -name "*LinkDef.h")
 define library_template
 .build/$(1)/$(notdir $(1))Dict.cxx:  $(1)/LinkDef.h $$(call dic_header_files,$(1)/LinkDef.h)
 	@mkdir -p $$(dir $$@)
-	$$(call run_and_test,rootcint -f $$@ -c $$(INCLUDES) -p $$(call dict_header_files,$$<) $$<,$$@,$$(COM_COLOR),$$(BLD_STRING),$$(OBJ_COLOR))
+	$$(call run_and_test,rootcint -f $$@ -c $$(INCLUDES) -p $$(call dict_header_files,$$<) $$<,$$@,$$(COM_COLOR),$$(BLD_STRING) ,$$(OBJ_COLOR))
 
 .build/$(1)/LibDictionary.o: .build/$(1)/$(notdir $(1))Dict.cxx
 	$$(call run_and_test,$$(CPP) -fPIC -c $$< -o $$@ $$(CFLAGS),$$@,$$(COM_COLOR),$$(COM_STRING),$$(OBJ_COLOR) )
