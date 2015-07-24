@@ -25,8 +25,10 @@ public:
   void Finalize();
 
   void ProcessFile(TRawFileIn* infile);
-
   void PrintQueue();
+  void StatusQueue();
+
+  bool IsPaused(); 
 
 private:
   static TDataLoop* item;

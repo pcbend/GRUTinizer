@@ -21,6 +21,7 @@ void RawDataQueue::Push(TRawEvent* obj){
   std::unique_lock<std::mutex> lock(mutex);
   while(queue.size() > max_queue_size){
     can_push.wait(lock);
+    //clock.
   }
   items_pushed++;
   bytes_pushed += obj->GetTotalSize();
@@ -52,3 +53,11 @@ void RawDataQueue::Print(){
             << "\t" << "Bytes: " << DYELLOW << bytes_popped << RESET_COLOR << "/" << BLUE << bytes_pushed << RESET_COLOR << "\n"
             << std::flush;
 }
+
+void RawDataQueue::Status() {
+  std::cout << "\t" << BLUE << items_pushed << RESET_COLOR 
+            << "/"  << DRED << items_popped << RESET_COLOR
+            << "\t" << BLUE << "Events in"  << RESET_COLOR
+            << "/"  << DRED << "Events out" << RESET_COLOR << std::endl;
+}
+

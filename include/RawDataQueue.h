@@ -6,6 +6,7 @@
 #include <queue>
 
 #include "TRawEvent.h"
+#include "TStopwatch.h"
 
 class RawDataQueue {
 public:
@@ -16,6 +17,7 @@ public:
   void Push(TRawEvent* obj);
 
   void Print();
+  void Status();
 
 private:
   std::mutex mutex;
@@ -34,6 +36,8 @@ private:
 
   static int num_opened;
   static int num_closed;
+
+  TStopwatch clock;
 };
 
 #endif /* _TDATAQUEUE_H_ */

@@ -34,7 +34,10 @@ void TDataLoop::Start(){
 void TDataLoop::ProcessFile(TRawFileIn* infile) {
   if(!running){
     this->infile = infile;
-    std::cout << "File error: " << infile->GetLastError() << std::endl;
+    if(infile->GetLastErrno()) {
+       std::cout << "Problem opening file: << " << infile->GetFileName() << std::endl;
+       std::cout << "\tFile State: " << infile->GetLastError() << std::endl;
+    }
     running = true;
     read_thread = std::thread(&TDataLoop::ReadLoop, this);
   }
@@ -42,6 +45,10 @@ void TDataLoop::ProcessFile(TRawFileIn* infile) {
 
 void TDataLoop::Pause() {
   paused = true;
+}
+
+bool TDataLoop::IsPaused() {
+  return paused;
 }
 
 void TDataLoop::Resume() {
@@ -66,26 +73,30 @@ void TDataLoop::Finalize() {
 void TDataLoop::ReadLoop() {
   std::cout << "Read loop starting" << std::endl;
   while(running){
-    std::cout << "In read loop" << std::endl;
     std::unique_lock<std::mutex> lock(pause_mutex);
-    while(!paused){
+    while(paused){
+      printf(" I am not paused?\n");
       paused_wait.wait(lock);
     }
-
-    std::cout << "I am not paused" << std::endl;
-
     Iteration();
   }
   std::cout << "End of read loop" << std::endl;
 }
 
 void TDataLoop::Iteration() {
-  std::cout << "I am iterating" << std::endl;
   TRawEvent* evt = new TRawEvent;
   infile->Read(evt);
   queue->Push(evt);
+  queue->Status();
 }
 
 void TDataLoop::PrintQueue(){
   queue->Print();
 }
+
+void TDataLoop::StatusQueue(){
+  queue->Status();
+}
+
+
+

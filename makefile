@@ -132,6 +132,6 @@ $(foreach lib,$(LIBRARY_DIRS),$(eval $(call library_template,$(lib))))
 
 clean:
 	@printf "\nCleaning up\n\n"
-	@rm -rf .build
-	@rm -rf bin
-	@rm -f $(LIBRARY_OUTPUT)
+	@$(RM) -rf .build
+	@$(RM) -rf bin
+	@$(RM) -f $(LIBRARY_OUTPUT)
