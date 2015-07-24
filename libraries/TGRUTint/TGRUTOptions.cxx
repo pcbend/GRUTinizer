@@ -44,7 +44,8 @@ void TGRUTOptions::Load(int argc, char** argv) {
 
   //parser.option() will initialize boolean values to false.
 
-  //parser.default_option(&input_files);
+  parser.default_option(&input_files)
+    .description("Input file(s)");
   parser.option("i input",&input_files)
     .description("Input file(s)");
   parser.option("r ring",&input_ring)

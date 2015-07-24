@@ -19,7 +19,7 @@ class ArgParseItem{
 public:
   ArgParseItem() : present_(false) { }
   virtual ~ArgParseItem(){ }
-  virtual bool matches(const std::string& flag, bool multichar_flag) const = 0;
+  virtual bool matches(const std::string& flag) const = 0;
   virtual void parse_item(const std::vector<std::string>& arguments) = 0;
   virtual int num_arguments() const = 0;
   virtual std::string printable(int description_column = -1, int* chars_before_desc=NULL) const = 0;
@@ -57,7 +57,11 @@ public:
     while(!ss.eof()){
       std::string temp;
       ss >> temp;
-      flags.push_back(temp);
+      if(temp.length() == 1){
+        flags.push_back("-" + temp);
+      } else if (temp.length() > 1) {
+        flags.push_back("--" + temp);
+      }
     }
   }
   virtual ~ArgParseConfig(){ }
@@ -72,11 +76,14 @@ public:
     return output;
   }
 
-  virtual bool matches(const std::string& flag, bool multichar_flag) const {
+  virtual bool matches(const std::string& flag) const {
+    // This is the default option, and something not a flag was passed.
+    if(flag.at(0)!='-' && flags.size()==0){
+      return true;
+    }
+
     for(auto& f : flags){
-      bool is_multichar = f.length()>1;
-      if(f == flag &&
-         multichar_flag == is_multichar ){
+      if(f == flag){
         return true;
       }
     }
@@ -106,17 +113,17 @@ public:
 
     bool has_singlechar_flag = false;
     for(auto flag : flags){
-      if(flag.length()==1){
-        ss << "-" << flag << " ";
+      if(flag.length()==2){
+        ss << flag << " ";
         has_singlechar_flag = true;
       }
     }
     for(auto flag : flags){
-      if(flag.length()!=1){
+      if(flag.length()!=2){
         if(has_singlechar_flag){
           ss << "[ ";
         }
-        ss << "--" << flag;
+        ss << flag;
         if(has_singlechar_flag){
           ss << " ]";
         }
@@ -237,17 +244,17 @@ public:
   }
 
   void parse(int argc, char** argv) {
+    bool double_dash_encountered = false;
+
     int iarg = 1;
     while(iarg < argc){
 
       std::string arg = argv[iarg++];
-      if(arg.at(0) != '-'){
-        std::stringstream ss;
-        ss << "Expected flag beginning with '-', received \"" << arg << "\" instead.";
-        throw ParseError(ss.str());
-      }
 
-      if(arg.at(1) == '-'){
+      if(arg.at(0) != '-' ||
+         double_dash_encountered){
+        handle_default_option(argc, argv, iarg);
+      } else if(arg.substr(0,2) == "--"){
         handle_long_flag(argc, argv, iarg);
       } else {
         handle_short_flag(argc, argv, iarg);
@@ -264,10 +271,15 @@ public:
   }
 
   template<typename T>
-  ArgParseConfigT<T>& option(const std::string& flag, T* output_location){
+  ArgParseConfigT<T>& option(const std::string flag, T* output_location){
     ArgParseConfigT<T>* output = new ArgParseConfigT<T>(flag, output_location);
     values.push_back(output);
     return *output;
+  }
+
+  template<typename T>
+  ArgParseConfigT<std::vector<T> >& default_option(std::vector<T>* output_location){
+    return option("", output_location);
   }
 
   void print(std::ostream& out) const {
@@ -297,32 +309,38 @@ private:
     size_t equals_index = arg.find("=");
     if(equals_index == std::string::npos){
       // flag followed by list of flag_args
-      flag = arg.substr(2);
-      flag_args = argument_list(argc, argv, iarg);
+      flag = arg;
     } else {
       // = inside flag
-      flag = arg.substr(2, equals_index-2);
+      flag = arg.substr(0, equals_index);
+    }
+
+    ArgParseItem& item = get_item(flag);
+
+    if(equals_index == std::string::npos){
+      flag_args = argument_list(argc, argv, iarg, item.num_arguments());
+    } else {
       flag_args.push_back(arg.substr(equals_index+1));
     }
-    ArgParseItem& item = get_item(flag, true);
+
     item.parse(flag, flag_args);
   }
 
   void handle_short_flag(int argc, char** argv, int& iarg){
     std::string arg = argv[iarg-1];
-    std::string flag = arg.substr(1,1);
-    ArgParseItem& item = get_item(flag, false);
+    std::string flag = arg.substr(0,2);
+    ArgParseItem& item = get_item(flag);
     if(item.num_arguments() == 0){
       // Each character is a boolean flag
       for(unsigned int ichar=1; ichar<arg.length(); ichar++){
-        std::string flag = arg.substr(ichar,1);
+        std::string flag = "-" + arg.substr(ichar,1);
         std::vector<std::string> flag_args;
-        get_item(flag, false).parse(flag, flag_args);
+        get_item(flag).parse(flag, flag_args);
       }
     } else {
       if(arg.length() == 2){
         // Next arguments passed to the program get passed to the flag.
-        std::vector<std::string> flag_args = argument_list(argc, argv, iarg);
+        std::vector<std::string> flag_args = argument_list(argc, argv, iarg, item.num_arguments());
         item.parse(flag, flag_args);
       } else {
         // Everything past the first character is argument to the flag.
@@ -332,11 +350,20 @@ private:
     }
   }
 
+  void handle_default_option(int /*argc*/, char** argv, int& iarg){
+    std::string arg = argv[iarg-1];
+    std::vector<std::string> flag_args{arg};
+
+    ArgParseItem& item = get_item(arg);
+    item.parse(arg, flag_args);
+  }
+
   //! Reads arguments into a list until finding one that begins with '-'
-  std::vector<std::string> argument_list(int argc, char** argv, int& iarg){
+  std::vector<std::string> argument_list(int argc, char** argv, int& iarg, int max_args){
     std::vector<std::string> output;
     bool read_extra = false;
-    while(iarg<argc){
+    while(iarg<argc &&
+          (max_args==-1 || output.size() < size_t(max_args))){
       std::string next_arg = argv[iarg++];
       if(next_arg.at(0) == '-'){
         read_extra = true;
@@ -351,15 +378,19 @@ private:
     return output;
   }
 
-  ArgParseItem& get_item(const std::string& flag, bool multichar_flag){
+  ArgParseItem& get_item(const std::string& flag){
     for(auto val : values){
-      if(val->matches(flag, multichar_flag)){
+      if(val->matches(flag)){
         return *val;
       }
     }
 
     std::stringstream ss;
-    ss << "Unknown option: \"" << flag << "\"";
+    if(flag.at(0)=='-'){
+      ss << "Unknown option: \"" << flag << "\"";
+    } else {
+      ss << "Was passed \"" << flag << "\" as a non-option argument, when no non-option arguments are allowed";
+    }
     throw ParseError(ss.str());
   }
 
