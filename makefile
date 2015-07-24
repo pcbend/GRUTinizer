@@ -81,6 +81,9 @@ run_and_test =@printf "%b" " $(3)$(4)$(5)$(2)$(NO_COLOR)\r";  \
 all: $(EXECUTABLES) $(LIBRARY_OUTPUT)
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
 
+docs:
+	doxygen doxygen.config
+
 bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT) bin
 	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
@@ -135,3 +138,7 @@ clean:
 	@$(RM) -rf .build
 	@$(RM) -rf bin
 	@$(RM) -f $(LIBRARY_OUTPUT)
+
+cleaner: clean
+	@printf "\nEven more clean up\n\n"
+	@$(RM) -rf htmldoc
