@@ -12,6 +12,8 @@
 class RawDataQueue;
 class TRawFileIn;
 
+class TRawEvent;
+
 class TDataLoop : public TNamed {
 public:
   static TDataLoop* Get();
@@ -28,7 +30,9 @@ public:
   void PrintQueue();
   void StatusQueue();
 
-  bool IsPaused(); 
+  bool IsPaused();
+
+  TRawEvent* GetEvent();
 
 private:
   static TDataLoop* item;

@@ -75,7 +75,6 @@ void TDataLoop::ReadLoop() {
   while(running){
     std::unique_lock<std::mutex> lock(pause_mutex);
     while(paused){
-      printf(" I am not paused?\n");
       paused_wait.wait(lock);
     }
     Iteration();
@@ -98,5 +97,6 @@ void TDataLoop::StatusQueue(){
   queue->Status();
 }
 
-
-
+TRawEvent* TDataLoop::GetEvent() {
+  return queue->Pop();
+}
