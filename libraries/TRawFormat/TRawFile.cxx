@@ -247,7 +247,7 @@ int TRawFileIn::FillBuffer(size_t bytes_requested) {
   }
 
   // Store everything
-  fCurrentBuffer = TSmartBuffer(buf, bytes_read);
+  fCurrentBuffer = TSmartBuffer(buf, bytes_to_copy + bytes_read);
   fBytesRead += bytes_read;
 
   // Set the error flags and return code appropriately.
