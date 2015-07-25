@@ -8,8 +8,9 @@
 
 #include "TEnv.h"
 #include "TPluginManager.h"
-#include "TGRUTint.h"
 
+#include "TGRUTint.h"
+#include "ProgramPath.h"
 
 #ifdef __APPLE__
 #define HAVE_UTMPX_H
@@ -65,13 +66,12 @@ int main(int argc, char **argv) {
 
 
 void SetGRUTEnv() {
-   std::string grut_path = getenv("GRUTSYS"); //Finds the GRUTSYS path 
-   if(grut_path.length()>0) {
-      grut_path += "/";
-   }
-   //Read in grsirc in the GRSISYS directory to set user defined options on grsisort startup
-   grut_path +=  ".grutrc";
-   gEnv->ReadFile(grut_path.c_str(),kEnvChange);
+  // Set the GRUTSYS variable based on the executable path.
+  // If GRUTSYS has already been defined, don't overwrite.
+  setenv("GRUTSYS", (program_path()+"/..").c_str(), 0);
+
+  std::string grut_path = program_path() + "/../.grutrc";
+  gEnv->ReadFile(grut_path.c_str(),kEnvChange);
 }
 
 void SetGRUTPluginHandlers() {
