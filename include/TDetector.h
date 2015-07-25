@@ -3,13 +3,10 @@
 
 #include <vector>
 
-#include "TDetectorHit.h"
 #include "TNamed.h"
 
-struct RawData {
-  char* data;
-  size_t data_size;
-};
+#include "TDetectorHit.h"
+#include "TSmartBuffer.h"
 
 class TDetector : public TNamed {
 public:
@@ -17,7 +14,7 @@ public:
   TDetector(const char *name,const char *title="");
   virtual ~TDetector();
 
-  virtual void AddRawData(RawData raw_data) { AbstractMethod("AddRawData"); }
+  virtual void AddRawData(TSmartBuffer buf) { AbstractMethod("AddRawData"); }
   virtual void BuildHits()                  { AbstractMethod("BuildHits()"); }
 
   virtual void InsertHit(const TDetectorHit&) { AbstractMethod("InsertHit()"); }

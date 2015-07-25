@@ -13,13 +13,13 @@ TJanus::~TJanus(){
   delete janus_hits;
 }
 
-void TJanus::AddRawData(RawData raw){
-  raw_data.push_back(raw);
+void TJanus::AddRawData(TSmartBuffer buf){
+  raw_data.push_back(buf);
 }
 
 void TJanus::BuildHits(){
-  for(auto raw : raw_data){
-    Build_VMUSB_Read(raw);
+  for(auto buf : raw_data){
+    Build_VMUSB_Read(buf);
   }
   raw_data.clear();
 }
@@ -43,10 +43,10 @@ TDetectorHit& TJanus::GetHit(int i){
 }
 
 
-void TJanus::Build_VMUSB_Read(RawData raw){
-  const char* data = raw.data;
+void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
+  const char* data = buf.GetData();
 
-  VMUSB_Header* vmusb_header = (VMUSB_Header*)data;
+  const VMUSB_Header* vmusb_header = (VMUSB_Header*)data;
   data += sizeof(VMUSB_Header);
 
   // vmusb_header.size() returns the number of 16-bit words in the payload.
@@ -55,7 +55,7 @@ void TJanus::Build_VMUSB_Read(RawData raw){
   int num_adc_channels = vmusb_header->size()/2 - 3;
 
   for(int i=0; i<num_adc_channels; i++){
-    CAEN_ADC* adc = (CAEN_ADC*)data;
+    const CAEN_ADC* adc = (CAEN_ADC*)data;
     data += sizeof(CAEN_ADC);
 
     if(adc->IsValid()){
@@ -71,8 +71,8 @@ void TJanus::Build_VMUSB_Read(RawData raw){
     }
   }
 
-  VME_Timestamp* vme_timestamp = (VME_Timestamp*)data;
+  const VME_Timestamp* vme_timestamp = (VME_Timestamp*)data;
   data += sizeof(VME_Timestamp);
 
-  assert(data == raw.data+raw.data_size);
+  assert(data == buf.GetData() + buf.GetSize());
 }

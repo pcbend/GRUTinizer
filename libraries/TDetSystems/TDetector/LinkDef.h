@@ -9,6 +9,5 @@
 
 #pragma link C++ class TDetectorHit+;
 #pragma link C++ class TDetector+;
-#pragma link C++ class RawData+;
 
 #endif

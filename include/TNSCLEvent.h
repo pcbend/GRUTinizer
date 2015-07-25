@@ -2,6 +2,7 @@
 #define _TNSCLEVENT_H_
 
 #include "TRawEvent.h"
+#include "TSmartBuffer.h"
 
 enum kNSCLEventType {
   BEGIN_RUN            = 1,    // 0x0001
@@ -75,6 +76,10 @@ public:
     return (GetBody() + GetBodyHeaderSize());
   }
 
+  TSmartBuffer GetPayloadBuffer() const {
+    return fBody.BufferSubset(GetBodyHeaderSize());
+  }
+
   Int_t GetPayloadSize() const {
     return (GetBodySize()-GetBodyHeaderSize());
   }
@@ -127,42 +132,42 @@ public:
 class TNSCLFragment : public TObject {
 
 public:
-  TNSCLFragment(const char *data)
-    : fData(data) { }
+  TNSCLFragment(TSmartBuffer buf)
+    : fBuf(buf) { }
 
   Long_t GetFragmentTimestamp() const {
-    return *(Long_t*)(fData+0);
+    return *(Long_t*)(fBuf.GetData()+0);
   }
 
   Int_t GetFragmentSourceID() const {
-    return *(Int_t*)(fData+8);
+    return *(Int_t*)(fBuf.GetData()+8);
   }
 
   Int_t GetTotalFragmentSize() const {
     return (20 + //Fragment header
-            8 + //Ring item header
+            8 +
             GetFragBodyHeaderSize() +
             GetFragmentPayloadSize());
   }
 
   Int_t GetFragmentPayloadSize() const {
-    return *(Int_t*)(fData+12);
+    return *(Int_t*)(fBuf.GetData()+12);
   }
 
   Int_t GetFragmentBarrier() const {
-    return *(Int_t*)(fData+16);
+    return *(Int_t*)(fBuf.GetData()+16);
   }
 
   Int_t GetRingItemSize() const {
-    return *(Int_t*)(fData+20);
+    return *(Int_t*)(fBuf.GetData()+20);
   }
 
   Int_t GetRingItemType() const {
-    return *(Int_t*)(fData+24);
+    return *(Int_t*)(fBuf.GetData()+24);
   }
 
   Int_t GetFragBodyHeaderSize() const {
-    Int_t output = *((Int_t*)(fData+28));
+    Int_t output = *((Int_t*)(fBuf.GetData()+28));
     if(output == 0) {
       return 4;  // If only the body header size is present, it is listed as 0.
     } else {
@@ -172,7 +177,7 @@ public:
 
   Long_t GetFragBodyTimestamp() const {
     if(GetFragBodyHeaderSize() > 4) {
-      return *((Long_t*)(fData+32));
+      return *((Long_t*)(fBuf.GetData()+32));
     } else {
       return -1;
     }
@@ -180,7 +185,7 @@ public:
 
   Int_t GetFragBodySourceID() const {
     if(GetFragBodyHeaderSize() > 4) {
-      return *((Int_t*)(fData+40));
+      return *((Int_t*)(fBuf.GetData()+40));
     } else {
       return -1;
     }
@@ -188,30 +193,35 @@ public:
 
   Int_t GetFragBodyBarrierType() const {
     if(GetFragBodyHeaderSize() > 4) {
-      return *((Int_t*)(fData+44));
+      return *((Int_t*)(fBuf.GetData()+44));
     } else {
       return -1;
     }
   }
 
-  const char* GetFragmentPayload(){
-    return fData + 28 + GetFragBodyHeaderSize();
+  const char* GetFragmentPayload() const {
+    return fBuf.GetData() + 28 + GetFragBodyHeaderSize();
+  }
+
+  TSmartBuffer GetFragmentPayloadBuffer() const {
+    return fBuf.BufferSubset(28 + GetFragBodyHeaderSize());
   }
 
 private:
-  const char* fData;
+  TSmartBuffer fBuf;
 
   ClassDef(TNSCLFragment,0);
 };
 
 class TNSCLBuiltRingItem : public TObject {
 public:
-  TNSCLBuiltRingItem(char* data)
-    : fData(data) { }
+  TNSCLBuiltRingItem(TSmartBuffer buf)
+    : fBuf(buf) { }
 
   TNSCLBuiltRingItem(TNSCLEvent& event)
-    : fData(event.GetPayload()) {
+    : fBuf(event.GetPayloadBuffer()) {
     assert(kNSCLEventType(event.GetEventType()) == kNSCLEventType::PHYSICS_EVENT);
+    assert(fBuf.GetSize() == GetBuiltRingItemSize());
   }
 
   TNSCLFragment GetFragment(size_t fragnum) const {
@@ -230,7 +240,7 @@ public:
   }
 
   Int_t GetBuiltRingItemSize() const {
-    return *(Int_t*)(fData + 0);
+    return *(Int_t*)(fBuf.GetData() + 0);
   }
 
 private:
@@ -239,16 +249,21 @@ private:
       return;
     }
 
-    const char* curr = fData + sizeof(Int_t);
-    const char* end  = fData + GetBuiltRingItemSize();
+    TSmartBuffer buf = fBuf.BufferSubset(sizeof(Int_t));
 
-    while(curr < end){
-      fragments.emplace_back(curr);
-      curr += fragments.back().GetTotalFragmentSize();
+    while(buf.GetSize()){
+      TNSCLFragment temp(buf);
+      std::cout << "Buffer size: " << buf.GetSize()
+                << "\tFragment size: " << temp.GetTotalFragmentSize()
+                << std::endl;
+      Int_t fragment_size = temp.GetTotalFragmentSize();
+      fragments.emplace_back(buf.BufferSubset(0,fragment_size));
+      buf = buf.BufferSubset(fragment_size);
+      break;
     }
   }
 
-  const char* fData;
+  TSmartBuffer fBuf;
   mutable std::vector<TNSCLFragment> fragments;
 
   ClassDef(TNSCLBuiltRingItem,0);

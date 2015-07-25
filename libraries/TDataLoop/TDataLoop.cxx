@@ -13,7 +13,7 @@ TDataLoop* TDataLoop::Get() {
 }
 
 TDataLoop::TDataLoop()
-  : running(false) {
+  : running(false), paused(false) {
   queue = new RawDataQueue;
 }
 
@@ -83,8 +83,8 @@ void TDataLoop::ReadLoop() {
 }
 
 void TDataLoop::Iteration() {
-  TRawEvent* evt = new TRawEvent;
-  infile->Read(evt);
+  TRawEvent evt;
+  infile->Read(&evt);
   queue->Push(evt);
   queue->Status();
 }
@@ -97,6 +97,6 @@ void TDataLoop::StatusQueue(){
   queue->Status();
 }
 
-TRawEvent* TDataLoop::GetEvent() {
+TRawEvent TDataLoop::GetEvent() {
   return queue->Pop();
 }

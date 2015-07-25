@@ -83,3 +83,16 @@ TSmartBuffer TSmartBuffer::BufferSubset(size_t pos, size_t length) const {
 
   return output;
 }
+
+void TSmartBuffer::Print() const {
+  std::cout << "TSmartBuffer allocated at " << (void*)fAllocatedLocation << ", "
+            << "currently pointed at " << (void*)fData << ", "
+            << "with a size of " << fSize << "bytes."
+            << std::endl;
+
+  if(fReferenceMutex){
+    std::unique_lock<std::mutex> lock(*fReferenceMutex);
+    std::cout << "There are " << *fReferenceCount << " TSmartBuffers sharing this C-buffer"
+              << std::endl;
+  }
+}

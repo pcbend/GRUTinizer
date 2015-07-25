@@ -17,31 +17,31 @@ RawDataQueue::~RawDataQueue(){
   num_closed++;
 }
 
-void RawDataQueue::Push(TRawEvent* obj){
+void RawDataQueue::Push(TRawEvent obj){
   std::unique_lock<std::mutex> lock(mutex);
   while(queue.size() > max_queue_size){
     can_push.wait(lock);
     //clock.
   }
   items_pushed++;
-  bytes_pushed += obj->GetTotalSize();
-  bytes_in_queue += obj->GetTotalSize();
+  bytes_pushed += obj.GetTotalSize();
+  bytes_in_queue += obj.GetTotalSize();
 
   queue.push(obj);
   can_pop.notify_one();
 }
 
-TRawEvent* RawDataQueue::Pop(){
+TRawEvent RawDataQueue::Pop(){
   std::unique_lock<std::mutex> lock(mutex);
   while(!queue.size()){
     can_pop.wait(lock);
   }
-  TRawEvent* output = queue.front();
+  TRawEvent output = queue.front();
   queue.pop();
 
   items_popped++;
-  bytes_popped += output->GetTotalSize();
-  bytes_in_queue -= output->GetTotalSize();
+  bytes_popped += output.GetTotalSize();
+  bytes_in_queue -= output.GetTotalSize();
 
   can_push.notify_one();
   return output;
@@ -55,9 +55,8 @@ void RawDataQueue::Print(){
 }
 
 void RawDataQueue::Status() {
-  std::cout << "\t" << BLUE << items_pushed << RESET_COLOR 
+  std::cout << "\t" << BLUE << items_pushed << RESET_COLOR
             << "/"  << DRED << items_popped << RESET_COLOR
             << "\t" << BLUE << "Events in"  << RESET_COLOR
             << "/"  << DRED << "Events out" << RESET_COLOR << std::endl;
 }
-

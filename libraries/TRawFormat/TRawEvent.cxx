@@ -20,6 +20,7 @@ void TRawEvent::Copy(const TRawEvent &rhs) {
   Clear();
   fEventHeader = rhs.fEventHeader;
   fBody = rhs.fBody;
+  fFileType = rhs.fFileType;
 }
 
 TRawEvent::TRawEvent(const TRawEvent &rhs) {

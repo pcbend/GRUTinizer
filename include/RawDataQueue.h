@@ -13,15 +13,15 @@ public:
   RawDataQueue();
   virtual ~RawDataQueue();
 
-  TRawEvent* Pop();
-  void Push(TRawEvent* obj);
+  TRawEvent Pop();
+  void Push(TRawEvent obj);
 
   void Print();
   void Status();
 
 private:
   std::mutex mutex;
-  std::queue<TRawEvent*> queue;
+  std::queue<TRawEvent> queue;
   std::condition_variable can_push;
   std::condition_variable can_pop;
 

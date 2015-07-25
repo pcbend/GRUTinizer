@@ -23,6 +23,8 @@ public:
 
   TSmartBuffer BufferSubset(size_t pos, size_t length = -1) const;
 
+  void Print() const;
+
 #ifndef __CINT__
   TSmartBuffer(TSmartBuffer&& other);
 #endif

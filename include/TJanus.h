@@ -11,7 +11,7 @@ public:
   TJanus();
   virtual ~TJanus();
 
-  virtual void AddRawData(RawData raw_data);
+  virtual void AddRawData(TSmartBuffer buf);
   virtual void BuildHits();
 
   virtual void InsertHit(const TDetectorHit&);
@@ -19,10 +19,10 @@ public:
   virtual int Size();
 
 private:
-  void Build_VMUSB_Read(RawData raw);
+  void Build_VMUSB_Read(TSmartBuffer buf);
 
   TClonesArray* janus_hits; //->
-  std::vector<RawData> raw_data; //!
+  std::vector<TSmartBuffer> raw_data; //!
 
   ClassDef(TJanus,1);
 };

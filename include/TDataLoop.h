@@ -9,10 +9,10 @@
 
 #include "TNamed.h"
 
+#include "TRawEvent.h"
+
 class RawDataQueue;
 class TRawFileIn;
-
-class TRawEvent;
 
 class TDataLoop : public TNamed {
 public:
@@ -32,7 +32,7 @@ public:
 
   bool IsPaused();
 
-  TRawEvent* GetEvent();
+  TRawEvent GetEvent();
 
 private:
   static TDataLoop* item;
