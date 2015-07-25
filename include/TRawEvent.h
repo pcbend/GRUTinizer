@@ -7,6 +7,7 @@
 #include "TObject.h"
 
 #include "TRawFile.h"
+#include "TSmartBuffer.h"
 
 class TRawEvent : public TObject {
 
@@ -25,10 +26,9 @@ public:
   void  Print(Option_t *opt ="")  const;
 
   RawHeader *GetRawHeader();
-  char *GetBody() const;
+  const char *GetBody() const;
 
-  void AllocateData() const;
-  void SetData(Int_t dataSize, char *dataBuffer);
+  void SetData(TSmartBuffer body);
 
   bool IsGoodSize() const;
   void SetFileType(kFileType type) { fFileType = type; }
@@ -40,8 +40,7 @@ public:
 protected:
   RawHeader fEventHeader;
   kFileType fFileType;
-  mutable char   *fData;
-  mutable bool    fAllocatedByUs;
+  TSmartBuffer fBody;
 
   ClassDef(TRawEvent,0)
 };

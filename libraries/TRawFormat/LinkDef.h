@@ -1,4 +1,4 @@
-// TRawFile.h TRawEvent.h TGEBEvent.h TNSCLEvent.h
+// TRawFile.h TRawEvent.h TGEBEvent.h TNSCLEvent.h TSmartBuffer.h
 
 #ifdef __CINT__
 
@@ -11,6 +11,7 @@
 #pragma link C++ enum kFileType;
 
 #pragma link C++ class TRawEvent+;
+#pragma link C++ class TSmartBuffer+;
 #pragma link C++ class TRawFile+;
 #pragma link C++ class TRawFileIn+;
 #pragma link C++ class TRawFileOut+;

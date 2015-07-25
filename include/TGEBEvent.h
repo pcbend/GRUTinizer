@@ -6,10 +6,10 @@ class TGEBEvent : public TRawEvent {
     Long_t GetTimeStamp() const {
       return *((Long_t*)(GetBody()+0));
     }
-    char* GetPayload(){
+    const char* GetPayload() const {
       return (GetBody() + sizeof(Long_t));
     }
-   
+
     bool operator<(const TGEBEvent &rhs) const { return (GetTimeStamp() < rhs.GetTimeStamp()); }
     bool operator>(const TGEBEvent &rhs) const { return (GetTimeStamp() > rhs.GetTimeStamp()); }
 

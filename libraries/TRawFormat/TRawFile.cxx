@@ -25,7 +25,8 @@ TRawFile::TRawFile() {
 }
 
 
-TRawFileIn::TRawFileIn(const char *fname, kFileType file_type) {
+TRawFileIn::TRawFileIn(const char *fname, kFileType file_type)
+  : fBufferSize(8192) {
   Open(fname, file_type);
 }
 
@@ -50,9 +51,6 @@ void TRawFile::Init() {
 
   fOutFile   = -1;
   fOutGzFile = NULL;
-
-  //int endian = 0x12345678;
-  //fDoByteSwap = (*(char)(&endian) != 0x78);
 }
 
 static int hasSuffix(const char *name,const char *suffix) {
@@ -202,26 +200,22 @@ int TRawFileIn::Read(TRawEvent *rawevent) {
    rawevent->Clear();
    rawevent->SetFileType(GetFileType());
 
-   int rd = 0;
-   int rd_head = 0;
-   char buffer[sizeof(int[2])];
-   if(fGzFile)
-     rd_head = gzread(*(gzFile*)fGzFile,(char*)rawevent->GetRawHeader(),sizeof(TRawEvent::RawHeader));
-   else
-     rd_head = readpipe(fFile,(char*)rawevent->GetRawHeader(),sizeof(TRawEvent::RawHeader));
-   if(rd_head==0) {
-     fLastErrno = 0;
-     fLastError = "EOF";
-     return 0;
-   } else if (rd_head != sizeof(TRawEvent::RawHeader)) {
-     fLastErrno = errno;
-     fLastError = strerror(errno);
+   int bytes_read_header = FillBuffer(sizeof(TRawEvent::RawHeader));
+   if(bytes_read_header < 0){
      return -1;
    }
 
-   if(fDoByteSwap) {
-     //do byte swap.
+   memcpy(rawevent->GetRawHeader(), fCurrentBuffer.GetData(), sizeof(TRawEvent::RawHeader));
+   fCurrentBuffer = fCurrentBuffer.BufferSubset(sizeof(TRawEvent::RawHeader));
+
+   size_t body_size = rawevent->GetBodySize();
+   int bytes_read = FillBuffer(body_size);
+   if(bytes_read < 0){
+     return -2;
    }
+
+   rawevent->SetData(fCurrentBuffer.BufferSubset(0, body_size));
+   fCurrentBuffer = fCurrentBuffer.BufferSubset(body_size);
 
    if(!rawevent->IsGoodSize()) {
      fLastErrno = -1;
@@ -229,28 +223,54 @@ int TRawFileIn::Read(TRawEvent *rawevent) {
      return -1;
    }
 
-   if(fGzFile) {
-     rd = gzread(*(gzFile*)fGzFile,rawevent->GetBody(),rawevent->GetBodySize());
-   } else {
-     rd = readpipe(fFile,rawevent->GetBody(),rawevent->GetBodySize());
-   }
+   return sizeof(TRawEvent::RawHeader) + body_size;
+}
 
-   if(rd != (int)rawevent->GetBodySize()) {
-     fLastErrno = errno;
-     fLastError = strerror(errno);
-     return -1;
-   }
+int TRawFileIn::FillBuffer(size_t bytes_requested) {
+  if(fCurrentBuffer.GetSize() >= bytes_requested){
+    return 0;
+  }
 
-  return rd + rd_head;
+  char* buf = (char*)malloc(fBufferSize);
 
+  // Copy any leftover bytes from the previous buffer.
+  size_t bytes_to_copy = fCurrentBuffer.GetSize();
+  memcpy(buf, fCurrentBuffer.GetData(), bytes_to_copy );
+
+  // Read to fill the buffer.
+  size_t bytes_to_read = fBufferSize - bytes_to_copy;
+  size_t bytes_read;
+  if(fGzFile) {
+    bytes_read = gzread(*(gzFile*)fGzFile, buf + bytes_to_copy, bytes_to_read);
+  } else {
+    bytes_read = readpipe(fFile, buf + bytes_to_copy, bytes_to_read);
+  }
+
+  // Store everything
+  fCurrentBuffer = TSmartBuffer(buf, bytes_read);
+  fBytesRead += bytes_read;
+
+  // Set the error flags and return code appropriately.
+  if(bytes_read == 0){
+    fLastErrno = 0;
+    fLastError = "EOF";
+    return 1;
+  } else if (bytes_read < bytes_requested){
+    fLastErrno = errno;
+    fLastError = strerror(errno);
+    return 2;
+  } else {
+    return 0;
+  }
 }
 
 int TRawFileOut::Write(TRawEvent *rawevent) {
   int wr = -2;
-  if(fOutGzFile)
+  if(fOutGzFile) {
     wr = gzwrite(*(gzFile*)fOutGzFile,(char*)rawevent->GetRawHeader(),sizeof(TRawEvent::RawHeader));
-  else
+  } else {
     wr = write(fOutFile,(char*)rawevent->GetRawHeader(),sizeof(TRawEvent::RawHeader));
+  }
 
   if(wr != sizeof(TRawEvent::RawHeader)) {
     fprintf(stderr,"TRawFile: write header error; return %i, size requested %lu\n",wr,sizeof(TRawEvent::RawHeader));
@@ -258,9 +278,9 @@ int TRawFileOut::Write(TRawEvent *rawevent) {
   }
 
   if(fOutGzFile)
-    wr = gzwrite(*(gzFile*)fOutGzFile,(char*)rawevent->GetBody(),rawevent->GetBodySize());
+    wr = gzwrite(*(gzFile*)fOutGzFile, rawevent->GetBody(), rawevent->GetBodySize());
   else
-    wr = write(fOutFile,(char*)rawevent->GetBody(),rawevent->GetBodySize());
+    wr = write(fOutFile, rawevent->GetBody(), rawevent->GetBodySize());
 
 
   if(wr != rawevent->GetBodySize()) {

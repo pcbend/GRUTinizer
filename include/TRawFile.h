@@ -5,7 +5,7 @@
 
 #include <TObject.h>
 
-//#include "TRawBanks.h"
+#include "TSmartBuffer.h"
 
 class TRawEvent;
 
@@ -43,8 +43,6 @@ protected:
   int         fLastErrno;
   std::string fLastError;
 
-  bool fDoByteSwap;
-
   size_t fFileSize;
   size_t fBytesRead;
   size_t fBytesWritten;
@@ -60,7 +58,7 @@ protected:
 
 class TRawFileIn  : public TRawFile {
 public:
-  TRawFileIn() : TRawFile()  { }
+  TRawFileIn() : fBufferSize(8192)  { }
   virtual ~TRawFileIn()      { }
 
   TRawFileIn(const char *fname, kFileType file_type);
@@ -68,7 +66,14 @@ public:
   int Read(TRawEvent*);
   TRawEvent Read();
 
+  void SetBufferSize(size_t buffer_size) { fBufferSize = buffer_size; }
+  size_t GetBufferSize() { return fBufferSize; }
+
 private:
+  int FillBuffer(size_t bytes_requested);
+
+  TSmartBuffer fCurrentBuffer;
+  size_t fBufferSize;
 
   ClassDef(TRawFileIn,0);
 };

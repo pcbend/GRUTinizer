@@ -23,7 +23,7 @@ enum kNSCLEventType {
 
 class TNSCLEvent : public TRawEvent {
 public:
-  Int_t GetBodyHeaderSize() {
+  Int_t GetBodyHeaderSize() const {
     Int_t output = *((Int_t*)(GetBody()+0));
     if(output == 0) {
       return 4;  // If only the body header size is present, it is listed as 0.
@@ -32,7 +32,7 @@ public:
     }
   }
 
-  Long_t GetTimestamp() {
+  Long_t GetTimestamp() const {
     if(GetBodyHeaderSize() > 4) {
       return *((Long_t*)(GetBody()+4));
     } else {
@@ -40,7 +40,7 @@ public:
     }
   }
 
-  Int_t GetSourceID() {
+  Int_t GetSourceID() const {
     if(GetBodyHeaderSize() > 4) {
       return *((Int_t*)(GetBody()+12));
     } else {
@@ -48,7 +48,7 @@ public:
     }
   }
 
-  Int_t GetBarrierType() {
+  Int_t GetBarrierType() const {
     if(GetBodyHeaderSize() > 4) {
       return *((Int_t*)(GetBody()+16));
     } else {
@@ -56,7 +56,7 @@ public:
     }
   }
 
-  int IsBuiltData(char* payload) {
+  int IsBuiltData(char* payload) const {
     static int is_built_data = -1;
     if(is_built_data != -1) {
       return is_built_data;
@@ -71,11 +71,11 @@ public:
     return is_built_data;
   }
 
-  char* GetPayload() {
+  const char* GetPayload() const {
     return (GetBody() + GetBodyHeaderSize());
   }
 
-  Int_t GetPayloadSize() {
+  Int_t GetPayloadSize() const {
     return (GetBodySize()-GetBodyHeaderSize());
   }
 
@@ -127,41 +127,41 @@ public:
 class TNSCLFragment : public TObject {
 
 public:
-  TNSCLFragment(char *data)
+  TNSCLFragment(const char *data)
     : fData(data) { }
 
-  Long_t GetFragmentTimestamp(){
+  Long_t GetFragmentTimestamp() const {
     return *(Long_t*)(fData+0);
   }
 
-  Int_t GetFragmentSourceID(){
+  Int_t GetFragmentSourceID() const {
     return *(Int_t*)(fData+8);
   }
 
-  Int_t GetTotalFragmentSize(){
+  Int_t GetTotalFragmentSize() const {
     return (20 + //Fragment header
             8 + //Ring item header
             GetFragBodyHeaderSize() +
             GetFragmentPayloadSize());
   }
 
-  Int_t GetFragmentPayloadSize(){
+  Int_t GetFragmentPayloadSize() const {
     return *(Int_t*)(fData+12);
   }
 
-  Int_t GetFragmentBarrier(){
+  Int_t GetFragmentBarrier() const {
     return *(Int_t*)(fData+16);
   }
 
-  Int_t GetRingItemSize(){
+  Int_t GetRingItemSize() const {
     return *(Int_t*)(fData+20);
   }
 
-  Int_t GetRingItemType(){
+  Int_t GetRingItemType() const {
     return *(Int_t*)(fData+24);
   }
 
-  Int_t GetFragBodyHeaderSize() {
+  Int_t GetFragBodyHeaderSize() const {
     Int_t output = *((Int_t*)(fData+28));
     if(output == 0) {
       return 4;  // If only the body header size is present, it is listed as 0.
@@ -170,7 +170,7 @@ public:
     }
   }
 
-  Long_t GetFragBodyTimestamp() {
+  Long_t GetFragBodyTimestamp() const {
     if(GetFragBodyHeaderSize() > 4) {
       return *((Long_t*)(fData+32));
     } else {
@@ -178,7 +178,7 @@ public:
     }
   }
 
-  Int_t GetFragBodySourceID() {
+  Int_t GetFragBodySourceID() const {
     if(GetFragBodyHeaderSize() > 4) {
       return *((Int_t*)(fData+40));
     } else {
@@ -186,7 +186,7 @@ public:
     }
   }
 
-  Int_t GetFragBodyBarrierType() {
+  Int_t GetFragBodyBarrierType() const {
     if(GetFragBodyHeaderSize() > 4) {
       return *((Int_t*)(fData+44));
     } else {
@@ -194,12 +194,12 @@ public:
     }
   }
 
-  char* GetFragmentPayload(){
+  const char* GetFragmentPayload(){
     return fData + 28 + GetFragBodyHeaderSize();
   }
 
 private:
-  char* fData;
+  const char* fData;
 
   ClassDef(TNSCLFragment,0);
 };
@@ -214,33 +214,33 @@ public:
     assert(kNSCLEventType(event.GetEventType()) == kNSCLEventType::PHYSICS_EVENT);
   }
 
-  TNSCLFragment GetFragment(size_t fragnum){
+  TNSCLFragment GetFragment(size_t fragnum) const {
     BuildFragments();
     return fragments.at(fragnum);
   }
 
-  Int_t Size(){
+  Int_t Size() const {
     BuildFragments();
     return fragments.size();
   }
 
-  size_t NumFragments(){
+  size_t NumFragments() const {
     BuildFragments();
     return fragments.size();
   }
 
-  Int_t GetBuiltRingItemSize(){
+  Int_t GetBuiltRingItemSize() const {
     return *(Int_t*)(fData + 0);
   }
 
 private:
-  void BuildFragments(){
+  void BuildFragments() const {
     if(fragments.size()){
       return;
     }
 
-    char* curr = fData + sizeof(Int_t);
-    char* end  = fData + GetBuiltRingItemSize();
+    const char* curr = fData + sizeof(Int_t);
+    const char* end  = fData + GetBuiltRingItemSize();
 
     while(curr < end){
       fragments.emplace_back(curr);
@@ -248,8 +248,8 @@ private:
     }
   }
 
-  char* fData;
-  std::vector<TNSCLFragment> fragments;
+  const char* fData;
+  mutable std::vector<TNSCLFragment> fragments;
 
   ClassDef(TNSCLBuiltRingItem,0);
 };

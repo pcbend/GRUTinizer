@@ -11,11 +11,6 @@
 ClassImp(TRawEvent)
 
 TRawEvent::TRawEvent() {
-  fData = NULL;
-  fAllocatedByUs = false;
-
-  //fEventHeader.type      = -1;
-  //fEventHeader.size      =  0;
   fEventHeader.datum1      = -1;
   fEventHeader.datum2      =  0;
   fFileType = kFileType::UNKNOWN;
@@ -24,18 +19,7 @@ TRawEvent::TRawEvent() {
 void TRawEvent::Copy(const TRawEvent &rhs) {
   Clear();
   fEventHeader = rhs.fEventHeader;
-
-  fData = (char*)malloc(GetBodySize());
-  if(!fData) {
-    printf("\n\tmalloc failed?\n");
-    printf("\n\n\n\n\n");
-    printf("\tfEventHeader.type  = %i\n",GetEventType());
-    printf("\tfEventHeader.size  = %i\n",GetBodySize());
-  }
-  assert(fData);
-  memcpy(fData,rhs.fData,GetBodySize());
-  fAllocatedByUs = true;
-
+  fBody = rhs.fBody;
 }
 
 TRawEvent::TRawEvent(const TRawEvent &rhs) {
@@ -56,27 +40,15 @@ TRawEvent &TRawEvent::operator=(const TRawEvent &rhs) {
 }
 
 void TRawEvent::Clear(Option_t *opt) {
-  if(fData && fAllocatedByUs) {
-    free(fData);
-  }
-  fData=NULL;
-  fAllocatedByUs = false;
   fEventHeader.datum1      =  0;
   fEventHeader.datum2      =  0;
+  fBody.Clear();
   fFileType = kFileType::UNKNOWN;
 }
 
-void TRawEvent::SetData(Int_t size, char *data) {
-
-  //fEventHeader.size = size;
-  assert(!fAllocatedByUs);
-  assert(IsGoodSize());
-  fData = data;
-  fAllocatedByUs = false;
-
+void TRawEvent::SetData(TSmartBuffer body) {
+  fBody = body;
 }
-
-
 
 Int_t TRawEvent::GetEventType() const {
   assert(fFileType != kFileType::UNKNOWN);
@@ -114,10 +86,8 @@ Int_t TRawEvent::GetTotalSize() const {
   return GetBodySize() + sizeof(RawHeader);
 }
 
-char *TRawEvent::GetBody() const {
-  if(!fData)
-    AllocateData();
-  return fData;
+const char *TRawEvent::GetBody() const {
+  return fBody.GetData();
 }
 
 TRawEvent::RawHeader* TRawEvent::GetRawHeader() {
@@ -133,30 +103,13 @@ void TRawEvent::Print(Option_t *opt) const {
 
   std::cout << fEventHeader;
   printf("\t");
-  int counter=0;
-  for(int x=0;x<GetBodySize();x+=2) {
-    printf("0x%04x  ",*((unsigned short*)(GetBody()+x)));
-    if((((++counter)%8)==0) && ((counter)!=GetBodySize()))
+  for(int x=0; x<GetBodySize(); x+=2) {
+    if((x%16 == 0) &&
+       (x!=GetBodySize())){
       printf("\n\t");
-
+    }
+    printf("0x%04x  ",*(unsigned short*)(GetBody()+x));
   }
   printf("\n--------------------------\n");
 
-}
-
-
-void TRawEvent::AllocateData()  const {
-  assert(!fAllocatedByUs);
-  assert(IsGoodSize());
-  assert(fFileType != kFileType::UNKNOWN);
-
-  size_t bytes = GetBodySize();
-  if(fFileType == GRETINA_MODE2 ||
-     fFileType == GRETINA_MODE3){
-    bytes += sizeof(Long_t);
-  }
-
-  fData = (char*)malloc(bytes);
-  assert(fData);
-  fAllocatedByUs = true;
 }
