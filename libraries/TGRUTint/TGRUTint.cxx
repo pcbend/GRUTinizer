@@ -47,8 +47,10 @@ TGRUTint::~TGRUTint() {   }
 
 void TGRUTint::Init() {
 
-  PopupLogo(false);
-  WaitLogo();
+  if(TGRUTOptions::Get()->ShowLogo()){
+    PopupLogo(false);
+    WaitLogo();
+  }
 
 }
 

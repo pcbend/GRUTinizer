@@ -184,8 +184,9 @@ template<>
 class ArgParseConfigT<bool> : public ArgParseConfig<bool> {
 public:
   ArgParseConfigT(std::string flag, bool* output_location)
-    : ArgParseConfig<bool>(flag), output_location(output_location) {
-    *output_location = false;
+    : ArgParseConfig<bool>(flag), output_location(output_location),
+      stored_default_value(false) {
+    *output_location = stored_default_value;
   }
 
   virtual ArgParseConfig<bool>& default_value(bool value){

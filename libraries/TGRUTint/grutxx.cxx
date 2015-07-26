@@ -147,17 +147,12 @@ static Pixmap GetRootLogo()
       attr.color_key = XPM_MONO;
    else
       attr.valuemask &= ~XpmColorKey;
-
 #endif // defined(XpmColorKey)
+
    std::string file;
    file.append(getenv("GRUTSYS"));
-   file.append("/src/Splash.xpm");
-#ifdef ROOTICONPATH
-   //snprintf(file, sizeof(file), "%s/Splash.xpm", ROOTICONPATH);
-   ///snprintf(file, sizeof(file), "%s/Splash.xpm", ROOTICONPATH);
-#else
-   //snprintf(file, sizeof(file), "%s/icons/Splash.xpm", getenv("ROOTSYS"));
-#endif
+   file.append("/util/Splash.xpm");
+
    int ret = XpmReadFileToPixmap(gDisplay, gLogoWindow,
                                  (char*)file.c_str(), &logo, 0, &attr);
    XpmFreeAttributes(&attr);

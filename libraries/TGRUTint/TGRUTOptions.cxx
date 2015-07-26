@@ -29,8 +29,8 @@ void TGRUTOptions::Clear(Option_t* opt) {
 
   fExitAfterSorting = false;
   fHelp = false;
-  fNoLogo = false;
-  fNoSort = false;
+  fShowLogo = true;
+  fSortRaw = true;
 
   fShouldExit = false;
 }
@@ -50,10 +50,12 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .description("Input file(s)");
   parser.option("r ring",&input_ring)
     .description("Input ring source (host/ringname)");
-  parser.option("l no-logo", &fNoLogo)
-    .description("Inhibit the startup logo");
-  parser.option("n no-sort", &fNoSort)
-    .description("Load raw data files without sorting");
+  parser.option("l no-logo", &fShowLogo)
+    .description("Inhibit the startup logo")
+    .default_value(true);
+  parser.option("n no-sort", &fSortRaw)
+    .description("Load raw data files without sorting")
+    .default_value(true);
   parser.option("q quit", &fExitAfterSorting)
     .description("Run in batch mode");
   parser.option("h help ?", &fHelp)
