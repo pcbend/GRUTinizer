@@ -84,9 +84,12 @@ void TDataLoop::ReadLoop() {
 
 void TDataLoop::Iteration() {
   TRawEvent evt;
-  infile->Read(&evt);
-  queue->Push(evt);
-  queue->Status();
+  int bytes_read = infile->Read(&evt);
+  if(bytes_read > 0){
+    queue->Push(evt);
+  } else {
+    running = false;
+  }
 }
 
 void TDataLoop::PrintQueue(){
