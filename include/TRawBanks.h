@@ -81,38 +81,6 @@ typedef struct {
 friend std::ostream& operator<<(std::ostream& os,const LaBrBank &bank);
 
 typedef struct RawHeader {
-
-  /*
-  int Set(const char *buffer,kFileType fileType) {
-    //Assumes sizeof(buufer) == sizeof(int[2])  !!!!!!!!
-    this->file_type = file_type;
-    switch(this->type){
-      case kFileType::NSCL_EVT: {
-        const TEvtEventHeader* header = (const TEvtEventHeader*)buffer;
-        size = header->size;
-        type = header->type;
-        timestamp = -1;
-        return 0;   // size in header is inclusive.
-      }
-      break;
-      case kFileType::GRETINA_MODE2:
-      case kFileType::GRETINA_MODE3: {
-        const TGEBEventHeader* header = (const TGEBEventHeader*)buffer;
-        size = header->size;
-        type = header->type;
-        //timestamp = header->timestamp;
-        return sizeof(int[2]); //TGEBEventHeader); //size of header is exclusive;
-      }
-      break;
-      case kFileType::UNKNOWN:
-        size      = -1;
-        type      = -1;
-        timestamp = -1;
-        return      -1;   // error state.
-    }
-    return -1;
-  }
-  */
   Int_t datum1;
   Int_t datum2;
 } __attribute__((__packed__)) RawHeader;

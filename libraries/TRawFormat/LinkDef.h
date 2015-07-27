@@ -1,4 +1,4 @@
-// TRawFile.h TRawEvent.h TGEBEvent.h TNSCLEvent.h TSmartBuffer.h
+// TRawFile.h TRawEvent.h TNSCLEvent.h TSmartBuffer.h
 
 #ifdef __CINT__
 
@@ -22,8 +22,6 @@
 #pragma link C++ class TNSCLFragment+;
 #pragma link C++ class TNSCLScaler+;
 #pragma link C++ class TNSCLBuiltRingItem+;
-#pragma link C++ class TGEBEvent+;
-
 
 //#pragma link C++ class TRawMultiFile+;
 
