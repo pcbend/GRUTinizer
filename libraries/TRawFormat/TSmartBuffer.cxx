@@ -76,6 +76,7 @@ TSmartBuffer TSmartBuffer::BufferSubset(size_t pos, size_t length) const {
 
   if(pos > fSize){
     output.fData += fSize;
+    output.fSize = 0;
   } else {
     output.fData += pos;
     output.fSize = std::min(fSize - pos, length);
