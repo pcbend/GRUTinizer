@@ -1,14 +1,20 @@
 var searchData=
 [
   ['init',['Init',['../classTGRUTint.html#ac4065e8ecb21c1eade63ead949c6f474',1,'TGRUTint::Init()'],['../classTRawFile.html#a74e149b7c917a7fb84a2396d6c35bca9',1,'TRawFile::Init()'],['../classTStripChart.html#a8024f024f9e023df987fd3766ad176ea',1,'TStripChart::Init()']]],
+  ['initialize',['Initialize',['../classTDataLoop.html#a35004113e871157c93995008f0a0152d',1,'TDataLoop']]],
   ['initimultfiles',['InitiMultFiles',['../classTGEBMultiFile.html#acbc1f622dba88bd1406a5e2b3a84647c',1,'TGEBMultiFile']]],
-  ['inittrawfile',['InitTRawFile',['../classTRawFile.html#ab1dd4b45346b3ca01386c263c0803ddd',1,'TRawFile']]],
+  ['inputring',['InputRing',['../classTGRUTOptions.html#a2a1e88c20992cb9bf619e362091b1249',1,'TGRUTOptions']]],
+  ['inserthit',['InsertHit',['../classTDetector.html#aa24bbc0bb0322825fcec424c4f2ff575',1,'TDetector::InsertHit()'],['../classTJanus.html#a3815a80aee7825bfab9ad64a6398ec6f',1,'TJanus::InsertHit()']]],
   ['instance',['instance',['../classTGRUTint.html#a81915082489894a8ec8be3978799d115',1,'TGRUTint']]],
+  ['is_5fpresent',['is_present',['../classArgParseItem.html#af4acc69b41947b42a36d0b1cb441656e',1,'ArgParseItem']]],
+  ['is_5frequired',['is_required',['../classArgParseItem.html#ab722bb2c4d7269fe9fd96a1a677753e0',1,'ArgParseItem::is_required()'],['../classArgParseConfig.html#a8a02c24d396b4eef8dcc0e3763c7b0a0',1,'ArgParseConfig::is_required()']]],
   ['isautoupdate',['IsAutoUpdate',['../classTStripChartItem.html#a48f08e7701766ac07c229969a667943d',1,'TStripChartItem']]],
-  ['isbuiltdata',['IsBuiltData',['../classTNSCLEvent.html#a97991b2ed509646c10a219bdac439694',1,'TNSCLEvent']]],
+  ['isbuiltdata',['IsBuiltData',['../classTNSCLEvent.html#a50c57d63d1a6dd223cb9c90e053d5a84',1,'TNSCLEvent']]],
   ['isgoodsize',['IsGoodSize',['../classTRawEvent.html#a73f58410845e1b798d129e169e17e2a9',1,'TRawEvent']]],
   ['isincremental',['IsIncremental',['../classTNSCLScaler.html#a1b7b897a53458c6a9eca8d5c07c0ef7d',1,'TNSCLScaler']]],
-  ['ispaused',['IsPaused',['../classTStripChart.html#a40e026cc24875f9c935e7cc215049776',1,'TStripChart']]],
+  ['ispaused',['IsPaused',['../classTDataLoop.html#a2dec3dd7a02a60fa4c556bff2c08330a',1,'TDataLoop::IsPaused()'],['../classTStripChart.html#a40e026cc24875f9c935e7cc215049776',1,'TStripChart::IsPaused()']]],
   ['isrunning',['IsRunning',['../classTStripChart.html#a2d6bcc13ed497574d655c45660d96be9',1,'TStripChart']]],
-  ['isvisible',['IsVisible',['../classTStripChartItem.html#a6550158c9dfcb5f12213f1260e02bf30',1,'TStripChartItem']]]
+  ['isvalid',['IsValid',['../structCAEN__ADC.html#ab35343f2461e5408eaf479125131d5fd',1,'CAEN_ADC::IsValid()'],['../JanusDataFormat_8h.html#ae3b224f4304a93e204e27bd47637ea71',1,'IsValid():&#160;JanusDataFormat.h']]],
+  ['isvisible',['IsVisible',['../classTStripChartItem.html#a6550158c9dfcb5f12213f1260e02bf30',1,'TStripChartItem']]],
+  ['iteration',['Iteration',['../classTDataLoop.html#a2b321c6e9aef3ee69ed1a4da5d60c0cd',1,'TDataLoop']]]
 ];

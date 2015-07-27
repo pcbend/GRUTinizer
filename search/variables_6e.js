@@ -6,5 +6,8 @@ var searchData=
   ['nhits',['nhits',['../struct____attribute____.html#a7e6b06b844f00f321767ee4f26c28003',1,'__attribute__::nhits()'],['../structTRawEvent_1_1____attribute____.html#a15aafcf209fd4d3b58d7085fb1670158',1,'TRawEvent::__attribute__::nhits()']]],
   ['norm_5fchisq',['norm_chisq',['../struct____attribute____.html#a90b07bcc936a4acc4b6e8fb19cb2ca66',1,'__attribute__::norm_chisq()'],['../structTRawEvent_1_1____attribute____.html#a62a449419101ee1d10b14e8934965725',1,'TRawEvent::__attribute__::norm_chisq()']]],
   ['ntimhits',['ntimhits',['../struct____attribute____.html#aa9fc7325fa0286f5f3de3a0b19ce8cd0',1,'__attribute__::ntimhits()'],['../structTRawEvent_1_1____attribute____.html#aa6da0b5485828c537178038eb4411df3',1,'TRawEvent::__attribute__::ntimhits()']]],
-  ['num',['num',['../struct____attribute____.html#a202e3401f3065f494da3974251419ddc',1,'__attribute__::num()'],['../structTRawEvent_1_1____attribute____.html#ab27f88f0f7b1ef82f34b2862e1a961b0',1,'TRawEvent::__attribute__::num()']]]
+  ['num',['num',['../struct____attribute____.html#a202e3401f3065f494da3974251419ddc',1,'__attribute__::num()'],['../structTRawEvent_1_1____attribute____.html#ab27f88f0f7b1ef82f34b2862e1a961b0',1,'TRawEvent::__attribute__::num()']]],
+  ['num_5farguments_5fexpected',['num_arguments_expected',['../classArgParseConfigT_3_01std_1_1vector_3_01T_01_4_01_4.html#a0e36b90dda4b59c6cfc6f7ac6943a6cf',1,'ArgParseConfigT&lt; std::vector&lt; T &gt; &gt;']]],
+  ['num_5fclosed',['num_closed',['../classRawDataQueue.html#a0530597c7b57d3151754ed33b6b4cc5d',1,'RawDataQueue']]],
+  ['num_5fopened',['num_opened',['../classRawDataQueue.html#ad414e9dc7eb5196172fb87edc91b1586',1,'RawDataQueue']]]
 ];

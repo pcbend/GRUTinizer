@@ -1,6 +1,7 @@
 var searchData=
 [
   ['t0',['t0',['../struct____attribute____.html#af61f50fffb110b099222b0f504f656a4',1,'__attribute__::t0()'],['../structTRawEvent_1_1____attribute____.html#a9dcfed952b2a392a26f40ddf4681f0fd',1,'TRawEvent::__attribute__::t0()']]],
+  ['tail',['tail',['../structCAEN__ADC.html#a502f6940470007b0e9ac45f7c5ae5442',1,'CAEN_ADC::tail()'],['../JanusDataFormat_8h.html#ace756213e1bd262b8d63eaf28e6249c9',1,'tail():&#160;JanusDataFormat.h']]],
   ['time',['time',['../struct____attribute____.html#a3c08c4720d31f4116a52e8619ca624a4',1,'__attribute__::time()'],['../structTRawEvent_1_1____attribute____.html#a12392af0012fa2c0770eb90408611b79',1,'TRawEvent::__attribute__::time()']]],
   ['time_5fhit',['time_hit',['../struct____attribute____.html#acd1eecae659ecb72706ae4565f1ee997',1,'__attribute__::time_hit()'],['../structTRawEvent_1_1____attribute____.html#aec7b411df48090c7353c4befb0ef5d3e',1,'TRawEvent::__attribute__::time_hit()']]],
   ['timestamp',['timestamp',['../struct____attribute____.html#aee14b8fc366f9afc9a1819030e47fe3c',1,'__attribute__::timestamp()'],['../structTRawEvent_1_1____attribute____.html#acb6eb59661e38651917e9e73b4feada2',1,'TRawEvent::__attribute__::timestamp()']]],
