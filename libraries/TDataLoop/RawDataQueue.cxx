@@ -9,6 +9,7 @@ int RawDataQueue::num_closed = 0;
 
 RawDataQueue::RawDataQueue()
   : queue_number(num_opened), max_queue_size(10000),
+    bytes_pushed(0), bytes_popped(0),
     items_pushed(0), items_popped(0) {
   num_opened++;
 }
@@ -47,10 +48,15 @@ TRawEvent RawDataQueue::Pop(){
   return output;
 }
 
+size_t RawDataQueue::Size(){
+  std::unique_lock<std::mutex> lock(mutex);
+  return items_pushed - items_popped;
+}
+
 void RawDataQueue::Print(){
   std::cout << "I am queue " << queue_number << " out of " << num_opened << ".\n"
-            << "\t" << "Items: " << DCYAN << items_popped << RESET_COLOR << "/" << DMAGENTA << items_pushed << RESET_COLOR << "\n"
-            << "\t" << "Bytes: " << DYELLOW << bytes_popped << RESET_COLOR << "/" << BLUE << bytes_pushed << RESET_COLOR << "\n"
+            << "\t" << "Events: " << DCYAN << items_popped << RESET_COLOR << "/" << DMAGENTA << items_pushed << RESET_COLOR << "\n"
+            << "\t" << "Bytes:  " << DYELLOW << bytes_popped << RESET_COLOR << "/" << BLUE << bytes_pushed << RESET_COLOR << "\n"
             << std::flush;
 }
 

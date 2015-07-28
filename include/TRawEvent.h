@@ -8,6 +8,7 @@
 
 #include "TRawFile.h"
 #include "TSmartBuffer.h"
+#include "TGRUTTypes.h"
 
 class TRawEvent : public TObject {
 
@@ -27,11 +28,13 @@ public:
 
   RawHeader *GetRawHeader();
   const char *GetBody() const;
+  TSmartBuffer& GetBuffer(){ return fBody; }
 
   void SetData(TSmartBuffer body);
 
   bool IsGoodSize() const;
   void SetFileType(kFileType type) { fFileType = type; }
+  kFileType GetFileType() { return fFileType; }
 
   Int_t  GetEventType() const;
   Int_t  GetTotalSize() const;

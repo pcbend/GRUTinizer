@@ -1,18 +1,6 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-enum kDetectorSystems {
-  GRETINA = 1,
-  S800 = 5,
-
-  SEGA = 64,
-  JANUS = 65,
-
-  CAESAR = 80,
-
-  PHOSWICH = 17
-};
-
 #ifndef __CINT__
 
 #define GRUT_RELEASE "0.01 "

@@ -5,6 +5,8 @@
 
 #include "TObject.h"
 
+#include "TGRUTTypes.h"
+
 class TGRUTOptions : public TObject {
 public:
   static TGRUTOptions* Get(int argc = 0, char** argv = NULL);
@@ -20,6 +22,8 @@ public:
   const std::vector<std::string>& MacroInputFiles() { return input_macro_files; }
   std::string InputRing() { return input_ring; }
 
+  std::string DetectorEnvironment() { return detector_environment; }
+
   const std::vector<std::string>& OptionFiles() { return options_file; }
 
   bool ExitAfterSorting() const { return fExitAfterSorting; }
@@ -29,6 +33,7 @@ public:
 
   bool ShouldExitImmediately() const { return fShouldExit; }
 
+  kFileType DetermineFileType(const std::string& filename);
 
 private:
   TGRUTOptions(int argc, char** argv);
@@ -40,6 +45,8 @@ private:
   std::vector<std::string> input_cal_files;
   std::vector<std::string> input_macro_files;
   std::string input_ring;
+
+  std::string detector_environment;
 
   std::vector<std::string> options_file;
 

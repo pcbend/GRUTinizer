@@ -50,6 +50,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .description("Input file(s)");
   parser.option("r ring",&input_ring)
     .description("Input ring source (host/ringname)");
+  parser.option("d detector-env",&detector_environment)
+    .description("Detector setup description")
+    .default_value(std::string(getenv("GRUTSYS")) + "/DetectorEnvironment.env");
   parser.option("l no-logo", &fShowLogo)
     .description("Inhibit the startup logo")
     .default_value(true);
@@ -79,7 +82,7 @@ void TGRUTOptions::Load(int argc, char** argv) {
   }
 }
 
-bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
+kFileType TGRUTOptions::DetermineFileType(const std::string& filename){
   size_t dot_pos = filename.find_last_of('.');
   std::string ext = filename.substr(dot_pos+1);
 
@@ -89,18 +92,43 @@ bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
     ext = remaining.substr(remaining.find_last_of('.'));
   }
 
-  if(ext == "root") {
-    input_root_files.push_back(filename);
-  } else if(ext == "cal") {
-    input_cal_files.push_back(filename);
-  } else if((ext == "c") || (ext == "C") || (ext == "c+") || (ext == "C+")) {
-    input_macro_files.push_back(filename);
-  } else if((ext == "evt") || (ext == "dat") ){
-    input_raw_files.push_back(filename);
+  if(ext=="evt"){
+    return kFileType::NSCL_EVT;
+  } else if (ext == "cal") {
+    return kFileType::CALIBRATED;
+  } else if (ext == "root") {
+    return kFileType::ROOT_DATA;
+  } else if ((ext == "c") || (ext == "C") || (ext == "c+") || (ext == "C+")) {
+    return kFileType::ROOT_MACRO;
+  } else if (ext == "dat") {
+    return kFileType::GRETINA_MODE2;
   } else {
+    return kFileType::UNKNOWN_FILETYPE;
+  }
+}
+
+bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
+  switch(DetermineFileType(filename)){
+  case kFileType::NSCL_EVT:
+  case kFileType::GRETINA_MODE2:
+  case kFileType::GRETINA_MODE3:
+    input_raw_files.push_back(filename);
+    return true;
+
+  case kFileType::ROOT_DATA:
+    input_root_files.push_back(filename);
+    return true;
+
+  case kFileType::ROOT_MACRO:
+    input_macro_files.push_back(filename);
+    return true;
+
+  case kFileType::CALIBRATED:
+    input_cal_files.push_back(filename);
+    return true;
+
+  case kFileType::UNKNOWN_FILETYPE:
     printf("\tDiscarding unknown file: %s\n",filename.c_str());
     return false;
   }
-
-  return true;
 }

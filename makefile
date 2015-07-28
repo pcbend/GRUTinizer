@@ -114,7 +114,7 @@ libraries/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%)
 	@mkdir -p $(dir $@)
 	$(call run_and_test,$(CPP) -fPIC -c $< -o $@ $(CFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
-dict_header_files = $(addprefix $(PWD)/include/,$(subst //,,$(shell head $(1) -n 1)))
+dict_header_files = $(addprefix $(PWD)/include/,$(subst //,,$(shell head $(1) -n 1 2> /dev/null)))
 find_linkdef = $(shell find $(1) -name "*LinkDef.h")
 
 # In order for all function names to be unique, rootcint requires unique output names.
@@ -135,10 +135,10 @@ $(foreach lib,$(LIBRARY_DIRS),$(eval $(call library_template,$(lib))))
 
 clean:
 	@printf "\nCleaning up\n\n"
-	@$(RM) -rf .build
-	@$(RM) -rf bin
-	@$(RM) -f $(LIBRARY_OUTPUT)
+	@-$(RM) -rf .build
+	@-$(RM) -rf bin
+	@-$(RM) -f $(LIBRARY_OUTPUT)
 
 cleaner: clean
 	@printf "\nEven more clean up\n\n"
-	@$(RM) -rf htmldoc
+	@-$(RM) -rf htmldoc

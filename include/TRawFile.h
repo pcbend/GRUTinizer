@@ -2,14 +2,13 @@
 #define TRAWFILE_H
 
 #include "Globals.h"
+#include "TGRUTTypes.h"
 
 #include <TObject.h>
 
 #include "TSmartBuffer.h"
 
 class TRawEvent;
-
-enum kFileType { UNKNOWN = -1, NSCL_EVT = 1, GRETINA_MODE2 = 2, GRETINA_MODE3 = 3};
 
 class TRawFile : public TObject {
 public:

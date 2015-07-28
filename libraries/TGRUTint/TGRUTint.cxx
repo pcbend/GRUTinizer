@@ -1,7 +1,9 @@
 #include <Globals.h>
 #include "TGRUTint.h"
 
+#include "TDetectorEnv.h"
 #include "TGRUTOptions.h"
+#include "TGRUTLoop.h"
 
 #include <TROOT.h>
 
@@ -47,11 +49,14 @@ TGRUTint::~TGRUTint() {   }
 
 void TGRUTint::Init() {
 
-  if(TGRUTOptions::Get()->ShowLogo()){
-    PopupLogo(false);
-    WaitLogo();
-  }
+  // if(TGRUTOptions::Get()->ShowLogo()){
+  //   PopupLogo(false);
+  //   WaitLogo();
+  // }
 
+  TGRUTLoop::CreateDataLoop<TGRUTLoop>();
+
+  ApplyOptions();
 }
 
 /*********************************/
@@ -66,4 +71,17 @@ bool TGRUTInterruptHandler::Notify() {
   printf("\n" DRED BG_WHITE  "   Control-c was pressed.   " RESET_COLOR "\n");
   gApplication->Terminate();
   return true;
+}
+
+void TGRUTint::ApplyOptions() {
+  TGRUTOptions* opt = TGRUTOptions::Get();
+
+
+  if(opt->RawInputFiles().size() && opt->SortRaw()){
+    for(auto filename : opt->RawInputFiles()){
+      TDataLoop::Instance()->ProcessFile(filename.c_str());
+    }
+  }
+
+  TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
 }

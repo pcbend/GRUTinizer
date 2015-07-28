@@ -40,7 +40,7 @@ TRawFile::~TRawFile() {
 
 void TRawFile::Init() {
   fFilename = "";
-  fFileType = kFileType::UNKNOWN;
+  fFileType = kFileType::UNKNOWN_FILETYPE;
 
   fFile      = -1;
   fGzFile    = NULL;
@@ -85,7 +85,7 @@ bool TRawFileIn::Open(const char *filename, kFileType file_type) {
     if(fPoFile == NULL) {
       fLastErrno = errno;
       fLastError = strerror(errno);
-      SetFileType(kFileType::UNKNOWN);
+      SetFileType(kFileType::UNKNOWN_FILETYPE);
       return false;
     }
 
@@ -97,7 +97,7 @@ bool TRawFileIn::Open(const char *filename, kFileType file_type) {
      if(fFile<=0) {
        fLastErrno = errno;
        fLastError = strerror(errno);
-       SetFileType(kFileType::UNKNOWN);
+       SetFileType(kFileType::UNKNOWN_FILETYPE);
        return false;
      }
 
@@ -108,7 +108,7 @@ bool TRawFileIn::Open(const char *filename, kFileType file_type) {
        if((*(gzFile*)fGzFile)==NULL) {
          fLastErrno = -1;
          fLastError = "zlib gzdopen() error";
-         SetFileType(kFileType::UNKNOWN);
+         SetFileType(kFileType::UNKNOWN_FILETYPE);
          return false;
        }
      }
@@ -128,7 +128,7 @@ bool TRawFileOut::Open(const char *filename, kFileType file_type) {
   if(fOutFile <= 0) {
     fLastErrno = errno;
     fLastError = strerror(errno);
-    SetFileType(kFileType::UNKNOWN);
+    SetFileType(kFileType::UNKNOWN_FILETYPE);
     return false;
   }
 
@@ -138,13 +138,13 @@ bool TRawFileOut::Open(const char *filename, kFileType file_type) {
     if((*(gzFile*)fOutGzFile) == NULL) {
       fLastErrno = -1;
       fLastError = "zlib gzdopen() error";
-      SetFileType(kFileType::UNKNOWN);
+      SetFileType(kFileType::UNKNOWN_FILETYPE);
       return false;
     }
     if(gzsetparams(*(gzFile*)fOutGzFile,1,Z_DEFAULT_STRATEGY) != Z_OK) {
       fLastErrno = -1;
       fLastError = "zlib gzsetparams() error";
-      SetFileType(kFileType::UNKNOWN);
+      SetFileType(kFileType::UNKNOWN_FILETYPE);
       return false;
     }
 
@@ -191,7 +191,7 @@ int TRawFileIn::Read(TRawEvent *rawevent) {
        printf("I do not know how to read GEB Mode3 data yet.\n");
        return 0;
        break;
-     case kFileType::UNKNOWN:
+     case kFileType::UNKNOWN_FILETYPE:
        printf("I do not know how to read Unknown data yet.\n");
        return 0;
        break;

@@ -13,7 +13,7 @@ ClassImp(TRawEvent)
 TRawEvent::TRawEvent() {
   fEventHeader.datum1      = -1;
   fEventHeader.datum2      =  0;
-  fFileType = kFileType::UNKNOWN;
+  fFileType = kFileType::UNKNOWN_FILETYPE;
 }
 
 void TRawEvent::Copy(const TRawEvent &rhs) {
@@ -44,7 +44,7 @@ void TRawEvent::Clear(Option_t *opt) {
   fEventHeader.datum1      =  0;
   fEventHeader.datum2      =  0;
   fBody.Clear();
-  fFileType = kFileType::UNKNOWN;
+  fFileType = kFileType::UNKNOWN_FILETYPE;
 }
 
 void TRawEvent::SetData(TSmartBuffer body) {
@@ -52,7 +52,7 @@ void TRawEvent::SetData(TSmartBuffer body) {
 }
 
 Int_t TRawEvent::GetEventType() const {
-  assert(fFileType != kFileType::UNKNOWN);
+  assert(fFileType != kFileType::UNKNOWN_FILETYPE);
 
   switch(fFileType){
   case NSCL_EVT:

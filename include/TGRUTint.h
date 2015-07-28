@@ -5,35 +5,36 @@
 #include <TSysEvtHandler.h>
 #include <TRint.h>
 #include <TEnv.h>
-          
+
 
 class TGRUTint : public TRint {
 
-   private:
-      TGRUTint(int argc, char **argv, void *opts=0,int numOptions=0,
-              bool noLogo = true, const char *appClassName = "grutinizer");
+private:
+  TGRUTint(int argc, char **argv, void *opts=0,int numOptions=0,
+           bool noLogo = true, const char *appClassName = "grutinizer");
 
-      static TEnv *fGRUTEnv;
-      static TGRUTint *fTGRUTint;
-   
-   public:
-      static TGRUTint*instance(int argc=0,char **argv=0,void *opts=0,int numOptions=-1,
-                              bool noLogo=true,const char *appClassName="grutinizer");
+  static TEnv *fGRUTEnv;
+  static TGRUTint *fTGRUTint;
 
-      virtual ~TGRUTint();
+public:
+  static TGRUTint*instance(int argc=0,char **argv=0,void *opts=0,int numOptions=-1,
+                           bool noLogo=true,const char *appClassName="grutinizer");
 
-      void Init();
+  virtual ~TGRUTint();
+
+  void Init();
+  void ApplyOptions();
 
 
-   ClassDef(TGRUTint,0)
+  ClassDef(TGRUTint,0);
 };
 
 
 class TGRUTInterruptHandler : public TSignalHandler {
-   public:
-      TGRUTInterruptHandler():TSignalHandler(ESignals::kSigInterrupt,false) { }
-      bool Notify();
-   ClassDef(TGRUTInterruptHandler,0)
+public:
+  TGRUTInterruptHandler():TSignalHandler(ESignals::kSigInterrupt,false) { }
+  bool Notify();
+  ClassDef(TGRUTInterruptHandler,0)
 };
 
 #endif

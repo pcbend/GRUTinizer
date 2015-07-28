@@ -15,6 +15,7 @@ public:
 
   TRawEvent Pop();
   void Push(TRawEvent obj);
+  size_t Size();
 
   void Print();
   void Status();
@@ -27,8 +28,8 @@ private:
 
   int queue_number;
   size_t max_queue_size;
-  int items_pushed;
-  int items_popped;
+  size_t items_pushed;
+  size_t items_popped;
 
   size_t bytes_in_queue;
   size_t bytes_pushed;
