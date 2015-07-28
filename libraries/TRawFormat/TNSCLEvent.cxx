@@ -35,7 +35,7 @@ Int_t TNSCLEvent::GetBarrierType() const {
   }
 }
 
-int TNSCLEvent::IsBuiltData(char* payload) const {
+int TNSCLEvent::IsBuiltData() const {
   static int is_built_data = -1;
   if(is_built_data != -1) {
     return is_built_data;
@@ -184,7 +184,7 @@ TNSCLBuiltRingItem::TNSCLBuiltRingItem(TNSCLEvent& event)
   assert(fBuf.GetSize() == GetBuiltRingItemSize());
 }
 
-TNSCLFragment TNSCLBuiltRingItem::GetFragment(size_t fragnum) const {
+const TNSCLFragment& TNSCLBuiltRingItem::GetFragment(size_t fragnum) const {
   BuildFragments();
   return fragments.at(fragnum);
 }

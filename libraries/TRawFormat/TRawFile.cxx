@@ -14,6 +14,8 @@
 
 #include <Rtypes.h>
 
+#include "TString.h"
+
 #include "TRawEvent.h"
 
 ClassImp(TRawFile)
@@ -48,9 +50,13 @@ void TRawFile::Init() {
   fLastErrno = 0;
 
   fFileSize  = -1;
+  fBytesRead = 0;
+  fBytesGiven= 0;
 
   fOutFile   = -1;
   fOutGzFile = NULL;
+
+  fIsFinished = true;
 }
 
 static int hasSuffix(const char *name,const char *suffix) {
@@ -65,8 +71,6 @@ bool TRawFileIn::Open(const char *filename, kFileType file_type) {
   //    normal .dat file
   //    bzip file ->   .bz2
   //    gzip fuke ->   .gz
-
-
 
   if(fFile>0)
     Close();
@@ -114,6 +118,7 @@ bool TRawFileIn::Open(const char *filename, kFileType file_type) {
      }
   }
   SetFileType(file_type);
+  fIsFinished = false;
   return true;
 }
 
@@ -183,6 +188,10 @@ int TRawFileIn::Read(TRawEvent *rawevent) {
     return -1;
    }
 
+   if(fBytesGiven == 0){
+     clock.Start();
+   }
+
    switch(GetFileType()) {
      case kFileType::NSCL_EVT:
      case kFileType::GRETINA_MODE2:
@@ -202,6 +211,8 @@ int TRawFileIn::Read(TRawEvent *rawevent) {
 
    int bytes_read_header = FillBuffer(sizeof(TRawEvent::RawHeader));
    if(bytes_read_header < 0){
+     clock.Stop();
+     fIsFinished = true;
      return -1;
    }
 
@@ -211,6 +222,8 @@ int TRawFileIn::Read(TRawEvent *rawevent) {
    size_t body_size = rawevent->GetBodySize();
    int bytes_read = FillBuffer(body_size);
    if(bytes_read < 0){
+     clock.Stop();
+     fIsFinished = true;
      return -2;
    }
 
@@ -220,10 +233,14 @@ int TRawFileIn::Read(TRawEvent *rawevent) {
    if(!rawevent->IsGoodSize()) {
      fLastErrno = -1;
      fLastError = "Invalid event size";
+     clock.Stop();
+     fIsFinished = true;
      return -1;
    }
 
-   return sizeof(TRawEvent::RawHeader) + body_size;
+   size_t total_bytes = sizeof(TRawEvent::RawHeader) + body_size;
+   fBytesGiven += total_bytes;
+   return total_bytes;
 }
 
 int TRawFileIn::FillBuffer(size_t bytes_requested) {
@@ -254,13 +271,13 @@ int TRawFileIn::FillBuffer(size_t bytes_requested) {
   if(bytes_read == 0){
     fLastErrno = 0;
     fLastError = "EOF";
-    return 1;
+    return -1;
   } else if (bytes_read < bytes_requested){
     fLastErrno = errno;
     fLastError = strerror(errno);
-    return 2;
+    return -2;
   } else {
-    return 0;
+    return bytes_read;
   }
 }
 
@@ -333,8 +350,21 @@ size_t TRawFile::FindFileSize(const char* fname) {
   return fsize;
 }
 
-size_t TRawFile::GetFileSize() {
+size_t TRawFile::GetFileSize() const {
   if(fFileSize==-1)
     fFileSize = FindFileSize(GetFileName());
   return fFileSize;
+}
+
+std::string TRawFile::Status() const {
+  double runtime = clock.RealTime();
+  clock.Continue();
+  return Form("%s %.2f MB given %s / %s %.2f MB total %s  => %s %.02f MB/s processed %s",
+              DCYAN, fBytesGiven/1e6, RESET_COLOR,
+              BLUE, GetFileSize()/1e6, RESET_COLOR,
+              GREEN, fBytesGiven/(1e6*runtime), RESET_COLOR);
+}
+
+bool TRawFile::IsFinished() const {
+  return fIsFinished;
 }

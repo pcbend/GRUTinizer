@@ -29,6 +29,7 @@ public:
   void Resume();
   void Stop();
   bool IsPaused();
+  void Join();
 
   virtual void Initialize() { }
   virtual void Finalize()   { }
@@ -43,6 +44,8 @@ public:
 
     data_loop = new T(std::forward<Params>(params)...);
   }
+
+  const TRawFileIn* GetInfile() { return infile; }
 
 protected:
   TDataLoop();

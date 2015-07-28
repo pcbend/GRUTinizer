@@ -103,14 +103,15 @@ bool TRawEvent::IsGoodSize() const {
 void TRawEvent::Print(Option_t *opt) const {
 
   std::cout << fEventHeader;
-  printf("\t");
-  for(int x=0; x<GetBodySize(); x+=2) {
-    if((x%16 == 0) &&
-       (x!=GetBodySize())){
-      printf("\n\t");
-    }
-    printf("0x%04x  ",*(unsigned short*)(GetBody()+x));
-  }
-  printf("\n--------------------------\n");
+  fBody.Print("all");
+  // printf("\t");
+  // for(int x=0; x<GetBodySize(); x+=2) {
+  //   if((x%16 == 0) &&
+  //      (x!=GetBodySize())){
+  //     printf("\n\t");
+  //   }
+  //   printf("0x%04x  ",*(unsigned short*)(GetBody()+x));
+  // }
+  // printf("\n--------------------------\n");
 
 }

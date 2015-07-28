@@ -8,6 +8,8 @@
 // So that rootcint doesn't see this
 class RawDataQueue;
 class TRootOutfile;
+class TNSCLEvent;
+class TGEBEvent;
 
 class TGRUTLoop : public TDataLoop {
 public:
@@ -15,6 +17,9 @@ public:
 
   virtual ~TGRUTLoop();
   virtual int ProcessEvent(TRawEvent& event);
+
+  using TDataLoop::ProcessFile;
+  void ProcessFile(const char* input, const char* output);
 
   void PrintQueue();
   void StatusQueue();
@@ -26,12 +31,22 @@ public:
 
   void PrintOutfile();
 
+  bool FillCondition(TRawEvent& event);
+
+  void Status();
+
 private:
   template<typename T, typename... Params>
   friend void TDataLoop::CreateDataLoop(Params&&... params);
 
+  void ProcessFromQueue(TRawEvent& event);
+
   TGRUTLoop();
   void WriteLoop();
+
+  void HandleBuiltNSCLData(TNSCLEvent& event);
+  void HandleUnbuiltNSCLData(TNSCLEvent& event);
+  void HandleGEBData(TGEBEvent& event);
 
   RawDataQueue* queue;
   TRootOutfile* outfile;

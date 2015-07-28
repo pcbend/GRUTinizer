@@ -5,6 +5,8 @@
 
 #include "TGRUTTypes.h"
 
+class TRawEvent;
+
 class TDetectorEnv : public TNamed {
 public:
   static TDetectorEnv& Get(const char* name = "");
@@ -23,7 +25,8 @@ public:
   static const std::vector<int>& JANUSIDs()     { return Get().source_ids[kDetectorSystems::JANUS]; }
   static const std::vector<int>& GretinaIDs()  { return Get().source_ids[kDetectorSystems::GRETINA]; }
 
-  static kDetectorSystems DetermineSystem(int source_id);
+  kDetectorSystems DetermineSystem(int source_id) const;
+  kDetectorSystems DetermineSystem(TRawEvent& event) const;
 
   Int_t ReadFile(const std::string& filename);
   Int_t ParseInputData(const char* inputdata);

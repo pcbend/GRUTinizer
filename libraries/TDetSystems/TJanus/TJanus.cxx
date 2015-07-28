@@ -13,20 +13,27 @@ TJanus::~TJanus(){
   delete janus_hits;
 }
 
-void TJanus::AddRawData(TSmartBuffer buf){
-  raw_data.push_back(buf);
+void TJanus::Clear(Option_t* opt){
+  janus_hits->Clear(opt);
+  raw_data.clear();
 }
 
-void TJanus::BuildHits(){
+bool TJanus::AddRawData(TSmartBuffer buf){
+  raw_data.push_back(buf);
+  return true;
+}
+
+int TJanus::BuildHits(){
   for(auto buf : raw_data){
     Build_VMUSB_Read(buf);
   }
   raw_data.clear();
+
+  return Size();
 }
 
 void TJanus::InsertHit(const TDetectorHit& hit){
   if(!hit.InheritsFrom("TJanusHit")){
-    std::cout << "Attempted to copy " << hit.ClassName() << " into TJanusHit" << std::endl;
     return;
   }
 
@@ -36,6 +43,10 @@ void TJanus::InsertHit(const TDetectorHit& hit){
 
 int TJanus::Size(){
   return janus_hits->GetEntries();
+}
+
+TJanusHit& TJanus::GetJanusHit(int i){
+  return *(TJanusHit*)janus_hits->At(i);
 }
 
 TDetectorHit& TJanus::GetHit(int i){
@@ -54,25 +65,40 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   // 3 additional 16-bit words for the timestamp
   int num_adc_channels = vmusb_header->size()/2 - 3;
 
-  for(int i=0; i<num_adc_channels; i++){
+  int i;
+  for(i=0; i<num_adc_channels; i++){
     const CAEN_ADC* adc = (CAEN_ADC*)data;
     data += sizeof(CAEN_ADC);
 
+    TJanusHit hit;
+    hit.SetEntryType((char)adc->entry_type());
+
     if(adc->IsValid()){
-      TJanusHit hit;
       int id = 32*(adc->card_num()-5) + adc->channel_num();
       hit.SetAnalogChannel(id);
       hit.SetOverflowBit(adc->overflow());
       hit.SetUnderflowBit(adc->underflow());
       hit.SetCharge(adc->adcvalue());
       hit.SetTime(0);
-
-      InsertHit(hit);
     }
+
+    InsertHit(hit);
   }
 
   const VME_Timestamp* vme_timestamp = (VME_Timestamp*)data;
   data += sizeof(VME_Timestamp);
 
-  assert(data == buf.GetData() + buf.GetSize());
+  //assert(data == buf.GetData() + buf.GetSize());
+  if(data != buf.GetData() + buf.GetSize()){
+    std::cerr << "End of janus read not equal to size of buffer given:\n"
+              << "\tBuffer Start: " << (void*)buf.GetData() << "\tBuffer Size: " << buf.GetSize()
+              << "\n\tBuffer End: " << (void*)(buf.GetData() + buf.GetSize())
+              << "\n\tNum ADC chan: " << num_adc_channels
+              << "\n\ti: " << i
+              << "\n\tPtr at end of read: " << (void*)(data)
+              << "\n\tDiff: " << (buf.GetData() + buf.GetSize()) - data
+              << std::endl;
+
+    buf.Print("all");
+  }
 }

@@ -140,3 +140,7 @@ void TDataLoop::Iteration() {
     Stop();
   }
 }
+
+void TDataLoop::Join(){
+  read_thread.join();
+}

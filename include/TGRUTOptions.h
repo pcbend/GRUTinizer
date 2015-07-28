@@ -20,11 +20,13 @@ public:
   const std::vector<std::string>& RootInputFiles()  { return input_root_files;  }
   const std::vector<std::string>& CalInputFiles()   { return input_cal_files;   }
   const std::vector<std::string>& MacroInputFiles() { return input_macro_files; }
+  const std::string DetectorEnvironment()           { return detector_environment; }
+  const std::string OutputFile()                    { return output_file; }
   std::string InputRing() { return input_ring; }
 
-  std::string DetectorEnvironment() { return detector_environment; }
-
   const std::vector<std::string>& OptionFiles() { return options_file; }
+
+  bool IgnoreErrors() { return fIgnoreErrors; }
 
   bool ExitAfterSorting() const { return fExitAfterSorting; }
   bool ShowedHelp() const { return fHelp; }
@@ -34,6 +36,7 @@ public:
   bool ShouldExitImmediately() const { return fShouldExit; }
 
   kFileType DetermineFileType(const std::string& filename);
+  std::string GenerateOutputFilename(const std::string& filename);
 
 private:
   TGRUTOptions(int argc, char** argv);
@@ -46,6 +49,8 @@ private:
   std::vector<std::string> input_macro_files;
   std::string input_ring;
 
+  std::string output_file;
+
   std::string detector_environment;
 
   std::vector<std::string> options_file;
@@ -54,6 +59,7 @@ private:
   bool fHelp;
   bool fShowLogo;
   bool fSortRaw;
+  bool fIgnoreErrors;
 
   bool fShouldExit;
 

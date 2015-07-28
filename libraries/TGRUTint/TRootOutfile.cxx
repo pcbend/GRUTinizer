@@ -1,6 +1,9 @@
 #include "TRootOutfile.h"
 
+#include "Globals.h"
+
 #include "TDetectorEnv.h"
+#include "TGRUTOptions.h"
 #include "TJanus.h"
 #include "TNSCLEvent.h"
 
@@ -64,15 +67,14 @@ void TRootOutfile::Init(const char* output_filename){
   // }
 }
 
-void TRootOutfile::AddRawData(TRawEvent& event){
-  if(FillCondition(event)){
-    FillTree();
-  }
+void TRootOutfile::AddRawData(const TSmartBuffer& event, kDetectorSystems det_type){
+  // if(FillCondition(event)){
+  //   FillTree();
+  // }
 
-  kDetectorSystems det_type = DetermineSystem(event);
-  try{
+   try{
     TDetector* det = det_list.at(det_type);
-    det->AddRawData(event.GetBuffer());
+    det->AddRawData(event);
   } catch (std::out_of_range& e) { }
 }
 
@@ -87,31 +89,6 @@ void TRootOutfile::FillTree(){
   for(auto& item : det_list){
     item.second->Clear();
   }
-}
-
-kDetectorSystems TRootOutfile::DetermineSystem(TRawEvent& event){
-  switch(event.GetFileType()){
-  case NSCL_EVT:
-  {
-    TNSCLEvent& nscl_event = (TNSCLEvent&)event;
-    return TDetectorEnv::Get().DetermineSystem(nscl_event.GetSourceID());
-  }
-    break;
-
-  case GRETINA_MODE2:
-  case GRETINA_MODE3:
-  {
-    //TGEBEvent& geb_event = (TGEBEvent&)event;
-    // return TDetectorEnv::Get().DetermineSystem(geb_event.GetEventType());
-  }
-
-  default:
-    return kDetectorSystems::UNKNOWN_SYSTEM;
-  }
-}
-
-bool TRootOutfile::FillCondition(TRawEvent& event) {
-  return true;
 }
 
 void TRootOutfile::FinalizeFile(){

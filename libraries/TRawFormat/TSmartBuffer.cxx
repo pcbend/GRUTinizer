@@ -85,7 +85,7 @@ TSmartBuffer TSmartBuffer::BufferSubset(size_t pos, size_t length) const {
   return output;
 }
 
-void TSmartBuffer::Print() const {
+void TSmartBuffer::Print(Option_t* opt) const {
   std::cout << "TSmartBuffer allocated at " << (void*)fAllocatedLocation << ", "
             << "currently pointed at " << (void*)fData << ", "
             << "with a size of " << fSize << "bytes."
@@ -95,5 +95,22 @@ void TSmartBuffer::Print() const {
     std::unique_lock<std::mutex> lock(*fReferenceMutex);
     std::cout << "There are " << *fReferenceCount << " TSmartBuffers sharing this C-buffer"
               << std::endl;
+
+    // Full hexdump of the buffer contents
+    if(!strcmp(opt,"all")){
+      printf("\t");
+      for(int x=0; x<GetSize()-1; x+=2) {
+        if((x%16 == 0) &&
+           (x!=GetSize())){
+          printf("\n\t");
+        }
+        printf("0x%04x  ",*(unsigned short*)(GetData()+x));
+      }
+      if(GetSize()%2 == 1){
+        printf("0x02x ", *(unsigned char*)(GetData()+GetSize()-1));
+      }
+
+      printf("\n--------------------------\n");
+    }
   }
 }

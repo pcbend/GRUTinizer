@@ -38,6 +38,8 @@ void TGRUTOptions::Clear(Option_t* opt) {
 void TGRUTOptions::Print(Option_t* opt) const { }
 
 void TGRUTOptions::Load(int argc, char** argv) {
+  detector_environment = std::string(getenv("GRUTSYS")) + "/config/DetectorEnvironment.env";
+
   ArgParser parser;
 
   std::vector<std::string> input_files;
@@ -46,19 +48,18 @@ void TGRUTOptions::Load(int argc, char** argv) {
 
   parser.default_option(&input_files)
     .description("Input file(s)");
-  parser.option("i input",&input_files)
-    .description("Input file(s)");
+  parser.option("o output", &output_file)
+    .description("Root output file");
   parser.option("r ring",&input_ring)
     .description("Input ring source (host/ringname)");
-  parser.option("d detector-env",&detector_environment)
-    .description("Detector setup description")
-    .default_value(std::string(getenv("GRUTSYS")) + "/DetectorEnvironment.env");
   parser.option("l no-logo", &fShowLogo)
     .description("Inhibit the startup logo")
     .default_value(true);
   parser.option("n no-sort", &fSortRaw)
     .description("Load raw data files without sorting")
     .default_value(true);
+  parser.option("ignore-errors ignore_errors", &fIgnoreErrors)
+    .description("Don't print warning messages.  Use at your own risk.");
   parser.option("q quit", &fExitAfterSorting)
     .description("Run in batch mode");
   parser.option("h help ?", &fHelp)
@@ -102,6 +103,8 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename){
     return kFileType::ROOT_MACRO;
   } else if (ext == "dat") {
     return kFileType::GRETINA_MODE2;
+  } else if (ext == "env") {
+    return kFileType::DETECTOR_ENVIRONMENT;
   } else {
     return kFileType::UNKNOWN_FILETYPE;
   }
@@ -127,8 +130,16 @@ bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
     input_cal_files.push_back(filename);
     return true;
 
+  case kFileType::DETECTOR_ENVIRONMENT:
+    detector_environment = filename;
+    return true;
+
   case kFileType::UNKNOWN_FILETYPE:
     printf("\tDiscarding unknown file: %s\n",filename.c_str());
     return false;
   }
+}
+
+std::string TGRUTOptions::GenerateOutputFilename(const std::string& filename){
+  return "temp.root";
 }

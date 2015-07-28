@@ -151,7 +151,7 @@ static Pixmap GetRootLogo()
 
    std::string file;
    file.append(getenv("GRUTSYS"));
-   file.append("/util/Splash.xpm");
+   file.append("/config/Splash.xpm");
 
    int ret = XpmReadFileToPixmap(gDisplay, gLogoWindow,
                                  (char*)file.c_str(), &logo, 0, &attr);

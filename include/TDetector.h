@@ -14,8 +14,8 @@ public:
   TDetector(const char *name,const char *title="");
   virtual ~TDetector();
 
-  virtual void AddRawData(TSmartBuffer buf) { AbstractMethod("AddRawData"); }
-  virtual void BuildHits()                  { AbstractMethod("BuildHits()"); }
+  virtual bool AddRawData(TSmartBuffer buf) { AbstractMethod("AddRawData"); }
+  virtual int  BuildHits()                  { AbstractMethod("BuildHits()"); }
 
   virtual void InsertHit(const TDetectorHit&) { AbstractMethod("InsertHit()"); }
   virtual TDetectorHit& GetHit(int i)         { AbstractMethod("GetHit()"); }

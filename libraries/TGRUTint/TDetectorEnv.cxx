@@ -4,6 +4,11 @@
 #include <iostream>
 #include <sstream>
 
+#include "TGRUTOptions.h"
+#include "TNSCLEvent.h"
+#include "TRawEvent.h"
+
+
 TDetectorEnv* TDetectorEnv::env = NULL;
 
 TDetectorEnv& TDetectorEnv::Get(const char* name){
@@ -36,7 +41,7 @@ Int_t TDetectorEnv::ReadFile(const std::string& filename) {
   std::ifstream infile;
   infile.open(filename);
   if (!infile) {
-    std::cerr << "Could not open file: " << filename << std::endl;
+    std::cerr << "TDetectorEnv: Could not open file: " << filename << std::endl;
     return -2;
   }
 
@@ -113,14 +118,52 @@ void TDetectorEnv::Clear(Option_t* opt){
   source_ids.clear();
 }
 
-kDetectorSystems TDetectorEnv::DetermineSystem(int source_id) {
+kDetectorSystems TDetectorEnv::DetermineSystem(int source_id) const {
+  kDetectorSystems output = kDetectorSystems::UNKNOWN_SYSTEM;
+
   for(auto& system : Get().source_ids){
     for(auto id : system.second){
       if(id == source_id){
-        return system.first;
+        output = system.first;
+        break;
       }
+    }
+
+    if(output != kDetectorSystems::UNKNOWN_SYSTEM){
+      break;
     }
   }
 
-  return kDetectorSystems::UNKNOWN_SYSTEM;
+  if(output == kDetectorSystems::UNKNOWN_SYSTEM
+     && !TGRUTOptions::Get()->IgnoreErrors()){
+    std::cerr << RED << "Unknown sourceid found: " << source_id << RESET_COLOR << std::endl;
+  }
+
+  return output;
+}
+
+kDetectorSystems TDetectorEnv::DetermineSystem(TRawEvent& event) const {
+  int source_id = -1;
+
+  switch(event.GetFileType()){
+  case NSCL_EVT:
+  {
+    TNSCLEvent& nscl_event = (TNSCLEvent&)event;
+    source_id = nscl_event.GetSourceID();
+  }
+    break;
+
+  case GRETINA_MODE2:
+  case GRETINA_MODE3:
+  {
+    //TGEBEvent& geb_event = (TGEBEvent&)event;
+    //source_id = geb_event.GetEventType();
+  }
+  break;
+
+  default:
+    break;
+  }
+
+  return DetermineSystem(source_id);
 }

@@ -20,15 +20,11 @@ public:
 
   void Init(const char* output_filename);
 
-  void AddRawData(TRawEvent& event);
+  void AddRawData(const TSmartBuffer& event, kDetectorSystems det_type);
   void FillTree();
 
   void FinalizeFile();
   void CloseFile();
-
-  bool FillCondition(TRawEvent& event);
-
-  kDetectorSystems DetermineSystem(TRawEvent& event);
 
   void Print(Option_t* option = "");
 

@@ -4,7 +4,8 @@
 #include "Globals.h"
 #include "TGRUTTypes.h"
 
-#include <TObject.h>
+#include "TObject.h"
+#include "TStopwatch.h"
 
 #include "TSmartBuffer.h"
 
@@ -25,12 +26,14 @@ public:
   void Print(Option_t *opt = "") const;
   void Clear(Option_t *opt = "");
 
-  size_t GetFileSize();
+  size_t GetFileSize() const;
   static size_t FindFileSize(const char*);
 
-  const kFileType GetFileType()                     { return fFileType; }
+  const kFileType GetFileType() const               { return fFileType; }
         void      SetFileType(const kFileType type) { fFileType = type; }
 
+  std::string Status() const;
+  bool IsFinished() const;
 
 protected:
 
@@ -41,9 +44,11 @@ protected:
 
   int         fLastErrno;
   std::string fLastError;
+  bool        fIsFinished;
 
-  size_t fFileSize;
+  mutable size_t fFileSize;
   size_t fBytesRead;
+  size_t fBytesGiven;
   size_t fBytesWritten;
 
   int     fFile;
@@ -51,6 +56,8 @@ protected:
   FILE*   fPoFile;
   int     fOutFile;
   void*   fOutGzFile;
+
+  mutable TStopwatch clock;
 
   ClassDef(TRawFile,0);
 };

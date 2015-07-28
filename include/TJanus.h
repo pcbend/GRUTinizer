@@ -11,10 +11,13 @@ public:
   TJanus();
   virtual ~TJanus();
 
-  virtual void AddRawData(TSmartBuffer buf);
-  virtual void BuildHits();
+  virtual void Clear(Option_t* opt = "");
+
+  virtual bool AddRawData(TSmartBuffer buf);
+  virtual int  BuildHits();
 
   virtual void InsertHit(const TDetectorHit&);
+  virtual TJanusHit&    GetJanusHit(int i);
   virtual TDetectorHit& GetHit(int i);
   virtual int Size();
 

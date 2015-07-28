@@ -24,14 +24,14 @@ enum kNSCLEventType {
 
 class TNSCLEvent : public TRawEvent {
 public:
-  Int_t        GetBodyHeaderSize()        const;
-  Long_t       GetTimestamp()             const;
-  Int_t        GetSourceID()              const;
-  Int_t        GetBarrierType()           const;
-  int          IsBuiltData(char* payload) const;
-  const char*  GetPayload()               const;
-  TSmartBuffer GetPayloadBuffer()         const;
-  Int_t        GetPayloadSize()           const;
+  Int_t        GetBodyHeaderSize() const;
+  Long_t       GetTimestamp()      const;
+  Int_t        GetSourceID()       const;
+  Int_t        GetBarrierType()    const;
+  int          IsBuiltData()       const;
+  const char*  GetPayload()        const;
+  TSmartBuffer GetPayloadBuffer()  const;
+  Int_t        GetPayloadSize()    const;
 
   ClassDef(TNSCLEvent,0);
 };
@@ -92,10 +92,10 @@ public:
   TNSCLBuiltRingItem(TSmartBuffer buf);
   TNSCLBuiltRingItem(TNSCLEvent& event);
 
-  TNSCLFragment GetFragment(size_t fragnum) const;
-  Int_t         Size()                      const;
-  size_t        NumFragments()              const;
-  Int_t         GetBuiltRingItemSize()      const;
+  const TNSCLFragment& GetFragment(size_t fragnum) const;
+        Int_t          Size()                      const;
+        size_t         NumFragments()              const;
+        Int_t          GetBuiltRingItemSize()      const;
 
 private:
   void BuildFragments() const;
