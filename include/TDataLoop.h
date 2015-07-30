@@ -14,7 +14,7 @@
 
 #include "TRawEvent.h"
 
-class TRawFileIn;
+class TRawEventSource;
 
 class TDataLoop : public TNamed {
 public:
@@ -22,6 +22,7 @@ public:
   virtual ~TDataLoop();
 
   void ProcessFile(const char* filename, kFileType file_type = kFileType::UNKNOWN_FILETYPE);
+  void ProcessFile(const std::vector<std::string>& filenames);
   void ProcessRing(const char* filename);
 
   void Start();
@@ -45,11 +46,12 @@ public:
     data_loop = new T(std::forward<Params>(params)...);
   }
 
-  const TRawFileIn* GetInfile() { return infile; }
+  const TRawEventSource* GetInfile() { return infile; }
 
 protected:
   TDataLoop();
 
+  TRawEventSource* infile;
 
 #ifndef __CINT__
   std::thread read_thread;
@@ -73,8 +75,6 @@ private:
   TDataLoop(const TDataLoop& other) { MayNotUse("TDataLoop()"); }
   TDataLoop& operator=(const TDataLoop& other) { MayNotUse("TDataLoop::operator="); }
 
-
-  TRawFileIn* infile;
 
   ClassDef(TDataLoop,0);
 };

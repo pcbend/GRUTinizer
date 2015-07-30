@@ -39,6 +39,7 @@ public:
   Int_t  GetEventType() const;
   Int_t  GetTotalSize() const;
   Int_t  GetBodySize()  const;
+  virtual long GetTimestamp() const { return -1; }
 
 protected:
   RawHeader fEventHeader;

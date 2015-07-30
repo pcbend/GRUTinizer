@@ -37,6 +37,7 @@ public:
 
   kFileType DetermineFileType(const std::string& filename);
   std::string GenerateOutputFilename(const std::string& filename);
+  std::string GenerateOutputFilename(const std::vector<std::string>& filename);
 
 private:
   TGRUTOptions(int argc, char** argv);

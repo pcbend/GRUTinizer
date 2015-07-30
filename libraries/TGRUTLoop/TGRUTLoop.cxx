@@ -47,6 +47,12 @@ void TGRUTLoop::ProcessFile(const char* input, const char* output){
   outfile->Init(output);
 }
 
+void TGRUTLoop::ProcessFile(const std::vector<std::string>& input, const char* output){
+  TDataLoop::ProcessFile(input);
+  outfile = new TRootOutfile();
+  outfile->Init(output);
+}
+
 void TGRUTLoop::Initialize(){
   if(!outfile){
     outfile = new TRootOutfile();
@@ -156,18 +162,14 @@ bool TGRUTLoop::FillCondition(TRawEvent& event){
   return true;
 }
 
-void TGRUTLoop::Status(){
-  if(TGRUTOptions::Get()->RawInputFiles().size() == 1){
-
-    if(!GetInfile()){
-      std::cout << "Status: Not running" << std::endl;
-    } else {
-      std::cout << "Status: " << std::endl;
-      while(!GetInfile()->IsFinished()){
-        std::cout << "\r" << GetInfile()->Status() << "             " << std::flush;
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-      }
+void TGRUTLoop::Status() {
+  if(!GetInfile())  {
+    std::cout << "Status: Not running" << std::endl;
+  } else {
+    std::cout << "Status: " << std::endl;
+    while(!GetInfile()->IsFinished())  {
+      std::cout << "\r" << GetInfile()->Status() << "             " << std::flush;
+      std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
   }
-
 }

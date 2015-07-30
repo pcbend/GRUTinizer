@@ -82,11 +82,20 @@ void TGRUTint::ApplyOptions() {
 
   if(opt->RawInputFiles().size()==1 && opt->SortRaw()){
     std::string filename = opt->RawInputFiles()[0];
-    std::string outfile = TGRUTOptions::Get()->OutputFile();
+    std::string outfile = opt->OutputFile();
     if(!outfile.length()){
-      outfile = TGRUTOptions::Get()->GenerateOutputFilename(filename);
+      outfile = opt->GenerateOutputFilename(filename);
     }
     TGRUTLoop::Get()->ProcessFile(filename.c_str(), outfile.c_str());
+    TGRUTLoop::Get()->Start();
+
+  } else if (opt->RawInputFiles().size()>1 && opt->SortRaw()){
+    std::vector<std::string> filenames = opt->RawInputFiles();
+    std::string outfile = opt->OutputFile();
+    if(!outfile.length()){
+      outfile = opt->GenerateOutputFilename(filenames);
+    }
+    TGRUTLoop::Get()->ProcessFile(filenames, outfile.c_str());
     TGRUTLoop::Get()->Start();
   }
 

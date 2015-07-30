@@ -2,6 +2,7 @@
 
 #include "RawDataQueue.h"
 #include "TGRUTOptions.h"
+#include "TMultiRawFile.h"
 #include "TRawFile.h"
 
 TDataLoop* TDataLoop::data_loop = NULL;
@@ -51,16 +52,31 @@ void TDataLoop::ProcessFile(const char* filename, kFileType file_type){
   case kFileType::GRETINA_MODE2:
   case kFileType::GRETINA_MODE3:
     break;
-
   default:
     std::cerr << "Attempting to process an unknown file type on file " << filename << std::endl;
   }
 
   TRawFileIn* infile = new TRawFileIn(filename, file_type);
-  if(infile->GetLastErrno() != 0){
+
+  if(infile->GetLastErrno() != 0)  {
     std::cerr << "Error opening file " << filename << ": " << infile->GetLastError()
               << " (Errno=" << infile->GetLastErrno() << ")" << std::endl;
     return;
+  }
+
+  this->infile = infile;
+  ProcessSource();
+}
+
+void TDataLoop::ProcessFile(const std::vector<std::string>& filenames){
+  if(running || infile){
+    std::cerr << "Data loop already running" << std::endl;
+  }
+
+  TMultiRawFile* infile = new TMultiRawFile;
+
+  for(auto& filename : filenames){
+    infile->AddFile(filename.c_str());
   }
 
   this->infile = infile;
@@ -78,7 +94,7 @@ void TDataLoop::ProcessSource() {
   }
 
   if(infile->GetLastErrno()) {
-    std::cout << "Problem opening file: << " << infile->GetFileName() << std::endl;
+    std::cout << "Problem opening file: << " << infile->SourceDescription() << std::endl;
     std::cout << "\tFile State: " << infile->GetLastError() << std::endl;
   }
   running = true;

@@ -143,3 +143,7 @@ bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
 std::string TGRUTOptions::GenerateOutputFilename(const std::string& filename){
   return "temp.root";
 }
+
+std::string TGRUTOptions::GenerateOutputFilename(const std::vector<std::string>& filename){
+  return "temp_from_multi.root";
+}

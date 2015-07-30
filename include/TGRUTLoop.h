@@ -20,6 +20,7 @@ public:
 
   using TDataLoop::ProcessFile;
   void ProcessFile(const char* input, const char* output);
+  void ProcessFile(const std::vector<std::string>& input, const char* output);
 
   void PrintQueue();
   void StatusQueue();

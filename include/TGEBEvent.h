@@ -8,7 +8,7 @@ public:
   TGEBEvent();
   virtual ~TGEBEvent();
 
-  Long_t GetTimestamp() const;
+  virtual long GetTimestamp() const;
 
   TSmartBuffer GetPayloadBuffer() const;
 

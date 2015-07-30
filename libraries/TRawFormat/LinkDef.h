@@ -8,9 +8,11 @@
 #pragma link C++ nestedclasses;
 
 
-#pragma link C++ class TRawEvent+;
+
 #pragma link C++ class TSmartBuffer+;
+#pragma link C++ class TRawEvent+;
 #pragma link C++ class TRawFile+;
+#pragma link C++ class TRawEventSource-!;
 #pragma link C++ class TRawFileIn+;
 #pragma link C++ class TRawFileOut+;
 #pragma link C++ class TMultiRawFile+;

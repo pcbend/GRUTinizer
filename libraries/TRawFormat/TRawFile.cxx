@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <cstdlib>
 #include <fstream>
+#include <sstream>
 
 #include <zlib.h>
 
@@ -57,12 +58,9 @@ void TRawFile::Init() {
 
   fFileSize  = -1;
   fBytesRead = 0;
-  fBytesGiven= 0;
 
   fOutFile   = -1;
   fOutGzFile = NULL;
-
-  fIsFinished = true;
 }
 
 static int hasSuffix(const char *name,const char *suffix) {
@@ -181,20 +179,14 @@ static int readpipe(int fd, char *buf, int length) {
   return count;
 }
 
-TRawEvent TRawFileIn::Read(){
-  TRawEvent output;
-  Read(&output);
-  return output;
-}
-
-int TRawFileIn::Read(TRawEvent *rawevent) {
+int TRawFileIn::GetEvent(TRawEvent *rawevent) {
 
    if(!rawevent) {
     fprintf(stderr,"TGEBFILE::Read;  Trying to filee NULL TRawEvent.");
     return -1;
    }
 
-   if(fBytesGiven == 0){
+   if(GetBytesGiven() == 0){
      clock.Start();
    }
 
@@ -245,7 +237,6 @@ int TRawFileIn::Read(TRawEvent *rawevent) {
    }
 
    size_t total_bytes = sizeof(TRawEvent::RawHeader) + body_size;
-   fBytesGiven += total_bytes;
    return total_bytes;
 }
 
@@ -362,15 +353,26 @@ size_t TRawFile::GetFileSize() const {
   return fFileSize;
 }
 
-std::string TRawFile::Status() const {
+std::string TRawFileIn::Status() const {
   double runtime = clock.RealTime();
   clock.Continue();
-  return Form("%s %.2f MB given %s / %s %.2f MB total %s  => %s %.02f MB/s processed %s",
-              DCYAN, fBytesGiven/1e6, RESET_COLOR,
+  return Form("%s %8.2f MB given %s / %s %8.2f MB total %s  => %s %3.02f MB/s processed %s",
+              DCYAN, GetBytesGiven()/1e6, RESET_COLOR,
               BLUE, GetFileSize()/1e6, RESET_COLOR,
-              GREEN, fBytesGiven/(1e6*runtime), RESET_COLOR);
+              GREEN, GetBytesGiven()/(1e6*runtime), RESET_COLOR);
 }
 
-bool TRawFile::IsFinished() const {
-  return fIsFinished;
+int TRawEventSource::Read(TRawEvent* event){
+  int result = GetEvent(event);
+  fBytesGiven += event->GetTotalSize();
+  return result;
 }
+
+std::string TRawFileIn::SourceDescription() const {
+  std::stringstream ss;
+  ss << GetFileName() << ", type=" << GetFileType();
+  return ss.str();
+}
+
+
+void TRawEventSource::Streamer(TBuffer&){ }
