@@ -144,8 +144,12 @@ void TGRUTLoop::HandleUnbuiltNSCLData(TNSCLEvent& event){
 }
 
 void TGRUTLoop::HandleGEBData(TGEBEvent& event){
-  std::cerr << "TGRUTLoop::HandleGEBData() NOT IMPLEMENTED YET"
-            << std::endl;
+  if(FillCondition(event)){
+    outfile->FillTree();
+  }
+
+  kDetectorSystems detector = TDetectorEnv::Get().DetermineSystem(event);
+  outfile->AddRawData(event.GetPayloadBuffer(), detector);
 }
 
 bool TGRUTLoop::FillCondition(TRawEvent& event){

@@ -62,12 +62,17 @@ protected:
   ClassDef(TRawFile,0);
 };
 
+
+
 class TRawFileIn  : public TRawFile {
 public:
   TRawFileIn() : fBufferSize(8192)  { }
+  TRawFileIn(const char *fname, kFileType file_type);
+  TRawFileIn(const char *fname);
+
   virtual ~TRawFileIn()      { }
 
-  TRawFileIn(const char *fname, kFileType file_type);
+
   bool Open(const char *fname, kFileType file_type);
   int Read(TRawEvent*);
   TRawEvent Read();

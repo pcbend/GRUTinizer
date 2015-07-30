@@ -17,6 +17,7 @@
 #include "TString.h"
 
 #include "TRawEvent.h"
+#include "TGRUTOptions.h"
 
 ClassImp(TRawFile)
 
@@ -30,6 +31,11 @@ TRawFile::TRawFile() {
 TRawFileIn::TRawFileIn(const char *fname, kFileType file_type)
   : fBufferSize(8192) {
   Open(fname, file_type);
+}
+
+TRawFileIn::TRawFileIn(const char *fname)
+  : fBufferSize(8192) {
+  Open(fname, TGRUTOptions::Get()->DetermineFileType(fname));
 }
 
 TRawFileOut::TRawFileOut(const char *fname, kFileType file_type) {

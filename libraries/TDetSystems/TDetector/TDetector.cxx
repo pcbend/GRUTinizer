@@ -12,14 +12,27 @@ TDetector::TDetector(const char* name,const char* title) {
 
 TDetector::~TDetector() { }
 
-void TDetector::Copy(const TDetector& rhs) {
-  TNamed::Copy((TObject&)rhs);
-
-}
-
 void TDetector::Clear(Option_t *opt) {
   TNamed::Clear(opt);
-
+  fTimestamp = -1;
 }
 
-void TDetector::Print(Option_t *opt) { }
+void TDetector::Print(Option_t *opt) const { }
+
+void TDetector::Copy(TObject& obj) const {
+  TNamed::Copy(obj);
+
+  TDetector& det = (TDetector&)obj;
+  det.fTimestamp = fTimestamp;
+}
+
+int TDetector::Compare(const TObject& obj) const {
+  TDetector& det = (TDetector&)obj;
+  if(fTimestamp < det.fTimestamp) {
+    return -1;
+  } else if (fTimestamp > det.fTimestamp) {
+    return +1;
+  } else {
+    return 0;
+  }
+}

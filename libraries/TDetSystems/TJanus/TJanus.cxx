@@ -13,6 +13,14 @@ TJanus::~TJanus(){
   delete janus_hits;
 }
 
+void TJanus::Copy(TObject& obj) const {
+  TDetector::Copy(obj);
+
+  TJanus& janus = (TJanus&)obj;
+  janus_hits->Copy(*janus.janus_hits);
+  janus.raw_data.clear();
+}
+
 void TJanus::Clear(Option_t* opt){
   janus_hits->Clear(opt);
   raw_data.clear();
@@ -38,7 +46,7 @@ void TJanus::InsertHit(const TDetectorHit& hit){
   }
 
   TJanusHit* new_hit = (TJanusHit*)janus_hits->ConstructedAt(Size());
-  new_hit->Copy(hit);
+  hit.Copy(*new_hit);
 }
 
 int TJanus::Size(){
@@ -79,7 +87,6 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
       hit.SetOverflowBit(adc->overflow());
       hit.SetUnderflowBit(adc->underflow());
       hit.SetCharge(adc->adcvalue());
-      hit.SetTime(0);
     }
 
     InsertHit(hit);

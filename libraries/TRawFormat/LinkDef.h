@@ -1,4 +1,4 @@
-// TRawFile.h TRawEvent.h TSmartBuffer.h
+// TRawFile.h TRawEvent.h TSmartBuffer.h TMultiRawFile.h
 
 #ifdef __CINT__
 
@@ -13,6 +13,7 @@
 #pragma link C++ class TRawFile+;
 #pragma link C++ class TRawFileIn+;
 #pragma link C++ class TRawFileOut+;
+#pragma link C++ class TMultiRawFile+;
 
 
 #endif

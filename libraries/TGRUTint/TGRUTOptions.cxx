@@ -89,8 +89,8 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename){
 
   bool isZipped = (ext=="gz") || (ext=="bz2") || (ext=="zip");
   if(isZipped){
-    std::string remaining = filename.substr(0,dot_pos-1);
-    ext = remaining.substr(remaining.find_last_of('.'));
+    std::string remaining = filename.substr(0,dot_pos);
+    ext = remaining.substr(remaining.find_last_of('.')+1);
   }
 
   if(ext=="evt"){
@@ -101,7 +101,7 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename){
     return kFileType::ROOT_DATA;
   } else if ((ext == "c") || (ext == "C") || (ext == "c+") || (ext == "C+")) {
     return kFileType::ROOT_MACRO;
-  } else if (ext == "dat") {
+  } else if (ext == "dat" || ext == "cvt") {
     return kFileType::GRETINA_MODE2;
   } else if (ext == "env") {
     return kFileType::DETECTOR_ENVIRONMENT;

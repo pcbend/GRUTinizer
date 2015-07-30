@@ -11,6 +11,8 @@ public:
   TJanus();
   virtual ~TJanus();
 
+  void Copy(TObject& obj) const;
+
   virtual void Clear(Option_t* opt = "");
 
   virtual bool AddRawData(TSmartBuffer buf);
