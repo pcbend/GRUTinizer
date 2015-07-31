@@ -16,7 +16,7 @@
 
 
 typedef struct { // HPGe Segment Hit Type 1;
-    Float_t     x;
+   Float_t     x;
    Float_t     y;
    Float_t     z;
    Float_t     e;        //fraction of the energy
@@ -102,5 +102,13 @@ typedef struct EVTHeader : public RawHeader {
 
 friend std::ostream& operator<<(std::ostream& os, const RawHeader &head);
 
+typedef struct TNSCLFragmentHeader {
+  long timestamp;
+  int sourceid;
+  int payload_size;
+  int barrier;
+} __attribute__((__packed__)) TNSCLFragmentHeader;
+
+friend std::ostream& operator<<(std::ostream& os, const TNSCLFragmentHeader &head);
 
 #endif

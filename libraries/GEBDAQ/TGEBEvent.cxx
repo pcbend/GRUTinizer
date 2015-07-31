@@ -10,6 +10,10 @@ Long_t TGEBEvent::GetTimestamp() const {
   return *(Long_t*)(GetBody() + 0);
 }
 
+const char* TGEBEvent::GetPayload() const {
+  return fBody.GetData() + sizeof(Long_t);
+}
+
 TSmartBuffer TGEBEvent::GetPayloadBuffer() const {
   return fBody.BufferSubset(sizeof(Long_t));
 }
@@ -25,4 +29,3 @@ void TGEBEvent::Print(Option_t *opt) const {
   std::cout << BLUE << "Timestamp:\t" << DYELLOW << GetTimestamp() << BLUE << "  tens of ns" << RESET_COLOR << std::endl;
   TRawEvent::Print("bodyonly");
 };
-

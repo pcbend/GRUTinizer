@@ -7,21 +7,25 @@ class TJanusHit : public TDetectorHit {
 public:
   TJanusHit() { }
 
+  void Clear(Option_t* opt = "");
   void Copy(TObject& obj) const;
 
   void SetAnalogChannel(int chan) { fChannel = chan; }
   void SetOverflowBit(bool bit)   { fOverflowBit = bit; }
   void SetUnderflowBit(bool bit)  { fUnderflowBit = bit; }
   void SetEntryType(char type)    { fEntryType = type; }
+  void SetTimestamp(long ts)      { fTimestamp = ts; }
 
-  int GetAnalogChannel() { return fChannel; }
-  bool GetOverflowBit()  { return fOverflowBit; }
-  bool GetUnderflowBit() { return fUnderflowBit;}
-  char GetEntryType()   { return fEntryType; }
+  int GetAnalogChannel() const { return fChannel; }
+  bool GetOverflowBit()  const { return fOverflowBit; }
+  bool GetUnderflowBit() const { return fUnderflowBit;}
+  char GetEntryType() const  { return fEntryType; }
+  long GetTimestamp() const { return fTimestamp; }
 
   bool IsValid() const { return fEntryType == 0; } //CAEN_ADC::EntryType::Event
 
 private:
+  long  fTimestamp;
   short fEntryType;
   int   fChannel;
   bool  fOverflowBit;

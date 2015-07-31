@@ -19,9 +19,6 @@ public:
   virtual void Print(Option_t *opt = "") const;
   virtual void Clear(Option_t *opt = "");
 
-  virtual bool          AddRawData(TGEBEvent &event) { return AddRawData(event.GetPayloadBuffer()); }
-  virtual bool          AddRawData(TSmartBuffer buf);
-  virtual int           BuildHits();
   virtual void          InsertHit(const TDetectorHit& hit);
   virtual TDetectorHit& GetHit(const int &i)            { return *(TGretinaHit*)gretina_hits->At(i); }
   virtual int           Size()                          { return gretina_hits->GetEntries(); }
@@ -34,6 +31,7 @@ public:
                                   Float_t localX=0,Float_t localY=0,Float_t localZ=0);
 
 private:
+  virtual int BuildHits();
   void BuildAddbackHits();
 
   TClonesArray* gretina_hits;//("TGretinaHit");
@@ -42,8 +40,6 @@ private:
   static Float_t crmat[32][4][4][4];
   static void SetCRMAT();
   static bool fCRMATSet;
-
-  std::vector<TSmartBuffer> raw_data; //!
 
   ClassDef(TGretina,3);
 };

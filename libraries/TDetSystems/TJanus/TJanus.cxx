@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "JanusDataFormat.h"
+#include "TNSCLEvent.h"
 
 TJanus::TJanus() {
   janus_hits = new TClonesArray("TJanusHit");
@@ -22,29 +23,21 @@ void TJanus::Copy(TObject& obj) const {
 }
 
 void TJanus::Clear(Option_t* opt){
-  janus_hits->Clear(opt);
-  raw_data.clear();
-}
+  TDetector::Clear(opt);
 
-bool TJanus::AddRawData(TSmartBuffer buf){
-  raw_data.push_back(buf);
-  return true;
+  janus_hits->Clear(opt);
 }
 
 int TJanus::BuildHits(){
-  for(auto buf : raw_data){
-    Build_VMUSB_Read(buf);
+  for(auto& event : raw_data){
+    TNSCLEvent& nscl = (TNSCLEvent&)event;
+    SetTimestamp(nscl.GetTimestamp());
+    Build_VMUSB_Read(nscl.GetPayloadBuffer());
   }
-  raw_data.clear();
-
   return Size();
 }
 
 void TJanus::InsertHit(const TDetectorHit& hit){
-  if(!hit.InheritsFrom("TJanusHit")){
-    return;
-  }
-
   TJanusHit* new_hit = (TJanusHit*)janus_hits->ConstructedAt(Size());
   hit.Copy(*new_hit);
 }
@@ -73,6 +66,9 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   // 3 additional 16-bit words for the timestamp
   int num_adc_channels = vmusb_header->size()/2 - 3;
 
+  const VME_Timestamp* vme_timestamp = (VME_Timestamp*)(data + num_adc_channels*sizeof(CAEN_ADC));
+  long timestamp = vme_timestamp->ts1();
+
   int i;
   for(i=0; i<num_adc_channels; i++){
     const CAEN_ADC* adc = (CAEN_ADC*)data;
@@ -80,6 +76,7 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
 
     TJanusHit hit;
     hit.SetEntryType((char)adc->entry_type());
+    hit.SetTimestamp(timestamp);
 
     if(adc->IsValid()){
       int id = 32*(adc->card_num()-5) + adc->channel_num();
@@ -92,7 +89,12 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
     InsertHit(hit);
   }
 
-  const VME_Timestamp* vme_timestamp = (VME_Timestamp*)data;
+  if(((VME_Timestamp*)data)->ts1() != timestamp){
+    std::cerr << "Inconsistent timestamp from VME-USB:\n"
+              << "\tOn first read:  " << timestamp << "\n"
+              << "\tOn second read: " << ((VME_Timestamp*)data)->ts1() << "\n"
+              << std::flush;
+  }
   data += sizeof(VME_Timestamp);
 
   //assert(data == buf.GetData() + buf.GetSize());

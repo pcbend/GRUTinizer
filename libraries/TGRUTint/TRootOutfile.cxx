@@ -5,11 +5,12 @@
 #include "TDetectorEnv.h"
 #include "TGRUTOptions.h"
 #include "TJanus.h"
+#include "TSega.h"
 #include "TNSCLEvent.h"
 
 TRootOutfile::TRootOutfile() {
   janus = NULL;
-  // sega = NULL;
+  sega = NULL;
   // s800 = NULL;
   // gretina = NULL;
   // caesar = NULL;
@@ -41,10 +42,10 @@ void TRootOutfile::Init(const char* output_filename){
     det_list[kDetectorSystems::JANUS] = janus;
   }
 
-  // if(TDetectorEnv::Sega()){
-  //   event_tree->Branch("TSega","TSega",&sega);
-  //   det_list["TSega"] = sega;
-  // }
+  if(TDetectorEnv::Sega()){
+    event_tree->Branch("TSega","TSega",&sega);
+    det_list[kDetectorSystems::SEGA] = sega;
+  }
 
   // if(TDetectorEnv::S800()){
   //   event_tree->Branch("TS800","TS800",&s800);
@@ -63,16 +64,12 @@ void TRootOutfile::Init(const char* output_filename){
 
   // if(TDetectorEnv::Phoswall()){
   //   event_tree->Branch("TPhoswall","TPhoswall",&phoswall);
-  //   det_list["TSega"] = sega;
+  //   det_list["TPhoswall"] = phoswall;
   // }
 }
 
-void TRootOutfile::AddRawData(const TSmartBuffer& event, kDetectorSystems det_type){
-  // if(FillCondition(event)){
-  //   FillTree();
-  // }
-
-   try{
+void TRootOutfile::AddRawData(const TRawEvent& event, kDetectorSystems det_type){
+  try{
     TDetector* det = det_list.at(det_type);
     det->AddRawData(event);
   } catch (std::out_of_range& e) { }
@@ -80,7 +77,7 @@ void TRootOutfile::AddRawData(const TSmartBuffer& event, kDetectorSystems det_ty
 
 void TRootOutfile::FillTree(){
   for(auto& item : det_list){
-    item.second->BuildHits();
+    item.second->Build();
   }
 
   event_tree->Fill();
@@ -111,7 +108,7 @@ void TRootOutfile::CloseFile(){
 
 void TRootOutfile::Print(Option_t* opt){
   std::cout << "Janus: " << janus << "\n"
-            // << "Sega: " << sega << "\n"
+            << "Sega: " << sega << "\n"
             // << "S800: " << s800 << "\n"
             // << "Gretina: " << gretina << "\n"
             // << "Caesar: " << caesar << "\n"

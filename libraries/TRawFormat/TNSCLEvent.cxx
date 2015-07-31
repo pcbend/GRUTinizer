@@ -11,7 +11,7 @@ Int_t TNSCLEvent::GetBodyHeaderSize() const {
   }
 }
 
-Long_t TNSCLEvent::GetTimestamp() const {
+long TNSCLEvent::GetTimestamp() const {
   if(GetBodyHeaderSize() > 4) {
     return *((Long_t*)(GetBody()+4));
   } else {
@@ -41,8 +41,8 @@ int TNSCLEvent::IsBuiltData() const {
     return is_built_data;
   }
 
-  Int_t sourceid = *((Int_t*)(GetPayload() + sizeof(Long_t)));
-  Int_t barrier  = *((Int_t*)(GetPayload() + sizeof(Long_t) + 2*sizeof(Int_t)));
+  unsigned int sourceid = *((unsigned int*)(GetPayload() + sizeof(Long_t)));
+  unsigned int barrier  = *((unsigned int*)(GetPayload() + sizeof(Long_t) + 2*sizeof(Int_t)));
 
   is_built_data = ((sourceid < 10) &&
                    (barrier == 0));
@@ -98,93 +98,42 @@ Int_t TNSCLScaler::GetScalerValue(size_t scaler_num){
   return *(Int_t*)(GetPayload() + 24 + 4*scaler_num);
 }
 
+TNSCLFragment::TNSCLFragment(TSmartBuffer& buf){
+  memcpy((char*)&fNSCLFragmentHeader, buf.GetData(), sizeof(fNSCLFragmentHeader));
+  buf = buf.BufferSubset(sizeof(fNSCLFragmentHeader));
 
-TNSCLFragment::TNSCLFragment(TSmartBuffer buf)
-  : fBuf(buf) { }
+  memcpy((char*)fNSCLEvent.GetRawHeader(), buf.GetData(), sizeof(TRawEvent::RawHeader));
+  buf = buf.BufferSubset(sizeof(TRawEvent::RawHeader));
 
-Long_t TNSCLFragment::GetFragmentTimestamp() const {
-  return *(Long_t*)(fBuf.GetData()+0);
-}
+  fNSCLEvent.SetFileType(kFileType::NSCL_EVT);
 
-Int_t TNSCLFragment::GetFragmentSourceID() const {
-  return *(Int_t*)(fBuf.GetData()+8);
-}
-
-Int_t TNSCLFragment::GetTotalFragmentSize() const {
-  return (20 + //Fragment header
-          8 +
-          GetFragBodyHeaderSize() +
-          GetFragmentPayloadSize());
-}
-
-Int_t TNSCLFragment::GetFragmentPayloadSize() const {
-  return *(Int_t*)(fBuf.GetData()+12);
-}
-
-Int_t TNSCLFragment::GetFragmentBarrier() const {
-  return *(Int_t*)(fBuf.GetData()+16);
-}
-
-Int_t TNSCLFragment::GetRingItemSize() const {
-  return *(Int_t*)(fBuf.GetData()+20);
-}
-
-Int_t TNSCLFragment::GetRingItemType() const {
-  return *(Int_t*)(fBuf.GetData()+24);
-}
-
-Int_t TNSCLFragment::GetFragBodyHeaderSize() const {
-  Int_t output = *((Int_t*)(fBuf.GetData()+28));
-  if(output == 0) {
-    return 4;  // If only the body header size is present, it is listed as 0.
-  } else {
-    return output;
-  }
-}
-
-Long_t TNSCLFragment::GetFragBodyTimestamp() const {
-  if(GetFragBodyHeaderSize() > 4) {
-    return *((Long_t*)(fBuf.GetData()+32));
-  } else {
-    return -1;
-  }
-}
-
-Int_t TNSCLFragment::GetFragBodySourceID() const {
-  if(GetFragBodyHeaderSize() > 4) {
-    return *((Int_t*)(fBuf.GetData()+40));
-  } else {
-    return -1;
-  }
-}
-
-Int_t TNSCLFragment::GetFragBodyBarrierType() const {
-  if(GetFragBodyHeaderSize() > 4) {
-    return *((Int_t*)(fBuf.GetData()+44));
-  } else {
-    return -1;
-  }
-}
-
-const char* TNSCLFragment::GetFragmentPayload() const {
-  return fBuf.GetData() + 28 + GetFragBodyHeaderSize();
-}
-
-TSmartBuffer TNSCLFragment::GetFragmentPayloadBuffer() const {
-  return fBuf.BufferSubset(28 + GetFragBodyHeaderSize());
+  fNSCLEvent.SetData(buf.BufferSubset(0,fNSCLEvent.GetBodySize()));
+  buf = buf.BufferSubset(fNSCLEvent.GetBodySize());
 }
 
 
-TNSCLBuiltRingItem::TNSCLBuiltRingItem(TSmartBuffer buf)
-  : fBuf(buf) { }
+Long_t       TNSCLFragment::GetFragmentTimestamp()     const{
+  return fNSCLFragmentHeader.timestamp;
+}
+
+Int_t        TNSCLFragment::GetFragmentSourceID()      const{
+  return fNSCLFragmentHeader.sourceid;
+}
+
+Int_t        TNSCLFragment::GetFragmentPayloadSize()   const{
+  return fNSCLFragmentHeader.payload_size;
+}
+
+Int_t        TNSCLFragment::GetFragmentBarrier()       const{
+  return fNSCLFragmentHeader.barrier;
+}
 
 TNSCLBuiltRingItem::TNSCLBuiltRingItem(TNSCLEvent& event)
-  : fBuf(event.GetPayloadBuffer()) {
+  : fEvent(event) {
   assert(kNSCLEventType(event.GetEventType()) == kNSCLEventType::PHYSICS_EVENT);
-  assert(fBuf.GetSize() == GetBuiltRingItemSize());
 }
 
-const TNSCLFragment& TNSCLBuiltRingItem::GetFragment(size_t fragnum) const {
+TNSCLFragment& TNSCLBuiltRingItem::GetFragment(size_t fragnum) {
   BuildFragments();
   return fragments.at(fragnum);
 }
@@ -200,7 +149,7 @@ size_t TNSCLBuiltRingItem::NumFragments() const {
 }
 
 Int_t TNSCLBuiltRingItem::GetBuiltRingItemSize() const {
-  return *(Int_t*)(fBuf.GetData() + 0);
+  return *(Int_t*)fEvent.GetPayloadBuffer().GetData();
 }
 
 void TNSCLBuiltRingItem::BuildFragments() const {
@@ -208,16 +157,12 @@ void TNSCLBuiltRingItem::BuildFragments() const {
     return;
   }
 
-  TSmartBuffer buf = fBuf.BufferSubset(sizeof(Int_t));
+  // Skip past the size of the fragments
+  TSmartBuffer buf = fEvent.GetPayloadBuffer().BufferSubset(sizeof(Int_t));
 
+  // Loop through, extracting each fragment
   while(buf.GetSize()){
-    TNSCLFragment temp(buf);
-    std::cout << "Buffer size: " << buf.GetSize()
-              << "\tFragment size: " << temp.GetTotalFragmentSize()
-              << std::endl;
-    Int_t fragment_size = temp.GetTotalFragmentSize();
-    fragments.emplace_back(buf.BufferSubset(0,fragment_size));
-    buf = buf.BufferSubset(fragment_size);
-    break;
+    // TNSCLFragment constructor advances the buffer
+    fragments.emplace_back(buf);
   }
 }

@@ -12,6 +12,7 @@
 #include "TRawEvent.h"
 
 class TJanus;
+class TSega;
 
 class TRootOutfile : public TObject {
 public:
@@ -20,7 +21,7 @@ public:
 
   void Init(const char* output_filename);
 
-  void AddRawData(const TSmartBuffer& event, kDetectorSystems det_type);
+  void AddRawData(const TRawEvent& event, kDetectorSystems det_type);
   void FillTree();
 
   void FinalizeFile();
@@ -32,7 +33,7 @@ private:
   std::map<kDetectorSystems, TDetector*> det_list;
 
   TJanus*    janus;
-  // TSega*     sega;
+  TSega*     sega;
   // TS800*     s800;
   // TGretina*  gretina;
   // TCaesar*   caesar;

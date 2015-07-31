@@ -10,27 +10,30 @@
 #include "TSmartBuffer.h"
 #include "TGRUTTypes.h"
 
+/// Class holding a single event.
 class TRawEvent : public TObject {
 
 public:
 #include "TRawBanks.h"
 
 public:
+  /// Constructs an empty TRawEvent.
   TRawEvent();
+  /// Copy constructor
   TRawEvent(const TRawEvent&);
   virtual ~TRawEvent();
   TRawEvent& operator=(const TRawEvent &);
 
-  void  Clear(Option_t *opt ="");
-  Int_t Compare(const TRawEvent&) const;
-  void  Copy(const TRawEvent&)    ;
-  void  Print(Option_t *opt ="")  const;
+  virtual void  Clear(Option_t *opt ="");
+  virtual Int_t Compare(const TRawEvent&) const;
+  virtual void  Copy(const TRawEvent&)    ;
+  virtual void  Print(Option_t *opt ="")  const;
 
   RawHeader *GetRawHeader();
   const char *GetBody() const;
   TSmartBuffer& GetBuffer(){ return fBody; }
 
-  void SetData(TSmartBuffer body);
+   void SetData(TSmartBuffer body);
 
   bool IsGoodSize() const;
   void SetFileType(kFileType type) { fFileType = type; }
@@ -39,7 +42,6 @@ public:
   Int_t  GetEventType() const;
   Int_t  GetTotalSize() const;
   Int_t  GetBodySize()  const;
-  virtual long GetTimestamp() const { return -1; }
 
 protected:
   RawHeader fEventHeader;

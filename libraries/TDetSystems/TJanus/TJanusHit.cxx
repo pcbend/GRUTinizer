@@ -9,3 +9,12 @@ void TJanusHit::Copy(TObject& obj) const {
   hit.fOverflowBit = fOverflowBit;
   hit.fUnderflowBit = fUnderflowBit;
 }
+
+void TJanusHit::Clear(Option_t* opt) {
+  TDetectorHit::Clear(opt);
+
+  fEntryType = -1;
+  fChannel = -1;
+  fOverflowBit = -1;
+  fUnderflowBit = -1;
+}

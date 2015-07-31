@@ -10,6 +10,7 @@ public:
 
   virtual long GetTimestamp() const;
 
+  const char* GetPayload() const;
   TSmartBuffer GetPayloadBuffer() const;
 
   virtual void Clear(Option_t *opt ="");

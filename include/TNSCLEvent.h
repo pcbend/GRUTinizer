@@ -25,7 +25,7 @@ enum kNSCLEventType {
 class TNSCLEvent : public TRawEvent {
 public:
   Int_t        GetBodyHeaderSize() const;
-  Long_t       GetTimestamp()      const;
+  long         GetTimestamp()      const;
   Int_t        GetSourceID()       const;
   Int_t        GetBarrierType()    const;
   int          IsBuiltData()       const;
@@ -61,46 +61,38 @@ public:
   ClassDef(TNSCLScaler,0);
 };
 
-
 class TNSCLFragment : public TObject {
 
 public:
-  TNSCLFragment(TSmartBuffer buf);
+  TNSCLFragment(TSmartBuffer& buf);
 
   Long_t       GetFragmentTimestamp()     const;
   Int_t        GetFragmentSourceID()      const;
-  Int_t        GetTotalFragmentSize()     const;
   Int_t        GetFragmentPayloadSize()   const;
   Int_t        GetFragmentBarrier()       const;
-  Int_t        GetRingItemSize()          const;
-  Int_t        GetRingItemType()          const;
-  Int_t        GetFragBodyHeaderSize()    const;
-  Long_t       GetFragBodyTimestamp()     const;
-  Int_t        GetFragBodySourceID()      const;
-  Int_t        GetFragBodyBarrierType()   const;
-  const char*  GetFragmentPayload()       const;
-  TSmartBuffer GetFragmentPayloadBuffer() const;
+
+  TNSCLEvent&  GetNSCLEvent() { return fNSCLEvent; }
 
 private:
-  TSmartBuffer fBuf;
+  TRawEvent::TNSCLFragmentHeader fNSCLFragmentHeader;
+  TNSCLEvent fNSCLEvent;
 
   ClassDef(TNSCLFragment,0);
 };
 
 class TNSCLBuiltRingItem : public TObject {
 public:
-  TNSCLBuiltRingItem(TSmartBuffer buf);
   TNSCLBuiltRingItem(TNSCLEvent& event);
 
-  const TNSCLFragment& GetFragment(size_t fragnum) const;
-        Int_t          Size()                      const;
-        size_t         NumFragments()              const;
-        Int_t          GetBuiltRingItemSize()      const;
+  TNSCLFragment& GetFragment(size_t fragnum);
+  Int_t          Size()                      const;
+  size_t         NumFragments()              const;
+  Int_t          GetBuiltRingItemSize()      const;
 
 private:
   void BuildFragments() const;
 
-  TSmartBuffer fBuf;
+  TNSCLEvent fEvent;
   mutable std::vector<TNSCLFragment> fragments;
 
   ClassDef(TNSCLBuiltRingItem,0);

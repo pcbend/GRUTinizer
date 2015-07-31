@@ -1,5 +1,6 @@
-
 #include "TDetector.h"
+
+#include <iostream>
 
 ClassImp(TDetector)
 
@@ -15,6 +16,7 @@ TDetector::~TDetector() { }
 void TDetector::Clear(Option_t *opt) {
   TNamed::Clear(opt);
   fTimestamp = -1;
+  raw_data.clear();
 }
 
 void TDetector::Print(Option_t *opt) const { }
@@ -35,4 +37,15 @@ int TDetector::Compare(const TObject& obj) const {
   } else {
     return 0;
   }
+}
+
+bool TDetector::AddRawData(const TRawEvent& buf){
+  raw_data.push_back(buf);
+  return true;
+}
+
+int TDetector::Build(){
+  int output = BuildHits();
+  raw_data.clear();
+  return output;
 }

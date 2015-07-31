@@ -85,3 +85,12 @@ std::ostream& operator<<(std::ostream& os, const TRawEvent::RawHeader &head) {
   return os << "\tdatum1      = " << std::setw(8) << head.datum1 << std::endl
             << "\tdatum2      = " << std::setw(8) << head.datum2 << std::endl;
 }
+
+std::ostream& operator<<(std::ostream& os, const TRawEvent::TNSCLFragmentHeader& head){
+  return os << "Fragment Header: " << "\n"
+            << "\tTimestamp: " << head.timestamp << "\n"
+            << "\tSource ID: " << head.sourceid << "\n"
+            << "\tPayload Size: " << head.payload_size << "\n"
+            << "\tBarrier: " << head.barrier << "\n"
+            << std::flush;
+}

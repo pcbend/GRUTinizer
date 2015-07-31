@@ -1,5 +1,7 @@
 #include "TGretina.h"
 
+#include "TGEBEvent.h"
+
 TGretina::TGretina(){
   gretina_hits = new TClonesArray("TGretinaHit");
   addback_hits = new TClonesArray("TGretinaHit");
@@ -58,12 +60,6 @@ void TGretina::SetCRMAT() {
   /* Done! */
 }
 
-bool TGretina::AddRawData(TSmartBuffer buf){
-
-  raw_data.push_back(buf);
-  return true;
-}
-
 void TGretina::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 
@@ -79,8 +75,10 @@ void TGretina::InsertHit(const TDetectorHit& hit){
 }
 
 int TGretina::BuildHits(){
-  for(auto& buf : raw_data){
-    const TRawEvent::GEBBankType1* raw = (const TRawEvent::GEBBankType1*)buf.GetData();
+  for(auto& event : raw_data){
+    TGEBEvent& geb = (TGEBEvent&)event;
+    SetTimestamp(geb.GetTimestamp());
+    const TRawEvent::GEBBankType1* raw = (const TRawEvent::GEBBankType1*)geb.GetPayloadBuffer().GetData();
     TGretinaHit hit;
     hit.BuildFrom(*raw);
     InsertHit(hit);

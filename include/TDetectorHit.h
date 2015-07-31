@@ -30,7 +30,7 @@ public:
       (((unsigned int)type   ) << 16) +
       (((unsigned int)channel) << 0);
   }
-  void   SetCharge(const Int_t chg) { fCharge = chg; }
+  void   SetCharge(Int_t chg) { fCharge = chg; }
 
   static const TVector3 BeamUnitVec; //!
 
