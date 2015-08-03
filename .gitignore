@@ -17,3 +17,4 @@ htmldoc
 .grut_history
 bin
 .build
+.nfs*
