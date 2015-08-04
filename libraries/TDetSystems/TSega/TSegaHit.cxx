@@ -35,7 +35,8 @@ void TSegaHit::SetTrace(unsigned int trace_length, const unsigned short* trace) 
   }
 
   fTraceLength = trace_length;
-  for(unsigned int i=0; i<std::min(trace_length, MAX_TRACE_LENGTH); i++){
+  unsigned int max_length = MAX_TRACE_LENGTH;
+  for(unsigned int i=0; i<std::min(trace_length, max_length); i++){
     fTrace[i] = trace[i];
   }
 }

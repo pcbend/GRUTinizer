@@ -2,6 +2,7 @@
 #include <Globals.h>
 
 #include <cstdio>
+#include <ctime>
 #include <string>
 //#include <sys/stat.h>
 //#include <netdb.h>
@@ -36,6 +37,7 @@
 # endif
 
 
+extern void PopupGrutLogo(bool);
 
 
 void SetGRUTEnv();
@@ -53,13 +55,22 @@ int main(int argc, char **argv) {
    //SetGRUTPluginHandlers();
    TGRUTint *input = 0;
 
-   //Create an instance of the grsi interpreter so that we can run root-like interpretive mode
+   //Create an instance of the grut interpreter so that we can run root-like interpretive mode
    input = TGRUTint::instance(argc,argv);
-   //input->GetOptions(&argc,argv);
+   //PopupGrutLogo(true);
+
    //Run the code!
    input->Run("true");
    //Be polite when you leave.
-   printf("\nbye,bye\n");
+   printf(DMAGENTA "\nbye,bye\t" DCYAN "%s" RESET_COLOR  "\n",getlogin());
+
+   if((clock()%60) == 0){
+     printf("DING!");
+     fflush(stdout);
+     gSystem->Sleep(500);
+     printf("\r              \r");
+     fflush(stdout);
+   }
 
    return 0;
 }

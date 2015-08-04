@@ -3,9 +3,9 @@
 
 #include "TDetectorHit.h"
 
-class TSegaHit : public TDetectorHit {
-  static const unsigned int MAX_TRACE_LENGTH = 100;
+#define MAX_TRACE_LENGTH 100
 
+class TSegaHit : public TDetectorHit {
 public:
   TSegaHit() { }
 

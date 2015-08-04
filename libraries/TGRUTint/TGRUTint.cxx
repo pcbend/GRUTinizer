@@ -1,14 +1,25 @@
 #include <Globals.h>
 #include "TGRUTint.h"
 
+#include <fstream>
+
 #include "TFile.h"
 
 #include "TDetectorEnv.h"
 #include "TGRUTOptions.h"
 #include "TGRUTLoop.h"
+#include "TObjectManager.h"
 
+//#include "Api.h"   // for G__value
+
+#include <TClass.h>
 #include <TROOT.h>
+#include <TString.h>
 
+
+//extern "C" G__value G__getitem(const char* item);
+//#include "FastAllocString.h"
+//char* G__valuemonitor(G__value buf, G__FastAllocString& temp);
 
 extern void PopupLogo(bool);
 extern void WaitLogo();
@@ -59,6 +70,9 @@ void TGRUTint::Init() {
   TGRUTLoop::CreateDataLoop<TGRUTLoop>();
 
   ApplyOptions();
+
+  TObjectManager::Init("GRUT_Manager", "GRUT Manager");
+  gManager->Connect("TObjectManager", "ObjectAppended(TObject*)", "TGRUTint", this, "ObjectAppended(TObject*)");
 }
 
 /*********************************/
@@ -103,7 +117,7 @@ void TGRUTint::ApplyOptions() {
     const char* command = Form("TFile *_file%i = new TFile(\"%s\",\"read\");", i, TGRUTOptions::Get()->RootInputFiles().at(i).c_str());
     ProcessLine(command);
 
-    TFile *file = (TFile*)gROOT->FindObject(TGRUTOptions::Get()->RootInputFiles().at(i).c_str());
+    TFile *file = (TFile*)gROOT->FindObjectAny(TGRUTOptions::Get()->RootInputFiles().at(i).c_str());
     std::cout << "\tfile " << file->GetName() << " opened as _file" << i << std::endl;
 
   }
@@ -114,3 +128,92 @@ void TGRUTint::ApplyOptions() {
     gApplication->Terminate();
   }
 }
+
+Int_t TGRUTint::TabCompletionHook(char* buf, int* pLoc, std::ostream& out){
+  fIsTabComplete = true;
+  auto result = TRint::TabCompletionHook(buf, pLoc, out);
+  fIsTabComplete = false;
+  return result;
+}
+
+
+Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
+  // If you print while fIsTabComplete is true, you will break tab complete.
+  // Any diagnostic print statements should be done after this if statement.
+  if(fIsTabComplete){
+    return TRint::ProcessLine(line, sync, error);
+  }
+
+  TString sline(line);
+  if(!sline.Length()){
+    return 0;
+  }
+
+  if(sline.Contains("for") ||
+     sline.Contains("while") ||
+     sline.Contains("if") ||
+     sline.Contains("{")){
+    return TRint::ProcessLine(line, sync, error);
+  }
+
+  Ssiz_t index;
+
+  if((index = sline.Index(';')) != kNPOS){
+    TString first = sline(0,index);
+    first = first.Strip(TString::kTrailing);
+    long res = ProcessLine(first.Data(),     sync, error);
+    if(sline.Length() > index){
+      TString second = sline(index+1, sline.Length()-index).Data();
+      second = second.Strip(TString::kLeading);
+      res += ProcessLine(second.Data(), sync, error);
+    }
+    return res;
+  }
+
+
+  fNewChild = NULL;
+  
+  long result =  TRint::ProcessLine(line,sync,error);
+
+  if(!fNewChild){
+    return result;
+  }
+
+  if((index = sline.Index("Project",TString::kIgnoreCase))    != kNPOS   ||
+     (index = sline.Index("Projection",TString::kIgnoreCase)) != kNPOS   ||
+     (index = sline.Index("Profile",TString::kIgnoreCase))    != kNPOS   ||
+     (index = sline.Index("Draw",TString::kIgnoreCase))       != kNPOS ) {
+
+    TString newline = ReverseObjectSearch(sline);
+    TObject *parent = gROOT->FindObject(newline.Data());
+
+    if(parent){
+      gManager->AddRelationship(parent, fNewChild);
+    }
+  }
+
+  fNewChild = NULL;
+  return result;
+}
+
+
+TObject* TGRUTint::ObjectAppended(TObject* obj){
+  fNewChild = obj;
+}
+
+
+TString TGRUTint::ReverseObjectSearch(TString &input) {
+
+  int end = 0;
+  int start = input.Length();
+  TString output;
+  for (int i = start; i > 0; i--) {
+    if (input[i] == '.') {
+      return TString(input(0,i));
+    }
+    if (input[i] == '>' && i > 0 && input[i-1] == '-') {
+      return TString(input(0,i-1));
+    }
+  }
+  return TString("");
+};

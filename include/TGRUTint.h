@@ -19,11 +19,22 @@ private:
 public:
   static TGRUTint*instance(int argc=0,char **argv=0,void *opts=0,int numOptions=-1,
                            bool noLogo=true,const char *appClassName="grutinizer");
-
   virtual ~TGRUTint();
 
   void Init();
   void ApplyOptions();
+
+  Long_t ProcessLine(const char* line, Bool_t sync=kFALSE,Int_t *error=0);
+  TString ReverseObjectSearch(TString&);
+
+
+  TObject* ObjectAppended(TObject* obj);
+
+  Int_t TabCompletionHook(char* buf, int* pLoc, std::ostream& out);
+
+private:
+  TObject* fNewChild;
+  bool fIsTabComplete;
 
 
   ClassDef(TGRUTint,0);
