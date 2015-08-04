@@ -1,4 +1,5 @@
 
+
 #include "RConfigure.h"
 
 #include <X11/Xlib.h>
@@ -9,6 +10,8 @@
 
 #include <time.h>
 #include <sys/time.h>
+
+#include <TSystem.h>
 
 static Display     *gDisplay       = 0;
 static Window       gLogoWindow    = 0;
@@ -71,7 +74,7 @@ static Pixmap GetGrutLogo() {
 void PopupGrutLogo(bool flag) { 
   gDisplay = XOpenDisplay("");
   if(!gDisplay) {
-    //printf("gDisplay: XOpenDisplay failed.\n");
+    printf("gDisplay: XOpenDisplay failed.\n");
     return;
   }
 
@@ -110,8 +113,16 @@ void PopupGrutLogo(bool flag) {
   gGC = XCreateGC(gDisplay, gLogoWindow, 0, 0);
   gFont = XLoadQueryFont(gDisplay, "-adobe-helvetica-medium-r-*-*-10-*-*-*-*-*-iso8859-1");
 
+
+
   XSelectInput(gDisplay, gLogoWindow, ButtonPressMask | ExposureMask);
   XMapRaised(gDisplay, gLogoWindow);
+
+  XFlush(gDisplay);
+ 
+  gSystem->Sleep(2000);
+
+  close(ConnectionNumber(gDisplay));
 
   //printf("now to become a logo...\n");  
   return;   
