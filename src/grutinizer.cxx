@@ -30,9 +30,6 @@
 #include <utmpx.h>
 #define STRUCT_UTMP struct utmpx
 #else
-#if defined(__linux) && defined(__powerpc) && (__GNUC__ == 2) && (__GNUC_MINOR__ < 90)
-  extern "C" {
-#endif
 #include <utmp.h>
 #define STRUCT_UTMP struct utmp
 #endif
@@ -46,20 +43,21 @@ static STRUCT_UTMP *SearchEntry(int, const char*);
 static STRUCT_UTMP *gUtmpContents;
 
 static void SetDisplay();
-void SetGRUTEnv();
 void SetGRUTPluginHandlers();
+void LoadGRUTEnv();
 
 
 int main(int argc, char **argv) {
    //Find the grut environment variable so that we can read in .grutrc
+  LoadGRUTEnv();
+
    SetDisplay();
-   SetGRUTEnv();
    //SetGRUTPluginHandlers();
    TGRUTint *input = 0;
 
    //Create an instance of the grut interpreter so that we can run root-like interpretive mode
    input = TGRUTint::instance(argc,argv);
-   PopupGrutLogo(true);
+   //PopupGrutLogo(true);
 
    //Run the code!
    input->Run("true");
@@ -78,14 +76,6 @@ int main(int argc, char **argv) {
 }
 
 
-void SetGRUTEnv() {
-  // Set the GRUTSYS variable based on the executable path.
-  // If GRUTSYS has already been defined, don't overwrite.
-  setenv("GRUTSYS", (program_path()+"/..").c_str(), 0);
-
-  std::string grut_path = program_path() + "/../.grutrc";
-  gEnv->ReadFile(grut_path.c_str(),kEnvChange);
-}
 
 void SetGRUTPluginHandlers() {
    //gPluginMgr->AddHandler("GRootCanvas","grsi","GRootCanvas"
@@ -182,6 +172,13 @@ static int ReadUtmp() {
   return 0;
 }
 
+void LoadGRUTEnv() {
+  // Set the GRUTSYS variable based on the executable path.
+  // If GRUTSYS has already been defined, don't overwrite.
+  setenv("GRUTSYS", (program_path()+"/..").c_str(), 0);
+  std::string grut_path = program_path() + "/../.grutrc";
+  gEnv->ReadFile(grut_path.c_str(),kEnvChange);
+}
 
 static STRUCT_UTMP *SearchEntry(int n, const char *tty) {
   STRUCT_UTMP *ue = gUtmpContents;
@@ -193,4 +190,3 @@ static STRUCT_UTMP *SearchEntry(int n, const char *tty) {
    }
    return 0;
 }
-

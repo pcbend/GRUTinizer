@@ -21,8 +21,6 @@ public:
                            bool noLogo=true,const char *appClassName="grutinizer");
   virtual ~TGRUTint();
 
-  void Init();
-  void ApplyOptions();
 
   Long_t ProcessLine(const char* line, Bool_t sync=kFALSE,Int_t *error=0);
   TString ReverseObjectSearch(TString&);
@@ -36,6 +34,8 @@ private:
   TObject* fNewChild;
   bool fIsTabComplete;
 
+  void Init();
+  void ApplyOptions();
 
   ClassDef(TGRUTint,0);
 };
