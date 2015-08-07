@@ -5,7 +5,7 @@ Unix.*.Root.MacroPath: .:$(GRUTSYS)/util:$(ROOTSYS)/macros
 #files to load at log in:
 Rint.Logon: $(GRUTSYS)/.grut_logon
 Rint.History $(GRUTSYS)/.grut_history
-Rint.HistSize: 1000000 
+Rint.HistSize: 1000000
 
 Rint.PromptColor: #CCCC00
 Rint.BracketColor: bold green
@@ -16,8 +16,3 @@ Rint.TabComColor: magenta
 Canvas.MoveOpaque: true
 Canvas.ShowEventStatus: true
 Canvas.ShowToolBar: true
-
-
-
-
-

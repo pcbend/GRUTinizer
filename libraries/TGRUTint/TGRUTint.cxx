@@ -66,12 +66,9 @@ void TGRUTint::Init() {
   //   PopupLogo(false);
   //   WaitLogo();
   // }
-
   TGRUTLoop::CreateDataLoop<TGRUTLoop>();
-
-  ApplyOptions();
-
   TObjectManager::Init("GRUT_Manager", "GRUT Manager");
+  ApplyOptions();
   gManager->Connect("TObjectManager", "ObjectAppended(TObject*)", "TGRUTint", this, "ObjectAppended(TObject*)");
 }
 
@@ -172,6 +169,7 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
 
 
   fNewChild = NULL;
+
   
   long result =  TRint::ProcessLine(line,sync,error);
 

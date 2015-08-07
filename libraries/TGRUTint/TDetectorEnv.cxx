@@ -52,9 +52,10 @@ Int_t TDetectorEnv::ReadFile(const std::string& filename) {
     return -2;
   }
 
-  char buffer[length];
+  char buffer[length+1];
   infile.seekg(0,std::ios::beg);
   infile.read(buffer,length);
+  buffer[length] = '\0';
 
   ParseInputData(buffer);
   return 1;
