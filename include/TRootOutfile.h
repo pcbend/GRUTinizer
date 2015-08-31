@@ -6,45 +6,43 @@
 #include "TFile.h"
 #include "TObject.h"
 #include "TTree.h"
+#include "TList.h"
 
 #include "TGRUTTypes.h"
 #include "TDetector.h"
 #include "TRawEvent.h"
 
-class TJanus;
-class TSega;
-
 class TRootOutfile : public TObject {
-public:
-  TRootOutfile();
-  ~TRootOutfile();
+  public:
+    TRootOutfile();
+    ~TRootOutfile();
+   
+    // Needs to be made for each.
+    virtual void Init(const char* output_filename) = 0;
+    virtual void FillHits() = 0;
 
-  void Init(const char* output_filename);
+    // Common to all. 
+    void AddRawData(const TRawEvent& event, kDetectorSystems det_type);
+    virtual void FillTree();   //takes from det_list;
+    virtual void FinalizeFile();
+    virtual void CloseFile();
 
-  void AddRawData(const TRawEvent& event, kDetectorSystems det_type);
-  void FillTree();
+    virtual void Clear(Option_t* option = "");  // Clears det_list.
+    virtual void Print(Option_t* option = "") const;
 
-  void FinalizeFile();
-  void CloseFile();
+  protected:
+    TTree *AddTree(const char *tname);
+    TTree *FindTree(const char *tname); 
+    std::map<kDetectorSystems,TDetector*> det_list;
+    std::map<std::string,TList> hist_list;
+    void   SetOutfile(const char *fname) { outfile = new TFile(fname,"recreate"); }
+    TFile *GetOutfile()  { return outfile; }
 
-  void Print(Option_t* option = "");
-
-private:
-  std::map<kDetectorSystems, TDetector*> det_list;
-
-  TJanus*    janus;
-  TSega*     sega;
-  // TS800*     s800;
-  // TGretina*  gretina;
-  // TCaesar*   caesar;
-  // TPhoswall* phoswall;
-
-  TTree* event_tree;
-  TTree* scaler_tree;
-
-  TFile* outfile;
-
-
+  private:
+    TList tree_list;
+   
+    TFile* outfile;
+   
   ClassDef(TRootOutfile, 0);
 };
 

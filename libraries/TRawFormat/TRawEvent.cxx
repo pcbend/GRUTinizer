@@ -7,6 +7,7 @@
 #include <assert.h>
 
 #include "TRawEvent.h"
+#include "TString.h"
 
 ClassImp(TRawEvent)
 
@@ -101,10 +102,10 @@ bool TRawEvent::IsGoodSize() const {
 
 
 void TRawEvent::Print(Option_t *opt) const {
-
-  if(strcmp(opt,"bodyonly"))
+  TString options(opt);
+  if(!options.Contains("bodyonly"))
     std::cout << fEventHeader;
-  fBody.Print("all");
+  fBody.Print(options.Data());
   // printf("\t");
   // for(int x=0; x<GetBodySize(); x+=2) {
   //   if((x%16 == 0) &&

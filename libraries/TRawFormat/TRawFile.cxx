@@ -195,8 +195,8 @@ int TRawFileIn::GetEvent(TRawEvent *rawevent) {
      case kFileType::GRETINA_MODE2:
        break;
      case kFileType::GRETINA_MODE3:
-       printf("I do not know how to read GEB Mode3 data yet.\n");
-       return 0;
+       //printf("I do not know how to read GEB Mode3 data yet.\n");
+       //return 0;
        break;
      case kFileType::UNKNOWN_FILETYPE:
        printf("I do not know how to read Unknown data yet.\n");
@@ -241,24 +241,38 @@ int TRawFileIn::GetEvent(TRawEvent *rawevent) {
 }
 
 int TRawFileIn::FillBuffer(size_t bytes_requested) {
+  //printf("fCurrentBuffer.GetSize()  =  %i\n",fCurrentBuffer.GetSize());
+  //printf("bytes_requested           =  %i\n",bytes_requested);
+
   if(fCurrentBuffer.GetSize() >= bytes_requested){
     return 0;
   }
 
-  char* buf = (char*)malloc(fBufferSize);
+  size_t bytes_allocating = (fBufferSize > bytes_requested) ? fBufferSize : bytes_requested;
+  //printf("bytes_allocation = %i\n",bytes_allocating);
+  char* buf = (char*)malloc(bytes_allocating);
+  
+  //printf("fCurrentBuffer.GetSize()  =  %i\n",fCurrentBuffer.GetSize());
+  //printf("bytes_requested           =  %i\n",bytes_requested);
 
   // Copy any leftover bytes from the previous buffer.
   size_t bytes_to_copy = fCurrentBuffer.GetSize();
   memcpy(buf, fCurrentBuffer.GetData(), bytes_to_copy );
 
+  //printf("bytes_to_copy = %i\n",bytes_to_copy);
+
+
   // Read to fill the buffer.
-  size_t bytes_to_read = fBufferSize - bytes_to_copy;
+  size_t bytes_to_read = bytes_allocating - bytes_to_copy;
+  //printf("bytes_to_read = %i\n",bytes_to_read);
   size_t bytes_read;
   if(fGzFile) {
     bytes_read = gzread(*(gzFile*)fGzFile, buf + bytes_to_copy, bytes_to_read);
   } else {
     bytes_read = readpipe(fFile, buf + bytes_to_copy, bytes_to_read);
   }
+  //printf("bytes_read = %i\n",bytes_read);
+  //printf("bytes sum  = %i\n",bytes_to_read+bytes_to_copy);
 
   // Store everything
   fCurrentBuffer = TSmartBuffer(buf, bytes_to_copy + bytes_read);
@@ -269,7 +283,7 @@ int TRawFileIn::FillBuffer(size_t bytes_requested) {
     fLastErrno = 0;
     fLastError = "EOF";
     return -1;
-  } else if (bytes_read < bytes_requested){
+  } else if ((bytes_read+bytes_to_copy)  < bytes_requested){  //Show to Eric!
     fLastErrno = errno;
     fLastError = strerror(errno);
     return -2;

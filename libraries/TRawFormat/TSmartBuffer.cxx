@@ -1,4 +1,7 @@
 #include "TSmartBuffer.h"
+#include "TString.h"
+#include "TRegexp.h"
+#include "Globals.h"
 
 #include <algorithm>
 #include <iostream>
@@ -86,25 +89,37 @@ TSmartBuffer TSmartBuffer::BufferSubset(size_t pos, size_t length) const {
 }
 
 void TSmartBuffer::Print(Option_t* opt) const {
-  std::cout << "TSmartBuffer allocated at " << (void*)fAllocatedLocation << ", "
-            << "currently pointed at " << (void*)fData << ", "
-            << "with a size of " << fSize << "bytes."
-            << std::endl;
-
+  TString options(opt);
+  TRegexp regexp("0x[0-9a-f][0-9a-f][0-9a-f][0-9a-f]");
+  if(!options.Contains("bodyonly")) {
+    std::cout << "TSmartBuffer allocated at " << (void*)fAllocatedLocation << ", "
+              << "currently pointed at " << (void*)fData << ", "
+              << "with a size of " << fSize << "bytes."
+              << std::endl;
+  }
   if(fReferenceMutex){
     std::unique_lock<std::mutex> lock(*fReferenceMutex);
     std::cout << "There are " << *fReferenceCount << " TSmartBuffers sharing this C-buffer"
               << std::endl;
 
     // Full hexdump of the buffer contents
-    if(!strcmp(opt,"all")){
+    TString highlight_string = options(regexp);   
+    unsigned short highlight = 0;
+    if(highlight_string.Length()) {
+      highlight = strtol(highlight_string.Data(),0,0);
+    }
+    if(options.Contains("all")){
       printf("\t");
       for(int x=0; x<GetSize()-1; x+=2) {
         if((x%16 == 0) &&
            (x!=GetSize())){
           printf("\n\t");
         }
-        printf("0x%04x  ",*(unsigned short*)(GetData()+x));
+        unsigned int value = *(unsigned short*)(GetData()+x);
+        if(highlight>0 && highlight==value) {printf(DRED);}
+        printf("0x%04x  ",value);
+        if(highlight>0 && highlight==value) {printf(RESET_COLOR);}
+        
       }
       if(GetSize()%2 == 1){
         printf("0x02x ", *(unsigned char*)(GetData()+GetSize()-1));

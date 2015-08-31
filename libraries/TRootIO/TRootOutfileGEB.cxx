@@ -1,34 +1,28 @@
-#include "TRootOutfile.h"
+#include "TRootOutfileGEB.h"
 
 #include "Globals.h"
 
 #include "TDetectorEnv.h"
 #include "TGRUTOptions.h"
-#include "TJanus.h"
-#include "TSega.h"
-#include "TNSCLEvent.h"
+#include "TGretina.h"
+#include "TMode3.h"
+#include "TGEBEvent.h"
 
-TRootOutfile::TRootOutfile() {
-  janus = NULL;
-  sega = NULL;
+
+TRootOutfileGEB::TRootOutfileGEB() {
+  gretina = NULL;
   // s800 = NULL;
-  // gretina = NULL;
-  // caesar = NULL;
   // phoswall = NULL;
-
-  outfile = NULL;
-  event_tree = NULL;
-  scaler_tree = NULL;
 }
 
-TRootOutfile::~TRootOutfile() {
+TRootOutfileGEB::~TRootOutfileGEB() {
   if(outfile){
     outfile->Close();
     delete outfile;
   }
 }
 
-void TRootOutfile::Init(const char* output_filename){
+void TRootOutfileGEB::Init(const char* output_filename){
   if(output_filename==NULL){
     output_filename = "my_output.root";
   }
@@ -38,8 +32,8 @@ void TRootOutfile::Init(const char* output_filename){
   scaler_tree = new TTree("ScalerTree","ScalerTree");
 
   if(TDetectorEnv::Janus()){
-    event_tree->Branch("TJanus","TJanus",&janus);
-    det_list[kDetectorSystems::JANUS] = janus;
+    event_tree->Branch("TGretina","TGretina",&gretina);
+    det_list[kDetectorSystems::GRETINA] = gretina;
   }
 
   if(TDetectorEnv::Sega()){
@@ -68,14 +62,14 @@ void TRootOutfile::Init(const char* output_filename){
   // }
 }
 
-void TRootOutfile::AddRawData(const TRawEvent& event, kDetectorSystems det_type){
+void TRootOutfileGEB::AddRawData(const TRawEvent& event, kDetectorSystems det_type){
   try{
     TDetector* det = det_list.at(det_type);
     det->AddRawData(event);
   } catch (std::out_of_range& e) { }
 }
 
-void TRootOutfile::FillTree(){
+void TRootOutfileGEB::FillTree(){
   for(auto& item : det_list){
     item.second->Build();
   }
@@ -88,7 +82,7 @@ void TRootOutfile::FillTree(){
   }
 }
 
-void TRootOutfile::FinalizeFile(){
+void TRootOutfileGEB::FinalizeFile(){
   if(outfile){
     outfile->cd();
   } else {
@@ -102,11 +96,11 @@ void TRootOutfile::FinalizeFile(){
   CloseFile();
 }
 
-void TRootOutfile::CloseFile(){
+void TRootOutfileGEB::CloseFile(){
   outfile->Close();
 }
 
-void TRootOutfile::Print(Option_t* opt){
+void TRootOutfileGEB::Print(Option_t* opt){
   std::cout << "Janus: " << janus << "\n"
             << "Sega: " << sega << "\n"
             // << "S800: " << s800 << "\n"

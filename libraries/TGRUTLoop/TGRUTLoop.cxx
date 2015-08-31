@@ -43,7 +43,18 @@ int TGRUTLoop::ProcessEvent(TRawEvent& event){
 
 void TGRUTLoop::ProcessFile(const char* input, const char* output){
   TDataLoop::ProcessFile(input);
-  outfile = new TRootOutfile();
+  switch(TGRUTOptione::Get()->DetermineFileType(input)) {
+    case kFileType::NSCL_EVT:
+      outfile = new TRootOutfileNSCL();
+      break;
+    case kFileType::GRETINA_MODE2:
+    case kFileType::GRETINA_MODE3:
+      outfile = new TRootOutfileGEB();
+      break;
+    default:
+      fprintf(stderr,"%s: trying to sort unknown filetype:%s\n",__PRETTY_FUNCTION__,input);
+      exit(1);
+  };
   outfile->Init(output);
 }
 
@@ -106,6 +117,9 @@ void TGRUTLoop::ProcessFromQueue(TRawEvent& event){
     //switch(event->GetType()) {
     HandleGEBData(geb_event);
   //};
+  }else if(event.GetFileType()==kFileType::GRETINA_MODE3) {
+    TGEBEvent& geb_event = (TGEBEvent&)event;
+    HandleGEBMode3(geb_event);
   }
 }
 
@@ -150,12 +164,18 @@ void TGRUTLoop::HandleUnbuiltNSCLData(TNSCLEvent& event){
 }
 
 void TGRUTLoop::HandleGEBData(TGEBEvent& event){
-  if(FillCondition(event)){
-    outfile->FillTree();
-  }
-
   kDetectorSystems detector = TDetectorEnv::Get().DetermineSystem(event);
-  outfile->AddRawData(event, detector);
+  TRootOutfileGEBi *gebout = (TRootOutFileGEB*)outfile;
+  if(detector == kDetectorSystems::MODE3) {
+    event.GetPayloadBuffer().GetData();
+
+
+  } else {
+    if(FillCondition(event)){
+      outfile->FillTree();
+    }
+    gebout->AddRawData(event, detector);
+ }
 }
 
 bool TGRUTLoop::FillCondition(TRawEvent& event){
@@ -173,3 +193,20 @@ void TGRUTLoop::Status() {
     }
   }
 }
+
+void HandleGEBMode(TGEBEvent& event) {
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+

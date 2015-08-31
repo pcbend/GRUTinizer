@@ -102,6 +102,8 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename){
   } else if ((ext == "c") || (ext == "C") || (ext == "c+") || (ext == "C+")) {
     return kFileType::ROOT_MACRO;
   } else if (ext == "dat" || ext == "cvt") {
+    if(filename.find("GlobalRaw")!=std::string::npos)
+      return kFileType::GRETINA_MODE3;
     return kFileType::GRETINA_MODE2;
   } else if (ext == "env") {
     return kFileType::DETECTOR_ENVIRONMENT;

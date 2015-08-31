@@ -47,6 +47,47 @@ typedef struct { // Decomposed GRETINA Data
 
 friend std::ostream& operator<<(std::ostream& os, const GEBBankType1 &bank);
 
+friend UShort_t SwapShort(UShort_t datum);
+
+typedef struct {
+  UShort_t a2;
+  UShort_t a1;
+  UShort_t lenghtGA;
+  UShort_t board_id;
+}__attribute__((__packed__)) GEBMode3Head;
+
+friend std::ostream& operator<<(std::ostream& os, const GEBMode3Head &head);
+void SwapMode3Head(GEBMode3Head &head);
+int  GetLength(const GEBMode3Head &head) const; 
+int  GetiChannel(const GEBMode3Head &head) const; 
+int  GetVME(const GEBMode3Head &head) const; 
+int  GetCrystal(const GEBMode3Head &head) const; 
+int  GetHole(const GEBMode3Head &head) const; 
+int  GetSegmentId(const GEBMode3Head &head) const; 
+int  GetCrystalId(const GEBMode3Head &head) const; 
+
+typedef struct {
+  UShort_t led_middle;
+  UShort_t led_low;
+  UShort_t energy_low;
+  UShort_t led_high;
+  UShort_t cfd_low;
+  UShort_t energy_high;
+  UShort_t cfd_high;
+  UShort_t cfd_middle;
+  UShort_t cfd_pt1_high;
+  UShort_t cfd_pt1_low;
+  UShort_t cfd_pt2_high;
+  UShort_t cfd_pt2_low;
+}__attribute__((__packed__)) GEBMode3Data;
+
+friend std::ostream& operator<<(std::ostream& os, const GEBMode3Data &data);
+void SwapMode3Data(GEBMode3Data &data);
+long GetLed(const GEBMode3Data &data) const;
+long GetCfd(const GEBMode3Data &data) const;
+int  GetEnergy(const GEBMode3Data &data, const int channel) const;
+
+
 typedef struct {
    Short_t pix_id;  //int16_t
    Short_t data_a;  //int16_t

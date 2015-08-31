@@ -36,6 +36,8 @@ public:
 
   void Status();
 
+  void GetRootOutfile() { return outfile; }
+
 private:
   template<typename T, typename... Params>
   friend void TDataLoop::CreateDataLoop(Params&&... params);

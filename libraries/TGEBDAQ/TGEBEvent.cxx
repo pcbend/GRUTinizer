@@ -1,4 +1,5 @@
 #include "TGEBEvent.h"
+#include "TString.h"
 
 ClassImp(TGEBEvent);
 
@@ -24,8 +25,13 @@ void TGEBEvent::Clear(Option_t *opt) {
 }
 
 void TGEBEvent::Print(Option_t *opt) const {
+  TString options(opt);
   std::cout << BLUE << "Type:     \t" << DYELLOW << GetEventType() << RESET_COLOR << std::endl;
   std::cout << BLUE << "Size:     \t" << DYELLOW << GetBodySize()  << RESET_COLOR << std::endl;
   std::cout << BLUE << "Timestamp:\t" << DYELLOW << GetTimestamp() << BLUE << "  tens of ns" << RESET_COLOR << std::endl;
-  TRawEvent::Print("bodyonly");
+  if(options.Contains("all")) {
+    TString pass_opt("bodyonly");
+    pass_opt.Append(options);
+    TRawEvent::Print(pass_opt.Data());
+  }
 };

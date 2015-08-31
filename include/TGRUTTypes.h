@@ -8,6 +8,7 @@ enum kDetectorSystems {
   UNKNOWN_SYSTEM = -1,
 
   GRETINA = 1,
+  MODE3   = 2,
   S800 = 5,
 
   SEGA = 64,
