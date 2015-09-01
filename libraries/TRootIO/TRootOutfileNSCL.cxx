@@ -72,11 +72,6 @@ void TRootOutfileNSCL::FillHists() {
 
 void TRootOutfileNSCL::Clear(Option_t *opt) {
   TRootOutfile::Clear(opt);
-  if(janus)    janus->Clear(opt);
-  if(sega)      sega->Clear(opt);
-  //if(s800)      s800->Clear(opt);
-  //if(caesar)  caesar->Clear(opt);
-
 }
 
 void TRootOutfileNSCL::Print(Option_t* opt) const {
@@ -85,5 +80,3 @@ void TRootOutfileNSCL::Print(Option_t* opt) const {
             << "Sega: " << sega << "\n"
             << std::flush;
 }
-
-

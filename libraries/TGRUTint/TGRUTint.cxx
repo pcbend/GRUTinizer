@@ -132,16 +132,21 @@ void TGRUTint::ApplyOptions() {
   }
 
   for(unsigned int i=0; i<opt->RootInputFiles().size(); i++) {
-    const char* command = Form("TFile *_file%i = new TFile(\"%s\",\"read\");", i, opt->RootInputFiles().at(i).c_str());
-    ProcessLine(command);
+    const char* command = Form("TFile *_file%i = new TFile(\"%s\",\"read\")", i, opt->RootInputFiles().at(i).c_str());
+    TRint::ProcessLine(command);
 
-    TFile *file = (TFile*)gROOT->FindObjectAny(opt->RootInputFiles().at(i).c_str());
-    std::cout << "\tfile " << file->GetName() << " opened as _file" << i << std::endl;
+    TFile *file = (TFile*)gROOT->GetListOfFiles()->FindObject(opt->RootInputFiles().at(i).c_str());
+    if(file){
+      std::cout << "\tfile " << file->GetName() << " opened as _file" << i << std::endl;
+    } else {
+      std::cout << __PRETTY_FUNCTION__ << "\tFile " << opt->RootInputFiles().at(i) << " does not exist" << std::endl;
+    }
+
   }
 
   for(auto& macro_filename : opt->MacroInputFiles()){
     const char* command = Form(".x %s", macro_filename.c_str());
-    ProcessLine(command);
+    TRint::ProcessLine(command);
   }
 
   if(TGRUTOptions::Get()->ExitAfterSorting()){

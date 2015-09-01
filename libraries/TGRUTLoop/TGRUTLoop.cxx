@@ -174,6 +174,7 @@ void TGRUTLoop::PrintOutfile(){
 void TGRUTLoop::HandleBuiltNSCLData(TNSCLEvent& event){
   if(event.FillCondition()){
     outfile->FillTree("EventTree");
+    outfile->Clear();
   }
 
   TNSCLBuiltRingItem built(event);
@@ -187,6 +188,7 @@ void TGRUTLoop::HandleBuiltNSCLData(TNSCLEvent& event){
 void TGRUTLoop::HandleUnbuiltNSCLData(TNSCLEvent& event){
   if(event.FillCondition()){
     outfile->FillTree("EventTree");
+    outfile->Clear();
   }
 
   kDetectorSystems detector = TDetectorEnv::Get().DetermineSystem(event);
@@ -199,6 +201,7 @@ void TGRUTLoop::HandleGEBData(TGEBEvent& event){
   if(type==1 || type ==5 || type==17 ) {
     if(event.FillCondition()){
       gebout->FillTree("EventTree");
+      gebout->Clear();
     }
   }
   switch(event.GetEventType()) {
@@ -212,7 +215,7 @@ void TGRUTLoop::HandleGEBData(TGEBEvent& event){
         //printf(DBLUE "I AM HERE!!!!" RESET_COLOR "\n"); fflush(stdout);
         while(m3event.GetNextItem(temp)) {
           //printf(DRED "I AM THERE!!!!" RESET_COLOR  "\n"); fflush(stdout);
-          gebout->HandleMode3(temp);    
+          gebout->HandleMode3(temp);
         }
       }
       break;
@@ -228,7 +231,7 @@ void TGRUTLoop::HandleGEBData(TGEBEvent& event){
       //dance party.
       break;
   };
-  
+
 }
 
 //bool TGRUTLoop::FillCondition(TRawEvent& event){
@@ -246,15 +249,3 @@ void TGRUTLoop::Status() {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
