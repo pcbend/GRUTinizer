@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -83,6 +83,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classTDetector-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">TDetector Class Reference</div>  </div>
@@ -96,7 +99,11 @@ Inheritance diagram for TDetector:</div>
  <div class="center">
   <img src="classTDetector.png" usemap="#TDetector_map" alt=""/>
   <map id="TDetector_map" name="TDetector_map">
-<area href="classTJanus.html" alt="TJanus" shape="rect" coords="0,56,67,80"/>
+<area href="classTGretina.html" alt="TGretina" shape="rect" coords="0,56,71,80"/>
+<area href="classTJanus.html" alt="TJanus" shape="rect" coords="81,56,152,80"/>
+<area href="classTMode3.html" alt="TMode3" shape="rect" coords="162,56,233,80"/>
+<area href="classTPhosWall.html" alt="TPhosWall" shape="rect" coords="243,56,314,80"/>
+<area href="classTSega.html" alt="TSega" shape="rect" coords="324,56,395,80"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -105,14 +112,29 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2e9f42fca6dde69fdf988c119ecefe22"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#a2e9f42fca6dde69fdf988c119ecefe22">TDetector</a> ()</td></tr>
 <tr class="memitem:acfd50fdd60cefed03cd7a466d64e3921"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#acfd50fdd60cefed03cd7a466d64e3921">TDetector</a> (const char *name, const char *title=&quot;&quot;)</td></tr>
 <tr class="memitem:a712d5c527dd6383012c02ea316f2a897"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#a712d5c527dd6383012c02ea316f2a897">~TDetector</a> ()</td></tr>
-<tr class="memitem:a3f5eba3190c08c7481d5a6e1d71244e1"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#a3f5eba3190c08c7481d5a6e1d71244e1">AddRawData</a> (<a class="el" href="classTSmartBuffer.html">TSmartBuffer</a> buf)</td></tr>
-<tr class="memitem:aea2dd8a625dfd4e43c8fa606d87e721d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#aea2dd8a625dfd4e43c8fa606d87e721d">BuildHits</a> ()</td></tr>
+<tr class="memitem:af2a499ca511599eaec889c695561c01a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#af2a499ca511599eaec889c695561c01a">AddRawData</a> (const <a class="el" href="classTRawEvent.html">TRawEvent</a> &amp;buf)</td></tr>
+<tr class="memitem:ae6668fc1ebe234edce77d1440dd1e24b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#ae6668fc1ebe234edce77d1440dd1e24b">Copy</a> (TObject &amp;obj) const </td></tr>
+<tr class="memitem:a3cbbbe5c12f3ae526a766882bdd47814"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#a3cbbbe5c12f3ae526a766882bdd47814">Clear</a> (Option_t *opt=&quot;&quot;)</td></tr>
+<tr class="memitem:abd44e7d6607b1e17565099ad773df66a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#abd44e7d6607b1e17565099ad773df66a">Print</a> (Option_t *opt=&quot;&quot;) const </td></tr>
+<tr class="memitem:a2b6d6efc27ab3517db9d1e8d8af6fb32"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#a2b6d6efc27ab3517db9d1e8d8af6fb32">Compare</a> (const TObject &amp;obj) const </td></tr>
+<tr class="memitem:ae08db18c06d7a59e1e94859983fff0c3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#ae08db18c06d7a59e1e94859983fff0c3">Build</a> ()</td></tr>
 <tr class="memitem:aa24bbc0bb0322825fcec424c4f2ff575"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#aa24bbc0bb0322825fcec424c4f2ff575">InsertHit</a> (const <a class="el" href="classTDetectorHit.html">TDetectorHit</a> &amp;)</td></tr>
 <tr class="memitem:a4d8dbe45adccee3793d8d92a15c96156"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classTDetectorHit.html">TDetectorHit</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#a4d8dbe45adccee3793d8d92a15c96156">GetHit</a> (int i)</td></tr>
-<tr class="memitem:a1f92a1dd0fcfe02bd33de03b8c760646"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#a1f92a1dd0fcfe02bd33de03b8c760646">Size</a> ()</td></tr>
-<tr class="memitem:a6569be1a2becaf21ab2b4b4cdf07d396"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#a6569be1a2becaf21ab2b4b4cdf07d396">Copy</a> (const <a class="el" href="classTDetector.html">TDetector</a> &amp;)</td></tr>
-<tr class="memitem:a3cbbbe5c12f3ae526a766882bdd47814"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#a3cbbbe5c12f3ae526a766882bdd47814">Clear</a> (Option_t *opt=&quot;&quot;)</td></tr>
-<tr class="memitem:ad3e62fafb720dd583f6157817cc28e5b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#ad3e62fafb720dd583f6157817cc28e5b">Print</a> (Option_t *opt=&quot;&quot;)</td></tr>
+<tr class="memitem:a2c8b83ccb196955134393707fc67f559"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#a2c8b83ccb196955134393707fc67f559">Size</a> () const </td></tr>
+<tr class="memitem:ad5c89f0cf322a26afc9595b78efb2321"><td class="memItemLeft" align="right" valign="top">Long_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#ad5c89f0cf322a26afc9595b78efb2321">Timestamp</a> () const </td></tr>
+<tr class="memitem:a6a9b758d696f701101488da64e164f15"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#a6a9b758d696f701101488da64e164f15">SetTimestamp</a> (Long_t <a class="el" href="TRawBanks_8h.html#ac5deed89768140dbc80dbc6529a5e14a">timestamp</a>)</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2><a name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:a7cf606e907949b9c2e74f49757d2d3b3"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classTRawEvent.html">TRawEvent</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#a7cf606e907949b9c2e74f49757d2d3b3">raw_data</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2><a name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:ac9e7fdbfbe6dc18f10adaedd9b287801"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#ac9e7fdbfbe6dc18f10adaedd9b287801">BuildHits</a> ()</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr class="memitem:aba954a1732643835445871ed0c13bec5"><td class="memItemLeft" align="right" valign="top">Long_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetector.html#aba954a1732643835445871ed0c13bec5">fTimestamp</a></td></tr>
 </table>
 <h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a2e9f42fca6dde69fdf988c119ecefe22"></a>
@@ -180,33 +202,38 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2>Member Function Documentation</h2>
-<a class="anchor" id="a3f5eba3190c08c7481d5a6e1d71244e1"></a>
+<a class="anchor" id="af2a499ca511599eaec889c695561c01a"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void TDetector::AddRawData </td>
+          <td class="memname">bool TDetector::AddRawData </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classTSmartBuffer.html">TSmartBuffer</a>&#160;</td>
+          <td class="paramtype">const <a class="el" href="classTRawEvent.html">TRawEvent</a> &amp;&#160;</td>
           <td class="paramname"><em>buf</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classTJanus.html#aca86c817aeb5a9646037bd9c1eda724b">TJanus</a>.</p>
+</div>
+</div>
+<a class="anchor" id="ae08db18c06d7a59e1e94859983fff0c3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int TDetector::Build </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="aea2dd8a625dfd4e43c8fa606d87e721d"></a>
+<a class="anchor" id="ac9e7fdbfbe6dc18f10adaedd9b287801"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -214,7 +241,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void TDetector::BuildHits </td>
+          <td class="memname">virtual int TDetector::BuildHits </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -222,12 +249,10 @@ Public Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Reimplemented in <a class="el" href="classTJanus.html#abe46ed8ba7ea1800882572fd355440ea">TJanus</a>.</p>
 
 </div>
 </div>
@@ -253,9 +278,35 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Reimplemented in <a class="el" href="classTGretina.html#a7bfb9f16c2cbf80dd3ee2978dd35bebe">TGretina</a>, <a class="el" href="classTPhosWall.html#a01faf9ca36e2458fbc6e16dfb2339bf4">TPhosWall</a>, <a class="el" href="classTMode3.html#a6093ce363f639ae6130688dd39512969">TMode3</a>, <a class="el" href="classTJanus.html#a7e7c738f7d4ab0332104f42fe8e2910b">TJanus</a>, and <a class="el" href="classTSega.html#ab381c0f432e575ec37cc2ef0fdee3672">TSega</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="a6569be1a2becaf21ab2b4b4cdf07d396"></a>
+<a class="anchor" id="a2b6d6efc27ab3517db9d1e8d8af6fb32"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int TDetector::Compare </td>
+          <td>(</td>
+          <td class="paramtype">const TObject &amp;&#160;</td>
+          <td class="paramname"><em>obj</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ae6668fc1ebe234edce77d1440dd1e24b"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -265,9 +316,9 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">void TDetector::Copy </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classTDetector.html">TDetector</a> &amp;&#160;</td>
-          <td class="paramname"><em>rhs</em></td><td>)</td>
-          <td></td>
+          <td class="paramtype">TObject &amp;&#160;</td>
+          <td class="paramname"><em>obj</em></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -276,6 +327,8 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Reimplemented in <a class="el" href="classTGretina.html#aa7d4ae917cd8f5c2852ede7c9b009b46">TGretina</a>, <a class="el" href="classTPhosWall.html#aecc1f30fe4bb001544f01bf34baee40e">TPhosWall</a>, <a class="el" href="classTJanus.html#a05ea42050b03f6e011f3bea305a0cd43">TJanus</a>, <a class="el" href="classTMode3.html#ad899f84245dbf3d6b82900dce38f8faa">TMode3</a>, and <a class="el" href="classTSega.html#aa49f431dbae8c834972ba796a78a4cc3">TSega</a>.</p>
 
 </div>
 </div>
@@ -301,7 +354,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classTJanus.html#abcd85dba257038b295223ebd0b86ec78">TJanus</a>.</p>
+<p>Reimplemented in <a class="el" href="classTPhosWall.html#abd0aa60df5f9b81c544e17849dc4335e">TPhosWall</a>, <a class="el" href="classTJanus.html#abcd85dba257038b295223ebd0b86ec78">TJanus</a>, and <a class="el" href="classTSega.html#a33131c512e0e1d8cc2f2221d4ab500a5">TSega</a>.</p>
 
 </div>
 </div>
@@ -327,11 +380,11 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classTJanus.html#a3815a80aee7825bfab9ad64a6398ec6f">TJanus</a>.</p>
+<p>Reimplemented in <a class="el" href="classTGretina.html#afc51a35dfe62731c632ee4b3a908fe40">TGretina</a>, <a class="el" href="classTPhosWall.html#ae03a72fbbc384c2a2055344c08add58a">TPhosWall</a>, <a class="el" href="classTMode3.html#a382a8c1c71fb34414f9833f8129404e4">TMode3</a>, <a class="el" href="classTJanus.html#a3815a80aee7825bfab9ad64a6398ec6f">TJanus</a>, and <a class="el" href="classTSega.html#a4f27441d678e28497540a714dd6a35fe">TSega</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ad3e62fafb720dd583f6157817cc28e5b"></a>
+<a class="anchor" id="abd44e7d6607b1e17565099ad773df66a"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -343,7 +396,7 @@ Public Member Functions</h2></td></tr>
           <td>(</td>
           <td class="paramtype">Option_t *&#160;</td>
           <td class="paramname"><em>opt</em> = <code>&quot;&quot;</code></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -353,9 +406,35 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Reimplemented in <a class="el" href="classTGretina.html#a051532b056e184c697ea1698020a4325">TGretina</a>, <a class="el" href="classTPhosWall.html#afc28622fe56ff5c96c2bd0200e577961">TPhosWall</a>, and <a class="el" href="classTMode3.html#a84c41c2dc1c0721f54dfffeb47f8adc6">TMode3</a>.</p>
+
 </div>
 </div>
-<a class="anchor" id="a1f92a1dd0fcfe02bd33de03b8c760646"></a>
+<a class="anchor" id="a6a9b758d696f701101488da64e164f15"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TDetector::SetTimestamp </td>
+          <td>(</td>
+          <td class="paramtype">Long_t&#160;</td>
+          <td class="paramname"><em>timestamp</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a2c8b83ccb196955134393707fc67f559"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -366,7 +445,7 @@ Public Member Functions</h2></td></tr>
           <td class="memname">virtual int TDetector::Size </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -376,7 +455,71 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classTJanus.html#a709b2050ca26d4da1bdab66ea9a5647c">TJanus</a>.</p>
+<p>Reimplemented in <a class="el" href="classTPhosWall.html#a1d894ce5b237d38e0c6d4ed37d3179dc">TPhosWall</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad5c89f0cf322a26afc9595b78efb2321"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Long_t TDetector::Timestamp </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2>Member Data Documentation</h2>
+<a class="anchor" id="aba954a1732643835445871ed0c13bec5"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Long_t TDetector::fTimestamp</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a7cf606e907949b9c2e74f49757d2d3b3"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="classTRawEvent.html">TRawEvent</a>&gt; TDetector::raw_data</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -387,7 +530,7 @@ Public Member Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jul 27 2015 10:56:05 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Sep 1 2015 15:28:58 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

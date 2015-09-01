@@ -7,6 +7,13 @@ var searchData=
   ['bg_5fred',['BG_RED',['../Globals_8h.html#ac317d04c219b630f9c36b0241d9d4be7',1,'Globals.h']]],
   ['bg_5fwhite',['BG_WHITE',['../Globals_8h.html#a6beded3f171517df3902c52f79f6fea2',1,'Globals.h']]],
   ['bg_5fyellow',['BG_YELLOW',['../Globals_8h.html#ab31fe3e74b1137650d30ede5c9b86218',1,'Globals.h']]],
+  ['bit28to16mask',['BIT28TO16MASK',['../DDASDataFormat_8h.html#a03f10abed008e6bf26d48001bcf8fd05',1,'DDASDataFormat.h']]],
+  ['bit29to16mask',['BIT29TO16MASK',['../DDASDataFormat_8h.html#af8cab0999c662a68f4f5337ee9b7b93a',1,'DDASDataFormat.h']]],
+  ['bit30mask',['BIT30MASK',['../DDASDataFormat_8h.html#abb70a1a39493876150a199a3f14f9bec',1,'DDASDataFormat.h']]],
+  ['bit30to16mask',['BIT30TO16MASK',['../DDASDataFormat_8h.html#adb08166c8136709e59d0ed63511dc450',1,'DDASDataFormat.h']]],
+  ['bit30to29mask',['BIT30TO29MASK',['../DDASDataFormat_8h.html#a23e0d83bc37ecbf0ef93ef7882ba9dbf',1,'DDASDataFormat.h']]],
+  ['bit31mask',['BIT31MASK',['../DDASDataFormat_8h.html#af9099e04b03a2b32e3845223552a021d',1,'DDASDataFormat.h']]],
+  ['bit31to29mask',['BIT31TO29MASK',['../DDASDataFormat_8h.html#ae10db909ec39319a6e158cc488d43c20',1,'DDASDataFormat.h']]],
   ['black',['BLACK',['../Globals_8h.html#a7b3b25cba33b07c303f3060fe41887f6',1,'Globals.h']]],
   ['blue',['BLUE',['../Globals_8h.html#a79d10e672abb49ad63eeaa8aaef57c38',1,'Globals.h']]]
 ];

@@ -68,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -111,96 +111,94 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00022"></a><span class="lineno"><a class="code" href="TNSCLEvent_8h.html#aa2a6ece2af44a2cb0a376ef7d1b6f40aad8635441b7680d694bc6cb82348f4004">   22</a></span>&#160;  <a class="code" href="TNSCLEvent_8h.html#aa2a6ece2af44a2cb0a376ef7d1b6f40aad8635441b7680d694bc6cb82348f4004">FIRST_USER_ITEM_CODE</a> = 32768 <span class="comment">// 0x8000</span></div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;};</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
-<div class="line"><a name="l00025"></a><span class="lineno"><a class="code" href="classTNSCLEvent.html">   25</a></span>&#160;<span class="keyword">class </span><a class="code" href="classTNSCLEvent.html">TNSCLEvent</a> : <span class="keyword">public</span> <a class="code" href="classTRawEvent.html">TRawEvent</a> {</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  Int_t        <a class="code" href="classTNSCLEvent.html#aeaf17238c10936331ad77ead16ed2f00">GetBodyHeaderSize</a>()        <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  Long_t       <a class="code" href="classTNSCLEvent.html#a563fe923012f072e975865346e80919d">GetTimestamp</a>()             <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  Int_t        <a class="code" href="classTNSCLEvent.html#a1866604245af56f8b98cda2ed7b1a5da">GetSourceID</a>()              <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  Int_t        <a class="code" href="classTNSCLEvent.html#a68926ffab5103560760e619e820c09ca">GetBarrierType</a>()           <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keywordtype">int</span>          <a class="code" href="classTNSCLEvent.html#a50c57d63d1a6dd223cb9c90e053d5a84">IsBuiltData</a>(<span class="keywordtype">char</span>* payload) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">char</span>*  <a class="code" href="classTNSCLEvent.html#ad9f994548c0ac6d4f0e831820c0f28de">GetPayload</a>()               <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <a class="code" href="classTSmartBuffer.html" title="Holds a char buffer and manages its memory.">TSmartBuffer</a> <a class="code" href="classTNSCLEvent.html#a8bdf3a443d635e0f4f3ded0b4819726b">GetPayloadBuffer</a>()         <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  Int_t        <a class="code" href="classTNSCLEvent.html#a66cafa12000f2747b2f1365185769847">GetPayloadSize</a>()           <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <a class="code" href="classTNSCLEvent.html#a7c9ee372ca351c52fa7fb3454f58045a">ClassDef</a>(<a class="code" href="classTNSCLEvent.html">TNSCLEvent</a>,0);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;};</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
-<div class="line"><a name="l00039"></a><span class="lineno"><a class="code" href="classTNSCLScaler.html">   39</a></span>&#160;<span class="keyword">class </span><a class="code" href="classTNSCLScaler.html">TNSCLScaler</a> : <span class="keyword">public</span> <a class="code" href="classTNSCLEvent.html">TNSCLEvent</a> {</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="comment">// Seconds since the previous scaler read</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  Int_t <a class="code" href="classTNSCLScaler.html#a3d7604583fe477b4248c820197a9a46e">GetIntervalStartOffset</a>();</div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="code" href="classTNSCLEvent.html">   25</a></span>&#160;<span class="keyword">class </span><a class="code" href="classTNSCLEvent.html">TNSCLEvent</a> : <span class="keyword">public</span> <a class="code" href="classTRawEvent.html" title="Class holding a single event.">TRawEvent</a> {</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <a class="code" href="classTNSCLEvent.html#a8023febd6bb27ec0bb949711ee7818e8">TNSCLEvent</a>();</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <a class="code" href="classTNSCLEvent.html#a8023febd6bb27ec0bb949711ee7818e8">TNSCLEvent</a>(<span class="keyword">const</span> <a class="code" href="classTRawEvent.html" title="Class holding a single event.">TRawEvent</a>&amp;);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classTNSCLEvent.html#a8f9a734dc056ac55c36a515552bac179">~TNSCLEvent</a>();</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    Int_t        <a class="code" href="classTNSCLEvent.html#aeaf17238c10936331ad77ead16ed2f00">GetBodyHeaderSize</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keywordtype">long</span>         <a class="code" href="classTNSCLEvent.html#ac0b2ec15863f5a65c5a6772081078292">GetTimestamp</a>()      <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    Int_t        <a class="code" href="classTNSCLEvent.html#a1866604245af56f8b98cda2ed7b1a5da">GetSourceID</a>()       <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    Int_t        <a class="code" href="classTNSCLEvent.html#a68926ffab5103560760e619e820c09ca">GetBarrierType</a>()    <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordtype">int</span>          <a class="code" href="classTNSCLEvent.html#a3f0e7d96547fa197cf818c16fdb1dc3a">IsBuiltData</a>()       <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span>*  <a class="code" href="classTNSCLEvent.html#ad9f994548c0ac6d4f0e831820c0f28de">GetPayload</a>()        <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <a class="code" href="classTSmartBuffer.html" title="Holds a char buffer and manages its memory.">TSmartBuffer</a> <a class="code" href="classTNSCLEvent.html#a8bdf3a443d635e0f4f3ded0b4819726b">GetPayloadBuffer</a>()  <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    Int_t        <a class="code" href="classTNSCLEvent.html#a66cafa12000f2747b2f1365185769847">GetPayloadSize</a>()    <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classTNSCLEvent.html#af499ee281f9f4fd557388d3d1e865845">FillCondition</a>();</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <a class="code" href="classTNSCLEvent.html#a7c9ee372ca351c52fa7fb3454f58045a">ClassDef</a>(<a class="code" href="classTNSCLEvent.html">TNSCLEvent</a>,0);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;};</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="comment">// Seconds since beginning of run</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  Int_t <a class="code" href="classTNSCLScaler.html#a99f8ab43a77777f2a5bfa623282fdfd3">GetIntervalEndOffset</a>();</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="comment">// Time when writing to disk</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  time_t <a class="code" href="classTNSCLScaler.html#a50fc1ea3ffd076884a0406e61f8e448d">GetUnixTime</a>();</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="comment">// Interval (seconds) between each scaler packet</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  Int_t <a class="code" href="classTNSCLScaler.html#a5e45e982b3b9b0f36f250bc5a8df2019">GetIntervalDivisor</a>();</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment">// Number of integers to follow.</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  Int_t <a class="code" href="classTNSCLScaler.html#aea4e1a7dfe94777c17604dbb60011868">GetScalerCount</a>();</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="comment">// Are the scalers reset after each read</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  Int_t <a class="code" href="classTNSCLScaler.html#a1b7b897a53458c6a9eca8d5c07c0ef7d">IsIncremental</a>();</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  Int_t <a class="code" href="classTNSCLScaler.html#aaf071da644fde6508ebca559e84d6eec">GetScalerValue</a>(<span class="keywordtype">size_t</span> scaler_num);</div>
+<div class="line"><a name="l00044"></a><span class="lineno"><a class="code" href="classTNSCLScaler.html">   44</a></span>&#160;<span class="keyword">class </span><a class="code" href="classTNSCLScaler.html">TNSCLScaler</a> : <span class="keyword">public</span> <a class="code" href="classTNSCLEvent.html">TNSCLEvent</a> {</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="comment">// Seconds since the previous scaler read</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  Int_t <a class="code" href="classTNSCLScaler.html#a3d7604583fe477b4248c820197a9a46e">GetIntervalStartOffset</a>();</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="comment">// Seconds since beginning of run</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  Int_t <a class="code" href="classTNSCLScaler.html#a99f8ab43a77777f2a5bfa623282fdfd3">GetIntervalEndOffset</a>();</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="comment">// Time when writing to disk</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  time_t <a class="code" href="classTNSCLScaler.html#a50fc1ea3ffd076884a0406e61f8e448d">GetUnixTime</a>();</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="comment">// Interval (seconds) between each scaler packet</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  Int_t <a class="code" href="classTNSCLScaler.html#a5e45e982b3b9b0f36f250bc5a8df2019">GetIntervalDivisor</a>();</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment">// Number of integers to follow.</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  Int_t <a class="code" href="classTNSCLScaler.html#aea4e1a7dfe94777c17604dbb60011868">GetScalerCount</a>();</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <a class="code" href="classTNSCLScaler.html#adde0b813614b4dfedecb303548ca6384">ClassDef</a>(<a class="code" href="classTNSCLScaler.html">TNSCLScaler</a>,0);</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;};</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="comment">// Are the scalers reset after each read</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  Int_t <a class="code" href="classTNSCLScaler.html#a1b7b897a53458c6a9eca8d5c07c0ef7d">IsIncremental</a>();</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
-<div class="line"><a name="l00065"></a><span class="lineno"><a class="code" href="classTNSCLFragment.html">   65</a></span>&#160;<span class="keyword">class </span><a class="code" href="classTNSCLFragment.html">TNSCLFragment</a> : <span class="keyword">public</span> TObject {</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  <a class="code" href="classTNSCLFragment.html#a7c11d7d80ec9c2d000747ca0623174b3">TNSCLFragment</a>(<a class="code" href="classTSmartBuffer.html" title="Holds a char buffer and manages its memory.">TSmartBuffer</a> buf);</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  Long_t       <a class="code" href="classTNSCLFragment.html#a9b677b682f1d2b962337895ac96c9be1">GetFragmentTimestamp</a>()     <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  Int_t        <a class="code" href="classTNSCLFragment.html#a845d21ff4ed2925a66c4457d8ad62fc0">GetFragmentSourceID</a>()      <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  Int_t        <a class="code" href="classTNSCLFragment.html#a10b37f743c669b5c5116134bc5a5a6a0">GetTotalFragmentSize</a>()     <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  Int_t        <a class="code" href="classTNSCLFragment.html#a5bc0118cb0c5b69777aadc7db3d4c813">GetFragmentPayloadSize</a>()   <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  Int_t        <a class="code" href="classTNSCLFragment.html#a59c8ec70f697b28cc967f22b33b95b1c">GetFragmentBarrier</a>()       <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  Int_t        <a class="code" href="classTNSCLFragment.html#a86cb1f874a7dd757b583a86f3330edef">GetRingItemSize</a>()          <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  Int_t        <a class="code" href="classTNSCLFragment.html#a8f65134203b3af4ed334de2523d720b1">GetRingItemType</a>()          <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  Int_t        <a class="code" href="classTNSCLFragment.html#a0600f127335e38c432e85b1e0847eb85">GetFragBodyHeaderSize</a>()    <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  Long_t       <a class="code" href="classTNSCLFragment.html#a6a4c03437e9877df84ac79036eb4cd36">GetFragBodyTimestamp</a>()     <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  Int_t        <a class="code" href="classTNSCLFragment.html#aebcfccbd5e340ca5e7bed5f9480a2ea6">GetFragBodySourceID</a>()      <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  Int_t        <a class="code" href="classTNSCLFragment.html#acb30c465f57e60d360f41ac770ddd14a">GetFragBodyBarrierType</a>()   <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  <span class="keyword">const</span> <span class="keywordtype">char</span>*  <a class="code" href="classTNSCLFragment.html#ae99a8e1efa04228fe91fb74bd475f16e">GetFragmentPayload</a>()       <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <a class="code" href="classTSmartBuffer.html" title="Holds a char buffer and manages its memory.">TSmartBuffer</a> <a class="code" href="classTNSCLFragment.html#ae386eac074f85eb7b0a3e64eed577916">GetFragmentPayloadBuffer</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00085"></a><span class="lineno"><a class="code" href="classTNSCLFragment.html#a7f4b514634224db3dbdad545b48630a3">   85</a></span>&#160;  <a class="code" href="classTSmartBuffer.html" title="Holds a char buffer and manages its memory.">TSmartBuffer</a> <a class="code" href="classTNSCLFragment.html#a7f4b514634224db3dbdad545b48630a3">fBuf</a>;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  <a class="code" href="classTNSCLFragment.html#a885eeb15e7bd480e0dd823d3e5b4917a">ClassDef</a>(<a class="code" href="classTNSCLFragment.html">TNSCLFragment</a>,0);</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;};</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
-<div class="line"><a name="l00090"></a><span class="lineno"><a class="code" href="classTNSCLBuiltRingItem.html">   90</a></span>&#160;<span class="keyword">class </span><a class="code" href="classTNSCLBuiltRingItem.html">TNSCLBuiltRingItem</a> : <span class="keyword">public</span> TObject {</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <a class="code" href="classTNSCLBuiltRingItem.html#a5212658f77b8e9ff00f7e8912847ff00">TNSCLBuiltRingItem</a>(<a class="code" href="classTSmartBuffer.html" title="Holds a char buffer and manages its memory.">TSmartBuffer</a> buf);</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  <a class="code" href="classTNSCLBuiltRingItem.html#a5212658f77b8e9ff00f7e8912847ff00">TNSCLBuiltRingItem</a>(<a class="code" href="classTNSCLEvent.html">TNSCLEvent</a>&amp; event);</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  <a class="code" href="classTNSCLFragment.html">TNSCLFragment</a> <a class="code" href="classTNSCLBuiltRingItem.html#aa52c9e37be8eb45625bbbdf595463c67">GetFragment</a>(<span class="keywordtype">size_t</span> fragnum) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  Int_t         <a class="code" href="classTNSCLBuiltRingItem.html#ab8a2a2b856a379476ac3854a6e68c57d">Size</a>()                      <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  <span class="keywordtype">size_t</span>        <a class="code" href="classTNSCLBuiltRingItem.html#a479db782ebc85ace3e3551289f2d02ac">NumFragments</a>()              <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  Int_t         <a class="code" href="classTNSCLBuiltRingItem.html#a230c4accd3a0c4def73e2b92171a7d7e">GetBuiltRingItemSize</a>()      <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  Int_t <a class="code" href="classTNSCLScaler.html#aaf071da644fde6508ebca559e84d6eec">GetScalerValue</a>(<span class="keywordtype">size_t</span> scaler_num);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <a class="code" href="classTNSCLScaler.html#adde0b813614b4dfedecb303548ca6384">ClassDef</a>(<a class="code" href="classTNSCLScaler.html">TNSCLScaler</a>,0);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;};</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
+<div class="line"><a name="l00069"></a><span class="lineno"><a class="code" href="classTNSCLFragment.html">   69</a></span>&#160;<span class="keyword">class </span><a class="code" href="classTNSCLFragment.html">TNSCLFragment</a> : <span class="keyword">public</span> TObject {</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <a class="code" href="classTNSCLFragment.html#ae8015c5a0dbf7d2cff20d3d8990718a4">TNSCLFragment</a>(<a class="code" href="classTSmartBuffer.html" title="Holds a char buffer and manages its memory.">TSmartBuffer</a>&amp; buf);</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  Long_t       <a class="code" href="classTNSCLFragment.html#a9b677b682f1d2b962337895ac96c9be1">GetFragmentTimestamp</a>()     <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  Int_t        <a class="code" href="classTNSCLFragment.html#a845d21ff4ed2925a66c4457d8ad62fc0">GetFragmentSourceID</a>()      <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  Int_t        <a class="code" href="classTNSCLFragment.html#a5bc0118cb0c5b69777aadc7db3d4c813">GetFragmentPayloadSize</a>()   <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  Int_t        <a class="code" href="classTNSCLFragment.html#a59c8ec70f697b28cc967f22b33b95b1c">GetFragmentBarrier</a>()       <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
+<div class="line"><a name="l00079"></a><span class="lineno"><a class="code" href="classTNSCLFragment.html#a331b3b830576270681aa3990bb13b048">   79</a></span>&#160;  <a class="code" href="classTNSCLEvent.html">TNSCLEvent</a>&amp;  <a class="code" href="classTNSCLFragment.html#a331b3b830576270681aa3990bb13b048">GetNSCLEvent</a>() { <span class="keywordflow">return</span> <a class="code" href="classTNSCLFragment.html#af68a25b7c3fad7812277ebca9c66e911">fNSCLEvent</a>; }</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00082"></a><span class="lineno"><a class="code" href="classTNSCLFragment.html#a530902045ed445b3c12aeb03186a4a16">   82</a></span>&#160;  <a class="code" href="structTRawEvent_1_1TNSCLFragmentHeader.html">TRawEvent::TNSCLFragmentHeader</a> <a class="code" href="classTNSCLFragment.html#a530902045ed445b3c12aeb03186a4a16">fNSCLFragmentHeader</a>;</div>
+<div class="line"><a name="l00083"></a><span class="lineno"><a class="code" href="classTNSCLFragment.html#af68a25b7c3fad7812277ebca9c66e911">   83</a></span>&#160;  <a class="code" href="classTNSCLEvent.html">TNSCLEvent</a> <a class="code" href="classTNSCLFragment.html#af68a25b7c3fad7812277ebca9c66e911">fNSCLEvent</a>;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  <a class="code" href="classTNSCLFragment.html#a885eeb15e7bd480e0dd823d3e5b4917a">ClassDef</a>(<a class="code" href="classTNSCLFragment.html">TNSCLFragment</a>,0);</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;};</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
+<div class="line"><a name="l00088"></a><span class="lineno"><a class="code" href="classTNSCLBuiltRingItem.html">   88</a></span>&#160;<span class="keyword">class </span><a class="code" href="classTNSCLBuiltRingItem.html">TNSCLBuiltRingItem</a> : <span class="keyword">public</span> TObject {</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  <a class="code" href="classTNSCLBuiltRingItem.html#accc20c41884695a9a2fc4ba91b348f48">TNSCLBuiltRingItem</a>(<a class="code" href="classTNSCLEvent.html">TNSCLEvent</a>&amp; event);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <a class="code" href="classTNSCLFragment.html">TNSCLFragment</a>&amp; <a class="code" href="classTNSCLBuiltRingItem.html#a1bd9df436d18915a803bb773ec075ae8">GetFragment</a>(<span class="keywordtype">size_t</span> fragnum);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  Int_t          <a class="code" href="classTNSCLBuiltRingItem.html#ab8a2a2b856a379476ac3854a6e68c57d">Size</a>()                      <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  <span class="keywordtype">size_t</span>         <a class="code" href="classTNSCLBuiltRingItem.html#a479db782ebc85ace3e3551289f2d02ac">NumFragments</a>()              <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  Int_t          <a class="code" href="classTNSCLBuiltRingItem.html#a230c4accd3a0c4def73e2b92171a7d7e">GetBuiltRingItemSize</a>()      <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classTNSCLBuiltRingItem.html#aee49573b3090627a062610822ee32dfc">BuildFragments</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classTNSCLBuiltRingItem.html#aee49573b3090627a062610822ee32dfc">BuildFragments</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;</div>
-<div class="line"><a name="l00103"></a><span class="lineno"><a class="code" href="classTNSCLBuiltRingItem.html#a2b249147ab202f1d018303ee1138232d">  103</a></span>&#160;  <a class="code" href="classTSmartBuffer.html" title="Holds a char buffer and manages its memory.">TSmartBuffer</a> <a class="code" href="classTNSCLBuiltRingItem.html#a2b249147ab202f1d018303ee1138232d">fBuf</a>;</div>
-<div class="line"><a name="l00104"></a><span class="lineno"><a class="code" href="classTNSCLBuiltRingItem.html#a11decc2de5ebce344ab42dca0d0e9de9">  104</a></span>&#160;  <span class="keyword">mutable</span> std::vector&lt;TNSCLFragment&gt; <a class="code" href="classTNSCLBuiltRingItem.html#a11decc2de5ebce344ab42dca0d0e9de9">fragments</a>;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  <a class="code" href="classTNSCLBuiltRingItem.html#ae495dfe2a59e361318b32a884908c8df">ClassDef</a>(<a class="code" href="classTNSCLBuiltRingItem.html">TNSCLBuiltRingItem</a>,0);</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;};</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* _TNSCLEVENT_H_ */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
+<div class="line"><a name="l00101"></a><span class="lineno"><a class="code" href="classTNSCLBuiltRingItem.html#a16e4cc6b08b82736a4d87eccf1745373">  101</a></span>&#160;  <a class="code" href="classTNSCLEvent.html">TNSCLEvent</a> <a class="code" href="classTNSCLBuiltRingItem.html#a16e4cc6b08b82736a4d87eccf1745373">fEvent</a>;</div>
+<div class="line"><a name="l00102"></a><span class="lineno"><a class="code" href="classTNSCLBuiltRingItem.html#a11decc2de5ebce344ab42dca0d0e9de9">  102</a></span>&#160;  <span class="keyword">mutable</span> std::vector&lt;TNSCLFragment&gt; <a class="code" href="classTNSCLBuiltRingItem.html#a11decc2de5ebce344ab42dca0d0e9de9">fragments</a>;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  <a class="code" href="classTNSCLBuiltRingItem.html#ae495dfe2a59e361318b32a884908c8df">ClassDef</a>(<a class="code" href="classTNSCLBuiltRingItem.html">TNSCLBuiltRingItem</a>,0);</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;};</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* _TNSCLEVENT_H_ */</span><span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jul 27 2015 10:56:05 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Sep 1 2015 15:28:57 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

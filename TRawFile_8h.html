@@ -68,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -85,14 +85,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#enum-members">Enumerations</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">TRawFile.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="Globals_8h_source.html">Globals.h</a>&quot;</code><br/>
-<code>#include &lt;TObject.h&gt;</code><br/>
+<code>#include &quot;<a class="el" href="TGRUTTypes_8h_source.html">TGRUTTypes.h</a>&quot;</code><br/>
+<code>#include &quot;TObject.h&quot;</code><br/>
+<code>#include &quot;TStopwatch.h&quot;</code><br/>
 <code>#include &quot;<a class="el" href="TSmartBuffer_8h_source.html">TSmartBuffer.h</a>&quot;</code><br/>
 </div>
 <p><a href="TRawFile_8h_source.html">Go to the source code of this file.</a></p>
@@ -100,53 +101,21 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawFile.html">TRawFile</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEventSource.html">TRawEventSource</a></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawFileIn.html">TRawFileIn</a></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawFileOut.html">TRawFileOut</a></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2><a name="enum-members"></a>
-Enumerations</h2></td></tr>
-<tr class="memitem:aa52857f83d8b7cda6be7f0bec0f45229"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TRawFile_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a> { <a class="el" href="TRawFile_8h.html#aa52857f83d8b7cda6be7f0bec0f45229a6ce26a62afab55d7606ad4e92428b30c">UNKNOWN</a> =  -1, 
-<a class="el" href="TRawFile_8h.html#aa52857f83d8b7cda6be7f0bec0f45229a382695eed500c6cf1ef551b2708a6ac5">NSCL_EVT</a> =  1, 
-<a class="el" href="TRawFile_8h.html#aa52857f83d8b7cda6be7f0bec0f45229a84735e457c6ec2f1eda00482194511a5">GRETINA_MODE2</a> =  2, 
-<a class="el" href="TRawFile_8h.html#aa52857f83d8b7cda6be7f0bec0f45229a7effeaf687bae0f670b59d44faa8edc3">GRETINA_MODE3</a> =  3
- }</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:aecb5319015f5f165ac379bed945dcf32"><td class="memItemLeft" align="right" valign="top">enum <a class="el" href="TRawFile_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TRawFile_8h.html#aecb5319015f5f165ac379bed945dcf32">__attribute__</a></td></tr>
+<tr class="memitem:abd7072f8660e6f6af29eb0e527f0966e"><td class="memItemLeft" align="right" valign="top">class <a class="el" href="classTRawFile.html">TRawFile</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TRawFile_8h.html#abd7072f8660e6f6af29eb0e527f0966e">__attribute__</a></td></tr>
 </table>
-<h2>Enumeration Type Documentation</h2>
-<a class="anchor" id="aa52857f83d8b7cda6be7f0bec0f45229"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="TRawFile_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
-<tr><td valign="top"><em><a class="anchor" id="aa52857f83d8b7cda6be7f0bec0f45229a6ce26a62afab55d7606ad4e92428b30c"></a>UNKNOWN</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" id="aa52857f83d8b7cda6be7f0bec0f45229a382695eed500c6cf1ef551b2708a6ac5"></a>NSCL_EVT</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" id="aa52857f83d8b7cda6be7f0bec0f45229a84735e457c6ec2f1eda00482194511a5"></a>GRETINA_MODE2</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" id="aa52857f83d8b7cda6be7f0bec0f45229a7effeaf687bae0f670b59d44faa8edc3"></a>GRETINA_MODE3</em>&nbsp;</td><td>
-</td></tr>
-</table>
-</dd>
-</dl>
-
-</div>
-</div>
 <h2>Variable Documentation</h2>
-<a class="anchor" id="aecb5319015f5f165ac379bed945dcf32"></a>
+<a class="anchor" id="abd7072f8660e6f6af29eb0e527f0966e"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="TRawFile_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a>  <a class="el" href="struct____attribute____.html">__attribute__</a></td>
+          <td class="memname">class <a class="el" href="classTRawFile.html">TRawFile</a>  <a class="el" href="struct____attribute____.html">__attribute__</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -156,7 +125,7 @@ Variables</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jul 27 2015 10:56:05 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Sep 1 2015 15:28:57 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

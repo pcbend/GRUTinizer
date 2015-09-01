@@ -68,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -85,7 +85,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">Globals.h File Reference</div>  </div>
@@ -124,20 +123,9 @@ Macros</h2></td></tr>
 <tr class="memitem:a21ef237e1c4d69656729da4b34c31d8b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Globals_8h.html#a21ef237e1c4d69656729da4b34c31d8b">BG_CYAN</a>&#160;&#160;&#160;&quot;\033[46m&quot;</td></tr>
 <tr class="memitem:ad40305115a1eba76faa49995740aec80"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Globals_8h.html#ad40305115a1eba76faa49995740aec80">HIDE_CURSOR</a>&#160;&#160;&#160;&quot;\033[?25l&quot;</td></tr>
 <tr class="memitem:a09ec0b302bee7262f9959add53ccd0c4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Globals_8h.html#a09ec0b302bee7262f9959add53ccd0c4">SHOW_CURSOR</a>&#160;&#160;&#160;&quot;\033[?25h&quot;</td></tr>
+<tr class="memitem:a70efb5dccaa6fceb0309f24ca94c7a11"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Globals_8h.html#a70efb5dccaa6fceb0309f24ca94c7a11">CURSOR_UP</a>&#160;&#160;&#160;&quot;\033[1A&quot;</td></tr>
+<tr class="memitem:ab222bed94f6c29e3c1970935f0d6e5e5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Globals_8h.html#ab222bed94f6c29e3c1970935f0d6e5e5">CURSOR_DOWN</a>&#160;&#160;&#160;&quot;\033[1B&quot;</td></tr>
 <tr class="memitem:ade3b398d4c616608495b2d29e309badb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Globals_8h.html#ade3b398d4c616608495b2d29e309badb">ALERTTEXT</a>&#160;&#160;&#160;&quot;\033[47m\033[0;31m&quot;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2><a name="enum-members"></a>
-Enumerations</h2></td></tr>
-<tr class="memitem:a6f4793c3f0dce322c8f24e795de0635d"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Globals_8h.html#a6f4793c3f0dce322c8f24e795de0635d">kDetectorSystems</a> { <br/>
-&#160;&#160;<a class="el" href="Globals_8h.html#a6f4793c3f0dce322c8f24e795de0635dac4a07793fcb07e2f6e655cb456858760">GRETINA</a> =  1, 
-<a class="el" href="Globals_8h.html#a6f4793c3f0dce322c8f24e795de0635da7ca0d28fe02d061aaf78fc217f530b31">S800</a> =  5, 
-<a class="el" href="Globals_8h.html#a6f4793c3f0dce322c8f24e795de0635da36249448a33a710c4f32d1480a844098">SEGA</a> =  64, 
-<a class="el" href="Globals_8h.html#a6f4793c3f0dce322c8f24e795de0635da928fee87ad089819efb5f41f2fc22e28">JANUS</a> =  65, 
-<br/>
-&#160;&#160;<a class="el" href="Globals_8h.html#a6f4793c3f0dce322c8f24e795de0635da450ba6973fe311eaeb0b9e4de7b9c932">CAESAR</a> =  80, 
-<a class="el" href="Globals_8h.html#a6f4793c3f0dce322c8f24e795de0635da8cb08586ca9e980b70d0b164c182a9cf">PHOSWICH</a> =  17
-<br/>
- }</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -258,6 +246,30 @@ Functions</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define BLUE&#160;&#160;&#160;&quot;\033[1;34m&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ab222bed94f6c29e3c1970935f0d6e5e5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CURSOR_DOWN&#160;&#160;&#160;&quot;\033[1B&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a70efb5dccaa6fceb0309f24ca94c7a11"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CURSOR_UP&#160;&#160;&#160;&quot;\033[1A&quot;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -480,35 +492,6 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<h2>Enumeration Type Documentation</h2>
-<a class="anchor" id="a6f4793c3f0dce322c8f24e795de0635d"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="Globals_8h.html#a6f4793c3f0dce322c8f24e795de0635d">kDetectorSystems</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
-<tr><td valign="top"><em><a class="anchor" id="a6f4793c3f0dce322c8f24e795de0635dac4a07793fcb07e2f6e655cb456858760"></a>GRETINA</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" id="a6f4793c3f0dce322c8f24e795de0635da7ca0d28fe02d061aaf78fc217f530b31"></a>S800</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" id="a6f4793c3f0dce322c8f24e795de0635da36249448a33a710c4f32d1480a844098"></a>SEGA</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" id="a6f4793c3f0dce322c8f24e795de0635da928fee87ad089819efb5f41f2fc22e28"></a>JANUS</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" id="a6f4793c3f0dce322c8f24e795de0635da450ba6973fe311eaeb0b9e4de7b9c932"></a>CAESAR</em>&nbsp;</td><td>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" id="a6f4793c3f0dce322c8f24e795de0635da8cb08586ca9e980b70d0b164c182a9cf"></a>PHOSWICH</em>&nbsp;</td><td>
-</td></tr>
-</table>
-</dd>
-</dl>
-
-</div>
-</div>
 <h2>Function Documentation</h2>
 <a class="anchor" id="a7f4cf1f9045d5ec5e1b476b1399faba8"></a>
 <div class="memitem">
@@ -529,7 +512,7 @@ Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jul 27 2015 10:56:05 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Sep 1 2015 15:28:57 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

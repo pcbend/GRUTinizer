@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -84,6 +84,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="#friends">Friends</a> &#124;
 <a href="classTRawEvent-members.html">List of all members</a>  </div>
@@ -92,6 +94,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
+<p>Class holding a single event.  
+ <a href="classTRawEvent.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="TRawEvent_8h_source.html">TRawEvent.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for TRawEvent:</div>
@@ -99,8 +104,10 @@ Inheritance diagram for TRawEvent:</div>
  <div class="center">
   <img src="classTRawEvent.png" usemap="#TRawEvent_map" alt=""/>
   <map id="TRawEvent_map" name="TRawEvent_map">
-<area href="classTNSCLEvent.html" alt="TNSCLEvent" shape="rect" coords="0,56,89,80"/>
-<area href="classTNSCLScaler.html" alt="TNSCLScaler" shape="rect" coords="0,112,89,136"/>
+<area href="classTGEBEvent.html" alt="TGEBEvent" shape="rect" coords="0,56,115,80"/>
+<area href="classTNSCLEvent.html" alt="TNSCLEvent" shape="rect" coords="125,56,240,80"/>
+<area href="classTGEBMode3Event.html" alt="TGEBMode3Event" shape="rect" coords="0,112,115,136"/>
+<area href="classTNSCLScaler.html" alt="TNSCLScaler" shape="rect" coords="125,112,240,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -109,47 +116,74 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTRawEvent_1_1____attribute____.html">__attribute__</a></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTRawEvent_1_1EVTHeader.html">EVTHeader</a></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTRawEvent_1_1GEBHeader.html">GEBHeader</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTRawEvent_1_1GEBMode3Data.html">GEBMode3Data</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTRawEvent_1_1GEBMode3Head.html">GEBMode3Head</a></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTRawEvent_1_1RawHeader.html">RawHeader</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTRawEvent_1_1TNSCLFragmentHeader.html">TNSCLFragmentHeader</a></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:aff69fe38a7d99eb3e8dbcae9bf719d69"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structTRawEvent_1_1GEBMode3Head.html">TRawEvent::GEBMode3Head</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#aff69fe38a7d99eb3e8dbcae9bf719d69">__attribute__</a> ((__packed__))</td></tr>
+<tr class="memitem:a11b2d73db44f41bcc964b15a24e512f9"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structTRawEvent_1_1GEBMode3Data.html">TRawEvent::GEBMode3Data</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a11b2d73db44f41bcc964b15a24e512f9">__attribute__</a> ((__packed__))</td></tr>
 <tr class="memitem:a3fb5a8c23d437c134f733c2f6adf120e"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structTRawEvent_1_1RawHeader.html">TRawEvent::RawHeader</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a3fb5a8c23d437c134f733c2f6adf120e">__attribute__</a> ((__packed__)) <a class="el" href="structTRawEvent_1_1RawHeader.html">RawHeader</a></td></tr>
 <tr class="memitem:a71aa338d096851022e338e15bba30791"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structTRawEvent_1_1GEBHeader.html">TRawEvent::GEBHeader</a> <a class="el" href="structTRawEvent_1_1RawHeader.html">RawHeader</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a71aa338d096851022e338e15bba30791">__attribute__</a> ((__packed__)) <a class="el" href="structTRawEvent_1_1GEBHeader.html">GEBHeader</a></td></tr>
 <tr class="memitem:ae668ea9ca2699fbfc12ca066bd0d1162"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structTRawEvent_1_1EVTHeader.html">TRawEvent::EVTHeader</a> <a class="el" href="structTRawEvent_1_1RawHeader.html">RawHeader</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#ae668ea9ca2699fbfc12ca066bd0d1162">__attribute__</a> ((__packed__)) <a class="el" href="structTRawEvent_1_1EVTHeader.html">EVTHeader</a></td></tr>
+<tr class="memitem:ac7289d63edb81d6e6a8c685979c9eb49"><td class="memItemLeft" align="right" valign="top">struct <br class="typebreak"/>
+<a class="el" href="structTRawEvent_1_1TNSCLFragmentHeader.html">TRawEvent::TNSCLFragmentHeader</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#ac7289d63edb81d6e6a8c685979c9eb49">__attribute__</a> ((__packed__)) <a class="el" href="structTRawEvent_1_1TNSCLFragmentHeader.html">TNSCLFragmentHeader</a></td></tr>
 <tr class="memitem:af0360c2132b380fe9099de4c1da67de7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#af0360c2132b380fe9099de4c1da67de7">TRawEvent</a> ()</td></tr>
+<tr class="memdesc:af0360c2132b380fe9099de4c1da67de7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an empty <a class="el" href="classTRawEvent.html" title="Class holding a single event.">TRawEvent</a>.  <a href="#af0360c2132b380fe9099de4c1da67de7"></a><br/></td></tr>
 <tr class="memitem:acea27bc38dff10c36ec2ad1a33039167"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#acea27bc38dff10c36ec2ad1a33039167">TRawEvent</a> (const <a class="el" href="classTRawEvent.html">TRawEvent</a> &amp;)</td></tr>
+<tr class="memdesc:acea27bc38dff10c36ec2ad1a33039167"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor.  <a href="#acea27bc38dff10c36ec2ad1a33039167"></a><br/></td></tr>
 <tr class="memitem:a2c0846280fb88a71e1cb5f7936b8d673"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a2c0846280fb88a71e1cb5f7936b8d673">~TRawEvent</a> ()</td></tr>
 <tr class="memitem:a0dc115ea6d489efeb2d397163b031cd4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classTRawEvent.html">TRawEvent</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a0dc115ea6d489efeb2d397163b031cd4">operator=</a> (const <a class="el" href="classTRawEvent.html">TRawEvent</a> &amp;)</td></tr>
-<tr class="memitem:ab45cabac2c6ebe0e424806b7ba078b35"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#ab45cabac2c6ebe0e424806b7ba078b35">Clear</a> (Option_t *opt=&quot;&quot;)</td></tr>
-<tr class="memitem:a70152502fcccb9ee2ddf1602a1b26733"><td class="memItemLeft" align="right" valign="top">Int_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a70152502fcccb9ee2ddf1602a1b26733">Compare</a> (const <a class="el" href="classTRawEvent.html">TRawEvent</a> &amp;) const </td></tr>
-<tr class="memitem:a3691473f8f99f2849b776f36c3e1f9d6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a3691473f8f99f2849b776f36c3e1f9d6">Copy</a> (const <a class="el" href="classTRawEvent.html">TRawEvent</a> &amp;)</td></tr>
-<tr class="memitem:ae2cafa72682281cbae8cf02430fa4bcc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#ae2cafa72682281cbae8cf02430fa4bcc">Print</a> (Option_t *opt=&quot;&quot;) const </td></tr>
+<tr class="memitem:ab45cabac2c6ebe0e424806b7ba078b35"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#ab45cabac2c6ebe0e424806b7ba078b35">Clear</a> (Option_t *opt=&quot;&quot;)</td></tr>
+<tr class="memitem:a45454afb69e51d9c04cf5dd4cb5302f0"><td class="memItemLeft" align="right" valign="top">virtual Int_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a45454afb69e51d9c04cf5dd4cb5302f0">Compare</a> (const TObject &amp;) const </td></tr>
+<tr class="memitem:a3a3a77f5e9f17e5b37604dcbc22db889"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a3a3a77f5e9f17e5b37604dcbc22db889">Copy</a> (TObject &amp;) const </td></tr>
+<tr class="memitem:ae2cafa72682281cbae8cf02430fa4bcc"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#ae2cafa72682281cbae8cf02430fa4bcc">Print</a> (Option_t *opt=&quot;&quot;) const </td></tr>
 <tr class="memitem:a92b752985d48a7334dd9a403332316fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structTRawEvent_1_1RawHeader.html">RawHeader</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a92b752985d48a7334dd9a403332316fd">GetRawHeader</a> ()</td></tr>
 <tr class="memitem:a486779fc9976a936de9ea3cab4a3fdd4"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a486779fc9976a936de9ea3cab4a3fdd4">GetBody</a> () const </td></tr>
+<tr class="memitem:acd1e4af481115aca7b65fd358847112c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classTSmartBuffer.html">TSmartBuffer</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#acd1e4af481115aca7b65fd358847112c">GetBuffer</a> ()</td></tr>
 <tr class="memitem:a8c48517dffd2d9cb1753f6f56fe1b03d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a8c48517dffd2d9cb1753f6f56fe1b03d">SetData</a> (<a class="el" href="classTSmartBuffer.html">TSmartBuffer</a> body)</td></tr>
 <tr class="memitem:a73f58410845e1b798d129e169e17e2a9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a73f58410845e1b798d129e169e17e2a9">IsGoodSize</a> () const </td></tr>
-<tr class="memitem:a727c6bd6d0939a1a28ebcd2f3787b442"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a727c6bd6d0939a1a28ebcd2f3787b442">SetFileType</a> (<a class="el" href="TRawFile_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a> <a class="el" href="TRawBanks_8h.html#a0e837bfa7ce433612866db897e7f8ce2">type</a>)</td></tr>
+<tr class="memitem:a727c6bd6d0939a1a28ebcd2f3787b442"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a727c6bd6d0939a1a28ebcd2f3787b442">SetFileType</a> (<a class="el" href="TGRUTTypes_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a> <a class="el" href="TRawBanks_8h.html#a0e837bfa7ce433612866db897e7f8ce2">type</a>)</td></tr>
+<tr class="memitem:a50b62b53b243ad1ede1f7ea7680189ba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="TGRUTTypes_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a50b62b53b243ad1ede1f7ea7680189ba">GetFileType</a> ()</td></tr>
 <tr class="memitem:a491a86c3d3b3349045da1d230c75eaab"><td class="memItemLeft" align="right" valign="top">Int_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a491a86c3d3b3349045da1d230c75eaab">GetEventType</a> () const </td></tr>
 <tr class="memitem:ad472def2c521b655247b2c45199079eb"><td class="memItemLeft" align="right" valign="top">Int_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#ad472def2c521b655247b2c45199079eb">GetTotalSize</a> () const </td></tr>
 <tr class="memitem:a87f4c9b2bf7788bcddf54cc63a664375"><td class="memItemLeft" align="right" valign="top">Int_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a87f4c9b2bf7788bcddf54cc63a664375">GetBodySize</a> () const </td></tr>
+<tr class="memitem:a7a379e7db82f054384633c489c529222"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a7a379e7db82f054384633c489c529222">FillCondition</a> ()</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a7d31a419e4fecbf0e09a541902a1e65f"><td class="memItemLeft" align="right" valign="top">static UShort_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a7d31a419e4fecbf0e09a541902a1e65f">SwapShort</a> (UShort_t datum)</td></tr>
+<tr class="memitem:ac0c50635dfbab2cde9d484650e9d5f71"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#ac0c50635dfbab2cde9d484650e9d5f71">SwapMode3Head</a> (<a class="el" href="structTRawEvent_1_1GEBMode3Head.html">GEBMode3Head</a> &amp;<a class="el" href="JanusDataFormat_8h.html#ae0411d119b6e19281b04bbe57cc854bc">head</a>)</td></tr>
+<tr class="memitem:a37c74f08ffe6f62268a3603e4cd96a24"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a37c74f08ffe6f62268a3603e4cd96a24">SwapMode3Data</a> (<a class="el" href="structTRawEvent_1_1GEBMode3Data.html">GEBMode3Data</a> &amp;<a class="el" href="JanusDataFormat_8h.html#aa6e451eccf9519b0809baad41f5ab241">data</a>)</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2><a name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a41a826487d1f95d459d92aa86fd2fa0d"><td class="memItemLeft" align="right" valign="top">typedef&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a41a826487d1f95d459d92aa86fd2fa0d">__attribute__</a></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:af2da61e47c6574fc934ba0e40022c429"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structTRawEvent_1_1RawHeader.html">RawHeader</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#af2da61e47c6574fc934ba0e40022c429">fEventHeader</a></td></tr>
-<tr class="memitem:ab70b5a8ffe70c7cbfe2722c737d29311"><td class="memItemLeft" align="right" valign="top"><a class="el" href="TRawFile_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#ab70b5a8ffe70c7cbfe2722c737d29311">fFileType</a></td></tr>
+<tr class="memitem:ab70b5a8ffe70c7cbfe2722c737d29311"><td class="memItemLeft" align="right" valign="top"><a class="el" href="TGRUTTypes_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#ab70b5a8ffe70c7cbfe2722c737d29311">fFileType</a></td></tr>
 <tr class="memitem:a2613a24af329244ca650c328acbbf4e7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classTSmartBuffer.html">TSmartBuffer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a2613a24af329244ca650c328acbbf4e7">fBody</a></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="friends"></a>
 Friends</h2></td></tr>
 <tr class="memitem:ae9e0677f84e79fdb5d875d4631a27cd5"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#ae9e0677f84e79fdb5d875d4631a27cd5">operator&lt;&lt;</a> (std::ostream &amp;os, const GEBInteractionPoint &amp;fSeg)</td></tr>
 <tr class="memitem:a8a902cc3e30bdd8d92979191f658b632"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a8a902cc3e30bdd8d92979191f658b632">operator&lt;&lt;</a> (std::ostream &amp;os, const GEBBankType1 &amp;bank)</td></tr>
+<tr class="memitem:a148c7e699386a077bc29410516e5fbd7"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a148c7e699386a077bc29410516e5fbd7">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="structTRawEvent_1_1GEBMode3Head.html">GEBMode3Head</a> &amp;<a class="el" href="JanusDataFormat_8h.html#ae0411d119b6e19281b04bbe57cc854bc">head</a>)</td></tr>
+<tr class="memitem:abdab5a688202ce8e774db6ffe093d389"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#abdab5a688202ce8e774db6ffe093d389">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="structTRawEvent_1_1GEBMode3Data.html">GEBMode3Data</a> &amp;<a class="el" href="JanusDataFormat_8h.html#aa6e451eccf9519b0809baad41f5ab241">data</a>)</td></tr>
 <tr class="memitem:a08b9abc891a418ea813168ad5fd09232"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a08b9abc891a418ea813168ad5fd09232">operator&lt;&lt;</a> (std::ostream &amp;os, const PWHit &amp;hit)</td></tr>
 <tr class="memitem:af935d4c73d53d1eef81934dc4d909ca7"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#af935d4c73d53d1eef81934dc4d909ca7">operator&lt;&lt;</a> (std::ostream &amp;os, const PWBank &amp;bank)</td></tr>
 <tr class="memitem:a04182848f8e0010ce7511ff8d20b0e95"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a04182848f8e0010ce7511ff8d20b0e95">operator&lt;&lt;</a> (std::ostream &amp;os, const LaBrSeg &amp;hit)</td></tr>
 <tr class="memitem:ac310c21eb74da4a87dbb141226114fdf"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#ac310c21eb74da4a87dbb141226114fdf">operator&lt;&lt;</a> (std::ostream &amp;os, const LaBrBank &amp;bank)</td></tr>
 <tr class="memitem:a7df56ad6fe5c37dc54b606b1795e7f30"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#a7df56ad6fe5c37dc54b606b1795e7f30">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="structTRawEvent_1_1RawHeader.html">RawHeader</a> &amp;<a class="el" href="JanusDataFormat_8h.html#ae0411d119b6e19281b04bbe57cc854bc">head</a>)</td></tr>
+<tr class="memitem:ab1d798af7b7fea9e8c4f567cddd5a8a5"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTRawEvent.html#ab1d798af7b7fea9e8c4f567cddd5a8a5">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="structTRawEvent_1_1TNSCLFragmentHeader.html">TNSCLFragmentHeader</a> &amp;<a class="el" href="JanusDataFormat_8h.html#ae0411d119b6e19281b04bbe57cc854bc">head</a>)</td></tr>
 </table>
-<h2>Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2>Detailed Description</h2>
+<div class="textblock"><p>Class holding a single event. </p>
+</div><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="af0360c2132b380fe9099de4c1da67de7"></a>
 <div class="memitem">
 <div class="memproto">
@@ -162,6 +196,8 @@ Friends</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Constructs an empty <a class="el" href="classTRawEvent.html" title="Class holding a single event.">TRawEvent</a>. </p>
 
 </div>
 </div>
@@ -178,6 +214,8 @@ Friends</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Copy constructor. </p>
 
 </div>
 </div>
@@ -205,6 +243,38 @@ Friends</h2></td></tr>
 </div>
 </div>
 <h2>Member Function Documentation</h2>
+<a class="anchor" id="aff69fe38a7d99eb3e8dbcae9bf719d69"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct <a class="el" href="structTRawEvent_1_1GEBMode3Head.html">TRawEvent::GEBMode3Head</a> <a class="el" href="structTRawEvent_1_1____attribute____.html">TRawEvent::__attribute__</a> </td>
+          <td>(</td>
+          <td class="paramtype">(__packed__)&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a11b2d73db44f41bcc964b15a24e512f9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct <a class="el" href="structTRawEvent_1_1GEBMode3Data.html">TRawEvent::GEBMode3Data</a> <a class="el" href="structTRawEvent_1_1____attribute____.html">TRawEvent::__attribute__</a> </td>
+          <td>(</td>
+          <td class="paramtype">(__packed__)&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a3fb5a8c23d437c134f733c2f6adf120e"></a>
 <div class="memitem">
 <div class="memproto">
@@ -253,9 +323,28 @@ Friends</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ac7289d63edb81d6e6a8c685979c9eb49"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct <a class="el" href="structTRawEvent_1_1TNSCLFragmentHeader.html">TRawEvent::TNSCLFragmentHeader</a> <a class="el" href="structTRawEvent_1_1____attribute____.html">TRawEvent::__attribute__</a> </td>
+          <td>(</td>
+          <td class="paramtype">(__packed__)&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="ab45cabac2c6ebe0e424806b7ba078b35"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void TRawEvent::Clear </td>
@@ -265,39 +354,87 @@ Friends</h2></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
+
+<p>Reimplemented in <a class="el" href="classTGEBEvent.html#a854737f0f363459ede5f9178c5fa112f">TGEBEvent</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a70152502fcccb9ee2ddf1602a1b26733"></a>
+<a class="anchor" id="a45454afb69e51d9c04cf5dd4cb5302f0"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">Int_t TRawEvent::Compare </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classTRawEvent.html">TRawEvent</a> &amp;&#160;</td>
+          <td class="paramtype">const TObject &amp;&#160;</td>
           <td class="paramname"><em>rhs</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a3691473f8f99f2849b776f36c3e1f9d6"></a>
+<a class="anchor" id="a3a3a77f5e9f17e5b37604dcbc22db889"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void TRawEvent::Copy </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classTRawEvent.html">TRawEvent</a> &amp;&#160;</td>
+          <td class="paramtype">TObject &amp;&#160;</td>
           <td class="paramname"><em>rhs</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a7a379e7db82f054384633c489c529222"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool TRawEvent::FillCondition </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
+
+<p>Reimplemented in <a class="el" href="classTNSCLEvent.html#af499ee281f9f4fd557388d3d1e865845">TNSCLEvent</a>, and <a class="el" href="classTGEBEvent.html#ae3065e990110534e367c5183be962fe7">TGEBEvent</a>.</p>
 
 </div>
 </div>
@@ -331,6 +468,29 @@ Friends</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="acd1e4af481115aca7b65fd358847112c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classTSmartBuffer.html">TSmartBuffer</a>&amp; TRawEvent::GetBuffer </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a491a86c3d3b3349045da1d230c75eaab"></a>
 <div class="memitem">
 <div class="memproto">
@@ -342,6 +502,29 @@ Friends</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a50b62b53b243ad1ede1f7ea7680189ba"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="TGRUTTypes_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a> TRawEvent::GetFileType </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>
@@ -410,6 +593,9 @@ Friends</h2></td></tr>
 <a class="anchor" id="ae2cafa72682281cbae8cf02430fa4bcc"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void TRawEvent::Print </td>
@@ -419,7 +605,14 @@ Friends</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
+
+<p>Reimplemented in <a class="el" href="classTGEBEvent.html#a07192966b31a6a67082ee74c514e645c">TGEBEvent</a>.</p>
 
 </div>
 </div>
@@ -449,7 +642,7 @@ Friends</h2></td></tr>
         <tr>
           <td class="memname">void TRawEvent::SetFileType </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="TRawFile_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="TGRUTTypes_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a>&#160;</td>
           <td class="paramname"><em>type</em></td><td>)</td>
           <td></td>
         </tr>
@@ -457,6 +650,78 @@ Friends</h2></td></tr>
   </td>
   <td class="mlabels-right">
 <span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a37c74f08ffe6f62268a3603e4cd96a24"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TRawEvent::SwapMode3Data </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structTRawEvent_1_1GEBMode3Data.html">TRawEvent::GEBMode3Data</a> &amp;&#160;</td>
+          <td class="paramname"><em>data</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ac0c50635dfbab2cde9d484650e9d5f71"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TRawEvent::SwapMode3Head </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structTRawEvent_1_1GEBMode3Head.html">TRawEvent::GEBMode3Head</a> &amp;&#160;</td>
+          <td class="paramname"><em>head</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a7d31a419e4fecbf0e09a541902a1e65f"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">UShort_t TRawEvent::SwapShort </td>
+          <td>(</td>
+          <td class="paramtype">UShort_t&#160;</td>
+          <td class="paramname"><em>datum</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -516,6 +781,74 @@ Friends</h2></td></tr>
           <td></td>
           <td class="paramtype">const GEBBankType1 &amp;&#160;</td>
           <td class="paramname"><em>bank</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a148c7e699386a077bc29410516e5fbd7"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream&amp; operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structTRawEvent_1_1GEBMode3Head.html">GEBMode3Head</a> &amp;&#160;</td>
+          <td class="paramname"><em>head</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="abdab5a688202ce8e774db6ffe093d389"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream&amp; operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structTRawEvent_1_1GEBMode3Data.html">GEBMode3Data</a> &amp;&#160;</td>
+          <td class="paramname"><em>data</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -702,7 +1035,53 @@ Friends</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ab1d798af7b7fea9e8c4f567cddd5a8a5"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream&amp; operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structTRawEvent_1_1TNSCLFragmentHeader.html">TNSCLFragmentHeader</a> &amp;&#160;</td>
+          <td class="paramname"><em>head</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <h2>Member Data Documentation</h2>
+<a class="anchor" id="a41a826487d1f95d459d92aa86fd2fa0d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef   <a class="el" href="structTRawEvent_1_1____attribute____.html">TRawEvent::__attribute__</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a2613a24af329244ca650c328acbbf4e7"></a>
 <div class="memitem">
 <div class="memproto">
@@ -751,7 +1130,7 @@ Friends</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="TRawFile_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a> TRawEvent::fFileType</td>
+          <td class="memname"><a class="el" href="TGRUTTypes_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a> TRawEvent::fFileType</td>
         </tr>
       </table>
   </td>
@@ -766,12 +1145,13 @@ Friends</h2></td></tr>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>include/<a class="el" href="TRawEvent_8h_source.html">TRawEvent.h</a></li>
 <li>include/<a class="el" href="TRawBanks_8h_source.html">TRawBanks.h</a></li>
+<li>libraries/TRawFormat/<a class="el" href="TRawBanks_8cxx.html">TRawBanks.cxx</a></li>
 <li>libraries/TRawFormat/<a class="el" href="TRawEvent_8cxx.html">TRawEvent.cxx</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jul 27 2015 10:56:06 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Sep 1 2015 15:28:58 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

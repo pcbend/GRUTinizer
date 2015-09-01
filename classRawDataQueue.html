@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -99,6 +99,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a877621027c1c2e4ae2da2f1da1d51d6b"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRawDataQueue.html#a877621027c1c2e4ae2da2f1da1d51d6b">~RawDataQueue</a> ()</td></tr>
 <tr class="memitem:ae12bf615470d2c60dee8668148299a08"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classTRawEvent.html">TRawEvent</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRawDataQueue.html#ae12bf615470d2c60dee8668148299a08">Pop</a> ()</td></tr>
 <tr class="memitem:a2d03fa7548a41553832a4e5a117bde9e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRawDataQueue.html#a2d03fa7548a41553832a4e5a117bde9e">Push</a> (<a class="el" href="classTRawEvent.html">TRawEvent</a> obj)</td></tr>
+<tr class="memitem:af0656d9f2b846e0e32496329a2c2f596"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRawDataQueue.html#af0656d9f2b846e0e32496329a2c2f596">Size</a> ()</td></tr>
 <tr class="memitem:aa4d976da5a82a995f7e03b1faf35b0c7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRawDataQueue.html#aa4d976da5a82a995f7e03b1faf35b0c7">Print</a> ()</td></tr>
 <tr class="memitem:a429a4a26d585d9b5c32b1d883026c661"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRawDataQueue.html#a429a4a26d585d9b5c32b1d883026c661">Status</a> ()</td></tr>
 </table><table class="memberdecls">
@@ -110,8 +111,8 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a859216d81f1007f2ca2b31523c3d6e68"><td class="memItemLeft" align="right" valign="top">std::condition_variable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRawDataQueue.html#a859216d81f1007f2ca2b31523c3d6e68">can_pop</a></td></tr>
 <tr class="memitem:a37b63cae115e7afc732997fbc505fc7f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRawDataQueue.html#a37b63cae115e7afc732997fbc505fc7f">queue_number</a></td></tr>
 <tr class="memitem:ab21563567c1abec4f992ca4fc8b3c53e"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRawDataQueue.html#ab21563567c1abec4f992ca4fc8b3c53e">max_queue_size</a></td></tr>
-<tr class="memitem:a709ff8e0c00db878da404634a8c5df6f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRawDataQueue.html#a709ff8e0c00db878da404634a8c5df6f">items_pushed</a></td></tr>
-<tr class="memitem:a15354b8ad4a9142397baaac39581642b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRawDataQueue.html#a15354b8ad4a9142397baaac39581642b">items_popped</a></td></tr>
+<tr class="memitem:a25f2d87baaa52aa7e27bb943bf863c5f"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRawDataQueue.html#a25f2d87baaa52aa7e27bb943bf863c5f">items_pushed</a></td></tr>
+<tr class="memitem:a9e62af3cb9c545d5f1a9e68125b12c25"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRawDataQueue.html#a9e62af3cb9c545d5f1a9e68125b12c25">items_popped</a></td></tr>
 <tr class="memitem:a3889a04e4c4567d9217dcc4dee15716b"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRawDataQueue.html#a3889a04e4c4567d9217dcc4dee15716b">bytes_in_queue</a></td></tr>
 <tr class="memitem:ac69eef6b625ba66ea59619cfa26d17cb"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRawDataQueue.html#ac69eef6b625ba66ea59619cfa26d17cb">bytes_pushed</a></td></tr>
 <tr class="memitem:a404ff6c61600f62e5dcccaaa33ed0f16"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRawDataQueue.html#a404ff6c61600f62e5dcccaaa33ed0f16">bytes_popped</a></td></tr>
@@ -201,6 +202,21 @@ Static Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classTRawEvent.html">TRawEvent</a>&#160;</td>
           <td class="paramname"><em>obj</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af0656d9f2b846e0e32496329a2c2f596"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t RawDataQueue::Size </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -344,7 +360,7 @@ Static Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a15354b8ad4a9142397baaac39581642b"></a>
+<a class="anchor" id="a9e62af3cb9c545d5f1a9e68125b12c25"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -352,7 +368,7 @@ Static Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int RawDataQueue::items_popped</td>
+          <td class="memname">size_t RawDataQueue::items_popped</td>
         </tr>
       </table>
   </td>
@@ -364,7 +380,7 @@ Static Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a709ff8e0c00db878da404634a8c5df6f"></a>
+<a class="anchor" id="a25f2d87baaa52aa7e27bb943bf863c5f"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -372,7 +388,7 @@ Static Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int RawDataQueue::items_pushed</td>
+          <td class="memname">size_t RawDataQueue::items_pushed</td>
         </tr>
       </table>
   </td>
@@ -511,7 +527,7 @@ Static Private Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jul 27 2015 10:56:05 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Sep 1 2015 15:28:58 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>
