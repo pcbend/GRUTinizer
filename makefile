@@ -7,7 +7,7 @@ PLATFORM:=$(PLATFORM)
 # EDIT THIS SECTION
 
 INCLUDES   = include
-CFLAGS     = -g -std=c++11 -Og
+CFLAGS     = -g -std=c++11 -O3
 #-Wall -Wextra -pedantic -Wno-unused-parameter
 LINKFLAGS_PREFIX  =
 LINKFLAGS_SUFFIX  = -L/opt/X11/lib -lX11 -lXpm -std=c++11
@@ -63,6 +63,9 @@ MAIN_O_FILES    := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard src/*.$(SRC_
 EXE_O_FILES     := $(UTIL_O_FILES) $(SANDBOX_O_FILES)
 EXECUTABLES     := $(patsubst %.o,bin/%,$(notdir $(EXE_O_FILES))) bin/grutinizer
 
+ifdef VERBOSE
+run_and_test = @echo $(1) && $(1);
+else
 run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  \
                 $(1) 2> $(2).log || touch $(2).error; \
                 if test -e $(2).error; then \
@@ -77,6 +80,7 @@ run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  
                       printf "%b%-60s%b%s%b" "$(3)$(4)$(5)" $(notdir $(2)) "$(OK_COLOR)" "$(OK_STRING)" "$(NO_COLOR)\n"   ; \
                 fi; \
                 rm -f $(2).log $(2).error
+endif
 
 all: $(EXECUTABLES) $(LIBRARY_OUTPUT)
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"

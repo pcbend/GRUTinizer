@@ -15,6 +15,10 @@ TRootOutfile::TRootOutfile() {
 }
 
 TRootOutfile::~TRootOutfile() {
+  for(auto list : hist_list){
+    delete list.second;
+  }
+
   if(outfile){
     FinalizeFile();
     CloseFile();
@@ -69,7 +73,7 @@ void TRootOutfile::FillTree(const char *tname) {
     return;
   }
 
-  if(elem->build_det){ 
+  if(elem->build_det){
     for(auto& item : det_list) {
       item.second->Build();
     }
@@ -125,9 +129,9 @@ void TRootOutfile::FinalizeFile(){
       outfile->mkdir(item.first.c_str());
       outfile->cd(item.first.c_str());
     }
-    item.second.Sort();
-    item.second.Write(); 
-    printf(" %i objects written.i\n",item.second.GetSize()); fflush(stdout);
+    item.second->Sort();
+    item.second->Write();
+    printf(" %i objects written.i\n",item.second->GetSize()); fflush(stdout);
     counter++;
   }
   printf("done. %i dirs written.\n",counter); fflush(stdout);
@@ -146,5 +150,3 @@ void TRootOutfile::Print(Option_t* opt) const {
 
   return;
 }
-
-

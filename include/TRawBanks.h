@@ -49,24 +49,25 @@ friend std::ostream& operator<<(std::ostream& os, const GEBBankType1 &bank);
 
 static UShort_t SwapShort(UShort_t datum);
 
-typedef struct {
+struct GEBMode3Head {
   UShort_t a2;
   UShort_t a1;
   UShort_t lengthGA;
   UShort_t board_id;
-  Int_t  GetLength() const; 
-  Int_t  GetChannel() const; 
-  Int_t  GetVME() const; 
-  Int_t  GetCrystal() const; 
-  Int_t  GetHole() const; 
-  Int_t  GetSegmentId() const; 
-  Int_t  GetCrystalId() const; 
-}__attribute__((__packed__)) GEBMode3Head;
+  Int_t  GetLength() const;
+  Int_t  GetChannel() const;
+  Int_t  GetVME() const;
+  Int_t  GetCrystal() const;
+  Int_t  GetHole() const;
+  Int_t  GetSegmentId() const;
+  Int_t  GetCrystalId() const;
+}__attribute__((__packed__));
 
 friend std::ostream& operator<<(std::ostream& os, const GEBMode3Head &head);
 static void SwapMode3Head(GEBMode3Head &head);
 
-typedef struct {
+//typedef struct {
+struct GEBMode3Data {
   UShort_t led_middle;
   UShort_t led_low;
   UShort_t energy_low;
@@ -82,7 +83,7 @@ typedef struct {
   Long_t GetLed() const;
   Long_t GetCfd() const;
   Int_t  GetEnergy(const int channel) const;
-}__attribute__((__packed__)) GEBMode3Data;
+}__attribute__((__packed__));
 
 friend std::ostream& operator<<(std::ostream& os, const GEBMode3Data &data);
 static void SwapMode3Data(GEBMode3Data &data);
