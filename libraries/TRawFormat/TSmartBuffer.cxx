@@ -95,12 +95,6 @@ void TSmartBuffer::Advance(size_t dist) {
 }
 
 void TSmartBuffer::Print(Option_t* opt) const {
-  std::cout << "TSmartBuffer allocated at " << (void*)fAllocatedLocation << ", "
-            << "currently pointed at " << (void*)fData << ", "
-            << "with a size of " << fSize << "bytes."
-            << std::endl;
-
-void TSmartBuffer::Print(Option_t* opt) const {
   TString options(opt);
   TRegexp regexp("0x[0-9a-f][0-9a-f][0-9a-f][0-9a-f]");
   if(!options.Contains("bodyonly")) {
