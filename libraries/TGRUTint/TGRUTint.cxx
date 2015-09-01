@@ -110,13 +110,17 @@ void TGRUTint::ApplyOptions() {
     TGRUTLoop::Get()->Start();
   }
 
-  for(unsigned int i=0; i<TGRUTOptions::Get()->RootInputFiles().size(); i++) {
-    const char* command = Form("TFile *_file%i = new TFile(\"%s\",\"read\");", i, TGRUTOptions::Get()->RootInputFiles().at(i).c_str());
+  for(unsigned int i=0; i<opt->RootInputFiles().size(); i++) {
+    const char* command = Form("TFile *_file%i = new TFile(\"%s\",\"read\");", i, opt->RootInputFiles().at(i).c_str());
     ProcessLine(command);
 
-    TFile *file = (TFile*)gROOT->FindObjectAny(TGRUTOptions::Get()->RootInputFiles().at(i).c_str());
+    TFile *file = (TFile*)gROOT->FindObjectAny(opt->RootInputFiles().at(i).c_str());
     std::cout << "\tfile " << file->GetName() << " opened as _file" << i << std::endl;
+  }
 
+  for(auto& macro_filename : opt->MacroInputFiles()){
+    const char* command = Form(".x %s", macro_filename.c_str());
+    ProcessLine(command);
   }
 
   if(TGRUTOptions::Get()->ExitAfterSorting()){
@@ -170,7 +174,7 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
 
   fNewChild = NULL;
 
-  
+
   long result =  TRint::ProcessLine(line,sync,error);
 
   if(!fNewChild){

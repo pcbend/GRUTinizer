@@ -41,9 +41,12 @@ int TNSCLEvent::IsBuiltData() const {
     return is_built_data;
   }
 
-  unsigned int sourceid = *((unsigned int*)(GetPayload() + sizeof(Long_t)));
-  unsigned int barrier  = *((unsigned int*)(GetPayload() + sizeof(Long_t) + 2*sizeof(Int_t)));
+  // If this is built data, there will be a 4-byte size, followed by a fragment header
+  TRawEvent::TNSCLFragmentHeader* header = (TRawEvent::TNSCLFragmentHeader*)(GetPayload() + sizeof(Int_t));
+  unsigned int sourceid = header->sourceid;
+  unsigned int barrier = header->barrier;
 
+  // Best guess as to whether this is a built event or not.
   is_built_data = ((sourceid < 10) &&
                    (barrier == 0));
 

@@ -37,7 +37,7 @@
 
 // From http://ascii-table.com/ansi-escape-sequences.php
 #define CURSOR_UP "\033[1A"
-#define CURSOR_Down "\033[1B"
+#define CURSOR_DOWN "\033[1B"
 
 #define ALERTTEXT "\033[47m\033[0;31m"
 

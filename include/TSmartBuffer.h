@@ -101,6 +101,15 @@ public:
    */
   TSmartBuffer BufferSubset(size_t pos, size_t length = -1) const;
 
+  /// Advances the pointer by the amount given.
+  /**
+     @param dist The distance by which the pointer should be advanced.
+
+     If the buffer cannot be advanced that far, the pointer
+       will be advanced to the end of the buffer.
+   */
+  void Advance(size_t dist);
+
   /// Prints a short description of the TSmartBuffer.
   void Print(Option_t* opt = "") const;
 

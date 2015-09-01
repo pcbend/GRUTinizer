@@ -85,6 +85,12 @@ TSmartBuffer TSmartBuffer::BufferSubset(size_t pos, size_t length) const {
   return output;
 }
 
+void TSmartBuffer::Advance(size_t dist) {
+  dist = std::min(dist, fSize);
+  fData += dist;
+  fSize -= dist;
+}
+
 void TSmartBuffer::Print(Option_t* opt) const {
   std::cout << "TSmartBuffer allocated at " << (void*)fAllocatedLocation << ", "
             << "currently pointed at " << (void*)fData << ", "
