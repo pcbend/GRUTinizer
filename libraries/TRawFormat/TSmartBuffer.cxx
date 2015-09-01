@@ -88,6 +88,12 @@ TSmartBuffer TSmartBuffer::BufferSubset(size_t pos, size_t length) const {
   return output;
 }
 
+void TSmartBuffer::Advance(size_t dist){
+  dist = std::min(dist,fSize);
+  fData += dist;
+  fSize -= dist;
+}
+
 void TSmartBuffer::Print(Option_t* opt) const {
   TString options(opt);
   TRegexp regexp("0x[0-9a-f][0-9a-f][0-9a-f][0-9a-f]");

@@ -2,15 +2,19 @@
 
 #include "Globals.h"
 
+#include "TGEBEvent.h"
 #include "TDetectorEnv.h"
 #include "TGRUTOptions.h"
+
 #include "TGretina.h"
 #include "TMode3.h"
-#include "TGEBEvent.h"
 
+ClassImp(TRootOutfileGEB)
 
 TRootOutfileGEB::TRootOutfileGEB() {
+  fMode3Init = false;
   gretina = NULL;
+  mode3   = NULL;
   // s800 = NULL;
   // phoswall = NULL;
 }
@@ -19,6 +23,8 @@ TRootOutfileGEB::~TRootOutfileGEB() {
   if(outfile){
     outfile->Close();
     delete outfile;
+    // GetOutfile()->Close();
+    // GetOutfile()->Delete();;
   }
 }
 
@@ -26,19 +32,15 @@ void TRootOutfileGEB::Init(const char* output_filename){
   if(output_filename==NULL){
     output_filename = "my_output.root";
   }
-  outfile = new TFile(output_filename, "RECREATE");
+  SetOutfile(output_filename);
 
-  event_tree = new TTree("EventTree","EventTree");
-  scaler_tree = new TTree("ScalerTree","ScalerTree");
+  TTree *event_tree  = AddTree("EventTree","Mode 2 data");
+  TTree *scaler_tree = AddTree("ScalerTree","ScalerTree");
 
-  if(TDetectorEnv::Janus()){
+
+  if(TDetectorEnv::Gretina()){
     event_tree->Branch("TGretina","TGretina",&gretina);
     det_list[kDetectorSystems::GRETINA] = gretina;
-  }
-
-  if(TDetectorEnv::Sega()){
-    event_tree->Branch("TSega","TSega",&sega);
-    det_list[kDetectorSystems::SEGA] = sega;
   }
 
   // if(TDetectorEnv::S800()){
@@ -46,10 +48,6 @@ void TRootOutfileGEB::Init(const char* output_filename){
   //   det_list["TS800"] = s800;
   // }
 
-  // if(TDetectorEnv::Gretina()){
-  //   event_tree->Branch("TGretina","TGretina",&gretina);
-  //   det_list["TGretina"] = gretina;
-  // }
 
   // if(TDetectorEnv::Caesar()){
   //   event_tree->Branch("TCaesar","TCaesar",&caesar);
@@ -60,72 +58,41 @@ void TRootOutfileGEB::Init(const char* output_filename){
   //   event_tree->Branch("TPhoswall","TPhoswall",&phoswall);
   //   det_list["TPhoswall"] = phoswall;
   // }
+  InitHists();
+
 }
 
-void TRootOutfileGEB::AddRawData(const TRawEvent& event, kDetectorSystems det_type){
-  try{
-    TDetector* det = det_list.at(det_type);
-    det->AddRawData(event);
-  } catch (std::out_of_range& e) { }
+void TRootOutfileGEB::InitHists() {
+  return;
 }
 
-void TRootOutfileGEB::FillTree(){
-  for(auto& item : det_list){
-    item.second->Build();
+void TRootOutfileGEB::FillHists() {
+  return;
+}
+
+void TRootOutfileGEB::Clear(Option_t *opt) {
+  TRootOutfile::Clear(opt);
+  if(gretina) gretina->Clear();
+  if(mode3)     mode3->Clear();
+}
+
+
+void TRootOutfileGEB::HandleMode3(const TMode3 &rhs) {
+  //printf("mode3 = 0x%08x\n",mode3);  fflush(stdout);
+  if(!fMode3Init) {
+    TTree *mode3_tree = AddTree("Data","Mode 3 data");
+    mode3_tree->Branch("TMode3","TMode3",&mode3);
+    fMode3Init=true;
   }
-
-  event_tree->Fill();
-  scaler_tree->Fill();
-
-  for(auto& item : det_list){
-    item.second->Clear();
-  }
+  //printf("mode3 = 0x%08x\n",mode3);  fflush(stdout);
+  rhs.Copy(*mode3);
+  FindTree("Data")->Fill();
 }
 
-void TRootOutfileGEB::FinalizeFile(){
-  if(outfile){
-    outfile->cd();
-  } else {
-    return;
-  }
 
-  std::cout << "Writing trees" << std::endl;
-  event_tree->Write();
-  scaler_tree->Write();
 
-  CloseFile();
-}
 
-void TRootOutfileGEB::CloseFile(){
-  outfile->Close();
-}
-
-void TRootOutfileGEB::Print(Option_t* opt){
-  std::cout << "Janus: " << janus << "\n"
-            << "Sega: " << sega << "\n"
-            // << "S800: " << s800 << "\n"
-            // << "Gretina: " << gretina << "\n"
-            // << "Caesar: " << caesar << "\n"
-            // << "Phoswall: " << phoswall << "\n"
+void TRootOutfileGEB::Print(Option_t* opt) const {
+  std::cout << "Comming Soon!\n"
             << std::flush;
 }
-
-
-// void TChannel::Streamer(TBuffer &R__b) {
-//    this->SetBit(kCanDelete);
-//    UInt_t R__s, R__c;
-//    if(R__b.IsReading()) { // reading from file
-//       Version_t R__v = R__b.ReadVersion(&R__s,&R__c); if (R__v) { }
-//       TNamed::Streamer(R__b);
-//       { TString R__str; R__str.Streamer(R__b); fFileName.assign(R__str.Data()); }
-//       { TString R__str; R__str.Streamer(R__b); fFileData.assign(R__str.Data()); }
-//       InitChannelInput();
-//       R__b.CheckByteCount(R__s,R__c,TChannel::IsA());
-//    } else {               // writing to file
-//       R__c = R__b.WriteVersion(TChannel::IsA(),true);
-//       TNamed::Streamer(R__b);
-//       {TString R__str = fFileName.c_str(); R__str.Streamer(R__b);}
-//       {TString R__str = fFileData.c_str(); R__str.Streamer(R__b);}
-//       R__b.SetByteCount(R__c,true);
-//    }
-// }

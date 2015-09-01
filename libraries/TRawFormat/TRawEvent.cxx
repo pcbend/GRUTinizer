@@ -17,27 +17,27 @@ TRawEvent::TRawEvent() {
   fFileType = kFileType::UNKNOWN_FILETYPE;
 }
 
-void TRawEvent::Copy(const TRawEvent &rhs) {
-  Clear();
-  fEventHeader = rhs.fEventHeader;
-  fBody = rhs.fBody;
-  fFileType = rhs.fFileType;
+void TRawEvent::Copy(TObject &rhs) const {
+  rhs.Clear();
+  ((TRawEvent&)rhs).fEventHeader = fEventHeader;
+  ((TRawEvent&)rhs).fBody        = fBody;
+  ((TRawEvent&)rhs).fFileType    = fFileType;
 }
 
 TRawEvent::TRawEvent(const TRawEvent &rhs) {
-  Copy(rhs);
+  rhs.Copy(*this);
 }
 
 TRawEvent::~TRawEvent() {
   Clear();
 }
 
-Int_t TRawEvent::Compare(const TRawEvent &rhs) const { }
+Int_t TRawEvent::Compare(const TObject &rhs) const { }
 
 TRawEvent &TRawEvent::operator=(const TRawEvent &rhs) {
   if(&rhs!=this)
     Clear();
-  this->Copy(rhs);
+  rhs.Copy(*this);
   return *this;
 }
 

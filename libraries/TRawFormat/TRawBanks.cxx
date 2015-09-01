@@ -39,56 +39,56 @@ std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBBankType1 &bank) 
    return os;
 };
 
-UShort_t SwapShort(UShort_t datum) {
+UShort_t TRawEvent:: SwapShort(UShort_t datum) {
   UShort_t temp = 0;
   temp = (datum&0x00ff);
   return (temp<<8) + (datum>>8);
 }
 
-void SwapMode3Head(TRawEvent::GEBMode3Head &head) {
-  lengthGA = SwapShort(lengthGA);
-  board_id = SwapShort(board_id);
+void TRawEvent::SwapMode3Head(TRawEvent::GEBMode3Head &head) {
+  head.lengthGA = SwapShort(head.lengthGA);
+  head.board_id = SwapShort(head.board_id);
 }
 
 std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBMode3Head &head) {
-  os << "a1       = " << hex << head.a1 << std::endl; 
-  os << "a2       = " << hex << head.a2 << std::endl; 
-  os << "board_id = " << hex << head.a1 << std::endl; 
-  os << "lengthGA = " << hex << head.a1 << std::endl; 
+  os << "a1       = " << std::hex << head.a1 << std::endl; 
+  os << "a2       = " << std::hex << head.a2 << std::endl; 
+  os << "board_id = " << std::hex << head.a1 << std::endl; 
+  os << "lengthGA = " << std::hex << head.a1 << std::endl; 
   return os;
 }
 
-int GetLength(const GEBMode3Head &head)    const { return lengthGA&0x07ff; } 
-int GetiChannel(const GEBMode3Head &head)  const { return board_id&0x000f; } 
-int GetVME(const GEBMode3Head &head)       const { return (board_id&0x0030)>>4; } 
-int GetCrystal(const GEBMode3Head &head)   const { return (board_id&0x00c0)>>6; } 
-int GetHole(const GEBMode3Head &head)      const { return (board_id&0x1f00)>>8 ; } 
-int GetSegmentId(const GEBMode3Head &head) const { return GetVME()*10+GetChannel(); } 
-int GetCrystalId(const GEBMode3Head &head) const { return GetHole()*4+GetCrystal(); } 
+Int_t TRawEvent::GEBMode3Head::GetLength()     const { return  lengthGA&0x07ff; } 
+Int_t TRawEvent::GEBMode3Head::GetChannel()    const { return  board_id&0x000f; } 
+Int_t TRawEvent::GEBMode3Head::GetVME()        const { return (board_id&0x0030)>>4; } 
+Int_t TRawEvent::GEBMode3Head::GetCrystal()    const { return (board_id&0x00c0)>>6; } 
+Int_t TRawEvent::GEBMode3Head::GetHole()       const { return (board_id&0x1f00)>>8 ; } 
+Int_t TRawEvent::GEBMode3Head::GetSegmentId()  const { return GetVME()*10+GetChannel(); } 
+Int_t TRawEvent::GEBMode3Head::GetCrystalId()  const { return GetHole()*4+GetCrystal(); } 
 
-void SwapMode3Data(TRawEvent::GEBMode3Data &data) {
-  led_middle   = SwapShort(led_middle)   ;
-  led_low      = SwapShort(led_low)      ;
-  energy_low   = SwapShort(energy_low)   ;
-  led_high     = SwapShort(led_high)     ;
-  cfd_low      = SwapShort(cfd_low)      ;
-  energy_high  = SwapShort(energy_high)  ;
-  cfd_high     = SwapShort(cfd_high)     ;
-  cfd_middle   = SwapShort(cfd_middle)   ;
-  cfd_pt1_high = SwapShort(cfd_pt1_high) ;
-  cfd_pt1_low  = SwapShort(cfd_pt1_low)  ;
-  cfd_pt2_high = SwapShort(cfd_pt2_high) ;
-  cfd_pt2_low  = SwapShort(cfd_pt2_low ) ;
+void TRawEvent::SwapMode3Data(TRawEvent::GEBMode3Data &data) {
+  data.led_middle   = SwapShort(data.led_middle)   ;
+  data.led_low      = SwapShort(data.led_low)      ;
+  data.energy_low   = SwapShort(data.energy_low)   ;
+  data.led_high     = SwapShort(data.led_high)     ;
+  data.cfd_low      = SwapShort(data.cfd_low)      ;
+  data.energy_high  = SwapShort(data.energy_high)  ;
+  data.cfd_high     = SwapShort(data.cfd_high)     ;
+  data.cfd_middle   = SwapShort(data.cfd_middle)   ;
+  data.cfd_pt1_high = SwapShort(data.cfd_pt1_high) ;
+  data.cfd_pt1_low  = SwapShort(data.cfd_pt1_low)  ;
+  data.cfd_pt2_high = SwapShort(data.cfd_pt2_high) ;
+  data.cfd_pt2_low  = SwapShort(data.cfd_pt2_low ) ;
 }
 
-std::stream& operator<<(std::ostream& os, const TRawEvent::GEBMode3Data &data) {
+std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBMode3Data &data) {
   os << "GEBMode3Data: coming soon." << std::endl;
   return os;
 }
 
-long GetLed(const TRawEvent::GEBMode3Data &data) const { return (((long)data.led_high)<<32) + (((long)data.led_middle)<<16) + (((long).dataled_low)<<0); }
-long GetCfd(const TRawEvent::GEBMode3Data &data) const { return (((long)data.cfd_high)<<32) + (((long)data.cfd_middle)<<16) + (((long).datacfd_low)<<0); }
-int  GetEnergy(const TRawEvent::GEBMode3Data &data, const int channel) const { 
+Long_t TRawEvent::GEBMode3Data::GetLed() const { return (((long)led_high)<<32) + (((long)led_middle)<<16) + (((long)led_low)<<0); }
+Long_t TRawEvent::GEBMode3Data::GetCfd() const { return (((long)cfd_high)<<32) + (((long)cfd_middle)<<16) + (((long)cfd_low)<<0); }
+Int_t  TRawEvent::GEBMode3Data::GetEnergy(const int channel) const  { 
   int  temp = (((int)energy_high)<<16) + (((int)energy_low)<<0);
   bool sign = temp&0x01000000;
        temp = temp&0x00ffffff;

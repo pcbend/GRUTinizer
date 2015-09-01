@@ -1,10 +1,5 @@
-#ifndef TGRETINA_H
-#define TGRETINA_H
-
-#include <TObject.h>
-#include <TMath.h>
-
-#include <TClonesArray.h>
+#ifndef TMODE3_H
+#define TMODE3_H
 
 #include "TDetector.h"
 #include "TGretinaHit.h"
@@ -17,34 +12,42 @@ class TMode3 : public TDetector {
     ~TMode3();
 
     virtual void Copy(TObject& obj) const;
-    virtual void Compare(TObject &obj) const;
+    //virtual void Compare(TObject &obj) const;
     virtual void Print(Option_t *opt = "") const;
     virtual void Clear(Option_t *opt = "");
 
-    virtual void          InsertHit(const TDetectorHit& hit) { return; } 
-    virtual TDetectorHit& GetHit(const int &i=0)    { return *this; }
-    virtual int           Size()                    { return 1; }
+    virtual void          InsertHit(const TDetectorHit& hit) { return;       } 
+    virtual TDetectorHit& GetHit(const int &i=0)             { return hit; }
+    virtual int           Size()                             { return 1;     }
 
-    Int_t    GetChannel()   { return (board_id & 0x0f00)>>8;  }
-    Int_t    GetVME()       { return (board_id & 0x3000)>>12; }
-    Int_t    GetCrystal()   { return (board_id & 0xc000)>>14; }
-    Int_t    GetHole()      { return (board_id & 0x001f);     }
+    void     BuildFrom(TSmartBuffer& buf, bool read_waveform);
+
+    Int_t    GetChannel()   { return (board_id & 0x000f);     }
+    Int_t    GetVME()       { return (board_id & 0x0030)>>4;    }
+    Int_t    GetCrystal()   { return (board_id & 0x00c0)>>6;    }
+    Int_t    GetHole()      { return (board_id & 0x1f00)>>8;        }
     Int_t    GetSegmentId() { return GetVME()*10 + GetChannel(); }
     Int_t    GetCrystalId() { return GetHole()*4 + GetCrystal(); }
     Int_t    GetWaveSize()  { return wavesize; }
     Short_t* GetWave()      { return wave;     } 
 
-    void SetExtractWaves(bool flag=true} { fExtractWaves = flag; }
-    bool ExtractWaves()                  {return fExtractWaves;  }
+    static void SetExtractWaves(bool flag=true) { fExtractWaves = flag;  }
+    static bool ExtractWaves()                  { return fExtractWaves;  }
+
+    Int_t    Charge()    { return hit.Charge(); }
+    Int_t    Address()    { return hit.Address(); }
+
   private:
     virtual int BuildHits();
 
     static bool fExtractWaves; //!
-    bool fOwnWave;             //!
+    mutable bool fOwnWave;             //!
+
+    TDetectorHit hit;
 
     Int_t  board_id;  
-    Int_t  energy;
-    Int_t  wavesize 
+    //Int_t  energy;
+    Int_t  wavesize; // In 16-bit elements
     Long_t led;
     Long_t cfd;     
     Short_t *wave;  //[wavesize]

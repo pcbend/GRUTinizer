@@ -249,30 +249,20 @@ int TRawFileIn::FillBuffer(size_t bytes_requested) {
   }
 
   size_t bytes_allocating = (fBufferSize > bytes_requested) ? fBufferSize : bytes_requested;
-  //printf("bytes_allocation = %i\n",bytes_allocating);
   char* buf = (char*)malloc(bytes_allocating);
-  
-  //printf("fCurrentBuffer.GetSize()  =  %i\n",fCurrentBuffer.GetSize());
-  //printf("bytes_requested           =  %i\n",bytes_requested);
 
   // Copy any leftover bytes from the previous buffer.
   size_t bytes_to_copy = fCurrentBuffer.GetSize();
   memcpy(buf, fCurrentBuffer.GetData(), bytes_to_copy );
 
-  //printf("bytes_to_copy = %i\n",bytes_to_copy);
-
-
   // Read to fill the buffer.
   size_t bytes_to_read = bytes_allocating - bytes_to_copy;
-  //printf("bytes_to_read = %i\n",bytes_to_read);
   size_t bytes_read;
   if(fGzFile) {
     bytes_read = gzread(*(gzFile*)fGzFile, buf + bytes_to_copy, bytes_to_read);
   } else {
     bytes_read = readpipe(fFile, buf + bytes_to_copy, bytes_to_read);
   }
-  //printf("bytes_read = %i\n",bytes_read);
-  //printf("bytes sum  = %i\n",bytes_to_read+bytes_to_copy);
 
   // Store everything
   fCurrentBuffer = TSmartBuffer(buf, bytes_to_copy + bytes_read);
@@ -283,7 +273,7 @@ int TRawFileIn::FillBuffer(size_t bytes_requested) {
     fLastErrno = 0;
     fLastError = "EOF";
     return -1;
-  } else if ((bytes_read+bytes_to_copy)  < bytes_requested){  //Show to Eric!
+  } else if ((bytes_read+bytes_to_copy)  < bytes_requested){  
     fLastErrno = errno;
     fLastError = strerror(errno);
     return -2;

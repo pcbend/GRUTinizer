@@ -1,9 +1,16 @@
 #include "TGEBEvent.h"
+
 #include "TString.h"
+
+#include "TMode3.h"
 
 ClassImp(TGEBEvent);
 
 TGEBEvent::TGEBEvent() { }
+
+TGEBEvent::TGEBEvent(const TRawEvent &raw) { 
+  raw.Copy(*this);
+}
 
 TGEBEvent::~TGEBEvent() { }
 
@@ -18,6 +25,8 @@ const char* TGEBEvent::GetPayload() const {
 TSmartBuffer TGEBEvent::GetPayloadBuffer() const {
   return fBody.BufferSubset(sizeof(Long_t));
 }
+
+bool TGEBEvent::FillCondition() { return true; }
 
 
 void TGEBEvent::Clear(Option_t *opt) {
@@ -35,3 +44,32 @@ void TGEBEvent::Print(Option_t *opt) const {
     TRawEvent::Print(pass_opt.Data());
   }
 };
+
+ClassImp(TGEBMode3Event);
+
+TGEBMode3Event::TGEBMode3Event(const TGEBEvent& event)
+  : TGEBEvent(event) {
+  buf = event.GetPayloadBuffer();
+}
+
+TGEBMode3Event::~TGEBMode3Event() {
+}
+
+bool TGEBMode3Event::GetNextItem(TMode3& output, bool read_waveform){
+  if(!buf.GetSize()){
+    return false;
+  }
+
+  output.BuildFrom(buf, read_waveform);
+  return true;
+}
+
+
+
+
+
+
+
+
+
+

@@ -2,6 +2,16 @@
 
 #include <cassert>
 
+TNSCLEvent::TNSCLEvent() { }
+
+TNSCLEvent::TNSCLEvent(const TRawEvent &raw) { 
+  raw.Copy(*this);
+}
+
+
+TNSCLEvent::~TNSCLEvent() { }
+
+
 Int_t TNSCLEvent::GetBodyHeaderSize() const {
   Int_t output = *((Int_t*)(GetBody()+0));
   if(output == 0) {
@@ -166,3 +176,10 @@ void TNSCLBuiltRingItem::BuildFragments() const {
     fragments.emplace_back(buf);
   }
 }
+
+bool TNSCLEvent::FillCondition() { 
+  return true; 
+}
+
+
+

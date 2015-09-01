@@ -32,7 +32,9 @@ public:
   void   SetTimestamp(Long_t timestamp)  { fTimestamp   = timestamp; }
 
 protected:
+  #ifndef __CINT__
   std::vector<TRawEvent> raw_data; //!
+  #endif
 
 private:
   virtual int  BuildHits()                  { AbstractMethod("BuildHits()"); }

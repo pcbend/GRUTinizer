@@ -3,6 +3,7 @@
 
 #include "TNamed.h"
 
+#include "TRootOutfile.h"
 #include "TDataLoop.h"
 
 // So that rootcint doesn't see this
@@ -32,11 +33,11 @@ public:
 
   void PrintOutfile();
 
-  bool FillCondition(TRawEvent& event);
+  //bool FillCondition(TRawEvent& event);
 
   void Status();
 
-  void GetRootOutfile() { return outfile; }
+  TRootOutfile *GetRootOutfile() { return outfile; }
 
 private:
   template<typename T, typename... Params>
@@ -50,6 +51,7 @@ private:
   void HandleBuiltNSCLData(TNSCLEvent& event);
   void HandleUnbuiltNSCLData(TNSCLEvent& event);
   void HandleGEBData(TGEBEvent& event);
+  void HandleGEBMode3(TGEBEvent& event);
 
   RawDataQueue* queue;
   TRootOutfile* outfile;

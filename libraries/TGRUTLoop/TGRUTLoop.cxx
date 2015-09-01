@@ -8,7 +8,11 @@
 #include "TGEBEvent.h"
 #include "TGRUTOptions.h"
 #include "TNSCLEvent.h"
-#include "TRootOutfile.h"
+
+#include "TRootOutfileNSCL.h"
+#include "TRootOutfileGEB.h"
+
+#include "TMode3.h"
 
 ClassImp(TGRUTLoop);
 
@@ -43,7 +47,7 @@ int TGRUTLoop::ProcessEvent(TRawEvent& event){
 
 void TGRUTLoop::ProcessFile(const char* input, const char* output){
   TDataLoop::ProcessFile(input);
-  switch(TGRUTOptione::Get()->DetermineFileType(input)) {
+  switch(TGRUTOptions::Get()->DetermineFileType(input)) {
     case kFileType::NSCL_EVT:
       outfile = new TRootOutfileNSCL();
       break;
@@ -60,32 +64,63 @@ void TGRUTLoop::ProcessFile(const char* input, const char* output){
 
 void TGRUTLoop::ProcessFile(const std::vector<std::string>& input, const char* output){
   TDataLoop::ProcessFile(input);
-  outfile = new TRootOutfile();
+  switch(TGRUTOptions::Get()->DetermineFileType(input.at(0))) {
+    case kFileType::NSCL_EVT:
+      outfile = new TRootOutfileNSCL();
+      break;
+    case kFileType::GRETINA_MODE2:
+    case kFileType::GRETINA_MODE3:
+      outfile = new TRootOutfileGEB();
+      break;
+    default:
+      fprintf(stderr,"%s: trying to sort unknown filetype:%s\n",__PRETTY_FUNCTION__,input.at(0).c_str());
+      exit(1);
+  };
+  //outfile = new TRootOutfile();
   outfile->Init(output);
 }
 
 void TGRUTLoop::Initialize(){
+  //printf("%s called.\n",__PRETTY_FUNCTION__);
+
+/*
   if(!outfile){
-    outfile = new TRootOutfile();
-    outfile->Init("my_output.root");
+    switch(TGRUTOptions::Get()->DetermineFileType(input)) {
+      case kFileType::NSCL_EVT:
+        outfile = new TRootOutfileNSCL();
+        break;
+      case kFileType::GRETINA_MODE2:
+      case kFileType::GRETINA_MODE3:
+        outfile = new TRootOutfileGEB();
+        break;
+      default:
+        fprintf(stderr,"%s: trying to sort unknown filetype:%s\n",__PRETTY_FUNCTION__,input);
+        exit(1);
+    };
   }
+*/
+  if(!outfile) // bad things are about to happen.
+    exit(1);
+
   write_thread = std::thread(&TGRUTLoop::WriteLoop, this);
 }
 
 void TGRUTLoop::WriteLoop(){
   std::cout << "Write loop starting" << std::endl;
+  //int counter = 0;
   while(running || queue->Size()){
+    //printf("counter = %i\n",counter); fflush(stdout); counter++;
     TRawEvent event = queue->Pop();
     ProcessFromQueue(event);
   }
   std::cout << "Flushing last event" << std::endl;
-  outfile->FillTree();
+  outfile->FillAllTrees();
   std::cout << "Write loop ending" << std::endl;
 }
 
 void TGRUTLoop::ProcessFromQueue(TRawEvent& event){
   if(event.GetFileType()==kFileType::NSCL_EVT) {
-    TNSCLEvent& nscl_event = (TNSCLEvent&)event;
+    TNSCLEvent nscl_event(event);
     switch(event.GetEventType()) {
     case kNSCLEventType::BEGIN_RUN:            // 0x0001
     case kNSCLEventType::END_RUN:              // 0x0002
@@ -112,14 +147,9 @@ void TGRUTLoop::ProcessFromQueue(TRawEvent& event){
       }
       break;
     };
-  }else if(event.GetFileType()==kFileType::GRETINA_MODE2) {
-    TGEBEvent& geb_event = (TGEBEvent&)event;
-    //switch(event->GetType()) {
+  }else if(event.GetFileType()==kFileType::GRETINA_MODE2 || event.GetFileType()==kFileType::GRETINA_MODE3)  {
+    TGEBEvent geb_event(event);
     HandleGEBData(geb_event);
-  //};
-  }else if(event.GetFileType()==kFileType::GRETINA_MODE3) {
-    TGEBEvent& geb_event = (TGEBEvent&)event;
-    HandleGEBMode3(geb_event);
   }
 }
 
@@ -142,8 +172,8 @@ void TGRUTLoop::PrintOutfile(){
 }
 
 void TGRUTLoop::HandleBuiltNSCLData(TNSCLEvent& event){
-  if(FillCondition(event)){
-    outfile->FillTree();
+  if(event.FillCondition()){
+    outfile->FillTree("EventTree");
   }
 
   TNSCLBuiltRingItem built(event);
@@ -155,8 +185,8 @@ void TGRUTLoop::HandleBuiltNSCLData(TNSCLEvent& event){
 }
 
 void TGRUTLoop::HandleUnbuiltNSCLData(TNSCLEvent& event){
-  if(FillCondition(event)){
-    outfile->FillTree();
+  if(event.FillCondition()){
+    outfile->FillTree("EventTree");
   }
 
   kDetectorSystems detector = TDetectorEnv::Get().DetermineSystem(event);
@@ -164,23 +194,46 @@ void TGRUTLoop::HandleUnbuiltNSCLData(TNSCLEvent& event){
 }
 
 void TGRUTLoop::HandleGEBData(TGEBEvent& event){
-  kDetectorSystems detector = TDetectorEnv::Get().DetermineSystem(event);
-  TRootOutfileGEBi *gebout = (TRootOutFileGEB*)outfile;
-  if(detector == kDetectorSystems::MODE3) {
-    event.GetPayloadBuffer().GetData();
-
-
-  } else {
-    if(FillCondition(event)){
-      outfile->FillTree();
+  int type = event.GetEventType();
+  TRootOutfileGEB *gebout = (TRootOutfileGEB*)outfile;
+  if(type==1 || type ==5 || type==17 ) {
+    if(event.FillCondition()){
+      gebout->FillTree("EventTree");
     }
-    gebout->AddRawData(event, detector);
- }
+  }
+  switch(event.GetEventType()) {
+    case 1: // Gretina Mode2 data.
+      gebout->AddRawData(event, kDetectorSystems::GRETINA);
+      break;
+    case 2: // Gretina Mode3 data.
+      if(!TGRUTOptions::Get()->IgnoreMode3()) {
+        TGEBMode3Event m3event(event);
+        TMode3 temp;
+        //printf(DBLUE "I AM HERE!!!!" RESET_COLOR "\n"); fflush(stdout);
+        while(m3event.GetNextItem(temp)) {
+          //printf(DRED "I AM THERE!!!!" RESET_COLOR  "\n"); fflush(stdout);
+          gebout->HandleMode3(temp);    
+        }
+      }
+      break;
+    case 5: // S800 Mode2 equvilant.
+      break;
+    case 8: // Gretina diag. data.
+      break;
+    case 17: //PWall Mode2 equivlant.
+      break;
+    case 29: // Something.
+      break;
+    default:
+      //dance party.
+      break;
+  };
+  
 }
 
-bool TGRUTLoop::FillCondition(TRawEvent& event){
-  return true;
-}
+//bool TGRUTLoop::FillCondition(TRawEvent& event){
+//  return true;
+//}
 
 void TGRUTLoop::Status() {
   if(!GetInfile())  {
@@ -194,11 +247,6 @@ void TGRUTLoop::Status() {
   }
 }
 
-void HandleGEBMode(TGEBEvent& event) {
-
-
-
-}
 
 
 

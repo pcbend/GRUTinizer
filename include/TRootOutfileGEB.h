@@ -13,6 +13,7 @@
 #include "TRawEvent.h"
 
 class TGretina;
+class TMode3;
 //class TPhosWall;
 //class TS800;
 
@@ -25,13 +26,17 @@ public:
   virtual void InitHists();
   virtual void FillHists();
 
+  void HandleMode3(const TMode3&);
   void Clear(Option_t* option = "");
   void Print(Option_t* option = "") const;
 
 private:
   TGretina*  gretina;
+  TMode3*    mode3;
+  bool fMode3Init;
   // TS800*     s800;
   // TPhoswall* phoswall;
+
 
   TFile* outfile;
 

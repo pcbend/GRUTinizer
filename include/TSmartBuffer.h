@@ -101,6 +101,8 @@ public:
    */
   TSmartBuffer BufferSubset(size_t pos, size_t length = -1) const;
 
+  void Advance(size_t dist);
+
   /// Prints a short description of the TSmartBuffer.
   void Print(Option_t* opt = "") const;
 

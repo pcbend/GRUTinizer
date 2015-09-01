@@ -1,4 +1,4 @@
-// TGretina.h TGretinaHit.h
+// TGretina.h TGretinaHit.h TMode3.h
 
 #ifdef __CINT__
 
@@ -9,5 +9,6 @@
 
 #pragma link C++ class TGretinaHit+;
 #pragma link C++ class TGretina+;
+#pragma link C++ class TMode3+;
 
 #endif

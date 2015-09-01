@@ -16,6 +16,8 @@
 #include <TROOT.h>
 #include <TString.h>
 
+#include <TTree.h>
+#include <TMode3.h>
 
 //extern "C" G__value G__getitem(const char* item);
 //#include "FastAllocString.h"
@@ -61,6 +63,21 @@ TGRUTint::~TGRUTint() {   }
 
 
 void TGRUTint::Init() {
+  //printf("%s called.\n",__PRETTY_FUNCTION__);
+//  TMode3 *mode3 = new TMode3;
+//  mode3->Class();
+
+  TFile *tempfile = TFile::Open("/var/tmp/mytemp.root","recreate");
+  TTree *temptree = new TTree("temp","temp");
+  TMode3 *mode3=0;
+  temptree->Branch("TMode3","TMode3",&mode3);
+  temptree->Fill();
+  temptree->Write();
+  delete tempfile;
+  gSystem->Unlink("/var/tmp/mytemp.root");
+
+//  TClass::LoadClass("TMode3",false);
+
 
   // if(TGRUTOptions::Get()->ShowLogo()){
   //   PopupLogo(false);
@@ -69,7 +86,11 @@ void TGRUTint::Init() {
   TGRUTLoop::CreateDataLoop<TGRUTLoop>();
   TObjectManager::Init("GRUT_Manager", "GRUT Manager");
   ApplyOptions();
+  //printf("\n\nI am here  1.\n");   fflush(stdout);
+  //printf("gManager = 0x%08x\n",gManager);   fflush(stdout);
+  gManager->Print();
   gManager->Connect("TObjectManager", "ObjectAppended(TObject*)", "TGRUTint", this, "ObjectAppended(TObject*)");
+  printf("\n\nI am here  2.\n");   fflush(stdout);
 }
 
 /*********************************/
@@ -215,3 +236,8 @@ TString TGRUTint::ReverseObjectSearch(TString &input) {
   }
   return TString("");
 };
+
+void TGRUTint::Terminate(Int_t status){
+  TGRUTLoop::Get()->Stop();
+  TRint::Terminate(status);
+}

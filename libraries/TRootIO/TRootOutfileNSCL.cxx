@@ -8,9 +8,11 @@
 #include "TSega.h"
 #include "TNSCLEvent.h"
 
+ClassImp(TRootOutfileNSCL);
+
 TRootOutfileNSCL::TRootOutfileNSCL() {
   janus = NULL;
-  sega = NULL;
+  sega  = NULL;
   // s800 = NULL;
   // caesar = NULL;
 
@@ -29,8 +31,8 @@ void TRootOutfileNSCL::Init(const char* output_filename){
   }
   SetOutfile(output_filename);
 
-  TTree *event_tree  = AddTree("EventTree");
-  TTree *scaler_tree = AddTree("ScalerTree");
+  TTree *event_tree  = AddTree("EventTree","Events, yo.",true);
+  TTree *scaler_tree = AddTree("ScalerTree","I can count.",false);
 
   if(TDetectorEnv::Janus()){
     event_tree->Branch("TJanus","TJanus",&janus);
