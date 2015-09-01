@@ -50,6 +50,8 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .description("Input file(s)");
   parser.option("o output", &output_file)
     .description("Root output file");
+  parser.option("x ignore-mode3 ", &fIgnoreMode3)
+    .description("skip over any gretina mode3 data");
   parser.option("r ring",&input_ring)
     .description("Input ring source (host/ringname)");
   parser.option("l no-logo", &fShowLogo)
@@ -64,6 +66,7 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .description("Run in batch mode");
   parser.option("h help ?", &fHelp)
     .description("Show this help message");
+
 
   try{
     parser.parse(argc, argv);
@@ -102,6 +105,8 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename){
   } else if ((ext == "c") || (ext == "C") || (ext == "c+") || (ext == "C+")) {
     return kFileType::ROOT_MACRO;
   } else if (ext == "dat" || ext == "cvt") {
+    if(filename.find("GlobalRaw")!=std::string::npos)
+      return kFileType::GRETINA_MODE3;
     return kFileType::GRETINA_MODE2;
   } else if (ext == "env") {
     return kFileType::DETECTOR_ENVIRONMENT;

@@ -8,5 +8,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class TGEBEvent+;
+#pragma link C++ class TGEBMode3Event+;
 
 #endif

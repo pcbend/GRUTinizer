@@ -32,6 +32,7 @@ public:
   bool ShowedHelp() const { return fHelp; }
   bool ShowLogo() const { return fShowLogo; }
   bool SortRaw() const { return fSortRaw; }
+  bool IgnoreMode3() const { return fIgnoreMode3; }
 
   bool ShouldExitImmediately() const { return fShouldExit; }
 
@@ -61,6 +62,7 @@ private:
   bool fShowLogo;
   bool fSortRaw;
   bool fIgnoreErrors;
+  bool fIgnoreMode3;
 
   bool fShouldExit;
 

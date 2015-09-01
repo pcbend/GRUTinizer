@@ -1,4 +1,4 @@
-// TGRUTint.h TGRUTOptions.h TGRUTTypes.h TRootOutfile.h TDetectorEnv.h
+// TGRUTint.h TGRUTOptions.h TGRUTTypes.h TDetectorEnv.h
 
 #ifdef __CINT__
 
@@ -15,7 +15,6 @@
 #pragma link C++ class TGRUTInterruptHandler+;
 #pragma link C++ class TDetectorEnv+;
 #pragma link C++ class TGRUTint+;
-#pragma link C++ class TRootOutfile+;
 
 
 #endif

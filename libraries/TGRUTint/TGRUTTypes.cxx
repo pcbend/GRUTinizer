@@ -4,6 +4,7 @@ std::map<std::string, kDetectorSystems> detector_system_map{
   {"Unknown",         kDetectorSystems::UNKNOWN_SYSTEM},
   {"Sega",            kDetectorSystems::SEGA},
   {"Gretina",         kDetectorSystems::GRETINA},
+  {"Mode3",           kDetectorSystems::MODE3},
   {"Janus",           kDetectorSystems::JANUS},
   {"Caesar",          kDetectorSystems::CAESAR},
   {"Phoswall",        kDetectorSystems::PHOSWALL},

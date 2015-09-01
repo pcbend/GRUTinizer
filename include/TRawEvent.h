@@ -25,8 +25,8 @@ public:
   TRawEvent& operator=(const TRawEvent &);
 
   virtual void  Clear(Option_t *opt ="");
-  virtual Int_t Compare(const TRawEvent&) const;
-  virtual void  Copy(const TRawEvent&)    ;
+  virtual Int_t Compare(const TObject&) const;
+  virtual void  Copy(TObject&) const;
   virtual void  Print(Option_t *opt ="")  const;
 
   RawHeader *GetRawHeader();
@@ -47,6 +47,8 @@ protected:
   RawHeader fEventHeader;
   kFileType fFileType;
   TSmartBuffer fBody;
+public:
+  virtual bool FillCondition() {printf("%s",__PRETTY_FUNCTION__); return true;} //!
 
   ClassDef(TRawEvent,0)
 };

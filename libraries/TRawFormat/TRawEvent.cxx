@@ -7,6 +7,7 @@
 #include <assert.h>
 
 #include "TRawEvent.h"
+#include "TString.h"
 
 ClassImp(TRawEvent)
 
@@ -16,27 +17,27 @@ TRawEvent::TRawEvent() {
   fFileType = kFileType::UNKNOWN_FILETYPE;
 }
 
-void TRawEvent::Copy(const TRawEvent &rhs) {
-  Clear();
-  fEventHeader = rhs.fEventHeader;
-  fBody = rhs.fBody;
-  fFileType = rhs.fFileType;
+void TRawEvent::Copy(TObject &rhs) const {
+  rhs.Clear();
+  ((TRawEvent&)rhs).fEventHeader = fEventHeader;
+  ((TRawEvent&)rhs).fBody        = fBody;
+  ((TRawEvent&)rhs).fFileType    = fFileType;
 }
 
 TRawEvent::TRawEvent(const TRawEvent &rhs) {
-  Copy(rhs);
+  rhs.Copy(*this);
 }
 
 TRawEvent::~TRawEvent() {
   Clear();
 }
 
-Int_t TRawEvent::Compare(const TRawEvent &rhs) const { }
+Int_t TRawEvent::Compare(const TObject &rhs) const { }
 
 TRawEvent &TRawEvent::operator=(const TRawEvent &rhs) {
   if(&rhs!=this)
     Clear();
-  this->Copy(rhs);
+  rhs.Copy(*this);
   return *this;
 }
 
@@ -101,8 +102,17 @@ bool TRawEvent::IsGoodSize() const {
 
 
 void TRawEvent::Print(Option_t *opt) const {
-
-  if(strcmp(opt,"bodyonly"))
+  TString options(opt);
+  if(!options.Contains("bodyonly"))
     std::cout << fEventHeader;
-  fBody.Print("all");
+  fBody.Print(options.Data());
+  // printf("\t");
+  // for(int x=0; x<GetBodySize(); x+=2) {
+  //   if((x%16 == 0) &&
+  //      (x!=GetBodySize())){
+  //     printf("\n\t");
+  //   }
+  //   printf("0x%04x  ",*(unsigned short*)(GetBody()+x));
+  // }
+  // printf("\n--------------------------\n");
 }
