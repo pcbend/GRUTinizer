@@ -60,6 +60,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("n no-sort", &fSortRaw)
     .description("Load raw data files without sorting")
     .default_value(true);
+  parser.option("port", &fPort)
+    .description("Port on which to listen for commands")
+    .default_value(9000);
   parser.option("ignore-errors ignore_errors", &fIgnoreErrors)
     .description("Don't print warning messages.  Use at your own risk.");
   parser.option("q quit", &fExitAfterSorting)

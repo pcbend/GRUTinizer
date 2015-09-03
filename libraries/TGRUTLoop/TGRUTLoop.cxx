@@ -212,9 +212,7 @@ void TGRUTLoop::HandleGEBData(TGEBEvent& event){
       if(!TGRUTOptions::Get()->IgnoreMode3()) {
         TGEBMode3Event m3event(event);
         TMode3 temp;
-        //printf(DBLUE "I AM HERE!!!!" RESET_COLOR "\n"); fflush(stdout);
         while(m3event.GetNextItem(temp)) {
-          //printf(DRED "I AM THERE!!!!" RESET_COLOR  "\n"); fflush(stdout);
           gebout->HandleMode3(temp);
         }
       }

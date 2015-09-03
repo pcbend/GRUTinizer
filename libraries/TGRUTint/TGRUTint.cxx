@@ -86,11 +86,9 @@ void TGRUTint::Init() {
   TGRUTLoop::CreateDataLoop<TGRUTLoop>();
   TObjectManager::Init("GRUT_Manager", "GRUT Manager");
   ApplyOptions();
-  //printf("\n\nI am here  1.\n");   fflush(stdout);
   //printf("gManager = 0x%08x\n",gManager);   fflush(stdout);
   gManager->Print();
   gManager->Connect("TObjectManager", "ObjectAppended(TObject*)", "TGRUTint", this, "ObjectAppended(TObject*)");
-  printf("\n\nI am here  2.\n");   fflush(stdout);
 }
 
 /*********************************/
@@ -148,6 +146,9 @@ void TGRUTint::ApplyOptions() {
     const char* command = Form(".x %s", macro_filename.c_str());
     TRint::ProcessLine(command);
   }
+
+  fServer.SetPort(opt->Port());
+  fServer.Start();
 
   if(TGRUTOptions::Get()->ExitAfterSorting()){
     TGRUTLoop::Get()->Status();
@@ -247,6 +248,7 @@ TString TGRUTint::ReverseObjectSearch(TString &input) {
 };
 
 void TGRUTint::Terminate(Int_t status){
+  fServer.Stop();
   TGRUTLoop::Get()->Stop();
   TRint::Terminate(status);
 }

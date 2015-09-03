@@ -24,6 +24,8 @@ public:
   const std::string OutputFile()                    { return output_file; }
   std::string InputRing() { return input_ring; }
 
+  int Port() { return fPort; }
+
   const std::vector<std::string>& OptionFiles() { return options_file; }
 
   bool IgnoreErrors() { return fIgnoreErrors; }
@@ -56,6 +58,8 @@ private:
   std::string detector_environment;
 
   std::vector<std::string> options_file;
+
+  int fPort;
 
   bool fExitAfterSorting;
   bool fHelp;
