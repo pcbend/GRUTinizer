@@ -5,12 +5,13 @@
 #include <vector>
 
 #include "TError.h"
-#include "TApplication.h"
 #include "TSocket.h"
+
+#include "TGRUTint.h"
 
 TGRUTServer::TGRUTServer()
   : port(-1), server(nullptr), is_running(false),
-    max_sleep(std::chrono::seconds(10)) { }
+    max_sleep(std::chrono::minutes(5)) { }
 
 TGRUTServer::TGRUTServer(int port)
   : port(port), server(nullptr), is_running(false),
@@ -119,8 +120,7 @@ bool TGRUTServer::ReadCommand(){
   std::string message = ReadFromSocket(*socket);
 
   // Do something with the command.
-  std::cout << "\n" << "Received command \"" << message << "\"" << std::endl;
-  gApplication->ProcessLine(message.c_str());
+  TGRUTint::instance()->DelayedProcessLine(message);
 
   return true;
 }

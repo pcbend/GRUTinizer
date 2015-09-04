@@ -1,6 +1,14 @@
 #ifndef TGRUTINT_H
 #define TGRUTINT_H
 
+#include <string>
+#include <queue>
+
+#ifndef __CINT__
+#include <mutex>
+#include <memory>
+#endif
+
 #include <TSystem.h>
 #include <TSysEvtHandler.h>
 #include <TRint.h>
@@ -35,7 +43,19 @@ public:
 
   Int_t TabCompletionHook(char* buf, int* pLoc, std::ostream& out);
 
+public:
+  void DelayedProcessLine(std::string message);
+  //GUI interface commands;
+  void OpenFileDialog();
+
+  void DelayedProcessLine_ProcessItem();
 private:
+#ifndef __CINT__
+  std::mutex fCommandsMutex;
+#endif
+  TTimer* fCommandTimer;
+  std::queue<std::string> fLinesToProcess;
+
   TObject* fNewChild;
   bool fIsTabComplete;
   TGRUTServer fServer;

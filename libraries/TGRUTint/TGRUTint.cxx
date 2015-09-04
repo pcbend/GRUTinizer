@@ -19,6 +19,8 @@
 #include <TTree.h>
 #include <TMode3.h>
 
+#include <TGFileDialog.h>
+
 //extern "C" G__value G__getitem(const char* item);
 //#include "FastAllocString.h"
 //char* G__valuemonitor(G__value buf, G__FastAllocString& temp);
@@ -40,7 +42,7 @@ TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions
 
 
 TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t noLogo,const char *appClassName)
-  :TRint(appClassName, &argc, argv, options, numOptions,noLogo) {
+  :TRint(appClassName, &argc, argv, options, numOptions,noLogo), fCommandTimer(NULL) {
 
   fGRUTEnv = gEnv;
   GetSignalHandler()->Remove();
@@ -59,7 +61,11 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
 }
 
 
-TGRUTint::~TGRUTint() {   }
+TGRUTint::~TGRUTint() {   
+  if(fCommandTimer){
+    delete fCommandTimer;
+  }
+}
 
 
 void TGRUTint::Init() {
@@ -155,6 +161,8 @@ void TGRUTint::ApplyOptions() {
   } else {
     fServer.SetPort(opt->Port());
     fServer.Start();
+    fCommandTimer = new TTimer("TGRUTint::instance()->DelayedProcessLine_ProcessItem();", 100);
+    fCommandTimer->TurnOn();
   }
 }
 
@@ -252,4 +260,51 @@ void TGRUTint::Terminate(Int_t status){
   fServer.Stop();
   TGRUTLoop::Get()->Stop();
   TRint::Terminate(status);
+}
+
+
+
+
+
+
+
+void TGRUTint::OpenFileDialog() {
+  TGFileInfo file_info;
+  const char *filetypes[] = { "ROOT File", "*.root", 
+                              "Macro File", "*.C",
+                              "GRETINA data file","*.dat",
+                              "NSCL data","*.evt",
+                              "Calibrtaion file","*.cal",
+                              0,0 };
+  file_info.fFileTypes = filetypes;
+  new TGFileDialog(gClient->GetRoot(),0,kFDOpen,&file_info);
+  if(file_info.fFilename)  {
+    printf("you selected: %s\n",file_info.fFilename);
+    fflush(stdout);
+  } else {
+    printf("you forgot to select a file\n");
+    fflush(stdout);
+  }
+  //fd->Delete();  window delees itself. you know, for the funz.  
+  return;
+}
+
+void TGRUTint::DelayedProcessLine(std::string message){
+  std::lock_guard<std::mutex> lock(fCommandsMutex);
+  fLinesToProcess.push(message);
+}
+
+void TGRUTint::DelayedProcessLine_ProcessItem(){
+  std::string message;
+  {
+    std::lock_guard<std::mutex> lock(fCommandsMutex);
+    if(fLinesToProcess.empty()){
+      return;
+    }
+    message = fLinesToProcess.front();
+    fLinesToProcess.pop();
+  }
+
+  std::cout << "Received command \"" << message << "\"" << std::endl;
+  ProcessLine(message.c_str());
 }
