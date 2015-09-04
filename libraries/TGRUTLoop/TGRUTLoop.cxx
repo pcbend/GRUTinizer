@@ -37,10 +37,6 @@ void TGRUTLoop::StatusQueue(){
   queue->Status();
 }
 
-TRawEvent TGRUTLoop::GetEvent() {
-  return queue->Pop();
-}
-
 int TGRUTLoop::ProcessEvent(TRawEvent& event){
   queue->Push(event);
 }
@@ -107,11 +103,13 @@ void TGRUTLoop::Initialize(){
 
 void TGRUTLoop::WriteLoop(){
   std::cout << "Write loop starting" << std::endl;
-  //int counter = 0;
   while(running || queue->Size()){
-    //printf("counter = %i\n",counter); fflush(stdout); counter++;
-    TRawEvent event = queue->Pop();
-    ProcessFromQueue(event);
+    if(queue->Size()){
+      TRawEvent event = queue->Pop();
+      ProcessFromQueue(event);
+    } else {
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
   }
   std::cout << "Flushing last event" << std::endl;
   outfile->FillAllTrees();
@@ -241,7 +239,7 @@ void TGRUTLoop::Status() {
     std::cout << "Status: Not running" << std::endl;
   } else {
     std::cout << "Status: " << std::endl;
-    while(!GetInfile()->IsFinished())  {
+    while(GetInfile() && !GetInfile()->IsFinished())  {
       std::cout << "\r" << GetInfile()->Status() << "             " << std::flush;
       std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }

@@ -26,8 +26,6 @@ public:
   void PrintQueue();
   void StatusQueue();
 
-  TRawEvent GetEvent();
-
   virtual void Initialize();
   virtual void Finalize();
 

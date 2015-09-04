@@ -147,13 +147,14 @@ void TGRUTint::ApplyOptions() {
     TRint::ProcessLine(command);
   }
 
-  fServer.SetPort(opt->Port());
-  fServer.Start();
-
   if(TGRUTOptions::Get()->ExitAfterSorting()){
     TGRUTLoop::Get()->Status();
+    std::cout << "Waiting for join" << std::endl;
     TGRUTLoop::Get()->Join();
     gApplication->Terminate();
+  } else {
+    fServer.SetPort(opt->Port());
+    fServer.Start();
   }
 }
 
