@@ -7,15 +7,16 @@ ClassImp(TMode3)
 bool TMode3::fExtractWaves = false;
 
 TMode3::TMode3(){
-  fOwnWave = false;
+  //fOwnWave = false;
   wave = NULL;
+  for(int i=0;i<MAXTRACE;i++) {wavebuffer[i]=0;}
 }
 
 TMode3::~TMode3() {
-  if(fOwnWave && wave) {
-    wave = 0;
-    delete wave;
-  }
+  //if(fOwnWave && wave) {
+  //  wave = 0;
+  //  delete wave;
+  //}
 }
 
 
@@ -39,17 +40,18 @@ void TMode3::BuildFrom(TSmartBuffer& buf, bool read_waveform){
   cfd = data->GetCfd();
 
   size_t wave_bytes = header->GetLength()*4 - sizeof(*header) + 4 - sizeof(*data);
-  if(read_waveform){
+  if(read_waveform & (wavesize<MAXTRACE)){
     wavesize = wave_bytes/sizeof(short);
-    wave = (short*)malloc(wave_bytes);
-    fOwnWave = true;
-    memcpy((char*)wave, buf.GetData(), wave_bytes);
+    //wave = (short*)malloc(wave_bytes);
+    //fOwnWave = true;
+    memcpy((char*)wavebuffer, buf.GetData(), wave_bytes);
  
     for(int i=0; i<wavesize; i+=2){
-      short tmp = TRawEvent::SwapShort(wave[i+1]);
-      wave[i+1] = TRawEvent::SwapShort(wave[i]);
-      wave[i]   = tmp;
+      short tmp      = TRawEvent::SwapShort(wavebuffer[i+1]);
+      wavebuffer[i+1] = TRawEvent::SwapShort(wavebuffer[i]);
+      wavebuffer[i]   = tmp;
     }
+    wave = &wavebuffer[0];
   } else {
     wave = NULL;
     wavesize = 0;
@@ -74,11 +76,14 @@ void TMode3::Copy(TObject& obj) const {
   mode3.wavesize = wavesize;
   mode3.led      = led;
   mode3.cfd      = cfd;
-  if(mode3.wave) { delete wave; }
+  //if(mode3.wave) { delete wave; }
   if(ExtractWaves() && wavesize>0) { 
-    fOwnWave = true;
-    mode3.wave = new Short_t[wavesize];
-    memcpy(mode3.wave,wave,wavesize*(sizeof(Short_t)));
+    //fOwnWave = true;
+    //mode3.wave = new Short_t[wavesize];
+    memcpy(mode3.wavebuffer,wavebuffer,wavesize*(sizeof(Short_t)));
+    mode3.wave = &(mode3.wavebuffer[0]);
+  } else {
+    mode3.wave=0; 
   }
   mode3.raw_data.clear();
 }
@@ -112,12 +117,22 @@ void TMode3::Clear(Option_t *opt) {
   hit.Clear(opt);
   board_id = -1;
   //energy   = -1;
-  wavesize =  0;
   led      = -1;
   cfd      = -1;
-  if(fOwnWave && wave) {
-    delete wave;
-  }
-  wave = 0;
+  //if(fOwnWave && wave) {
+  //  delete wave;
+  //}
+  ClearWave();
   raw_data.clear();
 }
+
+void TMode3::ClearWave(Option_t *opt) {
+  for(int i=0;i<wavesize;i++) 
+    wavebuffer[i] = 0;
+  wave = NULL;
+  wavesize =  0;
+}
+
+
+
+

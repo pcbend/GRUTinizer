@@ -26,7 +26,7 @@ public:
   void PrintQueue();
   void StatusQueue();
 
-  virtual void Initialize();
+  virtual bool Initialize();
   virtual void Finalize();
 
   void PrintOutfile();

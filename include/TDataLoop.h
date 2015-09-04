@@ -32,7 +32,7 @@ public:
   bool IsPaused();
   void Join();
 
-  virtual void Initialize() { }
+  virtual bool Initialize() { }
   virtual void Finalize()   { }
   virtual int ProcessEvent(TRawEvent& event) { AbstractMethod("ProcessEvent()"); }
 
@@ -50,6 +50,7 @@ public:
 
 protected:
   TDataLoop();
+  virtual bool CanStart() { return true; }
 
   TRawEventSource* infile;
 

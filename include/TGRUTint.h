@@ -47,14 +47,24 @@ public:
   void DelayedProcessLine(std::string message);
   //GUI interface commands;
   void OpenFileDialog();
+  void DefaultFunction();
 
   void DelayedProcessLine_ProcessItem();
+
+  void HandleFile(const std::string& filename);
+
+ private:
+  void OpenRootFile(const std::string& filename);
+  void RunMacroFile(const std::string& filename);
+
 private:
 #ifndef __CINT__
   std::mutex fCommandsMutex;
 #endif
   TTimer* fCommandTimer;
   std::queue<std::string> fLinesToProcess;
+
+  int fRootFilesOpened;
 
   TObject* fNewChild;
   bool fIsTabComplete;

@@ -25,11 +25,16 @@ TDataLoop::~TDataLoop(){
 }
 
 void TDataLoop::Start(){
+  if(!CanStart()){
+    return;
+  }
   if(running && !initialized){
     std::cout << "Initializing" << std::endl;
-    Initialize();
-    initialized = true;
-    Resume();
+    bool success = Initialize();
+    if(success){
+      initialized = true;
+      Resume();
+    }
   } else if (running && paused) {
     std::cout << "Resuming" << std::endl;
     Resume();

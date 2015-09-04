@@ -76,7 +76,7 @@ void TGRUTLoop::ProcessFile(const std::vector<std::string>& input, const char* o
   outfile->Init(output);
 }
 
-void TGRUTLoop::Initialize(){
+bool TGRUTLoop::Initialize(){
   //printf("%s called.\n",__PRETTY_FUNCTION__);
 
 /*
@@ -95,10 +95,13 @@ void TGRUTLoop::Initialize(){
     };
   }
 */
-  if(!outfile) // bad things are about to happen.
-    exit(1);
+  if(!outfile) { // bad things are about to happen.
+    std::cerr << "Cannot start data loop without output file defined" << std::endl;
+    return false;
+  }
 
   write_thread = std::thread(&TGRUTLoop::WriteLoop, this);
+  return true;
 }
 
 void TGRUTLoop::WriteLoop(){

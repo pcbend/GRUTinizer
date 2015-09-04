@@ -15,6 +15,7 @@ class TMode3 : public TDetector {
     //virtual void Compare(TObject &obj) const;
     virtual void Print(Option_t *opt = "") const;
     virtual void Clear(Option_t *opt = "");
+    virtual void ClearWave(Option_t *opt = "");
 
     virtual void          InsertHit(const TDetectorHit& hit) { return;       } 
     virtual TDetectorHit& GetHit(const int &i=0)             { return hit; }
@@ -41,7 +42,7 @@ class TMode3 : public TDetector {
     virtual int BuildHits();
 
     static bool fExtractWaves; //!
-    mutable bool fOwnWave;             //!
+    //mutable bool fOwnWave;             //!
 
     TDetectorHit hit;
 
@@ -50,7 +51,8 @@ class TMode3 : public TDetector {
     Int_t  wavesize; // In 16-bit elements
     Long_t led;
     Long_t cfd;     
-    Short_t *wave;  //[wavesize]
+    Short_t wavebuffer[MAXTRACE];  //!
+    Short_t *wave;                 //[wavesize]
 
   ClassDef(TMode3,1);
 };

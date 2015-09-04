@@ -9,6 +9,7 @@
 #include "TGRUTOptions.h"
 #include "TGRUTLoop.h"
 #include "TObjectManager.h"
+#include "TGRUTUtilities.h"
 
 //#include "Api.h"   // for G__value
 
@@ -42,7 +43,7 @@ TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions
 
 
 TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t noLogo,const char *appClassName)
-  :TRint(appClassName, &argc, argv, options, numOptions,noLogo), fCommandTimer(NULL) {
+  :TRint(appClassName, &argc, argv, options, numOptions,noLogo), fCommandTimer(NULL), fRootFilesOpened(0) {
 
   fGRUTEnv = gEnv;
   GetSignalHandler()->Remove();
@@ -135,22 +136,12 @@ void TGRUTint::ApplyOptions() {
     TGRUTLoop::Get()->Start();
   }
 
-  for(unsigned int i=0; i<opt->RootInputFiles().size(); i++) {
-    const char* command = Form("TFile *_file%i = new TFile(\"%s\",\"read\")", i, opt->RootInputFiles().at(i).c_str());
-    TRint::ProcessLine(command);
-
-    TFile *file = (TFile*)gROOT->GetListOfFiles()->FindObject(opt->RootInputFiles().at(i).c_str());
-    if(file){
-      std::cout << "\tfile " << file->GetName() << " opened as _file" << i << std::endl;
-    } else {
-      std::cout << __PRETTY_FUNCTION__ << "\tFile " << opt->RootInputFiles().at(i) << " does not exist" << std::endl;
-    }
-
+  for(auto& filename : opt->RootInputFiles()){
+    OpenRootFile(filename);
   }
 
-  for(auto& macro_filename : opt->MacroInputFiles()){
-    const char* command = Form(".x %s", macro_filename.c_str());
-    TRint::ProcessLine(command);
+  for(auto& filename : opt->MacroInputFiles()){
+    RunMacroFile(filename);
   }
 
   if(TGRUTOptions::Get()->ExitAfterSorting()){
@@ -163,6 +154,77 @@ void TGRUTint::ApplyOptions() {
     fServer.Start();
     fCommandTimer = new TTimer("TGRUTint::instance()->DelayedProcessLine_ProcessItem();", 100);
     fCommandTimer->TurnOn();
+  }
+}
+
+void TGRUTint::DefaultFunction(){
+  static int i = 0;
+  std::cout << "I am a default function." << std::endl;
+  std::cout << "I have been called " << i++ << " times before" << std::endl;
+}
+
+void TGRUTint::OpenRootFile(const std::string& filename){
+  if(!file_exists(filename)){
+    std::cerr << "File \"" << filename << "\" does not exist" << std::endl;
+    return;
+  }
+
+  TGRUTOptions* opt = TGRUTOptions::Get();
+
+  const char* command = Form("TFile *_file%i = new TFile(\"%s\",\"read\")", 
+			     fRootFilesOpened, filename.c_str());
+  TRint::ProcessLine(command);
+
+  TFile *file = (TFile*)gROOT->GetListOfFiles()->FindObject(filename.c_str());
+  if(file){
+    std::cout << "\tfile " << file->GetName() << " opened as _file" << fRootFilesOpened << std::endl;
+  }
+  
+  fRootFilesOpened++;
+}
+
+void TGRUTint::RunMacroFile(const std::string& filename){
+  if(!file_exists(filename)){
+    std::cerr << "File \"" << filename << "\" does not exist" << std::endl;
+    return;
+  }
+
+  const char* command = Form(".x %s", filename.c_str());
+  TRint::ProcessLine(command);
+}
+
+void TGRUTint::HandleFile(const std::string& filename){
+  if(!file_exists(filename)){
+    std::cerr << "File \"" << filename << "\" does not exist" << std::endl;
+    return;
+  }
+
+  TGRUTOptions* opt = TGRUTOptions::Get();
+
+  kFileType filetype = opt->DetermineFileType(filename);
+  switch(filetype){
+  case NSCL_EVT:
+  case GRETINA_MODE2:
+  case GRETINA_MODE3:
+    {
+      std::string outfile = opt->OutputFile();
+      if(!outfile.length()){
+	outfile = opt->GenerateOutputFilename(filename);
+      }
+      TGRUTLoop::Get()->ProcessFile(filename.c_str(), outfile.c_str());
+    }
+    break;
+
+  case ROOT_DATA:
+    OpenRootFile(filename);
+    break;
+
+  case ROOT_MACRO:
+    RunMacroFile(filename);
+    break;
+
+  default:
+    std::cerr << "Unknown file type for " << filename << std::endl;
   }
 }
 
@@ -279,13 +341,8 @@ void TGRUTint::OpenFileDialog() {
   file_info.fFileTypes = filetypes;
   new TGFileDialog(gClient->GetRoot(),0,kFDOpen,&file_info);
   if(file_info.fFilename)  {
-    printf("you selected: %s\n",file_info.fFilename);
-    fflush(stdout);
-  } else {
-    printf("you forgot to select a file\n");
-    fflush(stdout);
+    HandleFile(file_info.fFilename);
   }
-  //fd->Delete();  window delees itself. you know, for the funz.  
   return;
 }
 
@@ -306,5 +363,5 @@ void TGRUTint::DelayedProcessLine_ProcessItem(){
   }
 
   std::cout << "Received command \"" << message << "\"" << std::endl;
-  ProcessLine(message.c_str());
+  this->ProcessLine(message.c_str());
 }

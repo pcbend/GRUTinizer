@@ -30,7 +30,7 @@ class TGEBMode3Event : public TGEBEvent {
     TGEBMode3Event(const TGEBEvent&);
     ~TGEBMode3Event(); 
 
-    bool GetNextItem(TMode3& output, bool read_waveform = false);
+    bool GetNextItem(TMode3& output, bool read_waveform = false);  // only used in mode3 data.
 
 
   private:
