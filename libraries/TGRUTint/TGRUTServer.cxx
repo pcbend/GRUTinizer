@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "TError.h"
-#include "TInterpreter.h"
+#include "TApplication.h"
 #include "TSocket.h"
 
 TGRUTServer::TGRUTServer()
@@ -120,7 +120,7 @@ bool TGRUTServer::ReadCommand(){
 
   // Do something with the command.
   std::cout << "\n" << "Received command \"" << message << "\"" << std::endl;
-  gInterpreter->ProcessLine(message.c_str());
+  gApplication->ProcessLine(message.c_str());
 
   return true;
 }
