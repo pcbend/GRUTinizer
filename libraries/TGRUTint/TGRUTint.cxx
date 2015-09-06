@@ -43,7 +43,8 @@ TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions
 
 
 TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t noLogo,const char *appClassName)
-  :TRint(appClassName, &argc, argv, options, numOptions,noLogo), fCommandTimer(NULL), fRootFilesOpened(0) {
+  :TRint(appClassName, &argc, argv, options, numOptions,noLogo), 
+   fCommandServer(NULL), fCommandTimer(NULL), fRootFilesOpened(0) {
 
   fGRUTEnv = gEnv;
   GetSignalHandler()->Remove();
@@ -149,11 +150,11 @@ void TGRUTint::ApplyOptions() {
     std::cout << "Waiting for join" << std::endl;
     TGRUTLoop::Get()->Join();
     gApplication->Terminate();
-  } else {
-    fServer.SetPort(opt->Port());
-    fServer.Start();
-    fCommandTimer = new TTimer("TGRUTint::instance()->DelayedProcessLine_ProcessItem();", 100);
-    fCommandTimer->TurnOn();
+  } else if(TGRUTOptions::Get()->CommandServer()) {
+    fCommandServer = new TGRUTServer(TGRUTOptions::Get()->CommandPort());
+    fCommandServer->Start();
+//    fCommandTimer = new TTimer("TGRUTint::instance()->DelayedProcessLine_ProcessItem();", 100);
+//    fCommandTimer->TurnOn();
   }
 }
 
@@ -319,7 +320,10 @@ TString TGRUTint::ReverseObjectSearch(TString &input) {
 };
 
 void TGRUTint::Terminate(Int_t status){
-  fServer.Stop();
+  if(fCommandServer) {
+    fCommandServer->Stop();
+    fCommandServer->Delete();
+  }
   TGRUTLoop::Get()->Stop();
   TRint::Terminate(status);
 }
@@ -363,5 +367,5 @@ void TGRUTint::DelayedProcessLine_ProcessItem(){
   }
 
   std::cout << "Received command \"" << message << "\"" << std::endl;
-  this->ProcessLine(message.c_str());
+//  this->ProcessLine(message.c_str());
 }

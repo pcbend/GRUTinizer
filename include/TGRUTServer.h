@@ -9,13 +9,15 @@
 
 #include <string>
 
+#include "TList.h"
+#include "TMonitor.h"
 #include "TObject.h"
 #include "TServerSocket.h"
 
 
 class TGRUTServer : public TObject {
 public:
-  TGRUTServer();
+  //TGRUTServer();
   TGRUTServer(int port);
   virtual ~TGRUTServer();
 
@@ -31,13 +33,20 @@ private:
 
   void Run();
   void OpenPort();
-  bool ReadCommand();
-  std::string ReadFromSocket(TSocket& socket);
+  void Iteration();
+  void DoNewConnection(TSocket*);
+  void DoRead(TSocket*); 
+  void DoWrite(TSocket*); 
+
+  TMonitor *monitor;
+  TServerSocket *server;
 
   int port;
+  TList readlist;
+  TList writelist;
 
 #ifndef __CINT__
-  std::unique_ptr<TServerSocket> server;
+  //std::unique_ptr<TServerSocket> server;
   std::atomic_bool is_running;
   std::chrono::milliseconds max_sleep;
   std::thread listen_thread;

@@ -24,17 +24,18 @@ public:
   const std::string OutputFile()                    { return output_file; }
   std::string InputRing() { return input_ring; }
 
-  int Port() { return fPort; }
+  int CommandPort() { return fCommandPort; }
 
   const std::vector<std::string>& OptionFiles() { return options_file; }
 
   bool IgnoreErrors() { return fIgnoreErrors; }
 
-  bool ExitAfterSorting() const { return fExitAfterSorting; }
-  bool ShowedHelp() const { return fHelp; }
-  bool ShowLogo() const { return fShowLogo; }
-  bool SortRaw() const { return fSortRaw; }
-  bool IgnoreMode3() const { return fIgnoreMode3; }
+  bool ExitAfterSorting()   const { return fExitAfterSorting; }
+  bool ShowedHelp()         const { return fHelp; }
+  bool ShowLogo()           const { return fShowLogo; }
+  bool SortRaw()            const { return fSortRaw; }
+  bool IgnoreMode3()        const { return fIgnoreMode3; }
+  bool CommandServer()      const { return fCommandServer; }
 
   bool ShouldExitImmediately() const { return fShouldExit; }
 
@@ -59,7 +60,7 @@ private:
 
   std::vector<std::string> options_file;
 
-  int fPort;
+  int fCommandPort;
 
   bool fExitAfterSorting;
   bool fHelp;
@@ -67,6 +68,7 @@ private:
   bool fSortRaw;
   bool fIgnoreErrors;
   bool fIgnoreMode3;
+  bool fCommandServer;
 
   bool fShouldExit;
 

@@ -33,7 +33,7 @@ public:
 
   virtual void Terminate(Int_t status = 0);
 
-  void SetListenPort(int port) { fServer.SetPort(port); }
+  //void SetListenPort(int port) { fServer.SetPort(port); }
 
   Long_t ProcessLine(const char* line, Bool_t sync=kFALSE,Int_t *error=0);
   TString ReverseObjectSearch(TString&);
@@ -68,7 +68,7 @@ private:
 
   TObject* fNewChild;
   bool fIsTabComplete;
-  TGRUTServer fServer;
+  TGRUTServer *fCommandServer;
 
   void Init();
   void ApplyOptions();

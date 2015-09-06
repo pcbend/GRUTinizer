@@ -27,6 +27,7 @@ void TGRUTOptions::Clear(Option_t* opt) {
 
   options_file.clear();
 
+  fCommandServer    = true;
   fExitAfterSorting = false;
   fHelp = false;
   fShowLogo = true;
@@ -60,9 +61,12 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("n no-sort", &fSortRaw)
     .description("Load raw data files without sorting")
     .default_value(true);
-  parser.option("port", &fPort)
+  parser.option("port", &fCommandPort)
     .description("Port on which to listen for commands")
-    .default_value(9000);
+    .default_value(9090);
+  parser.option("noserver", &fCommandServer)
+    .description("Start program without default command server running.")
+    .default_value(true);
   parser.option("ignore-errors ignore_errors", &fIgnoreErrors)
     .description("Don't print warning messages.  Use at your own risk.");
   parser.option("q quit", &fExitAfterSorting)
