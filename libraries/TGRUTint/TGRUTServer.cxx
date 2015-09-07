@@ -152,6 +152,11 @@ void TGRUTServer::DoRead(TSocket *sock) {
       monitor->Remove(sock);
       }
       break;
+    case kMESS_OBJECT: {
+
+
+      }
+      break;
     default:
       break;
   };
