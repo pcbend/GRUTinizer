@@ -2,7 +2,8 @@
 #define TMODE3_H
 
 #include "TDetector.h"
-#include "TGretinaHit.h"
+#include "TDetectorHit.h"
+//#include "TGretinaHit.h"
 
 #define MAXTRACE 1024
 

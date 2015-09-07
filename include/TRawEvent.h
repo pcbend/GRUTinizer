@@ -1,12 +1,13 @@
 #ifndef TRAWEVENT_H
 #define TRAWEVENT_H
 
+#include <Globals.h>
+
 #include <iostream>
 #include <iomanip>
 
 #include "TObject.h"
 
-#include "TRawFile.h"
 #include "TSmartBuffer.h"
 #include "TGRUTTypes.h"
 

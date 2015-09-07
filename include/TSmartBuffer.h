@@ -2,8 +2,11 @@
 #define _TSMARTBUFFER_H_
 
 #ifndef __CINT__
+#ifndef __ROOTMACRO__
 #   include <mutex>
 #endif
+#endif
+//class  std::mutex;
 
 #include "TObject.h"
 
@@ -50,9 +53,12 @@ public:
   TSmartBuffer& operator=(TSmartBuffer other);
 
 #ifndef __CINT__
+#ifndef __ROOTMACRO__
   /// Move constructor
   TSmartBuffer(TSmartBuffer&& other);
 #endif
+#endif
+
 
 
   /// Clears the object.
@@ -134,6 +140,7 @@ private:
   /// The size of the current subset of the data.
   size_t fSize;
 #ifndef __CINT__
+#ifndef __ROOTMACRO__
   /// The location of the reference count.
   int* fReferenceCount;
 
@@ -144,6 +151,7 @@ private:
       so only writing is possible, and no synchronization is needed there.
    */
   std::mutex* fReferenceMutex;
+#endif
 #endif
 
   ClassDef(TSmartBuffer,0);

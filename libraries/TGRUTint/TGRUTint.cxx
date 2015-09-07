@@ -5,6 +5,7 @@
 
 #include "TFile.h"
 
+#include "TInterpreter.h"
 #include "TDetectorEnv.h"
 #include "TGRUTOptions.h"
 #include "TGRUTLoop.h"
@@ -53,10 +54,10 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
   ih->Add();
 
   SetPrompt("GRizer [%d] ");
-
+  
   auto opt = TGRUTOptions::Get(argc, argv);
   if(opt->ShouldExit()){
-    gApplication->Terminate();
+    this->Terminate();
     return;
   }
 
@@ -65,6 +66,7 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
 
 
 TGRUTint::~TGRUTint() {   
+
   if(fCommandTimer){
     delete fCommandTimer;
   }
@@ -85,15 +87,19 @@ void TGRUTint::Init() {
   delete tempfile;
   gSystem->Unlink("/var/tmp/mytemp.root");
 
-//  TClass::LoadClass("TMode3",false);
+  std::string grutpath = getenv("GRUTSYS");
 
+  gInterpreter->AddIncludePath(Form("%s/include",grutpath.c_str()));
+  //gSystem->AddIncludePath(Form("-I%s/include",grutpath.c_str()));
+  //gSystem->AddDynamicPath(Form("-%s/libraries",grutpath.c_str()));
 
-  // if(TGRUTOptions::Get()->ShowLogo()){
-  //   PopupLogo(false);
-  //   WaitLogo();
-  // }
+  if(TGRUTOptions::Get()->ShowLogo()){
+    PopupLogo(false);
+    WaitLogo();
+  }
+
   TGRUTLoop::CreateDataLoop<TGRUTLoop>();
-  TObjectManager::Init("GRUT_Manager", "GRUT Manager");
+  TObjectManager::Get("GRUT_Manager", "GRUT Manager");
   ApplyOptions();
   //printf("gManager = 0x%08x\n",gManager);   fflush(stdout);
   //gManager->Print();
@@ -110,7 +116,7 @@ bool TGRUTInterruptHandler::Notify() {
     exit(1);
   }
   printf("\n" DRED BG_WHITE  "   Control-c was pressed.   " RESET_COLOR "\n");
-  gApplication->Terminate();
+  TGRUTint::instance()->Terminate();
   return true;
 }
 
@@ -150,7 +156,7 @@ void TGRUTint::ApplyOptions() {
     TGRUTLoop::Get()->Status();
     std::cout << "Waiting for join" << std::endl;
     TGRUTLoop::Get()->Join();
-    gApplication->Terminate();
+    this->Terminate();
   } else if(TGRUTOptions::Get()->CommandServer()) {
     fCommandServer = new TGRUTServer(TGRUTOptions::Get()->CommandPort());
     fCommandServer->Start();
@@ -326,6 +332,17 @@ void TGRUTint::Terminate(Int_t status){
     fCommandServer->Delete();
   }
   TGRUTLoop::Get()->Stop();
+  
+  printf("%s\t%i\n",__PRETTY_FUNCTION__,TObjectManager::GetListOfManagers()->GetSize());
+  TIter iter(TObjectManager::GetListOfManagers());
+  while(TObjectManager *om = (TObjectManager*)iter.Next()) {
+     om->Delete();
+    //TObjectManager::GetListOfManagers()->RecursiveRemove(om);
+  }
+  printf("%s\t%i\n",__PRETTY_FUNCTION__,TObjectManager::GetListOfManagers()->GetSize());
+
+
+
   TRint::Terminate(status);
 }
 

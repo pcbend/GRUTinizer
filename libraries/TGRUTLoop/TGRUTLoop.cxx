@@ -3,6 +3,8 @@
 #include <chrono>
 #include <thread>
 
+#include "TRawFile.h"
+
 #include "RawDataQueue.h"
 #include "TDetectorEnv.h"
 #include "TGEBEvent.h"

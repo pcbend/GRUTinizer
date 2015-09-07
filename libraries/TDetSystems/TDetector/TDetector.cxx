@@ -1,5 +1,6 @@
 #include "TDetector.h"
 
+#include <TRawEvent.h>
 #include <iostream>
 
 ClassImp(TDetector)

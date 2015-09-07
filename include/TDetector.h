@@ -7,7 +7,9 @@
 
 #include "TDetectorHit.h"
 #include "TRawEvent.h"
-#include "TSmartBuffer.h"
+//class TRawEvent;
+class TSmartBuffer;
+
 
 class TDetector : public TNamed {
 public:

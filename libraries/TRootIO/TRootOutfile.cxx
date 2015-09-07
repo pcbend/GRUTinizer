@@ -37,6 +37,7 @@ TTree *TRootOutfile::AddTree(const char* tname,const char* ttitle,bool build) {
 
   tree_element elem;
   elem.tree = new TTree(tname,ttitle);
+  elem.tree->SetMaxTreeSize(1000000000); //outfile limited to 1gb, than outfle_%i opened.
   elem.build_det = build;
   trees[tname] = elem;
   return elem.tree;
@@ -114,6 +115,9 @@ void TRootOutfile::FinalizeFile(){
   for(auto& elem : trees){
     TTree* tree = elem.second.tree;
     printf("\t%s[%i] written...",tree->GetName(),tree->GetEntries());  fflush(stdout);
+    TFile *f = tree->GetCurrentFile();
+    outfile = f;
+    f->cd();
     tree->Write();
     printf(" done.\n"); fflush(stdout);
     counter++;
