@@ -31,7 +31,7 @@ TGRUTServer::~TGRUTServer() {
 }
 
 void TGRUTServer::Start() {
-  printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
+  //printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
   if(port>0 && !is_running){
     is_running = true;
     listen_thread = std::thread(&TGRUTServer::Run, this);
@@ -39,7 +39,7 @@ void TGRUTServer::Start() {
 }
 
 void TGRUTServer::Stop(){
-  printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
+  //printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
   if(is_running){
     is_running = false;
     listen_thread.join();
@@ -64,8 +64,8 @@ void TGRUTServer::SetPort(int new_port) {
 }
 
 void TGRUTServer::OpenPort(){
-  printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
-  printf(BLUE "attemping new TSocketServer on %i." RESET_COLOR "\n",port);  fflush(stdout);
+  //printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
+  //printf(BLUE "attemping new TSocketServer on %i." RESET_COLOR "\n",port);  fflush(stdout);
   while(is_running && port<65535) {
     auto old_val = gErrorIgnoreLevel;
     gErrorIgnoreLevel = kFatal;
@@ -74,8 +74,9 @@ void TGRUTServer::OpenPort(){
 
     if(server->IsValid()){
       monitor = new TMonitor(false);
-      //monitor->Add(server);
+      monitor->Add(server);
       server->SetOption(kNoBlock,1);
+      printf(BLUE "now listening on port: %i" RESET_COLOR  "\n",port);
       return;
     }
 
@@ -87,14 +88,14 @@ void TGRUTServer::OpenPort(){
 }
 
 void TGRUTServer::Iteration(){
-  printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
+  //printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
   int numsockets = monitor->Select(&readlist,&writelist,20);
-  if(numsockets==0) { //timeout
+  if(numsockets==0 || numsockets==-2 ) { //timeout
     std::this_thread::sleep_for(std::chrono::milliseconds(100));  
     return;
-  } else if(numsockets<0) { //error state.
-    fprintf(stderr,"%s error[%i]; stopping server.\n",__PRETTY_FUNCTION__,numsockets);
-    Stop();
+//  } else if(numsockets<0) { //error state.
+//    fprintf(stderr,"%s error[%i]; stopping server.\n",__PRETTY_FUNCTION__,numsockets);
+//    Stop();
   } else {
     //do reading.
     TIter read(&readlist);
@@ -118,26 +119,43 @@ void TGRUTServer::DoWrite(TSocket *sock) {
   return;
 }
 
-void TGRUTServer::DoNewConnection(TSocket *sock) {
-  printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
+void TGRUTServer::DoNewConnection(TServerSocket *sock) {
+  //printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
   if(!sock || (sock==(TSocket*)-1)) return;
   // Verify that the connection is from localhost
   std::string connection_location = sock->GetInetAddress().GetHostAddress();
-  if(connection_location != "127.0.0.1"){
-    std::cerr << "Attempted connection from " << connection_location << "\n"
-      	<< "Only localhost is allowed to connect." << std::endl;
+  TSocket *newsock = sock->Accept();
+  monitor->Add(newsock);
+//  if(connection_location != "127.0.0.1"){
+//    std::cerr << "Attempted connection from " << connection_location << "\n"
+//      	<< "Only localhost is allowed to connect." << std::endl;
     //readlist.Remove(sock);
-    delete sock;  //calls close on socket
-    return;
-  }
-  monitor->Add(sock);
-  std::cout << "Just accepted a connection" << std::endl;
+//    delete sock;  //calls close on socket
+//    return;
+//  }
+  //monitor->Add(sock);
+  //std::cout << "Just accepted a connection" << std::endl;
   return;
 }
   
 void TGRUTServer::DoRead(TSocket *sock) {
   printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
   if(!sock || (sock==(TSocket*)-1)) return;
+  TMessage *mess;
+  sock->Recv(mess);
+  switch(mess->What()) {
+    case kMESS_STRING: {
+      char str[256];
+      mess->ReadString(str,256);
+      //printf("Client %i: %s\n",sock==server ? 0:1,str);
+      TGRUTint::instance()->DelayedProcessLine(str);
+      monitor->Remove(sock);
+      }
+      break;
+    default:
+      break;
+  };
+  delete mess;
   return;
 }
 

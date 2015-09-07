@@ -131,7 +131,8 @@ static void SetDisplay()  {
    }
 
  }
-  printf("SetDisplay return \n");
+  //printf("SetDisplay return \n");
+  return;
 }
 
 

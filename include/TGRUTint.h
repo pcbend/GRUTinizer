@@ -27,7 +27,7 @@ private:
   static TGRUTint *fTGRUTint;
 
 public:
-  static TGRUTint*instance(int argc=0,char **argv=0,void *opts=0,int numOptions=-1,
+  static TGRUTint *instance(int argc=0,char **argv=0,void *opts=0,int numOptions=-1,
                            bool noLogo=true,const char *appClassName="grutinizer");
   virtual ~TGRUTint();
 

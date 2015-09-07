@@ -34,7 +34,7 @@ private:
   void Run();
   void OpenPort();
   void Iteration();
-  void DoNewConnection(TSocket*);
+  void DoNewConnection(TServerSocket*);
   void DoRead(TSocket*); 
   void DoWrite(TSocket*); 
 

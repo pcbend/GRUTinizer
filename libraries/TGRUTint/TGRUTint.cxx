@@ -13,6 +13,7 @@
 
 //#include "Api.h"   // for G__value
 
+#include <Getline.h>
 #include <TClass.h>
 #include <TROOT.h>
 #include <TString.h>
@@ -95,7 +96,7 @@ void TGRUTint::Init() {
   TObjectManager::Init("GRUT_Manager", "GRUT Manager");
   ApplyOptions();
   //printf("gManager = 0x%08x\n",gManager);   fflush(stdout);
-  gManager->Print();
+  //gManager->Print();
   gManager->Connect("TObjectManager", "ObjectAppended(TObject*)", "TGRUTint", this, "ObjectAppended(TObject*)");
 }
 
@@ -153,8 +154,8 @@ void TGRUTint::ApplyOptions() {
   } else if(TGRUTOptions::Get()->CommandServer()) {
     fCommandServer = new TGRUTServer(TGRUTOptions::Get()->CommandPort());
     fCommandServer->Start();
-//    fCommandTimer = new TTimer("TGRUTint::instance()->DelayedProcessLine_ProcessItem();", 100);
-//    fCommandTimer->TurnOn();
+    fCommandTimer = new TTimer("TGRUTint::instance()->DelayedProcessLine_ProcessItem();", 100);
+    fCommandTimer->TurnOn();
   }
 }
 
@@ -366,6 +367,7 @@ void TGRUTint::DelayedProcessLine_ProcessItem(){
     fLinesToProcess.pop();
   }
 
-  std::cout << "Received command \"" << message << "\"" << std::endl;
-//  this->ProcessLine(message.c_str());
+  std::cout << "Received remote command \"" << message << "\"" << std::endl;
+  this->ProcessLine(message.c_str());
+  Getlinem(EGetLineMode::kInit,((TRint*)gApplication)->GetPrompt());
 }
