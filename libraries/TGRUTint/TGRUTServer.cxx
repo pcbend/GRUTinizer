@@ -116,6 +116,7 @@ void TGRUTServer::Iteration(){
 void TGRUTServer::DoWrite(TSocket *sock) {
   printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
   if(!sock || (sock==(TSocket*)-1)) return;
+      //monitor->Remove(sock);
   return;
 }
 
@@ -123,16 +124,16 @@ void TGRUTServer::DoNewConnection(TServerSocket *sock) {
   //printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
   if(!sock || (sock==(TSocket*)-1)) return;
   // Verify that the connection is from localhost
-  std::string connection_location = sock->GetInetAddress().GetHostAddress();
   TSocket *newsock = sock->Accept();
+  std::string connection_location = newsock->GetInetAddress().GetHostAddress();
+  if(connection_location != "127.0.0.1"){
+    std::cerr << "Attempted connection from " << connection_location << "\n"
+              << "Only localhost is allowed to connect." << std::endl;
+  //readlist.Remove(sock);
+    delete newsock;  //calls close on socket
+    return;
+  }
   monitor->Add(newsock);
-//  if(connection_location != "127.0.0.1"){
-//    std::cerr << "Attempted connection from " << connection_location << "\n"
-//      	<< "Only localhost is allowed to connect." << std::endl;
-    //readlist.Remove(sock);
-//    delete sock;  //calls close on socket
-//    return;
-//  }
   //monitor->Add(sock);
   //std::cout << "Just accepted a connection" << std::endl;
   return;
@@ -149,6 +150,7 @@ void TGRUTServer::DoRead(TSocket *sock) {
       mess->ReadString(str,256);
       //printf("Client %i: %s\n",sock==server ? 0:1,str);
       TGRUTint::instance()->DelayedProcessLine(str);
+      sock->Send("hello!");
       monitor->Remove(sock);
       }
       break;

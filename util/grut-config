@@ -45,7 +45,7 @@ incdir=$GRUTSYS/include
 
 
 grutlibs="-lTGEBDAQ -lTDataLoop -lTGEBDAQ -lTGRUTUtil -lTNSCLDAQ -lTRawFormat -lGROOT -lTStripChart"
-detlibs="-lTSega -lTCaesar -lTDetector  -lTGretina -lTJanus -lTPhosWall"
+detlibs="-lTSega -lTDetector  -lTGretina -lTJanus -lTPhosWall"
 grutmore="-lTGRUTint -lTGRUTLoop -lTRootIO -lTDataLoop"
 
 cflags="-std=c++0x -I$incdir"
