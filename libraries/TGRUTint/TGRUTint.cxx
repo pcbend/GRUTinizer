@@ -35,6 +35,7 @@ ClassImp(TGRUTint)
 
 TGRUTint *TGRUTint::fTGRUTint = NULL;
 TEnv    *TGRUTint::fGRUTEnv  = NULL;
+TObject *gResponse = NULL;
 
 
 TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions, bool noLogo, const char *appClassName) {
@@ -217,14 +218,14 @@ void TGRUTint::HandleFile(const std::string& filename){
   case NSCL_EVT:
   case GRETINA_MODE2:
   case GRETINA_MODE3:
-    {
-      std::string outfile = opt->OutputFile();
-      if(!outfile.length()){
-	outfile = opt->GenerateOutputFilename(filename);
-      }
-      TGRUTLoop::Get()->ProcessFile(filename.c_str(), outfile.c_str());
+  {
+    std::string outfile = opt->OutputFile();
+    if(!outfile.length()){
+      outfile = opt->GenerateOutputFilename(filename);
     }
-    break;
+    TGRUTLoop::Get()->ProcessFile(filename.c_str(), outfile.c_str());
+  }
+  break;
 
   case ROOT_DATA:
     OpenRootFile(filename);
@@ -366,15 +367,28 @@ void TGRUTint::OpenFileDialog() {
   return;
 }
 
-void TGRUTint::DelayedProcessLine(std::string message){
-  std::lock_guard<std::mutex> lock(fCommandsMutex);
-  fLinesToProcess.push(message);
+TObject* TGRUTint::DelayedProcessLine(std::string message){
+  std::lock_guard<std::mutex> any_command_lock(fCommandWaitingMutex);
+
+  {
+    std::lock_guard<std::mutex> lock(fCommandListMutex);
+    fLinesToProcess.push(message);
+  }
+
+  std::unique_lock<std::mutex> lock(fResultListMutex);
+  while(fCommandResults.empty()){
+    fNewResult.wait(lock);
+  }
+
+  TObject* result = fCommandResults.front();
+  fCommandResults.pop();
+  return result;
 }
 
 void TGRUTint::DelayedProcessLine_ProcessItem(){
   std::string message;
   {
-    std::lock_guard<std::mutex> lock(fCommandsMutex);
+    std::lock_guard<std::mutex> lock(fCommandListMutex);
     if(fLinesToProcess.empty()){
       return;
     }
@@ -385,4 +399,12 @@ void TGRUTint::DelayedProcessLine_ProcessItem(){
   std::cout << "Received remote command \"" << message << "\"" << std::endl;
   this->ProcessLine(message.c_str());
   Getlinem(EGetLineMode::kInit,((TRint*)gApplication)->GetPrompt());
+
+  {
+    std::lock_guard<std::mutex> lock(fResultListMutex);
+    fCommandResults.push(gResponse);
+    gResponse = NULL;
+  }
+
+  fNewResult.notify_one();
 }

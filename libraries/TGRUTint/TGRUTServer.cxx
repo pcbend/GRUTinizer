@@ -11,16 +11,9 @@
 
 #include "TGRUTint.h"
 
-//TGRUTServer::TGRUTServer()
-//  : port(-1), server(NULL), is_running(false),
-//    max_sleep(std::chrono::minutes(5)), monitor(NULL) { 
-//}
-
 TGRUTServer::TGRUTServer(int port)
   : port(port), server(NULL), is_running(false),
-    max_sleep(std::chrono::seconds(10)), monitor(NULL) {
-  //Start();
-}
+    max_sleep(std::chrono::seconds(10)), monitor(NULL) { }
 
 TGRUTServer::~TGRUTServer() {
   Stop();
@@ -31,7 +24,6 @@ TGRUTServer::~TGRUTServer() {
 }
 
 void TGRUTServer::Start() {
-  //printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
   if(port>0 && !is_running){
     is_running = true;
     listen_thread = std::thread(&TGRUTServer::Run, this);
@@ -39,7 +31,6 @@ void TGRUTServer::Start() {
 }
 
 void TGRUTServer::Stop(){
-  //printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
   if(is_running){
     is_running = false;
     listen_thread.join();
@@ -64,8 +55,6 @@ void TGRUTServer::SetPort(int new_port) {
 }
 
 void TGRUTServer::OpenPort(){
-  //printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
-  //printf(BLUE "attemping new TSocketServer on %i." RESET_COLOR "\n",port);  fflush(stdout);
   while(is_running && port<65535) {
     auto old_val = gErrorIgnoreLevel;
     gErrorIgnoreLevel = kFatal;
@@ -88,14 +77,10 @@ void TGRUTServer::OpenPort(){
 }
 
 void TGRUTServer::Iteration(){
-  //printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
   int numsockets = monitor->Select(&readlist,&writelist,20);
   if(numsockets==0 || numsockets==-2 ) { //timeout
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));  
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     return;
-//  } else if(numsockets<0) { //error state.
-//    fprintf(stderr,"%s error[%i]; stopping server.\n",__PRETTY_FUNCTION__,numsockets);
-//    Stop();
   } else {
     //do reading.
     TIter read(&readlist);
@@ -116,12 +101,10 @@ void TGRUTServer::Iteration(){
 void TGRUTServer::DoWrite(TSocket *sock) {
   printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
   if(!sock || (sock==(TSocket*)-1)) return;
-      //monitor->Remove(sock);
   return;
 }
 
 void TGRUTServer::DoNewConnection(TServerSocket *sock) {
-  //printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
   if(!sock || (sock==(TSocket*)-1)) return;
   // Verify that the connection is from localhost
   TSocket *newsock = sock->Accept();
@@ -129,16 +112,13 @@ void TGRUTServer::DoNewConnection(TServerSocket *sock) {
   if(connection_location != "127.0.0.1"){
     std::cerr << "Attempted connection from " << connection_location << "\n"
               << "Only localhost is allowed to connect." << std::endl;
-  //readlist.Remove(sock);
     delete newsock;  //calls close on socket
     return;
   }
   monitor->Add(newsock);
-  //monitor->Add(sock);
-  //std::cout << "Just accepted a connection" << std::endl;
   return;
 }
-  
+
 void TGRUTServer::DoRead(TSocket *sock) {
   printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
   if(!sock || (sock==(TSocket*)-1)) return;
@@ -148,9 +128,13 @@ void TGRUTServer::DoRead(TSocket *sock) {
     case kMESS_STRING: {
       char str[256];
       mess->ReadString(str,256);
-      //printf("Client %i: %s\n",sock==server ? 0:1,str);
-      TGRUTint::instance()->DelayedProcessLine(str);
-      sock->Send("hello!");
+      TObject* obj = TGRUTint::instance()->DelayedProcessLine(str);
+      if(obj){
+        sock->SendObject(obj);
+        delete obj;
+      } else {
+        sock->Send("no response given");
+      }
       monitor->Remove(sock);
       }
       break;
@@ -165,47 +149,3 @@ void TGRUTServer::DoRead(TSocket *sock) {
   delete mess;
   return;
 }
-
-//  if(sock && (sock != (TSocket*)-1)){
-//    std::cout << "Just accepted a connection" << std::endl;
-/*
-
-    // Verify that the connection is from localhost
-    std::string connection_location = sock->GetInetAddress().GetHostAddress();
-    if(connection_location == "127.0.0.1"){
-      //monitor.Add(sock);
-    } else {
-      std::cerr << "Attempted connection from " << connection_location << "\n"
-		<< "Only localhost is allowed to connect." << std::endl;
-      delete sock;
-      return;
-    }
-  } else { 
-    return;
-  }
-
-  //sock = monitor.Select(10);
-  //if(sock && (long(sock) != -1)){
-    std::cout << "TMonitor gave me " << sock << std::endl;
-    TMessage* message;
-    int bytes = sock->Recv(message);
-    std::cout << "Received " << bytes << " bytes" << std::endl;
-    if(bytes == -4){
-      // Timeout, catch it next time
-    } else if (bytes <=0 ) {
-      //monitor.Remove(sock);
-    } else {
-      std::cout << "We have a message" << std::endl;
-      TObject* obj = message->ReadObject(message->GetClass());
-      std::cout << "Object name: " << obj->GetName() << std::endl;
-      if(obj->Class() == TString::Class()){
-  	std::cout << "We have a string" << std::endl;
-  	TString* string = (TString*)obj;
-  	TGRUTint::instance()->DelayedProcessLine(string->Data());
-      }
-      delete obj;
-      delete message;
-    }
-  //}
-*/
-//}
