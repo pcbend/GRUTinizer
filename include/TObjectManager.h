@@ -11,11 +11,12 @@
 //class TObjectManager : public TDirectory, public TQObject {
 class TObjectManager : public TFile, public TQObject {
 public:
-  static void Get(const char* name, Option_t *opt="update");
+  static TObjectManager* Get(const char* name, Option_t *opt="update");
   virtual ~TObjectManager();
 
   virtual void Add(TObject* obj, Bool_t replace = kFALSE);
   virtual void Append(TObject* obj, Bool_t replace = kFALSE);
+  virtual void SaveAndClose(Option_t* option = "");
 
   virtual void Print(Option_t* opt = "") const;
 
@@ -23,7 +24,7 @@ public:
 
   void AddRelationship(TObject* parent, TObject* child);
 
-  //virtual void RecursiveRemove(TObject* obj);
+  virtual void RecursiveRemove(TObject* obj);
 
   static TObjectManager *Open(const char *fname,Option_t *opt="read");
   static TList *GetListOfManagers() { return &objectmanagers; }
@@ -32,7 +33,7 @@ public:
 private:
   static TList objectmanagers;
   TObjectManager(const char* name, const char* title);
-  
+
   typedef std::map<TObject*,std::vector<TObject*> > ParentChildMap;
   ParentChildMap fParentChildren;
   void SaveParent(TObject*);
@@ -42,5 +43,6 @@ private:
 };
 
 extern TObjectManager* gManager;
+extern TObjectManager* gBaseManager;
 
 #endif /* _TOBJECTMANAGER_H_ */

@@ -64,6 +64,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("port", &fCommandPort)
     .description("Port on which to listen for commands")
     .default_value(9090);
+  parser.option("no-backup",&fMakeBackupFile)
+    .description("Disable the \"last.root\" backup file")
+    .default_value(true);
   parser.option("noserver", &fCommandServer)
     .description("Start program without default command server running.")
     .default_value(true);
@@ -86,6 +89,10 @@ void TGRUTOptions::Load(int argc, char** argv) {
   if(fHelp){
     std::cout << parser << std::endl;
     fShouldExit = true;
+  }
+
+  if(fExitAfterSorting){
+    fMakeBackupFile = false;
   }
 
   for(auto& file : input_files){

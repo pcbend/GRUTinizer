@@ -2,25 +2,29 @@
 
 #include <iostream>
 
+#include "TClass.h"
+#include "TInterpreter.h"
 #include "TROOT.h"
 #include "TFile.h"
 
 
 TObjectManager* gManager = NULL;
+TObjectManager* gBaseManager = NULL;
 TList TObjectManager::objectmanagers;
 
-void TObjectManager::Get(const char* name, Option_t* opt){
+TObjectManager* TObjectManager::Get(const char* name, Option_t* opt){
+  std::cout << __PRETTY_FUNCTION__ << std::endl;
 
-  TObjectManager *test = (TObjectManager*)objectmanagers.FindObject(name);  
+  TObjectManager *test = (TObjectManager*)objectmanagers.FindObject(name);
   if(!test){
-    //gManager = new TObjectManager(name, title);
     test = TObjectManager::Open(name,opt);
   }
   if(test) {
     gManager = test;
     gDirectory = gManager;
-    //objectmanagers.Add(gManager);
   }
+
+  return gManager;
 }
 
 TObjectManager::TObjectManager(const char* name, Option_t *opt)
@@ -30,47 +34,78 @@ TObjectManager::TObjectManager(const char* name, Option_t *opt)
 }
 
 TObjectManager *TObjectManager::Open(const char *fname,Option_t *opt) {
+  std::cout << __PRETTY_FUNCTION__ << "\t" << std::endl;
+  gROOT->GetListOfFiles()->Print();
+
   std::string strname = fname;
   std::string stropt  = opt;
-  if( "GRUT_Manager") { //default file name, recreate.
-    strname = "LastSession.root";   
+  bool is_base = false;
+  if(!strcmp(fname,"GRUT_Manager")) { //default file name, recreate.
+    strname  = "current.root";
     stropt   = "recreate";
+    is_base = true;
   }
 
   TObjectManager *current = new TObjectManager(strname.c_str(),stropt.c_str());
-  //current = TFile::Open(fname,opt);  
   objectmanagers.Add(current);
   gManager = current;
-  gDirectory = gManager;
+  gDirectory = current;
+  if(is_base){
+    gBaseManager = current;
+  }
 }
 
-TObjectManager *TObjectManager::cd() {
-  gManager = this;
-  this->cd();
-}
+void TObjectManager::SaveAndClose(Option_t* option){
+  std::cout << __PRETTY_FUNCTION__ << ", " << fList->GetSize() << " items known" << std::endl;
+  int num_objects = fList->GetSize();
 
-TObjectManager::~TObjectManager() {
 
-  printf("%s %s\n",__PRETTY_FUNCTION__,this->GetName());
   TString options = this->GetOption();
   if(options.Contains("CREATE")) {
     TObjectManager *current = gManager;
-    //tfile::cd("/");
+    TFile::cd("/");
     ParentChildMap::iterator it;
     for(it=fParentChildren.begin();it!=fParentChildren.end();it++) {
        TFile::cd("/");
        printf("it->first = 0x%08x\n",it->first);
        printf("getname() = %s\n",it->first->GetName());
        it->first->Write();
-       TFile::mkdir(it->first->GetName());
-       TFile::cd(it->first->GetName());
-       for(int x=0;x<it->second.size();x++) {
-         it->second.at(x)->Write();
-       }     
+       if(it->second.size()){
+         TFile::mkdir(it->first->GetName());
+         TFile::cd(it->first->GetName());
+         for(int x=0;x<it->second.size();x++) {
+           it->second.at(x)->Write();
+         }
+       }
     }
     gManager   = current;
     gDirectory = gManager;
   }
+
+  TFile::Close(option);
+
+  if(!strcmp(GetName(),"current.root")){
+    std::string name = "last.root";
+    while(objectmanagers.FindObject(name.c_str())){
+      name = "last_" + name;
+    }
+    if(num_objects > 0){
+      gInterpreter->ProcessLine(Form(".!mv current.root %s",name.c_str()));
+    } else {
+      gInterpreter->ProcessLine(Form(".!rm current.root",name.c_str()));
+    }
+  }
+}
+
+
+TObjectManager *TObjectManager::cd() {
+  gManager = this;
+  TFile::cd();
+
+  return this;
+}
+
+TObjectManager::~TObjectManager() {
 
 }
 
@@ -79,22 +114,22 @@ void TObjectManager::SaveParent(TObject *parent) {
   TString options = this->GetOption();
   if(options.Contains("CREATE")) {
     TObjectManager *current = gManager;
-    ParentChildMap::iterator it;
-    for(it=fParentChildren.begin();it!=fParentChildren.end();it++) {
-      if(it->first==parent) { 
-        TFile::cd("/");
-        printf("getname = %s",it->first->GetName());
-        it->first->Write();
-        if(it->second.size()>0) {
-          TFile::mkdir(it->first->GetName());
-          TFile::cd(it->first->GetName());
-          for(int x=0;x<it->second.size();x++) {
-            it->second.at(x)->Write();
-          }     
+
+    if(fParentChildren.count(parent)){
+      auto& children = fParentChildren[parent];
+
+      TFile::cd("/");
+      printf("getname = %s",parent->GetName());
+      parent->Write();
+      if(children.size()){
+        TFile::mkdir(parent->GetName());
+        TFile::cd(parent->GetName());
+        for(auto child : children){
+          child->Write();
         }
-        break;
       }
     }
+
     gManager   = current;
     gDirectory = gManager;
   }
@@ -138,21 +173,32 @@ void TObjectManager::AddRelationship(TObject* parent, TObject* child){
   }
 }
 
-/*
+
 void TObjectManager::RecursiveRemove(TObject* obj) {
+  std::cout << __PRETTY_FUNCTION__ << "\tObj: " << obj
+            << "\tClass: " << obj->Class()->GetName()
+            << std::endl;
+  std::vector<TObject*> parents_to_remove;
+
   for(auto p_it = fParentChildren.rbegin(); p_it != fParentChildren.rend(); p_it++){
     if(obj == p_it->first){
       SaveParent(p_it->first);
-      //fParentChildren.erase(p_it->first);
+      parents_to_remove.push_back(p_it->first);
     } else {
       for(auto c_it = p_it->second.end()-1; c_it != p_it->second.begin()-1; c_it--){
         if(*c_it == obj){
-          //p_it->second.erase(c_it);
+          p_it->second.erase(c_it);
         }
       }
     }
   }
 
+  // Parents must be removed while not looping over the map.
+  // Otherwise, the iterators become invalid.
+  for(auto parent : parents_to_remove){
+    fParentChildren.erase(parent);
+  }
+
+
   TDirectory::RecursiveRemove(obj);
 }
-*/

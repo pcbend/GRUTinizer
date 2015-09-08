@@ -10,6 +10,7 @@
 #pragma link C++ function Commands;
 
 #pragma link C++ global gManager;
+#pragma link C++ global gBaseManager;
 
 #pragma link C++ class TObjectManager+;
 

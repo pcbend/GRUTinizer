@@ -38,6 +38,7 @@ public:
   bool CommandServer()      const { return fCommandServer; }
 
   bool ShouldExitImmediately() const { return fShouldExit; }
+  bool MakeBackupFile() const { return fMakeBackupFile; }
 
   kFileType DetermineFileType(const std::string& filename);
   std::string GenerateOutputFilename(const std::string& filename);
@@ -71,6 +72,7 @@ private:
   bool fCommandServer;
 
   bool fShouldExit;
+  bool fMakeBackupFile;
 
   ClassDef(TGRUTOptions,0);
 };

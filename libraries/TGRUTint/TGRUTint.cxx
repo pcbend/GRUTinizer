@@ -45,7 +45,7 @@ TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions
 
 
 TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t noLogo,const char *appClassName)
-  :TRint(appClassName, &argc, argv, options, numOptions,noLogo), 
+  :TRint(appClassName, &argc, argv, options, numOptions,noLogo),
    fCommandServer(NULL), fCommandTimer(NULL), fRootFilesOpened(0) {
 
   fGRUTEnv = gEnv;
@@ -54,7 +54,7 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
   ih->Add();
 
   SetPrompt("GRizer [%d] ");
-  
+
   auto opt = TGRUTOptions::Get(argc, argv);
   if(opt->ShouldExit()){
     this->Terminate();
@@ -65,7 +65,7 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
 }
 
 
-TGRUTint::~TGRUTint() {   
+TGRUTint::~TGRUTint() {
 
   if(fCommandTimer){
     delete fCommandTimer;
@@ -99,7 +99,10 @@ void TGRUTint::Init() {
   }
 
   TGRUTLoop::CreateDataLoop<TGRUTLoop>();
-  TObjectManager::Get("GRUT_Manager", "GRUT Manager");
+
+  if(TGRUTOptions::Get()->MakeBackupFile()){
+    TObjectManager::Get("GRUT_Manager", "GRUT Manager");
+  }
   ApplyOptions();
   //printf("gManager = 0x%08x\n",gManager);   fflush(stdout);
   //gManager->Print();
@@ -179,7 +182,7 @@ void TGRUTint::OpenRootFile(const std::string& filename){
 
   TGRUTOptions* opt = TGRUTOptions::Get();
 
-  const char* command = Form("TFile *_file%i = new TFile(\"%s\",\"read\")", 
+  const char* command = Form("TFile *_file%i = TObjectManager::Get(\"%s\",\"read\")",
 			     fRootFilesOpened, filename.c_str());
   TRint::ProcessLine(command);
 
@@ -187,7 +190,7 @@ void TGRUTint::OpenRootFile(const std::string& filename){
   if(file){
     std::cout << "\tfile " << file->GetName() << " opened as _file" << fRootFilesOpened << std::endl;
   }
-  
+
   fRootFilesOpened++;
 }
 
@@ -332,16 +335,11 @@ void TGRUTint::Terminate(Int_t status){
     fCommandServer->Delete();
   }
   TGRUTLoop::Get()->Stop();
-  
-  printf("%s\t%i\n",__PRETTY_FUNCTION__,TObjectManager::GetListOfManagers()->GetSize());
+
   TIter iter(TObjectManager::GetListOfManagers());
   while(TObjectManager *om = (TObjectManager*)iter.Next()) {
-     om->Delete();
-    //TObjectManager::GetListOfManagers()->RecursiveRemove(om);
+    om->SaveAndClose();
   }
-  printf("%s\t%i\n",__PRETTY_FUNCTION__,TObjectManager::GetListOfManagers()->GetSize());
-
-
 
   TRint::Terminate(status);
 }
@@ -354,7 +352,7 @@ void TGRUTint::Terminate(Int_t status){
 
 void TGRUTint::OpenFileDialog() {
   TGFileInfo file_info;
-  const char *filetypes[] = { "ROOT File", "*.root", 
+  const char *filetypes[] = { "ROOT File", "*.root",
                               "Macro File", "*.C",
                               "GRETINA data file","*.dat",
                               "NSCL data","*.evt",
