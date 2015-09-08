@@ -44,9 +44,9 @@ incdir=$GRUTSYS/include
 #utildir=$GRUTSYS/etc
 
 
-grutlibs="-lGEBFormat " #-lNucleus -lKinematics -lSRIM -lGROOT"
-detlibs= #"-lGretina"
-grutmore="-lTGRUTint"
+grutlibs="-lTGEBDAQ -lTDataLoop -lTGEBDAQ -lTGRUTUtil -lTNSCLDAQ -lTRawFormat -lGROOT -lTStripChart"
+detlibs="-lTSega -lTCaesar -lTDetector  -lTGretina -lTJanus -lTPhosWall"
+grutmore="-lTGRUTint -lTGRUTLoop -lTRootIO -lTDataLoop"
 
 cflags="-std=c++0x -I$incdir"
 
