@@ -1,5 +1,7 @@
 
 #include "Globals.h"
+#include "GCanvas.h"
+
 
 #include <TClass.h>
 #include <TPaveStats.h>
@@ -21,11 +23,10 @@
 #include <TApplication.h>
 #include <TContextMenu.h>
 
-#include "GCanvas.h"
 //#include "GROOTGuiFactory.h"
-//#include "GRootObjectManager.h"
 //#include "GRootGlobals.h"
 
+#include "TObjectManager.h"
 
 #include <iostream>
 #include <fstream>
@@ -37,6 +38,13 @@
 #define kArrowKeyPress 25
 #define kArrowKeyRelease 26
 #endif
+
+enum MyArrowPress{
+  kMyArrowLeft  = 0x1012,
+  kMyArrowUp    = 0x1013,
+  kMyArrowRight = 0x1014,
+  kMyArrowDown  = 0x1015
+};
 
 #define MAXNUMBEROFMARKERS 4
 
@@ -138,14 +146,22 @@ void GCanvas::AddMarker(int x,int y,int dim) {
   return;
 }
 
-void GCanvas::RemoveMarker() {
-  if(fMarkers.size()<1)
-    return;
-  if(fMarkers.at(fMarkers.size()-1))
-     delete fMarkers.at(fMarkers.size()-1);
-  //printf("Marker %i Removed\n");
-  fMarkers.erase(fMarkers.end()-1);
-  return;
+void GCanvas::RemoveMarker(Option_t* opt) {
+  TString options(opt);
+
+  if(options.Contains("all")){
+    for(auto marker : fMarkers){
+      delete marker;
+    }
+    fMarkers.clear();
+  } else {
+    if(fMarkers.size()<1)
+      return;
+    if(fMarkers.at(fMarkers.size()-1))
+      delete fMarkers.at(fMarkers.size()-1);
+    //printf("Marker %i Removed\n");
+    fMarkers.erase(fMarkers.end()-1);
+  }
 }
 
 void GCanvas::OrderMarkers() { 
@@ -218,11 +234,12 @@ std::vector<TH1*> GCanvas::Find1DHists() {
   TH1 *hist = 0;
   TIter iter(gPad->GetListOfPrimitives());
   while(TObject *obj = iter.Next()) {
-     if( obj->InheritsFrom("TH1") &&
-        !obj->InheritsFrom("TH2") &&  
-        !obj->InheritsFrom("TH3") ) {  
-        tempvec.push_back((TH1*)obj); 
-     }
+    if( obj->InheritsFrom(TH1::Class()) ) {  
+      TH1* hist = (TH1*)obj;
+      if(hist->GetDimension()==1){
+        tempvec.push_back(hist); 
+      }
+    }
   }
   return tempvec;
 }
@@ -239,95 +256,19 @@ std::vector<TH1*> GCanvas::FindAllHists() {
 }
 
 bool GCanvas::HandleArrowKeyPress(Event_t *event,UInt_t *keysym) {
+
+  bool edited = false;
   
   std::vector<TH1*> hists = Find1DHists();
-  if(hists.size()==0)
-     return false;
-  int first = hists.at(0)->GetXaxis()->GetFirst();
-  int last = hists.at(0)->GetXaxis()->GetLast();
- 
-  int min = std::min(first,0);
-  int max = std::max(last,hists.at(0)->GetXaxis()->GetNbins()+1);
+  if(hists.size()>0){
+    edited = Process1DArrowKeyPress(event,keysym);
+  }
 
-  //printf("first = %i  |  last = %i\n", first,last);
-  //printf("min   = %i  |  max  = %i\n", min,max);
-
-  int xdiff = last-first;
-  int mdiff = max-min-2;
-  //if(xdiff==mdiff)
-  //   return;
-  TH1 *temph = 0;
-  switch (*keysym) {
-    case 0x1012: // left
-     {
-        if(mdiff>xdiff) {
-          if(first==(min+1)) {
-            //
-          }
-          else if((first-(xdiff/2))<min) {
-            first = min+1;
-            last  = min + (xdiff) + 1;
-            //last  = first-min-1 + (xdiff/2); 
-          } else {
-            first = first-(xdiff/2); 
-            last  = last -(xdiff/2);
-          }
-        }
-        for(int i=0;i<hists.size();i++)
-          hists.at(i)->GetXaxis()->SetRange(first,last);
-        gPad->Modified();
-        gPad->Update();
-      }
-      //printf("LEFT\n");
-      break;
-    case 0x1013: // up
-      printf("UP\n");
-      //temph = GRootObjectManager::Instance()->GetNext1D((TObject*)hists.at(0));
-      //if(temph) {
-      //  temph->GetXaxis()->SetRange(first,last);
-      //  temph->Draw();
-      //  gPad->Modified();
-      //  gPad->Update();
-      //}
-      break;
-    case 0x1014: // right
-     {
-        //int xdiff = last-first;
-        //int mdiff = max-min;
-        if(mdiff>xdiff) {
-          if(last== (max-1)) {
-            // 
-          }else if((last+(xdiff/2))>max) {
-            first = max - 1 - (xdiff); 
-            last  = max - 1;
-          } else {
-            last  = last +(xdiff/2); 
-            first = first+(xdiff/2); 
-          }
-        }
-        for(int i=0;i<hists.size();i++)
-          hists.at(i)->GetXaxis()->SetRange(first,last);
-        gPad->Modified();
-        gPad->Update();
-      }
-      //printf("RIGHT\n");
-      break;
-    case 0x1015: // down
-      printf("DOWN\n");
-      //temph = GRootObjectManager::Instance()->GetLast1D((TObject*)hists.at(0));
-      //if(temph) {
-      //  temph->GetXaxis()->SetRange(first,last);
-      //  temph->Draw();
-      //  gPad->Modified();
-      //  gPad->Update();
-      //}
-      break;
-    default:
-      printf("keysym = %i\n",*keysym);
-      break;
+  if(edited){
+    gPad->Modified();
+    gPad->Update();
   }
   return true;
-
 }
 
 
@@ -336,197 +277,17 @@ bool GCanvas::HandleKeyboardPress(Event_t *event,UInt_t *keysym) {
   //printf("keysym = %i\n",*keysym);
   TIter iter(gPad->GetListOfPrimitives());
   //TGraphErrors * ge = 0;
-  bool edit = false;
+  bool edited = false;
   //while(TObject *obj = iter.Next()) {
   //   if(obj->InheritsFrom("TGraphErrors")){
   //         ge = (TGraphErrors*)obj;
   //   }
   //}
   std::vector<TH1*> hists = Find1DHists();
-  if(hists.size()==0)
-     return false;
-
   if(hists.size()>0){  
-     switch(*keysym) {
-        //case kKey_b: {
-        //     GMarker *markers[4] = {0};
-        //     for(int i=0;i<GetNMarkers();i++) 
-        //        markers[i] = fMarkers.at(i);
-        //     edit = SetBackGround(markers[0],markers[1],markers[2],markers[3]);
-        //   }
-        //   break;
-        //case kKey_B:
-        //   SetBackGroundSubtractionType();
-        //   break;
-        case kKey_e:
-           if(GetNMarkers()<2)
-              break;
-           if(fMarkers.at(fMarkers.size()-1)->localx < fMarkers.at(fMarkers.size()-2)->localx) 
-              for(int i=0;i<hists.size();i++)
-                hists.at(i)->GetXaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-1)->localx,fMarkers.at(fMarkers.size()-2)->localx);
-           else
-              for(int i=0;i<hists.size();i++)
-                hists.at(i)->GetXaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-2)->localx,fMarkers.at(fMarkers.size()-1)->localx);
-           edit = true;
-           //while(GetNMarkers())
-           //   RemoveMarker();
-           //ClearBGMarkers();
-           break;
-        case kKey_E:
-           GetContextMenu()->Action(hists.back()->GetXaxis(),hists.back()->GetXaxis()->Class()->GetMethodAny("SetRangeUser"));
-           for(int i=0;i<hists.size()-1;i++)
-              hists.at(i)->GetXaxis()->SetRangeUser(hists.back()->GetXaxis()->GetFirst(),hists.back()->GetXaxis()->GetLast());
-           edit = true;
-           break;
-        //case kKey_g:
-        //   edit = GausFit();
-        //   break;
-        //case kKey_G:
-        //   edit = GausBGFit();
-        //   break;
-        //case kKey_l:
-        //   for(int i=0;i<hists.size();i++) {
-        //      hists.at(i)->GetYaxis()->UnZoom();
-        //   }
-        //   SetLogy(0);
-        //   edit = true;
-        //   break;
-        //case kKey_L:
-        //   for(int i=0;i<hists.size();i++) {
-        //     if(hists.at(i)->GetYaxis()->GetXmin()<0)
-        //        hists.at(i)->GetYaxis()->SetRangeUser(0,hists.at(i)->GetYaxis()->GetXmax());
-        //   }
-        //   SetLogy(1);
-        //   edit = true;
-        //   break;
-        case kKey_m:
-           SetMarkerMode(true);
-           break;
-        case kKey_M:
-           SetMarkerMode(false);
-        case kKey_n: 
-           while(GetNMarkers())
-              RemoveMarker();
-           //ClearBGMarkers();
-           for(int i=0;i<hists.size();i++)
-             hists.at(i)->GetListOfFunctions()->Delete();
-           edit = true;
-           break; 
-        case kKey_N:
-           while(GetNMarkers())  
-              RemoveMarker();
-           //ClearBGMarkers();
-           if(hists.back()->GetListOfFunctions()->Last())   
-              hists.back()->GetListOfFunctions()->Last()->Delete();
-           edit = true;
-           break;
-        case kKey_o:
-           for(int i=0;i<hists.size();i++)
-             hists.at(i)->GetXaxis()->UnZoom();
-           edit = true;    
-           while(GetNMarkers())
-              RemoveMarker();
-           break;
-        /* 
-        case kKey_p: //project.
-           //printf("\n  %p\n",GRootObjectManager::Instance()->FindMemObject(hists.at(0)->GetName()));
-           if(GMemObj *mobj = GRootObjectManager::Instance()->FindMemObject(hists.at(0)->GetName())) {
-             //printf("object parent:  %p\n",mobj->GetParent());
-             if(mobj->GetParent()) {
-                //printf("parent mobj:  %p\n", GRootObjectManager::Instance()->FindMemObject(mobj->GetParent())) ;
-                //printf("parent name:  %s\n",mobj->GetParent()->GetName());
-                if(!mobj->GetParent()->InheritsFrom("TH2"))
-                  break;
-                TH1D* temphist = 0;
-                TH1*  tempbg   = 0;
-                if(GetNMarkers()<2)
-                  break;
-                if(!strcmp(mobj->GetOption(),"ProjY")) {  // if we are working with a y projection, useX axis.
-                  int yvalue1 = ((TH2*)mobj->GetParent())->GetYaxis()->FindBin(fMarkers.at(fMarkers.size()-1)->localx);
-                  int yvalue0 = ((TH2*)mobj->GetParent())->GetYaxis()->FindBin(fMarkers.at(fMarkers.size()-2)->localx);
-                  if(yvalue1<yvalue0) {
-                     double temp = yvalue0;
-                     yvalue0 = yvalue1;
-                     yvalue1 = temp;
-                  }
-                  temphist = ProjectionX((TH2*)mobj->GetParent(),yvalue0,yvalue1); 
-
-                  tempbg = GetBackGroundHist(fMarkers.at(fMarkers.size()-1),
-                                             fMarkers.at(fMarkers.size()-2));
-                  
-                } else {  // if we are working with a x projection, use y axis
-                  int xvalue1 = ((TH2*)mobj->GetParent())->GetYaxis()->FindBin(fMarkers.at(fMarkers.size()-1)->localx);
-                  int xvalue0 = ((TH2*)mobj->GetParent())->GetYaxis()->FindBin(fMarkers.at(fMarkers.size()-2)->localx);
-                  if(xvalue1<xvalue0) {
-                     double temp = xvalue0;
-                     xvalue0 = xvalue1;
-                     xvalue1 = temp;
-                  }
-                  temphist = ProjectionY((TH2*)mobj->GetParent(),xvalue0,xvalue1); 
-                  
-                  tempbg = GetBackGroundHist(fMarkers.at(fMarkers.size()-1),
-                                             fMarkers.at(fMarkers.size()-2));
-
-                }
-                //printf("addgate: %i\n",fMarkers.at(0)->x);
-                //printf("addgate: %i\n",fMarkers.at(1)->x);
-                //printf("subgate: %i\n",fBG_Markers.at(0)->x);
-                //printf("subgate: %i\n",fBG_Markers.at(1)->x);
-                
-                //printf("i am here.\n");
-                if(tempbg){
-                   temphist->Add(tempbg,-1);
-                   temphist->SetTitle(Form("%s %s",temphist->GetTitle(),tempbg->GetTitle()));
-                }
-                temphist->Draw();
-                edit = true;
-             }  
-             while(GetNMarkers())
-                RemoveMarker();
-             ClearBGMarkers();
-           }
-           break;
-        */
-        //case kKey_f:
-        //   edit = PeakFitQ();
-        //   break;
-        //case kKey_F:
-        //   edit = PeakFit();
-        //   break;
-        //case kKey_s:
-        //   edit = ShowPeaks(hists.data(),hists.size());
-        //   break;
-        //case kKey_S:
-        //   edit = RemovePeaks(hists.data(),hists.size());
-        //   break;
-        /*case kKey_S:
-           if(fStatsDisplayed)
-              fStatsDisplayed = false;
-           else
-              fStatsDisplayed = true;
-           for(int i=0;i<hists.size();i++)
-             hists.at(i)->SetStats(fStatsDisplayed);
-           edit = true;
-           break;
-        */
-        case kKey_F10:{
-           //std::ofstream outfile;
-           //for(int i=0;i<hists.back()->GetListOfFunctions()->GetSize();i++) {
-              //printf("\n\n%s | %s\n",hist->GetListOfFunctions()->At(i)->IsA()->GetName(),((TF1*)hist->GetListOfFunctions()->At(i))->GetName());
-           //   if(hists.back()->GetListOfFunctions()->At(i)->InheritsFrom("TPeak")) {
-           //      if(!outfile.is_open())
-           //         outfile.open(Form("%s.fits",hists.back()->GetName()));
-           //      outfile << ((TPeak*)hists.back()->GetListOfFunctions()->At(i))->PrintString();
-           //      outfile << "\n\n";
-           //   }     
-           //} 
-           //if(!outfile.is_open())
-           //   outfile.close();
-        }    
-        break;
-
-     };
+    edited = Process1DKeyboardPress(event,keysym);
   }
+
   //if(ge){
   //  switch(*keysym) {
   //    case kKey_p:
@@ -535,7 +296,7 @@ bool GCanvas::HandleKeyboardPress(Event_t *event,UInt_t *keysym) {
   //  };
   //}
 
-  if(edit) {
+  if(edited) {
      gPad->Modified();
      gPad->Update();
   }
@@ -552,7 +313,7 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
 
   TIter iter(gPad->GetListOfPrimitives());
   TH1 *hist = 0;
-  bool edit = false;
+  bool edited = false;
   while(TObject *obj = iter.Next()) {
      if( obj->InheritsFrom("TH1") &&
         !obj->InheritsFrom("TH2") &&  
@@ -569,7 +330,7 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
     //((TFrame*)GetSelected())->SetBit(TBox::kCannotMove);
     //if(GetNMarkers()==4)
     //   RemoveMarker();
-//    AddMarker(x,y);
+    AddMarker(x,y);
     //int px = gPad->AbsPixeltoX(x);
     //TLine *line = new TLine(px,GetUymin(),px,GetUymax());
     //line->Draw();
@@ -608,12 +369,192 @@ TF1 *GCanvas::GetLastFit() {
   return 0;
 }
 
+
+bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) { 
+  bool edited = false;
+  std::vector<TH1*> hists = Find1DHists();
+
+  int first = hists.at(0)->GetXaxis()->GetFirst();
+  int last = hists.at(0)->GetXaxis()->GetLast();
+ 
+  int min = std::min(first,0);
+  int max = std::max(last,hists.at(0)->GetXaxis()->GetNbins()+1);
+
+  int xdiff = last-first;
+  int mdiff = max-min-2;
+
+  switch (*keysym) {
+  case kMyArrowLeft:
+    {
+      if(mdiff>xdiff) {
+	if(first==(min+1)) {
+	  //
+	}
+	else if((first-(xdiff/2))<min) {
+	  first = min+1;
+	  last  = min + (xdiff) + 1;
+	} else {
+	  first = first-(xdiff/2); 
+	  last  = last -(xdiff/2);
+	}
+      }
+      for(int i=0;i<hists.size();i++)
+	hists.at(i)->GetXaxis()->SetRange(first,last);
+
+      edited = true;
+    }
+    break;
+  case kMyArrowRight:
+    {
+      if(mdiff>xdiff) {
+	if(last== (max-1)) {
+	  // 
+	}else if((last+(xdiff/2))>max) {
+	  first = max - 1 - (xdiff); 
+	  last  = max - 1;
+	} else {
+	  last  = last +(xdiff/2); 
+	  first = first+(xdiff/2); 
+	}
+      }
+      for(int i=0;i<hists.size();i++)
+	hists.at(i)->GetXaxis()->SetRange(first,last);
+      
+      edited = true;
+    }
+    break;
+
+  case kMyArrowUp: {
+    TH1* temph = gManager->GetNext1D(hists.at(0), false);
+    if(temph) {
+      temph->GetXaxis()->SetRange(first,last);
+      temph->Draw();
+      edited = true;
+    }
+  }
+    break;
+  case kMyArrowDown: {
+    TH1* temph = gManager->GetNext1D(hists.at(0), true);
+    if(temph) {
+      temph->GetXaxis()->SetRange(first,last);
+      temph->Draw();
+      edited = true;
+    }
+  }
+    break;
+  default:
+    printf("keysym = %i\n",*keysym);
+    break;
+  }
+  return edited;
+}
+
+bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
+  bool edited = false;
+  std::vector<TH1*> hists = Find1DHists();
+  if(hists.size()<1)
+    return edited; 
+
+  switch(*keysym) {
+    case kKey_e:
+       if(GetNMarkers()<2)
+          break;
+       {
+       if(fMarkers.at(fMarkers.size()-1)->localx < fMarkers.at(fMarkers.size()-2)->localx) 
+          for(int i=0;i<hists.size();i++)
+            hists.at(i)->GetXaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-1)->localx,fMarkers.at(fMarkers.size()-2)->localx);
+       else
+          for(int i=0;i<hists.size();i++)
+            hists.at(i)->GetXaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-2)->localx,fMarkers.at(fMarkers.size()-1)->localx);
+       }
+       edited = true;
+       RemoveMarker("all");
+       break;
+    case kKey_E:
+       GetContextMenu()->Action(hists.back()->GetXaxis(),hists.back()->GetXaxis()->Class()->GetMethodAny("SetRangeUser"));
+       for(int i=0;i<hists.size()-1;i++)
+          hists.at(i)->GetXaxis()->SetRangeUser(hists.back()->GetXaxis()->GetFirst(),hists.back()->GetXaxis()->GetLast());
+       edited = true;
+       break;
+    //case kKey_g:
+    //   edited = GausFit();
+    //   break;
+    //case kKey_G:
+    //   edited = GausBGFit();
+    //   break;
+    //case kKey_l:
+    //   for(int i=0;i<hists.size();i++) {
+    //      hists.at(i)->GetYaxis()->UnZoom();
+    //   }
+    //   SetLogy(0);
+    //   edited = true;
+    //   break;
+    //case kKey_L:
+    //   for(int i=0;i<hists.size();i++) {
+    //     if(hists.at(i)->GetYaxis()->GetXmin()<0)
+    //        hists.at(i)->GetYaxis()->SetRangeUser(0,hists.at(i)->GetYaxis()->GetXmax());
+    //   }
+    //   SetLogy(1);
+    //   edited = true;
+    //   break;
+    case kKey_m:
+      SetMarkerMode(true);
+      break;
+    case kKey_M:
+      SetMarkerMode(false);
+    case kKey_n: 
+      RemoveMarker("all");
+      for(int i=0;i<hists.size();i++)
+        hists.at(i)->GetListOfFunctions()->Delete();
+      edited = true;
+      break; 
+    case kKey_o:
+      for(int i=0;i<hists.size();i++)
+        hists.at(i)->GetXaxis()->UnZoom();
+      RemoveMarker("all");
+      edited = true;    
+      break;
+    case kKey_F10:{
+      }    
+      break;
+
+  };
+  return edited;
+}
+
+bool GCanvas::Process1DMousePress(Int_t event,Int_t x,Int_t y)      { 
+  bool edited = false;
+  return edited;
+}
+
+bool GCanvas::Process2DArrowKeyPress(Event_t *event,UInt_t *keysym) { 
+  bool edited = false;
+  return edited;
+}
+
+bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) { 
+  bool edited = false;
+  return edited;
+}
+
+bool GCanvas::Process2DMousePress(Int_t event,Int_t x,Int_t y)      { 
+  bool edited = false;
+  return edited;
+}
+
+
+
+
+
+
+
+
 /*
 
 bool GCanvas::GausFit(GMarker *m1,GMarker *m2) {
   TIter iter(gPad->GetListOfPrimitives());
   TH1 *hist = 0;
-  bool edit = false;
+  bool edited = false;
   while(TObject *obj = iter.Next()) {
      if( obj->InheritsFrom("TH1") &&
         !obj->InheritsFrom("TH2") &&  
@@ -682,7 +623,7 @@ bool GCanvas::GausFit(GMarker *m1,GMarker *m2) {
 bool GCanvas::PeakFit(GMarker *m1,GMarker *m2) {
   TIter iter(gPad->GetListOfPrimitives());
   TH1 *hist = 0;
-  bool edit = false;
+  bool edited = false;
   while(TObject *obj = iter.Next()) {
      if( obj->InheritsFrom("TH1") &&
         !obj->InheritsFrom("TH2") &&  
@@ -757,7 +698,7 @@ bool GCanvas::PeakFit(GMarker *m1,GMarker *m2) {
 bool GCanvas::PeakFitQ(GMarker *m1,GMarker *m2) {
   TIter iter(gPad->GetListOfPrimitives());
   TH1 *hist = 0;
-  bool edit = false;
+  bool edited = false;
   while(TObject *obj = iter.Next()) {
      if( obj->InheritsFrom("TH1") &&
         !obj->InheritsFrom("TH2") &&  
@@ -888,7 +829,7 @@ void GCanvas::SetBackGroundSubtractionType() {
 
 bool GCanvas::SetBackGround(GMarker *m1,GMarker *m2,GMarker *m3,GMarker *m4) {
   ClearBGMarkers();  //removes all BG markers... 
-  bool edit = false;
+  bool edited = false;
   switch(fBGSubtraction_type) {   
     case 0:
       printf(RED "\nBackground Subtraction type not set, no Background subtraction will be performed.\n" RESET_COLOR );
@@ -908,7 +849,7 @@ bool GCanvas::SetBackGround(GMarker *m1,GMarker *m2,GMarker *m3,GMarker *m4) {
          RemoveMarker();
       }
 
-      edit = SetConstantBG();
+      edited = SetConstantBG();
       break;
     case 2:
       //printf(RED "\nWork in progress, check back soon; no Background subtraction will be performed.\n" RESET_COLOR );
@@ -917,7 +858,7 @@ bool GCanvas::SetBackGround(GMarker *m1,GMarker *m2,GMarker *m3,GMarker *m4) {
         Prompt();
         break;
       }
-      edit = SetBGGate(m1,m2,m3,0);
+      edited = SetBGGate(m1,m2,m3,0);
       break;
     case 3:
       if(!m3 || !m4) {
@@ -925,7 +866,7 @@ bool GCanvas::SetBackGround(GMarker *m1,GMarker *m2,GMarker *m3,GMarker *m4) {
         Prompt();
         break;
       }
-      edit = SetBGGate(m1,m2,m3,m4);
+      edited = SetBGGate(m1,m2,m3,m4);
       break;
     case 4:
       if(!m3 || !m4) {
@@ -933,14 +874,14 @@ bool GCanvas::SetBackGround(GMarker *m1,GMarker *m2,GMarker *m3,GMarker *m4) {
         Prompt();
         break;
       }
-      edit = SetBGGate(m3,m4);
+      edited = SetBGGate(m3,m4);
       //printf(RED "\nWork in progress, check back soon; no Background subtraction will be performed.\n" RESET_COLOR );
       break;
     case 5:
       printf(RED "\nWork in progress, check back soon; no Background subtraction will be performed.\n" RESET_COLOR );
       break;
   };
-  return edit;
+  return edited;
 }
 
 bool GCanvas::SetBGGate(GMarker *m1, GMarker *m2, GMarker *m3, GMarker *m4) {
@@ -1022,12 +963,12 @@ bool GCanvas::SetBGGate(GMarker *m1, GMarker *m2, GMarker *m3, GMarker *m4) {
 }
 
 bool GCanvas::SetConstantBG() {
-  bool edit = false;
+  bool edited = false;
   std::vector<TH1*> hists = Find1DHists();
   if(hists.size()<1)
-     return edit;
+     return edited;
   if(GetNBG_Markers()<1)
-     return edit;
+     return edited;
   OrderBGMarkers();
   TF1 *const_bg = hists.at(0)->GetFunction("const_bg");
   if(const_bg)
@@ -1044,8 +985,8 @@ bool GCanvas::SetConstantBG() {
   const_bg->SetRange(xaxis->GetFirst(),xaxis->GetLast());
   const_bg->Draw("SAME");
   hists.at(0)->GetListOfFunctions()->Add(const_bg);
-  edit = true;
-  return edit;
+  edited = true;
+  return edited;
 
 }
 

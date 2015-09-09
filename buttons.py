@@ -34,7 +34,7 @@ def Button1Pressed():
     run_command('TGRUTint::instance()->OpenFileDialog()')
 
 def Button2Pressed():
-    res = run_command('gResponse = new TObjString("my string here")')
+    res = run_command('gResponse = new TObjString("my string here");')
     res.Print('')
 
 def Button3Pressed():

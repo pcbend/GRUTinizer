@@ -120,7 +120,6 @@ void TGRUTServer::DoNewConnection(TServerSocket *sock) {
 }
 
 void TGRUTServer::DoRead(TSocket *sock) {
-  printf(BLUE "%s called." RESET_COLOR "\n",__PRETTY_FUNCTION__);  fflush(stdout);
   if(!sock || (sock==(TSocket*)-1)) return;
   TMessage *mess;
   sock->Recv(mess);

@@ -12,6 +12,7 @@
 #include "TObjectManager.h"
 #include "TGRUTUtilities.h"
 #include "GRootGuiFactory.h"
+#include "TUnixSystem.h"
 //#include "Api.h"   // for G__value
 
 #include <Getline.h>
@@ -47,7 +48,7 @@ TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions
 
 TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t noLogo,const char *appClassName)
   :TRint(appClassName, &argc, argv, options, numOptions,noLogo),
-   fCommandServer(NULL), fCommandTimer(NULL), fRootFilesOpened(0) {
+   fCommandServer(NULL), fCommandTimer(NULL), fRootFilesOpened(0), fIsTabComplete(false) {
 
   fGRUTEnv = gEnv;
   GetSignalHandler()->Remove();
@@ -168,7 +169,7 @@ void TGRUTint::ApplyOptions() {
   } else if(TGRUTOptions::Get()->CommandServer()) {
     fCommandServer = new TGRUTServer(TGRUTOptions::Get()->CommandPort());
     fCommandServer->Start();
-    fCommandTimer = new TTimer("TGRUTint::instance()->DelayedProcessLine_ProcessItem();", 100);
+    fCommandTimer = new TTimer("",10);
     fCommandTimer->TurnOn();
   }
 }
@@ -189,7 +190,7 @@ void TGRUTint::OpenRootFile(const std::string& filename){
 
   const char* command = Form("TFile *_file%i = TObjectManager::Get(\"%s\",\"read\")",
 			     fRootFilesOpened, filename.c_str());
-  TRint::ProcessLine(command);
+  ProcessLine(command);
 
   TFile *file = (TFile*)gROOT->GetListOfFiles()->FindObject(filename.c_str());
   if(file){
@@ -206,7 +207,7 @@ void TGRUTint::RunMacroFile(const std::string& filename){
   }
 
   const char* command = Form(".x %s", filename.c_str());
-  TRint::ProcessLine(command);
+  ProcessLine(command);
 }
 
 void TGRUTint::HandleFile(const std::string& filename){
@@ -258,17 +259,17 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   if(fIsTabComplete){
     return TRint::ProcessLine(line, sync, error);
   }
-
   TString sline(line);
   if(!sline.Length()){
     return 0;
   }
+  sline.ReplaceAll("TCanvas","GCanvas");
 
   if(sline.Contains("for") ||
      sline.Contains("while") ||
      sline.Contains("if") ||
      sline.Contains("{")){
-    return TRint::ProcessLine(line, sync, error);
+     return TRint::ProcessLine(sline.Data(), sync, error);
   }
 
   Ssiz_t index;
@@ -285,11 +286,8 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
     return res;
   }
 
-
   fNewChild = NULL;
-
-
-  long result =  TRint::ProcessLine(line,sync,error);
+  long result =  TRint::ProcessLine(sline.Data(),sync,error);
 
   if(!fNewChild){
     return result;
@@ -380,6 +378,8 @@ TObject* TGRUTint::DelayedProcessLine(std::string message){
     std::lock_guard<std::mutex> lock(fCommandListMutex);
     fLinesToProcess.push(message);
   }
+
+  TTimer::SingleShot(0,"TGRUTint",this,"DelayedProcessLine_ProcessItem()");
 
   std::unique_lock<std::mutex> lock(fResultListMutex);
   while(fCommandResults.empty()){

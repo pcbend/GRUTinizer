@@ -32,7 +32,9 @@ void TGretinaHit::Copy(TObject &rhs) const {
 
 
 void TGretinaHit::BuildFrom(const TRawEvent::GEBBankType1& raw){
-  SetAddress(kDetectorSystems::GRETINA, 1, raw.crystal_id);
+  //SetAddress(kDetectorSystems::GRETINA, 1, raw.crystal_id);
+  //                     HOLE          CRYSTAL     SEGMENT
+  //SetAddress(kDetectorSystems::GRETINA, 1, raw.crystal_id);
   fTimeStamp = raw.timestamp;
   fWalkCorrection = raw.t0;
   fCrystalId = raw.crystal_id;

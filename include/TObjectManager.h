@@ -8,6 +8,8 @@
 #include "TDirectory.h"
 #include "TFile.h"
 
+class TH1;
+
 //class TObjectManager : public TDirectory, public TQObject {
 class TObjectManager : public TFile, public TQObject {
 public:
@@ -29,6 +31,8 @@ public:
   static TObjectManager *Open(const char *fname,Option_t *opt="read");
   static TList *GetListOfManagers() { return &objectmanagers; }
   TObjectManager *cd();
+
+  TH1* GetNext1D(TH1* from, bool forward);
 
 private:
   static TList objectmanagers;

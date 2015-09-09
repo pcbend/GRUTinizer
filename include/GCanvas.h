@@ -62,7 +62,7 @@ class GCanvas : public TCanvas {
       bool fMarkerMode;
       std::vector<GMarker*> fMarkers;
       void AddMarker(int,int,int dim=1);
-      void RemoveMarker();
+      void RemoveMarker(Option_t *opt="");
       void OrderMarkers();
 
       //std::vector<GMarker*> fBG_Markers;
@@ -75,11 +75,21 @@ class GCanvas : public TCanvas {
       std::vector<TH1*> FindAllHists();
 
    public:
-      //void HandleKeyPress(int event,int x,int y,TObject *obj);
-      bool HandleArrowKeyPress(Event_t *event,UInt_t *keysym);
-      bool HandleKeyboardPress(Event_t *event,UInt_t *keysym);
-      bool HandleMousePress(Int_t event,Int_t x,Int_t y);
+     //void HandleKeyPress(int event,int x,int y,TObject *obj);
+     bool HandleArrowKeyPress(Event_t *event,UInt_t *keysym);
+     bool HandleKeyboardPress(Event_t *event,UInt_t *keysym);
+     bool HandleMousePress(Int_t event,Int_t x,Int_t y);
 
+   //private:
+
+     bool Process1DArrowKeyPress(Event_t *event,UInt_t *keysym);
+     bool Process1DKeyboardPress(Event_t *event,UInt_t *keysym);
+     bool Process1DMousePress(Int_t event,Int_t x,Int_t y);
+
+     bool Process2DArrowKeyPress(Event_t *event,UInt_t *keysym);
+     bool Process2DKeyboardPress(Event_t *event,UInt_t *keysym);
+     bool Process2DMousePress(Int_t event,Int_t x,Int_t y);
+      
       //bool SetBackGround(GMarker *m1=0,GMarker *m2=0,GMarker *m3=0,GMarker *m4=0);
       //bool SetLinearBG(GMarker *m1=0,GMarker *m2=0);
       //bool SetConstantBG(); //GMarker *m1=0,GMarker *m2=0);
