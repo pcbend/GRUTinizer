@@ -76,6 +76,7 @@ private:
 
   void Init();
   void ApplyOptions();
+  void LoadGRootGraphics();
 
   ClassDef(TGRUTint,0);
 };

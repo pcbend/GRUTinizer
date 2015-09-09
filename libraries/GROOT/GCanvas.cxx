@@ -569,7 +569,7 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
     //((TFrame*)GetSelected())->SetBit(TBox::kCannotMove);
     //if(GetNMarkers()==4)
     //   RemoveMarker();
-    AddMarker(x,y);
+//    AddMarker(x,y);
     //int px = gPad->AbsPixeltoX(x);
     //TLine *line = new TLine(px,GetUymin(),px,GetUymax());
     //line->Draw();

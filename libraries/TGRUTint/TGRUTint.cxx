@@ -11,7 +11,7 @@
 #include "TGRUTLoop.h"
 #include "TObjectManager.h"
 #include "TGRUTUtilities.h"
-
+#include "GRootGuiFactory.h"
 //#include "Api.h"   // for G__value
 
 #include <Getline.h>
@@ -126,6 +126,10 @@ bool TGRUTInterruptHandler::Notify() {
 
 void TGRUTint::ApplyOptions() {
   TGRUTOptions* opt = TGRUTOptions::Get();
+
+  if(!false) { //this can be change to something like, if(!ClassicRoot)
+     LoadGRootGraphics();
+  }
 
   TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
 
@@ -345,10 +349,12 @@ void TGRUTint::Terminate(Int_t status){
   TRint::Terminate(status);
 }
 
+void TGRUTint::LoadGRootGraphics() {
+  if(gROOT->IsBatch()) return;
+  gROOT->LoadClass("TCanvas","Gpad");
+  gGuiFactory = new GRootGuiFactory();
 
-
-
-
+}
 
 
 void TGRUTint::OpenFileDialog() {

@@ -1,4 +1,4 @@
-// GRootFunctions.h GCanvas.h TObjectManager.h
+// GRootGuiFactory.h GRootFunctions.h GRootCanvas.h GCanvas.h TObjectManager.h
 
 #ifdef __CINT__
 #pragma link off all globals;
@@ -16,5 +16,7 @@
 
 #pragma link C++ class GMarker+;
 #pragma link C++ class GCanvas+;
+#pragma link C++ class GRootCanvas+;
+#pragma link C++ class GRootGuiFactory+;
 
 #endif
