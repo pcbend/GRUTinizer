@@ -62,7 +62,7 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
 }
 
 
-TGRUTint::~TGRUTint() {   
+TGRUTint::~TGRUTint() {
   if(fCommandTimer){
     delete fCommandTimer;
   }
@@ -171,7 +171,7 @@ void TGRUTint::OpenRootFile(const std::string& filename){
 
   TGRUTOptions* opt = TGRUTOptions::Get();
 
-  const char* command = Form("TFile *_file%i = new TFile(\"%s\",\"read\")", 
+  const char* command = Form("TFile *_file%i = new TFile(\"%s\",\"read\")",
 			     fRootFilesOpened, filename.c_str());
   TRint::ProcessLine(command);
 
@@ -179,7 +179,7 @@ void TGRUTint::OpenRootFile(const std::string& filename){
   if(file){
     std::cout << "\tfile " << file->GetName() << " opened as _file" << fRootFilesOpened << std::endl;
   }
-  
+
   fRootFilesOpened++;
 }
 
@@ -332,7 +332,7 @@ void TGRUTint::Terminate(Int_t status){
 
 void TGRUTint::OpenFileDialog() {
   TGFileInfo file_info;
-  const char *filetypes[] = { "ROOT File", "*.root", 
+  const char *filetypes[] = { "ROOT File", "*.root",
                               "Macro File", "*.C",
                               "GRETINA data file","*.dat",
                               "NSCL data","*.evt",
