@@ -84,8 +84,12 @@ void TDataLoop::ProcessFile(const std::vector<std::string>& filenames){
     infile->AddFile(filename.c_str());
   }
 
-  this->infile = infile;
-  ProcessSource();
+  if(infile->IsValid()){
+    this->infile = infile;
+    ProcessSource();
+  } else {
+    delete infile;
+  }
 }
 
 void TDataLoop::ProcessRing(const char* filename){
@@ -163,6 +167,8 @@ void TDataLoop::Iteration() {
   }
 }
 
-void TDataLoop::Join(){
-  read_thread.join();
+void TDataLoop::Join() {
+  if(read_thread.joinable()){
+    read_thread.join();
+  }
 }
