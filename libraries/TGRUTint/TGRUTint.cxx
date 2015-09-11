@@ -36,8 +36,10 @@ TEnv    *TGRUTint::fGRUTEnv  = NULL;
 
 
 TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions, bool noLogo, const char *appClassName) {
-  if(!fTGRUTint)
+  if(!fTGRUTint) {
     fTGRUTint = new TGRUTint(argc,argv,options,numOptions,true,appClassName);
+    fTGRUTint->Init();
+  }
   return fTGRUTint;
 }
 
@@ -53,12 +55,6 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
   SetPrompt("GRizer [%d] ");
 
   auto opt = TGRUTOptions::Get(argc, argv);
-  if(opt->ShouldExit()){
-    gApplication->Terminate();
-    return;
-  }
-
-  Init();
 }
 
 
@@ -70,6 +66,13 @@ TGRUTint::~TGRUTint() {
 
 
 void TGRUTint::Init() {
+  TGRUTLoop::CreateDataLoop<TGRUTLoop>();
+  TObjectManager::Init("GRUT_Manager", "GRUT Manager");
+
+  if(TGRUTOptions::Get()->ShouldExit()){
+    gApplication->Terminate();
+    return;
+  }
   //printf("%s called.\n",__PRETTY_FUNCTION__);
 //  TMode3 *mode3 = new TMode3;
 //  mode3->Class();
@@ -90,8 +93,6 @@ void TGRUTint::Init() {
   //   PopupLogo(false);
   //   WaitLogo();
   // }
-  TGRUTLoop::CreateDataLoop<TGRUTLoop>();
-  TObjectManager::Init("GRUT_Manager", "GRUT Manager");
   ApplyOptions();
   //printf("gManager = 0x%08x\n",gManager);   fflush(stdout);
   gManager->Print();
