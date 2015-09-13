@@ -14,7 +14,7 @@ bool FileEvent::operator<(const FileEvent& other) const{
 }
 
 TMultiRawFile::TMultiRawFile()
-  : fIsFirstStatus(true) { }
+  : fIsFirstStatus(true), fIsValid(true) { }
 
 TMultiRawFile::~TMultiRawFile(){
   for(auto& val : fFileEvents){
@@ -32,7 +32,14 @@ void TMultiRawFile::AddFile(TRawFileIn* infile){
 
 void TMultiRawFile::AddFile(const char* filename){
   TRawFileIn* file = new TRawFileIn(filename);
-  AddFile(file);
+  if(file->GetLastErrno() == 0){
+    AddFile(file);
+  } else {
+    std::cerr << "Error opening file " << filename << ": " << file->GetLastError()
+              << " (Errno=" << file->GetLastErrno() << ")" << std::endl;
+    delete file;
+    fIsValid = false;
+  }
 }
 
 int TMultiRawFile::GetEvent(TRawEvent* outevent){

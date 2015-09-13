@@ -40,8 +40,10 @@ TObject *gResponse = NULL;
 
 
 TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions, bool noLogo, const char *appClassName) {
-  if(!fTGRUTint)
+  if(!fTGRUTint) {
     fTGRUTint = new TGRUTint(argc,argv,options,numOptions,true,appClassName);
+    fTGRUTint->Init();
+  }
   return fTGRUTint;
 }
 
@@ -58,17 +60,10 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
   SetPrompt("GRizer [%d] ");
 
   auto opt = TGRUTOptions::Get(argc, argv);
-  if(opt->ShouldExit()){
-    this->Terminate();
-    return;
-  }
-
-  Init();
 }
 
 
 TGRUTint::~TGRUTint() {
-
   if(fCommandTimer){
     delete fCommandTimer;
   }
@@ -76,6 +71,12 @@ TGRUTint::~TGRUTint() {
 
 
 void TGRUTint::Init() {
+  TGRUTLoop::CreateDataLoop<TGRUTLoop>();
+
+  if(TGRUTOptions::Get()->ShouldExit()){
+    gApplication->Terminate();
+    return;
+  }
   //printf("%s called.\n",__PRETTY_FUNCTION__);
 //  TMode3 *mode3 = new TMode3;
 //  mode3->Class();
@@ -89,6 +90,13 @@ void TGRUTint::Init() {
   delete tempfile;
   gSystem->Unlink("/var/tmp/mytemp.root");
 
+
+  if(TGRUTOptions::Get()->MakeBackupFile()){
+    TObjectManager::Get("GRUT_Manager", "GRUT Manager");
+  }
+
+
+
   std::string grutpath = getenv("GRUTSYS");
 
   gInterpreter->AddIncludePath(Form("%s/include",grutpath.c_str()));
@@ -100,11 +108,10 @@ void TGRUTint::Init() {
     WaitLogo();
   }
 
-  TGRUTLoop::CreateDataLoop<TGRUTLoop>();
-
-  if(TGRUTOptions::Get()->MakeBackupFile()){
-    TObjectManager::Get("GRUT_Manager", "GRUT Manager");
-  }
+  // if(TGRUTOptions::Get()->ShowLogo()){
+  //   PopupLogo(false);
+  //   WaitLogo();
+  // }
   ApplyOptions();
   //printf("gManager = 0x%08x\n",gManager);   fflush(stdout);
   //gManager->Print();
@@ -189,7 +196,8 @@ void TGRUTint::OpenRootFile(const std::string& filename){
   TGRUTOptions* opt = TGRUTOptions::Get();
 
   const char* command = Form("TFile *_file%i = TObjectManager::Get(\"%s\",\"read\")",
-			     fRootFilesOpened, filename.c_str());
+			      fRootFilesOpened, filename.c_str());
+  //const char* command = Form("TFile *_file%i = new TFile(\"%s\",\"read\")",
   ProcessLine(command);
 
   TFile *file = (TFile*)gROOT->GetListOfFiles()->FindObject(filename.c_str());
