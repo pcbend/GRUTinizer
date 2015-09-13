@@ -636,8 +636,10 @@ GRootCanvas::~GRootCanvas()
       delete fToolBarLayout;
       delete fHorizontal1;
       delete fHorizontal1Layout;
-
-      fMenuBar->Dump();
+      printf("I AM HERE!!!!\n"); fflush(stdout);
+      printf("fMenuBar = 0x%08x\n",fMenuBar); fflush(stdout);
+      fMenuBar->Print();
+      printf("I AM HERE!!!!\n"); fflush(stdout);
       delete fMenuBar;
       delete fMenuBarLayout;
       delete fMenuBarItemLayout;

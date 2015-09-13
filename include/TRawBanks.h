@@ -82,7 +82,7 @@ struct GEBMode3Data {
   UShort_t cfd_pt2_low;
   Long_t GetLed() const;
   Long_t GetCfd() const;
-  Int_t  GetEnergy(const int channel) const;
+  Int_t  GetEnergy(const GEBMode3Head&) const;
 }__attribute__((__packed__));
 
 friend std::ostream& operator<<(std::ostream& os, const GEBMode3Data &data);
