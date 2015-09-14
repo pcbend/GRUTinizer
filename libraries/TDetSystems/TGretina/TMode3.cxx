@@ -4,7 +4,7 @@
 
 ClassImp(TMode3)
 
-bool TMode3::fExtractWaves = false;
+bool TMode3::fExtractWaves = true;
 
 TMode3::TMode3(){
   //fOwnWave = false;

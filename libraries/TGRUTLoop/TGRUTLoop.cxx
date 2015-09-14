@@ -215,7 +215,7 @@ void TGRUTLoop::HandleGEBData(TGEBEvent& event){
       if(!TGRUTOptions::Get()->IgnoreMode3()) {
         TGEBMode3Event m3event(event);
         TMode3 temp;
-        while(m3event.GetNextItem(temp)) {
+        while(m3event.GetNextItem(temp,TGRUTOptions::Get()->ExtractWaves())) {
           gebout->HandleMode3(temp);
         }
       }

@@ -73,7 +73,6 @@ void TRootOutfile::FillTree(const char *tname) {
     fprintf(stderr,"%s: trying to fill nonexisting tree %s\n.",__PRETTY_FUNCTION__,tname);
     return;
   }
-
   if(elem->build_det){
     for(auto& item : det_list) {
       item.second->Build();

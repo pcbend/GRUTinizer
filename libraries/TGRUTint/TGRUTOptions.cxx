@@ -28,6 +28,7 @@ void TGRUTOptions::Clear(Option_t* opt) {
   options_file.clear();
 
   fCommandServer    = true;
+  fExtractWaves     = false;
   fExitAfterSorting = false;
   fHelp = false;
   fShowLogo = true;
@@ -64,6 +65,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("port", &fCommandPort)
     .description("Port on which to listen for commands")
     .default_value(9090);
+  parser.option("w getwaves",&fMakeBackupFile)
+    .description("Extract wave forms to data class when available.")
+    .default_value(false);
   parser.option("no-backup",&fMakeBackupFile)
     .description("Disable the \"last.root\" backup file")
     .default_value(true);
