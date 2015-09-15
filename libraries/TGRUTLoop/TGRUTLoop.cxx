@@ -112,11 +112,14 @@ void TGRUTLoop::WriteLoop(){
     if(queue->Size()){
       TRawEvent event = queue->Pop();
       ProcessFromQueue(event);
+      if(!running){
+	std::cout << "Queue size: " << queue->Size() << "\r" << std::flush;
+      }
     } else {
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
   }
-  std::cout << "Flushing last event" << std::endl;
+  std::cout << "\nFlushing last event" << std::endl;
   outfile->FillAllTrees();
   std::cout << "Write loop ending" << std::endl;
 }
@@ -201,14 +204,9 @@ void TGRUTLoop::HandleUnbuiltNSCLData(TNSCLEvent& event){
 void TGRUTLoop::HandleGEBData(TGEBEvent& event){
   int type = event.GetEventType();
   TRootOutfileGEB *gebout = (TRootOutfileGEB*)outfile;
-  if(type==1 || type ==5 || type==17 ) {
-    if(event.FillCondition()){
-      gebout->FillTree("EventTree");
-      gebout->Clear();
-    }
-  }
   switch(event.GetEventType()) {
     case 1: // Gretina Mode2 data.
+      gebout->FillTree("EventTree",event.GetTimestamp());
       gebout->AddRawData(event, kDetectorSystems::GRETINA);
       break;
     case 2: // Gretina Mode3 data.

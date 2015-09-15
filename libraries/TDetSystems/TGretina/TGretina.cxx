@@ -90,7 +90,6 @@ int TGretina::BuildHits(){
   BuildAddbackHits();
 
   //gretina_hits->At(0)->Print();
-
   return Size();
 }
 

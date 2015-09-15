@@ -34,7 +34,7 @@ void TRootOutfileGEB::Init(const char* output_filename){
   }
   SetOutfile(output_filename);
 
-  TTree *event_tree  = AddTree("EventTree","Mode 2 data",true);
+  TTree *event_tree  = AddTree("EventTree","Mode 2 data",true,1000);
   TTree *scaler_tree = AddTree("ScalerTree","ScalerTree");
 
 

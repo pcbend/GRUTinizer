@@ -23,7 +23,7 @@ class TRootOutfile : public TObject {
 
     // Common to all.
     void AddRawData(const TRawEvent& event, kDetectorSystems det_type);
-    virtual void FillTree(const char* tname);   //takes from det_list;
+    virtual void FillTree(const char* tname, long next_timestamp=-1);   //takes from det_list;
     virtual void FillAllTrees();
     virtual void FinalizeFile();
     virtual void CloseFile();
@@ -32,7 +32,9 @@ class TRootOutfile : public TObject {
     virtual void Print(Option_t* option = "") const;
 
   protected:
-    TTree *AddTree(const char *tname,const char *ttitle=0,bool build=false);
+    bool BuildCondition(TRawEvent& new_event);
+
+    TTree *AddTree(const char *tname,const char *ttitle=0,bool build=false,int build_window=-1);
     TTree *FindTree(const char *tname);
 
     std::map<kDetectorSystems,TDetector*> det_list;
@@ -44,6 +46,10 @@ class TRootOutfile : public TObject {
   private:
     struct tree_element{
       TTree* tree;
+      // Build size, in timestamp units
+      // If build_window is -1, then each event will be filled as they are read
+      int build_window;
+      long event_build_window_close;
       bool build_det;
     };
 
