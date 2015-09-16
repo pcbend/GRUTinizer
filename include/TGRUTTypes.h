@@ -9,7 +9,8 @@ enum kDetectorSystems {
 
   GRETINA = 1,
   MODE3   = 2,
-  S800 = 5,
+  S800    = 5,
+  BANK29  = 8,
 
   SEGA = 64,
   JANUS = 65,

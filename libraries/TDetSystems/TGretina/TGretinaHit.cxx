@@ -183,8 +183,8 @@ TVector3 TGretinaHit::GetFirstIntPosition() const {
 }
 
 TVector3 TGretinaHit::GetSecondIntPosition() const {
-   if(GetFirstIntPoint()>-1)
-     return GetInteractionPosition(GetFirstIntPoint());
+   if(GetSecondIntPoint()>-1)
+     return GetInteractionPosition(GetSecondIntPoint());
    return TDetectorHit::BeamUnitVec;
 }
 

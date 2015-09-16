@@ -7,6 +7,7 @@
 #include "TGRUTOptions.h"
 
 #include "TGretina.h"
+#include "TBank29.h"
 #include "TMode3.h"
 
 ClassImp(TRootOutfileGEB)
@@ -14,6 +15,7 @@ ClassImp(TRootOutfileGEB)
 TRootOutfileGEB::TRootOutfileGEB() {
   fMode3Init = false;
   gretina = NULL;
+  bank29  = NULL;
   mode3   = NULL;
   // s800 = NULL;
   // phoswall = NULL;
@@ -37,10 +39,14 @@ void TRootOutfileGEB::Init(const char* output_filename){
   TTree *event_tree  = AddTree("EventTree","Mode 2 data",true,1000);
   TTree *scaler_tree = AddTree("ScalerTree","ScalerTree");
 
-
   if(TDetectorEnv::Gretina()){
     event_tree->Branch("TGretina","TGretina",&gretina);
     det_list[kDetectorSystems::GRETINA] = gretina;
+  }
+
+  if(TDetectorEnv::Bank29()) {
+    event_tree->Branch("TBank29","TBank29",&bank29);
+    det_list[kDetectorSystems::BANK29] = bank29;
   }
 
   // if(TDetectorEnv::S800()){
