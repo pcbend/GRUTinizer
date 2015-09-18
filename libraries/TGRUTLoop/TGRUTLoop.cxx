@@ -204,6 +204,14 @@ void TGRUTLoop::HandleUnbuiltNSCLData(TNSCLEvent& event){
 void TGRUTLoop::HandleGEBData(TGEBEvent& event){
   int type = event.GetEventType();
   TRootOutfileGEB *gebout = (TRootOutfileGEB*)outfile;
+
+  //static long prev_timestamp = 0;
+  //if (event.GetTimestamp() < prev_timestamp) {
+  //  std::cout << BLUE;
+  //}
+  //std::cout << event.GetTimestamp() << RESET_COLOR << std::endl;
+  //prev_timestamp = event.GetTimestamp();
+
   switch(event.GetEventType()) {
     case 1: // Gretina Mode2 data.
       gebout->FillTree("EventTree",event.GetTimestamp());

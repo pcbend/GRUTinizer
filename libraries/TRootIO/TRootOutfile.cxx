@@ -75,6 +75,13 @@ void TRootOutfile::FillTree(const char *tname, long next_timestamp) {
     fprintf(stderr,"%s: trying to fill nonexisting tree %s\n.",__PRETTY_FUNCTION__,tname);
     return;
   }
+  
+  static long prev_timestamp = 0;
+  if (next_timestamp < prev_timestamp) {
+    std::cout << BLUE;
+  }
+  prev_timestamp = next_timestamp;
+
 
   if(next_timestamp >= 0 &&
      elem->build_window >= 0 &&

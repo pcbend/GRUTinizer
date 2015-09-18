@@ -37,7 +37,9 @@ Int_t TRawEvent::Compare(const TObject &rhs) const { }
 TRawEvent &TRawEvent::operator=(const TRawEvent &rhs) {
   if(&rhs!=this)
     Clear();
-  rhs.Copy(*this);
+  fEventHeader = rhs.fEventHeader;
+  fBody        = rhs.fBody;
+  fFileType    = rhs.fFileType;
   return *this;
 }
 
