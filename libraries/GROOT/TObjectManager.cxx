@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "TClass.h"
+#include "TH1.h"
 #include "TInterpreter.h"
 #include "TROOT.h"
 #include "TFile.h"
@@ -13,8 +14,6 @@ TObjectManager* gBaseManager = NULL;
 TList TObjectManager::objectmanagers;
 
 TObjectManager* TObjectManager::Get(const char* name, Option_t* opt){
-  std::cout << __PRETTY_FUNCTION__ << std::endl;
-
   TObjectManager *test = (TObjectManager*)objectmanagers.FindObject(name);
   if(!test){
     test = TObjectManager::Open(name,opt);
@@ -34,9 +33,6 @@ TObjectManager::TObjectManager(const char* name, Option_t *opt)
 }
 
 TObjectManager *TObjectManager::Open(const char *fname,Option_t *opt) {
-  std::cout << __PRETTY_FUNCTION__ << "\t" << std::endl;
-  gROOT->GetListOfFiles()->Print();
-
   std::string strname = fname;
   std::string stropt  = opt;
   bool is_base = false;
@@ -110,7 +106,6 @@ TObjectManager::~TObjectManager() {
 }
 
 void TObjectManager::SaveParent(TObject *parent) {
-  printf("%s %s\n",__PRETTY_FUNCTION__,this->GetName());
   TString options = this->GetOption();
   if(options.Contains("CREATE")) {
     TObjectManager *current = gManager;
@@ -119,7 +114,6 @@ void TObjectManager::SaveParent(TObject *parent) {
       auto& children = fParentChildren[parent];
 
       TFile::cd("/");
-      printf("getname = %s",parent->GetName());
       parent->Write();
       if(children.size()){
         TFile::mkdir(parent->GetName());
@@ -175,9 +169,6 @@ void TObjectManager::AddRelationship(TObject* parent, TObject* child){
 
 
 void TObjectManager::RecursiveRemove(TObject* obj) {
-  std::cout << __PRETTY_FUNCTION__ << "\tObj: " << obj
-            << "\tClass: " << obj->Class()->GetName()
-            << std::endl;
   std::vector<TObject*> parents_to_remove;
 
   for(auto p_it = fParentChildren.rbegin(); p_it != fParentChildren.rend(); p_it++){
@@ -201,4 +192,43 @@ void TObjectManager::RecursiveRemove(TObject* obj) {
 
 
   TDirectory::RecursiveRemove(obj);
+}
+
+
+TH1* TObjectManager::GetNext1D(TH1* from, bool forward = true){
+  auto iter = fParentChildren.find(from);
+
+  if(iter == fParentChildren.end()){
+    return 0;
+  }
+
+  while(true){
+
+    // Go to the next item in the map, in the direction specified.
+    // If at the begin/end, loop around
+    if(forward){
+      iter++;
+      if(iter == fParentChildren.end()){
+	iter = fParentChildren.begin();
+      }
+    } else {
+      if(iter == fParentChildren.begin()){
+	iter = fParentChildren.end();
+      }   
+      iter--;
+    }
+
+    // Full loop means there is nothing next
+    if(iter->first == from){
+      return 0;
+    }
+
+    // If the object is a TH1 and not, say, a TH2 or a TH3.
+    if(iter->first->InheritsFrom(TH1::Class())){
+      TH1* res = (TH1*)iter->first;
+      if(res->GetDimension()==1) {
+	return res;
+      }
+    }
+  }
 }

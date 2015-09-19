@@ -5,6 +5,7 @@
 #include <queue>
 
 #ifndef __CINT__
+#include <condition_variable>
 #include <mutex>
 #include <memory>
 #endif
@@ -16,6 +17,7 @@
 
 #include "TGRUTServer.h"
 
+extern TObject* gResponse;
 
 class TGRUTint : public TRint {
 
@@ -33,8 +35,6 @@ public:
 
   virtual void Terminate(Int_t status = 0);
 
-  //void SetListenPort(int port) { fServer.SetPort(port); }
-
   Long_t ProcessLine(const char* line, Bool_t sync=kFALSE,Int_t *error=0);
   TString ReverseObjectSearch(TString&);
 
@@ -44,7 +44,7 @@ public:
   Int_t TabCompletionHook(char* buf, int* pLoc, std::ostream& out);
 
 public:
-  void DelayedProcessLine(std::string message);
+  TObject* DelayedProcessLine(std::string message);
   //GUI interface commands;
   void OpenFileDialog();
   void DefaultFunction();
@@ -59,10 +59,14 @@ public:
 
 private:
 #ifndef __CINT__
-  std::mutex fCommandsMutex;
+  std::mutex fCommandListMutex;
+  std::mutex fResultListMutex;
+  std::mutex fCommandWaitingMutex;
+  std::condition_variable fNewResult;
 #endif
   TTimer* fCommandTimer;
   std::queue<std::string> fLinesToProcess;
+  std::queue<TObject*> fCommandResults;
 
   int fRootFilesOpened;
 
@@ -72,6 +76,7 @@ private:
 
   void Init();
   void ApplyOptions();
+  void LoadGRootGraphics();
 
   ClassDef(TGRUTint,0);
 };

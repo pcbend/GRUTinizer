@@ -33,6 +33,10 @@ class TMode3 : public TDetector {
     Int_t    GetWaveSize()  { return wavesize; }
     Short_t* GetWave()      { return wave;     } 
 
+    Long_t   GetLed()       { return led; }
+    Long_t   GetCfd()       { return cfd; }
+
+
     static void SetExtractWaves(bool flag=true) { fExtractWaves = flag;  }
     static bool ExtractWaves()                  { return fExtractWaves;  }
 

@@ -4,7 +4,7 @@
 
 ClassImp(TMode3)
 
-bool TMode3::fExtractWaves = false;
+bool TMode3::fExtractWaves = true;
 
 TMode3::TMode3(){
   //fOwnWave = false;
@@ -35,7 +35,7 @@ void TMode3::BuildFrom(TSmartBuffer& buf, bool read_waveform){
   buf.Advance(sizeof(TRawEvent::GEBMode3Data));
 
   led = data->GetLed();
-  hit.SetCharge(data->GetEnergy(header->GetChannel()));
+  hit.SetCharge(data->GetEnergy(*header));
   hit.SetAddress(GetHole(),GetCrystal(),GetSegmentId());
   cfd = data->GetCfd();
 

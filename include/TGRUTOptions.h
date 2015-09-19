@@ -36,11 +36,12 @@ public:
   bool SortRaw()            const { return fSortRaw; }
   bool IgnoreMode3()        const { return fIgnoreMode3; }
   bool CommandServer()      const { return fCommandServer; }
+  bool ExtractWaves()       const { return fExtractWaves;  }
 
   bool ShouldExitImmediately() const { return fShouldExit; }
   bool MakeBackupFile() const { return fMakeBackupFile; }
 
-  kFileType DetermineFileType(const std::string& filename);
+  kFileType   DetermineFileType(const std::string& filename);
   std::string GenerateOutputFilename(const std::string& filename);
   std::string GenerateOutputFilename(const std::vector<std::string>& filename);
 
@@ -70,6 +71,7 @@ private:
   bool fIgnoreErrors;
   bool fIgnoreMode3;
   bool fCommandServer;
+  bool fExtractWaves;
 
   bool fShouldExit;
   bool fMakeBackupFile;

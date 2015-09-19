@@ -17,7 +17,6 @@
 
 class TGRUTServer : public TObject {
 public:
-  //TGRUTServer();
   TGRUTServer(int port);
   virtual ~TGRUTServer();
 
@@ -35,8 +34,8 @@ private:
   void OpenPort();
   void Iteration();
   void DoNewConnection(TServerSocket*);
-  void DoRead(TSocket*); 
-  void DoWrite(TSocket*); 
+  void DoRead(TSocket*);
+  void DoWrite(TSocket*);
 
   TMonitor *monitor;
   TServerSocket *server;

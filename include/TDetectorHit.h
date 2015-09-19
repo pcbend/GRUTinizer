@@ -24,6 +24,10 @@ public:
   Int_t  GetType()    const { return ((fAddress&0x00ff0000)>>16); }
   Int_t  GetChannel() const { return ((fAddress&0x0000ffff)    ); }
 
+  Int_t  GetHole()      const { return ((fAddress&0xff000000)>>24); }
+  Int_t  GetCrystal()   const { return ((fAddress&0x00ff0000)>>16); }
+  Int_t  GetSegmentId() const { return ((fAddress&0x0000ffff)    ); }
+
   void   SetAddress(unsigned char system,unsigned char type,unsigned short channel) {
     fAddress =
       (((unsigned int)system ) << 24) +

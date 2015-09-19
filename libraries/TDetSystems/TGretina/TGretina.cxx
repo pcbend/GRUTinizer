@@ -75,20 +75,21 @@ void TGretina::InsertHit(const TDetectorHit& hit){
 }
 
 int TGretina::BuildHits(){
+  //printf("%s\n",__PRETTY_FUNCTION__);
   for(auto& event : raw_data){
-    TGEBEvent& geb = (TGEBEvent&)event;
+    TGEBEvent geb(event);
     SetTimestamp(geb.GetTimestamp());
     const TRawEvent::GEBBankType1* raw = (const TRawEvent::GEBBankType1*)geb.GetPayloadBuffer().GetData();
     TGretinaHit hit;
     hit.BuildFrom(*raw);
     InsertHit(hit);
   }
-  gretina_hits->At(0)->Print();
+  //gretina_hits->At(0)->Print();
   raw_data.clear();
 
   BuildAddbackHits();
 
-  gretina_hits->At(0)->Print();
+  //gretina_hits->At(0)->Print();
 
   return Size();
 }

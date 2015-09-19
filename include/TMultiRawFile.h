@@ -31,6 +31,8 @@ public:
   void AddFile(TRawFileIn* infile);
   void AddFile(const char* filename);
 
+  bool IsValid() const { return fIsValid; }
+
   virtual bool IsFinished() const;
   virtual std::string SourceDescription() const;
   virtual std::string Status() const;
@@ -47,6 +49,7 @@ private:
 
   virtual int GetEvent(TRawEvent* outevent);
   mutable bool fIsFirstStatus;
+  bool fIsValid;
 
 
   ClassDef(TMultiRawFile, 0);

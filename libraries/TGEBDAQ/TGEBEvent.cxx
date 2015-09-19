@@ -15,7 +15,10 @@ TGEBEvent::TGEBEvent(const TRawEvent &raw) {
 TGEBEvent::~TGEBEvent() { }
 
 Long_t TGEBEvent::GetTimestamp() const {
-  return *(Long_t*)(GetBody() + 0);
+  //std::cout << "I AM HERE " << std::endl;
+  //printf("GetBody() = 0x%08x\n",TRawEvent::GetBody()); fflush(stdout);
+  //return -1;
+  return *((Long_t*)(TRawEvent::GetBody() + 0));
 }
 
 const char* TGEBEvent::GetPayload() const {
