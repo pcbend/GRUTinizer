@@ -74,7 +74,7 @@ TVector3 TGretinaHit::GetInteractionPosition(int i) const {
   if(i>=0 && i<fNumberOfInteractions){
     return fGlobalInteractionPosition[i];
   } else {
-    TVector3(0,0,1);
+    return TVector3(0,0,1);
   }
 }
 

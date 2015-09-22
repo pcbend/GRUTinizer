@@ -176,8 +176,14 @@ void TRootOutfile::FinalizeFile(){
 }
 
 void TRootOutfile::CloseFile(){
-  outfile->Close();
-  outfile->Delete();
+  if(trees.size()){
+    TFile* curr_file = trees.begin().second.tree.GetCurrentFile();
+    curr_file->Close();
+    curr_file->Delete();
+  } else {
+    outfile->Close();
+    outfile->Delete();
+  }
   outfile = NULL;
 }
 

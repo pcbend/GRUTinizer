@@ -14,9 +14,13 @@ TGretina::~TGretina() {
 }
 
 Float_t TGretina::crmat[32][4][4][4];
-bool    TGretina:: fCRMATSet = false;
+bool    TGretina::fCRMATSet = false;
 
 void TGretina::SetCRMAT() {
+  if(fCRMATSet){
+    return;
+  }
+
   FILE *fp;
   std::string temp = getenv("GRUTSYS");
   temp.append("/libraries/TDetSystems/TGretina/crmat.dat");
@@ -95,6 +99,8 @@ int TGretina::BuildHits(){
 }
 
 TVector3 TGretina::CrystalToGlobal(int cryId,Float_t x,Float_t y,Float_t z) {
+  SetCRMAT();
+
   Int_t detectorPosition = cryId/4 - 1;
   Int_t crystalNumber    = cryId%4;
 
@@ -115,6 +121,7 @@ TVector3 TGretina::CrystalToGlobal(int cryId,Float_t x,Float_t y,Float_t z) {
                 (crmat[detectorPosition][crystalNumber][2][1] * y) +
                 (crmat[detectorPosition][crystalNumber][2][2] * z) +
                 (crmat[detectorPosition][crystalNumber][2][3]) );
+  
   return TVector3(xl, yl, zl);
 }
 
