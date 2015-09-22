@@ -5,6 +5,7 @@
 TGretina::TGretina(){
   gretina_hits = new TClonesArray("TGretinaHit");
   addback_hits = new TClonesArray("TGretinaHit");
+  Clear();
 }
 
 TGretina::~TGretina() {

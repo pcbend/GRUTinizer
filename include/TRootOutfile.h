@@ -33,11 +33,11 @@ class TRootOutfile : public TObject {
 
   protected:
     bool BuildCondition(TRawEvent& new_event);
+    void UpdateDetList(kDetectorSystems det_system, TDetector* detector, const char* tree_name);
 
     TTree *AddTree(const char *tname,const char *ttitle=0,bool build=false,int build_window=-1);
     TTree *FindTree(const char *tname);
 
-    std::map<kDetectorSystems,TDetector*> det_list;
     std::map<std::string,TList*> hist_list;
 
     void   SetOutfile(const char *fname) { outfile = new TFile(fname,"recreate"); }
@@ -51,10 +51,17 @@ class TRootOutfile : public TObject {
       int build_window;
       long event_build_window_close;
       bool build_det;
+      bool has_data;
+    };
+
+    struct det_list_element{
+      TDetector* det;
+      tree_element* tree_elem;
     };
 
     tree_element* FindTreeElement(const char* tname);
 
+    std::map<kDetectorSystems,det_list_element> det_list;
     std::map<std::string, tree_element> trees;
 
     TFile* outfile;

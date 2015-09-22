@@ -344,6 +344,7 @@ void TGRUTint::Terminate(Int_t status){
   if(fCommandServer) {
     fCommandServer->Stop();
     fCommandServer->Delete();
+    fCommandServer = NULL;
   }
   TGRUTLoop::Get()->Stop();
 

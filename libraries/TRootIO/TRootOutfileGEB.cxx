@@ -41,12 +41,12 @@ void TRootOutfileGEB::Init(const char* output_filename){
 
   if(TDetectorEnv::Gretina()){
     event_tree->Branch("TGretina","TGretina",&gretina);
-    det_list[kDetectorSystems::GRETINA] = gretina;
+    UpdateDetList(kDetectorSystems::GRETINA, gretina, "EventTree");
   }
 
   if(TDetectorEnv::Bank29()) {
     event_tree->Branch("TBank29","TBank29",&bank29);
-    det_list[kDetectorSystems::BANK29] = bank29;
+    UpdateDetList(kDetectorSystems::BANK29, bank29, "EventTree");
   }
 
   // if(TDetectorEnv::S800()){
