@@ -49,6 +49,7 @@ TObjectManager *TObjectManager::Open(const char *fname,Option_t *opt) {
   if(is_base){
     gBaseManager = current;
   }
+  return current;
 }
 
 void TObjectManager::SaveAndClose(Option_t* option){
@@ -214,7 +215,7 @@ TH1* TObjectManager::GetNext1D(TH1* from, bool forward = true){
     } else {
       if(iter == fParentChildren.begin()){
 	iter = fParentChildren.end();
-      }   
+      }
       iter--;
     }
 
