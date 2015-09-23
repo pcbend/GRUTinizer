@@ -9,6 +9,7 @@
 #include "TGretina.h"
 #include "TBank29.h"
 #include "TMode3.h"
+#include "TS800.h"
 
 ClassImp(TRootOutfileGEB)
 
@@ -17,7 +18,7 @@ TRootOutfileGEB::TRootOutfileGEB() {
   gretina = NULL;
   bank29  = NULL;
   mode3   = NULL;
-  // s800 = NULL;
+  s800    = NULL;
   // phoswall = NULL;
 }
 
@@ -49,10 +50,10 @@ void TRootOutfileGEB::Init(const char* output_filename){
     UpdateDetList(kDetectorSystems::BANK29, bank29, "EventTree");
   }
 
-  // if(TDetectorEnv::S800()){
-  //   event_tree->Branch("TS800","TS800",&s800);
-  //   det_list["TS800"] = s800;
-  // }
+  if(TDetectorEnv::S800()){
+     event_tree->Branch("TS800","TS800",&s800);
+     UpdateDetList(kDetectorSystems::S800, s800, "EventTree");
+  }
 
 
   // if(TDetectorEnv::Caesar()){
@@ -79,7 +80,9 @@ void TRootOutfileGEB::FillHists() {
 void TRootOutfileGEB::Clear(Option_t *opt) {
   TRootOutfile::Clear(opt);
   if(gretina) gretina->Clear();
-  if(mode3)     mode3->Clear();
+  if(mode3)   mode3->Clear();
+  if(bank29)  bank29->Clear();
+  if(s800)    s800->Clear();
 }
 
 

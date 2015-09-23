@@ -89,6 +89,8 @@ public:
   //void SetPosition(TVector3 &vec) { fCorePosition = vec; }
 
 private:
+  void SortHits();
+
   Long_t  fTimeStamp;
   Float_t fWalkCorrection;
 

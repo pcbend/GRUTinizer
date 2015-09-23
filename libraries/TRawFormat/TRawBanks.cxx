@@ -86,11 +86,21 @@ std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBMode3Data &data) 
   return os;
 }
 
+std::ostream& operator<<(std::ostream& os,const TRawEvent::GEBS800Header &head) {
+  return os << "-- S800 Header \"packet\" -- \n"
+            << "\t S800 timestamp:    " << head.S800_timestamp    << "\n"
+            << "\t S800 EC low:       " << std::hex << head.S800_eventnumber_low    << std::dec << "\n"
+            << "\t S800 EC middle:    " << std::hex << head.S800_eventnumber_middle << std::dec << "\n"
+            << "\t S800 EC high:      " << std::hex << head.S800_eventnumber_high   << std::dec << "\n"
+            << "\t S800 event number: " << head.GetEventNumber() << std::endl;
+}
+
+
 Long_t TRawEvent::GEBMode3Data::GetLed() const { return (((long)led_high)<<32) + (((long)led_middle)<<16) + (((long)led_low)<<0); }
 Long_t TRawEvent::GEBMode3Data::GetCfd() const { return (((long)cfd_high)<<32) + (((long)cfd_middle)<<16) + (((long)cfd_low)<<0); }
 Int_t  TRawEvent::GEBMode3Data::GetEnergy(const GEBMode3Head &head) const  { 
   int channel = head.GetChannel();
-  if((channel==1) &&( head.GetHole()==9) && (head.GetVME()==3))
+  if((channel==1) &&( head.GetHole()==9) && (head.GetCrystal()==3) && (head.GetVME()==3))
     channel = 9; //  Q5 e5 has an inverted radial box, treat it as a core.  pcb.
 
   int  temp = (((int)energy_high)<<16) + (((int)energy_low)<<0);

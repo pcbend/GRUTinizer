@@ -220,10 +220,15 @@ void TGRUTLoop::HandleGEBData(TGEBEvent& event){
       }
       break;
     case 5: // S800 Mode2 equvilant.
+      gebout->FillTree("EventTree",event.GetTimestamp());
+      gebout->AddRawData(event, kDetectorSystems::S800);
       break;
     case 8: // Gretina diag. data.
       gebout->FillTree("EventTree",event.GetTimestamp());
       gebout->AddRawData(event, kDetectorSystems::BANK29);
+      break;
+    case 10:
+      // S800 scaler data....
       break;
     case 17: //PWall Mode2 equivlant.
       break;

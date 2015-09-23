@@ -9,7 +9,7 @@ ClassImp(TOrderedRawFile);
 
 TOrderedRawFile::TOrderedRawFile(const char* filename, kFileType file_type)
   : TRawFileIn(filename, file_type),
-    depth(5000), oldest_timestamp(-1), newest_timestamp(-1),
+    depth(50000), oldest_timestamp(-1), newest_timestamp(-1),
     finished(false) {
 
   // Currently, only supports GEB file types, not NSCL file types.
@@ -57,7 +57,9 @@ bool TOrderedRawFile::IsFinished() const {
 int TOrderedRawFile::fillqueue() {
   while(event_queue.size()<depth && !TRawFileIn::IsFinished()) {
     TRawEvent new_event;
-    TRawFileIn::Read(&new_event);
+    int bytes = TRawFileIn::Read(&new_event);
+    if(bytes<1)
+      break;
     auto timestamp = TGEBEvent(new_event).GetTimestamp();
     event_queue.insert( std::make_pair(timestamp, new_event) );
   }

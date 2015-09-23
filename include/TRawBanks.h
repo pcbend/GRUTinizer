@@ -88,6 +88,31 @@ struct GEBMode3Data {
 friend std::ostream& operator<<(std::ostream& os, const GEBMode3Data &data);
 static void SwapMode3Data(GEBMode3Data &data);
 
+struct GEBS800Header {
+  Int_t    total_size;
+  UShort_t total_size2;  
+  UShort_t S800_packet; 
+  UShort_t S800_packet_size;
+  UShort_t S800_version;
+  UShort_t S800_timestamp_packet;
+  ULong_t  S800_timestamp;
+  UShort_t S800_eventnumber_packet_size;
+  UShort_t S800_eventnumber_packet;
+  UShort_t S800_eventnumber_low;
+  UShort_t S800_eventnumber_middle;
+  UShort_t S800_eventnumber_high;
+  Long_t GetEventNumber() const { 
+     long temp = (long)S800_eventnumber_low;
+     temp     += ((long)S800_eventnumber_middle) << 16;
+     temp     += ((long)S800_eventnumber_high)   << 32;
+     return temp;
+  }
+
+} __attribute__((__packed__));
+
+friend std::ostream& operator<<(std::ostream& os, const GEBS800Header &head);
+
+
 
 typedef struct {
    Short_t pix_id;  //int16_t
