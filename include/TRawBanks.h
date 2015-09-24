@@ -112,7 +112,31 @@ struct GEBS800Header {
 
 friend std::ostream& operator<<(std::ostream& os, const GEBS800Header &head);
 
+static Int_t GetS800Channel(UShort_t input) { return (input>>12);    }
+static Int_t GetS800Value(UShort_t input)   { return (input&0x0fff); }
 
+
+struct S800TriggerPacket {
+  UShort_t trgger_pattern;
+  UShort_t channel_time[4];
+  UShort_t channel_time_number;
+} __attribute__((__packed__));
+
+friend std::ostream& operator<<(std::ostream& os, const S800TriggerPacket &pack);
+
+struct S800TOFPacket {
+  UShort_t value[4]; 
+  UShort_t number;
+} __attribute__((__packed__));
+
+friend std::ostream& operator<<(std::ostream& os, const S800TOFPacket &tof);
+
+struct S800SCINTPacket {
+  UShort_t value[2][4];
+  UShort_t number;
+} __attribute__((__packed__));
+
+// https://wikihost.nscl.msu.edu/S800Doc/doku.php?id=s800_version_0x0006
 
 typedef struct {
    Short_t pix_id;  //int16_t

@@ -95,6 +95,41 @@ std::ostream& operator<<(std::ostream& os,const TRawEvent::GEBS800Header &head) 
             << "\t S800 event number: " << head.GetEventNumber() << std::endl;
 }
 
+std::ostream& operator<<(std::ostream& os,const TRawEvent::S800TriggerPacket &pack) {
+  os << "-- S800 Trigger Packet -- \n";
+  for(int x=0;x<pack.channel_time_number;x++) {
+    os << "\t" << x
+       << "Tigger[" << TRawEvent::GetS800Channel(pack.channel_time[x]) << "]   "
+       << TRawEvent::GetS800Value(pack.channel_time[x]) << "\n";
+  }
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os,const TRawEvent::S800TOFPacket &tof) {
+  os << "-- S800 TOF Packet -- \n";
+  for(int x=0;x<tof.number;x++) {
+    switch(TRawEvent::GetS800Channel(tof.value[x])) {
+      case 12:
+        os << "\t RF:  0x" << std::hex << TRawEvent::GetS800Value(tof.value[x]) << std::dec << "\n";
+        break;
+      case 13:
+        os << "\t Object Scintillator:  0x" << std::hex << TRawEvent::GetS800Value(tof.value[x]) << std::dec << "\n";
+        break;
+      case 14:
+        os << "\t XFP Scintillator:  0x" << std::hex << TRawEvent::GetS800Value(tof.value[x]) << std::dec << "\n";
+        break;
+      case 15:
+        os << "\t Si:  0x" << std::hex << TRawEvent::GetS800Value(tof.value[x]) << std::dec << "\n";
+        break;
+      default:
+        os << "\t " << TRawEvent::GetS800Channel(tof.value[x]) << ":  0x" << std::hex << TRawEvent::GetS800Value(tof.value[x]) << std::dec << "\n";
+        break;
+
+    };
+  }
+  return os;
+}
+
 
 Long_t TRawEvent::GEBMode3Data::GetLed() const { return (((long)led_high)<<32) + (((long)led_middle)<<16) + (((long)led_low)<<0); }
 Long_t TRawEvent::GEBMode3Data::GetCfd() const { return (((long)cfd_high)<<32) + (((long)cfd_middle)<<16) + (((long)cfd_low)<<0); }
