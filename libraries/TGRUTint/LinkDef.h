@@ -1,4 +1,4 @@
-// TGRUTint.h TGRUTOptions.h TGRUTTypes.h TDetectorEnv.h TGRUTServer.h
+// TGRUTint.h TGRUTOptions.h TGRUTTypes.h TDetectorEnv.h TGRUTServer.h TMyTestTree.h
 
 #ifdef __CINT__
 
@@ -16,6 +16,8 @@
 #pragma link C++ class TDetectorEnv+;
 #pragma link C++ class TGRUTint+;
 #pragma link C++ class TGRUTServer+;
+
+#pragma link C++ class TMyTestTree+;
 
 #pragma link C++ global gResponse;
 
