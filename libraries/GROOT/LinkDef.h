@@ -1,10 +1,15 @@
-// GRootGuiFactory.h GRootFunctions.h GRootCanvas.h GCanvas.h TObjectManager.h
+// GRootGuiFactory.h GRootCommands.h GRootCanvas.h GCanvas.h TObjectManager.h
 
 #ifdef __CINT__
 #pragma link off all globals;
 #pragma link off all classes;
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
+
+
+#pragma link C++ function LabelPeaks;
+#pragma link C++ function ShowPeaks;
+#pragma link C++ function RemovePeaks;
 
 #pragma link C++ function Help;
 #pragma link C++ function Commands;

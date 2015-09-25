@@ -25,7 +25,7 @@
 #include <TContextMenu.h>
 
 //#include "GROOTGuiFactory.h"
-//#include "GRootGlobals.h"
+#include "GRootCommands.h"
 
 #include "TObjectManager.h"
 
@@ -518,6 +518,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       RemoveMarker("all");
       for(int i=0;i<hists.size();i++)
         hists.at(i)->GetListOfFunctions()->Delete();
+      RemovePeaks(hists.data(),hists.size());
       edited = true;
       break; 
     case kKey_o:
@@ -525,6 +526,9 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
         hists.at(i)->GetXaxis()->UnZoom();
       RemoveMarker("all");
       edited = true;    
+      break;
+    case kKey_s:
+      edited = ShowPeaks(hists.data(),hists.size());
       break;
     case kKey_F10:{
       }    

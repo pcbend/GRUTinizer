@@ -280,6 +280,10 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
      return TRint::ProcessLine(sline.Data(), sync, error);
   }
 
+  if(!sline.CompareTo("clear")) {
+    return TRint::ProcessLine(".! clear");
+  } 
+
   Ssiz_t index;
 
   if((index = sline.Index(';')) != kNPOS){
@@ -293,6 +297,7 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
     }
     return res;
   }
+
 
   fNewChild = NULL;
   long result =  TRint::ProcessLine(sline.Data(),sync,error);
