@@ -1,0 +1,10 @@
+
+#include <GPeak.h>
+
+
+ClassImp(GPeak)
+
+GPeak::GPeak(Double_t cent,Double_t xlow,Double_t xhigh,Option_t *opt) 
+      : TF1
+
+

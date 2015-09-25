@@ -90,3 +90,17 @@ bool RemovePeaks(TH1 **hists,unsigned int nhists) {
   return flag;
 }
 
+//bool PeakFit(TH1 *hist,Double_t xlow, Double_t xhigh,Option_t *opt) {
+//  if(!hist)
+//   return;
+//  TString option = opt; 
+//}
+
+
+
+
+
+
+
+
+
