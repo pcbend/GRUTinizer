@@ -138,6 +138,19 @@ struct S800SCINTPacket {
 
 // https://wikihost.nscl.msu.edu/S800Doc/doku.php?id=s800_version_0x0006
 
+struct S800FPICPacket {
+  UShort_t number;
+  UShort_t subid;
+  UShort_t value[16];
+} __attribute__((__packed__));
+
+struct S800FPCRDCPacket {
+  UShort_t id;
+  UShort_t number;
+  UShort_t subid;
+  /// not finished.
+} __attribute__((__packed__));
+
 typedef struct {
    Short_t pix_id;  //int16_t
    Short_t data_a;  //int16_t
