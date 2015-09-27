@@ -100,12 +100,15 @@ bool GPeak::InitParams(TH1 *fithist){
   double largestx=0.0;
   double largesty=0.0;
   for(int i = binlow;i<=binhigh;i++) {
+    //printf("bin[%i] content:  %.1f\n",i,fithist->GetBinContent(i));
     if(fithist->GetBinContent(i) > largesty) {
       largesty = fithist->GetBinContent(i);
       largestx = fithist->GetXaxis()->GetBinCenter(i);
     }
   }
-  
+  //printf("largest x = %.1f\n",largestx);
+  //printf("largest y = %.1f\n",largesty);
+
   TF1::SetParLimits(1,xlow,xhigh);
   TF1::SetParLimits(2,0.1,xhigh-xlow); // sigma should be less than the window width - JKS
   TF1::SetParLimits(3,0.000,10);
@@ -118,8 +121,8 @@ bool GPeak::InitParams(TH1 *fithist){
   //Make initial guesses
   TF1::SetParameter("Height",largesty);  //fithist->GetBinContent(bin));
   TF1::SetParameter("centroid",largestx);          //GetParameter("centroid"));
-  TF1::SetParameter("sigma",(xhigh-xlow)*0.5);  
-  //TF1::SetParameter("sigma",2.0/binWidth); // 
+  //TF1::SetParameter("sigma",(xhigh-xlow)*0.5);  
+  TF1::SetParameter("sigma",2.0/binWidth); // 
   TF1::SetParameter("beta",0.5);
   TF1::SetParameter("R", 1.0);
   TF1::SetParameter("step",1.0);
