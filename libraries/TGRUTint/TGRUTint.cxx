@@ -57,7 +57,7 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
   GetSignalHandler()->Remove();
   TGRUTInterruptHandler *ih = new TGRUTInterruptHandler();
   ih->Add();
-  TH1::SetDefaultSumw2();
+  //TH1::SetDefaultSumw2();
 
   SetPrompt("GRizer [%d] ");
 
