@@ -488,6 +488,12 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
           hists.at(i)->GetXaxis()->SetRangeUser(hists.back()->GetXaxis()->GetFirst(),hists.back()->GetXaxis()->GetLast());
        edited = true;
        break;
+    case kKey_f:
+       if(!hists.empty() && GetNMarkers()>1) {
+         //printf("x low = %.1f\t\txhigh = %.1f\n",fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
+         edited = PhotoPeakFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
+       }
+       break;
     //case kKey_g:
     //   edited = GausFit();
     //   break;

@@ -1,4 +1,4 @@
-// GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GCanvas.h TObjectManager.h
+// GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GCanvas.h TObjectManager.h GPeak.h
 
 #ifdef __CINT__
 #pragma link off all globals;
@@ -20,6 +20,7 @@
 #pragma link C++ function LabelPeaks;
 #pragma link C++ function ShowPeaks;
 #pragma link C++ function RemovePeaks;
+#pragma link C++ finction PhotoPeakFit; 
 
 //#pragma link C++ function PeakFit;
 
@@ -35,5 +36,7 @@
 #pragma link C++ class GCanvas+;
 #pragma link C++ class GRootCanvas+;
 #pragma link C++ class GRootGuiFactory+;
+
+#pragma link C++ class GPeak+;
 
 #endif

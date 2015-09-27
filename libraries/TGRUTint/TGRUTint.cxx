@@ -21,6 +21,7 @@
 #include <TString.h>
 
 #include <TTree.h>
+#include <TH1.h>
 #include <TMode3.h>
 
 #include <TGFileDialog.h>
@@ -56,6 +57,7 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
   GetSignalHandler()->Remove();
   TGRUTInterruptHandler *ih = new TGRUTInterruptHandler();
   ih->Add();
+  TH1::SetDefaultSumw2();
 
   SetPrompt("GRizer [%d] ");
 

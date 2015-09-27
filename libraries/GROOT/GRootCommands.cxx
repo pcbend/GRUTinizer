@@ -18,6 +18,7 @@
 #include <TObjArray.h>
 #include <TH1.h>
 
+#include <GPeak.h>
 //#include <GRootObjectManager.h>
 
 
@@ -96,9 +97,28 @@ bool RemovePeaks(TH1 **hists,unsigned int nhists) {
 //  TString option = opt; 
 //}
 
+bool PhotoPeakFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
+  bool edit = false; 
+  if(!hist)
+    return edit;
+  int binx[2];
+  double y[2];
+  if(xlow>xhigh)
+    std::swap(xlow,xhigh);
+  binx[0] = hist->GetXaxis()->FindBin(xlow);
+  binx[1] = hist->GetXaxis()->FindBin(xhigh);
+  y[0] = hist->GetBinContent(xlow);
+  y[1] = hist->GetBinContent(xhigh);
 
+  GPeak *mypeak= new GPeak((xlow+xhigh)/2.0,xlow,xhigh);
+  mypeak->Fit(hist,"Q+");
+  //mypeak->Background()->Draw("SAME");
+  TF1 *bg = new TF1(*mypeak->Background());
+  hist->GetListOfFunctions()->Add(bg);
+  edit = true;
 
-
+  return edit;
+}
 
 
 
