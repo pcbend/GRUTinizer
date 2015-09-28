@@ -21,6 +21,7 @@
 #include <TString.h>
 
 #include <TTree.h>
+#include <TH1.h>
 #include <TMode3.h>
 
 #include <TGFileDialog.h>
@@ -56,6 +57,7 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
   GetSignalHandler()->Remove();
   TGRUTInterruptHandler *ih = new TGRUTInterruptHandler();
   ih->Add();
+  //TH1::SetDefaultSumw2();
 
   SetPrompt("GRizer [%d] ");
 
@@ -280,6 +282,10 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
      return TRint::ProcessLine(sline.Data(), sync, error);
   }
 
+  if(!sline.CompareTo("clear")) {
+    return TRint::ProcessLine(".! clear");
+  } 
+
   Ssiz_t index;
 
   if((index = sline.Index(';')) != kNPOS){
@@ -293,6 +299,7 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
     }
     return res;
   }
+
 
   fNewChild = NULL;
   long result =  TRint::ProcessLine(sline.Data(),sync,error);
@@ -344,6 +351,7 @@ void TGRUTint::Terminate(Int_t status){
   if(fCommandServer) {
     fCommandServer->Stop();
     fCommandServer->Delete();
+    fCommandServer = NULL;
   }
   TGRUTLoop::Get()->Stop();
 

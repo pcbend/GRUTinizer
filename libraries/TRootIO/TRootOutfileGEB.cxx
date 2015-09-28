@@ -7,15 +7,18 @@
 #include "TGRUTOptions.h"
 
 #include "TGretina.h"
+#include "TBank29.h"
 #include "TMode3.h"
+#include "TS800.h"
 
 ClassImp(TRootOutfileGEB)
 
 TRootOutfileGEB::TRootOutfileGEB() {
   fMode3Init = false;
   gretina = NULL;
+  bank29  = NULL;
   mode3   = NULL;
-  // s800 = NULL;
+  s800    = NULL;
   // phoswall = NULL;
 }
 
@@ -34,19 +37,23 @@ void TRootOutfileGEB::Init(const char* output_filename){
   }
   SetOutfile(output_filename);
 
-  TTree *event_tree  = AddTree("EventTree","Mode 2 data",true);
+  TTree *event_tree  = AddTree("EventTree","Mode 2 data",true,1000);
   TTree *scaler_tree = AddTree("ScalerTree","ScalerTree");
-
 
   if(TDetectorEnv::Gretina()){
     event_tree->Branch("TGretina","TGretina",&gretina);
-    det_list[kDetectorSystems::GRETINA] = gretina;
+    UpdateDetList(kDetectorSystems::GRETINA, gretina, "EventTree");
   }
 
-  // if(TDetectorEnv::S800()){
-  //   event_tree->Branch("TS800","TS800",&s800);
-  //   det_list["TS800"] = s800;
-  // }
+  if(TDetectorEnv::Bank29()) {
+    event_tree->Branch("TBank29","TBank29",&bank29);
+    UpdateDetList(kDetectorSystems::BANK29, bank29, "EventTree");
+  }
+
+  if(TDetectorEnv::S800()){
+     event_tree->Branch("TS800","TS800",&s800);
+     UpdateDetList(kDetectorSystems::S800, s800, "EventTree");
+  }
 
 
   // if(TDetectorEnv::Caesar()){
@@ -73,7 +80,9 @@ void TRootOutfileGEB::FillHists() {
 void TRootOutfileGEB::Clear(Option_t *opt) {
   TRootOutfile::Clear(opt);
   if(gretina) gretina->Clear();
-  if(mode3)     mode3->Clear();
+  if(mode3)   mode3->Clear();
+  if(bank29)  bank29->Clear();
+  if(s800)    s800->Clear();
 }
 
 

@@ -9,6 +9,7 @@ bool TMode3::fExtractWaves = true;
 TMode3::TMode3(){
   //fOwnWave = false;
   wave = NULL;
+  wavesize = 0;
   for(int i=0;i<MAXTRACE;i++) {wavebuffer[i]=0;}
 }
 
@@ -35,9 +36,14 @@ void TMode3::BuildFrom(TSmartBuffer& buf, bool read_waveform){
   buf.Advance(sizeof(TRawEvent::GEBMode3Data));
 
   led = data->GetLed();
-  hit.SetCharge(data->GetEnergy(*header));
-  hit.SetAddress(GetHole(),GetCrystal(),GetSegmentId());
+  SetCharge(data->GetEnergy(*header));
+  SetAddress(GetHole(),GetCrystal(),GetSegmentId());
   cfd = data->GetCfd();
+
+  //std::cout << "wavesize:  " << wavesize << std::endl;
+  //buf.Print("all");
+  //std::cout << std::endl;
+  //std::cout << std::endl;
 
   size_t wave_bytes = header->GetLength()*4 - sizeof(*header) + 4 - sizeof(*data);
   if(read_waveform & (wavesize<MAXTRACE)){
@@ -65,11 +71,10 @@ void TMode3::BuildFrom(TSmartBuffer& buf, bool read_waveform){
 
 
 void TMode3::Copy(TObject& obj) const {
-  TDetector::Copy(obj);
+  TDetectorHit::Copy(obj);
 
   TMode3& mode3 = (TMode3&)obj;
   
-  hit.Copy(mode3.hit);
   
   mode3.board_id = board_id;
   //mode3.energy   = energy;
@@ -85,36 +90,14 @@ void TMode3::Copy(TObject& obj) const {
   } else {
     mode3.wave=0; 
   }
-  mode3.raw_data.clear();
+  //mode3.raw_data.clear();
 }
 
-int TMode3::BuildHits(){
-/*
-  for(auto& event : raw_data){
-    TGEBEvent& geb = (TGEBEvent&)event;
-    SetTimestamp(geb.GetTimestamp());
-    const TRawEvent::GEBBankType1* raw = (const TRawEvent::GEBBankType1*)geb.GetPayloadBuffer().GetData();
-    TGretinaHit hit;
-    hit.BuildFrom(*raw);
-    InsertHit(hit);
-  }
-  gretina_hits->At(0)->Print();
-  raw_data.clear();
-
-  BuildAddbackHits();
-
-  gretina_hits->At(0)->Print();
-
-  return Size();
-*/
-  return 0;
-}
 
 void TMode3::Print(Option_t *opt) const { }
 
 void TMode3::Clear(Option_t *opt) {
-  TDetector::Clear(opt);
-  hit.Clear(opt);
+  TDetectorHit::Clear(opt);
   board_id = -1;
   //energy   = -1;
   led      = -1;
@@ -123,12 +106,16 @@ void TMode3::Clear(Option_t *opt) {
   //  delete wave;
   //}
   ClearWave();
-  raw_data.clear();
+  //raw_data.clear();
 }
 
 void TMode3::ClearWave(Option_t *opt) {
-  for(int i=0;i<wavesize;i++) 
+  for(int i=0;i<wavesize;i++) { 
+    if(i>MAXTRACE)
+      break;
+    //std::cout << "Clear wave  " << i << std::endl;
     wavebuffer[i] = 0;
+  }
   wave = NULL;
   wavesize =  0;
 }

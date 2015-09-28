@@ -35,6 +35,10 @@ public:
   void  Clear(Option_t *opt="");
   const Int_t Size()  { return fNumberOfInteractions; }//fSegmentNumber.size(); }
 
+  double GetX() { return GetPosition().X(); }
+  double GetY() { return GetPosition().Y(); }
+  double GetZ() { return GetPosition().Z(); }
+
   double GetPhi() {
     double phi = GetPosition().Phi();
     if(phi<0) {
@@ -85,6 +89,8 @@ public:
   //void SetPosition(TVector3 &vec) { fCorePosition = vec; }
 
 private:
+  void SortHits();
+
   Long_t  fTimeStamp;
   Float_t fWalkCorrection;
 

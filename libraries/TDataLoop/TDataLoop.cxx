@@ -3,6 +3,7 @@
 #include "RawDataQueue.h"
 #include "TGRUTOptions.h"
 #include "TMultiRawFile.h"
+#include "TOrderedRawFile.h"
 #include "TRawFile.h"
 
 TDataLoop* TDataLoop::data_loop = NULL;
@@ -61,7 +62,12 @@ void TDataLoop::ProcessFile(const char* filename, kFileType file_type){
     std::cerr << "Attempting to process an unknown file type on file " << filename << std::endl;
   }
 
-  TRawFileIn* infile = new TRawFileIn(filename, file_type);
+  TRawFileIn* infile;
+  if(TGRUTOptions::Get()->TimeSortInput()){
+    infile = new TOrderedRawFile(filename, file_type);
+  } else {
+    infile = new TRawFileIn(filename, file_type);
+  }
 
   if(infile->GetLastErrno() != 0)  {
     std::cerr << "Error opening file " << filename << ": " << infile->GetLastError()

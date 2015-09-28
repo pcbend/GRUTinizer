@@ -23,7 +23,7 @@ class TRootOutfile : public TObject {
 
     // Common to all.
     void AddRawData(const TRawEvent& event, kDetectorSystems det_type);
-    virtual void FillTree(const char* tname);   //takes from det_list;
+    virtual void FillTree(const char* tname, long next_timestamp=-1);   //takes from det_list;
     virtual void FillAllTrees();
     virtual void FinalizeFile();
     virtual void CloseFile();
@@ -32,10 +32,12 @@ class TRootOutfile : public TObject {
     virtual void Print(Option_t* option = "") const;
 
   protected:
-    TTree *AddTree(const char *tname,const char *ttitle=0,bool build=false);
+    bool BuildCondition(TRawEvent& new_event);
+    void UpdateDetList(kDetectorSystems det_system, TDetector* detector, const char* tree_name);
+
+    TTree *AddTree(const char *tname,const char *ttitle=0,bool build=false,int build_window=-1);
     TTree *FindTree(const char *tname);
 
-    std::map<kDetectorSystems,TDetector*> det_list;
     std::map<std::string,TList*> hist_list;
 
     void   SetOutfile(const char *fname) { outfile = new TFile(fname,"recreate"); }
@@ -44,11 +46,22 @@ class TRootOutfile : public TObject {
   private:
     struct tree_element{
       TTree* tree;
+      // Build size, in timestamp units
+      // If build_window is -1, then each event will be filled as they are read
+      int build_window;
+      long event_build_window_close;
       bool build_det;
+      bool has_data;
+    };
+
+    struct det_list_element{
+      TDetector* det;
+      tree_element* tree_elem;
     };
 
     tree_element* FindTreeElement(const char* tname);
 
+    std::map<kDetectorSystems,det_list_element> det_list;
     std::map<std::string, tree_element> trees;
 
     TFile* outfile;

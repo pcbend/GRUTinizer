@@ -36,12 +36,12 @@ void TRootOutfileNSCL::Init(const char* output_filename){
 
   if(TDetectorEnv::Janus()){
     event_tree->Branch("TJanus","TJanus",&janus);
-    det_list[kDetectorSystems::JANUS] = janus;
+    UpdateDetList(kDetectorSystems::JANUS, janus, "EventTree");
   }
 
   if(TDetectorEnv::Sega()){
     event_tree->Branch("TSega","TSega",&sega);
-    det_list[kDetectorSystems::SEGA] = sega;
+    UpdateDetList(kDetectorSystems::SEGA, sega, "EventTree");
   }
 
   InitHists();

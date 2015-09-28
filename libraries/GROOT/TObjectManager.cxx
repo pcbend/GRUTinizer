@@ -49,10 +49,11 @@ TObjectManager *TObjectManager::Open(const char *fname,Option_t *opt) {
   if(is_base){
     gBaseManager = current;
   }
+  return current;
 }
 
 void TObjectManager::SaveAndClose(Option_t* option){
-  std::cout << __PRETTY_FUNCTION__ << ", " << fList->GetSize() << " items known" << std::endl;
+  //std::cout << __PRETTY_FUNCTION__ << ", " << fList->GetSize() << " items known" << std::endl;
   int num_objects = fList->GetSize();
 
 
@@ -142,7 +143,7 @@ void TObjectManager::Print(Option_t* opt) const {
 }
 
 void TObjectManager::Add(TObject* obj, Bool_t replace){
-  std::cout << __PRETTY_FUNCTION__ << std::endl;
+  //std::cout << __PRETTY_FUNCTION__ << std::endl;
   TDirectory::Add(obj, replace);
 }
 
@@ -157,7 +158,7 @@ void TObjectManager::Append(TObject* obj, Bool_t replace){
 }
 
 void TObjectManager::ObjectAppended(TObject* obj) {
-  std::cout << __PRETTY_FUNCTION__ << "\t" << (void*)obj << std::endl;
+  //std::cout << __PRETTY_FUNCTION__ << "\t" << (void*)obj << std::endl;
   Emit("ObjectAppended(TObject*)",(long)obj);
 }
 
@@ -214,7 +215,7 @@ TH1* TObjectManager::GetNext1D(TH1* from, bool forward = true){
     } else {
       if(iter == fParentChildren.begin()){
 	iter = fParentChildren.end();
-      }   
+      }
       iter--;
     }
 

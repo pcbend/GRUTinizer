@@ -38,6 +38,8 @@ public:
   bool CommandServer()      const { return fCommandServer; }
   bool ExtractWaves()       const { return fExtractWaves;  }
 
+  bool TimeSortInput()      const { return fTimeSortInput; }
+
   bool ShouldExitImmediately() const { return fShouldExit; }
   bool MakeBackupFile() const { return fMakeBackupFile; }
 
@@ -72,6 +74,8 @@ private:
   bool fIgnoreMode3;
   bool fCommandServer;
   bool fExtractWaves;
+
+  bool fTimeSortInput;
 
   bool fShouldExit;
   bool fMakeBackupFile;

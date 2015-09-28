@@ -62,7 +62,7 @@ public:
   TRawEventSource() : fBytesGiven(0) { }
   virtual ~TRawEventSource() { }
 
-  int Read(TRawEvent* event);
+  virtual int Read(TRawEvent* event);
 
   // Child classes must implement all virtual methods present.
   // Not using "= 0" because root complains if we do.

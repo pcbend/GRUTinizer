@@ -71,7 +71,7 @@ class GCanvas : public TCanvas {
       //void ClearBGMarkers();
       //void OrderBGMarkers();
 
-      std::vector<TH1*> Find1DHists();
+      std::vector<TH1*> FindHists(int dim=1);
       std::vector<TH1*> FindAllHists();
 
    public:
