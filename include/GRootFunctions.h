@@ -14,8 +14,4 @@ namespace GRootFunctions {
   Double_t SkewedGaus(Double_t *dim, Double_t *par);
 
 
-}
-
-
 #endif
-

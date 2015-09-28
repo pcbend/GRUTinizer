@@ -1,5 +1,5 @@
 #ifndef GPEAK_H
-#define GPEAK_h
+#define GPEAK_H
 
 #include <TF1.h>
 
@@ -41,4 +41,3 @@ class GPeak : public TF1 {
 
 
 #endif
-

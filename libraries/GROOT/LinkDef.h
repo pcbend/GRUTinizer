@@ -20,7 +20,7 @@
 #pragma link C++ function LabelPeaks;
 #pragma link C++ function ShowPeaks;
 #pragma link C++ function RemovePeaks;
-#pragma link C++ finction PhotoPeakFit; 
+#pragma link C++ finction PhotoPeakFit;
 
 //#pragma link C++ function PeakFit;
 

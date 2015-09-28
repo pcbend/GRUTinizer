@@ -37,12 +37,12 @@ Double_t GRootFunctions::StepBG(Double_t *dim, Double_t *par) {
 }
 
 Double_t GRootFunctions::Gaus(Double_t *dim, Double_t *par) {
-  // -dim[0]: channels to fit
-  // -par[0]: height of peak
-  // -par[1]: cent of peak
-  // -par[2]: sigma
-  // -par[4]: relative height of skewed gaus to gaus
-  
+  // - dim[0]: channels to fit
+  // - par[0]: height of peak
+  // - par[1]: cent of peak
+  // - par[2]: sigma
+  // - par[4]: relative height of skewed gaus to gaus
+
   Double_t x      = dim[0];
   Double_t height = par[0];
   Double_t cent   = par[1];
@@ -59,7 +59,7 @@ Double_t GRootFunctions::SkewedGaus(Double_t *dim,Double_t *par) {
   // - par[1]: cent of peak
   // - par[2]: sigma
   // - par[3]: "skewedness" of the skewed gaussin
-  // - par[4]: relative height of skewed gaus to gaus 
+  // - par[4]: relative height of skewed gaus to gaus
 
   Double_t x      = dim[0]; //channel number used for fitting
   Double_t height = par[0]; //height of photopeak
@@ -67,25 +67,19 @@ Double_t GRootFunctions::SkewedGaus(Double_t *dim,Double_t *par) {
   Double_t sigma  = par[2]; //standard deviation of gaussian
   Double_t beta   = par[3]; //"skewedness" of the skewed gaussian
   Double_t R      = par[4]; //relative height of skewed gaussian
- 
- return R*height/100.0*(TMath::Exp((x-cent)/beta))*(TMath::Erfc(((x-cent)/(TMath::Sqrt(2.0)*sigma)) + sigma/(TMath::Sqrt(2.0)*beta)));
 
+  double scaling = R*height/100.0;
+  double x_rel = (x - cent)/sigma;
+
+  return (scaling *
+          TMath::Gaus(x_rel)/std::sqrt(2*3.1415926535) *
+          (1 + 1*TMath::Erf(beta*x_rel/TMath::Sqrt(2.0))) );
 }
-
-
 
 Double_t GRootFunctions::PhotoPeak(Double_t *dim,Double_t *par) {
   return Gaus(dim,par) + SkewedGaus(dim,par);
 }
 
 Double_t GRootFunctions::PhotoPeakBG(Double_t *dim,Double_t *par) {
-  return Gaus(dim,par) + SkewedGaus(dim,par) + StepFunction(dim,par) + PolyBg(dim,&par[6],2);
+  return Gaus(dim,par) + SkewedGaus(dim,par) + StepFunction(dim,par) + PolyBg(dim,par+6,2);
 }
-
-
-
-
-
-
-
-
