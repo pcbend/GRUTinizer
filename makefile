@@ -50,7 +50,7 @@ LIBRARY_OUTPUT := $(patsubst %,libraries/lib%.so,$(LIBRARY_NAMES))
 
 INCLUDES  := $(addprefix -I$(PWD)/,$(INCLUDES))
 CFLAGS    += $(shell root-config --cflags)
-CFLAGS    += -MMD $(INCLUDES)
+CFLAGS    += -MMD -MP $(INCLUDES)
 LINKFLAGS += -Llibraries $(addprefix -l,$(LIBRARY_NAMES)) -Wl,-rpath,\$$ORIGIN/../libraries
 LINKFLAGS += $(shell root-config --glibs) -lSpectrum
 LINKFLAGS := $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX) $(CFLAGS)
@@ -83,7 +83,7 @@ run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  
 endif
 
 all: $(EXECUTABLES) $(LIBRARY_OUTPUT)
-	@cp util/grut-config bin/ 
+	@cp util/grut-config bin/
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
 
 docs:
