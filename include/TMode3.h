@@ -7,7 +7,7 @@
 
 #define MAXTRACE 1024
 
-class TMode3 : public TDetector {
+class TMode3 : public TDetectorHit {
   public:
     TMode3();
     ~TMode3();
@@ -18,9 +18,9 @@ class TMode3 : public TDetector {
     virtual void Clear(Option_t *opt = "");
     virtual void ClearWave(Option_t *opt = "");
 
-    virtual void          InsertHit(const TDetectorHit& hit) { return;       } 
-    virtual TDetectorHit& GetHit(const int &i=0)             { return hit; }
-    virtual int           Size()                             { return 1;     }
+    //virtual void          InsertHit(const TDetectorHit& hit) { return;       } 
+    //virtual TDetectorHit& GetHit(const int &i=0)             { return hit; }
+    //virtual int           Size()                             { return 1;     }
 
     void     BuildFrom(TSmartBuffer& buf, bool read_waveform);
 
@@ -40,16 +40,16 @@ class TMode3 : public TDetector {
     static void SetExtractWaves(bool flag=true) { fExtractWaves = flag;  }
     static bool ExtractWaves()                  { return fExtractWaves;  }
 
-    Int_t    Charge()    { return hit.Charge(); }
-    Int_t    Address()    { return hit.Address(); }
+    //Int_t    Charge()    { return hit.Charge(); }
+    //Int_t    Address()    { return hit.Address(); }
 
   private:
-    virtual int BuildHits();
+    //virtual int BuildHits();
 
     static bool fExtractWaves; //!
     //mutable bool fOwnWave;             //!
 
-    TDetectorHit hit;
+    //TDetectorHit hit;
 
     Int_t  board_id;  
     //Int_t  energy;
@@ -59,7 +59,7 @@ class TMode3 : public TDetector {
     Short_t wavebuffer[MAXTRACE];  //!
     Short_t *wave;                 //[wavesize]
 
-  ClassDef(TMode3,1);
+  ClassDef(TMode3,2);
 };
 
 

@@ -27,7 +27,7 @@ TRootOutfile::~TRootOutfile() {
   }
 }
 
-TTree *TRootOutfile::AddTree(const char* tname,const char* ttitle,bool build) {
+TTree *TRootOutfile::AddTree(const char* tname,const char* ttitle,bool build,int build_window) {
   if(!outfile) {
     fprintf(stderr,"%s, attempting to make tree with out associated file.\n",__PRETTY_FUNCTION__);
   }
@@ -39,7 +39,11 @@ TTree *TRootOutfile::AddTree(const char* tname,const char* ttitle,bool build) {
   elem.tree = new TTree(tname,ttitle);
   elem.tree->SetMaxTreeSize(1000000000); //outfile limited to 1gb, than outfle_%i opened.
   elem.build_det = build;
+  elem.build_window = build_window;
+  elem.event_build_window_close = build_window;
+  elem.has_data = false;
   trees[tname] = elem;
+
   return elem.tree;
 };
 
@@ -53,9 +57,17 @@ TTree *TRootOutfile::FindTree(const char *tname) {
 
 void TRootOutfile::AddRawData(const TRawEvent& event, kDetectorSystems det_type){
   try{
-    TDetector* det = det_list.at(det_type);
-    det->AddRawData(event);
+    auto det = det_list.at(det_type);
+    det.det->AddRawData(event);
+    det.tree_elem->has_data = true;
   } catch (std::out_of_range& e) { }
+}
+
+void TRootOutfile::UpdateDetList(kDetectorSystems det_system, TDetector* detector, const char* tree_name){
+  det_list_element new_det;
+  new_det.det = detector;
+  new_det.tree_elem = FindTreeElement(tree_name);
+  det_list[det_system] = new_det;
 }
 
 TRootOutfile::tree_element* TRootOutfile::FindTreeElement(const char* tname){
@@ -66,39 +78,61 @@ TRootOutfile::tree_element* TRootOutfile::FindTreeElement(const char* tname){
   }
 }
 
-void TRootOutfile::FillTree(const char *tname) {
-
+void TRootOutfile::FillTree(const char *tname, long next_timestamp) {
   tree_element* elem = FindTreeElement(tname);
   if(!elem) {
     fprintf(stderr,"%s: trying to fill nonexisting tree %s\n.",__PRETTY_FUNCTION__,tname);
     return;
   }
+
+  if(!elem->has_data){
+    std::cerr << "\nNo data given, skipping (filled " << elem->tree->GetEntries() << " times before)" << std::endl;
+    return;
+  }
+
+  // If there is no data added, don't fill
+  // If there is a build window, don't fill unless the new timestamp is outside the window.
+  if(!elem->has_data || 
+     (next_timestamp >= 0 &&
+      elem->build_window >= 0 &&
+      next_timestamp < elem->event_build_window_close)) {
+    return;
+  }
+
   if(elem->build_det){
     for(auto& item : det_list) {
-      item.second->Build();
+      item.second.det->Build();
     }
   }
   elem->tree->Fill();
+  Clear();
+  elem->has_data = false;
+  elem->event_build_window_close = next_timestamp + elem->build_window;
 }
 
 
 void TRootOutfile::FillAllTrees() {
   for(auto& val : trees){
     tree_element& elem = val.second;
-    if(elem.build_det){
-      for(auto& item : det_list) {
-        item.second->Build();
+    
+    if(elem.has_data){
+      if(elem.build_det){
+	for(auto& item : det_list) {
+	  item.second.det->Build();
+	}
       }
-    }
 
-    elem.tree->Fill();
+      std::cout << "Dets built, filling tree" << std::endl;
+
+      elem.tree->Fill();
+    }
   }
 }
 
 
 void TRootOutfile::Clear(Option_t *opt) {
   for(auto& item : det_list) {
-    item.second->Clear();
+    item.second.det->Clear();
   }
 }
 
@@ -142,8 +176,14 @@ void TRootOutfile::FinalizeFile(){
 }
 
 void TRootOutfile::CloseFile(){
-  outfile->Close();
-  outfile->Delete();
+  if(trees.size()){
+    TFile* curr_file = trees.begin()->second.tree->GetCurrentFile();
+    curr_file->Close();
+    curr_file->Delete();
+  } else {
+    outfile->Close();
+    outfile->Delete();
+  }
   outfile = NULL;
 }
 

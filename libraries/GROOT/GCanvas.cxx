@@ -9,6 +9,7 @@
 #include <TText.h>
 #include <TLatex.h>
 #include <TH1.h>
+#include <TH2.h>
 #include <TGraphErrors.h>
 #include <Buttons.h>
 #include <KeySymbols.h> 
@@ -24,7 +25,7 @@
 #include <TContextMenu.h>
 
 //#include "GROOTGuiFactory.h"
-//#include "GRootGlobals.h"
+#include "GRootCommands.h"
 
 #include "TObjectManager.h"
 
@@ -229,20 +230,26 @@ void GCanvas::Draw(Option_t *opt) {
 }
 
 
-std::vector<TH1*> GCanvas::Find1DHists() {
+std::vector<TH1*> GCanvas::FindHists(int dim) {
   std::vector<TH1*> tempvec;
   TH1 *hist = 0;
   TIter iter(gPad->GetListOfPrimitives());
   while(TObject *obj = iter.Next()) {
     if( obj->InheritsFrom(TH1::Class()) ) {  
       TH1* hist = (TH1*)obj;
-      if(hist->GetDimension()==1){
+      if(hist->GetDimension()==dim){
         tempvec.push_back(hist); 
       }
     }
   }
   return tempvec;
 }
+
+
+
+
+
+
 
 std::vector<TH1*> GCanvas::FindAllHists() {
   std::vector<TH1*> tempvec;
@@ -259,7 +266,7 @@ bool GCanvas::HandleArrowKeyPress(Event_t *event,UInt_t *keysym) {
 
   bool edited = false;
   
-  std::vector<TH1*> hists = Find1DHists();
+  std::vector<TH1*> hists = FindHists();
   if(hists.size()>0){
     edited = Process1DArrowKeyPress(event,keysym);
   }
@@ -283,10 +290,15 @@ bool GCanvas::HandleKeyboardPress(Event_t *event,UInt_t *keysym) {
   //         ge = (TGraphErrors*)obj;
   //   }
   //}
-  std::vector<TH1*> hists = Find1DHists();
+  std::vector<TH1*> hists = FindHists();
   if(hists.size()>0){  
     edited = Process1DKeyboardPress(event,keysym);
-  }
+  } 
+  hists = FindHists(2);
+  if(hists.size()>0){
+    edited = Process2DKeyboardPress(event,keysym);
+  } 
+
 
   //if(ge){
   //  switch(*keysym) {
@@ -372,7 +384,7 @@ TF1 *GCanvas::GetLastFit() {
 
 bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) { 
   bool edited = false;
-  std::vector<TH1*> hists = Find1DHists();
+  std::vector<TH1*> hists = FindHists();
 
   int first = hists.at(0)->GetXaxis()->GetFirst();
   int last = hists.at(0)->GetXaxis()->GetLast();
@@ -451,7 +463,7 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
 
 bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
   bool edited = false;
-  std::vector<TH1*> hists = Find1DHists();
+  std::vector<TH1*> hists = FindHists();
   if(hists.size()<1)
     return edited; 
 
@@ -475,6 +487,12 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
        for(int i=0;i<hists.size()-1;i++)
           hists.at(i)->GetXaxis()->SetRangeUser(hists.back()->GetXaxis()->GetFirst(),hists.back()->GetXaxis()->GetLast());
        edited = true;
+       break;
+    case kKey_f:
+       if(!hists.empty() && GetNMarkers()>1) {
+         //printf("x low = %.1f\t\txhigh = %.1f\n",fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
+         edited = PhotoPeakFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
+       }
        break;
     //case kKey_g:
     //   edited = GausFit();
@@ -506,6 +524,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       RemoveMarker("all");
       for(int i=0;i<hists.size();i++)
         hists.at(i)->GetListOfFunctions()->Delete();
+      RemovePeaks(hists.data(),hists.size());
       edited = true;
       break; 
     case kKey_o:
@@ -513,6 +532,9 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
         hists.at(i)->GetXaxis()->UnZoom();
       RemoveMarker("all");
       edited = true;    
+      break;
+    case kKey_s:
+      edited = ShowPeaks(hists.data(),hists.size());
       break;
     case kKey_F10:{
       }    
@@ -534,6 +556,21 @@ bool GCanvas::Process2DArrowKeyPress(Event_t *event,UInt_t *keysym) {
 
 bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) { 
   bool edited = false;
+  //printf("2d hist key pressed.\n");
+  std::vector<TH1*> hists = FindHists(2);
+  if(hists.size()<1)
+    return edited; 
+  switch(*keysym) {
+    case kKey_o:
+      for(int i=0;i<hists.size();i++) {
+        TH2* h = (TH2*)hists.at(i);       
+        h->GetXaxis()->UnZoom();
+        h->GetYaxis()->UnZoom();
+      }
+      RemoveMarker("all");
+      edited = true;    
+      break;
+  };
   return edited;
 }
 
@@ -964,7 +1001,7 @@ bool GCanvas::SetBGGate(GMarker *m1, GMarker *m2, GMarker *m3, GMarker *m4) {
 
 bool GCanvas::SetConstantBG() {
   bool edited = false;
-  std::vector<TH1*> hists = Find1DHists();
+  std::vector<TH1*> hists = FindHists();
   if(hists.size()<1)
      return edited;
   if(GetNBG_Markers()<1)
@@ -991,7 +1028,7 @@ bool GCanvas::SetConstantBG() {
 }
 
 TH1 *GCanvas::GetBackGroundHist(GMarker *addlow,GMarker *addhigh) {
-  std::vector<TH1*> hists = Find1DHists();
+  std::vector<TH1*> hists = FindHists();
   if(hists.size()<1)
      return 0;
   TH1 *hist = hists.at(0);

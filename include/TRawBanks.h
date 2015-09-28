@@ -88,6 +88,68 @@ struct GEBMode3Data {
 friend std::ostream& operator<<(std::ostream& os, const GEBMode3Data &data);
 static void SwapMode3Data(GEBMode3Data &data);
 
+struct GEBS800Header {
+  Int_t    total_size;
+  UShort_t total_size2;  
+  UShort_t S800_packet; 
+  UShort_t S800_packet_size;
+  UShort_t S800_version;
+  UShort_t S800_timestamp_packet;
+  ULong_t  S800_timestamp;
+  UShort_t S800_eventnumber_packet_size;
+  UShort_t S800_eventnumber_packet;
+  UShort_t S800_eventnumber_low;
+  UShort_t S800_eventnumber_middle;
+  UShort_t S800_eventnumber_high;
+  Long_t GetEventNumber() const { 
+     long temp = (long)S800_eventnumber_low;
+     temp     += ((long)S800_eventnumber_middle) << 16;
+     temp     += ((long)S800_eventnumber_high)   << 32;
+     return temp;
+  }
+
+} __attribute__((__packed__));
+
+friend std::ostream& operator<<(std::ostream& os, const GEBS800Header &head);
+
+static Int_t GetS800Channel(UShort_t input) { return (input>>12);    }
+static Int_t GetS800Value(UShort_t input)   { return (input&0x0fff); }
+
+
+struct S800TriggerPacket {
+  UShort_t trgger_pattern;
+  UShort_t channel_time[4];
+  UShort_t channel_time_number;
+} __attribute__((__packed__));
+
+friend std::ostream& operator<<(std::ostream& os, const S800TriggerPacket &pack);
+
+struct S800TOFPacket {
+  UShort_t value[4]; 
+  UShort_t number;
+} __attribute__((__packed__));
+
+friend std::ostream& operator<<(std::ostream& os, const S800TOFPacket &tof);
+
+struct S800SCINTPacket {
+  UShort_t value[2][4];
+  UShort_t number;
+} __attribute__((__packed__));
+
+// https://wikihost.nscl.msu.edu/S800Doc/doku.php?id=s800_version_0x0006
+
+struct S800FPICPacket {
+  UShort_t number;
+  UShort_t subid;
+  UShort_t value[16];
+} __attribute__((__packed__));
+
+struct S800FPCRDCPacket {
+  UShort_t id;
+  UShort_t number;
+  UShort_t subid;
+  /// not finished.
+} __attribute__((__packed__));
 
 typedef struct {
    Short_t pix_id;  //int16_t

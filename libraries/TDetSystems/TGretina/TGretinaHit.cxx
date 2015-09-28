@@ -5,6 +5,19 @@
 
 #include "TGretina.h"
 
+struct interaction_point {
+  interaction_point(int segnum, TVector3 pos, float energy)
+    : segnum(segnum), pos(pos), energy(energy) { }
+
+  int segnum;
+  TVector3 pos;
+  float energy;
+
+  bool operator<(const interaction_point& other) const {
+    return energy > other.energy;
+  }
+};
+
 TGretinaHit::TGretinaHit(){ }
 
 TGretinaHit::~TGretinaHit(){ }
@@ -68,13 +81,15 @@ void TGretinaHit::BuildFrom(const TRawEvent::GEBBankType1& raw){
       second_interaction_value = seg_ener;
     }
   }
+
+  SortHits();
 }
 
 TVector3 TGretinaHit::GetInteractionPosition(int i) const {
   if(i>=0 && i<fNumberOfInteractions){
     return fGlobalInteractionPosition[i];
   } else {
-    TVector3(0,0,1);
+    return TVector3(0,0,1);
   }
 }
 
@@ -92,18 +107,32 @@ bool TGretinaHit::CheckAddback(const TGretinaHit& rhs) const {
   return ((dist.Mag()<250.0) && (dtime<20.0));
 }
 
-struct interaction_point {
-  interaction_point(int segnum, TVector3 pos, float energy)
-    : segnum(segnum), pos(pos), energy(energy) { }
-
-  int segnum;
-  TVector3 pos;
-  float energy;
-
-  bool operator<(const interaction_point& other) const {
-    return energy > other.energy;
+void TGretinaHit::SortHits(){
+  // sets are sorted, so this will sort all properties together.
+  std::set<interaction_point> ips;
+  for(int i=0; i<fNumberOfInteractions; i++){
+    ips.insert(interaction_point(fSegmentNumber[i],
+                                 fGlobalInteractionPosition[i],
+                                 fInteractionEnergy[i]));
   }
-};
+
+  // Fill all interaction points
+  fNumberOfInteractions = 0;
+  for(auto& point : ips){
+    if(fNumberOfInteractions >= MAXHPGESEGMENTS){
+      break;
+    }
+
+    fSegmentNumber[fNumberOfInteractions] = point.segnum;
+    fGlobalInteractionPosition[fNumberOfInteractions] = point.pos;
+    fInteractionEnergy[fNumberOfInteractions] = point.energy;
+    fNumberOfInteractions++;
+  }
+
+  // Because they are now sorted
+  fFirstInteraction = 0;
+  fSecondInteraction = 1;
+}
 
 // TODO: Handle interactions points better
 //       Right now, the "first interaction point" is the one with the highest energy,
@@ -183,8 +212,8 @@ TVector3 TGretinaHit::GetFirstIntPosition() const {
 }
 
 TVector3 TGretinaHit::GetSecondIntPosition() const {
-   if(GetFirstIntPoint()>-1)
-     return GetInteractionPosition(GetFirstIntPoint());
+   if(GetSecondIntPoint()>-1)
+     return GetInteractionPosition(GetSecondIntPoint());
    return TDetectorHit::BeamUnitVec;
 }
 

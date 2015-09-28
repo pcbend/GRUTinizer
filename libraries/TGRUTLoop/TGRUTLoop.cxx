@@ -112,11 +112,14 @@ void TGRUTLoop::WriteLoop(){
     if(queue->Size()){
       TRawEvent event = queue->Pop();
       ProcessFromQueue(event);
+      if(!running){
+	std::cout << "Queue size: " << queue->Size() << "\r" << std::flush;
+      }
     } else {
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
   }
-  std::cout << "Flushing last event" << std::endl;
+  std::cout << "\nFlushing last event" << std::endl;
   outfile->FillAllTrees();
   std::cout << "Write loop ending" << std::endl;
 }
@@ -201,14 +204,10 @@ void TGRUTLoop::HandleUnbuiltNSCLData(TNSCLEvent& event){
 void TGRUTLoop::HandleGEBData(TGEBEvent& event){
   int type = event.GetEventType();
   TRootOutfileGEB *gebout = (TRootOutfileGEB*)outfile;
-  if(type==1 || type ==5 || type==17 ) {
-    if(event.FillCondition()){
-      gebout->FillTree("EventTree");
-      gebout->Clear();
-    }
-  }
-  switch(event.GetEventType()) {
-    case 1: // Gretina Mode2 data.
+
+  switch(type) {
+    case 1: // Gretina decomp data.
+      gebout->FillTree("EventTree",event.GetTimestamp());
       gebout->AddRawData(event, kDetectorSystems::GRETINA);
       break;
     case 2: // Gretina Mode3 data.
@@ -221,17 +220,25 @@ void TGRUTLoop::HandleGEBData(TGEBEvent& event){
       }
       break;
     case 5: // S800 Mode2 equvilant.
+      gebout->FillTree("EventTree",event.GetTimestamp());
+      gebout->AddRawData(event, kDetectorSystems::S800);
       break;
     case 8: // Gretina diag. data.
+      gebout->FillTree("EventTree",event.GetTimestamp());
+      gebout->AddRawData(event, kDetectorSystems::BANK29);
+      break;
+    case 10:
+      // S800 scaler data....
       break;
     case 17: //PWall Mode2 equivlant.
       break;
     case 29: // Something.
       break;
     default:
+      std::cout << "Dance Party EventType: " << type << std::endl;
       //dance party.
       break;
-  };
+  }
 
 }
 
