@@ -1,6 +1,7 @@
 #ifndef _TMYTESTTREE_H_
 #define _TMYTESTTREE_H_
 
+#include "TCut.h"
 #include "TDirectory.h"
 #include "TTree.h"
 
@@ -8,24 +9,19 @@
 
 class TMyTestTree : public TTree {
 public:
-  TMyTestTree(int circular_size = 32768);
+  TMyTestTree(const char* name = "circular", int circular_size = 32768);
   virtual ~TMyTestTree();
 
   void AddDetectorBranch(TDetector** det, const char* name);
 
-  void PrintStatus() const;
+  void AddHistogram(const char* name,
+                    int bins, double low, double high, const char* varexp,
+                    const char* gate = "");
 
-  using TTree::Draw;
-
-  virtual void Draw(Option_t* opt = ""){
-    Draw(opt, "");
-  }
-
-  virtual Long64_t Draw(const char* varexp,
-                        const char* selection,
-                        Option_t* option = "",
-                        Long64_t nentries = 1000000000,
-                        Long64_t firstentry = 0);
+  void AddHistogram(const char* name,
+                    int binsX, double lowX, double highX, const char* varexpX,
+                    int binsY, double lowY, double highY, const char* varexpY,
+                    const char* gate = "");
 
   void RefillHistograms();
 
@@ -47,15 +43,32 @@ private:
   TDirectory directory;
   TDirectory* saved_dir;
 
+  int event_num;
+  int actual_event_num; // Because ROOT is obnoxious, see the src file
+  int last_fill;
   int circular_size;
 
-  struct HistPattern {
-    TString varexp;
-    TString selection;
+  struct HistPattern1D {
+    std::string name;
+    TCut gate;
+    std::string varexp;
+    int bins;
+    double low, high;
   };
 
-  //std::map<TObject*, HistPattern> hist_patterns;
-  std::vector<HistPattern> hist_patterns;
+  struct HistPattern2D {
+    std::string name;
+    TCut gate;
+    std::string varexpX;
+    int binsX;
+    double lowX, highX;
+    std::string varexpY;
+    int binsY;
+    double lowY, highY;
+  };
+
+  std::vector<HistPattern1D> hist_patterns_1d;
+  std::vector<HistPattern2D> hist_patterns_2d;
 
 
   ClassDef(TMyTestTree,0);

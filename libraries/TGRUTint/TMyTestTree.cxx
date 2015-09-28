@@ -2,19 +2,28 @@
 
 #include <chrono>
 #include <iostream>
+#include <sstream>
 #include <thread>
 
+#include "TH1.h"
+#include "TH2.h"
 #include "TObject.h"
 #include "TRandom.h"
 #include "TRegexp.h"
 
-TMyTestTree::TMyTestTree(int circular_size)
-  : TTree("t","t"), circular_size(circular_size), saved_dir(NULL) {
+#include "TPreserveGDirectory.h"
+
+TMyTestTree::TMyTestTree(const char* name, int circular_size)
+  : TTree(name,name), directory(Form("%s_dir",name),Form("%s_dir",name)),
+    event_num(0), actual_event_num(0), last_fill(0),
+    circular_size(circular_size), saved_dir(NULL) {
   SetDirectory(0);
   SetCircular(circular_size);
+
+  Branch("event_num", &event_num, "event_num/I");
 }
 
-TMyTestTree::~TMyTestTree(){}
+TMyTestTree::~TMyTestTree() { }
 
 void TMyTestTree::AddDetectorBranch(TDetector** det, const char* name){
   Branch(name, name, det);
@@ -51,36 +60,94 @@ void TMyTestTree::recurse_down(std::vector<std::string>& terminal_leaves, std::s
 
 
 Int_t TMyTestTree::Fill(){
-  Int_t output = TTree::Fill();
-
-  if(GetEntries() > circular_size * 0.9){
+  if(event_num - last_fill > circular_size * 0.8){
     RefillHistograms();
   }
+
+  event_num = actual_event_num;
+  Int_t output = TTree::Fill();
+  actual_event_num++;
 
   return output;
 }
 
-Long64_t TMyTestTree::Draw(const char* varexp, const char* selection,
-                           Option_t* option, Long64_t nentries, Long64_t firstentry){
-  HistPattern new_pat;
-  new_pat.varexp = varexp;
+void TMyTestTree::AddHistogram(const char* name,
+                               int bins, double low, double high, const char* varexp,
+                               const char* gate){
+  TPreserveGDirectory preserve;
+  directory.cd();
 
-  TRegexp re(">>[-+]?");
-  new_pat.varexp(re) = ">>+";
+  HistPattern1D pat;
 
-  new_pat.selection = selection;
-  hist_patterns.push_back(new_pat);
+  pat.name = Form("+%s",name);
+  pat.varexp = varexp;
+  pat.bins = bins;
+  pat.low = low;
+  pat.high = high;
+  pat.gate = gate;
+
+  // The histogram will be grabbed by the gDirectory, no memory leak
+  new TH1I(name,name,
+           bins, low, high);
+
+  hist_patterns_1d.push_back(pat);
+}
+
+void TMyTestTree::AddHistogram(const char* name,
+                               int binsX, double lowX, double highX, const char* varexpX,
+                               int binsY, double lowY, double highY, const char* varexpY,
+                               const char* gate){
+  TPreserveGDirectory preserve;
+  directory.cd();
+
+  HistPattern2D pat;
+
+  pat.name = Form("+%s",name);
+  pat.gate = gate;
+
+  pat.varexpX = varexpX;
+  pat.binsX = binsX;
+  pat.lowX = lowX;
+  pat.highX = highX;
+
+  pat.varexpY = varexpY;
+  pat.binsY = binsY;
+  pat.lowY = lowY;
+  pat.highY = highY;
+
+  // The histogram will be grabbed by the gDirectory, no memory leak
+  new TH2I(name,name,
+           binsX, lowX, highX,
+           binsY, lowY, highY);
+
+  hist_patterns_2d.push_back(pat);
 }
 
 void TMyTestTree::RefillHistograms() {
-  TDirectory* bak = gDirectory;
+  TPreserveGDirectory preserve;
   directory.cd();
-  for(auto& pattern : hist_patterns) {
-    gDirectory->ls();
-    //TTree::Project(pattern.varexp.Data(), pattern.selection.Data());
-    TTree::Draw(pattern.varexp.Data(), pattern.selection.Data(), "goff");
-    gDirectory->ls();
+
+  std::cout << "Last Fill: " << last_fill
+            << "\tEvent Num: " << event_num
+            << "\tActual Event Num: " << actual_event_num
+            << std::endl;
+
+  for(auto& pattern : hist_patterns_1d) {
+    TTree::Project(pattern.name.c_str(), pattern.varexp.c_str(),
+                   pattern.gate && Form("event_num>%d",last_fill-1));
   }
-  SetEntries(0);
-  bak->cd();
+
+  for(auto& pattern : hist_patterns_2d) {
+    TTree::Project(pattern.name.c_str(), (pattern.varexpY + ":" + pattern.varexpX).c_str(), pattern.gate);
+  }
+
+  // This doesn't work
+  // The pointer at which new data is inserted is not changed by SetEntries.
+  //SetEntries(0);
+
+  std::cout << "Last Fill: " << last_fill
+            << "\tEvent Num: " << event_num
+            << "\tActual Event Num: " << actual_event_num
+            << std::endl;
+  last_fill = actual_event_num;
 }

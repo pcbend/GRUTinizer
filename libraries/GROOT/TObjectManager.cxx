@@ -3,10 +3,11 @@
 #include <iostream>
 
 #include "TClass.h"
+#include "TCutG.h"
+#include "TFile.h"
 #include "TH1.h"
 #include "TInterpreter.h"
 #include "TROOT.h"
-#include "TFile.h"
 
 
 TObjectManager* gManager = NULL;
@@ -112,7 +113,6 @@ void TObjectManager::SaveParent(TObject *parent) {
 
     if(fParentChildren.count(parent)){
       auto& children = fParentChildren[parent];
-
       TFile::cd("/");
       parent->Write();
       if(children.size()){
@@ -150,9 +150,11 @@ void TObjectManager::Append(TObject* obj, Bool_t replace){
     RecursiveRemove(obj);
   }
 
-  TDirectory::Append(obj, replace);
-  fParentChildren[obj];
-  ObjectAppended(obj);
+  if(Trackable(obj)){
+    TDirectory::Append(obj, replace);
+    fParentChildren[obj];
+    ObjectAppended(obj);
+  }
 }
 
 void TObjectManager::ObjectAppended(TObject* obj) {
@@ -160,9 +162,14 @@ void TObjectManager::ObjectAppended(TObject* obj) {
 }
 
 void TObjectManager::AddRelationship(TObject* parent, TObject* child){
-  if(parent && child){
+  if(Trackable(parent) && Trackable(child)){
     fParentChildren[parent].push_back(child);
   }
+}
+
+bool TObjectManager::Trackable(TObject* obj){
+  return obj && (obj->InheritsFrom(TH1::Class()) ||
+                 obj->InheritsFrom(TCutG::Class()));
 }
 
 
