@@ -37,7 +37,7 @@ TTree *TRootOutfile::AddTree(const char* tname,const char* ttitle,bool build,int
 
   tree_element elem;
   elem.tree = new TTree(tname,ttitle);
-  elem.tree->SetMaxTreeSize(1000000000); //outfile limited to 1gb, than outfle_%i opened.
+  //elem.tree->SetMaxTreeSize(1000000000); //outfile limited to 1gb, than outfle_%i opened.
   elem.build_det = build;
   elem.build_window = build_window;
   elem.event_build_window_close = build_window;
