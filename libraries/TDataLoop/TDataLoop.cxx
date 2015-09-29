@@ -87,7 +87,13 @@ void TDataLoop::ProcessFile(const std::vector<std::string>& filenames){
   TMultiRawFile* infile = new TMultiRawFile;
 
   for(auto& filename : filenames){
-    infile->AddFile(filename.c_str());
+    TRawFileIn* infile_segment;
+    if(TGRUTOptions::Get()->TimeSortInput()){
+      infile_segment = new TOrderedRawFile(filename.c_str());
+    } else {
+      infile_segment = new TRawFileIn(filename.c_str());
+    }
+    infile->AddFile(infile_segment);
   }
 
   if(infile->IsValid()){

@@ -7,7 +7,7 @@
 class TOrderedRawFile : public TRawFileIn {
 
   public:
-    TOrderedRawFile(const char* filename,kFileType file_type); 
+    TOrderedRawFile(const char* filename,kFileType file_type = kFileType::UNKNOWN_FILETYPE);
     ~TOrderedRawFile();
 
     virtual int Read(TRawEvent*);
@@ -29,4 +29,3 @@ class TOrderedRawFile : public TRawFileIn {
 
 
 #endif
-

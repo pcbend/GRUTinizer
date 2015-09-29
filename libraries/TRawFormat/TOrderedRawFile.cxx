@@ -27,18 +27,18 @@ int TOrderedRawFile::Read(TRawEvent *event) {
     return 0;
   }
 
-  if(fillqueue()==0) 
+  if(fillqueue()==0)
    return -1;
 
   auto curr_timestamp = event_queue.begin()->first;
   *event = event_queue.begin()->second;
   event_queue.erase(event_queue.begin());
- 
+
   if(oldest_timestamp != -1 && newest_timestamp != -1 &&
      curr_timestamp < newest_timestamp){
     std::cerr << "Sorting failed, insufficient depth" << std::endl;
   }
-  
+
   if(oldest_timestamp == -1 || curr_timestamp < oldest_timestamp){
     oldest_timestamp = curr_timestamp;
   }
@@ -46,7 +46,7 @@ int TOrderedRawFile::Read(TRawEvent *event) {
     newest_timestamp = curr_timestamp;
   }
  return event->GetTotalSize();
-  
+
 }
 
 bool TOrderedRawFile::IsFinished() const {
@@ -63,10 +63,9 @@ int TOrderedRawFile::fillqueue() {
     auto timestamp = TGEBEvent(new_event).GetTimestamp();
     event_queue.insert( std::make_pair(timestamp, new_event) );
   }
-  
+
   if(!event_queue.size()){
     finished = true;
   }
   return event_queue.size();
 }
-

@@ -22,7 +22,7 @@ TMultiRawFile::~TMultiRawFile(){
   }
 }
 
-void TMultiRawFile::AddFile(TRawFileIn* infile){
+void TMultiRawFile::AddFile(TRawEventSource* infile){
   FileEvent f;
   f.file = infile;
   infile->Read(&f.next_event);
@@ -80,8 +80,10 @@ std::string TMultiRawFile::SourceDescription() const{
 
   std::stringstream ss;
   ss << "Multi file: ";
+  int i=0;
   for(auto& file : fFileList){
-    ss << file->GetFileName() << " ";
+    ss << i << " = (" << file->SourceDescription() << ") ";
+    i++;
   }
   return ss.str();
 }
