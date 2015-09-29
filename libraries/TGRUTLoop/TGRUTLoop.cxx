@@ -112,7 +112,7 @@ void TGRUTLoop::WriteLoop(){
     if(queue->Size()){
       TRawEvent event = queue->Pop();
       ProcessFromQueue(event);
-      if(!running){
+      if(!running && queue->Size() % 100 == 0){
 	std::cout << "Queue size: " << queue->Size() << "\r" << std::flush;
       }
     } else {

@@ -55,7 +55,7 @@ void TGEBMode3Event::BuildFragments(){
     memcpy((char*)&header, buf.GetData(), sizeof(TRawEvent::GEBMode3Head));
     TRawEvent::SwapMode3Head(header);
 
-    memcpy((char*)&data, buf.GetData(), sizeof(TRawEvent::GEBMode3Data));
+    memcpy((char*)&data, buf.GetData()+sizeof(TRawEvent::GEBMode3Head), sizeof(TRawEvent::GEBMode3Data));
     TRawEvent::SwapMode3Data(data);
 
     //header.GetLength() is number of 32-bit values, and does not include the 0xaaaaaaaa separator.
@@ -64,12 +64,13 @@ void TGEBMode3Event::BuildFragments(){
     // Transfer the timestamp and body
     size_t buf_size = body_size + sizeof(Long_t);
     char* new_buf = (char*)malloc(buf_size);
-    *(Long_t*)new_buf = data.GetCfd();
+    //*(Long_t*)new_buf = data.GetCfd();
+    *(Long_t*)new_buf = data.GetLed();
     memcpy(new_buf + sizeof(Long_t), buf.GetData(), body_size);
-    event.SetData(TSmartBuffer(new_buf, body_size));
+    event.SetData(TSmartBuffer(new_buf, body_size+sizeof(Long_t)));
 
     // Push a copy into the list
-    fragments.push_back(fEvent);
+    fragments.push_back(event);
     buf.Advance(body_size);
   }
 }
