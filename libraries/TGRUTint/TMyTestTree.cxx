@@ -60,13 +60,13 @@ void TMyTestTree::recurse_down(std::vector<std::string>& terminal_leaves, std::s
 
 
 Int_t TMyTestTree::Fill(){
-  if(event_num - last_fill > circular_size * 0.8){
+  event_num = actual_event_num++;
+  std::cout << "Filling at " << event_num << std::endl;
+  Int_t output = TTree::Fill();
+
+  if(actual_event_num - last_fill > circular_size * 0.7){
     RefillHistograms();
   }
-
-  event_num = actual_event_num;
-  Int_t output = TTree::Fill();
-  actual_event_num++;
 
   return output;
 }
@@ -128,26 +128,21 @@ void TMyTestTree::RefillHistograms() {
   directory.cd();
 
   std::cout << "Last Fill: " << last_fill
-            << "\tEvent Num: " << event_num
             << "\tActual Event Num: " << actual_event_num
             << std::endl;
 
   for(auto& pattern : hist_patterns_1d) {
     TTree::Project(pattern.name.c_str(), pattern.varexp.c_str(),
-                   pattern.gate && Form("event_num>%d",last_fill-1));
+                   pattern.gate && Form("event_num>=%d",last_fill));
   }
 
   for(auto& pattern : hist_patterns_2d) {
     TTree::Project(pattern.name.c_str(), (pattern.varexpY + ":" + pattern.varexpX).c_str(), pattern.gate);
   }
 
-  // This doesn't work
-  // The pointer at which new data is inserted is not changed by SetEntries.
-  //SetEntries(0);
-
-  std::cout << "Last Fill: " << last_fill
-            << "\tEvent Num: " << event_num
-            << "\tActual Event Num: " << actual_event_num
-            << std::endl;
+  // std::cout << "Last Fill: " << last_fill
+  //           << "\tEvent Num: " << event_num
+  //           << "\tActual Event Num: " << actual_event_num
+  //           << std::endl;
   last_fill = actual_event_num;
 }
