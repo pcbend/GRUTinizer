@@ -27,17 +27,13 @@ void TBank29::InsertHit(const TDetectorHit& hit){
 }
 
 int TBank29::BuildHits(){
-  //printf("%s\n",__PRETTY_FUNCTION__);
   for(auto& event : raw_data){
-    TGEBMode3Event geb(event);
-    SetTimestamp(geb.GetTimestamp());
-    TMode3 chan;
-    while(geb.GetNextItem(chan,TGRUTOptions::Get()->ExtractWaves())) {
-      InsertHit(chan);
-      chan.Clear();
-    }
+    TGEBEvent* geb = (TGEBEvent*)&event;
+    SetTimestamp(geb->GetTimestamp());
+    TMode3Hit hit;
+    hit.BuildFrom(geb->GetPayloadBuffer());
+    InsertHit(hit);
   }
-  raw_data.clear();
   return Size();
 }
 

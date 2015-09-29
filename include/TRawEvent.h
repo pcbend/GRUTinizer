@@ -48,8 +48,6 @@ protected:
   RawHeader fEventHeader;
   kFileType fFileType;
   TSmartBuffer fBody;
-public:
-  virtual bool FillCondition() {printf("%s",__PRETTY_FUNCTION__); return true;} //!
 
   ClassDef(TRawEvent,0)
 };
