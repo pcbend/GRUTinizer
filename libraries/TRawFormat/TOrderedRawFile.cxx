@@ -10,12 +10,7 @@ ClassImp(TOrderedRawFile);
 TOrderedRawFile::TOrderedRawFile(const char* filename, kFileType file_type)
   : TRawFileIn(filename, file_type),
     depth(50000), oldest_timestamp(-1), newest_timestamp(-1),
-    finished(false) {
-
-  // Currently, only supports GEB file types, not NSCL file types.
-  assert(file_type == GRETINA_MODE2 ||
-	 file_type == GRETINA_MODE3);
-}
+    finished(false) { }
 
 TOrderedRawFile::~TOrderedRawFile() {  }
 

@@ -79,6 +79,11 @@ bool TRawFileIn::Open(const char *filename, kFileType file_type) {
   if(fFile>0)
     Close();
 
+  if(file_type == kFileType::UNKNOWN_FILETYPE){
+    file_type = TGRUTOptions::Get()->DetermineFileType(filename);
+  }
+  SetFileType(file_type);
+
   fFilename = filename;
   std::string pipe;
 
@@ -130,6 +135,11 @@ bool TRawFileOut::Open(const char *filename, kFileType file_type) {
 
   if(fOutFile>0)
     Close();
+
+  if(file_type == kFileType::UNKNOWN_FILETYPE){
+    file_type = TGRUTOptions::Get()->DetermineFileType(filename);
+  }
+  SetFileType(file_type);
 
   fFilename = filename;
   fOutFile = open(filename,O_WRONLY | O_CREAT | O_TRUNC | O_LARGEFILE, 0644);
@@ -273,7 +283,7 @@ int TRawFileIn::FillBuffer(size_t bytes_requested) {
     fLastErrno = 0;
     fLastError = "EOF";
     return -1;
-  } else if ((bytes_read+bytes_to_copy)  < bytes_requested){  
+  } else if ((bytes_read+bytes_to_copy)  < bytes_requested){
     fLastErrno = errno;
     fLastError = strerror(errno);
     return -2;
