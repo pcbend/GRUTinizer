@@ -8,12 +8,12 @@
 
 #include "TObject.h"
 
-#include "TGEBEvent.h"
+#include "TRawEvent.h"
 #include "TRawFile.h"
 
 struct FileEvent {
   TRawFileIn* file;
-  TGEBEvent next_event;
+  TRawEvent next_event;
 
   // Needed for keeping the std::set sorted by timestamp
   bool operator<(const FileEvent& other) const;

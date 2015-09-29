@@ -34,7 +34,7 @@ public:
   const char *GetBody() const;
   TSmartBuffer& GetBuffer(){ return fBody; }
 
-   void SetData(TSmartBuffer body);
+  void SetData(TSmartBuffer body);
 
   bool IsGoodSize() const;
   void SetFileType(kFileType type) { fFileType = type; }
@@ -43,6 +43,7 @@ public:
   Int_t  GetEventType() const;
   Int_t  GetTotalSize() const;
   Int_t  GetBodySize()  const;
+  Long_t GetTimestamp() const;
 
 protected:
   RawHeader fEventHeader;

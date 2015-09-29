@@ -82,9 +82,9 @@ void TGretina::InsertHit(const TDetectorHit& hit){
 int TGretina::BuildHits(){
   //printf("%s\n",__PRETTY_FUNCTION__);
   for(auto& event : raw_data){
-    TGEBEvent geb(event);
-    SetTimestamp(geb.GetTimestamp());
-    const TRawEvent::GEBBankType1* raw = (const TRawEvent::GEBBankType1*)geb.GetPayloadBuffer().GetData();
+    TGEBEvent* geb = (TGEBEvent*)&event;
+    SetTimestamp(geb->GetTimestamp());
+    const TRawEvent::GEBBankType1* raw = (const TRawEvent::GEBBankType1*)geb->GetPayloadBuffer().GetData();
     TGretinaHit hit;
     hit.BuildFrom(*raw);
     InsertHit(hit);
@@ -121,7 +121,7 @@ TVector3 TGretina::CrystalToGlobal(int cryId,Float_t x,Float_t y,Float_t z) {
                 (crmat[detectorPosition][crystalNumber][2][1] * y) +
                 (crmat[detectorPosition][crystalNumber][2][2] * z) +
                 (crmat[detectorPosition][crystalNumber][2][3]) );
-  
+
   return TVector3(xl, yl, zl);
 }
 
