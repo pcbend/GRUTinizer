@@ -109,7 +109,7 @@ void GCanvas::GCanvasInit() {
    // TRootGuiFactory used in the creation of some of the
    // default gui's (canvas,browser,etc).
    //fStatsDisplayed = true;
-   fMarkerMode     = false;
+   fMarkerMode     = true;
 
    //if(gVirtualX->InheritsFrom("TGX11")) {
    //    printf("\tusing x11-like graphical interface.\n");
