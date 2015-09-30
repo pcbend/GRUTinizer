@@ -25,13 +25,13 @@ TMultiRawFile::~TMultiRawFile(){
 void TMultiRawFile::AddFile(TRawEventSource* infile){
   FileEvent f;
   f.file = infile;
-  infile->Read(&f.next_event);
+  infile->Read(f.next_event);
   fFileEvents.insert(f);
   fFileList.insert(infile);
 }
 
 void TMultiRawFile::AddFile(const char* filename){
-  TRawFileIn* file = new TRawFileIn(filename);
+  TRawEventSource* file = TRawEventSource::EventSource(filename);
   if(file->GetLastErrno() == 0){
     AddFile(file);
   } else {
@@ -42,24 +42,20 @@ void TMultiRawFile::AddFile(const char* filename){
   }
 }
 
-int TMultiRawFile::GetEvent(TRawEvent* outevent){
+int TMultiRawFile::GetEvent(TRawEvent& outevent){
   if(fFileEvents.begin() == fFileEvents.end()){
     return -1;
-  }
-
-  if(!outevent){
-    return -2;
   }
 
   // Pop the event, place in output
   FileEvent output = *fFileEvents.begin();
   fFileEvents.erase(fFileEvents.begin());
-  *outevent = output.next_event;
+  outevent = output.next_event;
 
   // If another event exists, put it back into the list
   FileEvent next;
   next.file = output.file;
-  int bytes_read = next.file->Read(&next.next_event);
+  int bytes_read = next.file->Read(next.next_event);
   if(bytes_read > 0){
     fFileEvents.insert(next);
   } else {
@@ -69,10 +65,6 @@ int TMultiRawFile::GetEvent(TRawEvent* outevent){
   }
 
   return output.next_event.GetTotalSize();
-}
-
-bool TMultiRawFile::IsFinished() const{
-  return !fFileEvents.size();
 }
 
 std::string TMultiRawFile::SourceDescription() const{

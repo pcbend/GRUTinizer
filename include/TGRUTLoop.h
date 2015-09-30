@@ -31,8 +31,6 @@ public:
 
   void PrintOutfile();
 
-  //bool FillCondition(TRawEvent& event);
-
   void Status();
 
   TRootOutfile *GetRootOutfile() { return outfile; }

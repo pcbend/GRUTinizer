@@ -1,6 +1,11 @@
 #ifndef TRAWFILE_H
 #define TRAWFILE_H
 
+#include <cstdio>
+#include <string>
+
+#include <zlib.h>
+
 #include "Globals.h"
 #include "TGRUTTypes.h"
 
@@ -11,122 +16,146 @@
 
 class TRawEvent;
 
-class TRawFile {
-public:
-  TRawFile();
-  virtual ~TRawFile();
-
-  virtual bool Open(const char* fname, kFileType file_type) = 0;
-  void Close();
-
-  const char * GetFileName()  const { return fFilename.c_str();  }
-  int          GetLastErrno() const { return fLastErrno;         }
-  const char * GetLastError() const { return fLastError.c_str(); }
-
-  void Print(Option_t *opt = "") const;
-  void Clear(Option_t *opt = "");
-
-  size_t GetFileSize() const;
-  static size_t FindFileSize(const char*);
-
-  const kFileType GetFileType() const               { return fFileType; }
-        void      SetFileType(const kFileType type) { fFileType = type; }
-
-protected:
-
-  std::string fFilename;
-  kFileType   fFileType;
-
-  void Init();
-
-  int         fLastErrno;
-  std::string fLastError;
-
-  mutable size_t fFileSize;
-  size_t fBytesRead;
-  size_t fBytesWritten;
-
-  int     fFile;
-  void*   fGzFile;
-  FILE*   fPoFile;
-  int     fOutFile;
-  void*   fOutGzFile;
-
-  mutable TStopwatch clock;
-
-  ClassDef(TRawFile,0);
-};
-
 class TRawEventSource {
 public:
-  TRawEventSource() : fBytesGiven(0) { }
+  TRawEventSource()
+    : fBytesGiven(0), fLastErrno(0), fIsFinished(0) { }
   virtual ~TRawEventSource() { }
 
-  virtual int Read(TRawEvent* event);
+  static TRawEventSource* EventSource(const char* filename,
+                                      kFileType file_type = kFileType::UNKNOWN_FILETYPE,
+                                      bool is_online = false, bool is_ring = false);
 
-  // Child classes must implement all virtual methods present.
-  // Not using "= 0" because root complains if we do.
-  virtual bool IsFinished() const { }
-  virtual std::string SourceDescription() const { }
-  virtual std::string Status() const { }
-  virtual int GetLastErrno() const { }
-  virtual std::string GetLastError() const { }
+  /// Reads the next event.
+  /** @param event The location of the event to be written.
+      @returns The number of bytes read.
+               If 0 is returned, the source has been read to completion.
+               If a negative number is returned, there was an error while reading.
+   */
+  int Read(TRawEvent& event);
 
+  virtual std::string SourceDescription() const = 0;
+  virtual std::string Status() const = 0;
+
+  virtual int GetLastErrno() const { return fLastErrno; }
+  virtual std::string GetLastError() const { return fLastError; }
+
+  bool IsFinished() const { return fIsFinished; }
   size_t GetBytesGiven() const { return fBytesGiven; }
-  void SetBytesGiven(size_t bytes = 0) { fBytesGiven = bytes; }
+
+protected:
+  void SetLastErrno(int error) { fLastErrno = error; }
+  void SetLastError(std::string error) { fLastError = error; }
 
 private:
-  virtual int GetEvent(TRawEvent*) { }
+  /// Given a pointer to a TRawEvent, read the next event.
+  /** @param event The event to be filled.
+      @return The number of bytes that are read.
+              Should return negative if there are no more events to be read.
+   */
+  virtual int GetEvent(TRawEvent& event) = 0;
 
   size_t fBytesGiven;
+  int fLastErrno;
+  bool fIsFinished;
+  std::string fLastError;
 
   ClassDef(TRawEventSource, 0);
 };
 
-class TRawFileIn  : public TRawFile, public TRawEventSource {
+class TRawEventByteSource : public TRawEventSource {
 public:
-  TRawFileIn() : fBufferSize(8192)  { }
-  TRawFileIn(const char *fname, kFileType file_type);
-  TRawFileIn(const char *fname);
+  TRawEventByteSource(kFileType file_type);
 
-  virtual ~TRawFileIn()      { }
-
-  using TRawEventSource::Read;
-  virtual bool IsFinished() const { return fIsFinished; }
-  virtual std::string SourceDescription() const;
   virtual std::string Status() const;
-  virtual int GetLastErrno() const { return TRawFile::GetLastErrno(); }
-  virtual std::string GetLastError() const { return TRawFile::GetLastError(); }
 
-  bool Open(const char *fname, kFileType file_type);
 
-  void SetBufferSize(size_t buffer_size) { fBufferSize = buffer_size; }
-  size_t GetBufferSize() { return fBufferSize; }
+  kFileType GetFileType() const { return fFileType; }
+  long GetFileSize() const { return fFileSize; }
+
+protected:
+  void SetFileSize(long file_size) { fFileSize = file_size; }
 
 private:
-  virtual int GetEvent(TRawEvent*);
+  /// Given a buffer, fill the buffer with at most `size` bytes.
+  /** @param buf The buffer to be filled.
+      @param size The maximum number of bytes to be read.
+      @return The number of bytes that were read.
+              Should return zero at end of file.
+              Should return a negative value in the case of error.
+   */
+  virtual int ReadBytes(char* buf, size_t size) = 0;
+
+  virtual int GetEvent(TRawEvent& event);
   int FillBuffer(size_t bytes_requested);
 
-  TSmartBuffer fCurrentBuffer;
-  size_t fBufferSize;
-  bool fIsFinished;
+  kFileType fFileType;
+  mutable TStopwatch clock;
 
-  ClassDef(TRawFileIn,0);
+  long fFileSize;
+
+  TSmartBuffer fCurrentBuffer;
+  size_t fDefaultBufferSize;
+
+  ClassDef(TRawEventByteSource,0);
 };
 
-
-class TRawFileOut : public TRawFile {
+class TRawEventFileSource : public TRawEventByteSource {
 public:
-  TRawFileOut() : TRawFile() { }
-  virtual ~TRawFileOut()     { }
+  TRawEventFileSource(const std::string& filename, kFileType file_type);
+  ~TRawEventFileSource();
 
-  TRawFileOut(const char *fname, kFileType file_type);
-  bool Open(const char *fname, kFileType file_type);
-  int Write(TRawEvent*);
+  virtual int ReadBytes(char* buf, size_t size);
 
+  virtual std::string SourceDescription() const;
 private:
+  std::string fFilename;
+  FILE* fFile;
 
-  ClassDef(TRawFileOut,0);
+  ClassDef(TRawEventFileSource,0);
+};
+
+class TRawEventGZipSource : public TRawEventByteSource {
+public:
+  TRawEventGZipSource(const std::string& filename, kFileType file_type);
+  ~TRawEventGZipSource();
+
+  virtual int ReadBytes(char* buf, size_t size);
+
+  virtual std::string SourceDescription() const;
+private:
+  std::string fFilename;
+  FILE* fFile;
+  gzFile* fGzFile;
+
+  ClassDef(TRawEventGZipSource,0);
+};
+
+class TRawEventPipeSource : public TRawEventByteSource {
+public:
+  TRawEventPipeSource(const std::string& command, kFileType file_type);
+  ~TRawEventPipeSource();
+
+  virtual int ReadBytes(char* buf, size_t size);
+
+  virtual std::string SourceDescription() const;
+private:
+  std::string fCommand;
+  FILE* fPipe;
+
+  ClassDef(TRawEventPipeSource,0);
+};
+
+class TRawEventBZipSource : public TRawEventPipeSource {
+public:
+  TRawEventBZipSource(const std::string& filename, kFileType file_type);
+  ~TRawEventBZipSource() { }
+
+  virtual std::string SourceDescription() const;
+private:
+  std::string fFilename;
+
+  ClassDef(TRawEventBZipSource,0);
 };
 
 #endif

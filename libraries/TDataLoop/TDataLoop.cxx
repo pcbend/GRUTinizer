@@ -69,11 +69,9 @@ void TDataLoop::ProcessFile(const char* filename, kFileType file_type){
     std::cerr << "Attempting to process an unknown file type on file " << filename << std::endl;
   }
 
-  TRawFileIn* infile;
+  TRawEventSource* infile = TRawEventSource::EventSource(filename, file_type);
   if(TGRUTOptions::Get()->TimeSortInput()){
-    infile = new TOrderedRawFile(filename, file_type);
-  } else {
-    infile = new TRawFileIn(filename, file_type);
+    infile = new TOrderedRawFile(infile);
   }
 
   if(infile->GetLastErrno() != 0)  {
@@ -94,11 +92,9 @@ void TDataLoop::ProcessFile(const std::vector<std::string>& filenames){
   TMultiRawFile* infile = new TMultiRawFile;
 
   for(auto& filename : filenames){
-    TRawFileIn* infile_segment;
+    TRawEventSource* infile_segment = TRawEventSource::EventSource(filename.c_str());;
     if(TGRUTOptions::Get()->TimeSortInput()){
-      infile_segment = new TOrderedRawFile(filename.c_str());
-    } else {
-      infile_segment = new TRawFileIn(filename.c_str());
+      infile_segment = new TOrderedRawFile(infile_segment);
     }
     infile->AddFile(infile_segment);
   }
@@ -178,7 +174,7 @@ void TDataLoop::ReadLoop() {
 
 void TDataLoop::Iteration() {
   TRawEvent evt;
-  int bytes_read = infile->Read(&evt);
+  int bytes_read = infile->Read(evt);
   if(bytes_read > 0){
     ProcessEvent(evt);
   } else {

@@ -1,28 +1,37 @@
 #ifndef TORDEREDRAWFILE_H
 #define TORDEREDRAWFILE_H
 
+#include <map>
+
+#include "TRawEvent.h"
 #include "TRawFile.h"
-#include "TGEBEvent.h"
 
-class TOrderedRawFile : public TRawFileIn {
+class TOrderedRawFile : public TRawEventSource {
 
-  public:
-    TOrderedRawFile(const char* filename,kFileType file_type = kFileType::UNKNOWN_FILETYPE);
-    ~TOrderedRawFile();
+public:
+  TOrderedRawFile(TRawEventSource* unordered);
+  ~TOrderedRawFile();
 
-    virtual int Read(TRawEvent*);
-    virtual bool IsFinished() const;
-    void SetDepth(int depth) { this->depth = depth; }
-    int GetDepth() { return depth; }
+  void SetDepth(int depth) { this->depth = depth; }
+  int GetDepth() { return depth; }
 
-  private:
-    int depth;
-    long oldest_timestamp,newest_timestamp;
-    bool finished;
+  virtual std::string SourceDescription() const { return unordered->SourceDescription(); }
+  virtual std::string Status()            const { return unordered->Status(); }
+  virtual int GetLastErrno()              const { return unordered->GetLastErrno(); }
+  virtual std::string GetLastError()      const { return unordered->GetLastError(); }
 
-    int fillqueue();
+private:
+  virtual int GetEvent(TRawEvent& event);
 
-    mutable std::multimap<long,TGEBEvent> event_queue;
+  TRawEventSource* unordered;
+
+  int depth;
+  long oldest_timestamp,newest_timestamp;
+  bool finished;
+
+  int fillqueue();
+
+  std::multimap<long,TRawEvent> event_queue;
 
   ClassDef(TOrderedRawFile,0)
 };

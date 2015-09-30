@@ -185,8 +185,15 @@ void TGRUTLoop::HandleBuiltNSCLData(TNSCLEvent& event){
   for(unsigned int i=0; i<built.NumFragments(); i++){
     TNSCLFragment& fragment = built.GetFragment(i);
     kDetectorSystems detector = TDetectorEnv::Get().DetermineSystem(fragment.GetFragmentSourceID());
+    outfile->FillTree("EventTree",fragment.GetFragmentTimestamp());
     outfile->AddRawData(fragment.GetNSCLEvent(), detector);
   }
+}
+
+void TGRUTLoop::HandleUnbuiltNSCLData(TNSCLEvent& event){
+  kDetectorSystems detector = TDetectorEnv::Get().DetermineSystem(event);
+  outfile->FillTree("EventTree", event.GetTimestamp());
+  outfile->AddRawData(event, detector);
 }
 
 void TGRUTLoop::HandleGEBMode3(TGEBEvent& event, kDetectorSystems system){
@@ -195,11 +202,6 @@ void TGRUTLoop::HandleGEBMode3(TGEBEvent& event, kDetectorSystems system){
     TGEBEvent& fragment = built.GetFragment(i);
     outfile->AddRawData(fragment, system);
   }
-}
-
-void TGRUTLoop::HandleUnbuiltNSCLData(TNSCLEvent& event){
-  kDetectorSystems detector = TDetectorEnv::Get().DetermineSystem(event);
-  outfile->AddRawData(event, detector);
 }
 
 void TGRUTLoop::HandleGEBData(TGEBEvent& event){
@@ -239,10 +241,6 @@ void TGRUTLoop::HandleGEBData(TGEBEvent& event){
   }
 
 }
-
-//bool TGRUTLoop::FillCondition(TRawEvent& event){
-//  return true;
-//}
 
 void TGRUTLoop::Status() {
   if(!GetInfile())  {
