@@ -6,7 +6,7 @@
 ClassImp(TBank29)
 
 TBank29::TBank29(){
-  channels = new TClonesArray("TMode3");
+  channels = new TClonesArray("TMode3Hit");
 }
 
 TBank29::~TBank29() {
@@ -27,17 +27,13 @@ void TBank29::InsertHit(const TDetectorHit& hit){
 }
 
 int TBank29::BuildHits(){
-  //printf("%s\n",__PRETTY_FUNCTION__);
   for(auto& event : raw_data){
-    TGEBMode3Event geb(event);
-    SetTimestamp(geb.GetTimestamp());
-    TMode3 chan;
-    while(geb.GetNextItem(chan,TGRUTOptions::Get()->ExtractWaves())) {
-      InsertHit(chan);
-      chan.Clear();
-    }
+    TGEBEvent* geb = (TGEBEvent*)&event;
+    SetTimestamp(geb->GetTimestamp());
+    TMode3Hit hit;
+    hit.BuildFrom(geb->GetPayloadBuffer());
+    InsertHit(hit);
   }
-  raw_data.clear();
   return Size();
 }
 
@@ -45,6 +41,6 @@ void TBank29::Print(Option_t *opt) const { }
 
 void TBank29::Clear(Option_t *opt) {
   TDetector::Clear(opt);
-  channels->Clear(opt);//("TBank29Hit");
+  channels->Clear(opt);//("TMode3Hit");
   raw_data.clear();
 }

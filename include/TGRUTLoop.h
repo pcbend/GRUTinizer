@@ -49,7 +49,7 @@ private:
   void HandleBuiltNSCLData(TNSCLEvent& event);
   void HandleUnbuiltNSCLData(TNSCLEvent& event);
   void HandleGEBData(TGEBEvent& event);
-  void HandleGEBMode3(TGEBEvent& event);
+  void HandleGEBMode3(TGEBEvent& event, kDetectorSystems system);
 
   RawDataQueue* queue;
   TRootOutfile* outfile;

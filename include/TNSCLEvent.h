@@ -36,8 +36,6 @@ class TNSCLEvent : public TRawEvent {
     const char*  GetPayload()        const;
     TSmartBuffer GetPayloadBuffer()  const;
     Int_t        GetPayloadSize()    const;
-  public:
-    bool FillCondition();
   ClassDef(TNSCLEvent,0);
 };
 
@@ -95,11 +93,11 @@ public:
   Int_t          GetBuiltRingItemSize()      const;
 
 private:
-  void BuildFragments() const;
+  void BuildFragments();
 
 
   TNSCLEvent fEvent;
-  mutable std::vector<TNSCLFragment> fragments;
+  std::vector<TNSCLFragment> fragments;
 
   ClassDef(TNSCLBuiltRingItem,0);
 };

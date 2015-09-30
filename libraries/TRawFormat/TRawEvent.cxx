@@ -1,4 +1,4 @@
-
+#include "TRawEvent.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -6,8 +6,10 @@
 #include <string.h>
 #include <assert.h>
 
-#include "TRawEvent.h"
 #include "TString.h"
+
+#include "TGEBEvent.h"
+#include "TNSCLEvent.h"
 
 ClassImp(TRawEvent)
 
@@ -81,6 +83,22 @@ Int_t TRawEvent::GetBodySize() const {
 
   default:
     return 0;
+  }
+
+  return 0;
+}
+
+Long_t TRawEvent::GetTimestamp() const {
+  assert(fFileType != kFileType::UNKNOWN_FILETYPE);
+
+  switch(fFileType){
+  case NSCL_EVT:
+    return ((TNSCLEvent*)this)->GetTimestamp();
+
+  case GRETINA_MODE2:
+  case GRETINA_MODE3:
+    return ((TGEBEvent*)this)->GetTimestamp();
+
   }
 
   return 0;

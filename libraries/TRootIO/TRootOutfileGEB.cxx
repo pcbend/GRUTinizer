@@ -51,8 +51,13 @@ void TRootOutfileGEB::Init(const char* output_filename){
   }
 
   if(TDetectorEnv::S800()){
-     event_tree->Branch("TS800","TS800",&s800);
-     UpdateDetList(kDetectorSystems::S800, s800, "EventTree");
+    event_tree->Branch("TS800","TS800",&s800);
+    UpdateDetList(kDetectorSystems::S800, s800, "EventTree");
+  }
+
+  if(TDetectorEnv::Mode3()){
+    event_tree->Branch("TMode3","TMode3",&mode3);
+    UpdateDetList(kDetectorSystems::MODE3, mode3, "EventTree");
   }
 
 

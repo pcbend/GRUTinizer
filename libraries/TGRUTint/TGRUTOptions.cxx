@@ -52,8 +52,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .description("Input file(s)");
   parser.option("o output", &output_file)
     .description("Root output file");
-  parser.option("x ignore-mode3 ", &fIgnoreMode3)
-    .description("skip over any gretina mode3 data");
+  parser.option("3 include-mode3 ", &fIgnoreMode3)
+    .description("skip over any gretina mode3 data")
+    .default_value(true);
   parser.option("r ring",&input_ring)
     .description("Input ring source (host/ringname)");
   parser.option("l no-logo", &fShowLogo)

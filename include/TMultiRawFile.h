@@ -8,12 +8,12 @@
 
 #include "TObject.h"
 
-#include "TGEBEvent.h"
+#include "TRawEvent.h"
 #include "TRawFile.h"
 
 struct FileEvent {
-  TRawFileIn* file;
-  TGEBEvent next_event;
+  TRawEventSource* file;
+  TRawEvent next_event;
 
   // Needed for keeping the std::set sorted by timestamp
   bool operator<(const FileEvent& other) const;
@@ -28,7 +28,7 @@ public:
   TMultiRawFile(const TMultiRawFile& other) { MayNotUse("TMultiRawFile()"); }
   TMultiRawFile& operator=(const TMultiRawFile& other) { MayNotUse("TMultiRawFile::operator=()"); }
 
-  void AddFile(TRawFileIn* infile);
+  void AddFile(TRawEventSource* infile);
   void AddFile(const char* filename);
 
   bool IsValid() const { return fIsValid; }
@@ -40,7 +40,7 @@ public:
   virtual std::string GetLastError() const;
 
 private:
-  std::set<TRawFileIn*> fFileList; // This list does not get modified frequently
+  std::set<TRawEventSource*> fFileList; // This list does not get modified frequently
   std::set<FileEvent> fFileEvents; // This list is modified frequently
 
 #ifndef __CINT__

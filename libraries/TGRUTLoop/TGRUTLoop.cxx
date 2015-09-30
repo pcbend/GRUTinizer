@@ -112,7 +112,7 @@ void TGRUTLoop::WriteLoop(){
     if(queue->Size()){
       TRawEvent event = queue->Pop();
       ProcessFromQueue(event);
-      if(!running){
+      if(!running && queue->Size() % 100 == 0){
 	std::cout << "Queue size: " << queue->Size() << "\r" << std::flush;
       }
     } else {
@@ -178,11 +178,6 @@ void TGRUTLoop::PrintOutfile(){
 }
 
 void TGRUTLoop::HandleBuiltNSCLData(TNSCLEvent& event){
-  if(event.FillCondition()){
-    outfile->FillTree("EventTree");
-    outfile->Clear();
-  }
-
   TNSCLBuiltRingItem built(event);
   for(unsigned int i=0; i<built.NumFragments(); i++){
     TNSCLFragment& fragment = built.GetFragment(i);
@@ -191,12 +186,15 @@ void TGRUTLoop::HandleBuiltNSCLData(TNSCLEvent& event){
   }
 }
 
-void TGRUTLoop::HandleUnbuiltNSCLData(TNSCLEvent& event){
-  if(event.FillCondition()){
-    outfile->FillTree("EventTree");
-    outfile->Clear();
+void TGRUTLoop::HandleGEBMode3(TGEBEvent& event, kDetectorSystems system){
+  TGEBMode3Event built(event);
+  for(unsigned int i=0; i<built.NumFragments(); i++){
+    TGEBEvent& fragment = built.GetFragment(i);
+    outfile->AddRawData(fragment, system);
   }
+}
 
+void TGRUTLoop::HandleUnbuiltNSCLData(TNSCLEvent& event){
   kDetectorSystems detector = TDetectorEnv::Get().DetermineSystem(event);
   outfile->AddRawData(event, detector);
 }
@@ -212,11 +210,8 @@ void TGRUTLoop::HandleGEBData(TGEBEvent& event){
       break;
     case 2: // Gretina Mode3 data.
       if(!TGRUTOptions::Get()->IgnoreMode3()) {
-        TGEBMode3Event m3event(event);
-        TMode3 temp;
-        while(m3event.GetNextItem(temp,TGRUTOptions::Get()->ExtractWaves())) {
-          gebout->HandleMode3(temp);
-        }
+        gebout->FillTree("EventTree",event.GetTimestamp());
+        HandleGEBMode3(event, kDetectorSystems::MODE3);
       }
       break;
     case 5: // S800 Mode2 equvilant.
@@ -225,7 +220,7 @@ void TGRUTLoop::HandleGEBData(TGEBEvent& event){
       break;
     case 8: // Gretina diag. data.
       gebout->FillTree("EventTree",event.GetTimestamp());
-      gebout->AddRawData(event, kDetectorSystems::BANK29);
+      HandleGEBMode3(event, kDetectorSystems::BANK29);
       break;
     case 10:
       // S800 scaler data....
