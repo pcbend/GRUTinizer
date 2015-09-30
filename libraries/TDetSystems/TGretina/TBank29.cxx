@@ -6,7 +6,7 @@
 ClassImp(TBank29)
 
 TBank29::TBank29(){
-  channels = new TClonesArray("TMode3");
+  channels = new TClonesArray("TMode3Hit");
 }
 
 TBank29::~TBank29() {
@@ -41,6 +41,6 @@ void TBank29::Print(Option_t *opt) const { }
 
 void TBank29::Clear(Option_t *opt) {
   TDetector::Clear(opt);
-  channels->Clear(opt);//("TBank29Hit");
+  channels->Clear(opt);//("TMode3Hit");
   raw_data.clear();
 }
