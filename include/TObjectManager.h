@@ -34,6 +34,8 @@ public:
 
   TH1* GetNext1D(TH1* from, bool forward);
 
+  bool Trackable(TObject* obj);
+
 private:
   static TList objectmanagers;
   TObjectManager(const char* name, const char* title);

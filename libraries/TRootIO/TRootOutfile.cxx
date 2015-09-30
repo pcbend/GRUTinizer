@@ -92,7 +92,7 @@ void TRootOutfile::FillTree(const char *tname, long next_timestamp) {
 
   // If there is no data added, don't fill
   // If there is a build window, don't fill unless the new timestamp is outside the window.
-  if(!elem->has_data || 
+  if(!elem->has_data ||
      (next_timestamp >= 0 &&
       elem->build_window >= 0 &&
       next_timestamp < elem->event_build_window_close)) {
@@ -114,7 +114,7 @@ void TRootOutfile::FillTree(const char *tname, long next_timestamp) {
 void TRootOutfile::FillAllTrees() {
   for(auto& val : trees){
     tree_element& elem = val.second;
-    
+
     if(elem.has_data){
       if(elem.build_det){
 	for(auto& item : det_list) {

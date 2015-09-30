@@ -3,10 +3,11 @@
 #include <iostream>
 
 #include "TClass.h"
+#include "TCutG.h"
+#include "TFile.h"
 #include "TH1.h"
 #include "TInterpreter.h"
 #include "TROOT.h"
-#include "TFile.h"
 
 
 TObjectManager* gManager = NULL;
@@ -53,7 +54,6 @@ TObjectManager *TObjectManager::Open(const char *fname,Option_t *opt) {
 }
 
 void TObjectManager::SaveAndClose(Option_t* option){
-  //std::cout << __PRETTY_FUNCTION__ << ", " << fList->GetSize() << " items known" << std::endl;
   int num_objects = fList->GetSize();
 
 
@@ -113,7 +113,6 @@ void TObjectManager::SaveParent(TObject *parent) {
 
     if(fParentChildren.count(parent)){
       auto& children = fParentChildren[parent];
-
       TFile::cd("/");
       parent->Write();
       if(children.size()){
@@ -143,7 +142,10 @@ void TObjectManager::Print(Option_t* opt) const {
 }
 
 void TObjectManager::Add(TObject* obj, Bool_t replace){
+<<<<<<< HEAD
   //std::cout << __PRETTY_FUNCTION__ << std::endl;
+=======
+>>>>>>> circular_tree
   TDirectory::Add(obj, replace);
 }
 
@@ -152,20 +154,30 @@ void TObjectManager::Append(TObject* obj, Bool_t replace){
     RecursiveRemove(obj);
   }
 
-  TDirectory::Append(obj, replace);
-  fParentChildren[obj];
-  ObjectAppended(obj);
+  if(Trackable(obj)){
+    TDirectory::Append(obj, replace);
+    fParentChildren[obj];
+    ObjectAppended(obj);
+  }
 }
 
 void TObjectManager::ObjectAppended(TObject* obj) {
+<<<<<<< HEAD
   //std::cout << __PRETTY_FUNCTION__ << "\t" << (void*)obj << std::endl;
+=======
+>>>>>>> circular_tree
   Emit("ObjectAppended(TObject*)",(long)obj);
 }
 
 void TObjectManager::AddRelationship(TObject* parent, TObject* child){
-  if(parent && child){
+  if(Trackable(parent) && Trackable(child)){
     fParentChildren[parent].push_back(child);
   }
+}
+
+bool TObjectManager::Trackable(TObject* obj){
+  return obj && (obj->InheritsFrom(TH1::Class()) ||
+                 obj->InheritsFrom(TCutG::Class()));
 }
 
 
