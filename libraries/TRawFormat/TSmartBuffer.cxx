@@ -98,6 +98,7 @@ void TSmartBuffer::Advance(size_t dist) {
 void TSmartBuffer::Print(Option_t* opt) const {
   TString options(opt);
   TRegexp regexp("0x[0-9a-f][0-9a-f][0-9a-f][0-9a-f]");
+  //TRegexp regexp2("0x[0-9a-f][0-9a-f][0-9a-f][0-9a-f]");
   if(!options.Contains("bodyonly")) {
     std::cout << "TSmartBuffer allocated at " << (void*)fAllocatedLocation << ", "
               << "currently pointed at " << (void*)fData << ", "
@@ -110,10 +111,19 @@ void TSmartBuffer::Print(Option_t* opt) const {
               << std::endl;
 
     // Full hexdump of the buffer contents
-    TString highlight_string = options(regexp);
-    unsigned short highlight = 0;
-    if(highlight_string.Length()) {
-      highlight = strtol(highlight_string.Data(),0,0);
+    //TString highlight_string = options(regexp);
+    std::vector<TString> highlight_strings;
+    while(options.Contains(regexp)) { 
+      highlight_strings.push_back(options(regexp));
+      options.ReplaceAll(highlight_strings.back(),"");
+    }
+    //unsigned short highlight = 0;
+    std::vector<unsigned short> highlight;
+    if(highlight_strings.size()) { //Length()) {
+      //highlight = strtol(highlight_string.Data(),0,0);
+      for(int j=0;j<highlight_strings.size();j++) {
+        highlight.push_back(strtol(highlight_strings.at(j).Data(),0,0));
+      }
     }
     if(options.Contains("all")){
       printf("\t");
@@ -123,9 +133,16 @@ void TSmartBuffer::Print(Option_t* opt) const {
           printf("\n\t");
         }
         unsigned int value = *(unsigned short*)(GetData()+x);
-        if(highlight>0 && highlight==value) {printf(DRED);}
+        //if(highlight>0 && highlight==value) {printf(DRED);}
+        bool found = false;
+        for(int j=0;j<highlight.size();j++) {
+          if(highlight.at(j) == value)
+            found = true;
+        }
+        if(found) {printf(DRED);}
         printf("0x%04x  ",value);
-        if(highlight>0 && highlight==value) {printf(RESET_COLOR);}
+        if(found) {printf(RESET_COLOR);}
+        //if(highlight>0 && highlight==value) {printf(RESET_COLOR);}
 
       }
       if(GetSize()%2 == 1){
