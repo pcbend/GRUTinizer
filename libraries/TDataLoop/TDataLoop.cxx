@@ -16,6 +16,13 @@ TDataLoop* TDataLoop::Instance() {
   return data_loop;
 }
 
+void TDataLoop::DeleteInstance() {
+  if(data_loop){
+    delete data_loop;
+    data_loop = NULL;
+  }
+}
+
 TDataLoop::TDataLoop()
   : running(false), initialized(false), paused(false),
     infile(NULL) {

@@ -3,8 +3,8 @@
 
 #include "TNamed.h"
 
-#include "TRootOutfile.h"
 #include "TDataLoop.h"
+#include "TRootOutfile.h"
 
 // So that rootcint doesn't see this
 class RawDataQueue;

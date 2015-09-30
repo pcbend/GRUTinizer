@@ -9,7 +9,8 @@
 
 class TOnlineTree : public TTree {
 public:
-  TOnlineTree(const char* name = "circular", int circular_size = 32768);
+  TOnlineTree(const char* name = "circular", const char* title = "circular",
+              int circular_size = 32768);
   virtual ~TOnlineTree();
 
   void AddDetectorBranch(TDetector** det, const char* name);

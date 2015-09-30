@@ -38,6 +38,8 @@ public:
   bool CommandServer()      const { return fCommandServer; }
   bool ExtractWaves()       const { return fExtractWaves;  }
 
+  bool IsOnline()           const { return fIsOnline; }
+
   bool TimeSortInput()      const { return fTimeSortInput; }
 
   bool ShouldExitImmediately() const { return fShouldExit; }
@@ -74,6 +76,7 @@ private:
   bool fIgnoreMode3;
   bool fCommandServer;
   bool fExtractWaves;
+  bool fIsOnline;
 
   bool fTimeSortInput;
 

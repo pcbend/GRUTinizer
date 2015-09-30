@@ -26,13 +26,19 @@ TRootOutfileNSCL::~TRootOutfileNSCL() {
 }
 
 void TRootOutfileNSCL::Init(const char* output_filename){
-  if(output_filename==NULL){
-    output_filename = "myNSCLoutput.root";
-  }
-  SetOutfile(output_filename);
+  bool is_online = TGRUTOptions::Get()->IsOnline();
 
-  TTree *event_tree  = AddTree("EventTree","Events, yo.",true);
-  TTree *scaler_tree = AddTree("ScalerTree","I can count.",false);
+  if(is_online){
+    SetOutfile(NULL);
+  } else {
+    if(output_filename==NULL){
+      output_filename = "my_output.root";
+    }
+    SetOutfile(output_filename);
+  }
+
+  TTree *event_tree  = AddTree("EventTree","Events, yo.",true, 1000, is_online);
+  TTree *scaler_tree = AddTree("ScalerTree","I can count.",false, -1, is_online);
 
   if(TDetectorEnv::Janus()){
     event_tree->Branch("TJanus","TJanus",&janus);

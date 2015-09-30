@@ -25,6 +25,9 @@ TGRUTLoop::TGRUTLoop(){
 
 TGRUTLoop::~TGRUTLoop(){
   delete queue;
+  if(outfile){
+    delete outfile;
+  }
 }
 
 TGRUTLoop* TGRUTLoop::Get(){
@@ -113,7 +116,7 @@ void TGRUTLoop::WriteLoop(){
       TRawEvent event = queue->Pop();
       ProcessFromQueue(event);
       if(!running && queue->Size() % 100 == 0){
-	std::cout << "Queue size: " << queue->Size() << "\r" << std::flush;
+	std::cout << "Queue size: " << queue->Size() << "     \r" << std::flush;
       }
     } else {
       std::this_thread::sleep_for(std::chrono::milliseconds(10));

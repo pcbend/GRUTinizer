@@ -40,8 +40,6 @@ private:
   // TPhoswall* phoswall;
 
 
-  TFile* outfile;
-
   ClassDef(TRootOutfileGEB, 0);
 };
 

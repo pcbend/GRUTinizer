@@ -142,10 +142,6 @@ void TObjectManager::Print(Option_t* opt) const {
 }
 
 void TObjectManager::Add(TObject* obj, Bool_t replace){
-<<<<<<< HEAD
-  //std::cout << __PRETTY_FUNCTION__ << std::endl;
-=======
->>>>>>> circular_tree
   TDirectory::Add(obj, replace);
 }
 
@@ -162,10 +158,6 @@ void TObjectManager::Append(TObject* obj, Bool_t replace){
 }
 
 void TObjectManager::ObjectAppended(TObject* obj) {
-<<<<<<< HEAD
-  //std::cout << __PRETTY_FUNCTION__ << "\t" << (void*)obj << std::endl;
-=======
->>>>>>> circular_tree
   Emit("ObjectAppended(TObject*)",(long)obj);
 }
 

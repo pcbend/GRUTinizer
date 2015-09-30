@@ -13,8 +13,8 @@
 
 #include "TPreserveGDirectory.h"
 
-TOnlineTree::TOnlineTree(const char* name, int circular_size)
-  : TTree(name,name), directory(Form("%s_dir",name),Form("%s_dir",name)),
+TOnlineTree::TOnlineTree(const char* name, const char* title, int circular_size)
+  : TTree(name,title), directory(Form("%s_dir",name),Form("%s_dir",name)),
     event_num(0), actual_event_num(0), last_fill(0),
     circular_size(circular_size), saved_dir(NULL) {
   SetDirectory(0);

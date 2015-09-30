@@ -146,7 +146,7 @@ void TGRUTint::ApplyOptions() {
   if(opt->RawInputFiles().size()==1 && opt->SortRaw()){
     std::string filename = opt->RawInputFiles()[0];
     std::string outfile = opt->OutputFile();
-    if(!outfile.length()){
+    if(!outfile.length() && !opt->IsOnline()){
       outfile = opt->GenerateOutputFilename(filename);
     }
     TGRUTLoop::Get()->ProcessFile(filename.c_str(), outfile.c_str());
@@ -155,7 +155,7 @@ void TGRUTint::ApplyOptions() {
   } else if (opt->RawInputFiles().size()>1 && opt->SortRaw()){
     std::vector<std::string> filenames = opt->RawInputFiles();
     std::string outfile = opt->OutputFile();
-    if(!outfile.length()){
+    if(!outfile.length() && !opt->IsOnline()){
       outfile = opt->GenerateOutputFilename(filenames);
     }
     TGRUTLoop::Get()->ProcessFile(filenames, outfile.c_str());
@@ -284,7 +284,7 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
 
   if(!sline.CompareTo("clear")) {
     return TRint::ProcessLine(".! clear");
-  } 
+  }
 
   Ssiz_t index;
 
@@ -354,6 +354,7 @@ void TGRUTint::Terminate(Int_t status){
     fCommandServer = NULL;
   }
   TGRUTLoop::Get()->Stop();
+  TDataLoop::DeleteInstance();
 
   TIter iter(TObjectManager::GetListOfManagers());
   while(TObjectManager *om = (TObjectManager*)iter.Next()) {

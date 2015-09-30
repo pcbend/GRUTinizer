@@ -19,6 +19,8 @@ class TRawEventSource;
 class TDataLoop : public TNamed {
 public:
   static TDataLoop* Instance();
+  static void DeleteInstance();
+
   virtual ~TDataLoop();
 
   void ProcessFile(const char* filename, kFileType file_type = kFileType::UNKNOWN_FILETYPE);
