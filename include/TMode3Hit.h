@@ -24,17 +24,17 @@ class TMode3Hit : public TDetectorHit {
 
     void     BuildFrom(TSmartBuffer buf);
 
-    Int_t    GetChannel()   { return (board_id & 0x000f);     }
-    Int_t    GetVME()       { return (board_id & 0x0030)>>4;    }
-    Int_t    GetCrystal()   { return (board_id & 0x00c0)>>6;    }
-    Int_t    GetHole()      { return (board_id & 0x1f00)>>8;        }
-    Int_t    GetSegmentId() { return GetVME()*10 + GetChannel(); }
-    Int_t    GetCrystalId() { return GetHole()*4 + GetCrystal(); }
-    Int_t    GetWaveSize()  { return wavesize; }
-    Short_t* GetWave()      { return wave;     }
+    Int_t    GetChannel()   const { return (board_id & 0x000f);     }
+    Int_t    GetVME()       const { return (board_id & 0x0030)>>4;    }
+    Int_t    GetCrystal()   const { return (board_id & 0x00c0)>>6;    }
+    Int_t    GetHole()      const { return (board_id & 0x1f00)>>8;        }
+    Int_t    GetSegmentId() const { return GetVME()*10 + GetChannel(); }
+    Int_t    GetCrystalId() const { return GetHole()*4 + GetCrystal(); }
+    Int_t    GetWaveSize()  const { return wavesize; }
+    Short_t* GetWave()      const { return wave;     }
 
-    Long_t   GetLed()       { return led; }
-    Long_t   GetCfd()       { return cfd; }
+    Long_t   GetLed()       const { return led; }
+    Long_t   GetCfd()       const { return cfd; }
 
 
     static void SetExtractWaves(bool flag=true) { fExtractWaves = flag;  }
