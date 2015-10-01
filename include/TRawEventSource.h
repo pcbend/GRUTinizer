@@ -1,20 +1,17 @@
-#ifndef TRAWFILE_H
-#define TRAWFILE_H
+#ifndef _TRAWEVENTSOURCE_H_
+#define _TRAWEVENTSOURCE_H_
+
+#include "Globals.h"
 
 #include <cstdio>
 #include <string>
 
-#include <zlib.h>
-
-#include "Globals.h"
-#include "TGRUTTypes.h"
-
-#include "TObject.h"
 #include "TStopwatch.h"
 
+#include "TGRUTTypes.h"
+#include "TRawEvent.h"
 #include "TSmartBuffer.h"
 
-class TRawEvent;
 
 class TRawEventSource {
 public:
@@ -63,6 +60,7 @@ private:
   ClassDef(TRawEventSource, 0);
 };
 
+
 class TRawEventByteSource : public TRawEventSource {
 public:
   TRawEventByteSource(kFileType file_type);
@@ -100,36 +98,6 @@ private:
   ClassDef(TRawEventByteSource,0);
 };
 
-class TRawEventFileSource : public TRawEventByteSource {
-public:
-  TRawEventFileSource(const std::string& filename, kFileType file_type);
-  ~TRawEventFileSource();
-
-  virtual int ReadBytes(char* buf, size_t size);
-
-  virtual std::string SourceDescription() const;
-private:
-  std::string fFilename;
-  FILE* fFile;
-
-  ClassDef(TRawEventFileSource,0);
-};
-
-class TRawEventGZipSource : public TRawEventByteSource {
-public:
-  TRawEventGZipSource(const std::string& filename, kFileType file_type);
-  ~TRawEventGZipSource();
-
-  virtual int ReadBytes(char* buf, size_t size);
-
-  virtual std::string SourceDescription() const;
-private:
-  std::string fFilename;
-  FILE* fFile;
-  gzFile* fGzFile;
-
-  ClassDef(TRawEventGZipSource,0);
-};
 
 class TRawEventPipeSource : public TRawEventByteSource {
 public:
@@ -146,16 +114,4 @@ private:
   ClassDef(TRawEventPipeSource,0);
 };
 
-class TRawEventBZipSource : public TRawEventPipeSource {
-public:
-  TRawEventBZipSource(const std::string& filename, kFileType file_type);
-  ~TRawEventBZipSource() { }
-
-  virtual std::string SourceDescription() const;
-private:
-  std::string fFilename;
-
-  ClassDef(TRawEventBZipSource,0);
-};
-
-#endif
+#endif /* _TRAWEVENTSOURCE_H_ */

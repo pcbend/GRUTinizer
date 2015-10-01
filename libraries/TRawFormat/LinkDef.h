@@ -1,4 +1,4 @@
-// TRawFile.h TRawEvent.h TSmartBuffer.h TMultiRawFile.h TOrderedRawFile.h
+// TRawEventSource.h TRawEvent.h TRawEventGZipSource.h TRawEventBZipSource.h TRawEventFileSource.h TSmartBuffer.h TMultiRawFile.h TOrderedRawFile.h
 
 #ifdef __CINT__
 

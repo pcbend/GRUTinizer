@@ -3,7 +3,7 @@
 #include <chrono>
 #include <thread>
 
-#include "TRawFile.h"
+#include "TRawEventSource.h"
 
 #include "RawDataQueue.h"
 #include "TDetectorEnv.h"

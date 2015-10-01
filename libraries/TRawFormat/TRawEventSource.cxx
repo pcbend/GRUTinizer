@@ -1,23 +1,11 @@
-#include "TRawFile.h"
-
-#include <cstdio>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <assert.h>
-#include <cstdlib>
-#include <fstream>
-#include <sstream>
-
-#include <Rtypes.h>
+#include "TRawEventSource.h"
 
 #include "TString.h"
 
-#include "FileSize.h"
-#include "TRawEvent.h"
 #include "TGRUTOptions.h"
+#include "TRawEventBZipSource.h"
+#include "TRawEventFileSource.h"
+#include "TRawEventGZipSource.h"
 
 ClassImp(TRawEventSource);
 
@@ -153,55 +141,6 @@ int TRawEventByteSource::FillBuffer(size_t bytes_requested) {
   }
 }
 
-TRawEventFileSource::TRawEventFileSource(const std::string& filename, kFileType file_type)
-  : TRawEventByteSource(file_type), fFilename(filename) {
-  fFile = fopen(filename.c_str(),"rb");
-  SetFileSize(FindFileSize(filename.c_str()));
-}
-
-TRawEventFileSource::~TRawEventFileSource() {
-  fclose(fFile);
-}
-
-int TRawEventFileSource::ReadBytes(char* buf, size_t size){
-  size_t output = fread(buf, 1, size, fFile);
-  if(output != size){
-    SetLastErrno(ferror(fFile));
-    SetLastError(strerror(GetLastErrno()));
-  }
-  return output;
-}
-
-std::string TRawEventFileSource::SourceDescription() const {
-  return "File: " + fFilename;
-}
-
-TRawEventGZipSource::TRawEventGZipSource(const std::string& filename, kFileType file_type)
-  : TRawEventByteSource(file_type), fFilename(filename) {
-  fFile = fopen(filename.c_str(),"rb");
-  fGzFile = new gzFile;
-  *fGzFile = gzdopen(fileno(fFile),"rb");
-}
-
-TRawEventGZipSource::~TRawEventGZipSource() {
-  gzclose(*fGzFile);
-  delete fGzFile;
-  fclose(fFile);
-}
-
-int TRawEventGZipSource::ReadBytes(char* buf, size_t size){
-  size_t output = gzread(*fGzFile, buf, size);
-  if(output != size){
-    SetLastErrno(errno);
-    SetLastError(strerror(GetLastErrno()));
-  }
-  return output;
-}
-
-std::string TRawEventGZipSource::SourceDescription() const {
-  return "GZip File: " + fFilename;
-}
-
 TRawEventPipeSource::TRawEventPipeSource(const std::string& command, kFileType file_type)
   : TRawEventByteSource(file_type), fCommand(command) {
   fPipe = popen(command.c_str(),"r");
@@ -222,12 +161,4 @@ int TRawEventPipeSource::ReadBytes(char* buf, size_t size){
 
 std::string TRawEventPipeSource::SourceDescription() const {
   return "Pipe: " + fCommand;
-}
-
-TRawEventBZipSource::TRawEventBZipSource(const std::string& filename, kFileType file_type)
-  : TRawEventPipeSource("bzip2 -dc " + filename, file_type),
-    fFilename(filename) { }
-
-std::string TRawEventBZipSource::SourceDescription() const {
-  return "BZip File: " + fFilename;
 }

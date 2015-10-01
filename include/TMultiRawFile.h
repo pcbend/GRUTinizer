@@ -9,7 +9,7 @@
 #include "TObject.h"
 
 #include "TRawEvent.h"
-#include "TRawFile.h"
+#include "TRawEventSource.h"
 
 struct FileEvent {
   TRawEventSource* file;

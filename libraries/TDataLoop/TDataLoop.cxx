@@ -4,7 +4,7 @@
 #include "TGRUTOptions.h"
 #include "TMultiRawFile.h"
 #include "TOrderedRawFile.h"
-#include "TRawFile.h"
+#include "TRawEventSource.h"
 
 TDataLoop* TDataLoop::data_loop = NULL;
 
