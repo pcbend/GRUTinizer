@@ -9,7 +9,7 @@ NamespaceImp(GRootFunctions);
 
 Double_t GRootFunctions::PolyBg(Double_t *dim, Double_t *par, Int_t order) {
   Double_t result = 0.0;
-  for(Int_t i=0;i<order;i++)
+  for(Int_t i=0;i<=order;i++)
     result += par[i]*TMath::Power(dim[0]-par[order+1],i);
   return result;
 }
@@ -20,15 +20,18 @@ Double_t GRootFunctions::StepFunction(Double_t *dim, Double_t *par) {
   //  -par[0]: height of peak
   //  -par[1]: centroid of peak
   //  -par[2]: sigma of peak
+  //  -par[4]: relative height of skewed gaus to gaus
   //  -par[5]: size of step in step function.
 
   Double_t x       = dim[0];
   Double_t height  = par[0];
   Double_t cent    = par[1];
   Double_t sigma   = par[2];
+  Double_t R       = par[4];
   Double_t step    = par[5];
 
-  return TMath::Abs(step)*height/100.0*TMath::Erfc((x-cent)/(TMath::Sqrt(2.0)*sigma));
+  //return TMath::Abs(step)*height/100.0*TMath::Erfc((x-cent)/(TMath::Sqrt(2.0)*sigma));
+  return TMath::Abs(step)*TMath::Erfc((x-cent)/(TMath::Sqrt(2.0)*sigma));
 
 }
 
