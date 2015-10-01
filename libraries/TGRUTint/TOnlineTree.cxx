@@ -13,6 +13,9 @@
 
 #include "TPreserveGDirectory.h"
 
+TOnlineTree* online_events = NULL;
+TOnlineTree* online_scalers = NULL;
+
 TOnlineTree::TOnlineTree(const char* name, const char* title, int circular_size)
   : TTree(name,title), directory(Form("%s_dir",name),Form("%s_dir",name)),
     event_num(0), actual_event_num(0), last_fill(0),
@@ -21,6 +24,12 @@ TOnlineTree::TOnlineTree(const char* name, const char* title, int circular_size)
   SetCircular(circular_size);
 
   Branch("event_num", &event_num, "event_num/L");
+
+  if(!strcmp(name,"EventTree")){
+    online_events = this;
+  } else if(!strcmp(name,"ScalerTree")){
+    online_scalers = this;
+  }
 }
 
 TOnlineTree::~TOnlineTree() { }

@@ -150,7 +150,8 @@ void TDataLoop::Stop() {
     running = false;
 
     // If this is not running from the read thread, wait for it to close.
-    if(std::this_thread::get_id() != read_thread.get_id()){
+    if(std::this_thread::get_id() != read_thread.get_id() &&
+       read_thread.joinable()){
       read_thread.join();
     }
 

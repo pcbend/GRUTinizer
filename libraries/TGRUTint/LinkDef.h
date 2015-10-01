@@ -20,5 +20,7 @@
 #pragma link C++ class TOnlineTree+;
 
 #pragma link C++ global gResponse;
+#pragma link C++ global online_events;
+#pragma link C++ global online_scalers;
 
 #endif

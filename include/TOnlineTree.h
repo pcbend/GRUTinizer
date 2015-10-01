@@ -76,4 +76,7 @@ private:
   ClassDef(TOnlineTree,0);
 };
 
+extern TOnlineTree* online_events;
+extern TOnlineTree* online_scalers;
+
 #endif /* _TONLINETREE_H_ */

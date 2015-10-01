@@ -114,7 +114,13 @@ void TGRUTLoop::WriteLoop(){
   while(running || queue->Size()){
     if(queue->Size()){
       TRawEvent event = queue->Pop();
-      ProcessFromQueue(event);
+
+
+      if(running || !TGRUTOptions::Get()->IsOnline()){
+        ProcessFromQueue(event);
+      }
+
+
       if(!running && queue->Size() % 100 == 0){
 	std::cout << "Queue size: " << queue->Size() << "     \r" << std::flush;
       }
@@ -128,6 +134,7 @@ void TGRUTLoop::WriteLoop(){
 }
 
 void TGRUTLoop::ProcessFromQueue(TRawEvent& event){
+
   if(event.GetFileType()==kFileType::NSCL_EVT) {
     TNSCLEvent nscl_event(event);
     switch(event.GetEventType()) {
