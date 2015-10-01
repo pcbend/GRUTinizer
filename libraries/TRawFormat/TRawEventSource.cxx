@@ -1,11 +1,15 @@
 #include "TRawEventSource.h"
 
+#include <cassert>
+
 #include "TString.h"
 
 #include "TGRUTOptions.h"
 #include "TRawEventBZipSource.h"
 #include "TRawEventFileSource.h"
 #include "TRawEventGZipSource.h"
+#include "TRawEventRingSource.h"
+#include "TRawEventOnlineFileSource.h"
 
 ClassImp(TRawEventSource);
 
@@ -32,12 +36,29 @@ namespace{
   }
 }
 
-TRawEventSource* TRawEventSource::EventSource(const char* filename, kFileType file_type,
-                                              bool is_online, bool is_ring){
+kFileType TRawEventSource::DefaultFileType() {
+  return TGRUTOptions::Get()->DefaultFileType();
+}
+
+TRawEventSource* TRawEventSource::EventSource(const char* filename,
+                                              bool is_online, bool is_ring,
+                                              kFileType file_type){
   if(file_type == kFileType::UNKNOWN_FILETYPE){
+    if(is_ring){
+      std::cerr << "File type determination does not work for ring sources" << std::endl;
+      assert(false);
+    }
     file_type = TGRUTOptions::Get()->DetermineFileType(filename);
   }
 
+  // If we are reading active data, either from a ring, or from an in-progress file
+  if(is_ring){
+    return new TRawEventRingSource(filename, file_type);
+  } else if (is_online){
+    return new TRawEventOnlineFileSource(filename, file_type);
+  }
+
+  // If it is offline data, check if it needs to be unpacked.
   if(hasSuffix(filename,".bz2")){
     return new TRawEventBZipSource(filename, file_type);
   } else if (hasSuffix(filename,".gz")){

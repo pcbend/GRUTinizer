@@ -45,7 +45,9 @@ public:
   bool ShouldExitImmediately() const { return fShouldExit; }
   bool MakeBackupFile() const { return fMakeBackupFile; }
 
-  kFileType   DetermineFileType(const std::string& filename);
+  kFileType   DefaultFileType() const { return fDefaultFileType; }
+  kFileType   DetermineFileType(const std::string& filename) const;
+
   std::string GenerateOutputFilename(const std::string& filename);
   std::string GenerateOutputFilename(const std::vector<std::string>& filename);
 
@@ -68,6 +70,7 @@ private:
 
   int fCommandPort;
 
+  kFileType fDefaultFileType;
   bool fExitAfterSorting;
   bool fHelp;
   bool fShowLogo;

@@ -9,6 +9,7 @@
 #include "TStopwatch.h"
 
 #include "TGRUTTypes.h"
+#include "TGRUTOptions.h"
 #include "TRawEvent.h"
 #include "TSmartBuffer.h"
 
@@ -20,8 +21,8 @@ public:
   virtual ~TRawEventSource() { }
 
   static TRawEventSource* EventSource(const char* filename,
-                                      kFileType file_type = kFileType::UNKNOWN_FILETYPE,
-                                      bool is_online = false, bool is_ring = false);
+                                      bool is_online = false, bool is_ring = false,
+                                      kFileType file_type = DefaultFileType());
 
   /// Reads the next event.
   /** @param event The location of the event to be written.
@@ -51,6 +52,9 @@ private:
               Should return negative if there are no more events to be read.
    */
   virtual int GetEvent(TRawEvent& event) = 0;
+
+  static kFileType DefaultFileType();
+
 
   size_t fBytesGiven;
   int fLastErrno;

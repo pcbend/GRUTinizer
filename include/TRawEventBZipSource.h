@@ -11,6 +11,7 @@ public:
   ~TRawEventBZipSource() { }
 
   virtual std::string SourceDescription() const;
+
 private:
   std::string fFilename;
 
