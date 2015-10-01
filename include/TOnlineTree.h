@@ -29,6 +29,7 @@ public:
   virtual Int_t Fill();
 
   std::vector<std::string> GetStringLeaves();
+  TObject* GetObjectStringLeaves();
 
   void cd(){ saved_dir = gDirectory; directory.cd(); }
   void popd() {

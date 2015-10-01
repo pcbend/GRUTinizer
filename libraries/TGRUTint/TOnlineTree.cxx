@@ -8,6 +8,7 @@
 #include "TH1.h"
 #include "TH2.h"
 #include "TObject.h"
+#include "TObjString.h"
 #include "TRandom.h"
 #include "TRegexp.h"
 
@@ -36,6 +37,14 @@ TOnlineTree::~TOnlineTree() { }
 
 void TOnlineTree::AddDetectorBranch(TDetector** det, const char* name){
   Branch(name, name, det);
+}
+
+TObject* TOnlineTree::GetObjectStringLeaves(){
+  std::stringstream ss;
+  for(auto& elem : GetStringLeaves()){
+    ss << elem << "\n";
+  }
+  return new TObjString(ss.str().c_str());
 }
 
 std::vector<std::string> TOnlineTree::GetStringLeaves() {
