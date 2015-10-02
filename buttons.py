@@ -10,5 +10,4 @@ else:
 
 
 window = MainWindow('localhost',port)
-window.window.geometry("350x700")
 window.Run()
