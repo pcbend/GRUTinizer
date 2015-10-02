@@ -16,6 +16,7 @@ class MainWindow(object):
         self.host = host
         self.port = port
 
+        self.load_library('libGui.so',False)
         self.load_library('libGROOT.so')
 
         self.window = tk.Tk()
