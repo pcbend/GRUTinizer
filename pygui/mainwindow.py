@@ -28,16 +28,18 @@ class MainWindow(object):
         self.plotlocation.set(1)
 
         self.canvases = []
-        self.files = []
+        self.files = {}
 
         self._setup_GUI()
 
     def _load_icons(self):
         self.icons = {}
         self.icons['1d hist'] = tk.PhotoImage(
-            file = os.path.join(os.path.dirname(__file__),'resources','h1_t.ppm'))
+            file = os.path.join(os.path.dirname(__file__),'resources','h1_t.gif'))
         self.icons['2d hist'] = tk.PhotoImage(
-            file = os.path.join(os.path.dirname(__file__),'resources','h2_t.ppm'))
+            file = os.path.join(os.path.dirname(__file__),'resources','h2_t.gif'))
+        self.icons['tfile'] = tk.PhotoImage(
+            file = os.path.join(os.path.dirname(__file__),'resources','rootdb_t.gif'))
 
     def _setup_GUI(self):
         self.window.geometry('350x700')
@@ -143,6 +145,23 @@ class MainWindow(object):
     def _MakeHistView(self,parent):
         self.hists = ttk.Treeview(parent)
         self.hists.pack(fill=tk.BOTH,expand=True)
+        self.hists.bind("<Double-1>", self.OnHistClick)
+
+    def OnHistClick(self,event):
+        hist_name = event.widget.selection()[0]
+        try:
+            file_name = event.widget.parent(hist_name)
+        except TclError:
+            return
+
+        try:
+            hist = self.files[file_name].Get(hist_name)
+        except KeyError:
+            return
+
+        if not filter(None,self.canvases):
+            self.canvases.append(ROOT.GCanvas())
+        hist.Draw()
 
     def run_command(self, command):
         return run_command(command, self.host, self.port)
@@ -156,9 +175,10 @@ class MainWindow(object):
             return
 
         tfile = ROOT.TFile(filename)
-        self.files.append(tfile)
+        self.files[filename] = tfile
 
-        tree_id = self.hists.insert('','end',filename, text=filename)
+        icon = self.icons['tfile']
+        tree_id = self.hists.insert('','end',filename, text=filename, image=icon)
         for key in tfile.GetListOfKeys():
             obj = key.ReadObj()
             hist_name = obj.GetName()
