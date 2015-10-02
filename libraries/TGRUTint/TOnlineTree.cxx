@@ -56,10 +56,6 @@ std::vector<std::string> TOnlineTree::GetStringLeaves() {
     recurse_down(output, obj->GetName(), (TBranch*)obj);
   }
 
-  for(auto& name : output){
-    std::cout << name << std::endl;
-  }
-
   return output;
 }
 

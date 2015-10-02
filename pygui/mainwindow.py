@@ -18,6 +18,7 @@ class MainWindow(object):
 
         self.load_library('libGui.so',False)
         self.load_library('libGROOT.so')
+        ROOT.GRootGuiFactory.Init()
 
         self.window = tk.Tk()
         self._load_icons()
