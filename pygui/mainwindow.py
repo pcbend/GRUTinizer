@@ -29,11 +29,44 @@ class MainWindow(object):
         self.window = tk.Tk()
         self._load_icons()
 
-
         self.refreshrate  = tk.IntVar()
         self.refreshrate.set(-1)
         self.plotlocation = tk.StringVar()
         self.plotlocation.set('NewCanvas')
+
+        self.predefinedzones = tk.StringVar()
+        self.predefinedzones.set('1x1')
+        self.zone_rows = 1
+        self.zone_cols = 1
+
+        self.optstat_name      = tk.BooleanVar()
+        self.optstat_entries   = tk.BooleanVar()
+        self.optstat_mean      = tk.BooleanVar()
+        self.optstat_mean_err  = tk.BooleanVar()
+        self.optstat_rms       = tk.BooleanVar()
+        self.optstat_rms_err   = tk.BooleanVar()
+        self.optstat_underflow = tk.BooleanVar()
+        self.optstat_overflow  = tk.BooleanVar()
+        self.optstat_integral  = tk.BooleanVar()
+        self.optstat_skew      = tk.BooleanVar()
+        self.optstat_skew_err  = tk.BooleanVar()
+        self.optstat_kurt      = tk.BooleanVar()
+        self.optstat_kurt_err  = tk.BooleanVar()
+        self.optstat_name.set(True)
+        self.optstat_entries.set(True)
+        self.optstat_mean.set(True)
+        self.optstat_mean_err.set(False)
+        self.optstat_rms.set(False)
+        self.optstat_underflow.set(False) 
+        self.optstat_overflow.set(False)   
+        self.optstat_rms_err.set(False)
+        self.optstat_integral.set(True)
+        self.optstat_skew.set(False)     
+        self.optstat_skew_err.set(False) 
+        self.optstat_kurt.set(False)     
+        self.optstat_kurt_err.set(False) 
+
+        ROOT.gStyle.SetOptStat(1001111);     
 
         self.canvases = []
         self.files = {}
@@ -83,6 +116,36 @@ class MainWindow(object):
 
         notebook.pack(fill=tk.BOTH,expand=True)
 
+    def _SetOptStat(self):
+        stat = ''
+        if self.optstat_name.get():
+            stat += 'n'
+        if self.optstat_entries.get():
+            stat += 'e'
+        if self.optstat_mean.get():
+            stat += 'm'
+            if self.optstat_mean_err.get():
+                stat += 'M'
+        if self.optstat_rms.get():
+            stat += 'r'
+            if self.optstat_rms_err.get():
+                stat += 'R'
+        if self.optstat_underflow.get():
+            stat += 'u'
+        if self.optstat_overflow.get():
+            stat += 'o'
+        if self.optstat_integral.get():
+            stat += 'i'
+        if self.optstat_skew.get():
+            stat += 's'
+            if self.optstat_skew_err.get():
+                stat += 'S'
+        if self.optstat_kurt.get():
+            stat += 'k'
+            if self.optstat_kurt_err.get():
+                stat += 'K'
+        ROOT.gStyle.SetOptStat(stat)
+
     def _LoadMenuBar(self):
         self.menubar  = tk.Menu(self.window)
 
@@ -123,10 +186,37 @@ class MainWindow(object):
 
     def _MakeZoneMenu(self):
         zonesmenu = tk.Menu(self.menubar,tearoff=0)
+        zonesmenu.add_checkbutton(label="1 x 1",onvalue='1x1',
+                                  variable=self.predefinedzones)
+        zonesmenu.add_checkbutton(label="1 x 2",onvalue='1x2',
+                                  variable=self.predefinedzones)
+        zonesmenu.add_checkbutton(label="1 x 3",onvalue='1x3',
+                                  variable=self.predefinedzones)
+        zonesmenu.add_checkbutton(label="2 x 1",onvalue='2x1',
+                                  variable=self.predefinedzones)
+        zonesmenu.add_checkbutton(label="2 x 2",onvalue='2x2',
+                                  variable=self.predefinedzones)
+        zonesmenu.add_checkbutton(label="3 x 3",onvalue='3x3',
+                                  variable=self.predefinedzones)
+        zonesmenu.add_checkbutton(label="4 x 4",onvalue='4x4',
+                                  variable=self.predefinedzones)
         self.menubar.add_cascade(label="Zones",menu=zonesmenu)
 
     def _MakeOptStatMenu(self):
         optstatmenu = tk.Menu(self.menubar,tearoff=0)
+        optstatmenu.add_checkbutton(label="Name",onvalue=1,variable=self.optstat_name) 
+        optstatmenu.add_checkbutton(label="Entries",onvalue=1,variable=self.optstat_entries)
+        optstatmenu.add_checkbutton(label="Mean",onvalue=1,variable=self.optstat_mean) 
+        optstatmenu.add_checkbutton(label="Mean Error",onvalue=1,variable=self.optstat_mean_err)
+        optstatmenu.add_checkbutton(label="RMS",onvalue=1,variable=self.optstat_rms)
+        optstatmenu.add_checkbutton(label="RMS Error",onvalue=1,variable=self.optstat_rms_err)
+        optstatmenu.add_checkbutton(label="Underflows",onvalue=1,variable=self.optstat_underflow)
+        optstatmenu.add_checkbutton(label="Overflows",onvalue=1,variable=self.optstat_overflow)
+        optstatmenu.add_checkbutton(label="Integral",onvalue=1,variable=self.optstat_integral)
+        optstatmenu.add_checkbutton(label="Skew",onvalue=1,variable=self.optstat_skew)
+        optstatmenu.add_checkbutton(label="Skew Error",onvalue=1,variable=self.optstat_skew_err)
+        optstatmenu.add_checkbutton(label="Kurtosis",onvalue=1,variable=self.optstat_kurt)
+        optstatmenu.add_checkbutton(label="Kurtosis Error",onvalue=1,variable=self.optstat_kurt_err)
         self.menubar.add_cascade(label="OptStats",menu=optstatmenu)
 
     def _MakePlotMenu(self):
@@ -257,7 +347,7 @@ class MainWindow(object):
 
         if hist.GetDimension() > 1:
             opt.append('colz')
-
+        self._SetOptStat()
         hist.Draw(' '.join(opt))
         fix_tcanvases()
 

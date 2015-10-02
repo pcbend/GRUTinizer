@@ -135,8 +135,8 @@ Long_t TRawEvent::GEBMode3Data::GetLed() const { return (((long)led_high)<<32) +
 Long_t TRawEvent::GEBMode3Data::GetCfd() const { return (((long)cfd_high)<<32) + (((long)cfd_middle)<<16) + (((long)cfd_low)<<0); }
 Int_t  TRawEvent::GEBMode3Data::GetEnergy(const GEBMode3Head &head) const  { 
   int channel = head.GetChannel();
-  if((channel==1) &&( head.GetHole()==9) && (head.GetCrystal()==3) && (head.GetVME()==3))
-    channel = 9; //  Q5 e5 has an inverted radial box, treat it as a core.  pcb.
+  //if ((channel==1) &&( head.GetHole()==9) && (head.GetCrystal()==3) && (head.GetVME()==3))
+    //channel = 9; //  Q5 e5 has an inverted radial box, treat it as a core.  pcb. 
 
   int  temp = (((int)energy_high)<<16) + (((int)energy_low)<<0);
   bool sign = temp&0x01000000;
