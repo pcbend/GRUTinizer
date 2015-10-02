@@ -23,8 +23,8 @@ public:
 
   virtual ~TDataLoop();
 
-  void ProcessFile(const char* filename, kFileType file_type = kFileType::UNKNOWN_FILETYPE);
-  void ProcessFile(const std::vector<std::string>& filenames);
+  void ProcessFile(const char* filename, bool is_online = false);
+  void ProcessFile(const std::vector<std::string>& filenames, bool is_online = false);
   void ProcessRing(const char* filename);
 
   void Start();

@@ -4,7 +4,7 @@
 #include "TGRUTOptions.h"
 #include "TMultiRawFile.h"
 #include "TOrderedRawFile.h"
-#include "TRawFile.h"
+#include "TRawEventSource.h"
 
 TDataLoop* TDataLoop::data_loop = NULL;
 
@@ -51,34 +51,20 @@ void TDataLoop::Start(){
   }
 }
 
-void TDataLoop::ProcessFile(const char* filename, kFileType file_type){
+void TDataLoop::ProcessFile(const char* filename, bool is_online){
   if(running || infile){
     std::cerr << "Data loop already running" << std::endl;
   }
 
-  if(file_type == kFileType::UNKNOWN_FILETYPE){
-    file_type = TGRUTOptions::Get()->DetermineFileType(filename);
-  }
-
-  switch(file_type){
-  case kFileType::NSCL_EVT:
-  case kFileType::GRETINA_MODE2:
-  case kFileType::GRETINA_MODE3:
-    break;
-  default:
-    std::cerr << "Attempting to process an unknown file type on file " << filename << std::endl;
-  }
-
-  TRawFileIn* infile;
+  TRawEventSource* infile = TRawEventSource::EventSource(filename, is_online);
   if(TGRUTOptions::Get()->TimeSortInput()){
-    infile = new TOrderedRawFile(filename, file_type);
-  } else {
-    infile = new TRawFileIn(filename, file_type);
+    infile = new TOrderedRawFile(infile);
   }
 
   if(infile->GetLastErrno() != 0)  {
     std::cerr << "Error opening file " << filename << ": " << infile->GetLastError()
               << " (Errno=" << infile->GetLastErrno() << ")" << std::endl;
+    delete infile;
     return;
   }
 
@@ -86,7 +72,7 @@ void TDataLoop::ProcessFile(const char* filename, kFileType file_type){
   ProcessSource();
 }
 
-void TDataLoop::ProcessFile(const std::vector<std::string>& filenames){
+void TDataLoop::ProcessFile(const std::vector<std::string>& filenames, bool is_online){
   if(running || infile){
     std::cerr << "Data loop already running" << std::endl;
   }
@@ -94,11 +80,9 @@ void TDataLoop::ProcessFile(const std::vector<std::string>& filenames){
   TMultiRawFile* infile = new TMultiRawFile;
 
   for(auto& filename : filenames){
-    TRawFileIn* infile_segment;
+    TRawEventSource* infile_segment = TRawEventSource::EventSource(filename.c_str(), is_online);
     if(TGRUTOptions::Get()->TimeSortInput()){
-      infile_segment = new TOrderedRawFile(filename.c_str());
-    } else {
-      infile_segment = new TRawFileIn(filename.c_str());
+      infile_segment = new TOrderedRawFile(infile_segment);
     }
     infile->AddFile(infile_segment);
   }
@@ -112,7 +96,24 @@ void TDataLoop::ProcessFile(const std::vector<std::string>& filenames){
 }
 
 void TDataLoop::ProcessRing(const char* filename){
-  std::cerr << "ProcessRing not implemented yet" << std::endl;
+  if(running || infile){
+    std::cerr << "Data loop already running" << std::endl;
+  }
+
+  TRawEventSource* infile = TRawEventSource::EventSource(filename, true, true);
+  if(TGRUTOptions::Get()->TimeSortInput()){
+    infile = new TOrderedRawFile(infile);
+  }
+
+  if(infile->GetLastErrno() != 0)  {
+    std::cerr << "Error opening file " << filename << ": " << infile->GetLastError()
+              << " (Errno=" << infile->GetLastErrno() << ")" << std::endl;
+    delete infile;
+    return;
+  }
+
+  this->infile = infile;
+  ProcessSource();
 }
 
 
@@ -149,7 +150,8 @@ void TDataLoop::Stop() {
     running = false;
 
     // If this is not running from the read thread, wait for it to close.
-    if(std::this_thread::get_id() != read_thread.get_id()){
+    if(std::this_thread::get_id() != read_thread.get_id() &&
+       read_thread.joinable()){
       read_thread.join();
     }
 
@@ -178,7 +180,7 @@ void TDataLoop::ReadLoop() {
 
 void TDataLoop::Iteration() {
   TRawEvent evt;
-  int bytes_read = infile->Read(&evt);
+  int bytes_read = infile->Read(evt);
   if(bytes_read > 0){
     ProcessEvent(evt);
   } else {

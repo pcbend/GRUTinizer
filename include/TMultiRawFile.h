@@ -9,7 +9,7 @@
 #include "TObject.h"
 
 #include "TRawEvent.h"
-#include "TRawFile.h"
+#include "TRawEventSource.h"
 
 struct FileEvent {
   TRawEventSource* file;
@@ -21,19 +21,18 @@ struct FileEvent {
 
 bool file_event_sorting(const FileEvent& a, const FileEvent& b);
 
-class TMultiRawFile : public TObject, public TRawEventSource {
+class TMultiRawFile : public TRawEventSource {
 public:
   TMultiRawFile();
   ~TMultiRawFile();
-  TMultiRawFile(const TMultiRawFile& other) { MayNotUse("TMultiRawFile()"); }
-  TMultiRawFile& operator=(const TMultiRawFile& other) { MayNotUse("TMultiRawFile::operator=()"); }
+  TMultiRawFile(const TMultiRawFile& other) { }
+  TMultiRawFile& operator=(const TMultiRawFile& other) { }
 
   void AddFile(TRawEventSource* infile);
   void AddFile(const char* filename);
 
   bool IsValid() const { return fIsValid; }
 
-  virtual bool IsFinished() const;
   virtual std::string SourceDescription() const;
   virtual std::string Status() const;
   virtual int GetLastErrno() const;
@@ -47,7 +46,7 @@ private:
   mutable std::mutex fFileListMutex;
 #endif
 
-  virtual int GetEvent(TRawEvent* outevent);
+  virtual int GetEvent(TRawEvent& outevent);
   mutable bool fIsFirstStatus;
   bool fIsValid;
 
