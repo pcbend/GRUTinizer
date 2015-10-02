@@ -10,6 +10,12 @@ import ROOT
 from pygui.run_command import run_command
 from tree_structure import Node
 
+
+#Fix ROOT TCanvases, which don't redraw when they should
+def fix_tcanvases():
+    for canvas in ROOT.gROOT.GetListOfCanvases():
+        canvas.Update()
+
 class MainWindow(object):
 
     def __init__(self,host,port):
@@ -26,8 +32,8 @@ class MainWindow(object):
 
         self.refreshrate  = tk.IntVar()
         self.refreshrate.set(-1)
-        self.plotlocation = tk.IntVar()
-        self.plotlocation.set(1)
+        self.plotlocation = tk.StringVar()
+        self.plotlocation.set('NewCanvas')
 
         self.canvases = []
         self.files = {}
@@ -67,6 +73,7 @@ class MainWindow(object):
         notebook = ttk.Notebook(self.window)
 
         tree_page = ttk.Frame(notebook)
+        self._MakeHistogramControls(tree_page)
         self._MakeTreeView(tree_page)
         notebook.add(tree_page, text='Tree Viewer')
 
@@ -124,14 +131,14 @@ class MainWindow(object):
 
     def _MakePlotMenu(self):
         plotmenu = tk.Menu(self.menubar,tearoff=0)
-        plotmenu.add_checkbutton(label="New Canvas",onvalue=1,
-                                 variable=self.plotlocation,command=self.set_plotlocation)
-        plotmenu.add_checkbutton(label="Next Pad",onvalue=2,
-                                 variable=self.plotlocation,command=self.set_plotlocation)
-        plotmenu.add_checkbutton(label="Current Pad (replace)",onvalue=3,
-                                 variable=self.plotlocation,command=self.set_plotlocation)
-        plotmenu.add_checkbutton(label="Current Pad (overlay)",onvalue=4,
-                                 variable=self.plotlocation,command=self.set_plotlocation)
+        plotmenu.add_checkbutton(label="New Canvas",onvalue='NewCanvas',
+                                 variable=self.plotlocation)
+        plotmenu.add_checkbutton(label="Next Pad",onvalue='NextPad',
+                                 variable=self.plotlocation)
+        plotmenu.add_checkbutton(label="Current Pad (replace)",onvalue='Replace',
+                                 variable=self.plotlocation)
+        plotmenu.add_checkbutton(label="Current Pad (overlay)",onvalue='Overlay',
+                                 variable=self.plotlocation)
         self.menubar.add_cascade(label="Plot",menu=plotmenu)
 
     def _MakeHelpMenu(self):
@@ -144,28 +151,115 @@ class MainWindow(object):
         self._LoadTree()
         self.tree.bind("<Double-1>", self.ParameterSelection)
 
+    def _MakeHistogramControls(self,parent):
+        frame = tk.Frame(parent)
+
+        frame.columnconfigure(1,weight=1)
+
+        tk.Label(frame,text='Parameter').grid(row=0,column=1)
+        tk.Label(frame,text='Bins').grid(row=0,column=2)
+        tk.Label(frame,text='Low').grid(row=0,column=3)
+        tk.Label(frame,text='High').grid(row=0,column=4)
+
+        enable_x_spacer = tk.Label(frame,text='X',
+                                   anchor=tk.E)
+        enable_x_spacer.grid(row=1,column=0)
+
+        self.x_draw_varexp = tk.StringVar()
+        x_varexp = tk.Entry(frame,textvariable=self.x_draw_varexp)
+        x_varexp.grid(row=1,column=1,sticky='ew')
+
+        self.x_draw_bins = tk.StringVar()
+        x_bins = tk.Entry(frame,textvariable=self.x_draw_bins,
+                          width=4)
+        x_bins.grid(row=1,column=2)
+
+        self.x_draw_low = tk.StringVar()
+        x_low = tk.Entry(frame,textvariable=self.x_draw_low,
+                         width=4)
+        x_low.grid(row=1,column=3)
+
+        self.x_draw_high = tk.StringVar()
+        x_high = tk.Entry(frame,textvariable=self.x_draw_high,
+                          width=4)
+        x_high.grid(row=1,column=4)
+
+
+
+        y_entry_boxes = []
+        def enable_y_parameters():
+            state = 'normal' if self.hist2d.get() else 'disabled'
+            for entry in y_entry_boxes:
+                entry.configure(state=state)
+
+        self.hist2d = tk.IntVar()
+        enable_y_box = tk.Checkbutton(frame, text='Y',
+                                      variable=self.hist2d,
+                                      command=enable_y_parameters)
+        enable_y_box.grid(row=2,column=0)
+
+
+        self.y_draw_varexp = tk.StringVar()
+        y_varexp = tk.Entry(frame,textvariable=self.y_draw_varexp)
+        y_varexp.grid(row=2,column=1,sticky='ew')
+        y_entry_boxes.append(y_varexp)
+
+        self.y_draw_bins = tk.StringVar()
+        y_bins = tk.Entry(frame,textvariable=self.y_draw_bins,
+                          width=4)
+        y_bins.grid(row=2,column=2)
+        y_entry_boxes.append(y_bins)
+
+        self.y_draw_low = tk.StringVar()
+        y_low = tk.Entry(frame,textvariable=self.y_draw_low,
+                         width=4)
+        y_low.grid(row=2,column=3)
+        y_entry_boxes.append(y_low)
+
+        self.y_draw_high = tk.StringVar()
+        y_high = tk.Entry(frame,textvariable=self.y_draw_high,
+                          width=4)
+        y_high.grid(row=2,column=4)
+        y_entry_boxes.append(y_high)
+
+        enable_y_parameters()
+
+        frame.pack(fill=tk.X,expand=False)
+
     def _MakeHistView(self,parent):
         self.hists = ttk.Treeview(parent)
         self.hists.pack(fill=tk.BOTH,expand=True)
         self.hists.bind("<Double-1>", self.OnHistClick)
 
     def OnHistClick(self,event):
-        hist_name = event.widget.selection()[0]
-        try:
-            file_name = event.widget.parent(hist_name)
-        except TclError:
-            return
+        hist_names = event.widget.selection()
+        for hist_name in hist_names:
+            try:
+                file_name = event.widget.parent(hist_name)
+            except TclError:
+                continue
 
+            self._draw_single(file_name, hist_name)
+
+    def _draw_single(self,file_name,hist_name):
         try:
             hist = self.files[file_name].Get(hist_name)
         except KeyError:
             return
 
-        if not filter(None,self.canvases):
+        canvas_exists = bool(filter(None,self.canvases))
+        if not canvas_exists or self.plotlocation.get()=='NewCanvas':
             self.canvases.append(ROOT.GCanvas())
 
-        opt = '' if hist.GetDimension()==1 else 'colz'
-        hist.Draw(opt)
+        opt = []
+        if self.plotlocation.get() == 'Overlay':
+            opt.append('same')
+
+        if hist.GetDimension() > 1:
+            opt.append('colz')
+
+        hist.Draw(' '.join(opt))
+        fix_tcanvases()
 
     def run_command(self, command):
         return run_command(command, self.host, self.port)
@@ -228,7 +322,12 @@ class MainWindow(object):
         tree.ttk_treeview(self.tree)
 
     def ParameterSelection(self, event):
-        print 'You clicked "{}"'.format(event.widget.selection()[0])
+        param = event.widget.selection()[0]
+        if event.widget.get_children(param):
+            return
+
+        self.x_draw_varexp.set(param)
+
 
     def Run(self):
         self.window.mainloop()
@@ -247,6 +346,3 @@ class MainWindow(object):
 
     def set_refresh(self):
         print("refresh = " + str(self.refreshrate.get()))
-
-    def set_plotlocation(self):
-        print("plot location = " + str(self.plotlocation.get()))
