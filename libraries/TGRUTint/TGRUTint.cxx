@@ -365,10 +365,7 @@ void TGRUTint::Terminate(Int_t status){
 }
 
 void TGRUTint::LoadGRootGraphics() {
-  if(gROOT->IsBatch()) return;
-  gROOT->LoadClass("TCanvas","Gpad");
-  gGuiFactory = new GRootGuiFactory();
-
+  GRootGuiFactory::Init();
 }
 
 

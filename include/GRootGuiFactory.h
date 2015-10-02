@@ -29,6 +29,8 @@ class TControlBar;
 class GRootGuiFactory : public TGuiFactory {
 
 public:
+   static void Init();
+
    GRootGuiFactory(const char *name = "Root", const char *title = "GRUT GUI Factory");
    virtual ~GRootGuiFactory() { }
 

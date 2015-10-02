@@ -18,6 +18,7 @@ class MainWindow(object):
 
         self.load_library('libGui.so',False)
         self.load_library('libGROOT.so')
+        ROOT.GRootGuiFactory.Init()
 
         self.window = tk.Tk()
         self._load_icons()
@@ -162,7 +163,9 @@ class MainWindow(object):
 
         if not filter(None,self.canvases):
             self.canvases.append(ROOT.GCanvas())
-        hist.Draw()
+
+        opt = '' if hist.GetDimension()==1 else 'colz'
+        hist.Draw(opt)
 
     def run_command(self, command):
         return run_command(command, self.host, self.port)
