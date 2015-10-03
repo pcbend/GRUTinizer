@@ -81,6 +81,8 @@ class MainWindow(object):
             file = os.path.join(os.path.dirname(__file__),'resources','h2_t.gif'))
         self.icons['tfile'] = tk.PhotoImage(
             file = os.path.join(os.path.dirname(__file__),'resources','rootdb_t.gif'))
+        img = tk.PhotoImage(file=os.path.join(os.path.dirname(__file__),'resources','hdb_s.gif'))
+        self.window.tk.call('wm','iconphoto',self.window._w,img)
 
     def _setup_GUI(self):
         self.window.geometry('350x700')
