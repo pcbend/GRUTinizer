@@ -189,20 +189,29 @@ class MainWindow(object):
     def _MakeZoneMenu(self):
         zonesmenu = tk.Menu(self.menubar,tearoff=0)
         zonesmenu.add_checkbutton(label="1 x 1",onvalue='1x1',
-                                  variable=self.predefinedzones)
+                                  variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="1 x 2",onvalue='1x2',
-                                  variable=self.predefinedzones)
+                                  variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="1 x 3",onvalue='1x3',
-                                  variable=self.predefinedzones)
+                                  variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="2 x 1",onvalue='2x1',
-                                  variable=self.predefinedzones)
+                                  variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="2 x 2",onvalue='2x2',
-                                  variable=self.predefinedzones)
+                                  variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="3 x 3",onvalue='3x3',
-                                  variable=self.predefinedzones)
+                                  variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="4 x 4",onvalue='4x4',
-                                  variable=self.predefinedzones)
+                                  variable=self.predefinedzones,command=self.set_zones)
         self.menubar.add_cascade(label="Zones",menu=zonesmenu)
+
+    def set_zones(self,zones=""):
+        if not zones:
+            zones = self.predefinedzones.get()
+        zones = zones.lower()
+        zones.replace(" ","")
+        zones = zones.split("x")
+        self.zone_cols = int(zones[0])
+        self.zone_rows = int(zones[1])
 
     def _MakeOptStatMenu(self):
         optstatmenu = tk.Menu(self.menubar,tearoff=0)
@@ -324,14 +333,16 @@ class MainWindow(object):
         self.hists.bind("<Double-1>", self.OnHistClick)
 
     def OnHistClick(self,event):
+        #print "event = " + str(event.widget.selection())
+        #print "number selected = " + str(len(event.widget.selection()))
         hist_names = event.widget.selection()
         for hist_name in hist_names:
             try:
                 file_name = event.widget.parent(hist_name)
             except TclError:
                 continue
-
             self._draw_single(file_name, hist_name)
+
 
     def _draw_single(self,file_name,hist_name):
         try:
@@ -341,7 +352,15 @@ class MainWindow(object):
 
         canvas_exists = bool(filter(None,self.canvases))
         if not canvas_exists or self.plotlocation.get()=='NewCanvas':
-            self.canvases.append(ROOT.GCanvas())
+            self.open_canvas("",self.zone_cols,self.zone_rows)
+            #self.canvases.append(ROOT.GCanvas())
+
+        if self.plotlocation.get()=='NextPad':
+            currentnumber = ROOT.gPad.GetNumber()
+            if currentnumber>0:
+                ROOT.gPad.GetCanvas().cd(currentnumber+1)
+                if ROOT.gPad.GetNumber() == currentnumber:
+                    ROOT.gPad.GetCanvas().cd(1)
 
         opt = []
         if self.plotlocation.get() == 'Overlay':
@@ -352,6 +371,7 @@ class MainWindow(object):
         self._SetOptStat()
         hist.Draw(' '.join(opt))
         fix_tcanvases()
+
 
     def run_command(self, command):
         return run_command(command, self.host, self.port)
@@ -433,8 +453,23 @@ class MainWindow(object):
     def hello(self):
         print "hello!"
 
-    def open_canvas(self):
-        self.canvases.append(ROOT.GCanvas())
+    def open_canvas(self,title="",columns=1,rows=1,topx=0,topy=0,width=0,height=0):
+        if not title:
+            title = "canvas" + str(len(self.canvases))
+        if width*height == 0:
+            canvas = ROOT.GCanvas(title,title)
+        else:
+            canvas = ROOT.GCanvas(title,title,topx,topy,width,height);
+        canvas.cd()
+        if columns*rows == 1:
+            self.plotlocation.set('NewCanvas')
+        else:
+            self.plotlocation.set('NextPad')
+            canvas.Divide(columns,rows)
+            canvas.cd(columns*rows)
+        canvas.Modified()
+        canvas.Update()
+        self.canvases.append(canvas)
 
     def set_refresh(self):
         print("refresh = " + str(self.refreshrate.get()))
