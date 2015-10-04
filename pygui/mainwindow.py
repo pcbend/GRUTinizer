@@ -66,7 +66,7 @@ class MainWindow(object):
         self.optstat_kurt.set(False)     
         self.optstat_kurt_err.set(False) 
 
-        ROOT.gStyle.SetOptStat(1001111);     
+        self._load_default_style()
 
         self.canvases = []
         self.files = {}
@@ -75,14 +75,30 @@ class MainWindow(object):
 
     def _load_icons(self):
         self.icons = {}
-        self.icons['1d hist'] = tk.PhotoImage(
+        self.icons['h1_t'] = tk.PhotoImage(
             file = os.path.join(os.path.dirname(__file__),'resources','h1_t.gif'))
-        self.icons['2d hist'] = tk.PhotoImage(
+        self.icons['h2_t'] = tk.PhotoImage(
             file = os.path.join(os.path.dirname(__file__),'resources','h2_t.gif'))
+        self.icons['folder_t'] = tk.PhotoImage(
+            file = os.path.join(os.path.dirname(__file__),'resources','folder_t.gif'))
         self.icons['tfile'] = tk.PhotoImage(
             file = os.path.join(os.path.dirname(__file__),'resources','rootdb_t.gif'))
         img = tk.PhotoImage(file=os.path.join(os.path.dirname(__file__),'resources','hdb_s.gif'))
         self.window.tk.call('wm','iconphoto',self.window._w,img)
+
+    def _load_default_style(self):
+        style = ROOT.TStyle("GRUTStyle","")
+        style.SetOptStat(1001111)
+        style.SetPalette(1)
+        style.SetTitleColor(ROOT.kBlue)
+        style.SetStatTextColor(ROOT.kBlue)
+        style.SetTitleBorderSize(0)
+        style.SetOptFit(1111)
+        style.SetPadBorderSize(1) 
+        style.SetPadBorderMode(1) 
+        ROOT.gROOT.SetStyle("GRUTStyle")
+        ROOT.gROOT.ForceStyle()
+
 
     def _setup_GUI(self):
         self.window.geometry('350x700')
@@ -201,6 +217,8 @@ class MainWindow(object):
         zonesmenu.add_checkbutton(label="3 x 3",onvalue='3x3',
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="4 x 4",onvalue='4x4',
+                                  variable=self.predefinedzones,command=self.set_zones)
+        zonesmenu.add_checkbutton(label="12 x 12",onvalue='12x12',
                                   variable=self.predefinedzones,command=self.set_zones)
         self.menubar.add_cascade(label="Zones",menu=zonesmenu)
 
@@ -337,19 +355,32 @@ class MainWindow(object):
         #print "event = " + str(event.widget.selection())
         #print "number selected = " + str(len(event.widget.selection()))
         hist_names = event.widget.selection()
+        #print str(event.widget.selection())
+        if not event.widget.parent(hist_names[0]):
+            return
         for hist_name in hist_names:
+            #print("anc:  " + str(event.widget.ancestor(hist_name)))
             try:
-                file_name = event.widget.parent(hist_name)
+                file_name = hist_name
+                while event.widget.parent(file_name):
+                    file_name = event.widget.parent(file_name)
+                #file_name = event.widget.parent(hist_name)
             except TclError:
                 continue
-            self._draw_single(file_name, hist_name)
+            try:
+                obj = self.files[file_name].FindObjectAny(hist_name)
+            except KeyError:
+                print("file: " + self.files[file_name].GetName() + "hist: " + hist_name)
+                return
+            if obj.InheritsFrom(ROOT.TH1.Class()):
+                self._draw_single(obj)
 
 
-    def _draw_single(self,file_name,hist_name):
-        try:
-            hist = self.files[file_name].Get(hist_name)
-        except KeyError:
-            return
+    def _draw_single(self,hist):
+        #try:
+        #    hist = self.files[file_name].Get(hist_name)
+        #except KeyError:
+        #    return
 
         canvas_exists = bool(filter(None,self.canvases))
         if not canvas_exists or self.plotlocation.get()=='NewCanvas':
@@ -391,19 +422,41 @@ class MainWindow(object):
         self.files[filename] = tfile
 
         icon = self.icons['tfile']
-        tree_id = self.hists.insert('','end',filename, text=filename, image=icon)
-        for key in tfile.GetListOfKeys():
-            obj = key.ReadObj()
-            hist_name = obj.GetName()
-            if obj.Class().InheritsFrom('TH2'):
-                icon = self.icons['2d hist']
-            elif obj.Class().InheritsFrom('TH1'):
-                icon = self.icons['1d hist']
-            else:
-                icon = None
+        self._insert_collapsable('',tfile,icon)
+        #tree_id = self.hists.insert('','end',filename, text=filename, image=icon)
+        #for key in tfile.GetListOfKeys():
+        #    obj = key.ReadObj()
+        #    obj_name = obj.GetName()
+        #    if obj.Class().InheritsFrom('TDirectory'):
+        #        icon = self.icons['folder_t']
+        #        self._insert_collapsable(filename,obj,icon)
+        #    else:
+        #        self._insert_drawable(obj,tree_id)
 
-            self.hists.insert(tree_id,'end',hist_name, text=hist_name,
-                              image=icon)
+    def _insert_drawable(self,obj,tree_id):
+        if obj.Class().InheritsFrom('TH2'):
+            icon = self.icons['h2_t']
+        elif obj.Class().InheritsFrom('TH1'):
+            icon = self.icons['h1_t']
+        else:
+            icon = None
+        if icon:
+            self.hists.insert(tree_id,'end',obj.GetName(), text=obj.GetName(),image=icon)
+        else:
+            self.hists.insert(tree_id,'end',obj.GetName(), text=obj.GetName())
+        
+    def _insert_collapsable(self,top,directory,icon):
+        if(icon):
+            tree_id = self.hists.insert(top,'end',directory.GetName(),text=directory.GetName(), image=icon)
+        else:    
+            tree_id = self.hists.insert(top,'end',directory.GetName(),text=directory.GetName())
+        for key in directory.GetListOfKeys():
+            obj = key.ReadObj()
+            if obj.Class().InheritsFrom('TDirectory'):
+                icon = self.icons['folder_t']
+                self._insert_collapsable(directory.GetName(),obj,icon)
+            else:
+                self._insert_drawable(obj,tree_id)
 
 
     def Interpreter(self):

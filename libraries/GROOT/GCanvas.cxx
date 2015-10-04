@@ -110,7 +110,7 @@ void GCanvas::GCanvasInit() {
    // default gui's (canvas,browser,etc).
    //fStatsDisplayed = true;
    fMarkerMode     = true;
-
+   control_key = false;
    //if(gVirtualX->InheritsFrom("TGX11")) {
    //    printf("\tusing x11-like graphical interface.\n");
    //}
@@ -462,12 +462,18 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
 }
 
 bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
+
+  //printf("keysym:   0x%08x\n",*keysym);
+
   bool edited = false;
   std::vector<TH1*> hists = FindHists();
   if(hists.size()<1)
     return edited;
 
   switch(*keysym) {
+    case kKey_Control:
+      toggle_control();
+      break;
     case kKey_e:
        if(GetNMarkers()<2)
           break;
@@ -483,9 +489,31 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
        RemoveMarker("all");
        break;
     case kKey_E:
+       //this->GetListOfPrimitives()->Print();
        GetContextMenu()->Action(hists.back()->GetXaxis(),hists.back()->GetXaxis()->Class()->GetMethodAny("SetRangeUser"));
-       for(int i=0;i<hists.size()-1;i++)
-          hists.at(i)->GetXaxis()->SetRangeUser(hists.back()->GetXaxis()->GetFirst(),hists.back()->GetXaxis()->GetLast());
+       {
+          double x1 = hists.back()->GetXaxis()->GetBinCenter(hists.back()->GetXaxis()->GetFirst());
+          double x2 = hists.back()->GetXaxis()->GetBinCenter(hists.back()->GetXaxis()->GetLast());
+          TIter iter(this->GetListOfPrimitives());
+          while(TObject *obj = iter.Next()) {
+            if(obj->InheritsFrom(TPad::Class())) {
+              TPad *pad = (TPad*)obj;
+              TIter iter2(pad->GetListOfPrimitives());
+              while(TObject *obj2=iter2.Next()) {
+                if(obj2->InheritsFrom(TH1::Class())) {
+                  TH1* hist = (TH1*)obj2;
+                  hist->GetXaxis()->SetRangeUser(x1,x2);
+                  pad->Modified();
+                  pad->Update();
+                }
+              }
+            }
+          }
+
+       //for(int i=0;i<hists.size()-1;i++)   // this doesn't work, set range needs values not bins.   pcb.
+       //   hists.at(i)->GetXaxis()->SetRangeUser(hists.back()->GetXaxis()->GetFirst(),hists.back()->GetXaxis()->GetLast());
+
+       }
        edited = true;
        break;
     case kKey_f:

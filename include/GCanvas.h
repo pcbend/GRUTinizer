@@ -107,6 +107,10 @@ class GCanvas : public TCanvas {
       Window_t fCanvasWindowID;
       TRootCanvas *fRootCanvas;
 
+      bool control_key;
+
+      bool toggle_control() { control_key = !control_key;}
+
    ClassDef(GCanvas,2);
 };
 
