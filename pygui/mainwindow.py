@@ -212,6 +212,7 @@ class MainWindow(object):
         zones = zones.split("x")
         self.zone_cols = int(zones[0])
         self.zone_rows = int(zones[1])
+        print("zones set to " + str(self.zone_cols) + " x " + str(self.zone_rows))
 
     def _MakeOptStatMenu(self):
         optstatmenu = tk.Menu(self.menubar,tearoff=0)
@@ -453,9 +454,12 @@ class MainWindow(object):
     def hello(self):
         print "hello!"
 
-    def open_canvas(self,title="",columns=1,rows=1,topx=0,topy=0,width=0,height=0):
+    def open_canvas(self,title="",columns=-1,rows=-1,topx=0,topy=0,width=0,height=0):
         if not title:
             title = "canvas" + str(len(self.canvases))
+        if columns==-1 or rows==-1:
+            columns = self.zone_cols
+            rows = self.zone_rows
         if width*height == 0:
             canvas = ROOT.GCanvas(title,title)
         else:
