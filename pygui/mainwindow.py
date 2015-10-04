@@ -384,7 +384,9 @@ class MainWindow(object):
         filename = askopenfilename(filetypes=(("ROOT File", "*.root"),))
         if not filename:
             return
+        self.LoadRootFile(filename)
 
+    def LoadRootFile(self,filename):
         tfile = ROOT.TFile(filename)
         self.files[filename] = tfile
 
