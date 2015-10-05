@@ -212,8 +212,11 @@ void GCanvas::HandleInput(Int_t event,Int_t x,Int_t y) {
   //If the below switch breaks. You need to upgrade your version of ROOT
   //Version 5.34.24 works. //older version should work now too pcb (8/2015)
   bool used = false;
+  //printf("event = 0x%08x\n",event);
   switch(event) {
-    case 0x00000001:
+    case 0x00000001: //single click
+    case 0x0000003d: //double click
+    case 0x00000007: //shift-click
       used = HandleMousePress(event,x,y);
       break;
   };
@@ -327,16 +330,23 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
   TH1 *hist = 0;
   bool edited = false;
   while(TObject *obj = iter.Next()) {
-     if( obj->InheritsFrom("TH1") &&
-        !obj->InheritsFrom("TH2") &&
-        !obj->InheritsFrom("TH3") ) {
+     if(obj->InheritsFrom(TH1::Class()))
         hist = (TH1*)obj;
-     }
   }
   if(!hist)
      return false;
+  if(event == 0x00000007) {
+    new GCanvas();
+    TString options;
+    if(hist->GetDimension()==2)
+      options.Append("colz");
+    hist->DrawCopy(options.Data());
+    return true;
+  }
 
   bool used = false;
+  if(hist->GetDimension()!=1)
+    return used;
 
   if(!strcmp(GetSelected()->GetName(),"TFrame") && fMarkerMode) {
     //((TFrame*)GetSelected())->SetBit(TBox::kCannotMove);

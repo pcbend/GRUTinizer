@@ -224,6 +224,8 @@ class MainWindow(object):
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="12 x 12",onvalue='12x12',
                                   variable=self.predefinedzones,command=self.set_zones)
+        zonesmenu.add_checkbutton(label="13 x 13",onvalue='13x13',
+                                  variable=self.predefinedzones,command=self.set_zones)
         self.menubar.add_cascade(label="Zones",menu=zonesmenu)
 
     def set_zones(self,zones=""):
@@ -395,6 +397,9 @@ class MainWindow(object):
         if not canvas_exists or self.plotlocation.get()=='NewCanvas':
             self.open_canvas("",self.zone_cols,self.zone_rows)
             #self.canvases.append(ROOT.GCanvas())
+        if not ROOT.gPad:
+            self.open_canvas("",self.zone_cols,self.zone_rows)
+
 
         #if self.plotlocation.get()=='NextPad':
         #    if self.zone_cols*self.zone_rows == 1:
