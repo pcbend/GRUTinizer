@@ -1,5 +1,7 @@
 #!/usr/bin/env python2
 
+import re
+
 class Node(object):
 
     def __init__(self, name, parent=None):
@@ -37,13 +39,18 @@ class Node(object):
 
     @property
     def full_name(self):
+        # Get the name
         if self.parent is None:
-            return self.name
+            output = self.name
         elif self.name in [self.parent.name,'TDetector']:
-            return self.parent.full_name
+            output =  self.parent.full_name
         else:
             parent_name = self.parent.full_name
             if parent_name:
-                return parent_name + '.' + self.name
+                output = parent_name + '.' + self.name
             else:
-                return self.name
+                output = self.name
+
+        # If the name ends in [num], strip it
+        output = re.sub(r'\[[0-9]*\]$','',output)
+        return output
