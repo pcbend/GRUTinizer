@@ -30,42 +30,26 @@ class MainWindow(object):
         self.window = tk.Tk()
         self._load_icons()
 
-        self.refreshrate  = tk.IntVar()
-        self.refreshrate.set(-1)
-        self.plotlocation = tk.StringVar()
-        self.plotlocation.set('NewCanvas')
+        self.refreshrate  = tk.IntVar(value='-1')
+        self.plotlocation = tk.StringVar(value='NewCanvas')
 
-        self.predefinedzones = tk.StringVar()
-        self.predefinedzones.set('1x1')
+        self.predefinedzones = tk.StringVar(value='1x1')
         self.zone_rows = 1
         self.zone_cols = 1
 
-        self.optstat_name      = tk.BooleanVar()
-        self.optstat_entries   = tk.BooleanVar()
-        self.optstat_mean      = tk.BooleanVar()
-        self.optstat_mean_err  = tk.BooleanVar()
-        self.optstat_rms       = tk.BooleanVar()
-        self.optstat_rms_err   = tk.BooleanVar()
-        self.optstat_underflow = tk.BooleanVar()
-        self.optstat_overflow  = tk.BooleanVar()
-        self.optstat_integral  = tk.BooleanVar()
-        self.optstat_skew      = tk.BooleanVar()
-        self.optstat_skew_err  = tk.BooleanVar()
-        self.optstat_kurt      = tk.BooleanVar()
-        self.optstat_kurt_err  = tk.BooleanVar()
-        self.optstat_name.set(True)
-        self.optstat_entries.set(True)
-        self.optstat_mean.set(True)
-        self.optstat_mean_err.set(False)
-        self.optstat_rms.set(False)
-        self.optstat_underflow.set(False) 
-        self.optstat_overflow.set(False)   
-        self.optstat_rms_err.set(False)
-        self.optstat_integral.set(True)
-        self.optstat_skew.set(False)     
-        self.optstat_skew_err.set(False) 
-        self.optstat_kurt.set(False)     
-        self.optstat_kurt_err.set(False) 
+        self.optstat_name      = tk.BooleanVar(value=True)
+        self.optstat_entries   = tk.BooleanVar(value=True)
+        self.optstat_mean      = tk.BooleanVar(value=True)
+        self.optstat_mean_err  = tk.BooleanVar(value=False)
+        self.optstat_rms       = tk.BooleanVar(value=False)
+        self.optstat_rms_err   = tk.BooleanVar(value=False)
+        self.optstat_underflow = tk.BooleanVar(value=False)
+        self.optstat_overflow  = tk.BooleanVar(value=False)
+        self.optstat_integral  = tk.BooleanVar(value=True)
+        self.optstat_skew      = tk.BooleanVar(value=False)
+        self.optstat_skew_err  = tk.BooleanVar(value=False)
+        self.optstat_kurt      = tk.BooleanVar(value=False)
+        self.optstat_kurt_err  = tk.BooleanVar(value=False)
 
         self._load_default_style()
 
@@ -96,8 +80,8 @@ class MainWindow(object):
         style.SetFuncColor(ROOT.kRed)
         style.SetTitleBorderSize(0)
         style.SetOptFit(1111)
-        style.SetPadBorderSize(1) 
-        style.SetPadBorderMode(1) 
+        style.SetPadBorderSize(1)
+        style.SetPadBorderMode(1)
         ROOT.gROOT.SetStyle("GRUTStyle")
         ROOT.gROOT.ForceStyle()
 
@@ -240,9 +224,9 @@ class MainWindow(object):
 
     def _MakeOptStatMenu(self):
         optstatmenu = tk.Menu(self.menubar,tearoff=0)
-        optstatmenu.add_checkbutton(label="Name",onvalue=1,variable=self.optstat_name) 
+        optstatmenu.add_checkbutton(label="Name",onvalue=1,variable=self.optstat_name)
         optstatmenu.add_checkbutton(label="Entries",onvalue=1,variable=self.optstat_entries)
-        optstatmenu.add_checkbutton(label="Mean",onvalue=1,variable=self.optstat_mean) 
+        optstatmenu.add_checkbutton(label="Mean",onvalue=1,variable=self.optstat_mean)
         optstatmenu.add_checkbutton(label="Mean Error",onvalue=1,variable=self.optstat_mean_err)
         optstatmenu.add_checkbutton(label="RMS",onvalue=1,variable=self.optstat_rms)
         optstatmenu.add_checkbutton(label="RMS Error",onvalue=1,variable=self.optstat_rms_err)
@@ -358,27 +342,24 @@ class MainWindow(object):
         self.hists.bind("<Double-1>", self.OnHistClick)
 
     def OnHistClick(self,event):
-        #print "event = " + str(event.widget.selection())
-        #print "number selected = " + str(len(event.widget.selection()))
         hist_names = event.widget.selection()
-        #print str(event.widget.selection())
         if not event.widget.parent(hist_names[0]):
             return
         color = 1;
         for hist_name in hist_names:
-            #print("anc:  " + str(event.widget.ancestor(hist_name)))
             try:
                 file_name = hist_name
                 while event.widget.parent(file_name):
                     file_name = event.widget.parent(file_name)
-                #file_name = event.widget.parent(hist_name)
             except TclError:
                 continue
+
             try:
                 obj = self.files[file_name].FindObjectAny(hist_name)
             except KeyError:
                 print("file: " + self.files[file_name].GetName() + "hist: " + hist_name)
                 return
+
             if obj.InheritsFrom(ROOT.TH1.Class()):
                 self._draw_single(obj,color,len(hist_names))
                 if self.plotlocation.get()=='Overlay':
@@ -388,23 +369,11 @@ class MainWindow(object):
 
 
     def _draw_single(self,hist,color=1,nselected=1):
-        #try:
-        #    hist = self.files[file_name].Get(hist_name)
-        #except KeyError:
-        #    return
-
         canvas_exists = bool(filter(None,self.canvases))
-        if not canvas_exists or self.plotlocation.get()=='NewCanvas':
-            self.open_canvas("",self.zone_cols,self.zone_rows)
-            #self.canvases.append(ROOT.GCanvas())
-        if not ROOT.gPad:
-            self.open_canvas("",self.zone_cols,self.zone_rows)
-
-
-        #if self.plotlocation.get()=='NextPad':
-        #    if self.zone_cols*self.zone_rows == 1:
-        #        col_rows = math.ceil(nselected)
-        #        ROOT.gPad.Divide(col_rows,col_rows)
+        if (not canvas_exists or
+            self.plotlocation.get()=='NewCanvas' or
+            not ROOT.gPad):
+            self.open_canvas(columns = self.zone_cols, rows = self.zone_rows)
 
         currentnumber = ROOT.gPad.GetNumber()
         if currentnumber>0:
@@ -442,15 +411,6 @@ class MainWindow(object):
 
         icon = self.icons['tfile']
         self._insert_collapsable('',tfile,icon)
-        #tree_id = self.hists.insert('','end',filename, text=filename, image=icon)
-        #for key in tfile.GetListOfKeys():
-        #    obj = key.ReadObj()
-        #    obj_name = obj.GetName()
-        #    if obj.Class().InheritsFrom('TDirectory'):
-        #        icon = self.icons['folder_t']
-        #        self._insert_collapsable(filename,obj,icon)
-        #    else:
-        #        self._insert_drawable(obj,tree_id)
 
     def _insert_drawable(self,obj,tree_id):
         if obj.Class().InheritsFrom('TH2'):
@@ -458,17 +418,13 @@ class MainWindow(object):
         elif obj.Class().InheritsFrom('TH1'):
             icon = self.icons['h1_t']
         else:
-            icon = None
-        if icon:
-            self.hists.insert(tree_id,'end',obj.GetName(), text=obj.GetName(),image=icon)
-        else:
-            self.hists.insert(tree_id,'end',obj.GetName(), text=obj.GetName())
-        
-    def _insert_collapsable(self,top,directory,icon):
-        if(icon):
-            tree_id = self.hists.insert(top,'end',directory.GetName(),text=directory.GetName(), image=icon)
-        else:    
-            tree_id = self.hists.insert(top,'end',directory.GetName(),text=directory.GetName())
+            icon = ''
+
+        self.hists.insert(tree_id,'end',obj.GetName(), text=obj.GetName(),image=icon)
+
+    def _insert_collapsable(self,top,directory,icon=''):
+        tree_id = self.hists.insert(top,'end',directory.GetName(),text=directory.GetName(), image=icon)
+
         for key in directory.GetListOfKeys():
             obj = key.ReadObj()
             if obj.Class().InheritsFrom('TDirectory'):
@@ -515,7 +471,6 @@ class MainWindow(object):
 
         self.x_draw_varexp.set(param)
 
-
     def Run(self):
         self.window.mainloop()
 
@@ -528,7 +483,7 @@ class MainWindow(object):
     def hello(self):
         print "hello!"
 
-    def close_all_canvases(self): 
+    def close_all_canvases(self):
         canvases = ROOT.gROOT.GetListOfCanvases()
         for canvas in canvases:
             canvas.Close()
@@ -537,15 +492,18 @@ class MainWindow(object):
     def open_canvas(self,title="",columns=-1,rows=-1,topx=0,topy=0,width=0,height=0):
         if not title:
             title = "canvas" + str(len(self.canvases))
+
         if columns==-1 or rows==-1:
             columns = self.zone_cols
             rows = self.zone_rows
+
         if width*height == 0:
             canvas = ROOT.GCanvas(title,title)
         else:
             canvas = ROOT.GCanvas(title,title,topx,topy,width,height);
         canvas.cd()
-        if columns*rows == 1: #and not self.plotlocation.get() == "Overlay":
+
+        if columns*rows == 1:
             self.plotlocation.set('NewCanvas')
         else:
             self.plotlocation.set('NextPad')
@@ -553,6 +511,7 @@ class MainWindow(object):
             canvas.cd(columns*rows)
         canvas.Modified()
         canvas.Update()
+
         self.canvases.append(canvas)
 
     def set_refresh(self):
