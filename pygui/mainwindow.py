@@ -6,6 +6,7 @@ from tkFileDialog import askopenfilename
 import ttk
 
 import ROOT
+import math
 
 from pygui.run_command import run_command
 from tree_structure import Node
@@ -92,6 +93,7 @@ class MainWindow(object):
         style.SetPalette(1)
         style.SetTitleColor(ROOT.kBlue)
         style.SetStatTextColor(ROOT.kBlue)
+        style.SetFuncColor(ROOT.kRed)
         style.SetTitleBorderSize(0)
         style.SetOptFit(1111)
         style.SetPadBorderSize(1) 
@@ -177,6 +179,8 @@ class MainWindow(object):
     def _MakeFileMenu(self):
         filemenu = tk.Menu(self.menubar,tearoff=0)
         filemenu.add_command(label="New Canvas",command=self.open_canvas)
+        filemenu.add_separator()
+        filemenu.add_command(label="Close All Canvases",command=self.close_all_canvases)
         filemenu.add_separator()
         filemenu.add_command(label="Open",command=self.hello)
         filemenu.add_command(label="Save",command=self.hello)
@@ -358,6 +362,7 @@ class MainWindow(object):
         #print str(event.widget.selection())
         if not event.widget.parent(hist_names[0]):
             return
+        color = 1;
         for hist_name in hist_names:
             #print("anc:  " + str(event.widget.ancestor(hist_name)))
             try:
@@ -373,10 +378,14 @@ class MainWindow(object):
                 print("file: " + self.files[file_name].GetName() + "hist: " + hist_name)
                 return
             if obj.InheritsFrom(ROOT.TH1.Class()):
-                self._draw_single(obj)
+                self._draw_single(obj,color,len(hist_names))
+                if self.plotlocation.get()=='Overlay':
+                    color+=1
+                    if color == 5:
+                        color+=1
 
 
-    def _draw_single(self,hist):
+    def _draw_single(self,hist,color=1,nselected=1):
         #try:
         #    hist = self.files[file_name].Get(hist_name)
         #except KeyError:
@@ -387,12 +396,16 @@ class MainWindow(object):
             self.open_canvas("",self.zone_cols,self.zone_rows)
             #self.canvases.append(ROOT.GCanvas())
 
-        if self.plotlocation.get()=='NextPad':
-            currentnumber = ROOT.gPad.GetNumber()
-            if currentnumber>0:
-                ROOT.gPad.GetCanvas().cd(currentnumber+1)
-                if ROOT.gPad.GetNumber() == currentnumber:
-                    ROOT.gPad.GetCanvas().cd(1)
+        #if self.plotlocation.get()=='NextPad':
+        #    if self.zone_cols*self.zone_rows == 1:
+        #        col_rows = math.ceil(nselected)
+        #        ROOT.gPad.Divide(col_rows,col_rows)
+
+        currentnumber = ROOT.gPad.GetNumber()
+        if currentnumber>0:
+            ROOT.gPad.GetCanvas().cd(currentnumber+1)
+            if ROOT.gPad.GetNumber() == currentnumber:
+                ROOT.gPad.GetCanvas().cd(1)
 
         opt = []
         if self.plotlocation.get() == 'Overlay':
@@ -401,6 +414,7 @@ class MainWindow(object):
         if hist.GetDimension() > 1:
             opt.append('colz')
         self._SetOptStat()
+        hist.SetLineColor(color)
         hist.Draw(' '.join(opt))
         fix_tcanvases()
 
@@ -509,6 +523,12 @@ class MainWindow(object):
     def hello(self):
         print "hello!"
 
+    def close_all_canvases(self): 
+        canvases = ROOT.gROOT.GetListOfCanvases()
+        for canvas in canvases:
+            canvas.Close()
+
+
     def open_canvas(self,title="",columns=-1,rows=-1,topx=0,topy=0,width=0,height=0):
         if not title:
             title = "canvas" + str(len(self.canvases))
@@ -520,7 +540,7 @@ class MainWindow(object):
         else:
             canvas = ROOT.GCanvas(title,title,topx,topy,width,height);
         canvas.cd()
-        if columns*rows == 1:
+        if columns*rows == 1: #and not self.plotlocation.get() == "Overlay":
             self.plotlocation.set('NewCanvas')
         else:
             self.plotlocation.set('NextPad')
