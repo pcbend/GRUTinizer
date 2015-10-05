@@ -72,7 +72,7 @@ void TOnlineTree::recurse_down(std::vector<std::string>& terminal_leaves, std::s
   }
 }
 
-TDirectory* TOnlineTree::GetContents() {
+TList* TOnlineTree::GetHistograms() {
   TList* output = new TList;
   output->SetOwner(false);
 
