@@ -72,6 +72,20 @@ void TOnlineTree::recurse_down(std::vector<std::string>& terminal_leaves, std::s
   }
 }
 
+TDirectory* TOnlineTree::GetContents() {
+  TList* output = new TList;
+  output->SetOwner(false);
+
+  TIter iter(directory.GetList());
+  TObject* obj = NULL;
+  while((obj = iter.Next())){
+    if(obj->InheritsFrom(TH1::Class())){
+      output->Add(obj);
+    }
+  }
+
+  return output;
+}
 
 Int_t TOnlineTree::Fill(){
   event_num = actual_event_num++;

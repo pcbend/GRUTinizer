@@ -24,6 +24,10 @@ def is_int(string):
     except ValueError:
         return False
 
+def unpack_tdirectory(tdir):
+    for key in tdir.GetListOfKeys():
+        yield key.ReadObj()
+
 class MainWindow(object):
 
     def __init__(self,host,port):
@@ -183,7 +187,7 @@ class MainWindow(object):
         refreshmenu = tk.Menu(self.menubar,tearoff=0)
         refreshmenu.add_checkbutton(label="Off",onvalue=-1,
                                     variable=self.refreshrate,command=self.set_refresh)
-        refreshmenu.add_command(label="Now!",command=self.hello)
+        refreshmenu.add_command(label="Now!",command=self.RefreshHistograms)
         refreshmenu.add_separator()
         refreshmenu.add_checkbutton(label="1 second",onvalue=1,
                                     variable=self.refreshrate,command=self.set_refresh)
@@ -382,9 +386,16 @@ class MainWindow(object):
                 'Yexp'  : self.y_draw_varexp.get(),
             }
         command = command.format(**args)
-
-
         self.run_command(command)
+        self.RefreshHistograms()
+
+    def RefreshHistograms(self):
+        online_hists = self.run_command('if(online_events) {'
+                                        '   gResponse = online_events->GetHistograms();'
+                                        '}')
+        if online_hists is not None:
+            online_hists.SetName('online_hists')
+            self._insert_to_hist_tree(online_hists)
 
     def _MakeHistView(self,parent):
         self.hists = ttk.Treeview(parent)
@@ -468,9 +479,16 @@ class MainWindow(object):
         self.hist_indices[index] = obj
         tree_id = self.hists.insert(tree_id,'end',index, text=obj.GetName(),image=icon)
 
-        if hasattr(obj,'GetListOfKeys'):
-            for key in obj.GetListOfKeys():
-                self._insert_to_hist_tree(key.ReadObj(), tree_id)
+        if obj.Class().InheritsFrom('TList'):
+            iterable = obj
+        elif hasattr(obj,'GetListOfKeys'):
+            iterable = unpack_tdirectory(obj)
+        else:
+            iterable = None
+
+        if iterable is not None:
+            for obj in iterable:
+                self._insert_to_hist_tree(obj, tree_id)
 
     def Interpreter(self):
         try:

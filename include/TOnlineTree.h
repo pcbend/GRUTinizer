@@ -31,6 +31,8 @@ public:
   std::vector<std::string> GetStringLeaves();
   TObject* GetObjectStringLeaves();
 
+  TList* GetHistograms();
+
   void cd(){ saved_dir = gDirectory; directory.cd(); }
   void popd() {
     if(saved_dir) {
