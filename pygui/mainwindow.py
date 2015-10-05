@@ -407,35 +407,27 @@ class MainWindow(object):
     def LoadRootFile(self,filename):
         tfile = ROOT.TFile(filename)
         self.files[filename] = tfile
+        self._insert_to_hist_tree(tfile)
 
-        icon = self.icons['tfile']
-        self._insert_collapsable('',tfile,icon)
-
-    def _insert_drawable(self,obj,tree_id):
+    def _insert_to_hist_tree(self,obj,tree_id=''):
         if obj.Class().InheritsFrom('TH2'):
             icon = self.icons['h2_t']
         elif obj.Class().InheritsFrom('TH1'):
             icon = self.icons['h1_t']
+        elif obj.Class().InheritsFrom('TFile'):
+            icon = self.icons['tfile']
+        elif obj.Class().InheritsFrom('TDirectory'):
+            icon = self.icons['folder_t']
         else:
             icon = ''
 
         index = len(self.hist_indices)
         self.hist_indices[index] = obj
-        self.hists.insert(tree_id,'end',index, text=obj.GetName(),image=icon)
+        tree_id = self.hists.insert(tree_id,'end',index, text=obj.GetName(),image=icon)
 
-    def _insert_collapsable(self,top,directory,icon=''):
-        index = len(self.hist_indices)
-        self.hist_indices[index] = directory
-        tree_id = self.hists.insert(top,'end',index,text=directory.GetName(), image=icon)
-
-        for key in directory.GetListOfKeys():
-            obj = key.ReadObj()
-            if obj.Class().InheritsFrom('TDirectory'):
-                icon = self.icons['folder_t']
-                self._insert_collapsable(directory.GetName(),obj,icon)
-            else:
-                self._insert_drawable(obj,tree_id)
-
+        if hasattr(obj,'GetListOfKeys'):
+            for key in obj.GetListOfKeys():
+                self._insert_to_hist_tree(key.ReadObj(), tree_id)
 
     def Interpreter(self):
         try:
