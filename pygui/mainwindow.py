@@ -17,6 +17,13 @@ def fix_tcanvases():
     for canvas in ROOT.gROOT.GetListOfCanvases():
         canvas.Update()
 
+def is_int(string):
+    try:
+        int(string)
+        return True
+    except ValueError:
+        return False
+
 class MainWindow(object):
 
     def __init__(self,host,port):
@@ -339,33 +346,25 @@ class MainWindow(object):
     def _MakeHistView(self,parent):
         self.hists = ttk.Treeview(parent)
         self.hists.pack(fill=tk.BOTH,expand=True)
+        # Map from index to ROOT object
+        # Indices increase sequentially
+        self.hist_indices = {}
         self.hists.bind("<Double-1>", self.OnHistClick)
 
     def OnHistClick(self,event):
-        hist_names = event.widget.selection()
-        if not event.widget.parent(hist_names[0]):
-            return
+        hist_indices = [int(s) for s in event.widget.selection()
+                        if is_int(s)]
+        objects = [self.hist_indices[i] for i in hist_indices
+                   if i in self.hist_indices]
+        histograms = [h for h in objects if h.InheritsFrom('TH1')]
+
         color = 1;
-        for hist_name in hist_names:
-            try:
-                file_name = hist_name
-                while event.widget.parent(file_name):
-                    file_name = event.widget.parent(file_name)
-            except TclError:
-                continue
-
-            try:
-                obj = self.files[file_name].FindObjectAny(hist_name)
-            except KeyError:
-                print("file: " + self.files[file_name].GetName() + "hist: " + hist_name)
-                return
-
-            if obj.InheritsFrom(ROOT.TH1.Class()):
-                self._draw_single(obj,color,len(hist_names))
-                if self.plotlocation.get()=='Overlay':
+        for obj in histograms:
+            self._draw_single(obj,color,len(hist_indices))
+            if self.plotlocation.get()=='Overlay':
+                color+=1
+                if color == 5:
                     color+=1
-                    if color == 5:
-                        color+=1
 
 
     def _draw_single(self,hist,color=1,nselected=1):
@@ -420,10 +419,14 @@ class MainWindow(object):
         else:
             icon = ''
 
-        self.hists.insert(tree_id,'end',obj.GetName(), text=obj.GetName(),image=icon)
+        index = len(self.hist_indices)
+        self.hist_indices[index] = obj
+        self.hists.insert(tree_id,'end',index, text=obj.GetName(),image=icon)
 
     def _insert_collapsable(self,top,directory,icon=''):
-        tree_id = self.hists.insert(top,'end',directory.GetName(),text=directory.GetName(), image=icon)
+        index = len(self.hist_indices)
+        self.hist_indices[index] = directory
+        tree_id = self.hists.insert(top,'end',index,text=directory.GetName(), image=icon)
 
         for key in directory.GetListOfKeys():
             obj = key.ReadObj()
