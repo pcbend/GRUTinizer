@@ -27,6 +27,14 @@ int TRawEventSource::Read(TRawEvent& event){
   }
 }
 
+int TRawEventSource::Read(TRawEvent* event){
+  if(event){
+    return Read(*event);
+  } else {
+    return -1;
+  }
+}
+
 namespace{
   int hasSuffix(const char *name,const char *suffix) {
     const char *s = strstr(name,suffix);

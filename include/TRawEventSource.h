@@ -32,6 +32,8 @@ public:
    */
   int Read(TRawEvent& event);
 
+  int Read(TRawEvent* event);
+
   virtual std::string SourceDescription() const = 0;
   virtual std::string Status() const = 0;
 
