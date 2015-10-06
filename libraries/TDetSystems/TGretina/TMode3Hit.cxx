@@ -29,13 +29,11 @@ void TMode3Hit::BuildFrom(TSmartBuffer buf){
   bool read_waveform = TGRUTOptions::Get()->ExtractWaves();
 
   auto header = (TRawEvent::GEBMode3Head*)buf.GetData();
-  TRawEvent::SwapMode3Head(*header);
   buf.Advance(sizeof(TRawEvent::GEBMode3Head));
 
   board_id = header->board_id;
 
   auto data   = (TRawEvent::GEBMode3Data*)buf.GetData();
-  TRawEvent::SwapMode3Data(*data);
   buf.Advance(sizeof(TRawEvent::GEBMode3Data));
 
   led = data->GetLed();

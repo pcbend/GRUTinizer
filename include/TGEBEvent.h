@@ -41,21 +41,4 @@ private:
   ClassDef(TGEBMode3Event,0);
 };
 
-// TODO remove commented code
-// class TGEBMode3Event : public TGEBEvent {
-// public:
-//   TGEBMode3Event(const TGEBEvent&);
-//   ~TGEBMode3Event();
-
-//   bool GetNextItem(TMode3& output, bool read_waveform = false);  // only used in mode3 data.
-//   //TSmartBuffer GetNextItem(bool read_waveform = false);  // only used in mode3 data.
-
-
-// private:
-//   TSmartBuffer buf;
-
-//   ClassDef(TGEBMode3Event,0);
-// };
-
-
 #endif /* _TGEBEVENT_H_ */

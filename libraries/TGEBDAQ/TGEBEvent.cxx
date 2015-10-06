@@ -23,7 +23,11 @@ const char* TGEBEvent::GetPayload() const {
 }
 
 TSmartBuffer TGEBEvent::GetPayloadBuffer() const {
-  return fBody.BufferSubset(sizeof(Long_t));
+  if(fTimestamp != -1){
+    return fBody;
+  } else {
+    return fBody.BufferSubset(sizeof(Long_t));
+  }
 }
 
 void TGEBEvent::Clear(Option_t *opt) {
@@ -47,57 +51,26 @@ ClassImp(TGEBMode3Event);
 void TGEBMode3Event::BuildFragments(){
   TSmartBuffer buf = fEvent.GetPayloadBuffer();
   TGEBEvent event(fEvent);
-  TRawEvent::GEBMode3Head header;
   TRawEvent::GEBMode3Data data;
 
   while(buf.GetSize()){
     // Read the header and body
-    memcpy((char*)&header, buf.GetData(), sizeof(TRawEvent::GEBMode3Head));
-    TRawEvent::SwapMode3Head(header);
+    TRawEvent::GEBMode3Head* header = (TRawEvent::GEBMode3Head*)buf.GetData();
+    TRawEvent::SwapMode3Head(*header);
 
-    memcpy((char*)&data, buf.GetData()+sizeof(TRawEvent::GEBMode3Head), sizeof(TRawEvent::GEBMode3Data));
-    TRawEvent::SwapMode3Data(data);
+    TRawEvent::GEBMode3Data* data = (TRawEvent::GEBMode3Data*)(buf.GetData()+sizeof(TRawEvent::GEBMode3Head));
+    TRawEvent::SwapMode3Data(*data);
 
-    //header.GetLength() is number of 32-bit values, and does not include the 0xaaaaaaaa separator.
-    size_t body_size = header.GetLength()*4 + 4;
+    //header.GetLength() is number of 32-bit values,
+    //   and does not include the 0xaaaaaaaa separator.
+    size_t body_size = header->GetLength()*4 + 4;
 
     // Transfer the timestamp and body
-    size_t buf_size = body_size + sizeof(Long_t);
-    char* new_buf = (char*)malloc(buf_size);
-    //*(Long_t*)new_buf = data.GetCfd();
-    *(Long_t*)new_buf = data.GetLed();
-    memcpy(new_buf + sizeof(Long_t), buf.GetData(), body_size);
-    event.SetData(TSmartBuffer(new_buf, body_size+sizeof(Long_t)));
+    event.SetFragmentTimestamp(data->GetLed());
+    event.SetData(buf.BufferSubset(0,body_size));
 
     // Push a copy into the list
     fragments.push_back(event);
     buf.Advance(body_size);
   }
 }
-
-// TODO remove commented code
-// TGEBMode3Event::TGEBMode3Event(const TGEBEvent& event)
-//   : TGEBEvent(event) {
-//   buf = event.GetPayloadBuffer();
-// }
-
-// TGEBMode3Event::~TGEBMode3Event() {
-// }
-
-// bool TGEBMode3Event::GetNextItem(TMode3& output, bool read_waveform){
-//   if(!buf.GetSize()){
-//     return false;
-//   }
-
-//   output.BuildFrom(buf, read_waveform);
-//   return true;
-// }
-
-// TSmartBuffer TGEBMode3Event::GetNextItem(bool read_waveform){
-//   if(!buf.GetSize()){
-//     return false;
-//   }
-
-//   output.BuildFrom(buf, read_waveform);
-//   return true;
-// }

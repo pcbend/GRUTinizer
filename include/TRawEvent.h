@@ -45,10 +45,14 @@ public:
   Int_t  GetBodySize()  const;
   Long_t GetTimestamp() const;
 
+  void SetFragmentTimestamp(long timestamp) { fTimestamp = timestamp; }
+
 protected:
   RawHeader fEventHeader;
   kFileType fFileType;
+  long fTimestamp;
   TSmartBuffer fBody;
+
 
   ClassDef(TRawEvent,0)
 };

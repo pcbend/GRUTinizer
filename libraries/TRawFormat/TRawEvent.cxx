@@ -17,6 +17,7 @@ TRawEvent::TRawEvent() {
   fEventHeader.datum1      = -1;
   fEventHeader.datum2      =  0;
   fFileType = kFileType::UNKNOWN_FILETYPE;
+  fTimestamp = -1;
 }
 
 void TRawEvent::Copy(TObject &rhs) const {
@@ -24,6 +25,7 @@ void TRawEvent::Copy(TObject &rhs) const {
   ((TRawEvent&)rhs).fEventHeader = fEventHeader;
   ((TRawEvent&)rhs).fBody        = fBody;
   ((TRawEvent&)rhs).fFileType    = fFileType;
+  ((TRawEvent&)rhs).fTimestamp    = fTimestamp;
 }
 
 TRawEvent::TRawEvent(const TRawEvent &rhs) {
@@ -89,6 +91,10 @@ Int_t TRawEvent::GetBodySize() const {
 }
 
 Long_t TRawEvent::GetTimestamp() const {
+  if(fTimestamp != -1){
+    return fTimestamp;
+  }
+
   assert(fFileType != kFileType::UNKNOWN_FILETYPE);
 
   switch(fFileType){
