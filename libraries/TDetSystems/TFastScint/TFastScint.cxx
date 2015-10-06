@@ -3,9 +3,10 @@
 #include <cassert>
 #include <iostream>
 
-//#include "FastScintDataFormat.h"
 #include "TNSCLEvent.h"
 #include "TH2.h"
+
+int TFastScint::errors;
 
 TFastScint::TFastScint() {
   fs_hits = new TClonesArray("TFastScintHit");
@@ -37,7 +38,7 @@ int TFastScint::BuildHits(){
   for(auto& event : raw_data){
     TNSCLEvent& nscl = (TNSCLEvent&)event;
     SetTimestamp(nscl.GetTimestamp());
-    Build_From(nscl);
+    errors+=Build_From(nscl,true);
   }
   return Size();
 }
@@ -55,238 +56,152 @@ TFastScintHit* TFastScint::GetLaBrHit(int i){
   return (TFastScintHit*)fs_hits->At(i);
 }
 
+int TFastScint::GetDetNumberIn_fs_hits(Int_t det){
+  int detNumber = -1;
+  for(int i_hit = 0; i_hit < Size(); i_hit++){
+    TFastScintHit* temp_hit = GetLaBrHit(i_hit);
+    if(temp_hit->GetChannel()==det)
+      detNumber=i_hit;
+  }
+  return detNumber;
+}
+
 TDetectorHit& TFastScint::GetHit(int i){
   return *(TFastScintHit*)fs_hits->At(i);
 }
 
 // This is where the unpacking happens:
-void TFastScint::Build_From(TNSCLEvent &event){
+int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
+
+  bool DEBUG = false;
+
+  bool isQ = false;  
+  bool isT = false;
+
+  Int_t words_processed = 0;
+  UShort_t buffer_size = 0;
+  Int_t detNumber = -1;
+
+  // Payload size in 32 bit words.
+  Int_t PayloadSize = event.GetPayloadSize()/4.0;
   
-  bool DEBUG = true;
+  if(PayloadSize == 1)
+    return 1;
   
-  int counter = 0;
-  int tdc_counter = 0;
-  int qdc_counter = 0;
-
-  //---------------------------------------
-  // Note : The things we want to fill are
-  //        channel, charge, and time
-  unsigned int header_qdc,size_qdc,id_qdc;
-  unsigned int header_tdc,size_tdc, id_tdc, res_tdc;
-  int data;
-  int channel_qdc,charge_qdc,ts_qdc;
-  int channel_tdc,time_tdc,trig_tdc,ts_tdc;
-  int ptr = 0;
-  int BufferSize = 0;
-
-  BufferSize = event.GetBodySize();
-
+  const char* data = event.GetPayload();
+  
+  // NOTE -> buffer_size is 2*PayloadSize.
+  buffer_size = *((UShort_t*)(data));
+  data+=2;
+  
   if(DEBUG){
     event.Print("all");
-    std::cout << " E Type : " << event.GetEventType() << std::endl;
-    std::cout << " Size   : " << BufferSize << std::endl;
+    std::cout << " Payload Size : " << PayloadSize << std::endl;
   }
-
   
-  //=======================
-  // Enter this while loop:
-  while(true){
 
-    //===================
-    // Zero these things:
-    data = 0;
-    channel_qdc = charge_qdc = header_qdc = size_qdc = ts_qdc = 0;
-    channel_tdc = header_tdc = size_tdc = ts_tdc = 0;
-    time_tdc = trig_tdc = 0;
-    ptr = 0;
-    qdc_counter = 0;
-    tdc_counter = 0;
+  for(Int_t i = 0; i <PayloadSize; i++ ){
+    const TRawEvent::Mesy_Word* Mword = (TRawEvent::Mesy_Word*)data;
+    data+=sizeof(TRawEvent::Mesy_Word); words_processed++;
     
-    //=======================================================
-    // Set the initial value for where we are 
-    // looking in the buffer.  Words take up units of
-    // 2, so ptr+=2 means ptr (which was 0) is 2.  This
-    // means look at words 1 and 2 (if we start at word 0).
-    ptr+=2;
-    
-    //====================
-    // Get the QDC header:
-    header_qdc = *((unsigned int*)(event.GetPayload()+ptr));
-
-    //===================================================
-    // The size of the buffer is the number of 32 bit 
-    // data words. It includes a 32 bit End of Event (EOE)
-    // word that contains a 30 bit timestamp.
-    size_qdc = header_qdc&0x00000fff;
-    
-    //================
-    // Get the QDC ID:
-    id_qdc = (header_qdc&0x00ff0000)>>16;
-    
-    if(DEBUG){
-      if(size_qdc>3){
-	std::cout << " Head   : " << std::hex << header_qdc << std::endl;
-	std::cout << " Words  : " << size_qdc << std::endl;
-	std::cout << " ID     : " << id_qdc << std::endl;
+    if(Mword->isHeader()){ // Header
+      const TRawEvent::Mesy_Header* Mhead = (TRawEvent::Mesy_Header*)Mword;
+      if(Mhead->isQDC()){ 
+	isQ = true; isT = false;
       }
+      else if(Mhead->isTDC()){ 
+	isQ = false; isT = true;
+      }
+      else std::cout << " *** Error -- Not QDC or TDC *** " << std::endl;
     }
+    else if(Mword->isData()){ // Data
+      if(isQ){ // QDC:
+	// NOTE -> we do it this way bc QDC should always come first!!!!
+	TFastScintHit hit;
+	const TRawEvent::M_QDC_Data* Mq = (TRawEvent::M_QDC_Data*)Mword;
+	hit.SetChannel(Mq->Chan());
+	hit.SetTime(-1);
+	if(Mq->isOOR()) hit.SetCharge(5000);
+	else            hit.SetCharge(Mq->Charge());	
+	
+	if(Zero_Suppress){
+	  if(Mq->Charge()>0){
+	    InsertHit(hit);
+	  }
+	}
+	else{
+	  InsertHit(hit);
+	 
+	
+	}
 
-    /*****************************************************/
-    // Want to loop over the number of words in the buffer
-    // minus the EOE words.
-    std::map<int,int> chanmap;
-    for(int i_i = 0; i_i<size_qdc-1;i_i++){
 
-      //===================================================
-      // Get payload gets new data words in intervals of 4:
-      ptr+=4;
-      data =*((unsigned int*)(event.GetPayload()+ptr));
-
-      //===========================================
-      // If these words are an "extended timestamp"
-      // skip it for now.
-      if((data&0xffff0000)==0x04800000)
-	continue;
-      
-      if((data&0xffffffff)==0x00000000)
-      	continue;
-
-      //=========================================
-      // Now pick off detector number and charge:
-      if((data&0xfff00000) != 0x04000000)
-        continue;
-      channel_qdc = (data&0x001f0000)>>16;
-      //hit.SetChannel(channel_qdc);
-      charge_qdc = (data&0x00000fff);	     
-      //hit.SetCharge(charge_qdc);
-      chanmap[channel_qdc]=charge_qdc;
-      if(charge_qdc>0)
-	qdc_counter++;
-      //InsertHit(hit);
-
-      if(DEBUG){
-	if(size_qdc>3){
-	  std::cout << " Charge : " << charge_qdc << std::endl;
-	  std::cout << " Chan   : " << channel_qdc << std::endl;
+	if(DEBUG){
+	  std::cout << " QDC Q : " << std::hex << Mq->Charge() << std::endl;
+	  std::cout << " QDC ch: " << std::dec << Mq->Chan() << std::endl;
+	  std::cout << " QDC Ov: " << Mq->isOOR() << std::endl;
 	}
       }
- 
-    }
-    std::map<int,int>::iterator it;
-    for(it=chanmap.begin();it!=chanmap.end();it++){
-      TFastScintHit hit;      
-      hit.SetChannel(it->first);
-      hit.SetCharge(it->second);
-      InsertHit(hit);
+      else if(isT){ // TDC
+	const TRawEvent::M_TDC_Data* Mt = (TRawEvent::M_TDC_Data*)Mword;
+	
+	detNumber = -1;
+	detNumber = GetDetNumberIn_fs_hits(Int_t(Mt->Chan()));
 
-    }
-
-    /******************************************/
-    // Now handle the last words. These are TS
-    ptr+=4;
-    data =*((unsigned int*)(event.GetPayload()+ptr));
-    ts_qdc = (data&0x00ffffff);
-    
-    if(DEBUG){
-      if(size_qdc>3){
-	std::cout << " TS     : " << ts_qdc << std::endl;
-      }
-    }
-
-    //---------------- END QDC --------------------------    
-    
-    /**************************************************/
-    // Here we will handle the TDC part of the buffer.
- /*   ptr+=8;
-    header_tdc =*((unsigned int*)(event.GetPayload()+ptr));
-    size_tdc = header_tdc&0x00000fff;
-    id_tdc  = (header_tdc&0x00ff0000)>>16;
-    res_tdc = (header_tdc&0x0000f000)>>12;
-  
-  
-    if(DEBUG){
-      if(size_qdc>3){
-	std::cout << " Head T : " << header_tdc << std::endl;
-	std::cout << " Size T : " << size_tdc << std::endl;
-	std::cout << " ID T   : " << id_tdc << std::endl;
-	std::cout << " Res T  : " << res_tdc <<std::endl;
-      }
-    }
-    
-    for(int i_j = 0; i_j<size_tdc-1;i_j++){
-      if((header_tdc&0xff000000)!=0x40000000)
-	continue;
-      
-      //===================================================
-      // Get payload gets new data words in intervals of 4:
-      ptr+=4;
-      data =*((unsigned int*)(event.GetPayload()+ptr));
-
-      //===========================================
-      // If these words are an "extended timestamp"
-      // skip it for now.
-      if((data&0xffff0000)==0x04800000)
-	continue;
-      
-      if((data&0xffffffff)==0x00000000)
-	continue;
-
-      //===================================
-      // If these words have a trigger flag, 
-      // do this:
-      if((data&0x00200000)>>21==1){
-	trig_tdc = data&0x0000ffff;
-        SetTDCTrigger(trig_tdc);	
-	continue;
-      }
-      
-      channel_tdc = (data&0x001f0000)>>16;
-      time_tdc = data&0x0000ffff;
-      bool found = false;
-      for(int k=0;k<Size();k++) {
-        TFastScintHit *qdchit = GetLaBrHit(k);
-        if(qdchit->GetChannel()==channel_tdc) {
-          found = true;
-          qdchit->SetTime(time_tdc);
-	  if(time_tdc>0)
-	    tdc_counter++;
-	  break;
-        }
-      }
-      if(!found) {
-        printf("I AM NEVER HERE!\n");
-        TFastScintHit tdchit;
-        tdchit.SetChannel(channel_tdc);
-        tdchit.SetCharge(0);
-        tdchit.SetTime(time_tdc);
-	tdc_counter++;
-        InsertHit(tdchit);
-      }
-
-      if(DEBUG){
-	if(size_tdc>3){
-	  std::cout << " Chan T : " << channel_tdc << std::endl;
-	  std::cout << " Time T : " << time_tdc << std::endl;
+	
+	if(detNumber!=-1){
+	  TFastScintHit *qdc_hit = GetLaBrHit(detNumber);
+	  if(qdc_hit->GetChannel()==Mt->Chan()){
+	    qdc_hit->SetTime(Mt->Time());
+	    
+	    if(DEBUG){
+	      std::cout << " TDC ch         : " << Mt->Chan() << std::endl;
+	      std::cout << " TDC for QDC ch : " << qdc_hit->GetChannel() << std::endl;
+	      std::cout << " TDC time       : " << Mt->Time() << std::endl;
+	    }
+	  }
+	  else{ // should never be here.
+	    std::cout << " *** Found a Channel but it didnt match ?? *** " << std::endl;
+	  }
 	}
+	else{ // No Matching QDC 
+	  TFastScintHit tdc_hit;
+	  tdc_hit.SetTime(Mt->Time());
+	  tdc_hit.SetCharge(-1);
+	  
+	  if(Mt->isTrig())  tdc_hit.SetChannel(-10);
+	  else   	    tdc_hit.SetChannel(Mt->Chan());
+	    
+	  if(Zero_Suppress){
+	    if(Mt->Time()>0){
+	      InsertHit(tdc_hit);
+	    }
+	  }
+	  else
+	    InsertHit(tdc_hit);
+	  
+	  if(DEBUG){
+	    std::cout << " TDC t : " << std::hex << Mt->Time() << std::endl;
+	    std::cout << " TDC ch: " << std::dec << Mt->Chan() << std::endl;
+	    std::cout << " TDC Tr: " << Mt->isTrig() << std::endl;
+	  }
+	}
+      }	
+      else{ // If not QDC or TDC 
+	std::cout << " *** Not TDC or QDC **** " << std::endl;
       }
- 
     }
-
-    SetTDC_Count(tdc_counter);
-    SetQDC_Count(qdc_counter);
-    
-    //===================
-    // Get TDC Timestamp:
-    ptr+=4;
-    data =*((unsigned int*)(event.GetPayload()+ptr));
-    ts_tdc = (data&0x00ffffff);
-   */ 
-    if(DEBUG){
-      if(size_tdc>3){
-	std::cout << " T  TS  : " << ts_tdc << std::endl;
-	std::cout << " Trig T : " << trig_tdc << std::endl;
-      }
+    else if(Mword->isETS()){
+      if(DEBUG)
+	std::cout << " ETS " << std::endl;
     }
-    break;
-  }// end while.
+    else if(Mword->isFILL()){
+      if(DEBUG)
+	std::cout << " Filler " << std::endl;
+    }
+    else if(Mword->isEOE()){
+      if(DEBUG) std::cout << " EOE " << std::endl;
+    }    
+  }
+  return 0;
 }
