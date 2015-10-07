@@ -79,7 +79,7 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("f format",&default_file_format)
     .description("File format of raw data.  Allowed options are \"EVT\" and \"GEB\"."
                  "If unspecified, will be guessed from the filename.");
-  parser.option("w getwaves",&fMakeBackupFile)
+  parser.option("w getwaves",&fExtractWaves)
     .description("Extract wave forms to data class when available.")
     .default_value(false);
   parser.option("no-backup",&fMakeBackupFile)
