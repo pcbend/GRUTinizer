@@ -17,13 +17,6 @@ def fix_tcanvases():
     for canvas in ROOT.gROOT.GetListOfCanvases():
         canvas.Update()
 
-def is_int(string):
-    try:
-        int(string)
-        return True
-    except ValueError:
-        return False
-
 def unpack_tdirectory(tdir):
     for key in tdir.GetListOfKeys():
         yield key.ReadObj()
@@ -400,21 +393,17 @@ class MainWindow(object):
     def _MakeHistView(self,parent):
         self.hists = ttk.Treeview(parent)
         self.hists.pack(fill=tk.BOTH,expand=True)
-        # Map from index to ROOT object
-        # Indices increase sequentially
-        self.hist_indices = {}
+        # Map from treeview name to ROOT object
+        self.hist_lookup = {}
         self.hists.bind("<Double-1>", self.OnHistClick)
 
     def OnHistClick(self,event):
-        hist_indices = [int(s) for s in event.widget.selection()
-                        if is_int(s)]
-        objects = [self.hist_indices[i] for i in hist_indices
-                   if i in self.hist_indices]
+        objects = [self.hist_lookup[i] for i in event.widget.selection()]
         histograms = [h for h in objects if h.InheritsFrom('TH1')]
 
         color = 1;
         for obj in histograms:
-            self._draw_single(obj,color,len(hist_indices))
+            self._draw_single(obj,color,len(histograms))
             if self.plotlocation.get()=='Overlay':
                 color+=1
                 if color == 5:
@@ -459,11 +448,12 @@ class MainWindow(object):
         self.LoadRootFile(filename)
 
     def LoadRootFile(self,filename):
+        filename = os.path.abspath(filename)
         tfile = ROOT.TFile(filename)
         self.files[filename] = tfile
         self._insert_to_hist_tree(tfile)
 
-    def _insert_to_hist_tree(self,obj,tree_id=''):
+    def _insert_to_hist_tree(self,obj,parent=''):
         if obj.Class().InheritsFrom('TH2'):
             icon = self.icons['h2_t']
         elif obj.Class().InheritsFrom('TH1'):
@@ -475,9 +465,17 @@ class MainWindow(object):
         else:
             icon = ''
 
-        index = len(self.hist_indices)
-        self.hist_indices[index] = obj
-        tree_id = self.hists.insert(tree_id,'end',index, text=obj.GetName(),image=icon)
+        name = parent + '/' + obj.GetName()
+
+        if (name in self.hists.get_children(parent) and
+            obj.Class().InheritsFrom('TH1')):
+            orig = self.hist_lookup[name]
+            obj.Copy(orig) # Copy the new object into the original
+            return
+        elif name in self.hists.get_children(parent):
+            self.hist_lookup[name] = obj
+        else:
+            self.hists.insert(parent,'end', name, text=obj.GetName(),image=icon)
 
         if obj.Class().InheritsFrom('TList'):
             iterable = obj
@@ -488,7 +486,7 @@ class MainWindow(object):
 
         if iterable is not None:
             for obj in iterable:
-                self._insert_to_hist_tree(obj, tree_id)
+                self._insert_to_hist_tree(obj, name)
 
     def Interpreter(self):
         try:
