@@ -96,15 +96,23 @@ class MainWindow(object):
         self._LoadMenuBar()
         self.window.config(menu=self.menubar)
 
-        button = tk.Button(self.window,
-                           text='Load Remote File',fg="black",bg="goldenrod",
+        frame = tk.Frame(self.window)
+        button = tk.Button(frame,
+                           text='Load Data File',fg="black",bg="goldenrod",
                            command=self.LoadRemoteFile)
-        button.pack(fill=tk.X,expand=False)
+        button.pack(side=tk.LEFT)
 
-        button = tk.Button(self.window,
-                           text='Load Local File',fg="black",bg="goldenrod",
+        button = tk.Button(frame,
+                           text='Load Root File',fg="black",bg="goldenrod",
                            command=self.LoadLocalFile)
-        button.pack(fill=tk.X,expand=False)
+        button.pack(side=tk.LEFT)
+
+        button = tk.Button(frame,
+                           text='Refresh',fg="black",bg="goldenrod",
+                           command=self.RefreshHistograms)
+        button.pack(side=tk.LEFT)
+
+        frame.pack(fill=tk.X,expand=False)
 
         button = tk.Button(self.window,
                            text='Jump into Interpreter',fg="black",bg="goldenrod",
@@ -179,20 +187,30 @@ class MainWindow(object):
     def _MakeRefreshMenu(self):
         refreshmenu = tk.Menu(self.menubar,tearoff=0)
         refreshmenu.add_checkbutton(label="Off",onvalue=-1,
-                                    variable=self.refreshrate,command=self.set_refresh)
+                                    variable=self.refreshrate)
         refreshmenu.add_command(label="Now!",command=self.RefreshHistograms)
         refreshmenu.add_separator()
         refreshmenu.add_checkbutton(label="1 second",onvalue=1,
-                                    variable=self.refreshrate,command=self.set_refresh)
+                                    variable=self.refreshrate)
         refreshmenu.add_checkbutton(label="2 seconds",onvalue=2,
-                                    variable=self.refreshrate,command=self.set_refresh)
+                                    variable=self.refreshrate)
         refreshmenu.add_checkbutton(label="5 seconds",onvalue=5,
-                                    variable=self.refreshrate,command=self.set_refresh)
+                                    variable=self.refreshrate)
         refreshmenu.add_checkbutton(label="10 seconds",onvalue=10,
-                                    variable=self.refreshrate,command=self.set_refresh)
+                                    variable=self.refreshrate)
         refreshmenu.add_checkbutton(label="30 seconds",onvalue=30,
-                                    variable=self.refreshrate,command=self.set_refresh)
+                                    variable=self.refreshrate)
         self.menubar.add_cascade(label="Refresh",menu=refreshmenu)
+        self.window.after_idle(self._PeriodicRefresh)
+
+    def _PeriodicRefresh(self):
+        if self.refreshrate.get()<0:
+            self.window.after(1000,self._PeriodicRefresh)
+            return
+
+        self.RefreshHistograms()
+        self.window.after(self.refreshrate.get()*1000, self._PeriodicRefresh)
+
 
     def _MakeZoneMenu(self):
         zonesmenu = tk.Menu(self.menubar,tearoff=0)
@@ -475,6 +493,7 @@ class MainWindow(object):
         elif name in self.hists.get_children(parent):
             self.hist_lookup[name] = obj
         else:
+            self.hist_lookup[name] = obj
             self.hists.insert(parent,'end', name, text=obj.GetName(),image=icon)
 
         if obj.Class().InheritsFrom('TList'):
