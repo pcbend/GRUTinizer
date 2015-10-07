@@ -102,7 +102,6 @@ GCanvas::~GCanvas() {
 }
 
 void GCanvas::GCanvasInit() {
-   printf("GCanvasInit called.\n");
    // ok, to interact with the default TGWindow
    // stuff from the root gui we need our own GRootCanvas.
    // We make this using GROOTGuiFactory, which replaces the

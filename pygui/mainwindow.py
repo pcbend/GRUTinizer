@@ -7,11 +7,11 @@ import ttk
 
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
-import math
 
 from .run_command import run_command
 from .tree_tab import TreeTab
 from .hist_tab import HistTab
+from .tcut_tab import TCutTab
 
 #Fix ROOT TCanvases, which don't redraw when they should
 def fix_tcanvases():
@@ -47,6 +47,8 @@ class MainWindow(object):
             file = os.path.join(os.path.dirname(__file__),'resources','folder_t.gif'))
         self.icons['tfile'] = tk.PhotoImage(
             file = os.path.join(os.path.dirname(__file__),'resources','rootdb_t.gif'))
+        self.icons['tcutg'] = tk.PhotoImage(
+            file = os.path.join(os.path.dirname(__file__),'resources','bld_cut.gif'))
         img = tk.PhotoImage(file=os.path.join(os.path.dirname(__file__),'resources','hdb_s.gif'))
         self.window.tk.call('wm','iconphoto',self.window._w,img)
 
@@ -102,6 +104,10 @@ class MainWindow(object):
         hist_page = ttk.Frame(notebook)
         self.hist_tab = HistTab(self, hist_page)
         notebook.add(hist_page, text='Histograms')
+
+        tcut_page = ttk.Frame(notebook)
+        self.tcut_page = TCutTab(self, tcut_page)
+        notebook.add(tcut_page, text='Gates')
 
         notebook.pack(fill=tk.BOTH,expand=True)
 

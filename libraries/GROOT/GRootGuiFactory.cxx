@@ -67,7 +67,6 @@ TCanvasImp *GRootGuiFactory::CreateCanvasImp(TCanvas *c, const char *title,
                                              UInt_t width, UInt_t height)
 {
    // Create a ROOT native GUI version of TCanvasImp
-   printf("Created a GRootCanvas.\n");
    //GRootObjectManager::Instance()->AddCanvas(c);
    //return new GRootCanvas(c, title, width, height);i
    GRootCanvas *grc = new GRootCanvas((GCanvas*)c, title, width, height);
@@ -83,7 +82,6 @@ TCanvasImp *GRootGuiFactory::CreateCanvasImp(TCanvas *c, const char *title,
                                   Int_t x, Int_t y, UInt_t width, UInt_t height)
 {
    // Create a ROOT native GUI version of TCanvasImp
-   printf("Created a GRootCanvas.\n");
    //GRootObjectManager::Instance()->AddCanvas(c);
    //return new GRootCanvas(c, title, x, y, width, height);
    GRootCanvas *grc = new GRootCanvas((GCanvas*)c, title, x, y, width, height);
