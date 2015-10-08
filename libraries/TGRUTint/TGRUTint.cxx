@@ -176,10 +176,12 @@ void TGRUTint::ApplyOptions() {
   }
 
   if(opt->StartGUI()){
-    std::string script_filename = program_path() + "../util/grut-view.py";
+    std::string script_filename = program_path() + "/../util/grut-view.py";
+    //printf("%s\n",script_filename.c_str());
     std::ifstream script(script_filename);
     std::string script_text((std::istreambuf_iterator<char>(script)),
                             std::istreambuf_iterator<char>());
+    //printf("%s\n",script_text.c_str());
     TPython::Exec(script_text.c_str());
     fGuiTimer = new TTimer("TPython::Exec(\"if threading.current_thread().ident == ident: window.Update()\");",100);
     fGuiTimer->TurnOn();

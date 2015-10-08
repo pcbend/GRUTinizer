@@ -95,16 +95,25 @@ void TObjectManager::SaveAndClose(Option_t* option){
 }
 
 
-TObjectManager *TObjectManager::cd() {
-  gManager = this;
-  TFile::cd();
+bool TObjectManager::cd(const char * path) {
+  //gManager = this;
+  bool ok = TDirectoryFile::cd(path);
+  if(ok) gManager = (TObjectManager*)TFile::CurrentFile();
+  //TFile::cd();
 
-  return this;
+  return ok;
 }
+
+
+
+
 
 TObjectManager::~TObjectManager() {
 
 }
+
+
+
 
 void TObjectManager::SaveParent(TObject *parent) {
   TString options = this->GetOption();

@@ -82,7 +82,7 @@ run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  
                 rm -f $(2).log $(2).error
 endif
 
-all: $(EXECUTABLES) $(LIBRARY_OUTPUT) bin/grutinizer-config bin/grut-view.py
+all: $(EXECUTABLES) $(LIBRARY_OUTPUT) bin/grutinizer-config 
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
 
 docs:

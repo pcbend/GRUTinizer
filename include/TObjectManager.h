@@ -30,7 +30,8 @@ public:
 
   static TObjectManager *Open(const char *fname,Option_t *opt="read");
   static TList *GetListOfManagers() { return &objectmanagers; }
-  TObjectManager *cd();
+  //TObjectManager *cd();
+  bool cd(const char *path=0);
 
   TH1* GetNext1D(TH1* from, bool forward);
 
