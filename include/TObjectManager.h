@@ -44,7 +44,8 @@ private:
   typedef std::map<TObject*,std::vector<TObject*> > ParentChildMap;
   ParentChildMap fParentChildren;
   void SaveParent(TObject*);
-
+  
+  void FindTrackables(TDirectory*);
 
   ClassDef(TObjectManager, 0);
 };

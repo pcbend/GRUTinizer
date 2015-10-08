@@ -167,8 +167,10 @@ void TGRUTint::ApplyOptions() {
     TGRUTLoop::Get()->Start();
   }
 
-  for(auto& filename : opt->RootInputFiles()){
-    OpenRootFile(filename);
+  if(!opt->StartGUI()) {
+    for(auto& filename : opt->RootInputFiles()){
+      OpenRootFile(filename);
+    }
   }
 
   for(auto& filename : opt->MacroInputFiles()){
@@ -183,6 +185,10 @@ void TGRUTint::ApplyOptions() {
                             std::istreambuf_iterator<char>());
     //printf("%s\n",script_text.c_str());
     TPython::Exec(script_text.c_str());
+    for(auto& filename : opt->RootInputFiles()){
+      TPython::Exec(Form("window.LoadRootFile(\"%s\")",filename.c_str()));
+      OpenRootFile(filename);
+    }
     fGuiTimer = new TTimer("TPython::Exec(\"if threading.current_thread().ident == ident: window.Update()\");",100);
     fGuiTimer->TurnOn();
   }

@@ -446,7 +446,11 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
     break;
 
   case kMyArrowUp: {
-    TH1* temph = gManager->GetNext1D(hists.at(0), false);
+    //printf("Up.\n");
+    //printf("start: 0x%08x\n",hists.at(0));
+    TH1* temph = (TH1*)gManager->FindObjectAny(hists.at(0)->GetName());
+    temph = gManager->GetNext1D(temph, false);
+    //printf("next:  0x%08x\n",temph);
     if(temph) {
       temph->GetXaxis()->SetRange(first,last);
       temph->Draw();
@@ -455,7 +459,10 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
   }
     break;
   case kMyArrowDown: {
-    TH1* temph = gManager->GetNext1D(hists.at(0), true);
+    //printf("Down.\n");
+    //TH1* temph = gManager->GetNext1D(hists.at(0), true);
+    TH1* temph = (TH1*)gManager->FindObjectAny(hists.at(0)->GetName());
+    temph = gManager->GetNext1D(temph, false);
     if(temph) {
       temph->GetXaxis()->SetRange(first,last);
       temph->Draw();

@@ -150,16 +150,36 @@ class MainWindow(object):
         return menubar
 
     def _MakeFileMenu(self, menubar):
+        self.defaultcanvassize = tk.StringVar(value='800x600')
         filemenu = tk.Menu(menubar,tearoff=0)
         filemenu.add_command(label="New Canvas",command=self.open_canvas)
+        filemenu.add_separator()
+        filemenu.add_checkbutton(label="Size 800 x 600",onvalue="800x600",
+                                 variable=self.defaultcanvassize)
+        filemenu.add_checkbutton(label="Size 1200 x 600",onvalue="1200x600",
+                                 variable=self.defaultcanvassize)
+        filemenu.add_checkbutton(label="Size 1900 x 450",onvalue="1900x450",
+                                 variable=self.defaultcanvassize)
+        filemenu.add_checkbutton(label="Size 1900 x 900",onvalue="1900x900",
+                                 variable=self.defaultcanvassize)
         filemenu.add_separator()
         filemenu.add_command(label="Close All Canvases",command=self.close_all_canvases)
         filemenu.add_separator()
         filemenu.add_command(label="Open",command=self.hello)
         filemenu.add_command(label="Save",command=self.hello)
         filemenu.add_separator()
-        filemenu.add_command(label="Exit",command=self.window.quit)
+        #filemenu.add_command(label="Exit",command=self.window.quit)
+        filemenu.add_command(label="Exit",command=ROOT.TGRUTint.instance().Terminate)
         menubar.add_cascade(label="File",menu=filemenu)
+
+    def get_canvas_size(self,size=""):
+        if not size:
+            size = self.defaultcanvassize.get()
+        size = size.lower()
+        size.replace(" ","")
+        size = size.split("x")
+        array =(size[0],size[1])
+        return array
 
     def _MakeRefreshMenu(self,menubar):
         self.refreshrate  = tk.IntVar(value='-1')
@@ -210,6 +230,8 @@ class MainWindow(object):
         zonesmenu.add_checkbutton(label="3 x 3",onvalue='3x3',
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="4 x 4",onvalue='4x4',
+                                  variable=self.predefinedzones,command=self.set_zones)
+        zonesmenu.add_checkbutton(label="8 x 4",onvalue='8x4',
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="12 x 12",onvalue='12x12',
                                   variable=self.predefinedzones,command=self.set_zones)
@@ -324,7 +346,7 @@ class MainWindow(object):
             return
 
         filename = os.path.abspath(filename)
-        tfile = ROOT.TObjectManager.Get(filename)
+        tfile = ROOT.TObjectManager.Get(filename,"read")
         self.files[filename] = tfile
         self.hist_tab.Insert(tfile)
 
@@ -374,7 +396,9 @@ class MainWindow(object):
             rows = self.zone_rows
 
         if width*height == 0:
-            canvas = ROOT.GCanvas(title,title)
+            array = self.get_canvas_size()
+            array = map(int,array)
+            canvas = ROOT.GCanvas(title,title,0,0,array[0],array[1])
         else:
             canvas = ROOT.GCanvas(title,title,topx,topy,width,height);
         canvas.cd()
