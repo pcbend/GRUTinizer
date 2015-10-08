@@ -20,8 +20,8 @@ public:
   const std::vector<std::string>& RootInputFiles()  { return input_root_files;  }
   const std::vector<std::string>& CalInputFiles()   { return input_cal_files;   }
   const std::vector<std::string>& MacroInputFiles() { return input_macro_files; }
-  const std::string DetectorEnvironment()           { return detector_environment; }
-  const std::string OutputFile()                    { return output_file; }
+  const std::string& DetectorEnvironment()          { return detector_environment; }
+  const std::string& OutputFile()                   { return output_file; }
   std::string InputRing() { return input_ring; }
 
   int CommandPort() { return fCommandPort; }
@@ -37,6 +37,7 @@ public:
   bool IgnoreMode3()        const { return fIgnoreMode3; }
   bool CommandServer()      const { return fCommandServer; }
   bool ExtractWaves()       const { return fExtractWaves;  }
+  bool StartGUI()           const { return fStartGui; }
 
   bool IsOnline()           const { return fIsOnline; }
 
@@ -80,6 +81,7 @@ private:
   bool fCommandServer;
   bool fExtractWaves;
   bool fIsOnline;
+  bool fStartGui;
 
   bool fTimeSortInput;
 

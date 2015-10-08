@@ -3,6 +3,9 @@
 import Tkinter as tk
 import ttk
 
+import ROOT
+ROOT.PyConfig.IgnoreCommandLineOptions = True
+
 from .tree_structure import Node
 
 class TreeTab(object):
@@ -124,12 +127,10 @@ class TreeTab(object):
             self.next_param = 'x'
 
     def _LoadTree(self):
-        res = self.main.run_command('if(online_events) {'
-                                    '    gResponse = online_events->GetObjectStringLeaves();'
-                                    '}')
-        if res is None:
+        if not ROOT.online_events:
             return
 
+        res = ROOT.online_events.GetObjectStringLeaves()
         res = filter(None,str(res).split('\n'))
         tree = Node('')
         for item in res:
@@ -137,32 +138,26 @@ class TreeTab(object):
         tree.ttk_treeview(self.tree)
 
     def AddHistogram(self):
-        commands = {1:
-                    'if(online_events) {{'
-                    '    online_events->AddHistogram("{name}",'
-                    '                                {Xbins},{Xlow},{Xhigh},"{Xexp}");'
-                    '}}',
-                    2:
-                    'if(online_events) {{'
-                    '    online_events->AddHistogram("{name}",'
-                    '                                {Xbins},{Xlow},{Xhigh},"{Xexp}",'
-                    '                                {Ybins},{Ylow},{Yhigh},"{Yexp}");'
-                    '}}',
-        }
+        if not ROOT.online_events:
+            return
 
         dimension = 2 if self.hist2d.get() else 1
-        command = commands[dimension]
 
-        args = {'name'  : self.hist_name.get(),
-                'Xbins' : self.x_draw_bins.get(),
-                'Xlow'  : self.x_draw_low.get(),
-                'Xhigh' : self.x_draw_high.get(),
-                'Xexp'  : self.x_draw_varexp.get(),
-                'Ybins' : self.y_draw_bins.get(),
-                'Ylow'  : self.y_draw_low.get(),
-                'Yhigh' : self.y_draw_high.get(),
-                'Yexp'  : self.y_draw_varexp.get(),
-            }
-        command = command.format(**args)
-        self.main.run_command(command)
+        if dimension==1:
+            ROOT.online_events.AddHistogram(self.hist_name.get(),
+                                            self.x_draw_bins.get(),
+                                            self.x_draw_low.get(),
+                                            self.x_draw_high.get(),
+                                            self.x_draw_varexp.get())
+        else:
+            ROOT.online_events.AddHistogram(self.hist_name.get(),
+                                            self.x_draw_bins.get(),
+                                            self.x_draw_low.get(),
+                                            self.x_draw_high.get(),
+                                            self.x_draw_varexp.get(),
+                                            self.y_draw_bins.get(),
+                                            self.y_draw_low.get(),
+                                            self.y_draw_high.get(),
+                                            self.y_draw_varexp.get())
+
         self.main.RefreshHistograms()
