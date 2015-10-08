@@ -537,6 +537,13 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
     //case kKey_G:
     //   edited = GausBGFit();
     //   break;
+    case kKey_i:
+       if(!hists.empty() && GetNMarkers()>1) {
+         double sum = hists.back()->Integral( hists.back()->GetXaxis()->FindBin(fMarkers.at(fMarkers.size()-2)->localx),
+                                              hists.back()->GetXaxis()->FindBin(fMarkers.back()->localx) );
+         printf( BLUE "\n\tSum [%.01f : %.01f] = %.01f\n",fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx,sum);
+       }
+       break;
     //case kKey_l:
     //   for(int i=0;i<hists.size();i++) {
     //      hists.at(i)->GetYaxis()->UnZoom();
