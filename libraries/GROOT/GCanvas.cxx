@@ -539,9 +539,13 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
     //   break;
     case kKey_i:
        if(!hists.empty() && GetNMarkers()>1) {
-         double sum = hists.back()->Integral( hists.back()->GetXaxis()->FindBin(fMarkers.at(fMarkers.size()-2)->localx),
-                                              hists.back()->GetXaxis()->FindBin(fMarkers.back()->localx) );
-         printf( BLUE "\n\tSum [%.01f : %.01f] = %.01f\n",fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx,sum);
+         double xlow  = (fMarkers.at(fMarkers.size()-2)->localx);
+         double xhigh = (fMarkers.back()->localx); 
+         if(xlow>xhigh)
+           std::swap(xlow,xhigh);
+         double sum = hists.back()->Integral(hists.back()->GetXaxis()->FindBin(xlow),
+                                             hists.back()->GetXaxis()->FindBin(xhigh));
+         printf( BLUE "\n\tSum [%.01f : %.01f] = %.01f" RESET_COLOR  "\n",xlow,xhigh,sum);
        }
        break;
     //case kKey_l:
