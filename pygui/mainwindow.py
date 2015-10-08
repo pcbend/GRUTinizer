@@ -2,8 +2,10 @@
 
 import os
 import Tkinter as tk
-from tkFileDialog import askopenfilename
+from tkFileDialog import askopenfilename, askopenfilenames
 import ttk
+
+import sys
 
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
@@ -20,13 +22,7 @@ def fix_tcanvases():
 
 class MainWindow(object):
 
-    def __init__(self,host,port):
-        self.host = host
-        self.port = port
-
-        self.load_library('libGui.so',False)
-        self.load_library('libGROOT.so')
-        ROOT.GRootGuiFactory.Init()
+    def __init__(self):
 
         self.window = tk.Tk()
         self._load_icons()
@@ -74,8 +70,8 @@ class MainWindow(object):
 
         frame = tk.Frame(self.window)
         button = tk.Button(frame,
-                           text='Load Data File',fg="black",bg="goldenrod",
-                           command=self.LoadDataFile)
+                           text='Load Data File(s)',fg="black",bg="goldenrod",
+                           command=self.LoadDataFiles)
         button.pack(side=tk.LEFT)
 
         button = tk.Button(frame,
@@ -280,11 +276,9 @@ class MainWindow(object):
         menubar.add_cascade(label="Send Help",menu=helpmenu)
 
     def RefreshHistograms(self):
-        online_hists = self.run_command('if(online_events) {'
-                                        '   gResponse = online_events->GetHistograms();'
-                                        '}')
-        if online_hists is not None:
-            online_hists.SetName('online_hists')
+        if online_tree is not None:
+            hists = online_tree.GetHistograms()
+            hists.SetName('online_hists')
             self.hist_tab.Insert(online_hists)
 
     def _draw_single(self,hist,color=1,nselected=1):
@@ -311,21 +305,26 @@ class MainWindow(object):
         hist.Draw(' '.join(opt))
         fix_tcanvases()
 
-    def run_command(self, command):
-        return run_command(command, self.host, self.port)
+    def LoadDataFiles(self, filenames = None):
+        if filenames is None:
+            filenames = askopenfilenames(filetypes=(("GEB File", "*.dat"),))
+            filenames = self.window.tk.splitlist(filenames)
 
-    def LoadDataFile(self):
-        self.run_command('TGRUTint::instance()->OpenFileDialog()')
+        if not filenames:
+            return
 
-    def LoadRootFile(self):
-        filename = askopenfilename(filetypes=(("ROOT File", "*.root"),))
+        #TODO: Make this not crash
+        ROOT.TGRUTLoop.Get().ProcessFile(filenames,'')
+
+    def LoadRootFile(self,filename=None):
+        if filename is None:
+            filename = askopenfilename(filetypes=(("ROOT File", "*.root"),))
+
         if not filename:
             return
-        self.LoadRootFile(filename)
 
-    def LoadRootFile(self,filename):
         filename = os.path.abspath(filename)
-        tfile = ROOT.TFile(filename)
+        tfile = ROOT.TObjectManager.Get(filename)
         self.files[filename] = tfile
         self.hist_tab.Insert(tfile)
 
@@ -348,6 +347,9 @@ class MainWindow(object):
 
     def Run(self):
         self.window.mainloop()
+
+    def Update(self):
+        self.window.update()
 
     def load_library(self, library_name, grut_lib = True):
         if grut_lib:

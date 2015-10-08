@@ -10,9 +10,10 @@
 
 #include "TEnv.h"
 #include "TPluginManager.h"
+#include "TPython.h"
 
 #include "TGRUTint.h"
-#include "ProgramPath.h"
+#include "LoadGRUTEnv.h"
 
 #ifdef __APPLE__
 #define HAVE_UTMPX_H
@@ -44,35 +45,23 @@ static STRUCT_UTMP *gUtmpContents;
 
 static void SetDisplay();
 void SetGRUTPluginHandlers();
-void LoadGRUTEnv();
-
 
 int main(int argc, char **argv) {
-   //Find the grut environment variable so that we can read in .grutrc
+  //Find the grut environment variable so that we can read in .grutrc
   LoadGRUTEnv();
 
-   SetDisplay();
-   //SetGRUTPluginHandlers();
-   TGRUTint *input = 0;
+  SetDisplay();
+  //SetGRUTPluginHandlers();
+  TGRUTint *input = 0;
 
-   //Create an instance of the grut interpreter so that we can run root-like interpretive mode
-   input = TGRUTint::instance(argc,argv);
-   //PopupGrutLogo(true);
+  //Create an instance of the grut interpreter so that we can run root-like interpretive mode
+  input = TGRUTint::instance(argc,argv);
+  //PopupGrutLogo(true);
 
-   //Run the code!
-   input->Run("true");
-   //Be polite when you leave.
-   printf(DMAGENTA "\nbye,bye\t" DCYAN "%s" RESET_COLOR  "\n",getlogin());
+  //Run the code!
+  input->Run(true);
 
-   if((clock()%60) == 0){
-     printf("DING!");
-     fflush(stdout);
-     gSystem->Sleep(500);
-     printf("\r              \r");
-     fflush(stdout);
-   }
-
-   return 0;
+  return 0;
 }
 
 
@@ -171,14 +160,6 @@ static int ReadUtmp() {
   free(gUtmpContents);
   gUtmpContents = 0;
   return 0;
-}
-
-void LoadGRUTEnv() {
-  // Set the GRUTSYS variable based on the executable path.
-  // If GRUTSYS has already been defined, don't overwrite.
-  setenv("GRUTSYS", (program_path()+"/..").c_str(), 0);
-  std::string grut_path = program_path() + "/../.grutrc";
-  gEnv->ReadFile(grut_path.c_str(),kEnvChange);
 }
 
 static STRUCT_UTMP *SearchEntry(int n, const char *tty) {

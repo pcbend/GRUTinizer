@@ -79,6 +79,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("f format",&default_file_format)
     .description("File format of raw data.  Allowed options are \"EVT\" and \"GEB\"."
                  "If unspecified, will be guessed from the filename.");
+  parser.option("g start-gui",&fStartGui)
+    .description("Start the GUI")
+    .default_value(false);
   parser.option("w getwaves",&fExtractWaves)
     .description("Extract wave forms to data class when available.")
     .default_value(false);
@@ -171,31 +174,31 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename) const{
 
 bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
   switch(DetermineFileType(filename)){
-  case kFileType::NSCL_EVT:
-  case kFileType::GRETINA_MODE2:
-  case kFileType::GRETINA_MODE3:
-    input_raw_files.push_back(filename);
-    return true;
+    case kFileType::NSCL_EVT:
+    case kFileType::GRETINA_MODE2:
+    case kFileType::GRETINA_MODE3:
+      input_raw_files.push_back(filename);
+      return true;
 
-  case kFileType::ROOT_DATA:
-    input_root_files.push_back(filename);
-    return true;
+    case kFileType::ROOT_DATA:
+      input_root_files.push_back(filename);
+      return true;
 
-  case kFileType::ROOT_MACRO:
-    input_macro_files.push_back(filename);
-    return true;
+    case kFileType::ROOT_MACRO:
+      input_macro_files.push_back(filename);
+      return true;
 
-  case kFileType::CALIBRATED:
-    input_cal_files.push_back(filename);
-    return true;
+    case kFileType::CALIBRATED:
+      input_cal_files.push_back(filename);
+      return true;
 
-  case kFileType::DETECTOR_ENVIRONMENT:
-    detector_environment = filename;
-    return true;
+    case kFileType::DETECTOR_ENVIRONMENT:
+      detector_environment = filename;
+      return true;
 
-  case kFileType::UNKNOWN_FILETYPE:
-    printf("\tDiscarding unknown file: %s\n",filename.c_str());
-    return false;
+    case kFileType::UNKNOWN_FILETYPE:
+      printf("\tDiscarding unknown file: %s\n",filename.c_str());
+      return false;
   }
 }
 
