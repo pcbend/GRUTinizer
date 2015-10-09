@@ -20,8 +20,8 @@ public:
   const std::vector<std::string>& RootInputFiles()  { return input_root_files;  }
   const std::vector<std::string>& CalInputFiles()   { return input_cal_files;   }
   const std::vector<std::string>& MacroInputFiles() { return input_macro_files; }
-  const std::string DetectorEnvironment()           { return detector_environment; }
-  const std::string OutputFile()                    { return output_file; }
+  const std::string& DetectorEnvironment()          { return detector_environment; }
+  const std::string& OutputFile()                   { return output_file; }
   std::string InputRing() { return input_ring; }
 
   int CommandPort() { return fCommandPort; }
@@ -37,13 +37,18 @@ public:
   bool IgnoreMode3()        const { return fIgnoreMode3; }
   bool CommandServer()      const { return fCommandServer; }
   bool ExtractWaves()       const { return fExtractWaves;  }
+  bool StartGUI()           const { return fStartGui; }
+
+  bool IsOnline()           const { return fIsOnline; }
 
   bool TimeSortInput()      const { return fTimeSortInput; }
 
   bool ShouldExitImmediately() const { return fShouldExit; }
   bool MakeBackupFile() const { return fMakeBackupFile; }
 
-  kFileType   DetermineFileType(const std::string& filename);
+  kFileType   DefaultFileType() const { return fDefaultFileType; }
+  kFileType   DetermineFileType(const std::string& filename) const;
+
   std::string GenerateOutputFilename(const std::string& filename);
   std::string GenerateOutputFilename(const std::vector<std::string>& filename);
 
@@ -66,6 +71,7 @@ private:
 
   int fCommandPort;
 
+  kFileType fDefaultFileType;
   bool fExitAfterSorting;
   bool fHelp;
   bool fShowLogo;
@@ -74,6 +80,8 @@ private:
   bool fIgnoreMode3;
   bool fCommandServer;
   bool fExtractWaves;
+  bool fIsOnline;
+  bool fStartGui;
 
   bool fTimeSortInput;
 

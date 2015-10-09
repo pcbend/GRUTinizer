@@ -35,12 +35,12 @@ class TRootOutfile : public TObject {
     bool BuildCondition(TRawEvent& new_event);
     void UpdateDetList(kDetectorSystems det_system, TDetector* detector, const char* tree_name);
 
-    TTree *AddTree(const char *tname,const char *ttitle=0,bool build=false,int build_window=-1);
+  TTree *AddTree(const char *tname,const char *ttitle=0,bool build=false,int build_window=-1, bool is_online = false, int circular_size = 10000);
     TTree *FindTree(const char *tname);
 
     std::map<std::string,TList*> hist_list;
 
-    void   SetOutfile(const char *fname) { outfile = new TFile(fname,"recreate"); }
+    void   SetOutfile(const char *fname);
     TFile *GetOutfile()  { return outfile; }
 
   private:

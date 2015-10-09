@@ -30,7 +30,7 @@ public:
 private:
   virtual int BuildHits();
 
-  TClonesArray* channels;//("TBank29Hit");
+  TClonesArray* channels;//("TMode3Hit");
 
   ClassDef(TBank29,1);
 };

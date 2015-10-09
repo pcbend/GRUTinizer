@@ -7,6 +7,7 @@
 #include "TJanus.h"
 #include "TSega.h"
 #include "TNSCLEvent.h"
+#include "TOnlineTree.h"
 
 ClassImp(TRootOutfile)
 
@@ -25,19 +26,36 @@ TRootOutfile::~TRootOutfile() {
     //outfile->Close();
     //delete outfile;
   }
+
+  if(TGRUTOptions::Get()->IsOnline()){
+    for(auto& elem : trees){
+      delete elem.second.tree;
+    }
+  }
 }
 
-TTree *TRootOutfile::AddTree(const char* tname,const char* ttitle,bool build,int build_window) {
-  if(!outfile) {
+TTree *TRootOutfile::AddTree(const char* tname,const char* ttitle,
+                             bool build, int build_window,
+                             bool is_online, int circular_size) {
+  if(!outfile && !is_online) {
     fprintf(stderr,"%s, attempting to make tree with out associated file.\n",__PRETTY_FUNCTION__);
   }
   if(!ttitle)
     ttitle = tname;
-  outfile->cd();
+
+  if(outfile){
+    outfile->cd();
+  }
 
   tree_element elem;
-  elem.tree = new TTree(tname,ttitle);
-  elem.tree->SetMaxTreeSize(1000000000); //outfile limited to 1gb, than outfle_%i opened.
+
+  if(is_online){
+    elem.tree = new TOnlineTree(tname, ttitle, circular_size);
+  } else {
+    elem.tree = new TTree(tname,ttitle);
+  }
+
+  //elem.tree->SetMaxTreeSize(1000000000); //outfile limited to 1gb, than outfle_%i opened.
   elem.build_det = build;
   elem.build_window = build_window;
   elem.event_build_window_close = build_window;
@@ -86,13 +104,12 @@ void TRootOutfile::FillTree(const char *tname, long next_timestamp) {
   }
 
   if(!elem->has_data){
-    std::cerr << "\nNo data given, skipping (filled " << elem->tree->GetEntries() << " times before)" << std::endl;
     return;
   }
 
   // If there is no data added, don't fill
   // If there is a build window, don't fill unless the new timestamp is outside the window.
-  if(!elem->has_data || 
+  if(!elem->has_data ||
      (next_timestamp >= 0 &&
       elem->build_window >= 0 &&
       next_timestamp < elem->event_build_window_close)) {
@@ -114,7 +131,7 @@ void TRootOutfile::FillTree(const char *tname, long next_timestamp) {
 void TRootOutfile::FillAllTrees() {
   for(auto& val : trees){
     tree_element& elem = val.second;
-    
+
     if(elem.has_data){
       if(elem.build_det){
 	for(auto& item : det_list) {
@@ -133,6 +150,12 @@ void TRootOutfile::FillAllTrees() {
 void TRootOutfile::Clear(Option_t *opt) {
   for(auto& item : det_list) {
     item.second.det->Clear();
+  }
+}
+
+void TRootOutfile::SetOutfile(const char* fname){
+  if(!TGRUTOptions::Get()->IsOnline()){
+    outfile = new TFile(fname,"recreate");
   }
 }
 
@@ -176,15 +199,17 @@ void TRootOutfile::FinalizeFile(){
 }
 
 void TRootOutfile::CloseFile(){
-  if(trees.size()){
-    TFile* curr_file = trees.begin()->second.tree->GetCurrentFile();
-    curr_file->Close();
-    curr_file->Delete();
-  } else {
-    outfile->Close();
-    outfile->Delete();
+  if(outfile){
+    if(trees.size()){
+      TFile* curr_file = trees.begin()->second.tree->GetCurrentFile();
+      curr_file->Close();
+      curr_file->Delete();
+    } else {
+      outfile->Close();
+      outfile->Delete();
+    }
+    outfile = NULL;
   }
-  outfile = NULL;
 }
 
 

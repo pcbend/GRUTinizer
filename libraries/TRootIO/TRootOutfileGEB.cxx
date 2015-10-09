@@ -22,23 +22,23 @@ TRootOutfileGEB::TRootOutfileGEB() {
   // phoswall = NULL;
 }
 
-TRootOutfileGEB::~TRootOutfileGEB() {
-  if(outfile){
-    outfile->Close();
-    delete outfile;
-    // GetOutfile()->Close();
-    // GetOutfile()->Delete();;
-  }
-}
+TRootOutfileGEB::~TRootOutfileGEB() { }
 
 void TRootOutfileGEB::Init(const char* output_filename){
-  if(output_filename==NULL){
-    output_filename = "my_output.root";
-  }
-  SetOutfile(output_filename);
+  bool is_online = TGRUTOptions::Get()->IsOnline();
 
-  TTree *event_tree  = AddTree("EventTree","Mode 2 data",true,1000);
-  TTree *scaler_tree = AddTree("ScalerTree","ScalerTree");
+  if(is_online){
+    SetOutfile(NULL);
+  } else {
+    if(output_filename==NULL){
+      output_filename = "my_output.root";
+    }
+    SetOutfile(output_filename);
+  }
+
+  //                            Name          Title       Build?  Window  obvious
+  TTree *event_tree  = AddTree("EventTree", "Mode 2 data",true,    1000,  is_online);
+  TTree *scaler_tree = AddTree("ScalerTree","ScalerTree", false,   -1,    is_online);
 
   if(TDetectorEnv::Gretina()){
     event_tree->Branch("TGretina","TGretina",&gretina);
@@ -51,8 +51,13 @@ void TRootOutfileGEB::Init(const char* output_filename){
   }
 
   if(TDetectorEnv::S800()){
-     event_tree->Branch("TS800","TS800",&s800);
-     UpdateDetList(kDetectorSystems::S800, s800, "EventTree");
+    event_tree->Branch("TS800","TS800",&s800);
+    UpdateDetList(kDetectorSystems::S800, s800, "EventTree");
+  }
+
+  if(TDetectorEnv::Mode3()){
+    event_tree->Branch("TMode3","TMode3",&mode3);
+    UpdateDetList(kDetectorSystems::MODE3, mode3, "EventTree");
   }
 
 

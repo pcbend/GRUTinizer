@@ -6,13 +6,13 @@
 #include <TFitResultPtr.h>
 
 #include "Globals.h"
-#include <GRootFunctions.h>
-#include <GCanvas.h>
+#include "GRootFunctions.h"
+#include "GCanvas.h"
 
 ClassImp(GPeak)
 
-GPeak::GPeak(Double_t cent,Double_t xlow,Double_t xhigh,Option_t *opt) 
-      : TF1("photopeakbg",GRootFunctions::PhotoPeakBG,xlow,xhigh,10),  
+GPeak::GPeak(Double_t cent,Double_t xlow,Double_t xhigh,Option_t *opt)
+      : TF1("photopeakbg",GRootFunctions::PhotoPeakBG,xlow,xhigh,10),
         background("background",GRootFunctions::StepBG,xlow,xhigh,10)  {
   Clear("");
   if(cent>xhigh || cent<xlow) {
@@ -34,13 +34,13 @@ GPeak::GPeak(Double_t cent,Double_t xlow,Double_t xhigh,Option_t *opt)
   SetName(Form("Chan%d_%d_to_%d",(Int_t)(cent),(Int_t)(xlow),(Int_t)(xhigh)));
   InitNames();
   TF1::SetParameter("centroid",cent);
-      
+
 }
 
-GPeak::GPeak() 
+GPeak::GPeak()
       : TF1("photopeakbg",GRootFunctions::PhotoPeakBG,0,1000,10),
         background("background",GRootFunctions::StepBG,0,1000,10) {
-        
+
   Clear();
   InitNames();
   background.SetNpx(1000);
@@ -91,7 +91,7 @@ bool GPeak::InitParams(TH1 *fithist){
   //Makes initial guesses at parameters for the fit. Uses the histogram to
   Double_t xlow,xhigh;
   GetRange(xlow,xhigh);
- 
+
   Int_t bin = fithist->GetXaxis()->FindBin(GetParameter("centroid"));
   Int_t binlow = fithist->GetXaxis()->FindBin(xlow);
   Int_t binhigh = fithist->GetXaxis()->FindBin(xhigh);
@@ -117,12 +117,12 @@ bool GPeak::InitParams(TH1 *fithist){
   TF1::SetParLimits(6,0.0,fithist->GetBinContent(bin)*1.4);
   //this->SetParLimits(9,xlow,xhigh);
   TF1::SetParLimits(5,0.0,1.0E2);
-  
+
   //Make initial guesses
   TF1::SetParameter("Height",largesty);  //fithist->GetBinContent(bin));
   TF1::SetParameter("centroid",largestx);          //GetParameter("centroid"));
-  //TF1::SetParameter("sigma",(xhigh-xlow)*0.5);  
-  TF1::SetParameter("sigma",2.0/binWidth); // 
+  //TF1::SetParameter("sigma",(xhigh-xlow)*0.5);
+  TF1::SetParameter("sigma",2.0/binWidth); //
   TF1::SetParameter("beta",0.5);
   TF1::SetParameter("R", 1.0);
   TF1::SetParameter("step",1.0);
@@ -137,7 +137,7 @@ bool GPeak::InitParams(TH1 *fithist){
 }
 
 Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
-  if(!fithist) 
+  if(!fithist)
     return false;
   TString options = opt;
   if(!IsInitialized())
@@ -147,9 +147,9 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   bool verbose = !options.Contains("Q");
   TF1::SetParLimits(1,GetXmin(),GetXmax());
   TF1::SetParLimits(9,GetXmin(),GetXmax());
-  
+
   TFitResultPtr fitres = fithist->Fit(this,Form("%sRSM",options.Data()));
-  
+
   if(fitres->ParError(2) != fitres->ParError(2)) { // checks if nan.
     if(fitres->Parameter(3)<1) {
       FixParameter(4,0);
@@ -253,17 +253,3 @@ void GPeak::DrawResiduals(TH1 *hist) const{
   delete[] res;
   delete[] bin;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

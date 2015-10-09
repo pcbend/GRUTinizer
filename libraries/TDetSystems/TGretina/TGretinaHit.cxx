@@ -18,7 +18,7 @@ struct interaction_point {
   }
 };
 
-TGretinaHit::TGretinaHit(){ }
+TGretinaHit::TGretinaHit(){ Clear(); }
 
 TGretinaHit::~TGretinaHit(){ }
 
@@ -63,7 +63,9 @@ void TGretinaHit::BuildFrom(const TRawEvent::GEBBankType1& raw){
   float second_interaction_value = -1e99;
 
   for(int i=0; i<fNumberOfInteractions; i++) {
-    fSegmentNumber[i] = 36*fCrystalId + raw.intpts[i].seg;
+    //fSegmentNumber[i] = 36*fCrystalId + raw.intpts[i].seg;
+    //printf("[%02i] : seg[%02i] = %.02f\n",i,raw.intpts[i].seg,raw.intpts[i].seg_ener); fflush(stdout);
+    fSegmentNumber[i] =  raw.intpts[i].seg;
     fGlobalInteractionPosition[i] = TGretina::CrystalToGlobal(fCrystalId,
                                                               raw.intpts[i].x,
                                                               raw.intpts[i].y,
@@ -81,8 +83,8 @@ void TGretinaHit::BuildFrom(const TRawEvent::GEBBankType1& raw){
       second_interaction_value = seg_ener;
     }
   }
-
   SortHits();
+
 }
 
 TVector3 TGretinaHit::GetInteractionPosition(int i) const {
@@ -128,7 +130,7 @@ void TGretinaHit::SortHits(){
     fInteractionEnergy[fNumberOfInteractions] = point.energy;
     fNumberOfInteractions++;
   }
-
+  //Print("all");
   // Because they are now sorted
   fFirstInteraction = 0;
   fSecondInteraction = 1;
@@ -238,14 +240,18 @@ void TGretinaHit::Print(Option_t *opt) const {
 
   if(!strcmp(opt,"all")) {
     for(int i=0;i<fNumberOfInteractions;i++) {
-      std::cout << "\t\t[" << i << "]Seg Num:      \t" << fSegmentNumber[i]     << std::endl
-                << "\t\t[" << i << "]Seg Eng:      \t" << fInteractionEnergy[i] << std::endl
-                         << "\t\t[" << i << "]Seg Pos(R,T,P)\t" << fGlobalInteractionPosition[i].Mag()
-                                                       << "  "
-                                                       << fGlobalInteractionPosition[i].Theta()*TMath::RadToDeg()
-                                                       << "  "
-                                                       << fGlobalInteractionPosition[i].Phi()*TMath::RadToDeg()
-                                                       << std::endl;
+      printf("\t\tSeg[%02i]\tEng: % 4.2f\t(R,T,P) % 3.2f % 3.2f % 3.2f\n",fSegmentNumber[i],fInteractionEnergy[i],
+                                                                          fGlobalInteractionPosition[i].Mag(),
+                                                                          fGlobalInteractionPosition[i].Theta()*TMath::RadToDeg(),
+                                                                          fGlobalInteractionPosition[i].Phi()*TMath::RadToDeg() ); fflush(stdout);
+      //std::cout << "\t\tSe[" << i << "]Seg Num:      \t" << fSegmentNumber[i]     << std::endl
+      //          << "\t\t[" << i << "]Seg Eng:      \t" << fInteractionEnergy[i] << std::endl
+      //                   << "\t\t[" << i << "]Seg Pos(R,T,P)\t" << fGlobalInteractionPosition[i].Mag()
+      //                                                 << "  "
+      //                                                 << fGlobalInteractionPosition[i].Theta()*TMath::RadToDeg()
+      //                                                 << "  "
+      //                                                 << fGlobalInteractionPosition[i].Phi()*TMath::RadToDeg()
+      //                                                 << std::endl;
     }
   }
   std::cout << "------------------------------"  << std::endl;

@@ -3,10 +3,13 @@
 #include <iostream>
 
 #include "TClass.h"
+#include "TCutG.h"
+#include "TFile.h"
 #include "TH1.h"
 #include "TInterpreter.h"
 #include "TROOT.h"
-#include "TFile.h"
+
+#include "TKey.h"
 
 
 TObjectManager* gManager = NULL;
@@ -29,6 +32,7 @@ TObjectManager* TObjectManager::Get(const char* name, Option_t* opt){
 TObjectManager::TObjectManager(const char* name, Option_t *opt)
   : TFile(name,opt){
   objectmanagers.SetOwner(false);
+  FindTrackables(this);
   //gROOT->GetListOfCleanups()->Add(this);
 }
 
@@ -53,10 +57,8 @@ TObjectManager *TObjectManager::Open(const char *fname,Option_t *opt) {
 }
 
 void TObjectManager::SaveAndClose(Option_t* option){
-  //std::cout << __PRETTY_FUNCTION__ << ", " << fList->GetSize() << " items known" << std::endl;
   int num_objects = fList->GetSize();
-
-
+  Print();
   TString options = this->GetOption();
   if(options.Contains("CREATE")) {
     TObjectManager *current = gManager;
@@ -79,6 +81,7 @@ void TObjectManager::SaveAndClose(Option_t* option){
     gDirectory = gManager;
   }
 
+  //TFile::Close(option);
   TFile::Close(option);
 
   if(!strcmp(GetName(),"current.root")){
@@ -95,16 +98,25 @@ void TObjectManager::SaveAndClose(Option_t* option){
 }
 
 
-TObjectManager *TObjectManager::cd() {
-  gManager = this;
-  TFile::cd();
+bool TObjectManager::cd(const char * path) {
+  //gManager = this;
+  bool ok = TDirectoryFile::cd(path);
+  if(ok) gManager = (TObjectManager*)TFile::CurrentFile();
+  //TFile::cd();
 
-  return this;
+  return ok;
 }
+
+
+
+
 
 TObjectManager::~TObjectManager() {
 
 }
+
+
+
 
 void TObjectManager::SaveParent(TObject *parent) {
   TString options = this->GetOption();
@@ -113,7 +125,6 @@ void TObjectManager::SaveParent(TObject *parent) {
 
     if(fParentChildren.count(parent)){
       auto& children = fParentChildren[parent];
-
       TFile::cd("/");
       parent->Write();
       if(children.size()){
@@ -132,18 +143,20 @@ void TObjectManager::SaveParent(TObject *parent) {
 
 void TObjectManager::Print(Option_t* opt) const {
   std::cout << "I am our custom object manager (" << fName << ", " << fTitle << ")" << std::endl;
-  for(auto& element : fParentChildren){
-    std::cout << "Parent: " << element.first->GetName() << " @ " << (void*)element.first << std::endl;
-    for(auto& child : element.second){
-      std::cout << "\t" << child->GetName() << " @ " << (void*)child << std::endl;
-    }
+  TString option = opt;
+  if(option.Contains("all")) {
+    for(auto& element : fParentChildren){
+      std::cout << "Parent: " << element.first->GetName() << " @ " << (void*)element.first << std::endl;
+      for(auto& child : element.second){
+        std::cout << "\t" << child->GetName() << " @ " << (void*)child << std::endl;
+      }
 
-    std::cout << "-----------------------" << std::endl;
+      std::cout << "-----------------------" << std::endl;
+    }
   }
 }
 
 void TObjectManager::Add(TObject* obj, Bool_t replace){
-  //std::cout << __PRETTY_FUNCTION__ << std::endl;
   TDirectory::Add(obj, replace);
 }
 
@@ -152,20 +165,43 @@ void TObjectManager::Append(TObject* obj, Bool_t replace){
     RecursiveRemove(obj);
   }
 
-  TDirectory::Append(obj, replace);
-  fParentChildren[obj];
-  ObjectAppended(obj);
+  if(Trackable(obj)){
+    TDirectory::Append(obj, replace);
+    fParentChildren[obj];
+    ObjectAppended(obj);
+  }
 }
 
 void TObjectManager::ObjectAppended(TObject* obj) {
-  //std::cout << __PRETTY_FUNCTION__ << "\t" << (void*)obj << std::endl;
   Emit("ObjectAppended(TObject*)",(long)obj);
 }
 
 void TObjectManager::AddRelationship(TObject* parent, TObject* child){
-  if(parent && child){
+  if(Trackable(parent) && Trackable(child)){
     fParentChildren[parent].push_back(child);
   }
+}
+
+bool TObjectManager::Trackable(TObject* obj){
+  return obj && (obj->InheritsFrom(TH1::Class()) ||
+                 obj->InheritsFrom(TCutG::Class()));
+}
+
+void TObjectManager::FindTrackables(TDirectory *dir) {
+  if(!dir)
+    return;
+  TIter iter(dir->GetListOfKeys());
+  while(TKey *key = (TKey*)iter.Next()) {
+    TObject *obj = key->ReadObj();
+    if(obj->InheritsFrom(TDirectory::Class())) {
+        FindTrackables((TDirectory*)obj);
+    } else if(Trackable(obj)) {
+      Append(obj,true);
+      //fParentChildren[obj];
+      //ObjectAppended(obj);
+    }
+  }
+
 }
 
 
@@ -198,11 +234,9 @@ void TObjectManager::RecursiveRemove(TObject* obj) {
 
 TH1* TObjectManager::GetNext1D(TH1* from, bool forward = true){
   auto iter = fParentChildren.find(from);
-
   if(iter == fParentChildren.end()){
     return 0;
   }
-
   while(true){
 
     // Go to the next item in the map, in the direction specified.

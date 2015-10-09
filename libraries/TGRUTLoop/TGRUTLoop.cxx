@@ -3,7 +3,7 @@
 #include <chrono>
 #include <thread>
 
-#include "TRawFile.h"
+#include "TRawEventSource.h"
 
 #include "RawDataQueue.h"
 #include "TDetectorEnv.h"
@@ -25,6 +25,9 @@ TGRUTLoop::TGRUTLoop(){
 
 TGRUTLoop::~TGRUTLoop(){
   delete queue;
+  if(outfile){
+    delete outfile;
+  }
 }
 
 TGRUTLoop* TGRUTLoop::Get(){
@@ -111,9 +114,15 @@ void TGRUTLoop::WriteLoop(){
   while(running || queue->Size()){
     if(queue->Size()){
       TRawEvent event = queue->Pop();
-      ProcessFromQueue(event);
-      if(!running){
-	std::cout << "Queue size: " << queue->Size() << "\r" << std::flush;
+
+
+      if(running || !TGRUTOptions::Get()->IsOnline()){
+        ProcessFromQueue(event);
+      }
+
+
+      if(!running && queue->Size() % 100 == 0){
+	std::cout << "Queue size: " << queue->Size() << "     \r" << std::flush;
       }
     } else {
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -125,6 +134,7 @@ void TGRUTLoop::WriteLoop(){
 }
 
 void TGRUTLoop::ProcessFromQueue(TRawEvent& event){
+
   if(event.GetFileType()==kFileType::NSCL_EVT) {
     TNSCLEvent nscl_event(event);
     switch(event.GetEventType()) {
@@ -178,27 +188,27 @@ void TGRUTLoop::PrintOutfile(){
 }
 
 void TGRUTLoop::HandleBuiltNSCLData(TNSCLEvent& event){
-  if(event.FillCondition()){
-    outfile->FillTree("EventTree");
-    outfile->Clear();
-  }
-
   TNSCLBuiltRingItem built(event);
   for(unsigned int i=0; i<built.NumFragments(); i++){
     TNSCLFragment& fragment = built.GetFragment(i);
     kDetectorSystems detector = TDetectorEnv::Get().DetermineSystem(fragment.GetFragmentSourceID());
+    outfile->FillTree("EventTree",fragment.GetFragmentTimestamp());
     outfile->AddRawData(fragment.GetNSCLEvent(), detector);
   }
 }
 
 void TGRUTLoop::HandleUnbuiltNSCLData(TNSCLEvent& event){
-  if(event.FillCondition()){
-    outfile->FillTree("EventTree");
-    outfile->Clear();
-  }
-
   kDetectorSystems detector = TDetectorEnv::Get().DetermineSystem(event);
+  outfile->FillTree("EventTree", event.GetTimestamp());
   outfile->AddRawData(event, detector);
+}
+
+void TGRUTLoop::HandleGEBMode3(TGEBEvent& event, kDetectorSystems system){
+  TGEBMode3Event built(event);
+  for(unsigned int i=0; i<built.NumFragments(); i++){
+    TGEBEvent& fragment = built.GetFragment(i);
+    outfile->AddRawData(fragment, system);
+  }
 }
 
 void TGRUTLoop::HandleGEBData(TGEBEvent& event){
@@ -212,11 +222,8 @@ void TGRUTLoop::HandleGEBData(TGEBEvent& event){
       break;
     case 2: // Gretina Mode3 data.
       if(!TGRUTOptions::Get()->IgnoreMode3()) {
-        TGEBMode3Event m3event(event);
-        TMode3 temp;
-        while(m3event.GetNextItem(temp,TGRUTOptions::Get()->ExtractWaves())) {
-          gebout->HandleMode3(temp);
-        }
+        gebout->FillTree("EventTree",event.GetTimestamp());
+        HandleGEBMode3(event, kDetectorSystems::MODE3);
       }
       break;
     case 5: // S800 Mode2 equvilant.
@@ -225,7 +232,7 @@ void TGRUTLoop::HandleGEBData(TGEBEvent& event){
       break;
     case 8: // Gretina diag. data.
       gebout->FillTree("EventTree",event.GetTimestamp());
-      gebout->AddRawData(event, kDetectorSystems::BANK29);
+      HandleGEBMode3(event, kDetectorSystems::BANK29);
       break;
     case 10:
       // S800 scaler data....
@@ -241,10 +248,6 @@ void TGRUTLoop::HandleGEBData(TGEBEvent& event){
   }
 
 }
-
-//bool TGRUTLoop::FillCondition(TRawEvent& event){
-//  return true;
-//}
 
 void TGRUTLoop::Status() {
   if(!GetInfile())  {

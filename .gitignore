@@ -18,3 +18,4 @@ htmldoc
 bin
 .build
 .nfs*
+*.pyc

@@ -30,9 +30,12 @@ public:
 
   static TObjectManager *Open(const char *fname,Option_t *opt="read");
   static TList *GetListOfManagers() { return &objectmanagers; }
-  TObjectManager *cd();
+  //TObjectManager *cd();
+  bool cd(const char *path=0);
 
   TH1* GetNext1D(TH1* from, bool forward);
+
+  bool Trackable(TObject* obj);
 
 private:
   static TList objectmanagers;
@@ -41,7 +44,8 @@ private:
   typedef std::map<TObject*,std::vector<TObject*> > ParentChildMap;
   ParentChildMap fParentChildren;
   void SaveParent(TObject*);
-
+  
+  void FindTrackables(TDirectory*);
 
   ClassDef(TObjectManager, 0);
 };

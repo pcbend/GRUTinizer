@@ -3,8 +3,8 @@
 
 #include "TNamed.h"
 
-#include "TRootOutfile.h"
 #include "TDataLoop.h"
+#include "TRootOutfile.h"
 
 // So that rootcint doesn't see this
 class RawDataQueue;
@@ -31,8 +31,6 @@ public:
 
   void PrintOutfile();
 
-  //bool FillCondition(TRawEvent& event);
-
   void Status();
 
   TRootOutfile *GetRootOutfile() { return outfile; }
@@ -49,7 +47,7 @@ private:
   void HandleBuiltNSCLData(TNSCLEvent& event);
   void HandleUnbuiltNSCLData(TNSCLEvent& event);
   void HandleGEBData(TGEBEvent& event);
-  void HandleGEBMode3(TGEBEvent& event);
+  void HandleGEBMode3(TGEBEvent& event, kDetectorSystems system);
 
   RawDataQueue* queue;
   TRootOutfile* outfile;

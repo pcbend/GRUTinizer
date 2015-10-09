@@ -4,7 +4,7 @@
 
 TNSCLEvent::TNSCLEvent() { }
 
-TNSCLEvent::TNSCLEvent(const TRawEvent &raw) { 
+TNSCLEvent::TNSCLEvent(const TRawEvent &raw) {
   raw.Copy(*this);
 }
 
@@ -144,20 +144,18 @@ Int_t        TNSCLFragment::GetFragmentBarrier()       const{
 TNSCLBuiltRingItem::TNSCLBuiltRingItem(TNSCLEvent& event)
   : fEvent(event) {
   assert(kNSCLEventType(event.GetEventType()) == kNSCLEventType::PHYSICS_EVENT);
+  BuildFragments();
 }
 
 TNSCLFragment& TNSCLBuiltRingItem::GetFragment(size_t fragnum) {
-  BuildFragments();
   return fragments.at(fragnum);
 }
 
 Int_t TNSCLBuiltRingItem::Size() const {
-  BuildFragments();
   return fragments.size();
 }
 
 size_t TNSCLBuiltRingItem::NumFragments() const {
-  BuildFragments();
   return fragments.size();
 }
 
@@ -165,11 +163,7 @@ Int_t TNSCLBuiltRingItem::GetBuiltRingItemSize() const {
   return *(Int_t*)fEvent.GetPayloadBuffer().GetData();
 }
 
-void TNSCLBuiltRingItem::BuildFragments() const {
-  if(fragments.size()){
-    return;
-  }
-
+void TNSCLBuiltRingItem::BuildFragments() {
   // Skip past the size of the fragments
   TSmartBuffer buf = fEvent.GetPayloadBuffer().BufferSubset(sizeof(Int_t));
 
@@ -179,10 +173,3 @@ void TNSCLBuiltRingItem::BuildFragments() const {
     fragments.emplace_back(buf);
   }
 }
-
-bool TNSCLEvent::FillCondition() { 
-  return true; 
-}
-
-
-

@@ -24,26 +24,15 @@ void TS800::Clear(Option_t* opt){
 int TS800::BuildHits(){
   //printf("In S800 build events.\n");
   for(auto& event : raw_data) {
-    TGEBEvent geb(event);
-    SetTimestamp(geb.GetTimestamp());
+    TGEBEvent* geb = (TGEBEvent*)&event;
+    SetTimestamp(geb->GetTimestamp());
     int ptr = 0;
-    const TRawEvent::GEBS800Header *head = ((const TRawEvent::GEBS800Header*)geb.GetPayload());
+    const TRawEvent::GEBS800Header *head = ((const TRawEvent::GEBS800Header*)geb->GetPayload());
     ptr += sizeof(TRawEvent::GEBS800Header);
     //std::cout << *head << std::endl;
     SetEventCounter(head->GetEventNumber());
     //       *((Long_t*)(geb.GetPayload()+26)) & 0x0000ffffffffffff);
     //geb.Print("all0x5804");
-    
-    
-
-
-
-
-
-
-
-
-
   }
   return 0;
 }
@@ -60,7 +49,3 @@ TDetectorHit& TS800::GetHit(int i){
   TDetectorHit *hit = new TDetectorHit;
   return *hit;
 }
-
-
-
-

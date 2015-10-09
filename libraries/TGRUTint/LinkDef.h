@@ -1,4 +1,4 @@
-// TGRUTint.h TGRUTOptions.h TGRUTTypes.h TDetectorEnv.h TGRUTServer.h
+// TGRUTint.h TGRUTOptions.h TGRUTTypes.h TDetectorEnv.h TGRUTServer.h TOnlineTree.h
 
 #ifdef __CINT__
 
@@ -17,6 +17,10 @@
 #pragma link C++ class TGRUTint+;
 #pragma link C++ class TGRUTServer+;
 
+#pragma link C++ class TOnlineTree+;
+
 #pragma link C++ global gResponse;
+#pragma link C++ global online_events;
+#pragma link C++ global online_scalers;
 
 #endif

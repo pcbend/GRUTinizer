@@ -64,6 +64,8 @@ private:
   std::mutex fCommandWaitingMutex;
   std::condition_variable fNewResult;
 #endif
+  TTimer* fGuiTimer;
+
   TTimer* fCommandTimer;
   std::queue<std::string> fLinesToProcess;
   std::queue<TObject*> fCommandResults;

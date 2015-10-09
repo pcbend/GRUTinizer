@@ -8,16 +8,13 @@ ClassImp(TGEBEvent);
 
 TGEBEvent::TGEBEvent() { }
 
-TGEBEvent::TGEBEvent(const TRawEvent &raw) { 
+TGEBEvent::TGEBEvent(const TRawEvent &raw) {
   raw.Copy(*this);
 }
 
 TGEBEvent::~TGEBEvent() { }
 
 Long_t TGEBEvent::GetTimestamp() const {
-  //std::cout << "I AM HERE " << std::endl;
-  //printf("GetBody() = 0x%08x\n",TRawEvent::GetBody()); fflush(stdout);
-  //return -1;
   return *((Long_t*)(TRawEvent::GetBody() + 0));
 }
 
@@ -26,11 +23,12 @@ const char* TGEBEvent::GetPayload() const {
 }
 
 TSmartBuffer TGEBEvent::GetPayloadBuffer() const {
-  return fBody.BufferSubset(sizeof(Long_t));
+  if(fTimestamp != -1){
+    return fBody;
+  } else {
+    return fBody.BufferSubset(sizeof(Long_t));
+  }
 }
-
-bool TGEBEvent::FillCondition() { return true; }
-
 
 void TGEBEvent::Clear(Option_t *opt) {
   TRawEvent::Clear(opt);
@@ -50,29 +48,29 @@ void TGEBEvent::Print(Option_t *opt) const {
 
 ClassImp(TGEBMode3Event);
 
-TGEBMode3Event::TGEBMode3Event(const TGEBEvent& event)
-  : TGEBEvent(event) {
-  buf = event.GetPayloadBuffer();
-}
+void TGEBMode3Event::BuildFragments(){
+  TSmartBuffer buf = fEvent.GetPayloadBuffer();
+  TGEBEvent event(fEvent);
+  TRawEvent::GEBMode3Data data;
 
-TGEBMode3Event::~TGEBMode3Event() {
-}
+  while(buf.GetSize()){
+    // Read the header and body
+    TRawEvent::GEBMode3Head* header = (TRawEvent::GEBMode3Head*)buf.GetData();
+    TRawEvent::SwapMode3Head(*header);
 
-bool TGEBMode3Event::GetNextItem(TMode3& output, bool read_waveform){
-  if(!buf.GetSize()){
-    return false;
+    TRawEvent::GEBMode3Data* data = (TRawEvent::GEBMode3Data*)(buf.GetData()+sizeof(TRawEvent::GEBMode3Head));
+    TRawEvent::SwapMode3Data(*data);
+
+    //header.GetLength() is number of 32-bit values,
+    //   and does not include the 0xaaaaaaaa separator.
+    size_t body_size = header->GetLength()*4 + 4;
+
+    // Transfer the timestamp and body
+    event.SetFragmentTimestamp(data->GetLed());
+    event.SetData(buf.BufferSubset(0,body_size));
+
+    // Push a copy into the list
+    fragments.push_back(event);
+    buf.Advance(body_size);
   }
-
-  output.BuildFrom(buf, read_waveform);
-  return true;
 }
-
-
-
-
-
-
-
-
-
-

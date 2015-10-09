@@ -4,6 +4,7 @@
 #include <fstream>
 
 #include "TFile.h"
+#include "TPython.h"
 
 #include "TInterpreter.h"
 #include "TDetectorEnv.h"
@@ -14,6 +15,8 @@
 #include "GRootGuiFactory.h"
 #include "TUnixSystem.h"
 //#include "Api.h"   // for G__value
+
+#include "ProgramPath.h"
 
 #include <Getline.h>
 #include <TClass.h>
@@ -51,7 +54,7 @@ TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions
 
 TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t noLogo,const char *appClassName)
   :TRint(appClassName, &argc, argv, options, numOptions,noLogo),
-   fCommandServer(NULL), fCommandTimer(NULL), fRootFilesOpened(0), fIsTabComplete(false) {
+   fCommandServer(NULL), fGuiTimer(NULL), fCommandTimer(NULL), fRootFilesOpened(0), fIsTabComplete(false) {
 
   fGRUTEnv = gEnv;
   GetSignalHandler()->Remove();
@@ -60,14 +63,16 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
   //TH1::SetDefaultSumw2();
 
   SetPrompt("GRizer [%d] ");
-
-  auto opt = TGRUTOptions::Get(argc, argv);
+  TGRUTOptions::Get(argc, argv);
 }
 
 
 TGRUTint::~TGRUTint() {
   if(fCommandTimer){
     delete fCommandTimer;
+  }
+  if(fGuiTimer){
+    delete fGuiTimer;
   }
 }
 
@@ -76,7 +81,7 @@ void TGRUTint::Init() {
   TGRUTLoop::CreateDataLoop<TGRUTLoop>();
 
   if(TGRUTOptions::Get()->ShouldExit()){
-    gApplication->Terminate();
+    Terminate();
     return;
   }
   //printf("%s called.\n",__PRETTY_FUNCTION__);
@@ -146,7 +151,7 @@ void TGRUTint::ApplyOptions() {
   if(opt->RawInputFiles().size()==1 && opt->SortRaw()){
     std::string filename = opt->RawInputFiles()[0];
     std::string outfile = opt->OutputFile();
-    if(!outfile.length()){
+    if(!outfile.length() && !opt->IsOnline()){
       outfile = opt->GenerateOutputFilename(filename);
     }
     TGRUTLoop::Get()->ProcessFile(filename.c_str(), outfile.c_str());
@@ -155,19 +160,37 @@ void TGRUTint::ApplyOptions() {
   } else if (opt->RawInputFiles().size()>1 && opt->SortRaw()){
     std::vector<std::string> filenames = opt->RawInputFiles();
     std::string outfile = opt->OutputFile();
-    if(!outfile.length()){
+    if(!outfile.length() && !opt->IsOnline()){
       outfile = opt->GenerateOutputFilename(filenames);
     }
     TGRUTLoop::Get()->ProcessFile(filenames, outfile.c_str());
     TGRUTLoop::Get()->Start();
   }
 
-  for(auto& filename : opt->RootInputFiles()){
-    OpenRootFile(filename);
+  if(!opt->StartGUI()) {
+    for(auto& filename : opt->RootInputFiles()){
+      OpenRootFile(filename);
+    }
   }
 
   for(auto& filename : opt->MacroInputFiles()){
     RunMacroFile(filename);
+  }
+
+  if(opt->StartGUI()){
+    std::string script_filename = program_path() + "/../util/grut-view.py";
+    //printf("%s\n",script_filename.c_str());
+    std::ifstream script(script_filename);
+    std::string script_text((std::istreambuf_iterator<char>(script)),
+                            std::istreambuf_iterator<char>());
+    //printf("%s\n",script_text.c_str());
+    TPython::Exec(script_text.c_str());
+    for(auto& filename : opt->RootInputFiles()){
+      TPython::Exec(Form("window.LoadRootFile(\"%s\")",filename.c_str()));
+      OpenRootFile(filename);
+    }
+    fGuiTimer = new TTimer("TPython::Exec(\"if threading.current_thread().ident == ident: window.Update()\");",100);
+    fGuiTimer->TurnOn();
   }
 
   if(TGRUTOptions::Get()->ExitAfterSorting()){
@@ -284,7 +307,7 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
 
   if(!sline.CompareTo("clear")) {
     return TRint::ProcessLine(".! clear");
-  } 
+  }
 
   Ssiz_t index;
 
@@ -354,20 +377,29 @@ void TGRUTint::Terminate(Int_t status){
     fCommandServer = NULL;
   }
   TGRUTLoop::Get()->Stop();
+  TDataLoop::DeleteInstance();
 
   TIter iter(TObjectManager::GetListOfManagers());
   while(TObjectManager *om = (TObjectManager*)iter.Next()) {
     om->SaveAndClose();
   }
 
+  //Be polite when you leave.
+  printf(DMAGENTA "\nbye,bye\t" DCYAN "%s" RESET_COLOR  "\n",getlogin());
+
+  if((clock()%60) == 0){
+    printf("DING!");
+    fflush(stdout);
+    gSystem->Sleep(500);
+    printf("\r              \r");
+    fflush(stdout);
+  }
+
   TRint::Terminate(status);
 }
 
 void TGRUTint::LoadGRootGraphics() {
-  if(gROOT->IsBatch()) return;
-  gROOT->LoadClass("TCanvas","Gpad");
-  gGuiFactory = new GRootGuiFactory();
-
+  GRootGuiFactory::Init();
 }
 
 
@@ -384,7 +416,6 @@ void TGRUTint::OpenFileDialog() {
   if(file_info.fFilename)  {
     HandleFile(file_info.fFilename);
   }
-  return;
 }
 
 TObject* TGRUTint::DelayedProcessLine(std::string message){

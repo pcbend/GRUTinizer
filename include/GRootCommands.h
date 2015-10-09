@@ -1,6 +1,8 @@
 #ifndef GROOTCOMMANDS__H
 #define GROOTCOMMANDS__H
 
+#include <string>
+class TTree;
 class TH1;
 class GMarker;
 
@@ -11,6 +13,8 @@ bool ShowPeaks(TH1**,unsigned int);
 bool RemovePeaks(TH1**,unsigned int);
 
 bool PhotoPeakFit(TH1*,double,double,Option_t *opt="");
+
+
 
 //bool PeakFit(TH1*,Double_t,Double_t,Option_t *opt="");
 
