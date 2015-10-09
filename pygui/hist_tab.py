@@ -3,6 +3,11 @@
 import Tkinter as tk
 import ttk
 
+import ROOT
+ROOT.PyConfig.IgnoreCommandLineOptions = True
+
+from .util import unpack_tdirectory
+
 class HistTab(object):
 
     def __init__(self, main, frame):
@@ -33,33 +38,19 @@ class HistTab(object):
                     color+=1
 
     def Insert(self,obj,parent=''):
-        if obj.Class().InheritsFrom('TH2'):
-            icon = self.main.icons['h2_t']
-        elif obj.Class().InheritsFrom('TH1'):
-            icon = self.main.icons['h1_t']
-        elif obj.Class().InheritsFrom('TFile'):
-            icon = self.main.icons['tfile']
-        elif obj.Class().InheritsFrom('TDirectory'):
-            icon = self.main.icons['folder_t']
-        else:
-            icon = ''
-
-        name = parent + '/' + obj.GetName()
-
-        if (name in self.treeview.get_children(parent) and
-            obj.Class().InheritsFrom('TH1')):
-            orig = self.hist_lookup[name]
-            obj.Copy(orig) # Copy the new object into the original
+        if obj.InheritsFrom('TTree'):
             return
-        elif name in self.treeview.get_children(parent):
-            self.hist_lookup[name] = obj
-        else:
-            self.hist_lookup[name] = obj
-            self.treeview.insert(parent,'end', name, text=obj.GetName(),image=icon)
 
-        if obj.Class().InheritsFrom('TList'):
+        if parent:
+            name = parent + '/' + obj.GetName()
+        else:
+            name = obj.GetName()
+
+        self._insert_single_nonrecursive(obj, parent, name)
+
+        if obj.InheritsFrom('TList'):
             iterable = obj
-        elif hasattr(obj,'GetListOfKeys'):
+        elif obj.InheritsFrom('TDirectory'):
             iterable = unpack_tdirectory(obj)
         else:
             iterable = None
@@ -68,7 +59,29 @@ class HistTab(object):
             for obj in iterable:
                 self.Insert(obj, name)
 
+    def _insert_single_nonrecursive(self, obj, parent, name):
+        if (name in self.treeview.get_children(parent) and
+            obj.InheritsFrom('TH1')):
+            orig = self.hist_lookup[name]
+            obj.Copy(orig) # Copy the new object into the original
+            return
+        elif name in self.treeview.get_children(parent):
+            self.hist_lookup[name] = obj
+        else:
+            icon = self.main._PickIcon(obj)
+            self.hist_lookup[name] = obj
+            self.treeview.insert(parent,'end', name, text=obj.GetName(),image=icon)
 
-def unpack_tdirectory(tdir):
-    for key in tdir.GetListOfKeys():
-        yield key.ReadObj()
+    def CheckOnlineHists(self):
+        if ROOT.online_events:
+            self.Insert(ROOT.online_events.GetDirectory())
+        if ROOT.online_scalers:
+            self.Insert(ROOT.online_scalers.GetDirectory())
+
+    def InsertHist(self, hist):
+        dirname = hist.GetDirectory().GetName()
+
+        if dirname in self.treeview.get_children(''):
+            icon = self.main._PickIcon(hist)
+            name = dirname + '/' + hist.GetName()
+            self._insert_single_nonrecursive(hist, dirname, name)

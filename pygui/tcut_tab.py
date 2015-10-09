@@ -7,6 +7,8 @@ import re
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
+from .util import increment_name
+
 class TCutTab(object):
 
     def __init__(self, main, frame):
@@ -64,13 +66,7 @@ class TCutTab(object):
 
     def _increment_name(self):
         name = self.next_name.get()
-        res = re.search('[0-9]+$', name)
-        if res:
-            prefix = name[:-len(res.group())]
-            number = int(res.group()) + 1
-            self.next_name.set(prefix + str(number))
-        else:
-            self.next_name.set(name + '_1')
+        self.next_name.set(increment_name(name))
 
     def _MakeNaming(self, parent):
         self.next_name = tk.StringVar(value='tcutg_0')

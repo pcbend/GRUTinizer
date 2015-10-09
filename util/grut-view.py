@@ -4,6 +4,7 @@ import os
 import sys
 import warnings
 import threading
+import Tkinter as tk
 
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
@@ -15,7 +16,16 @@ sys.argv.append('grut-view.py')
 sys.path.append(os.environ['GRUTSYS'])
 from pygui.mainwindow import MainWindow
 
+ident = threading.current_thread().ident
+
+def update():
+    try:
+        if threading.current_thread().ident == ident:
+            window.Update()
+    except tk.TclError:
+        pass
+    except Exception as e:
+        print e
+
 window = MainWindow()
 #window.Run()
-
-ident = threading.current_thread().ident

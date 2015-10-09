@@ -14,11 +14,7 @@ from .run_command import run_command
 from .tree_tab import TreeTab
 from .hist_tab import HistTab
 from .tcut_tab import TCutTab
-
-#Fix ROOT TCanvases, which don't redraw when they should
-def fix_tcanvases():
-    for canvas in ROOT.gROOT.GetListOfCanvases():
-        canvas.Update()
+from .util import update_tcanvases
 
 class MainWindow(object):
 
@@ -30,6 +26,8 @@ class MainWindow(object):
 
         self.canvases = []
         self.files = {}
+
+        self.is_online = ROOT.TGRUTOptions.Get().IsOnline()
 
         self._setup_GUI()
 
@@ -45,6 +43,8 @@ class MainWindow(object):
             file = os.path.join(os.path.dirname(__file__),'resources','rootdb_t.gif'))
         self.icons['tcutg'] = tk.PhotoImage(
             file = os.path.join(os.path.dirname(__file__),'resources','bld_cut.gif'))
+        self.icons['ttree'] = tk.PhotoImage(
+            file = os.path.join(os.path.dirname(__file__),'resources','ttree_t.gif'))
         img = tk.PhotoImage(file=os.path.join(os.path.dirname(__file__),'resources','hdb_s.gif'))
         self.window.tk.call('wm','iconphoto',self.window._w,img)
 
@@ -168,9 +168,22 @@ class MainWindow(object):
         filemenu.add_command(label="Open",command=self.hello)
         filemenu.add_command(label="Save",command=self.hello)
         filemenu.add_separator()
-        #filemenu.add_command(label="Exit",command=self.window.quit)
         filemenu.add_command(label="Exit",command=ROOT.TGRUTint.instance().Terminate)
         menubar.add_cascade(label="File",menu=filemenu)
+
+    def _PickIcon(self, obj):
+        if obj.InheritsFrom('TH2'):
+            return self.icons['h2_t']
+        elif obj.InheritsFrom('TH1'):
+            return self.icons['h1_t']
+        elif obj.InheritsFrom('TFile'):
+            return self.icons['tfile']
+        elif obj.InheritsFrom('TDirectory'):
+            return self.icons['folder_t']
+        elif obj.InheritsFrom('TTree'):
+            return self.icons['ttree']
+        else:
+            return ''
 
     def get_canvas_size(self,size=""):
         if not size:
@@ -298,10 +311,11 @@ class MainWindow(object):
         menubar.add_cascade(label="Send Help",menu=helpmenu)
 
     def RefreshHistograms(self):
-        if online_tree is not None:
-            hists = online_tree.GetHistograms()
-            hists.SetName('online_hists')
-            self.hist_tab.Insert(online_hists)
+        if ROOT.online_events:
+            ROOT.online_events.RefillHistograms()
+        if ROOT.online_scalers:
+            ROOT.online_scalers.RefillHistograms()
+        update_tcanvases()
 
     def _draw_single(self,hist,color=1,nselected=1):
         canvas_exists = bool(filter(None,self.canvases))
@@ -325,7 +339,7 @@ class MainWindow(object):
         self._SetOptStat()
         hist.SetLineColor(color)
         hist.Draw(' '.join(opt))
-        fix_tcanvases()
+        update_tcanvases()
 
     def LoadDataFiles(self, filenames = None):
         if filenames is None:
@@ -349,6 +363,7 @@ class MainWindow(object):
         tfile = ROOT.TObjectManager.Get(filename,"read")
         self.files[filename] = tfile
         self.hist_tab.Insert(tfile)
+        self.tree_tab.AddFile(tfile)
 
     def Interpreter(self):
         try:

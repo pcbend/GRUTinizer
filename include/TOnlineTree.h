@@ -44,10 +44,12 @@ public:
     saved_dir = NULL;
   }
 
+  TDirectory& GetDirectory() { return directory; }
+
 private:
   static void recurse_down(std::vector<std::string>& terminal_leaves, std::string current_branch, TBranch* branch);
 
-  TDirectory directory;
+  TDirectory  directory;
   TDirectory* saved_dir;
 
   long event_num;

@@ -7,12 +7,18 @@ import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 from .tree_structure import Node
+from .util import increment_name, unpack_tdirectory
 
 class TreeTab(object):
 
     def __init__(self, main, frame):
         self.main = main
         self._setup_GUI(frame)
+        self.object_lookup = {}
+        self.param_lookup = {}
+        self.active_ttree = None
+
+        self.AddOnlineTrees()
 
     def _setup_GUI(self, frame):
         self.frame = frame
@@ -108,12 +114,20 @@ class TreeTab(object):
     def _MakeTreeView(self,parent):
         self.tree = ttk.Treeview(parent)
         self.tree.pack(fill=tk.BOTH,expand=True)
-        self._LoadTree()
-        self.tree.bind("<Double-1>", self.ParameterSelection)
+        self.tree.bind("<Double-1>", self.OnDoubleClick)
 
-    def ParameterSelection(self, event):
-        param = event.widget.selection()[0]
-        if event.widget.get_children(param):
+    def OnDoubleClick(self, event):
+        selection = event.widget.selection()[0]
+        obj = self.object_lookup.get(selection)
+
+        if obj is not None and obj.InheritsFrom('TTree'):
+            self.active_ttree = obj
+        else:
+            self.ParameterSelection(selection)
+
+    def ParameterSelection(self, selection):
+        param = self.param_lookup.get(selection)
+        if param is None:
             return
 
         if not self.hist2d.get():
@@ -126,18 +140,69 @@ class TreeTab(object):
             self.y_draw_varexp.set(param)
             self.next_param = 'x'
 
-    def _LoadTree(self):
-        if not ROOT.online_events:
-            return
+    def AddOnlineTrees(self):
+        if ROOT.online_events or ROOT.online_scalers:
+            self.tree.insert('', 'end', 'online', text='online')
 
-        res = ROOT.online_events.GetObjectStringLeaves()
+        if ROOT.online_events:
+            self.AddTree('online',ROOT.online_events)
+        if ROOT.online_scalers:
+            self.AddTree('online',ROOT.online_scalers)
+
+    def AddTree(self, filename, ttree):
+        res = ROOT.TOnlineTree.GetObjectStringLeaves(ttree)
         res = filter(None,str(res).split('\n'))
-        tree = Node('')
+
+        name = filename + '/' + ttree.GetName()
+        tree = Node(name)
         for item in res:
             tree.AddChild(item)
-        tree.ttk_treeview(self.tree)
 
-    def AddHistogram(self):
+        self.object_lookup[name] = ttree
+        self.tree.insert(filename, 'end', name, text=ttree.GetName(),
+                         image = self.main._PickIcon(ttree))
+        tree.ttk_treeview(self.tree, name, lookup_table=self.param_lookup)
+
+    def AddFile(self, tfile):
+        print 'Adding trees from ',tfile.GetName()
+        name = tfile.GetName()
+        self.object_lookup[name] = tfile
+        self.tree.insert('', 'end', name, text=name,
+                         image = self.main._PickIcon(tfile))
+
+        objects = {obj.GetName():obj for obj in unpack_tdirectory(tfile)}
+        for obj in objects.values():
+            if obj.InheritsFrom('TTree'):
+                self.AddTree(tfile.GetName(), obj)
+
+    def AddOfflineHistogram(self, ttree):
+        dimension = 2 if self.hist2d.get() else 1
+
+        name  = self.hist_name.get()
+        Xvar  = self.x_draw_varexp.get()
+        Xbins = int(self.x_draw_bins.get())
+        Xlow  = float(self.x_draw_low.get())
+        Xhigh = float(self.x_draw_high.get())
+        Yvar  = self.y_draw_varexp.get()
+        Ybins = int(self.y_draw_bins.get())
+        Ylow  = float(self.y_draw_low.get())
+        Yhigh = float(self.y_draw_high.get())
+
+        if dimension==1:
+            new_hist = ROOT.TH1I(name, name,
+                                 Xbins, Xlow, Xhigh)
+            draw_command = Xvar
+        else:
+            new_hist = ROOT.TH1I(name, name,
+                                 Xbins, Xlow, Xhigh,
+                                 Ybins, Ylow, Yhigh)
+            draw_command = Yvar + ':' + Xvar
+
+        ttree.Project(name, draw_command)
+        new_hist.SetDirectory(ttree.GetDirectory())
+        self.main.hist_tab.InsertHist(new_hist)
+
+    def AddOnlineHistogram(self):
         if not ROOT.online_events:
             return
 
@@ -145,19 +210,33 @@ class TreeTab(object):
 
         if dimension==1:
             ROOT.online_events.AddHistogram(self.hist_name.get(),
-                                            self.x_draw_bins.get(),
-                                            self.x_draw_low.get(),
-                                            self.x_draw_high.get(),
+                                            int(self.x_draw_bins.get()),
+                                            float(self.x_draw_low.get()),
+                                            float(self.x_draw_high.get()),
                                             self.x_draw_varexp.get())
         else:
             ROOT.online_events.AddHistogram(self.hist_name.get(),
-                                            self.x_draw_bins.get(),
-                                            self.x_draw_low.get(),
-                                            self.x_draw_high.get(),
+                                            int(self.x_draw_bins.get()),
+                                            float(self.x_draw_low.get()),
+                                            float(self.x_draw_high.get()),
                                             self.x_draw_varexp.get(),
-                                            self.y_draw_bins.get(),
-                                            self.y_draw_low.get(),
-                                            self.y_draw_high.get(),
+                                            int(self.y_draw_bins.get()),
+                                            float(self.y_draw_low.get()),
+                                            float(self.y_draw_high.get()),
                                             self.y_draw_varexp.get())
 
         self.main.RefreshHistograms()
+        self.main.hist_tab.CheckOnlineHists()
+
+    def _increment_name(self):
+        name = self.hist_name.get()
+        self.hist_name.set(increment_name(name))
+
+    def AddHistogram(self):
+        if self.active_ttree.InheritsFrom('TOnlineTree'):
+            self.AddOnlineHistogram()
+        else:
+            if self.active_ttree is not None:
+                self.AddOfflineHistogram(self.active_ttree)
+
+        self._increment_name()

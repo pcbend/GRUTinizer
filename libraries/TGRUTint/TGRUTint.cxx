@@ -189,7 +189,7 @@ void TGRUTint::ApplyOptions() {
       TPython::Exec(Form("window.LoadRootFile(\"%s\")",filename.c_str()));
       OpenRootFile(filename);
     }
-    fGuiTimer = new TTimer("TPython::Exec(\"if threading.current_thread().ident == ident: window.Update()\");",100);
+    fGuiTimer = new TTimer("TPython::Exec(\"update()\");",100);
     fGuiTimer->TurnOn();
   }
 
@@ -301,7 +301,8 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   if(sline.Contains("for") ||
      sline.Contains("while") ||
      sline.Contains("if") ||
-     sline.Contains("{")){
+     sline.Contains("{") ||
+     sline.Contains("TPython")){
      return TRint::ProcessLine(sline.Data(), sync, error);
   }
 
