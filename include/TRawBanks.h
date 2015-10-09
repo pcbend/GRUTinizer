@@ -13,6 +13,87 @@
 #define MAX_INTPTS 16
 #define MAX_PWID   256
 #define MAX_LABRID 16
+#define MQDC_ID 10
+#define MTDC_ID 20
+
+// General Mesytec Stuff:
+struct Mesy_Word{
+  // This is 2x16 bits = 32 bits.  The MQDC talks in 32 bit words.
+  UShort_t tail;
+  UShort_t nose;
+
+  bool isHeader() const { return((nose&0xff00)==0x4000); }
+  bool isData()   const { return((nose&0xffc0)==0x0400); } // for QDC 0x0020 should also be 0.  Left out for easy use.
+  bool isETS()    const { return((nose&0xffff)==0x0480); }
+  bool isFILL()   const { return(((nose&0xffff)==0) && ((tail&0xffff)==0)); }
+  bool isEOE()    const { return((nose&0xc000)==0xc000); }
+}__attribute__((__packed__));
+
+struct Mesy_Header{
+  UShort_t tail;
+  UShort_t nose;
+
+  UShort_t format()   const { return ((tail&0x8000)>>15); }
+  UShort_t size()     const { return tail&0x0fff; }
+  UShort_t id()       const { return nose&0x00ff; }
+  UShort_t res()      const { return (tail&0x7000)>>12; }
+  bool isQDC()        const { return(id()==MQDC_ID); }
+  bool isTDC()        const { return(id()==MTDC_ID); }
+}__attribute__((__packed__));
+
+struct Mesy_ETS{
+  UShort_t tail;
+  UShort_t nose;
+
+  UShort_t ETS()    const { return tail&0xffff; }
+}__attribute__((__packed__));
+
+struct Mesy_FILL{
+  UShort_t tail;
+  UShort_t nose;
+}__attribute__((__packed__));
+
+struct Mesy_EOE{
+  UInt_t data;
+
+  Int_t TS()     const { return data&0x3fffffff; }
+}__attribute__((__packed__));
+
+// Mesytec QDC: 
+struct M_QDC_Data{
+  UShort_t tail;
+  UShort_t nose;  
+
+  UShort_t Chan()   const { return nose&0x001f; }
+  UShort_t Charge() const { return tail&0x0fff; }
+  UShort_t isOOR()  const { return (tail&0x4000)>>14; }  
+}__attribute__((__packed__));
+
+// Mesytec TDC:
+struct M_TDC_Data{
+  UShort_t tail;
+  UShort_t nose;  
+
+  bool isTrig() const { return((nose&0x0020)>>5); }
+  UShort_t Chan()   const { return nose&0x001f; }
+  UShort_t Time()   const { return tail&0xffff; }
+}__attribute__((__packed__));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 typedef struct { // HPGe Segment Hit Type 1;
