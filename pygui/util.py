@@ -13,10 +13,16 @@ def unpack_tdirectory(tdir):
         for obj in tdir.GetList():
             yield obj
 
-def update_tcanvases():
-    for canvas in ROOT.gROOT.GetListOfCanvases():
-        canvas.Modified()
-        canvas.Update()
+def update_tcanvases(objects=None):
+    if objects is None:
+        objects = ROOT.gROOT.GetListOfCanvases()
+
+    for obj in objects:
+        if obj.InheritsFrom('TPad'):
+            obj.Modified()
+            obj.Update()
+            update_tcanvases(obj.GetListOfPrimitives())
+
 
 def increment_name(name):
     res = re.search('[0-9]+$', name)
