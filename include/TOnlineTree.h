@@ -1,6 +1,10 @@
 #ifndef _TONLINETREE_H_
 #define _TONLINETREE_H_
 
+#ifndef __CINT__
+#include <mutex>
+#endif
+
 #include "TCut.h"
 #include "TDirectory.h"
 #include "TTree.h"
@@ -48,6 +52,12 @@ public:
 
 private:
   static void recurse_down(std::vector<std::string>& terminal_leaves, std::string current_branch, TBranch* branch);
+
+  void RefillHistograms_MutexTaken();
+
+#ifndef __CINT__
+  std::mutex fill_mutex;
+#endif
 
   TDirectory  directory;
   TDirectory* saved_dir;

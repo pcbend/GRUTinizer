@@ -109,11 +109,13 @@ TList* TOnlineTree::GetHistograms() {
 }
 
 Int_t TOnlineTree::Fill(){
+  std::lock_guard<std::mutex> lock(fill_mutex);
+
   event_num = actual_event_num++;
   Int_t output = TTree::Fill();
 
   if(actual_event_num - last_fill > circular_size * 0.7){
-    RefillHistograms();
+    RefillHistograms_MutexTaken();
   }
 
   return output;
@@ -173,7 +175,7 @@ void TOnlineTree::AddHistogram(const char* name,
   hist_patterns_2d.push_back(pat);
 }
 
-void TOnlineTree::RefillHistograms() {
+void TOnlineTree::RefillHistograms_MutexTaken() {
   TPreserveGDirectory preserve;
   directory.cd();
 
@@ -190,4 +192,9 @@ void TOnlineTree::RefillHistograms() {
   }
 
   last_fill = actual_event_num;
+}
+
+void TOnlineTree::RefillHistograms() {
+  std::lock_guard<std::mutex> lock(fill_mutex);
+  RefillHistograms_MutexTaken();
 }
