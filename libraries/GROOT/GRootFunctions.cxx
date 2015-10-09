@@ -83,3 +83,26 @@ Double_t GRootFunctions::PhotoPeak(Double_t *dim,Double_t *par) {
 Double_t GRootFunctions::PhotoPeakBG(Double_t *dim,Double_t *par) {
   return Gaus(dim,par) + SkewedGaus(dim,par) + StepFunction(dim,par) + PolyBg(dim,par+6,2);
 }
+
+
+// For fitting Ge detector efficiencies.
+Double_t GRootFunctions::Efficiency(Double_t *dim, Double_t *par){
+  // - dim[0]: energy.
+  // - par[0]: zeroth order
+  // - par[1]: first order
+  // - par[2]: second order
+  // - par[3]: inverse energy squared term.
+  // - Formula : 10**(0+1*Log(x)+2*Log(x)**2+3/x**2)
+
+  Double_t x  = dim[0];
+  Double_t p0 = par[0];
+  Double_t p1 = par[1];
+  Double_t p2 = par[2];
+  Double_t p3 = par[3];
+
+  if(x!=0)
+    return pow(10.0,(p0+p1*TMath::Log10(x)+p2*std::pow(TMath::Log10(x),2.0)+p3/(std::pow(x,2.0))));
+  else
+    return 0;
+	    
+}

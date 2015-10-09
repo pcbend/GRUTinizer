@@ -121,7 +121,7 @@ while test $# -gt 0; do
         continue
       fi
       rootout="yes"
-      out="$out `root-config --cflags --glibs` -lPhysics -lSpectrum" 
+      out="$out `root-config --cflags --glibs` -lPhysics -lSpectrum -lPyROOT" 
       ;;
     --help)
       ### Print a helpful message...

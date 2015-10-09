@@ -31,6 +31,9 @@ public:
   std::vector<std::string> GetStringLeaves();
   TObject* GetObjectStringLeaves();
 
+  static std::vector<std::string> GetStringLeaves(TTree*);
+  static TObject* GetObjectStringLeaves(TTree*);
+
   TList* GetHistograms();
 
   void cd(){ saved_dir = gDirectory; directory.cd(); }
@@ -42,7 +45,7 @@ public:
   }
 
 private:
-  void recurse_down(std::vector<std::string>& terminal_leaves, std::string current_branch, TBranch* branch);
+  static void recurse_down(std::vector<std::string>& terminal_leaves, std::string current_branch, TBranch* branch);
 
   TDirectory directory;
   TDirectory* saved_dir;

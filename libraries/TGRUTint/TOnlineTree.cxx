@@ -47,10 +47,31 @@ TObject* TOnlineTree::GetObjectStringLeaves(){
   return new TObjString(ss.str().c_str());
 }
 
+
+TObject* TOnlineTree::GetObjectStringLeaves(TTree *tree){
+  std::stringstream ss;
+  for(auto& elem : GetStringLeaves(tree)){
+    ss << elem << "\n";
+  }
+  return new TObjString(ss.str().c_str());
+}
+
 std::vector<std::string> TOnlineTree::GetStringLeaves() {
   std::vector<std::string> output;
 
   TIter leaves(TTree::GetListOfBranches());
+  TObject* obj = NULL;
+  while((obj = leaves.Next())){
+    recurse_down(output, obj->GetName(), (TBranch*)obj);
+  }
+
+  return output;
+}
+
+std::vector<std::string> TOnlineTree::GetStringLeaves(TTree *tree) {
+  std::vector<std::string> output;
+
+  TIter leaves(tree->GetListOfBranches());
   TObject* obj = NULL;
   while((obj = leaves.Next())){
     recurse_down(output, obj->GetName(), (TBranch*)obj);

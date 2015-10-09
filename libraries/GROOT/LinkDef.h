@@ -27,6 +27,7 @@
 #pragma link C++ function Help;
 #pragma link C++ function Commands;
 
+  
 #pragma link C++ global gManager;
 #pragma link C++ global gBaseManager;
 

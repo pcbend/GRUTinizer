@@ -11,7 +11,7 @@
 #include "TGEBEvent.h"
 #include "TDetectorHit.h"
 
-#define MAXHPGESEGMENTS 32
+#define MAXHPGESEGMENTS 36
 
 class TGretinaHit : public TDetectorHit {
 
@@ -107,7 +107,7 @@ private:
   /// The number of the segment containing the interaction.
   /**
      Note: This is not equal to the segment number as read from the datastream.
-     This is equal to 36*raw.crystal_id + raw.segnum.
+     This is equal to 36*raw.crystal_id + raw.segnum.  ///not anymore pcb.
    */
   Int_t    fSegmentNumber[MAXHPGESEGMENTS];
 

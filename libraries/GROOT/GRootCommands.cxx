@@ -2,9 +2,12 @@
 #include "GRootCommands.h"
 
 #include <cstdio>
-#include <string>
+//#include <string>
+#include <sstream>
+
 
 #include <TRint.h>
+#include <TTree.h>
 #include <Getline.h>
 #include <TAxis.h>
 #include <TDirectory.h>
@@ -119,7 +122,6 @@ bool PhotoPeakFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
 
   return edit;
 }
-
 
 
 

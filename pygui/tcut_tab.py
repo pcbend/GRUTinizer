@@ -75,9 +75,11 @@ class TCutTab(object):
     def _MakeNaming(self, parent):
         self.next_name = tk.StringVar(value='tcutg_0')
         frame = tk.Frame(parent)
-        tk.Label(frame, text='Name:').pack(side=tk.LEFT)
-        tk.Entry(frame, textvariable=self.next_name).pack(side=tk.LEFT)
+        tk.Label(frame, text='Name:').pack(side=tk.TOP)
+        tk.Entry(frame, textvariable=self.next_name).pack(side=tk.TOP)
         tk.Button(frame, text='Make Gate', command=self.StartCut).pack(side=tk.LEFT)
+        tk.Button(frame, text='Save Gate', command=self.StartCut).pack(side=tk.LEFT)
+        tk.Button(frame, text='Delete Gate', command=self.StartCut).pack(side=tk.LEFT)
         frame.pack(fill=tk.X,expand=False)
 
     def _MakeTreeView(self, parent):
