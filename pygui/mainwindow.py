@@ -39,7 +39,6 @@ class MainWindow(object):
             settings = ast.literal_eval(text)
 
         if 'histograms' in settings:
-            print settings['histograms']
             self.hist_tab._load_online_patterns(settings['histograms'])
 
 

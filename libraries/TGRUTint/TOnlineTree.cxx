@@ -198,6 +198,10 @@ void TOnlineTree::RefillHistograms_MutexTaken() {
   last_fill = actual_event_num;
 }
 
+bool TOnlineTree::HasHistogram(std::string name) {
+  return directory.GetList()->FindObject(name.c_str());
+}
+
 void TOnlineTree::RefillHistograms() {
   std::lock_guard<std::mutex> lock(fill_mutex);
   RefillHistograms_MutexTaken();

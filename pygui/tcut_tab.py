@@ -58,7 +58,7 @@ class TCutTab(object):
     def AddCut(self, cut):
         name = cut.GetName()
         self.cuts[name] = cut
-        self.tree.insert('', 'end', name, text=name,
+        self.tree.insert('', 'end', name, text=name, values='2D Cut',
                          image = self.main.icons['tcutg'])
 
     def StartCut(self):
@@ -71,17 +71,22 @@ class TCutTab(object):
     def _MakeNaming(self, parent):
         self.next_name = tk.StringVar(value='tcutg_0')
         frame = tk.Frame(parent)
-        tk.Label(frame, text='Name:').pack(side=tk.TOP)
-        tk.Entry(frame, textvariable=self.next_name).pack(side=tk.TOP)
+        tk.Label(frame, text='Name:').pack(side=tk.LEFT)
+        tk.Entry(frame, textvariable=self.next_name).pack(side=tk.LEFT)
+        frame.pack(fill=tk.X,expand=False)
+
+        frame = tk.Frame(parent)
         tk.Button(frame, text='Make Gate', command=self.StartCut).pack(side=tk.LEFT)
         tk.Button(frame, text='Save Gate', command=self.StartCut).pack(side=tk.LEFT)
         tk.Button(frame, text='Delete Gate', command=self.StartCut).pack(side=tk.LEFT)
         frame.pack(fill=tk.X,expand=False)
 
     def _MakeTreeView(self, parent):
-        self.tree = ttk.Treeview(parent)
+        self.tree = ttk.Treeview(parent, columns=('type',))
+        self.tree.column('type', width=50, anchor='e')
+        self.tree.heading('type', text='Type')
         self.tree.pack(fill=tk.BOTH,expand=True)
         self.tree.bind("<Double-1>",self.GateSelection)
 
     def GateSelection(self, event):
-        print 'Gate was double-clicked'
+        gate_name = event.widget.selection()[0]
