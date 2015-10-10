@@ -167,6 +167,8 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename) const{
     return kFileType::GRETINA_MODE2;
   } else if (ext == "env") {
     return kFileType::DETECTOR_ENVIRONMENT;
+  } else if (ext == "hist") {
+    return kFileType::GUI_HIST_FILE;
   } else {
     return kFileType::UNKNOWN_FILETYPE;
   }
@@ -190,6 +192,10 @@ bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
 
     case kFileType::CALIBRATED:
       input_cal_files.push_back(filename);
+      return true;
+
+    case kFileType::GUI_HIST_FILE:
+      input_gui_hist_files.push_back(filename);
       return true;
 
     case kFileType::DETECTOR_ENVIRONMENT:

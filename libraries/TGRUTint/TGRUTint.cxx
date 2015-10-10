@@ -155,7 +155,6 @@ void TGRUTint::ApplyOptions() {
       outfile = opt->GenerateOutputFilename(filename);
     }
     TGRUTLoop::Get()->ProcessFile(filename.c_str(), outfile.c_str());
-    TGRUTLoop::Get()->Start();
 
   } else if (opt->RawInputFiles().size()>1 && opt->SortRaw()){
     std::vector<std::string> filenames = opt->RawInputFiles();
@@ -164,7 +163,6 @@ void TGRUTint::ApplyOptions() {
       outfile = opt->GenerateOutputFilename(filenames);
     }
     TGRUTLoop::Get()->ProcessFile(filenames, outfile.c_str());
-    TGRUTLoop::Get()->Start();
   }
 
   if(!opt->StartGUI()) {
@@ -187,10 +185,18 @@ void TGRUTint::ApplyOptions() {
     TPython::Exec(script_text.c_str());
     for(auto& filename : opt->RootInputFiles()){
       TPython::Exec(Form("window.LoadRootFile(\"%s\")",filename.c_str()));
-      OpenRootFile(filename);
+      OpenRootFile(filename); // Is this needed/sane?
+    }
+
+    for(auto& filename : opt->GuiSaveSetFiles()){
+      TPython::Exec(Form("window.LoadGuiFile(\"%s\")",filename.c_str()));
     }
     fGuiTimer = new TTimer("TPython::Exec(\"update()\");",100);
     fGuiTimer->TurnOn();
+  }
+
+  if (opt->RawInputFiles().size()){
+    TGRUTLoop::Get()->Start();
   }
 
   if(TGRUTOptions::Get()->ExitAfterSorting()){

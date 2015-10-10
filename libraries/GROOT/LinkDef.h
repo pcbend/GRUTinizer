@@ -20,14 +20,16 @@
 #pragma link C++ function LabelPeaks;
 #pragma link C++ function ShowPeaks;
 #pragma link C++ function RemovePeaks;
-#pragma link C++ finction PhotoPeakFit;
+#pragma link C++ function PhotoPeakFit;
+
+#pragma link C++ function MergeStrings;
 
 //#pragma link C++ function PeakFit;
 
 #pragma link C++ function Help;
 #pragma link C++ function Commands;
 
-  
+
 #pragma link C++ global gManager;
 #pragma link C++ global gBaseManager;
 
