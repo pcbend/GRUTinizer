@@ -47,7 +47,7 @@ int TGRUTLoop::ProcessEvent(TRawEvent& event){
 }
 
 void TGRUTLoop::ProcessFile(const char* input, const char* output){
-  TDataLoop::ProcessFile(input);
+  TDataLoop::ProcessFile(input, TGRUTOptions::Get()->IsOnline());
   switch(TGRUTOptions::Get()->DetermineFileType(input)) {
     case kFileType::NSCL_EVT:
       outfile = new TRootOutfileNSCL();
