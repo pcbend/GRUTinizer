@@ -1,8 +1,10 @@
 #!/usr/bin/env python2
 
+import ast
 import os
+import pprint
 import Tkinter as tk
-from tkFileDialog import askopenfilename, askopenfilenames
+import tkFileDialog
 import ttk
 
 import sys
@@ -30,6 +32,32 @@ class MainWindow(object):
         self.is_online = ROOT.TGRUTOptions.Get().IsOnline()
 
         self._setup_GUI()
+
+    def LoadGuiFile(self, filename):
+        with open(filename) as f:
+            text = f.read()
+            settings = ast.literal_eval(text)
+
+        if 'histograms' in settings:
+            print settings['histograms']
+            self.hist_tab._load_online_patterns(settings['histograms'])
+
+
+    def _save_gui_file(self, filename = None):
+        if filename is None:
+            filename = tkFileDialog.asksaveasfilename(filetypes=(("GUI File", "*.hist"),))
+
+        if not filename:
+            return
+
+        if not filename.endswith('.hist'):
+            filename += '.hist'
+
+        output = {}
+        output['histograms'] = self.hist_tab._hist_patterns()
+        with open(filename,'w') as f:
+            pprint.pprint(output, f)
+
 
     def _load_icons(self):
         self.icons = {}
@@ -89,6 +117,7 @@ class MainWindow(object):
         button = tk.Button(self.window,
                            text='Jump into Interpreter',fg="black",bg="goldenrod",
                            command=self.Interpreter)
+
         button.pack(fill=tk.X,expand=False)
 
         notebook = ttk.Notebook(self.window)
@@ -166,7 +195,7 @@ class MainWindow(object):
         filemenu.add_command(label="Close All Canvases",command=self.close_all_canvases)
         filemenu.add_separator()
         filemenu.add_command(label="Open",command=self.hello)
-        filemenu.add_command(label="Save",command=self.hello)
+        filemenu.add_command(label="Save",command=self._save_gui_file)
         filemenu.add_separator()
         filemenu.add_command(label="Exit",command=ROOT.TGRUTint.instance().Terminate)
         menubar.add_cascade(label="File",menu=filemenu)
@@ -339,11 +368,10 @@ class MainWindow(object):
         self._SetOptStat()
         hist.SetLineColor(color)
         hist.Draw(' '.join(opt))
-        update_tcanvases()
 
     def LoadDataFiles(self, filenames = None):
         if filenames is None:
-            filenames = askopenfilenames(filetypes=(("GEB File", "*.dat"),))
+            filenames = tkFileDialog.askopenfilenames(filetypes=(("GEB File", "*.dat"),))
             filenames = self.window.tk.splitlist(filenames)
 
         if not filenames:
@@ -354,7 +382,7 @@ class MainWindow(object):
 
     def LoadRootFile(self,filename=None):
         if filename is None:
-            filename = askopenfilename(filetypes=(("ROOT File", "*.root"),))
+            filename = tkFileDialog.askopenfilename(filetypes=(("ROOT File", "*.root"),))
 
         if not filename:
             return

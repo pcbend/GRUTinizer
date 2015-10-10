@@ -124,12 +124,14 @@ Int_t TOnlineTree::Fill(){
 void TOnlineTree::AddHistogram(const char* name,
                                int bins, double low, double high, const char* varexp,
                                const char* gate){
+  std::lock_guard<std::mutex> lock(fill_mutex);
+
   TPreserveGDirectory preserve;
   directory.cd();
 
   HistPattern1D pat;
 
-  pat.name = Form("+%s",name);
+  pat.name = name;
   pat.varexp = varexp;
   pat.bins = bins;
   pat.low = low;
@@ -147,12 +149,14 @@ void TOnlineTree::AddHistogram(const char* name,
                                int binsX, double lowX, double highX, const char* varexpX,
                                int binsY, double lowY, double highY, const char* varexpY,
                                const char* gate){
+  std::lock_guard<std::mutex> lock(fill_mutex);
+
   TPreserveGDirectory preserve;
   directory.cd();
 
   HistPattern2D pat;
 
-  pat.name = Form("+%s",name);
+  pat.name = name;
   pat.gate = gate;
 
   pat.varexp = Form("%s:%s",varexpY,varexpX);
@@ -180,13 +184,13 @@ void TOnlineTree::RefillHistograms_MutexTaken() {
   directory.cd();
 
   for(auto& pattern : hist_patterns_1d) {
-    TTree::Project(pattern.name.c_str(), pattern.varexp.c_str(),
+    TTree::Project(("+"+pattern.name).c_str(), pattern.varexp.c_str(),
                    pattern.gate, "", circular_size,
                    GetEntries() - (actual_event_num - last_fill));
   }
 
   for(auto& pattern : hist_patterns_2d) {
-    TTree::Project(pattern.name.c_str(), pattern.varexp.c_str(),
+    TTree::Project(("+"+pattern.name).c_str(), pattern.varexp.c_str(),
                    pattern.gate, "", circular_size,
                    GetEntries() - (actual_event_num - last_fill));
   }
@@ -197,4 +201,41 @@ void TOnlineTree::RefillHistograms_MutexTaken() {
 void TOnlineTree::RefillHistograms() {
   std::lock_guard<std::mutex> lock(fill_mutex);
   RefillHistograms_MutexTaken();
+}
+
+std::string TOnlineTree::GetHistPattern(std::string name) {
+  //TODO: Change this to a std::map lookup
+  for(auto& pat : hist_patterns_1d) {
+    if(pat.name == name){
+      std::stringstream ss;
+      ss << GetName() << "\n";
+      ss << pat.name << "\n";
+      ss << pat.gate << "\n";
+      ss << pat.varexp << "\n";
+      ss << pat.bins << "\n";
+      ss << pat.low << "\n";
+      ss << pat.high;
+      return ss.str();
+    }
+  }
+
+  for(auto& pat : hist_patterns_2d) {
+    if(pat.name == name){
+      std::stringstream ss;
+      ss << GetName() << "\n";
+      ss << pat.name << "\n";
+      ss << pat.gate << "\n";
+      ss << pat.varexpX << "\n";
+      ss << pat.binsX << "\n";
+      ss << pat.lowX << "\n";
+      ss << pat.highX << "\n";
+      ss << pat.varexpY << "\n";
+      ss << pat.binsY << "\n";
+      ss << pat.lowY << "\n";
+      ss << pat.highY;
+      return ss.str();
+    }
+  }
+
+  return "";
 }

@@ -33,7 +33,7 @@ void Commands() { printf("this is a list of useful commands.\n");}
 int LabelPeaks(TH1 *hist,double sigma,double thresh,Option_t *opt) {
   TSpectrum::StaticSearch(hist,sigma,"Qnodraw",thresh);
   TPolyMarker *pm = (TPolyMarker*)hist->GetListOfFunctions()->FindObject("TPolyMarker");
-  if(!pm) { 
+  if(!pm) {
     //something has gone wrong....
     return 0;
   }
@@ -97,11 +97,11 @@ bool RemovePeaks(TH1 **hists,unsigned int nhists) {
 //bool PeakFit(TH1 *hist,Double_t xlow, Double_t xhigh,Option_t *opt) {
 //  if(!hist)
 //   return;
-//  TString option = opt; 
+//  TString option = opt;
 //}
 
 bool PhotoPeakFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
-  bool edit = false; 
+  bool edit = false;
   if(!hist)
     return edit;
   int binx[2];
@@ -123,6 +123,16 @@ bool PhotoPeakFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
   return edit;
 }
 
+std::string MergeStrings(const std::vector<std::string>& strings, char split) {
+  std::stringstream ss;
+  for(auto it = strings.begin(); it != strings.end(); it++) {
+    ss << *it;
 
-
-
+    auto next = it;
+    next++;
+    if(next != strings.end()){
+      ss << split;
+    }
+  }
+  return ss.str();
+}

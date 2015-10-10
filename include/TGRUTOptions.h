@@ -20,6 +20,7 @@ public:
   const std::vector<std::string>& RootInputFiles()  { return input_root_files;  }
   const std::vector<std::string>& CalInputFiles()   { return input_cal_files;   }
   const std::vector<std::string>& MacroInputFiles() { return input_macro_files; }
+  const std::vector<std::string>& GuiSaveSetFiles() { return input_gui_hist_files; }
   const std::string& DetectorEnvironment()          { return detector_environment; }
   const std::string& OutputFile()                   { return output_file; }
   std::string InputRing() { return input_ring; }
@@ -61,6 +62,7 @@ private:
   std::vector<std::string> input_root_files;
   std::vector<std::string> input_cal_files;
   std::vector<std::string> input_macro_files;
+  std::vector<std::string> input_gui_hist_files;
   std::string input_ring;
 
   std::string output_file;
