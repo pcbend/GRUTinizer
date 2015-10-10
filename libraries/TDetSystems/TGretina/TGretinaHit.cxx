@@ -6,11 +6,12 @@
 #include "TGretina.h"
 
 struct interaction_point {
-  interaction_point(int segnum, TVector3 pos, float energy)
-    : segnum(segnum), pos(pos), energy(energy) { }
+  interaction_point(int segnum, TVector3 pos,TVector3 loc,float energy)
+    : segnum(segnum), pos(pos),local_pos(loc), energy(energy) { }
 
   int segnum;
   TVector3 pos;
+  TVector3 local_pos;
   float energy;
 
   bool operator<(const interaction_point& other) const {
@@ -39,6 +40,7 @@ void TGretinaHit::Copy(TObject &rhs) const {
   for(int i=0;i<fNumberOfInteractions;i++) {
     ((TGretinaHit&)rhs).fSegmentNumber[i] = fSegmentNumber[i];
     ((TGretinaHit&)rhs).fGlobalInteractionPosition[i] = fGlobalInteractionPosition[i];
+    ((TGretinaHit&)rhs).fLocalInteractionPosition[i]  = fLocalInteractionPosition[i];
     ((TGretinaHit&)rhs).fInteractionEnergy[i] = fInteractionEnergy[i];
   }
 }
@@ -70,6 +72,10 @@ void TGretinaHit::BuildFrom(const TRawEvent::GEBBankType1& raw){
                                                               raw.intpts[i].x,
                                                               raw.intpts[i].y,
                                                               raw.intpts[i].z);
+    fLocalInteractionPosition[i].SetXYZ(raw.intpts[i].x,
+                                        raw.intpts[i].y,
+                                        raw.intpts[i].z);
+
     float seg_ener = raw.intpts[i].seg_ener;
     fInteractionEnergy[i] = seg_ener;
 
@@ -95,6 +101,18 @@ TVector3 TGretinaHit::GetInteractionPosition(int i) const {
   }
 }
 
+TVector3 TGretinaHit::GetLocalPosition(int i) const {
+  if(i>=0 && i<fNumberOfInteractions){
+    return fLocalInteractionPosition[i];
+  } else {
+    return TVector3(0,0,1);
+  }
+}
+
+
+
+
+
 //TVector3 TGretinaHit::GetCrystalPosition(int i) const {
 //  std::cerr << __PRETTY_FUNCTION__ << " NOT IMPLEMENTED YET" << std::endl;
 //}
@@ -115,6 +133,7 @@ void TGretinaHit::SortHits(){
   for(int i=0; i<fNumberOfInteractions; i++){
     ips.insert(interaction_point(fSegmentNumber[i],
                                  fGlobalInteractionPosition[i],
+                                 fLocalInteractionPosition[i],
                                  fInteractionEnergy[i]));
   }
 
@@ -127,6 +146,7 @@ void TGretinaHit::SortHits(){
 
     fSegmentNumber[fNumberOfInteractions] = point.segnum;
     fGlobalInteractionPosition[fNumberOfInteractions] = point.pos;
+    fLocalInteractionPosition[fNumberOfInteractions] = point.local_pos;
     fInteractionEnergy[fNumberOfInteractions] = point.energy;
     fNumberOfInteractions++;
   }
@@ -147,11 +167,13 @@ void TGretinaHit::AddToSelf(const TGretinaHit& rhs, double& max_energy) {
   for(int i=0; i<fNumberOfInteractions; i++){
     ips.insert(interaction_point(fSegmentNumber[i],
                                  fGlobalInteractionPosition[i],
+                                 fLocalInteractionPosition[i],
                                  fInteractionEnergy[i]));
   }
   for(int i=0; i<rhs.fNumberOfInteractions; i++){
     ips.insert(interaction_point(fSegmentNumber[i],
                                  fGlobalInteractionPosition[i],
+                                 fLocalInteractionPosition[i],
                                  fInteractionEnergy[i]));
   }
 
@@ -174,6 +196,7 @@ void TGretinaHit::AddToSelf(const TGretinaHit& rhs, double& max_energy) {
 
     fSegmentNumber[fNumberOfInteractions] = point.segnum;
     fGlobalInteractionPosition[fNumberOfInteractions] = point.pos;
+    fLocalInteractionPosition[fNumberOfInteractions] = point.local_pos;
     fInteractionEnergy[fNumberOfInteractions] = point.energy;
     fNumberOfInteractions++;
   }
@@ -280,6 +303,7 @@ void TGretinaHit::Clear(Option_t *opt) {
   for(int i=0;i<MAXHPGESEGMENTS;i++) {
     fSegmentNumber[i]             = -1 ;
     fGlobalInteractionPosition[i].Clear(opt);
+    fLocalInteractionPosition[i].Clear(opt);
     fInteractionEnergy[i]         = -1 ;
   }
 }

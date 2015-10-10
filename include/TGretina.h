@@ -24,7 +24,7 @@ public:
   virtual int           Size()                          { return gretina_hits->GetEntries(); }
 
   const TGretinaHit& GetGretinaHit(int i) { return *(TGretinaHit*)gretina_hits->At(i); }
-  TGretinaHit& GetAddbackHit(int i) { return *(TGretinaHit*)addback_hits->At(i); }
+  //const TGretinaHit& GetAddbackHit(int i) { return *(TGretinaHit*)addback_hits->At(i); }
   void PrintHit(int i){ gretina_hits->At(i)->Print(); }
 
   static TVector3 CrystalToGlobal(int cryId,
@@ -32,10 +32,10 @@ public:
 
 private:
   virtual int BuildHits();
-  void BuildAddbackHits();
+  //void BuildAddbackHits();
 
   TClonesArray* gretina_hits;//("TGretinaHit");
-  TClonesArray* addback_hits;//("TGretinaHit");
+  //TClonesArray* addback_hits;//("TGretinaHit");
 
   static Float_t crmat[32][4][4][4];
   static void SetCRMAT();

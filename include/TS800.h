@@ -26,7 +26,18 @@ private:
 
   void Build_VMUSB_Read(TSmartBuffer buf);
 
-  //TClonesArray* janus_hits; //->
+  //TClonesArray *fTimeOfFlight;
+  //TClonesArray *fTimeOfFlight;
+  //TClonesArray *fTimeOfFlight;
+  //TClonesArray *fTimeOfFlight;
+  //TClonesArray *fTimeOfFlight;
+  //TClonesArray *fTimeOfFlight;
+
+
+
+
+
+
 
   Long_t fEventCounter;
 

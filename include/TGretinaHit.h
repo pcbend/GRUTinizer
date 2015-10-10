@@ -77,6 +77,7 @@ public:
   Int_t   GetSegmentId(const int &i)           { return fSegmentNumber[i]; }
   Float_t GetSegmentEng(const int &i)          { return fInteractionEnergy[i]; }
   TVector3 GetInteractionPosition(int i) const; //{ return fGlobalInteractionPosition[i]; }
+  TVector3 GetLocalPosition(int i) const; 
   //TVector3 GetCrystalPosition(int i)     const { return TVector3(0,0,1): }
   TVector3 GetPosition()                 const { return GetFirstIntPosition(); }
 
@@ -118,6 +119,7 @@ private:
      To get the crystal coordinate, use TGretinaHit::GetCrystalPosition(int i).
    */
   TVector3 fGlobalInteractionPosition[MAXHPGESEGMENTS];
+  TVector3 fLocalInteractionPosition[MAXHPGESEGMENTS];
   Float_t  fInteractionEnergy[MAXHPGESEGMENTS];
 
   ClassDef(TGretinaHit,1)

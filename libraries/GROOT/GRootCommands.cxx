@@ -68,7 +68,7 @@ int LabelPeaks(TH1 *hist,double sigma,double thresh,Option_t *opt) {
 
 bool ShowPeaks(TH1 **hists,unsigned int nhists) {
   double sigma  = 2.0;
-  double thresh = 0.05;
+  double thresh = 0.02;
   int num_found = 0;
   for(int i=0;i<nhists;i++) {
     if(TObject *obj = hists[i]->GetListOfFunctions()->FindObject("PeakLabels")) {

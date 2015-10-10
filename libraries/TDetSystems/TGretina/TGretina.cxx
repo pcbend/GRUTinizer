@@ -4,13 +4,13 @@
 
 TGretina::TGretina(){
   gretina_hits = new TClonesArray("TGretinaHit");
-  addback_hits = new TClonesArray("TGretinaHit");
+  //addback_hits = new TClonesArray("TGretinaHit");
   Clear();
 }
 
 TGretina::~TGretina() {
   gretina_hits->Delete();
-  addback_hits->Delete();
+  //addback_hits->Delete();
 }
 
 Float_t TGretina::crmat[32][4][4][4];
@@ -70,7 +70,7 @@ void TGretina::Copy(TObject& obj) const {
 
   TGretina& gretina = (TGretina&)obj;
   gretina_hits->Copy(*gretina.gretina_hits);
-  addback_hits->Copy(*gretina.addback_hits);
+  //addback_hits->Copy(*gretina.addback_hits);
   gretina.raw_data.clear();
 }
 
@@ -92,7 +92,7 @@ int TGretina::BuildHits(){
   //gretina_hits->At(0)->Print();
   raw_data.clear();
 
-  BuildAddbackHits();
+  //BuildAddbackHits();
 
   //gretina_hits->At(0)->Print();
   return Size();
@@ -125,6 +125,7 @@ TVector3 TGretina::CrystalToGlobal(int cryId,Float_t x,Float_t y,Float_t z) {
   return TVector3(xl, yl, zl);
 }
 
+/*
 void TGretina::BuildAddbackHits(){
   if(Size()==0)
     return;
@@ -157,12 +158,13 @@ void TGretina::BuildAddbackHits(){
     }
   }
 }
+*/
 
 void TGretina::Print(Option_t *opt) const { }
 
 void TGretina::Clear(Option_t *opt) {
   TDetector::Clear(opt);
   gretina_hits->Clear(opt);//("TGretinaHit");
-  addback_hits->Clear(opt);//("TGretinaHit");
+  //addback_hits->Clear(opt);//("TGretinaHit");
   raw_data.clear();
 }
