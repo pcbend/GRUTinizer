@@ -31,8 +31,8 @@ class TS800Channel : public TObject {
 
 class TS800Hit : public TDetectorHit {
   public:
-    TS800Hit();
-    ~TS800Hit();
+    TS800Hit()   {  }
+    ~TS800Hit()  {  }
     virtual Int_t Charge() const { return 0; }
 
     virtual void Clear(Option_t *opt ="")       {  }
