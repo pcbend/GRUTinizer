@@ -29,7 +29,9 @@ public:
   Int_t    GetHoleNumber()      const { return fCrystalId/4 -1; }
   Int_t    GetCrystalNumber()   const { return fCrystalId%4;    }
   Float_t  GetCoreEnergy()      const { return fCoreEnergy;     }
-  Float_t  GetCoreCharge(int i) const { return fCoreCharge[i];  }
+  Int_t    GetCoreCharge(int i) const { return fCoreCharge[i];  }
+  virtual Int_t Charge()        const { return fCoreCharge[3];  }
+  
 
   void  Print(Option_t *opt="") const;
   void  Clear(Option_t *opt="");
@@ -123,7 +125,7 @@ private:
   Float_t  fInteractionEnergy[MAXHPGESEGMENTS]; //[fNumberOfInteractions]
   Float_t  fInteractionFraction[MAXHPGESEGMENTS]; //[fNumberOfInteractions]
 
-  ClassDef(TGretinaHit,1)
+  ClassDef(TGretinaHit,3)
 };
 
 

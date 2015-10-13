@@ -14,12 +14,14 @@ public:
   virtual void Print(Option_t *opt = "") const;
 
   int GetChannel() const { return fChannel; }
-  int GetSlot() const { return fSlot; }
-  int GetCrate() const { return fCrate; }
+  int GetSlot() const    { return fSlot; }
+  int GetCrate() const   { return fCrate; }
+  virtual int Charge() const { return fCharge;}
 
-  void SetChannel(int chan) { fChannel = chan; }
-  void SetSlot(int slot) { fSlot = slot; }
-  void SetCrate(int crate) { fCrate = crate; }
+  void SetChannel(int chan) { fChannel = chan;  }
+  void SetSlot(int slot)    { fSlot    = slot;  }
+  void SetCrate(int crate)  { fCrate   = crate; }
+  void SetCharge(int chg)   { fCharge  = chg;   }
 
   unsigned int GetTraceLength() const { return fTraceLength; }
   const unsigned short* GetTrace() const { return fTrace; }
@@ -32,13 +34,14 @@ public:
 private:
   long fTimestamp;
   int fChannel;
+  int fCharge;
   int fSlot;
   int fCrate;
 
   unsigned int fTraceLength;
   unsigned short fTrace[MAX_TRACE_LENGTH];
 
-  ClassDef(TSegaHit,1);
+  ClassDef(TSegaHit,2);
 };
 
 #endif /* _TSEGAHIT_H_ */

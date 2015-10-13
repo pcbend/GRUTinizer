@@ -7,15 +7,22 @@ void TSegaHit::Copy(TObject& obj) const{
   TDetectorHit::Copy(obj);
 
   TSegaHit& sega = (TSegaHit&)obj;
-  sega.fChannel = fChannel;
-  sega.fSlot = fSlot;
-  sega.fCrate = fCrate;
+  sega.fChannel  = fChannel;
+  sega.fSlot     = fSlot;
+  sega.fCrate    = fCrate;
+  sega.fCharge   = fCharge;
   sega.fTraceLength = fTraceLength;
   memcpy(sega.fTrace, fTrace, fTraceLength * sizeof(unsigned short));
+  
 }
 
 void TSegaHit::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
+  fCharge  = -1;
+  fSlot    = -1;
+  fCrate   = -1;
+  fChannel = -1;
+  fTraceLength = 0;
 }
 
 void TSegaHit::Print(Option_t *opt) const {
