@@ -169,6 +169,8 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename) const{
     return kFileType::DETECTOR_ENVIRONMENT;
   } else if (ext == "hist") {
     return kFileType::GUI_HIST_FILE;
+  } else if (ext == "so") {
+    return kFileType::COMPILED_HISTOGRAMS;
   } else {
     return kFileType::UNKNOWN_FILETYPE;
   }
@@ -200,6 +202,10 @@ bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
 
     case kFileType::DETECTOR_ENVIRONMENT:
       detector_environment = filename;
+      return true;
+
+    case kFileType::COMPILED_HISTOGRAMS:
+      compiled_histogram_file = filename;
       return true;
 
     case kFileType::UNKNOWN_FILETYPE:

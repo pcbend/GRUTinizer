@@ -24,6 +24,7 @@ public:
   const std::string& DetectorEnvironment()          { return detector_environment; }
   const std::string& OutputFile()                   { return output_file; }
   std::string InputRing() { return input_ring; }
+  std::string CompiledHistogramFile() { return compiled_histogram_file; }
 
   int CommandPort() { return fCommandPort; }
 
@@ -68,6 +69,7 @@ private:
   std::string output_file;
 
   std::string detector_environment;
+  std::string compiled_histogram_file;
 
   std::vector<std::string> options_file;
 

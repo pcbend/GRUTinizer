@@ -340,9 +340,9 @@ class MainWindow(object):
 
     def RefreshHistograms(self):
         if ROOT.online_events:
-            ROOT.online_events.RefillHistograms()
+            ROOT.online_events.FillParsedHistograms()
         if ROOT.online_scalers:
-            ROOT.online_scalers.RefillHistograms()
+            ROOT.online_scalers.FillParsedHistograms()
         update_tcanvases()
 
     def _draw_single(self,hist,color=1,nselected=1):

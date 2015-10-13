@@ -34,7 +34,7 @@ TRootOutfile::~TRootOutfile() {
   }
 }
 
-TTree *TRootOutfile::AddTree(const char* tname,const char* ttitle,
+void TRootOutfile::AddTree(const char* tname,const char* ttitle,
                              bool build, int build_window,
                              bool is_online, int circular_size) {
   if(!outfile && !is_online) {
@@ -61,8 +61,6 @@ TTree *TRootOutfile::AddTree(const char* tname,const char* ttitle,
   elem.event_build_window_close = build_window;
   elem.has_data = false;
   trees[tname] = elem;
-
-  return elem.tree;
 };
 
 TTree *TRootOutfile::FindTree(const char *tname) {
@@ -86,6 +84,24 @@ void TRootOutfile::UpdateDetList(kDetectorSystems det_system, TDetector* detecto
   new_det.det = detector;
   new_det.tree_elem = FindTreeElement(tree_name);
   det_list[det_system] = new_det;
+}
+
+void TRootOutfile::AddBranch(const char* treename, const char* branchname,
+                             const char* classname, TDetector** obj,
+                             kDetectorSystems det_system) {
+  TTree* tree = FindTree(treename);
+
+  if(!tree){
+    std::cerr << "Could not find ttree: " << treename << std::endl;
+    return;
+  }
+
+  tree->Branch(branchname, classname, obj);
+  UpdateDetList(det_system, *obj, "EventTree");
+
+  if(tree->InheritsFrom(TOnlineTree::Class())){
+    ((TOnlineTree*)tree)->RegisterDetectorBranch(*obj);
+  }
 }
 
 TRootOutfile::tree_element* TRootOutfile::FindTreeElement(const char* tname){

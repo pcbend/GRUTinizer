@@ -12,7 +12,9 @@
 #include "TRandom.h"
 #include "TRegexp.h"
 
+#include "TGRUTOptions.h"
 #include "TPreserveGDirectory.h"
+#include "TRuntimeObjects.h"
 
 TOnlineTree* online_events = NULL;
 TOnlineTree* online_scalers = NULL;
@@ -31,12 +33,19 @@ TOnlineTree::TOnlineTree(const char* name, const char* title, int circular_size)
   } else if(!strcmp(name,"ScalerTree")){
     online_scalers = this;
   }
+
+  detector_list.SetOwner(false);
+
+  if(!strcmp(name,"EventTree") &&
+     TGRUTOptions::Get()->CompiledHistogramFile().length()) {
+    compiled_histograms.Load(TGRUTOptions::Get()->CompiledHistogramFile());
+  }
 }
 
 TOnlineTree::~TOnlineTree() { }
 
-void TOnlineTree::AddDetectorBranch(TDetector** det, const char* name){
-  Branch(name, name, det);
+void TOnlineTree::RegisterDetectorBranch(TDetector* det){
+  detector_list.Add(det);
 }
 
 TObject* TOnlineTree::GetObjectStringLeaves(){
@@ -114,11 +123,18 @@ Int_t TOnlineTree::Fill(){
   event_num = actual_event_num++;
   Int_t output = TTree::Fill();
 
+  FillCompiledHistograms();
+
   if(actual_event_num - last_fill > circular_size * 0.7){
-    RefillHistograms_MutexTaken();
+    FillParsedHistograms_MutexTaken();
   }
 
   return output;
+}
+
+void TOnlineTree::FillCompiledHistograms() {
+  TRuntimeObjects obj(&detector_list, directory.GetList());
+  compiled_histograms.Call(obj);
 }
 
 void TOnlineTree::AddHistogram(const char* name,
@@ -179,7 +195,7 @@ void TOnlineTree::AddHistogram(const char* name,
   hist_patterns_2d.push_back(pat);
 }
 
-void TOnlineTree::RefillHistograms_MutexTaken() {
+void TOnlineTree::FillParsedHistograms_MutexTaken() {
   TPreserveGDirectory preserve;
   directory.cd();
 
@@ -202,9 +218,9 @@ bool TOnlineTree::HasHistogram(std::string name) {
   return directory.GetList()->FindObject(name.c_str());
 }
 
-void TOnlineTree::RefillHistograms() {
+void TOnlineTree::FillParsedHistograms() {
   std::lock_guard<std::mutex> lock(fill_mutex);
-  RefillHistograms_MutexTaken();
+  FillParsedHistograms_MutexTaken();
 }
 
 std::string TOnlineTree::GetHistPattern(std::string name) {
