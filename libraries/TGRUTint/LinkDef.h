@@ -1,4 +1,4 @@
-// TGRUTint.h TGRUTOptions.h TGRUTTypes.h TDetectorEnv.h TGRUTServer.h TOnlineTree.h
+// TGRUTint.h TGRUTOptions.h TGRUTTypes.h TDetectorEnv.h TGRUTServer.h TOnlineTree.h THashList_ThreadSafe.h
 
 #ifdef __CINT__
 
@@ -16,6 +16,7 @@
 #pragma link C++ class TDetectorEnv+;
 #pragma link C++ class TGRUTint+;
 #pragma link C++ class TGRUTServer+;
+#pragma link C++ class THashList_ThreadSafe+;
 
 #pragma link C++ class TOnlineTree+;
 

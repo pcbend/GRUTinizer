@@ -7,10 +7,12 @@
 #include "TGEBEvent.h"
 
 TS800::TS800() {
+  time_of_flight = new TClonesArray("TS800TOF",10);
   Clear();
 }
 
 TS800::~TS800(){
+  time_of_flight->Delete();
 }
 
 void TS800::Copy(TObject& obj) const {
@@ -24,6 +26,7 @@ void TS800::Clear(Option_t* opt){
   fTriggerPattern = -1;
   fTrigger        = -1;
 
+  time_of_flight->Clear();
   rf_tdc   = -1;
   obj_tdc  = -1;
   obj_tac  = -1;
@@ -137,30 +140,9 @@ bool TS800::HandleTOFPacket(char *data,unsigned short size) {
   if(size<2)
     return false;
   for(int i=0;i<size;i+=2) {
-    unsigned short *temp = ((unsigned short*)(data+i));
-    switch((*temp)&0xf000) {
-      case 0xc000:  //RF_tdc
-        rf_tdc  = ((*temp)&0xfff);
-        break;
-      case 0xd000:  //obj_tdc
-        obj_tdc = ((*temp)&0xfff);
-        break;
-      case 0x5000:  //obj_tac
-        obj_tac = ((*temp)&0xfff);
-        break;
-      case 0xe000:  //xfp_tdc
-        xfp_tdc = ((*temp)&0xfff);
-        break;
-      case 0x4000:  //xfp_tac
-        xfp_tac = ((*temp)&0xfff);
-        break;
-      case 0xf000:  //si_tdc
-        si_tdc  = ((*temp)&0xfff);
-        break;
-    };
+    TS800TOF *tof = (TS800TOF*)time_of_flight->ConstructedAt(time_of_flight->GetEntries());
+    tof->Set(*((unsigned short*)(data+i))); 
   } 
-
-
   return true;
 }
 

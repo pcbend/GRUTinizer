@@ -35,7 +35,7 @@ private:
   bool HandleFPScintPacket(char*,unsigned short);  //!
   bool HandleFPICPacket(char*,unsigned short);     //!
 
-  //TClonesArray *fTimeOfFlight;
+  TClonesArray *time_of_flight;
   //TClonesArray *fTimeOfFlight;
   //TClonesArray *fTimeOfFlight;
   //TClonesArray *fTimeOfFlight;

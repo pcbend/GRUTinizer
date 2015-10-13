@@ -29,6 +29,32 @@ class TS800Channel : public TObject {
 };
 
 
+
+class TS800TOF : public TS800Channel { 
+  public:
+    TS800TOF()  {  }
+    TS800TOF(const TS800TOF &tof)  { tof.Copy(*this); }
+    TS800TOF(short value) : TS800Channel(value)          {  }
+    TS800TOF(unsigned short value) : TS800Channel(value) {  }
+    //TS800TOF(char *data,int size);
+    ~TS800TOF() {  }
+
+    bool IsRF_tdc( ) {return GetChannel() == 0x000c;} 
+    bool IsOBJ_tdc() {return GetChannel() == 0x000d;} 
+    bool IsOBJ_tac() {return GetChannel() == 0x0005;} 
+    bool IsXFP_tac() {return GetChannel() == 0x000e;} 
+    bool IsXFP_tdc() {return GetChannel() == 0x0004;} 
+    bool IsSI_tdc()  {return GetChannel() == 0x000f;}
+
+    virtual void Clear(Option_t *opt="")       { TS800Channel::Clear(opt);              }
+    virtual void Print(Option_t *opt="") const { printf("TOF");TS800Channel::Print(opt);} 
+    virtual void Copy(TObject &obj)      const { TS800Channel::Copy(obj);             }
+
+  ClassDef(TS800TOF,1);
+};
+
+
+
 class TS800Hit : public TDetectorHit {
   public:
     TS800Hit()   {  }

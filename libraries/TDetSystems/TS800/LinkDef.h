@@ -8,6 +8,9 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class TS800Channel+;
+#pragma link C++ class TS800TOF+;
+
+
 #pragma link C++ class TS800Hit+;
 #pragma link C++ class TS800+;
 

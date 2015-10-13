@@ -548,7 +548,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
     case kKey_i:
        if(!hists.empty() && GetNMarkers()>1) {
          double xlow  = (fMarkers.at(fMarkers.size()-2)->localx);
-         double xhigh = (fMarkers.back()->localx); 
+         double xhigh = (fMarkers.back()->localx);
          if(xlow>xhigh)
            std::swap(xlow,xhigh);
          double sum = hists.back()->Integral(hists.back()->GetXaxis()->FindBin(xlow),

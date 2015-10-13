@@ -110,7 +110,7 @@ class MainWindow(object):
                            text='Refresh',fg="black",bg="goldenrod",
                            command=self.RefreshHistograms)
         button.pack(side=tk.LEFT)
-        
+
         button = tk.Button(frame,
                            text='Reset',fg="black",bg="goldenrod",
                            command=self.ResetHistograms)

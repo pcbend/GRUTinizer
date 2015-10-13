@@ -13,6 +13,7 @@
 #include "TPython.h"
 
 #include "TGRUTint.h"
+#include "TROOT_Shim.h"
 #include "LoadGRUTEnv.h"
 
 #ifdef __APPLE__
@@ -49,6 +50,7 @@ void SetGRUTPluginHandlers();
 int main(int argc, char **argv) {
   //Find the grut environment variable so that we can read in .grutrc
   LoadGRUTEnv();
+  ReplaceCleanups();
 
   SetDisplay();
   //SetGRUTPluginHandlers();
