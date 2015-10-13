@@ -31,6 +31,7 @@ public:
                     int binsY, double lowY, double highY, const char* varexpY,
                     const char* gate = "");
 
+  bool HasHistogram(std::string name);
   void RefillHistograms();
 
   virtual Int_t Fill();

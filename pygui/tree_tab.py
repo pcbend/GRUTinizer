@@ -102,6 +102,26 @@ class TreeTab(object):
 
         frame.pack(fill=tk.X,expand=False)
 
+
+        # Gate frame
+        frame = tk.Frame(parent)
+        def enable_gate_box():
+            state = 'normal' if self.apply_gate.get() else 'disabled'
+            gate_box.configure(state=state)
+
+        self.apply_gate = tk.IntVar(value=0)
+        apply_gate = tk.Checkbutton(frame, text='Apply Gate',
+                                    variable=self.apply_gate,
+                                    command=enable_gate_box)
+        apply_gate.pack(side=tk.LEFT)
+
+        self.gate = tk.StringVar(value='')
+        gate_box = tk.Entry(frame, textvariable=self.gate)
+        gate_box.pack(side=tk.LEFT)
+        enable_gate_box()
+
+        frame.pack(fill=tk.X,expand=False)
+
         # Button frame
         frame = tk.Frame(parent)
         self.hist_name = tk.StringVar(value='hist')
@@ -206,24 +226,30 @@ class TreeTab(object):
         if not ROOT.online_events:
             return
 
+        # TODO: Modify TOnlineTree so this replaces the histogram instead.
+        if self.active_ttree.HasHistogram(self.hist_name.get()):
+            print 'Histogram "{}" already exists.  Choose a different name'.format(
+                self.hist_name.get())
+            return
+
         dimension = 2 if self.hist2d.get() else 1
 
         if dimension==1:
-            ROOT.online_events.AddHistogram(self.hist_name.get(),
-                                            int(self.x_draw_bins.get()),
-                                            float(self.x_draw_low.get()),
-                                            float(self.x_draw_high.get()),
-                                            self.x_draw_varexp.get())
+            self.active_ttree.AddHistogram(self.hist_name.get(),
+                                           int(self.x_draw_bins.get()),
+                                           float(self.x_draw_low.get()),
+                                           float(self.x_draw_high.get()),
+                                           self.x_draw_varexp.get())
         else:
-            ROOT.online_events.AddHistogram(self.hist_name.get(),
-                                            int(self.x_draw_bins.get()),
-                                            float(self.x_draw_low.get()),
-                                            float(self.x_draw_high.get()),
-                                            self.x_draw_varexp.get(),
-                                            int(self.y_draw_bins.get()),
-                                            float(self.y_draw_low.get()),
-                                            float(self.y_draw_high.get()),
-                                            self.y_draw_varexp.get())
+            self.active_ttree.AddHistogram(self.hist_name.get(),
+                                           int(self.x_draw_bins.get()),
+                                           float(self.x_draw_low.get()),
+                                           float(self.x_draw_high.get()),
+                                           self.x_draw_varexp.get(),
+                                           int(self.y_draw_bins.get()),
+                                           float(self.y_draw_low.get()),
+                                           float(self.y_draw_high.get()),
+                                           self.y_draw_varexp.get())
 
         self.main.RefreshHistograms()
         self.main.hist_tab.CheckOnlineHists()
