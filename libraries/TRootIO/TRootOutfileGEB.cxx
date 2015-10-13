@@ -15,11 +15,15 @@ ClassImp(TRootOutfileGEB)
 
 TRootOutfileGEB::TRootOutfileGEB() {
   fMode3Init = false;
-  gretina = NULL;
-  bank29  = NULL;
-  mode3   = NULL;
-  s800    = NULL;
-  // phoswall = NULL;
+  // gretina = NULL;
+  // bank29  = NULL;
+  // mode3   = NULL;
+  // s800    = NULL;
+  gretina = new TGretina;
+  bank29  = new TBank29;
+  mode3   = new TMode3;
+  s800    = new TS800;
+  // // phoswall = NULL;
 }
 
 TRootOutfileGEB::~TRootOutfileGEB() { }
@@ -36,28 +40,28 @@ void TRootOutfileGEB::Init(const char* output_filename){
     SetOutfile(output_filename);
   }
 
-  //                            Name          Title       Build?  Window  obvious
-  TTree *event_tree  = AddTree("EventTree", "Mode 2 data",true,    1000,  is_online);
-  TTree *scaler_tree = AddTree("ScalerTree","ScalerTree", false,   -1,    is_online);
+  //       Name          Title       Build?  Window  obvious
+  AddTree("EventTree", "Mode 2 data",true,    1000,  is_online);
+  AddTree("ScalerTree","ScalerTree", false,   -1,    is_online);
 
   if(TDetectorEnv::Gretina()){
-    event_tree->Branch("TGretina","TGretina",&gretina);
-    UpdateDetList(kDetectorSystems::GRETINA, gretina, "EventTree");
+    AddBranch("EventTree", "TGretina", "TGretina",
+              (TDetector**)&gretina, kDetectorSystems::GRETINA);
   }
 
   if(TDetectorEnv::Bank29()) {
-    event_tree->Branch("TBank29","TBank29",&bank29);
-    UpdateDetList(kDetectorSystems::BANK29, bank29, "EventTree");
+    AddBranch("EventTree","TBank29","TBank29",
+              (TDetector**)&bank29,kDetectorSystems::BANK29);
   }
 
   if(TDetectorEnv::S800()){
-    event_tree->Branch("TS800","TS800",&s800);
-    UpdateDetList(kDetectorSystems::S800, s800, "EventTree");
+    AddBranch("EventTree","TS800","TS800",
+              (TDetector**)&s800, kDetectorSystems::S800);
   }
 
   if(TDetectorEnv::Mode3()){
-    event_tree->Branch("TMode3","TMode3",&mode3);
-    UpdateDetList(kDetectorSystems::MODE3, mode3, "EventTree");
+    AddBranch("EventTree","TMode3","TMode3",
+              (TDetector**)&mode3, kDetectorSystems::MODE3);
   }
 
 
@@ -94,7 +98,8 @@ void TRootOutfileGEB::Clear(Option_t *opt) {
 void TRootOutfileGEB::HandleMode3(const TMode3 &rhs) {
   //printf("mode3 = 0x%08x\n",mode3);  fflush(stdout);
   if(!fMode3Init) {
-    TTree *mode3_tree = AddTree("Data","Mode 3 data");
+    AddTree("Data","Mode 3 data");
+    TTree *mode3_tree = FindTree("Data");
     mode3_tree->Branch("TMode3","TMode3",&mode3);
     fMode3Init=true;
   }

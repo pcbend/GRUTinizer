@@ -37,17 +37,17 @@ void TRootOutfileNSCL::Init(const char* output_filename){
     SetOutfile(output_filename);
   }
 
-  TTree *event_tree  = AddTree("EventTree","Events, yo.",true, 1000, is_online);
-  TTree *scaler_tree = AddTree("ScalerTree","I can count.",false, -1, is_online);
+  AddTree("EventTree","Events, yo.",true, 1000, is_online);
+  AddTree("ScalerTree","I can count.",false, -1, is_online);
 
   if(TDetectorEnv::Janus()){
-    event_tree->Branch("TJanus","TJanus",&janus);
-    UpdateDetList(kDetectorSystems::JANUS, janus, "EventTree");
+    AddBranch("EventTree","TJanus","TJanus",
+              (TDetector**)&janus,kDetectorSystems::JANUS);
   }
 
   if(TDetectorEnv::Sega()){
-    event_tree->Branch("TSega","TSega",&sega);
-    UpdateDetList(kDetectorSystems::SEGA, sega, "EventTree");
+    AddBranch("EventTree","TSega","TSega",
+              (TDetector**)&sega,kDetectorSystems::SEGA);
   }
 
   InitHists();

@@ -12,6 +12,7 @@
 #include "TDirectory.h"
 #include "TTree.h"
 
+#include "TCompiledHistograms.h"
 #include "TDetector.h"
 
 class TOnlineTree : public TTree {
@@ -20,7 +21,7 @@ public:
               int circular_size = 32768);
   virtual ~TOnlineTree();
 
-  void AddDetectorBranch(TDetector** det, const char* name);
+  void RegisterDetectorBranch(TDetector* det);
 
   void AddHistogram(const char* name,
                     int bins, double low, double high, const char* varexp,
@@ -32,7 +33,8 @@ public:
                     const char* gate = "");
 
   bool HasHistogram(std::string name);
-  void RefillHistograms();
+  void FillParsedHistograms();
+  void FillCompiledHistograms();
 
   virtual Int_t Fill();
 
@@ -59,11 +61,14 @@ public:
 private:
   static void recurse_down(std::vector<std::string>& terminal_leaves, std::string current_branch, TBranch* branch);
 
-  void RefillHistograms_MutexTaken();
+  void FillParsedHistograms_MutexTaken();
 
 #ifndef __CINT__
   std::mutex fill_mutex;
 #endif
+
+  TList detector_list;
+  TCompiledHistograms compiled_histograms;
 
   TDirectory  directory;
   TDirectory* saved_dir;

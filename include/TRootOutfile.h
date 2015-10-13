@@ -13,58 +13,63 @@
 #include "TRawEvent.h"
 
 class TRootOutfile : public TObject {
-  public:
-    TRootOutfile();
-    ~TRootOutfile();
+public:
+  TRootOutfile();
+  ~TRootOutfile();
 
-    // Needs to be made for each.
-    virtual void Init(const char* output_filename) = 0;
-    virtual void FillHists() = 0;
+  // Needs to be made for each.
+  virtual void Init(const char* output_filename) = 0;
+  virtual void FillHists() = 0;
 
-    // Common to all.
-    void AddRawData(const TRawEvent& event, kDetectorSystems det_type);
-    virtual void FillTree(const char* tname, long next_timestamp=-1);   //takes from det_list;
-    virtual void FillAllTrees();
-    virtual void FinalizeFile();
-    virtual void CloseFile();
+  // Common to all.
+  void AddRawData(const TRawEvent& event, kDetectorSystems det_type);
+  virtual void FillTree(const char* tname, long next_timestamp=-1);   //takes from det_list;
+  virtual void FillAllTrees();
+  virtual void FinalizeFile();
+  virtual void CloseFile();
 
-    virtual void Clear(Option_t* option = "");  // Clears det_list.
-    virtual void Print(Option_t* option = "") const;
+  virtual void Clear(Option_t* option = "");  // Clears det_list.
+  virtual void Print(Option_t* option = "") const;
 
-  protected:
-    bool BuildCondition(TRawEvent& new_event);
-    void UpdateDetList(kDetectorSystems det_system, TDetector* detector, const char* tree_name);
+protected:
+  bool BuildCondition(TRawEvent& new_event);
 
-  TTree *AddTree(const char *tname,const char *ttitle=0,bool build=false,int build_window=-1, bool is_online = false, int circular_size = 10000);
-    TTree *FindTree(const char *tname);
+  void AddTree(const char *tname,const char *ttitle=0,bool build=false,int build_window=-1,
+               bool is_online = false, int circular_size = 10000);
+  void AddBranch(const char* treename, const char* branchname, const char* classname,
+                 TDetector** obj, kDetectorSystems det_system);
 
-    std::map<std::string,TList*> hist_list;
+  TTree *FindTree(const char *tname);
 
-    void   SetOutfile(const char *fname);
-    TFile *GetOutfile()  { return outfile; }
+  std::map<std::string,TList*> hist_list;
 
-  private:
-    struct tree_element{
-      TTree* tree;
-      // Build size, in timestamp units
-      // If build_window is -1, then each event will be filled as they are read
-      int build_window;
-      long event_build_window_close;
-      bool build_det;
-      bool has_data;
-    };
+  void   SetOutfile(const char *fname);
+  TFile *GetOutfile()  { return outfile; }
 
-    struct det_list_element{
-      TDetector* det;
-      tree_element* tree_elem;
-    };
+private:
+  void UpdateDetList(kDetectorSystems det_system, TDetector* detector, const char* tree_name);
 
-    tree_element* FindTreeElement(const char* tname);
+  struct tree_element{
+    TTree* tree;
+    // Build size, in timestamp units
+    // If build_window is -1, then each event will be filled as they are read
+    int build_window;
+    long event_build_window_close;
+    bool build_det;
+    bool has_data;
+  };
 
-    std::map<kDetectorSystems,det_list_element> det_list;
-    std::map<std::string, tree_element> trees;
+  struct det_list_element{
+    TDetector* det;
+    tree_element* tree_elem;
+  };
 
-    TFile* outfile;
+  tree_element* FindTreeElement(const char* tname);
+
+  std::map<kDetectorSystems,det_list_element> det_list;
+  std::map<std::string, tree_element> trees;
+
+  TFile* outfile;
 
   ClassDef(TRootOutfile, 0);
 };

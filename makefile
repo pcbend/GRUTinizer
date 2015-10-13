@@ -63,6 +63,8 @@ MAIN_O_FILES    := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard src/*.$(SRC_
 EXE_O_FILES     := $(UTIL_O_FILES) $(SANDBOX_O_FILES)
 EXECUTABLES     := $(patsubst %.o,bin/%,$(notdir $(EXE_O_FILES))) bin/grutinizer
 
+HISTOGRAM_SO    := $(patsubst hist/%.$(SRC_SUFFIX),libraries/lib%.so,$(wildcard hist/*.$(SRC_SUFFIX)))
+
 ifdef VERBOSE
 run_and_test = @echo $(1) && $(1);
 else
@@ -82,7 +84,7 @@ run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  
                 rm -f $(2).log $(2).error
 endif
 
-all: $(EXECUTABLES) $(LIBRARY_OUTPUT) bin/grutinizer-config 
+all: $(EXECUTABLES) $(LIBRARY_OUTPUT) bin/grutinizer-config $(HISTOGRAM_SO)
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
 
 docs:
@@ -102,6 +104,9 @@ bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) bin
 
 bin:
 	@mkdir -p $@
+
+libraries/lib%.so: .build/hist/%.o
+	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 # Functions for determining the files included in a library.
 # All src files in the library directory are included.

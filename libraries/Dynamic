@@ -1,0 +1,24 @@
+#ifndef _OBJECTPASSED_H_
+#define _OBJECTPASSED_H_
+
+#include <string>
+
+class ObjectPassed {
+public:
+  //TDetector* GetDetector(const char* name);
+  TList& GetDetectors();
+
+  //TGretina* GetGretina();
+  // and friends
+
+  TCutG* GetCut(const char* name);
+
+  void FillHistogram(name, bins, low, high, value);
+  void FillHistogram(name, bins, low, high, value, bins, low, high, value);
+
+  TList& GetList();
+  // void AddHistogram(TH1* hist);
+  // TH1* GetHistogram(const char* name);
+};
+
+#endif /* _OBJECTPASSED_H_ */
