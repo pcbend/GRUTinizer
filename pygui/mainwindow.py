@@ -257,7 +257,6 @@ class MainWindow(object):
         self.RefreshHistograms()
         self.window.after(self.refreshrate.get()*1000, self._PeriodicRefresh)
 
-
     def _MakeZoneMenu(self, menubar):
         self.predefinedzones = tk.StringVar(value='1x1')
         self.zone_rows = 1

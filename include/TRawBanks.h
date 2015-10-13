@@ -59,20 +59,20 @@ struct Mesy_EOE{
   Int_t TS()     const { return data&0x3fffffff; }
 }__attribute__((__packed__));
 
-// Mesytec QDC: 
+// Mesytec QDC:
 struct M_QDC_Data{
   UShort_t tail;
-  UShort_t nose;  
+  UShort_t nose;
 
   UShort_t Chan()   const { return nose&0x001f; }
   UShort_t Charge() const { return tail&0x0fff; }
-  UShort_t isOOR()  const { return (tail&0x4000)>>14; }  
+  UShort_t isOOR()  const { return (tail&0x4000)>>14; }
 }__attribute__((__packed__));
 
 // Mesytec TDC:
 struct M_TDC_Data{
   UShort_t tail;
-  UShort_t nose;  
+  UShort_t nose;
 
   bool isTrig() const { return((nose&0x0020)>>5); }
   UShort_t Chan()   const { return nose&0x001f; }
@@ -163,7 +163,7 @@ struct GEBMode3Data {
   UShort_t cfd_pt2_low;
   Long_t GetLed() const;
   Long_t GetCfd() const;
-  Int_t  GetEnergy(const GEBMode3Head&) const;
+  Int_t  GetEnergy() const;
 }__attribute__((__packed__));
 
 friend std::ostream& operator<<(std::ostream& os, const GEBMode3Data &data);
@@ -171,8 +171,8 @@ static void SwapMode3Data(GEBMode3Data &data);
 
 struct GEBS800Header {
   Int_t    total_size;
-  UShort_t total_size2;  
-  UShort_t S800_packet; 
+  UShort_t total_size2;
+  UShort_t S800_packet;
   UShort_t S800_packet_size;
   UShort_t S800_version;
   UShort_t S800_timestamp_packet;
@@ -182,7 +182,7 @@ struct GEBS800Header {
   UShort_t S800_eventnumber_low;
   UShort_t S800_eventnumber_middle;
   UShort_t S800_eventnumber_high;
-  Long_t GetEventNumber() const { 
+  Long_t GetEventNumber() const {
      long temp = (long)S800_eventnumber_low;
      temp     += ((long)S800_eventnumber_middle) << 16;
      temp     += ((long)S800_eventnumber_high)   << 32;
@@ -206,7 +206,7 @@ struct S800TriggerPacket {
 friend std::ostream& operator<<(std::ostream& os, const S800TriggerPacket &pack);
 
 struct S800TOFPacket {
-  UShort_t value[4]; 
+  UShort_t value[4];
   UShort_t number;
 } __attribute__((__packed__));
 

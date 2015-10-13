@@ -31,7 +31,7 @@ public:
   Float_t  GetCoreEnergy()      const { return fCoreEnergy;     }
   Int_t    GetCoreCharge(int i) const { return fCoreCharge[i];  }
   virtual Int_t Charge()        const { return fCoreCharge[3];  }
-  
+
 
   void  Print(Option_t *opt="") const;
   void  Clear(Option_t *opt="");
@@ -75,9 +75,9 @@ public:
 
   Int_t   GetFirstIntPoint()             const { return fFirstInteraction;     }
   Int_t   GetSecondIntPoint()            const { return fSecondInteraction;    }
-  Int_t   NumberOfInteractions()               { return fNumberOfInteractions; }
-  Int_t   GetSegmentId(const int &i)           { return fSegmentNumber[i]; }
-  Float_t GetSegmentEng(const int &i)          { return fInteractionEnergy[i]; }
+  Int_t   NumberOfInteractions()         const { return fNumberOfInteractions; }
+  Int_t   GetSegmentId(const int &i)     const { return fSegmentNumber[i]; }
+  Float_t GetSegmentEng(const int &i)    const { return fInteractionEnergy[i]; }
   TVector3 GetInteractionPosition(int i) const; //{ return fGlobalInteractionPosition[i]; }
   TVector3 GetLocalPosition(int i) const;
   //TVector3 GetCrystalPosition(int i)     const { return TVector3(0,0,1): }

@@ -22,7 +22,7 @@ class TMode3Hit : public TDetectorHit {
     //virtual TDetectorHit& GetHit(const int &i=0)             { return hit; }
     //virtual int           Size()                             { return 1;     }
 
-    void     BuildFrom(TSmartBuffer buf);
+  void     BuildFrom(TSmartBuffer buf);
 
     Int_t    GetChannel()   const { return (board_id & 0x000f);     }
     Int_t    GetVME()       const { return (board_id & 0x0030)>>4;    }

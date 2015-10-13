@@ -161,6 +161,9 @@ void TOnlineTree::AddHistogram(const char* name,
   // The histogram will be grabbed by the gDirectory, no memory leak
   new TH1I(name,name,
            bins, low, high);
+  std::cout << "Name: " << name << " "
+            << "(" << bins << "," << low << "," << high << ")"
+            << std::endl;
 
   hist_patterns_1d.push_back(pat);
 }

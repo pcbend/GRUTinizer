@@ -15,6 +15,7 @@ class HistTab(object):
         self._setup_GUI(frame)
 
         self.CheckOnlineHists()
+        self.main.window.after_idle(self._PeriodicHistogramCheck)
 
     def _setup_GUI(self, frame):
         self.frame = frame
@@ -151,6 +152,10 @@ class HistTab(object):
             icon = self.main._PickIcon(obj)
             self.hist_lookup[name] = obj
             self.treeview.insert(parent,'end', name, text=obj.GetName(),image=icon)
+
+    def _PeriodicHistogramCheck(self):
+        self.CheckOnlineHists()
+        self.main.window.after(5000, self._PeriodicHistogramCheck)
 
     def CheckOnlineHists(self):
         if ROOT.online_events:

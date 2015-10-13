@@ -37,7 +37,7 @@ void TMode3Hit::BuildFrom(TSmartBuffer buf){
   buf.Advance(sizeof(TRawEvent::GEBMode3Data));
 
   led = data->GetLed();
-  charge = data->GetEnergy(*header);
+  charge = data->GetEnergy();
   //SetCharge(data->GetEnergy(*header));
   SetAddress(GetHole(),GetCrystal(),GetSegmentId());
   cfd = data->GetCfd();
@@ -80,6 +80,7 @@ void TMode3Hit::Copy(TObject& obj) const {
 
   mode3.board_id = board_id;
   //mode3.energy   = energy;
+  mode3.charge   = charge;
   mode3.wavesize = wavesize;
   mode3.led      = led;
   mode3.cfd      = cfd;

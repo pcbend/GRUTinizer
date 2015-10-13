@@ -11,8 +11,8 @@
 ClassImp(TRootOutfileNSCL);
 
 TRootOutfileNSCL::TRootOutfileNSCL() {
-  janus = NULL;
-  sega  = NULL;
+  janus = new TJanus;
+  sega  = new TSega;
   // s800 = NULL;
   // caesar = NULL;
 
