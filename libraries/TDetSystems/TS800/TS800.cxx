@@ -7,16 +7,27 @@
 #include "TGEBEvent.h"
 
 TS800::TS800() {
-  time_of_flight = new TClonesArray("TS800TOF",10);
+  time_of_flight = new TClonesArray("TTOFHit",10);
+  fp_scint       = new TClonesArray("TFPScint",10);
+  ion_chamber    = new TClonesArray("TIonChamber",20);
+  crdc           = new TClonesArray("TCrdcPad",2);
   Clear();
 }
 
 TS800::~TS800(){
   time_of_flight->Delete();
+  fp_scint->Delete();
+  ion_chamber->Delete();
+  crdc->Delete();
 }
 
 void TS800::Copy(TObject& obj) const {
   TDetector::Copy(obj);
+  
+  time_of_flight->Copy((*((TS800&)obj).time_of_flight)) ;
+  fp_scint->Copy((*((TS800&)obj).time_of_flight));
+  ion_chamber->Copy((*((TS800&)obj).time_of_flight));
+  crdc->Copy((*((TS800&)obj).crdc));
 }
 
 void TS800::Clear(Option_t* opt){
@@ -27,29 +38,9 @@ void TS800::Clear(Option_t* opt){
   fTrigger        = -1;
 
   time_of_flight->Clear();
-  rf_tdc   = -1;
-  obj_tdc  = -1;
-  obj_tac  = -1;
-  xfp_tdc  = -1;
-  xfp_tac  = -1;
-  si_tdc   = -1;
-
-  e1up_energy   = -1;
-  e1up_time     = -1;
-  e2up_energy   = -1;
-  e2up_time     = -1;
-  e3up_energy   = -1;
-  e3up_time     = -1;
-  e1down_energy = -1;
-  e1down_time   = -1;
-  e2down_energy = -1;
-  e2down_time   = -1;
-  e3down_energy = -1;
-  e3down_time   = -1;
-
-
-
-
+  fp_scint->Clear();
+  ion_chamber->Clear();
+  crdc->Clear();
 }
 
 int TS800::BuildHits(){
@@ -85,7 +76,10 @@ int TS800::BuildHits(){
           HandleFPScintPacket(data+4,size_in_bytes-4);
           break;
         case 0x5820:
-          HandleFPICPacket(data+4,size_in_bytes-4);
+          HandleIonChamberPacket(data+4,size_in_bytes-4);
+          break;
+        case 0x5840:
+          HandleCRDCPacket(data+4,size_in_bytes-4);
           break;
       };
 
@@ -101,7 +95,7 @@ int TS800::BuildHits(){
     std::cout << *head << std::endl;
     SetEventCounter(head->GetEventNumber());
     //       *((Long_t*)(geb.GetPayload()+26)) & 0x0000ffffffffffff);
-    //geb->Print("all0x5800");
+    geb->Print("all0x5800");
     geb->Print(buffer.c_str());
   }
   return 0;
@@ -140,7 +134,7 @@ bool TS800::HandleTOFPacket(char *data,unsigned short size) {
   if(size<2)
     return false;
   for(int i=0;i<size;i+=2) {
-    TS800TOF *tof = (TS800TOF*)time_of_flight->ConstructedAt(time_of_flight->GetEntries());
+    TTOFHit *tof = (TTOFHit*)time_of_flight->ConstructedAt(time_of_flight->GetEntries());
     tof->Set(*((unsigned short*)(data+i))); 
   } 
   return true;
@@ -150,46 +144,56 @@ bool TS800::HandleFPScintPacket(char *data,unsigned short size) {
   //Energies and times of the focal plane scintillator, read from a Lecroy 4300B FERA and a Phillips 7186H TDC, should come in pairs.
   for(int i=0;i<size;i+=4) {
     unsigned short *temp = ((unsigned short*)(data+i));
-    if(((*(temp+2))&0xf000) != (*temp)&0xf000) {
+    if(((*(temp+1))&0xf000) != (*temp)&0xf000) {
       fprintf(stderr,"fp_scint: energy and time do not match.");
       return false;
     }
-    switch((*temp)&0xf000) {
-      case 0x0000: //E1 up
-        e1up_energy = (*temp)&0x0fff;
-        e1up_time   = (*(temp+2)&0x0fff);
-        break;
-      case 0x0001: //E1 down
-        e1down_energy = (*temp)&0x0fff;
-        e1down_time   = (*(temp+2)&0x0fff);
-        break;
-      case 0x0002: //E2 up 
-        e2up_energy = (*temp)&0x0fff;
-        e2up_time   = (*(temp+2)&0x0fff);
-        break;
-      case 0x0003: //E2 down
-        e2down_energy = (*temp)&0x0fff;
-        e2down_time   = (*(temp+2)&0x0fff);
-        break;
-      case 0x0004: //E3 up
-        e3up_energy = (*temp)&0x0fff;
-        e3up_time   = (*(temp+2)&0x0fff);
-        break;
-      case 0x0005: //E3 down
-        e3down_energy = (*temp)&0x0fff;
-        e3down_time   = (*(temp+2)&0x0fff);
-        break;
-    };
+    TFPScint *hit = (TFPScint*)fp_scint->ConstructedAt(fp_scint->GetEntries());
+    hit->SetCharge(*temp);
+    hit->SetCharge(*(temp+1));
   }
   return true;
 }
 
-bool TS800::HandleFPICPacket(char *data,unsigned short size) {
+bool TS800::HandleIonChamberPacket(char *data,unsigned short size) {
   //Zero suppressed energies from the ionization chamber, read from a Phillips 7164 ADC.
   //Note, this data is in a "sub-packet".  
+  int x =0;
+  if(*(data+2) == 0x5821)
+    x+=4;
+  for(;x<size;x+=2) {
+    unsigned short *temp = ((unsigned short*)(data+x));
+    TIonChamber *ion = (TIonChamber*)ion_chamber->ConstructedAt(ion_chamber->GetEntries());
+    ion->Set(*temp);
+  }
+  return true;
+
+}
+
+bool TS800::HandleCRDCPacket(char *data,unsigned short size) {
   int ptr = 0;
-
-
+  short id      = *((short*)data); ptr += 2;
+  short subsize = *((short*)(data+ptr)); ptr += 2;
+  short subtype = *((short*)(data+ptr)); ptr += 2;
+  short zerobuffer = *((short*)(data+ptr)); ptr += 2;
+  int lastsampe = 0;
+  for(int x=2;x<subsize;x++) {
+    unsigned short word1 = *((unsigned short*)(data+ptr)); ptr += 2;
+    unsigned short word2 = *((unsigned short*)(data+ptr)); ptr += 2;
+    if((word1&0x8000)!=0x8000) { }
+    int sample_number    = (word1&(0x7fc0)) >> 6;
+    int channel_number   =  word1&(0x003f);
+    int connector_number = (word2&(0x0c00)) >> 10;
+    int databits         = (word2&(0x03ff));
+    
+    printf("0x%04x\t0x%04x\t\t",word1,word2); 
+    std::cout << "[" << x << "]"  << "\t"
+              << sample_number    << "\t" 
+              << channel_number   << "\t"
+              << connector_number << "\t"
+              << databits         << std::endl;
+  }
+  std::cout << " ++++++++++++++++++++++++++++++++++++\n";
 
   return true;
 }

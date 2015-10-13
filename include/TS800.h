@@ -33,12 +33,14 @@ private:
   bool HandleTriggerPacket(char*,unsigned short);  //!
   bool HandleTOFPacket(char*,unsigned short);      //!
   bool HandleFPScintPacket(char*,unsigned short);  //!
-  bool HandleFPICPacket(char*,unsigned short);     //!
+  bool HandleIonChamberPacket(char*,unsigned short);     //!
+  bool HandleCRDCPacket(char*,unsigned short);     //!
+
 
   TClonesArray *time_of_flight;
-  //TClonesArray *fTimeOfFlight;
-  //TClonesArray *fTimeOfFlight;
-  //TClonesArray *fTimeOfFlight;
+  TClonesArray *fp_scint;
+  TClonesArray *ion_chamber;
+  TClonesArray *crdc;
   //TClonesArray *fTimeOfFlight;
   //TClonesArray *fTimeOfFlight;
 
@@ -46,13 +48,6 @@ private:
 
   short fTriggerPattern;
   short fTrigger;
-
-  short rf_tdc;
-  short obj_tdc;
-  short obj_tac;
-  short xfp_tdc;
-  short xfp_tac;
-  short si_tdc;
 
   short e1up_energy;
   short e1up_time;
