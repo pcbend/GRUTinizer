@@ -17,7 +17,7 @@ TDetectorHit::~TDetectorHit() { }
 void TDetectorHit::Clear(Option_t *opt) {
   TObject::Clear(opt);
   fAddress = -1;
-  fCharge = -1;
+  //fCharge = -1;
 }
 
 void TDetectorHit::Print(Option_t *opt) const { }
@@ -27,11 +27,12 @@ void TDetectorHit::Copy(TObject& obj) const {
 
   TDetectorHit& hit = (TDetectorHit&)obj;
   hit.fAddress = fAddress;
-  hit.fCharge = fCharge;
+  //hit.fCharge = fCharge;
 }
 
 double TDetectorHit::GetEnergy() const {
-  return fCharge + gRandom->Uniform();
+  //return fCharge + gRandom->Uniform()
+  return Charge() + gRandom->Uniform();
 }
 
 Int_t TDetectorHit::Compare(const TObject *obj) const{

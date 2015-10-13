@@ -9,7 +9,7 @@
 #include <fstream>
 #include <string>
 
-//#include "TGRSITransition.h"
+//#include "TTransition.h"
 
 #include "TObject.h"
 #include "TNamed.h"
@@ -47,14 +47,14 @@ class TNucleus : public TNamed{
   double GetMass() const       {return fMass;}		// Gets the mass of the nucleus (in MeV)
   const char* GetSymbol() const{return fSymbol.c_str();}	// Gets the atomic symbol of the nucleus
 
-  void AddTransition(Double_t energy, Double_t intensity, Double_t energy_uncertainty = 0.0, Double_t intensity_uncertainty = 0.0);
-  //void AddTransition(TGRSITransition *tran);
+  // void AddTransition(Double_t energy, Double_t intensity, Double_t energy_uncertainty = 0.0, Double_t intensity_uncertainty = 0.0);
+  // void AddTransition(TTransition *tran);
   Bool_t RemoveTransition(Int_t idx);
   //TGRSITransition *GetTransition(Int_t idx);
 
   Int_t NTransitions() const { return TransitionList.GetSize();};
  
- double GetRadius() const;					
+  double GetRadius() const;					
   int GetZfromSymbol(char*);				
 
   TList TransitionList;

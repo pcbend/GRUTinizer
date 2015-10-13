@@ -42,6 +42,7 @@ private:
   int tdc_trigger;
   int qdc_channels;
   int tdc_channels;
+
   static int errors; //!
 
   ClassDef(TFastScint,1);

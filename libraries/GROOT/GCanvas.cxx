@@ -98,7 +98,7 @@ GCanvas::GCanvas(const char* name, const char* title, Int_t wtopx, Int_t wtopy, 
 
 
 GCanvas::~GCanvas() {
-   //TCanvas::~TCanvas();
+  //TCanvas::~TCanvas();
 }
 
 void GCanvas::GCanvasInit() {
@@ -114,6 +114,7 @@ void GCanvas::GCanvasInit() {
    //    printf("\tusing x11-like graphical interface.\n");
    //}
    //this->SetCrosshair(true);
+  SetBit(kNotDeleted,false); //root voodoo.
 }
 
 void GCanvas::AddMarker(int x,int y,int dim) {

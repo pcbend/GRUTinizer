@@ -37,7 +37,8 @@ void TMode3Hit::BuildFrom(TSmartBuffer buf){
   buf.Advance(sizeof(TRawEvent::GEBMode3Data));
 
   led = data->GetLed();
-  SetCharge(data->GetEnergy(*header));
+  charge = data->GetEnergy(*header);
+  //SetCharge(data->GetEnergy(*header));
   SetAddress(GetHole(),GetCrystal(),GetSegmentId());
   cfd = data->GetCfd();
 
@@ -100,7 +101,7 @@ void TMode3Hit::Print(Option_t *opt) const { }
 void TMode3Hit::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
   board_id = -1;
-  //energy   = -1;
+  charge   = -1;
   led      = -1;
   cfd      = -1;
   //if(fOwnWave && wave) {

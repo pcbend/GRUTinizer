@@ -16,12 +16,13 @@ public:
   virtual void Print(Option_t *opt = "") const;
   virtual void Clear(Option_t *opt = "");
 
-  const Int_t  A()     { return fACharge; }
-  const Int_t  B()     { return fBCharge; }
-  const Int_t  C()     { return fCCharge; }
-  const Int_t  Pixel() { return fPixel; }
-  const Int_t  Time()  { return fTime; }
-
+  Int_t  A()     const { return fACharge; }
+  Int_t  B()     const { return fBCharge; }
+  Int_t  C()     const { return fCCharge; }
+  Int_t  Pixel() const { return fPixel; }
+  Int_t  Time()  const { return fTime; }
+  
+  virtual Int_t Charge() const { return B(); }
 
 
 private:
@@ -33,7 +34,7 @@ private:
 
   TVector3  fPosition;
 
-  ClassDef(TPhosWallHit,1)
+  ClassDef(TPhosWallHit,2)
 
 };
 

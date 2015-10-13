@@ -40,7 +40,7 @@ class TMode3Hit : public TDetectorHit {
     static void SetExtractWaves(bool flag=true) { fExtractWaves = flag;  }
     static bool ExtractWaves()                  { return fExtractWaves;  }
 
-    //Int_t    Charge()    { return hit.Charge(); }
+    virtual Int_t  Charge() const   { return charge; }
     //Int_t    Address()    { return hit.Address(); }
 
   private:
@@ -52,12 +52,13 @@ class TMode3Hit : public TDetectorHit {
     //TDetectorHit hit;
 
     Int_t  board_id;
-    //Int_t  energy;
+    Int_t  charge;
     Int_t  wavesize; // In 16-bit elements
     Long_t led;
     Long_t cfd;
     Short_t wavebuffer[MAXTRACE];  //!
     Short_t *wave;                 //[wavesize]
+
 
   ClassDef(TMode3Hit,2);
 };

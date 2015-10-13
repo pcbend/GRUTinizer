@@ -5,6 +5,9 @@
 #include <mutex>
 #endif
 
+#include <map>
+#include <utility>
+
 #include "TCut.h"
 #include "TDirectory.h"
 #include "TTree.h"
