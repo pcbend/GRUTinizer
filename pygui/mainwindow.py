@@ -39,7 +39,6 @@ class MainWindow(object):
             settings = ast.literal_eval(text)
 
         if 'histograms' in settings:
-            print settings['histograms']
             self.hist_tab._load_online_patterns(settings['histograms'])
 
 
@@ -353,8 +352,8 @@ class MainWindow(object):
         update_tcanvases()
 
     def ResetHistograms(self,hist=None):
-        if hist is not None:
-            for obj in ROOT.gPad.GetListOfPrimative():
+        if hist is None:
+            for obj in ROOT.gPad.GetListOfPrimitives():
                 if obj.InheritsFrom(ROOT.TH1.Class()):
                     obj.Reset()
         else:

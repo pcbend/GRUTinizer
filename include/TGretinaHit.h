@@ -26,8 +26,8 @@ public:
   Double_t GetTime()  const     { return (double)fTimeStamp - (double)fWalkCorrection; }
   Int_t    GetAddress()         const { return fAddress;        }
   Int_t    GetCrystalId()       const { return fCrystalId;      }
-  Int_t    GetHoleNumber()      const { return fCrystalId/4 -1; } 
-  Int_t    GetCrystalNumber()   const { return fCrystalId%4;    }   
+  Int_t    GetHoleNumber()      const { return fCrystalId/4 -1; }
+  Int_t    GetCrystalNumber()   const { return fCrystalId%4;    }
   Float_t  GetCoreEnergy()      const { return fCoreEnergy;     }
   Float_t  GetCoreCharge(int i) const { return fCoreCharge[i];  }
 
@@ -77,7 +77,7 @@ public:
   Int_t   GetSegmentId(const int &i)           { return fSegmentNumber[i]; }
   Float_t GetSegmentEng(const int &i)          { return fInteractionEnergy[i]; }
   TVector3 GetInteractionPosition(int i) const; //{ return fGlobalInteractionPosition[i]; }
-  TVector3 GetLocalPosition(int i) const; 
+  TVector3 GetLocalPosition(int i) const;
   //TVector3 GetCrystalPosition(int i)     const { return TVector3(0,0,1): }
   TVector3 GetPosition()                 const { return GetFirstIntPosition(); }
 
@@ -110,7 +110,7 @@ private:
      Note: This is not equal to the segment number as read from the datastream.
      This is equal to 36*raw.crystal_id + raw.segnum.  ///not anymore pcb.
    */
-  Int_t    fSegmentNumber[MAXHPGESEGMENTS];
+  Int_t    fSegmentNumber[MAXHPGESEGMENTS]; //[fNumberOfInteractions]
 
   /// The position of the interaction point in lab coordinates
   /**
@@ -118,9 +118,10 @@ private:
      This has been transformed to lab coordinates.
      To get the crystal coordinate, use TGretinaHit::GetCrystalPosition(int i).
    */
-  TVector3 fGlobalInteractionPosition[MAXHPGESEGMENTS];
-  TVector3 fLocalInteractionPosition[MAXHPGESEGMENTS];
-  Float_t  fInteractionEnergy[MAXHPGESEGMENTS];
+  TVector3 fGlobalInteractionPosition[MAXHPGESEGMENTS]; //[fNumberOfInteractions]
+  TVector3 fLocalInteractionPosition[MAXHPGESEGMENTS]; //[fNumberOfInteractions]
+  Float_t  fInteractionEnergy[MAXHPGESEGMENTS]; //[fNumberOfInteractions]
+  Float_t  fInteractionFraction[MAXHPGESEGMENTS]; //[fNumberOfInteractions]
 
   ClassDef(TGretinaHit,1)
 };

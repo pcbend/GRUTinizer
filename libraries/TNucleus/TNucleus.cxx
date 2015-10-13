@@ -333,19 +333,20 @@ bool TNucleus::SetSourceData() {
 }
 */
 
-void TNucleus::AddTransition(Double_t energy, Double_t intensity, Double_t energy_uncertainty, Double_t intensity_uncertainty){
-   //TGRSITransition * tran = new TGRSITransition;
-   //tran->fenergy = energy;
-   //tran->fenergy_uncertainty = energy_uncertainty;
-   //tran->fintensity = intensity;
-   //tran->fintensity_uncertainty = intensity_uncertainty;
+/*void TNucleus::AddTransition(Double_t energy, Double_t intensity, Double_t energy_uncertainty, Double_t intensity_uncertainty){
+   TTransition * tran = new TTransition;
+   tran->fEnergy = energy;
+   tran->fEnUncertainty = energy_uncertainty;
+   tran->fIntensity = intensity;
+   tran->fIntUncertainty = intensity_uncertainty;
 
-   //AddTransition(tran);
-}
+   AddTransition(tran);
+   }*/
 
-//void TNucleus::AddTransition(TGRSITransition* tran){
-//   TransitionList.Add(tran);
-//}
+/*
+void TNucleus::AddTransition(TTransition* tran){
+   TransitionList.Add(tran);
+   }*/
 
 Bool_t TNucleus::RemoveTransition(Int_t idx){
    //TGRSITransition *tran;

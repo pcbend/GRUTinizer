@@ -11,8 +11,10 @@
 #include "TObjString.h"
 #include "TRandom.h"
 #include "TRegexp.h"
+#include "TTreeFormula.h"
 
 #include "TPreserveGDirectory.h"
+
 
 TOnlineTree* online_events = NULL;
 TOnlineTree* online_scalers = NULL;
@@ -36,7 +38,8 @@ TOnlineTree::TOnlineTree(const char* name, const char* title, int circular_size)
 TOnlineTree::~TOnlineTree() { }
 
 void TOnlineTree::AddDetectorBranch(TDetector** det, const char* name){
-  Branch(name, name, det);
+  //TBranch *branch = Branch(name, name, det,32000,0);
+  TBranch *branch = Branch(name, name, det);
 }
 
 TObject* TOnlineTree::GetObjectStringLeaves(){
@@ -94,6 +97,8 @@ void TOnlineTree::recurse_down(std::vector<std::string>& terminal_leaves, std::s
 }
 
 TList* TOnlineTree::GetHistograms() {
+  std::lock_guard<std::mutex> lock(fill_mutex);
+
   TList* output = new TList;
   output->SetOwner(false);
 
@@ -183,10 +188,21 @@ void TOnlineTree::RefillHistograms_MutexTaken() {
   TPreserveGDirectory preserve;
   directory.cd();
 
+   //if(!this->FindBranch("gretina_hits")) {
+   //  printf("\treturn!\t%s\n",this->GetName());
+   //  return;
+   //}
+
   for(auto& pattern : hist_patterns_1d) {
+    //printf("pattern.varexp.c_str():  %s\n",pattern.varexp.c_str());
+    //printf("   %i     %i     %i\n", circular_size,GetEntries() - (actual_event_num - last_fill), GetEntries()   );
+    //printf("this->FindBranch(\"gretina_hits\") = 0x%08x\n",this->FindBranch("gretina_hits"));
+    //printf("this->FindBranch(\"gretina_hits\")->LoadBaskets() = %i\n",this->FindBranch("gretina_hits")->LoadBaskets());
+    //if(TTree::GetSelect()) TTree::GetSelect()->Print();
     TTree::Project(("+"+pattern.name).c_str(), pattern.varexp.c_str(),
                    pattern.gate, "", circular_size,
                    GetEntries() - (actual_event_num - last_fill));
+    //printf("i am here.\n");
   }
 
   for(auto& pattern : hist_patterns_2d) {
@@ -194,7 +210,6 @@ void TOnlineTree::RefillHistograms_MutexTaken() {
                    pattern.gate, "", circular_size,
                    GetEntries() - (actual_event_num - last_fill));
   }
-
   last_fill = actual_event_num;
 }
 

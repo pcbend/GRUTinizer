@@ -21,10 +21,19 @@ public:
   Long_t GetEventCounter() { return fEventCounter;}
   void   SetEventCounter(Long_t counter) { fEventCounter = counter; }
 
+  short GetTriggerPattern() { return fTriggerPattern;       }
+  short GetTriggerChannel() { return (fTrigger&0xf000)>>12; }
+  short GetTrigger()        { return (fTrigger&0xfff);      }
+
 private:
   virtual int  BuildHits();
 
-  void Build_VMUSB_Read(TSmartBuffer buf);
+  void Build_VMUSB_Read(TSmartBuffer buf);         //!
+
+  bool HandleTriggerPacket(char*,unsigned short);  //!
+  bool HandleTOFPacket(char*,unsigned short);      //!
+  bool HandleFPScintPacket(char*,unsigned short);  //!
+  bool HandleFPICPacket(char*,unsigned short);     //!
 
   //TClonesArray *fTimeOfFlight;
   //TClonesArray *fTimeOfFlight;
@@ -32,16 +41,31 @@ private:
   //TClonesArray *fTimeOfFlight;
   //TClonesArray *fTimeOfFlight;
   //TClonesArray *fTimeOfFlight;
-
-
-
-
-
-
 
   Long_t fEventCounter;
 
+  short fTriggerPattern;
+  short fTrigger;
 
+  short rf_tdc;
+  short obj_tdc;
+  short obj_tac;
+  short xfp_tdc;
+  short xfp_tac;
+  short si_tdc;
+
+  short e1up_energy;
+  short e1up_time;
+  short e2up_energy;
+  short e2up_time;
+  short e3up_energy;
+  short e3up_time;
+  short e1down_energy;
+  short e1down_time;
+  short e2down_energy;
+  short e2down_time;
+  short e3down_energy;
+  short e3down_time;
 
   ClassDef(TS800,1);
 };
