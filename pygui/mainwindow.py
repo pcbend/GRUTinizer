@@ -205,6 +205,10 @@ class MainWindow(object):
         menubar.add_cascade(label="File",menu=filemenu)
 
     def _PickIcon(self, obj):
+        # If this is a TKey, look up the icon for the thing it points to.
+        if obj.InheritsFrom('TKey'):
+            obj = ROOT.TClass(obj.GetClassName())
+
         if obj.InheritsFrom('TH2'):
             return self.icons['h2_t']
         elif obj.InheritsFrom('TH1'):

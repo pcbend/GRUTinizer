@@ -190,10 +190,11 @@ class TreeTab(object):
         self.tree.insert('', 'end', name, text=name,
                          image = self.main._PickIcon(tfile))
 
-        objects = {obj.GetName():obj for obj in unpack_tdirectory(tfile)}
+        objects = {obj.GetName():obj for obj in tfile.GetListOfKeys()
+                   if ROOT.TClass(obj.GetClassName()).InheritsFrom('TTree')}
+
         for obj in objects.values():
-            if obj.InheritsFrom('TTree'):
-                self.AddTree(tfile.GetName(), obj)
+            self.AddTree(tfile.GetName(), obj.ReadObj())
 
     def AddOfflineHistogram(self, ttree):
         dimension = 2 if self.hist2d.get() else 1

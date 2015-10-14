@@ -32,3 +32,24 @@ def increment_name(name):
         return prefix + str(number)
     else:
         return name + '_1'
+
+
+class TKeyDict(dict):
+    def __getitem__(self, key):
+        output = super(TKeyDict,self).__getitem__(key)
+        if output.InheritsFrom('TKey'):
+            print 'Reading key ',output.GetName()
+            value = output.ReadObj().Clone()
+            value.SetDirectory(0)
+            if hasattr(output, 'hist_pattern'):
+                value.hist_pattern = output.hist_pattern
+            self[key] = value
+            output = value
+        return output
+
+    def is_tkey(self, key):
+        output = super(TKeyDict,self).__getitem__(key)
+        try:
+            return output.InheritsFrom('TKey')
+        except AttributeError:
+            return False
