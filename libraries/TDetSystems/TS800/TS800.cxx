@@ -95,7 +95,7 @@ int TS800::BuildHits(){
     std::cout << *head << std::endl;
     SetEventCounter(head->GetEventNumber());
     //       *((Long_t*)(geb.GetPayload()+26)) & 0x0000ffffffffffff);
-    geb->Print("all0x5800");
+    //geb->Print("all0x5800");
     geb->Print(buffer.c_str());
   }
   return 0;
@@ -177,10 +177,10 @@ bool TS800::HandleCRDCPacket(char *data,unsigned short size) {
   short subtype = *((short*)(data+ptr)); ptr += 2;
   short zerobuffer = *((short*)(data+ptr)); ptr += 2;
   int lastsampe = 0;
-  for(int x=2;x<subsize;x++) {
+  for(int x=2;x<subsize;x+=2) {
     unsigned short word1 = *((unsigned short*)(data+ptr)); ptr += 2;
+    if((word1&0x8000)!=0x8000) { continue; }
     unsigned short word2 = *((unsigned short*)(data+ptr)); ptr += 2;
-    if((word1&0x8000)!=0x8000) { }
     int sample_number    = (word1&(0x7fc0)) >> 6;
     int channel_number   =  word1&(0x003f);
     int connector_number = (word2&(0x0c00)) >> 10;
