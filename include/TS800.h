@@ -25,6 +25,8 @@ public:
   short GetTriggerChannel() { return (fTrigger&0xf000)>>12; }
   short GetTrigger()        { return (fTrigger&0xfff);      }
 
+  Long_t GetTimestamp()  { Timestamp(); }
+
 private:
   virtual int  BuildHits();
 

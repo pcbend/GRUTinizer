@@ -60,13 +60,13 @@ int TS800::BuildHits(){
     int ptr = 0;
     const TRawEvent::GEBS800Header *head = ((const TRawEvent::GEBS800Header*)geb->GetPayload());
     ptr += sizeof(TRawEvent::GEBS800Header);     //  Here, we are now pointing at the size of the next S800 thing.  Inclusive in shorts.
-    std::string buffer = Form("all0x%04x",*((unsigned short*)(geb->GetPayload()+ptr+2)));
+    //std::string buffer = Form("all0x%04x",*((unsigned short*)(geb->GetPayload()+ptr+2)));
     char data[2048];
     
-    printf("head.total_size == %i\n",head->total_size); fflush(stdout);
+    //printf("head.total_size == %i\n",head->total_size); fflush(stdout);
 
     while(ptr<((head->total_size*2)-2)) {
-      printf("\tptr == %i\t0x%04x\t0x%04x\n",ptr,(*((unsigned short*)(geb->GetPayload()+ptr))) , (*((unsigned short*)(geb->GetPayload()+ptr+2)))       ); fflush(stdout);
+      //printf("\tptr == %i\t0x%04x\t0x%04x\n",ptr,(*((unsigned short*)(geb->GetPayload()+ptr))) , (*((unsigned short*)(geb->GetPayload()+ptr+2)))       ); fflush(stdout);
 
       unsigned short size_in_bytes = (*((unsigned short*)(geb->GetPayload()+ptr))*2);
       unsigned short type          = *((unsigned short*)(geb->GetPayload()+ptr+2));
@@ -92,17 +92,17 @@ int TS800::BuildHits(){
 
       if(ptr>=(head->total_size*2)) 
         break;
-      buffer += Form("0x%04x",type);//*((unsigned short*)(geb->GetPayload()+ptr+2)));
+      //buffer += Form("0x%04x",type);//*((unsigned short*)(geb->GetPayload()+ptr+2)));
        
     }
 
 
     //printf("buffer.c_str == %s\n",buffer.c_str());
-    std::cout << *head << std::endl;
+    //std::cout << *head << std::endl;
     SetEventCounter(head->GetEventNumber());
     //       *((Long_t*)(geb.GetPayload()+26)) & 0x0000ffffffffffff);
     //geb->Print("all0x5800");
-    geb->Print(buffer.c_str());
+    //geb->Print(buffer.c_str());
   }
   return 0;
 }
@@ -121,13 +121,13 @@ bool TS800::HandleTriggerPacket(char *data,unsigned short size) {
         fTrigger  = *temp;
         break;
       case 0x9000:  //External1 source
-        fprintf(stderr,"Trigger from !S800, External1!!");
+        //fprintf(stderr,"Trigger from !S800, External1!!");
         break;
       case 0xa000:  //External2 source
-        fprintf(stderr,"Trigger from !S800, External2!!");
+        //fprintf(stderr,"Trigger from !S800, External2!!");
         break;
       case 0xb000:  //Secondary source
-        fprintf(stderr,"Trigger from !S800, Secondary source!!");
+        //fprintf(stderr,"Trigger from !S800, Secondary source!!");
         break;
     };
   }
