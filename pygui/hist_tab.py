@@ -140,18 +140,13 @@ class HistTab(object):
             obj.InheritsFrom('TH1')):
             self._setup_online_hist_pattern(obj, online_tree)
 
-
-        if (name in self.treeview.get_children(parent) and
-            obj.InheritsFrom('TH1')):
-            orig = self.hist_lookup[name]
-            obj.Copy(orig) # Copy the new object into the original
-            return
-        elif name in self.treeview.get_children(parent):
+        if name in self.treeview.get_children(parent):
             self.hist_lookup[name] = obj
         else:
             icon = self.main._PickIcon(obj)
             self.hist_lookup[name] = obj
             self.treeview.insert(parent,'end', name, text=obj.GetName(),image=icon)
+
 
     def _PeriodicHistogramCheck(self):
         self.CheckOnlineHists()
@@ -159,6 +154,7 @@ class HistTab(object):
 
     def CheckOnlineHists(self):
         if ROOT.online_events:
+
             self.Insert(ROOT.online_events.GetDirectory(),
                         online_tree=ROOT.online_events)
         if ROOT.online_scalers:

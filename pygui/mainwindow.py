@@ -41,7 +41,6 @@ class MainWindow(object):
         if 'histograms' in settings:
             self.hist_tab._load_online_patterns(settings['histograms'])
 
-
     def _save_gui_file(self, filename = None):
         if filename is None:
             filename = tkFileDialog.asksaveasfilename(filetypes=(("GUI File", "*.hist"),))
