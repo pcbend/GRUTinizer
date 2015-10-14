@@ -26,7 +26,8 @@ struct Mesy_Word{
   bool isData()   const { return((nose&0xffc0)==0x0400); } // for QDC 0x0020 should also be 0.  Left out for easy use.
   bool isETS()    const { return((nose&0xffff)==0x0480); }
   bool isFILL()   const { return(((nose&0xffff)==0) && ((tail&0xffff)==0)); }
-  bool isEOE()    const { return((nose&0xc000)==0xc000); }
+  bool isALLF()   const { return(((nose&0xffff)==0xffff) && ((tail&0xffff)==0xffff)); }
+  bool isEOE()    const { return(((nose&0xc000)==0xc000) && !(isALLF())); }
 }__attribute__((__packed__));
 
 struct Mesy_Header{

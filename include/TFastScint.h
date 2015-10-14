@@ -23,13 +23,17 @@ public:
 
   int GetDetNumberIn_fs_hits(Int_t det);
   
-  void SetTDCTrigger(int trig) { tdc_trigger = trig; }
-  void SetTDC_Count(int count) { tdc_channels= count;}
-  void SetQDC_Count(int count) { qdc_channels= count;}
+  //  void SetTDCTrigger(int trig) { tdc_trigger = trig; }
+  //void SetTDC_Count(int count) { tdc_channels= count;}
+  //void SetQDC_Count(int count) { qdc_channels= count;}
+  void SetTDC_TimeStamp(int ts) { tdc_TS = ts; }
+  void SetQDC_TimeStamp(int ts) { qdc_TS = ts; }
 
-  int GetTDCTrigger() {return tdc_trigger; }
-  int GetTDC_Count()  {return tdc_channels; }
-  int GetQDC_Count()  {return qdc_channels; }
+  int GetTDC_TimeStamp() {return tdc_TS; }
+  int GetQDC_TimeStamp() {return qdc_TS; }
+  //int GetTDCTrigger() {return tdc_trigger; }
+  //int GetTDC_Count()  {return tdc_channels; }
+  //int GetQDC_Count()  {return qdc_channels; }
   int GetErrors() {return errors; };
 
 private:
@@ -39,9 +43,9 @@ private:
 
   TClonesArray* fs_hits; //->
   
-  int tdc_trigger;
-  int qdc_channels;
-  int tdc_channels;
+  int qdc_TS;
+  int tdc_TS;
+
   static int errors; //!
 
   ClassDef(TFastScint,1);
