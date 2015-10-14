@@ -15,6 +15,7 @@
 
 #include <TH1.h>
 #include <TH2.h>
+#include "TRandom.h"
 
 #include "TObject.h"
 #include "TGretina.h"
@@ -69,13 +70,19 @@ void MakeHistograms(TRuntimeObjects& obj) {
   }
 
   TList *list = &(obj.GetObjects());
-  int numobj = list->GetSize();  
+  int numobj = list->GetSize();
+
+  obj.FillHistogram("rand",
+                    100,-10,10,gRandom->Gaus(0,1));
+  obj.FillHistogram("rand2",
+                    100,-10,10,gRandom->Gaus(0,3));
+
 
   if(bank29) {
     for(int x=0;x<bank29->Size();x++) {
       TMode3Hit &hit = (TMode3Hit&)bank29->GetHit(x);
-      std::string histname = Form("bank29_%i",hit.GetChannel()); 
-      TH1 *hist = (TH1*)list->FindObject(histname.c_str()); 
+      std::string histname = Form("bank29_%i",hit.GetChannel());
+      TH1 *hist = (TH1*)list->FindObject(histname.c_str());
       if(!hist) {
         hist= new TH1F(histname.c_str(),histname.c_str(),16000,0,64000);
         list->Add(hist);

@@ -60,6 +60,8 @@ class TCutTab(object):
         self.cuts[name] = cut
         self.tree.insert('', 'end', name, text=name, values='2D Cut',
                          image = self.main.icons['tcutg'])
+        if ROOT.online_events:
+            ROOT.online_events.GetDirectory().Add(cut)
 
     def StartCut(self):
         ROOT.gROOT.SetEditorMode('CutG')

@@ -40,3 +40,15 @@ TList& TRuntimeObjects::GetDetectors() {
 TList& TRuntimeObjects::GetObjects() {
   return *objects;
 }
+
+TCutG* TRuntimeObjects::GetCut(const std::string& name) {
+  TIter next(objects);
+  TObject* obj;
+  while((obj = next())){
+    if(obj->InheritsFrom(TCutG::Class()) &&
+       obj->GetName() == name){
+      return (TCutG*)obj;
+    }
+  }
+  return NULL;
+}
