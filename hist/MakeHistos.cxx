@@ -72,12 +72,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
   TList *list = &(obj.GetObjects());
   int numobj = list->GetSize();
 
-  obj.FillHistogram("rand",
-                    100,-10,10,gRandom->Gaus(0,1));
-  obj.FillHistogram("rand2",
-                    100,-10,10,gRandom->Gaus(0,3));
-
-
   if(bank29) {
     for(int x=0;x<bank29->Size();x++) {
       TMode3Hit &hit = (TMode3Hit&)bank29->GetHit(x);

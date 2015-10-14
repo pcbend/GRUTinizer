@@ -140,13 +140,24 @@ class HistTab(object):
             obj.InheritsFrom('TH1')):
             self._setup_online_hist_pattern(obj, online_tree)
 
-        if name in self.treeview.get_children(parent):
-            self.hist_lookup[name] = obj
+        if obj.InheritsFrom('TH1'):
+            if name in self.hist_lookup:
+                # If the histogram has already been read, copy it in
+                orig = self.hist_lookup[name]
+                obj.Copy(orig)
+                orig.SetDirectory(0)
+            else:
+                # Make a copy, so the TOnlineTree updating won't require
+                # an update of the canvas.
+                obj = obj.Clone()
+                obj.SetDirectory(0)
+                self.hist_lookup[name] = obj
         else:
-            icon = self.main._PickIcon(obj)
             self.hist_lookup[name] = obj
-            self.treeview.insert(parent,'end', name, text=obj.GetName(),image=icon)
 
+        if name not in self.treeview.get_children(parent):
+            icon = self.main._PickIcon(obj)
+            self.treeview.insert(parent,'end', name, text=obj.GetName(),image=icon)
 
     def _PeriodicHistogramCheck(self):
         self.CheckOnlineHists()
