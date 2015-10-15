@@ -3,13 +3,15 @@
 #include <TRawEvent.h>
 #include <iostream>
 
+#include <TClass.h>
+
 ClassImp(TDetector)
 
 TDetector::TDetector() { }
 
 TDetector::TDetector(const char* name,const char* title) {
   TNamed::SetNameTitle(name,title);
-
+  Class()->CanIgnoreTObjectStreamer();
 }
 
 TDetector::~TDetector() { }

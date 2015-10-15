@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include <TClass.h>
 #include "TRandom.h"
 
 ClassImp(TDetectorHit)
@@ -9,6 +10,7 @@ ClassImp(TDetectorHit)
 const TVector3 TDetectorHit::BeamUnitVec(0,0,1);
 
 TDetectorHit::TDetectorHit() {
+  Class()->CanIgnoreTObjectStreamer();
   Clear();
 }
 

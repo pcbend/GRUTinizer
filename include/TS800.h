@@ -35,32 +35,37 @@ private:
   bool HandleFPScintPacket(char*,unsigned short);  //!
   bool HandleIonChamberPacket(char*,unsigned short);     //!
   bool HandleCRDCPacket(char*,unsigned short);     //!
-
+  bool HandleIntermediatePPACPacket(char*,unsigned short);     //!
+  bool HandleHODOPacket(char*,unsigned short);     //!
+  bool HandleMTDCPacket(char*,unsigned short);     //!
 
   TClonesArray *time_of_flight;
   TClonesArray *fp_scint;
   TClonesArray *ion_chamber;
-  TClonesArray *crdc;
-  //TClonesArray *fTimeOfFlight;
-  //TClonesArray *fTimeOfFlight;
+  TClonesArray *crdc1;
+  TClonesArray *crdc2;
+  TClonesArray *hodo;
+  TClonesArray *ppac1;
+  TClonesArray *ppac2;
 
   Long_t fEventCounter;
 
   short fTriggerPattern;
   short fTrigger;
 
-  short e1up_energy;
-  short e1up_time;
-  short e2up_energy;
-  short e2up_time;
-  short e3up_energy;
-  short e3up_time;
-  short e1down_energy;
-  short e1down_time;
-  short e2down_energy;
-  short e2down_time;
-  short e3down_energy;
-  short e3down_time;
+  short crdc1_charge;
+  short crdc2_charge;
+  short crdc1_time;
+  short crdc2_time;
+  
+  short ppac1_charge;
+  short ppac2_charge;
+  short ppac1_time;
+  short ppac2_time;
+
+  unsigned short hodo_hit_pattern1;
+  unsigned short hodo_hit_pattern2;
+  unsigned short hodo_hit_time;
 
   ClassDef(TS800,1);
 };

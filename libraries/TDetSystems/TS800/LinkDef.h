@@ -7,12 +7,15 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+//#pragma link C++ class std::map<int,int>+;
+
 #pragma link C++ class TS800Channel+;
 
 #pragma link C++ class TTOFHit+;
 #pragma link C++ class TFPScint+;
 #pragma link C++ class TIonChamber+;
 #pragma link C++ class TCrdcPad+;
+#pragma link C++ class THodoHit+;
 
 #pragma link C++ class TS800Hit+;
 #pragma link C++ class TS800+;

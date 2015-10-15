@@ -4,7 +4,9 @@
 #include <TObject.h>
 #include <TClass.h>
 
-#define MAXCRDC 512
+#include <TDetectorHit.h>
+
+#define MAXCRDC 513
 
 
 class TS800Channel : public TDetectorHit {
@@ -17,7 +19,7 @@ class TS800Channel : public TDetectorHit {
     void Set(short value)          { fValue = (unsigned short)value; }
     void Set(unsigned short value) { fValue = value; }
 
-    short GetId()      const { return (((fValue)&0xf000)>>12);  }
+    virtual short GetId()      const { return (((fValue)&0xf000)>>12);  }
     short GetValue()   const { return fValue&0x0fff;  }
 
     virtual void Clear(Option_t *opt="")       { TDetectorHit::Clear(opt); fValue = 0; }
@@ -57,6 +59,29 @@ class TTOFHit :  public TS800Channel {
 
   ClassDef(TTOFHit,1);
 };
+
+
+class THodoHit : public TS800Channel {
+  public:
+    THodoHit() { Clear(); }
+    THodoHit(short chan,short value) { SetChannel(chan); Set(value); }
+    ~THodoHit() { };
+
+    virtual void Clear(Option_t *opt="")       { TS800Channel::Clear(opt); fChannel=-1; }
+    virtual void Print(Option_t *opt="") const { printf("HODO"); }
+    virtual void Copy(TObject &obj)      const { TS800Channel::Copy(obj); ((THodoHit&)obj).fChannel = fChannel; }
+
+    void SetChannel(short chan) { fChannel = chan;  }
+    short GetId()      const { return GetChannel(); }
+    short GetChannel() const { return fChannel;     }
+
+  private:
+    short fChannel;
+
+
+  ClassDef(THodoHit,1)
+};
+
 
 class TFPScint :  public TS800Channel {
   public:
@@ -104,20 +129,42 @@ class TIonChamber : public TS800Channel {
 
 };
 
+
 class TCrdcPad : public TDetectorHit {
+ 
   public:
-    TCrdcPad() { }
-    ~TCrdcPad() { }
+    TCrdcPad(); 
+    TCrdcPad(int chan); 
+    ~TCrdcPad();
     
+    virtual Int_t Charge() const; 
 
-    virtual Int_t Charge() const { return 0; } //TODO
+    
+    void SetChannel(short chan)         { fChannel = chan; }
+    void SetPoint(short sample,short value) { 
+      if(fNumSamples >= MAXCRDC){
+        printf("fNumSamples = %i\n",fNumSamples); fflush(stdout); 
+      }
+      fSample[fNumSamples] = sample; 
+      fValue[fNumSamples] = value; 
+      fNumSamples++;  
 
+    }
+    //int  GetPoint(int sample)           { if(fTrace.count(sample)) return fTrace.at(sample); else return 0; }  
+    short GetChannel()                  { return fChannel; }
 
+    virtual void Clear(Option_t *opt="");       
+    virtual void Print(Option_t *opt="") const; 
+    virtual void Copy(TObject &obj)      const; 
+
+  private:
     short fChannel;
+    short fNumSamples;
+    short fSample[MAXCRDC];
+    short fValue[MAXCRDC];
+    //std::map <int,int> fTrace;
+  
 
-    Int_t   wavesize;
-    Short_t wavebuffer[MAXCRDC];  //!
-    Short_t *wave;                 //[wavesize]
 
   ClassDef(TCrdcPad,1)
 };
@@ -129,7 +176,7 @@ class TS800Hit : public TDetectorHit {
     ~TS800Hit()  {  }
     virtual Int_t Charge() const { return 0; }
 
-    virtual void Clear(Option_t *opt ="")       {  }
+    virtual void Clear(Option_t *opt ="")       { TDetectorHit::Clear(opt); }
     virtual void Print(Option_t *opt ="") const {  }
     virtual void Copy(TObject &obj)       const { TDetectorHit::Copy(obj);  }
 
