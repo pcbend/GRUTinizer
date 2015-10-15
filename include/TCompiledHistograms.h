@@ -2,6 +2,7 @@
 #define _TCOMPILEDHISTOGRAMS_H_
 
 #include <memory>
+#include <string>
 
 #include "TObject.h"
 
@@ -16,6 +17,8 @@ public:
   void Load(std::string libname);
   void Call(TRuntimeObjects& obj);
   void Reload();
+
+  std::string GetLibraryName() const { return libname; }
 
 private:
   void swap(TCompiledHistograms& other);

@@ -11,10 +11,6 @@ struct RuntimeFileNotFound : public RuntimeException {
   RuntimeFileNotFound(const std::string& msg) : RuntimeException(msg) { }
 };
 
-struct RuntimeSymbolNotFound : public RuntimeException {
-  RuntimeSymbolNotFound(const std::string& msg) : RuntimeException(msg) { }
-};
-
 struct RuntimeSymlinkCreation : public RuntimeException {
   RuntimeSymlinkCreation(const std::string& msg) : RuntimeException(msg) { }
 };

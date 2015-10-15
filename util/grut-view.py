@@ -35,4 +35,3 @@ def on_close():
     gc.collect()
 
 window = MainWindow()
-#window.Run()

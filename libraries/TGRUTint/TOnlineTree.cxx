@@ -37,11 +37,6 @@ TOnlineTree::TOnlineTree(const char* name, const char* title, int circular_size)
   }
 
   detector_list.SetOwner(false);
-
-  if(!strcmp(name,"EventTree") &&
-     TGRUTOptions::Get()->CompiledHistogramFile().length()) {
-    compiled_histograms.Load(TGRUTOptions::Get()->CompiledHistogramFile());
-  }
 }
 
 TOnlineTree::~TOnlineTree() { }
@@ -260,4 +255,12 @@ std::string TOnlineTree::GetHistPattern(std::string name) {
   }
 
   return "";
+}
+
+std::string TOnlineTree::GetCompiledHistogramLibrary() const {
+  return compiled_histograms.GetLibraryName();
+}
+
+void TOnlineTree::LoadCompiledHistogramLibrary(const std::string& filename) {
+  compiled_histograms.Load(filename);
 }

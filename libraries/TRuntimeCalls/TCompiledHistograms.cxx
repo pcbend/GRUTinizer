@@ -6,6 +6,8 @@
 
 #include <sys/stat.h>
 
+#include "FullPath.h"
+
 typedef void* __attribute__((__may_alias__)) void_alias;
 
 TCompiledHistograms::TCompiledHistograms()
@@ -13,8 +15,8 @@ TCompiledHistograms::TCompiledHistograms()
     last_modified(0), last_checked(0), check_every(5) { }
 
 TCompiledHistograms::TCompiledHistograms(std::string libname)
-  : libname(libname), check_every(5) {
-  library = std::make_shared<DynamicLibrary>(libname.c_str(), true);
+  : libname(full_path(libname)), check_every(5) {
+  library = std::make_shared<DynamicLibrary>(this->libname.c_str(), true);
   // Casting required to keep gcc from complaining.
   *(void_alias*)(&func) = library->GetSymbol("MakeHistograms");
   last_modified = get_timestamp();
@@ -55,7 +57,7 @@ void TCompiledHistograms::swap(TCompiledHistograms& other) {
 }
 
 void TCompiledHistograms::Call(TRuntimeObjects& obj) {
-  if(!library){
+  if(!library || !func){
     return;
   }
 

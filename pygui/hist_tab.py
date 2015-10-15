@@ -90,6 +90,16 @@ class HistTab(object):
         # Bring all the histograms into the list
         self.CheckOnlineHists()
 
+    def _load_compiled_histograms(self, filename):
+        if ROOT.online_events:
+            ROOT.online_events.LoadCompiledHistograms(filename)
+
+    def _compiled_histogram_filename(self):
+        if ROOT.online_events:
+            return ROOT.online_events.GetCompiledHistogramLibrary()
+        else:
+            return ''
+
     def Insert(self,obj,parent='',online_tree=None):
         if (obj.InheritsFrom('TKey') and
             not ROOT.TClass(obj.GetClassName()).InheritsFrom('TH1')):
@@ -146,14 +156,15 @@ class HistTab(object):
         hist.hist_pattern = pattern
 
     def _insert_single_nonrecursive(self, obj, parent, name, online_tree=None):
-        is_histogram = (obj.InheritsFrom('TKey') and
-                        ROOT.TClass(obj.GetClassName()).InheritsFrom('TH1'))
+        is_histogram_key = (obj.InheritsFrom('TKey') and
+                            ROOT.TClass(obj.GetClassName()).InheritsFrom('TH1'))
+        is_histogram = obj.InheritsFrom('TH1')
 
         if (online_tree is not None and
-            is_histogram):
+            (is_histogram_key or is_histogram)):
             self._setup_online_hist_pattern(obj, online_tree)
 
-        if (is_histogram and
+        if (is_histogram_key and
             name in self.hist_lookup and
             not self.hist_lookup.is_tkey(name)):
             # If the histogram has already been read, copy it in

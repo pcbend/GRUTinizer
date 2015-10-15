@@ -58,6 +58,9 @@ public:
 
   std::string GetHistPattern(std::string name);
 
+  std::string GetCompiledHistogramLibrary() const;
+  void LoadCompiledHistogramLibrary(const std::string& filename);
+
 private:
   static void recurse_down(std::vector<std::string>& terminal_leaves, std::string current_branch, TBranch* branch);
 

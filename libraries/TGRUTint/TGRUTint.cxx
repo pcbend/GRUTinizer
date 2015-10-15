@@ -174,11 +174,9 @@ void TGRUTint::ApplyOptions() {
 
   if(opt->StartGUI()){
     std::string script_filename = program_path() + "/../util/grut-view.py";
-    //printf("%s\n",script_filename.c_str());
     std::ifstream script(script_filename);
     std::string script_text((std::istreambuf_iterator<char>(script)),
                             std::istreambuf_iterator<char>());
-    //printf("%s\n",script_text.c_str());
     TPython::Exec(script_text.c_str());
     for(auto& filename : opt->RootInputFiles()){
       TPython::Exec(Form("window.LoadRootFile(\"%s\")",filename.c_str()));
@@ -192,17 +190,21 @@ void TGRUTint::ApplyOptions() {
     fGuiTimer->TurnOn();
   }
 
+  if(online_events && opt->CompiledHistogramFile().length()){
+    online_events->LoadCompiledHistogramLibrary(opt->CompiledHistogramFile());
+  }
+
   if (opt->RawInputFiles().size()){
     TGRUTLoop::Get()->Start();
   }
 
-  if(TGRUTOptions::Get()->ExitAfterSorting()){
+  if(opt->ExitAfterSorting()){
     TGRUTLoop::Get()->Status();
     std::cout << "Waiting for join" << std::endl;
     TGRUTLoop::Get()->Join();
     this->Terminate();
-  } else if(TGRUTOptions::Get()->CommandServer()) {
-    fCommandServer = new TGRUTServer(TGRUTOptions::Get()->CommandPort());
+  } else if(opt->CommandServer()) {
+    fCommandServer = new TGRUTServer(opt->CommandPort());
     fCommandServer->Start();
     fCommandTimer = new TTimer("",10);
     fCommandTimer->TurnOn();
@@ -220,8 +222,6 @@ void TGRUTint::OpenRootFile(const std::string& filename){
     std::cerr << "File \"" << filename << "\" does not exist" << std::endl;
     return;
   }
-
-  TGRUTOptions* opt = TGRUTOptions::Get();
 
   const char* command = Form("TFile *_file%i = TObjectManager::Get(\"%s\",\"read\")",
 			      fRootFilesOpened, filename.c_str());

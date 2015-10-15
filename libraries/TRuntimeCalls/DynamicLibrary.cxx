@@ -65,9 +65,5 @@ void DynamicLibrary::swap(DynamicLibrary& other){
 }
 
 void* DynamicLibrary::GetSymbol(const char* symbol) {
-  void* output = dlsym(library, symbol);
-  if(!output){
-    throw RuntimeSymbolNotFound(symbol);
-  }
-  return output;
+  return dlsym(library, symbol);
 }

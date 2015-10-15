@@ -41,7 +41,9 @@ class MainWindow(object):
         if 'histograms' in settings:
             self.hist_tab._load_online_patterns(settings['histograms'])
         if 'tcuts' in settings:
-            self.tcut_tab._load_tcut_patterns(setting['tcuts'])
+            self.tcut_tab._load_tcut_patterns(settings['tcuts'])
+        if 'compiled_histograms' in settings:
+            self.hist_tab._load_compiled_histograms(settings['compiled_histograms']['name'])
 
     def _save_gui_file(self, filename = None):
         if filename is None:
@@ -56,6 +58,10 @@ class MainWindow(object):
         output = {}
         output['histograms'] = self.hist_tab._hist_patterns()
         output['tcuts'] = self.tcut_tab._tcut_patterns()
+
+        if self.hist_tab._compiled_histogram_filename():
+            output['compiled_histograms'] = {'name':self.hist_tab._compiled_histogram_filename()}
+
         with open(filename,'w') as f:
             pprint.pprint(output, f)
 
