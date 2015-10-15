@@ -306,14 +306,13 @@ class MainWindow(object):
                                   variable=self.predefinedzones,command=self.set_zones)
         menubar.add_cascade(label="Zones",menu=zonesmenu)
 
-    def set_zones(self,zones=""):
-        if not zones:
-            zones = self.predefinedzones.get()
-        zones = zones.lower()
-        zones.replace(" ","")
-        zones = zones.split("x")
-        self.zone_cols = int(zones[0])
-        self.zone_rows = int(zones[1])
+    def set_zones(self):
+        zones_str = self.predefinedzones.get()
+        try:
+            zones = map(int,zones.split("x"))
+            self.zone_cols,self.zone_rows = zones
+        except (IndexError,ValueError):
+            print 'Cannot set zones to "{}"'.format(zones_str)
 
     def _MakeOptStatMenu(self, menubar):
         self.optstat_name      = tk.BooleanVar(value=True)
