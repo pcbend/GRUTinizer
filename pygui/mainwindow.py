@@ -120,8 +120,8 @@ class MainWindow(object):
 
         frame = tk.Frame(self.window)
         button = tk.Button(frame,
-                           text='Load Data File(s)',fg="black",bg="goldenrod",
-                           command=self.LoadDataFiles)
+                           text='Load Data File',fg="black",bg="goldenrod",
+                           command=self.LoadDataFile)
         button.pack(side=tk.LEFT)
 
         button = tk.Button(frame,
@@ -404,16 +404,16 @@ class MainWindow(object):
         hist.SetLineColor(color)
         hist.Draw(' '.join(opt))
 
-    def LoadDataFiles(self, filenames = None):
-        if filenames is None:
-            filenames = tkFileDialog.askopenfilenames(filetypes=(("GEB File", "*.dat"),))
-            filenames = self.window.tk.splitlist(filenames)
+    def LoadDataFile(self, filename = None):
+        if filename is None:
+            filename = tkFileDialog.askopenfilename(filetypes=(("GEB File", "*.dat"),))
 
-        if not filenames:
+        if not filename:
             return
 
-        #TODO: Make this not crash
-        ROOT.TGRUTLoop.Get().ProcessFile(filenames,'')
+        ROOT.TGRUTLoop.Get().Stop()
+        ROOT.TGRUTLoop.Get().ProcessFile(filename,'')
+        ROOT.TGRUTLoop.Get().Start()
 
     def LoadRootFile(self,filename=None):
         if filename is None:
