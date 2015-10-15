@@ -31,7 +31,7 @@ public:
 
 private:
 #ifndef __CINT__
-  std::mutex mutex;
+  std::recursive_mutex mutex;
 #endif
 
   ClassDef(THashList_ThreadSafe, 1);
