@@ -133,6 +133,8 @@ class MainWindow(object):
                            command=self.ResetHistograms)
         button.pack(side=tk.LEFT)
 
+        frame.pack(fill=tk.X,expand=False)
+
         notebook = ttk.Notebook(self.window)
 
         hist_page = ttk.Frame(notebook)
