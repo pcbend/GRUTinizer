@@ -88,9 +88,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("no-backup",&fMakeBackupFile)
     .description("Disable the \"last.root\" backup file")
     .default_value(true);
-  parser.option("noserver", &fCommandServer)
-    .description("Start program without default command server running.")
-    .default_value(true);
+  parser.option("server", &fCommandServer)
+    .description("Start program with command server running.")
+    .default_value(false);
   parser.option("ignore-errors ignore_errors", &fIgnoreErrors)
     .description("Don't print warning messages.  Use at your own risk.");
   parser.option("q quit", &fExitAfterSorting)

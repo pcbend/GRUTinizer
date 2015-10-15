@@ -83,6 +83,11 @@ class TCutTab(object):
 
         self.AddCut(cutg)
 
+    def AddFile(self, tfile):
+        for key in tfile.GetListOfKeys():
+            if key.GetClassName()=='TCutG':
+                self.AddCut(key.ReadObj())
+
     def AddCut(self, cut):
         name = cut.GetName()
         self.cuts[name] = cut

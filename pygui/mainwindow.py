@@ -40,6 +40,8 @@ class MainWindow(object):
 
         if 'histograms' in settings:
             self.hist_tab._load_online_patterns(settings['histograms'])
+        if 'tcuts' in settings:
+            self.tcut_tab._load_tcut_patterns(setting['tcuts'])
 
     def _save_gui_file(self, filename = None):
         if filename is None:
@@ -53,6 +55,7 @@ class MainWindow(object):
 
         output = {}
         output['histograms'] = self.hist_tab._hist_patterns()
+        output['tcuts'] = self.tcut_tab._tcut_patterns()
         with open(filename,'w') as f:
             pprint.pprint(output, f)
 
@@ -130,20 +133,7 @@ class MainWindow(object):
                            command=self.ResetHistograms)
         button.pack(side=tk.LEFT)
 
-
-        frame.pack(fill=tk.X,expand=False)
-
-        button = tk.Button(self.window,
-                           text='Jump into Interpreter',fg="black",bg="goldenrod",
-                           command=self.Interpreter)
-
-        button.pack(fill=tk.X,expand=False)
-
         notebook = ttk.Notebook(self.window)
-
-        tree_page = ttk.Frame(notebook)
-        self.tree_tab = TreeTab(self, tree_page)
-        notebook.add(tree_page, text='Tree Viewer')
 
         hist_page = ttk.Frame(notebook)
         self.hist_tab = HistTab(self, hist_page)
@@ -152,6 +142,10 @@ class MainWindow(object):
         tcut_page = ttk.Frame(notebook)
         self.tcut_tab = TCutTab(self, tcut_page)
         notebook.add(tcut_page, text='Gates')
+
+        tree_page = ttk.Frame(notebook)
+        self.tree_tab = TreeTab(self, tree_page)
+        notebook.add(tree_page, text='Tree Viewer')
 
         notebook.pack(fill=tk.BOTH,expand=True)
 
@@ -425,23 +419,7 @@ class MainWindow(object):
         self.files[filename] = tfile
         self.hist_tab.Insert(tfile)
         self.tree_tab.AddFile(tfile)
-
-    def Interpreter(self):
-        try:
-            import ptpython.repl; ptpython.repl.embed(globals(), locals())
-        except ImportError:
-            pass
-        else:
-            return
-
-        try:
-            import IPython; IPython.embed()
-        except ImportError:
-            pass
-        else:
-            return
-
-        import code; code.interact(local=locals())
+        self.tcut_tab.AddFile(tfile)
 
     def Run(self):
         self.window.mainloop()
