@@ -28,6 +28,10 @@ class TCutTab(object):
         self._check_for_tcut()
         self.frame.after(1000,self._repeatedly_check)
 
+    def _dump_to_tfile(self):
+        for cut in self.cuts.values():
+            cut.Write()
+
     def _check_for_tcut(self):
         # Does CUTG exist?
         cutg = ROOT.gROOT.GetListOfSpecials().FindObject('CUTG')

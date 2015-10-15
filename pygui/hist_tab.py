@@ -42,6 +42,10 @@ class HistTab(object):
 
         update_tcanvases()
 
+    def _dump_to_tfile(self):
+        for key in self.hist_lookup:
+            self.hist_lookup[key].Write()
+
     def _hist_patterns(self):
         output = []
         for obj in self.hist_lookup.values():
