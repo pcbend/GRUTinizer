@@ -161,10 +161,6 @@ void TOnlineTree::AddHistogram(const char* name,
   // The histogram will be grabbed by the gDirectory, no memory leak
   new TH1I(name,name,
            bins, low, high);
-  std::cout << "Name: " << name << " "
-            << "(" << bins << "," << low << "," << high << ")"
-            << std::endl;
-
   hist_patterns_1d.push_back(pat);
 }
 
@@ -206,21 +202,10 @@ void TOnlineTree::FillParsedHistograms_MutexTaken() {
   TPreserveGDirectory preserve;
   directory.cd();
 
-   //if(!this->FindBranch("gretina_hits")) {
-   //  printf("\treturn!\t%s\n",this->GetName());
-   //  return;
-   //}
-
   for(auto& pattern : hist_patterns_1d) {
-    //printf("pattern.varexp.c_str():  %s\n",pattern.varexp.c_str());
-    //printf("   %i     %i     %i\n", circular_size,GetEntries() - (actual_event_num - last_fill), GetEntries()   );
-    //printf("this->FindBranch(\"gretina_hits\") = 0x%08x\n",this->FindBranch("gretina_hits"));
-    //printf("this->FindBranch(\"gretina_hits\")->LoadBaskets() = %i\n",this->FindBranch("gretina_hits")->LoadBaskets());
-    //if(TTree::GetSelect()) TTree::GetSelect()->Print();
     TTree::Project(("+"+pattern.name).c_str(), pattern.varexp.c_str(),
                    pattern.gate, "", circular_size,
                    GetEntries() - (actual_event_num - last_fill));
-    //printf("i am here.\n");
   }
 
   for(auto& pattern : hist_patterns_2d) {

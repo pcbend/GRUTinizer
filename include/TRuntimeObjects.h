@@ -32,6 +32,8 @@ public:
     return NULL;
   }
 
+  TCutG* GetCut(const std::string& name);
+
   TList& GetDetectors();
   TList& GetObjects();
 

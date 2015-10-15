@@ -28,6 +28,34 @@ class TCutTab(object):
         self._check_for_tcut()
         self.frame.after(1000,self._repeatedly_check)
 
+    def _dump_to_tfile(self):
+        for cut in self.cuts.values():
+            cut.Write()
+
+    def _tcut_patterns(self):
+        output = []
+        for name, cut in self.cuts:
+            points = []
+            for i in xrange(cut.GetN()):
+                points.append((cut.GetX()[i], cut.GetY()[i]))
+
+            pattern = {'name':name,
+                       'points':points,
+                       'varx':cut.GetVarX(),
+                       'vary':cut.GetVarY(),
+                }
+            output.append(pattern)
+        return output
+
+    def _load_tcut_patterns(self, patterns):
+        for pattern in patterns:
+            cut = ROOT.TCutG(pattern['name'],len(pattern['points']))
+            cut.SetVarX(pattern['varx'])
+            cut.SetVarY(pattern['vary'])
+            for i,(x,y) in enumerate(pattern['points']):
+                cut.SetPoint(i, x, y)
+            self.AddCut(cut)
+
     def _check_for_tcut(self):
         # Does CUTG exist?
         cutg = ROOT.gROOT.GetListOfSpecials().FindObject('CUTG')
@@ -60,6 +88,8 @@ class TCutTab(object):
         self.cuts[name] = cut
         self.tree.insert('', 'end', name, text=name, values='2D Cut',
                          image = self.main.icons['tcutg'])
+        if ROOT.online_events:
+            ROOT.online_events.GetDirectory().Add(cut)
 
     def StartCut(self):
         ROOT.gROOT.SetEditorMode('CutG')

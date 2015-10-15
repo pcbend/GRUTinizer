@@ -6,7 +6,7 @@ import ttk
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
-from .util import unpack_tdirectory,update_tcanvases
+from .util import unpack_tdirectory, update_tcanvases, TKeyDict
 
 class HistTab(object):
 
@@ -25,7 +25,7 @@ class HistTab(object):
         self.treeview = ttk.Treeview(parent)
         self.treeview.pack(fill=tk.BOTH,expand=True)
         # Map from treeview name to ROOT object
-        self.hist_lookup = {}
+        self.hist_lookup = TKeyDict()
         self.treeview.bind("<Double-1>", self.OnHistClick)
 
     def OnHistClick(self,event):
@@ -41,6 +41,10 @@ class HistTab(object):
                     color+=1
 
         update_tcanvases()
+
+    def _dump_to_tfile(self):
+        for key in self.hist_lookup:
+            self.hist_lookup[key].Write()
 
     def _hist_patterns(self):
         output = []
@@ -87,6 +91,10 @@ class HistTab(object):
         self.CheckOnlineHists()
 
     def Insert(self,obj,parent='',online_tree=None):
+        if (obj.InheritsFrom('TKey') and
+            not ROOT.TClass(obj.GetClassName()).InheritsFrom('TH1')):
+            obj = obj.ReadObj()
+
         if obj.InheritsFrom('TTree'):
             return
 
@@ -100,7 +108,9 @@ class HistTab(object):
         if obj.InheritsFrom('TList'):
             iterable = obj
         elif obj.InheritsFrom('TDirectory'):
-            iterable = unpack_tdirectory(obj)
+            iterable = obj.GetListOfKeys()
+            if not iterable:
+                iterable = obj.GetList()
         else:
             iterable = None
 
@@ -136,21 +146,27 @@ class HistTab(object):
         hist.hist_pattern = pattern
 
     def _insert_single_nonrecursive(self, obj, parent, name, online_tree=None):
+        is_histogram = (obj.InheritsFrom('TKey') and
+                        ROOT.TClass(obj.GetClassName()).InheritsFrom('TH1'))
+
         if (online_tree is not None and
-            obj.InheritsFrom('TH1')):
+            is_histogram):
             self._setup_online_hist_pattern(obj, online_tree)
 
-
-        if (name in self.treeview.get_children(parent) and
-            obj.InheritsFrom('TH1')):
+        if (is_histogram and
+            name in self.hist_lookup and
+            not self.hist_lookup.is_tkey(name)):
+            # If the histogram has already been read, copy it in
             orig = self.hist_lookup[name]
-            obj.Copy(orig) # Copy the new object into the original
-            return
-        elif name in self.treeview.get_children(parent):
-            self.hist_lookup[name] = obj
+            obj.Copy(orig)
+            orig.SetDirectory(0)
         else:
-            icon = self.main._PickIcon(obj)
+            # TKeyDict makes a Clone, so the TOnlineTree updating won't
+            # require an update of the canvas.
             self.hist_lookup[name] = obj
+
+        if name not in self.treeview.get_children(parent):
+            icon = self.main._PickIcon(obj)
             self.treeview.insert(parent,'end', name, text=obj.GetName(),image=icon)
 
     def _PeriodicHistogramCheck(self):
@@ -159,6 +175,7 @@ class HistTab(object):
 
     def CheckOnlineHists(self):
         if ROOT.online_events:
+
             self.Insert(ROOT.online_events.GetDirectory(),
                         online_tree=ROOT.online_events)
         if ROOT.online_scalers:

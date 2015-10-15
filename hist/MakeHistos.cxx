@@ -16,6 +16,7 @@
 #include <TH1.h>
 #include <TH2.h>
 #include <TMath.h>
+#include "TRandom.h"
 
 #include "TObject.h"
 #include "TGretina.h"

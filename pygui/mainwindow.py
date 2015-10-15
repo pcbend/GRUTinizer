@@ -41,7 +41,6 @@ class MainWindow(object):
         if 'histograms' in settings:
             self.hist_tab._load_online_patterns(settings['histograms'])
 
-
     def _save_gui_file(self, filename = None):
         if filename is None:
             filename = tkFileDialog.asksaveasfilename(filetypes=(("GUI File", "*.hist"),))
@@ -57,6 +56,21 @@ class MainWindow(object):
         with open(filename,'w') as f:
             pprint.pprint(output, f)
 
+    def _dump_root_file(self, filename = None):
+        if filename is None:
+            filename = tkFileDialog.asksaveasfilename(filetypes=(("ROOT File", "*.root"),))
+
+        if not filename:
+            return
+
+        if not filename.endswith('.root'):
+            filename += '.root'
+
+        self.RefreshHistograms()
+        output = ROOT.TFile(filename,'RECREATE')
+        self.hist_tab._dump_to_tfile()
+        self.tcut_tab._dump_to_tfile()
+        output.Close()
 
     def _load_icons(self):
         self.icons = {}
@@ -136,7 +150,7 @@ class MainWindow(object):
         notebook.add(hist_page, text='Histograms')
 
         tcut_page = ttk.Frame(notebook)
-        self.tcut_page = TCutTab(self, tcut_page)
+        self.tcut_tab = TCutTab(self, tcut_page)
         notebook.add(tcut_page, text='Gates')
 
         notebook.pack(fill=tk.BOTH,expand=True)
@@ -199,13 +213,18 @@ class MainWindow(object):
         filemenu.add_separator()
         filemenu.add_command(label="Close All Canvases",command=self.close_all_canvases)
         filemenu.add_separator()
-        filemenu.add_command(label="Open",command=self.hello)
-        filemenu.add_command(label="Save",command=self._save_gui_file)
+        filemenu.add_command(label="Open GUI",command=self.hello)
+        filemenu.add_command(label="Save GUI",command=self._save_gui_file)
+        filemenu.add_command(label="Dump ROOT File",command=self._dump_root_file)
         filemenu.add_separator()
         filemenu.add_command(label="Exit",command=ROOT.TGRUTint.instance().Terminate)
         menubar.add_cascade(label="File",menu=filemenu)
 
     def _PickIcon(self, obj):
+        # If this is a TKey, look up the icon for the thing it points to.
+        if obj.InheritsFrom('TKey'):
+            obj = ROOT.TClass(obj.GetClassName())
+
         if obj.InheritsFrom('TH2'):
             return self.icons['h2_t']
         elif obj.InheritsFrom('TH1'):
