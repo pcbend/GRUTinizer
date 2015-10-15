@@ -114,7 +114,7 @@ class MainWindow(object):
 
 
     def _setup_GUI(self):
-        self.window.geometry('400x850')
+        self.window.geometry('450x850')
         self.window.wm_title("hist-o-matic")
         self.window.config(menu=self._MakeMenuBar())
 
@@ -137,6 +137,11 @@ class MainWindow(object):
         button = tk.Button(frame,
                            text='Reset',fg="black",bg="goldenrod",
                            command=self.ResetHistograms)
+        button.pack(side=tk.LEFT)
+
+        button = tk.Button(frame,
+                           text='Reset All',fg="black",bg="goldenrod",
+                           command=self.ResetAllHistograms)
         button.pack(side=tk.LEFT)
 
         frame.pack(fill=tk.X,expand=False)
@@ -380,6 +385,13 @@ class MainWindow(object):
         else:
             hist.Reset()
         update_tcanvases()
+
+    def ResetAllHistograms(self):
+        if ROOT.online_events:
+            ROOT.online_events.ClearHistograms()
+        if ROOT.online_scalers:
+            ROOT.online_scalers.ClearHistograms()
+        self.RefreshHistograms()
 
     def _draw_single(self,hist,color=1,nselected=1):
         canvas_exists = bool(filter(None,self.canvases))

@@ -34,7 +34,6 @@ public:
 
   bool HasHistogram(std::string name);
   void FillParsedHistograms();
-  void FillCompiledHistograms();
 
   virtual Int_t Fill();
 
@@ -61,9 +60,12 @@ public:
   std::string GetCompiledHistogramLibrary() const;
   void LoadCompiledHistogramLibrary(const std::string& filename);
 
+  void ClearHistograms();
+
 private:
   static void recurse_down(std::vector<std::string>& terminal_leaves, std::string current_branch, TBranch* branch);
 
+  void FillCompiledHistograms();
   void FillParsedHistograms_MutexTaken();
 
 #ifndef __CINT__

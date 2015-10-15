@@ -264,3 +264,16 @@ std::string TOnlineTree::GetCompiledHistogramLibrary() const {
 void TOnlineTree::LoadCompiledHistogramLibrary(const std::string& filename) {
   compiled_histograms.Load(filename);
 }
+
+void TOnlineTree::ClearHistograms() {
+  std::lock_guard<std::mutex> lock(fill_mutex);
+
+  TIter next(directory.GetList());
+  TObject* obj;
+  while((obj = next())){
+    if(obj->InheritsFrom(TH1::Class())){
+      TH1* hist = (TH1*)obj;
+      hist->Reset();
+    }
+  }
+}
