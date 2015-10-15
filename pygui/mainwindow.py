@@ -305,7 +305,7 @@ class MainWindow(object):
     def set_zones(self):
         zones_str = self.predefinedzones.get()
         try:
-            zones = map(int,zones.split("x"))
+            zones = map(int,zones_str.split("x"))
             self.zone_cols,self.zone_rows = zones
         except (IndexError,ValueError):
             print 'Cannot set zones to "{}"'.format(zones_str)
