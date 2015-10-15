@@ -23,10 +23,11 @@ public:
 
   void BuildFrom(const TRawEvent::GEBBankType1& raw);
 
+  Long_t   GetTimestamp() const { return fTimeStamp; }
   Double_t GetTime()  const     { return (double)fTimeStamp - (double)fWalkCorrection; }
   Int_t    GetAddress()         const { return fAddress;        }
   Int_t    GetCrystalId()       const { return fCrystalId;      }
-  Int_t    GetHoleNumber()      const { return fCrystalId/4 -1; }
+  Int_t    GetHoleNumber()      const { return fCrystalId/4-1;  }
   Int_t    GetCrystalNumber()   const { return fCrystalId%4;    }
   Float_t  GetCoreEnergy()      const { return fCoreEnergy;     }
   Int_t    GetCoreCharge(int i) const { return fCoreCharge[i];  }

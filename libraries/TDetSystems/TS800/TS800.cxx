@@ -22,16 +22,16 @@ TS800::~TS800(){
   time_of_flight->Delete();
   fp_scint->Delete();
   ion_chamber->Delete();
-  crdc1->Delete();
-  crdc2->Delete();
-  ppac1->Delete();
-  ppac2->Delete();
+  crdc1->Delete("C");
+  crdc2->Delete("C");
+  ppac1->Delete("C");
+  ppac2->Delete("C");
   hodo->Delete();
 }
 
 void TS800::Copy(TObject& obj) const {
   TDetector::Copy(obj);
-  
+
   time_of_flight->Copy((*((TS800&)obj).time_of_flight)) ;
   fp_scint->Copy((*((TS800&)obj).time_of_flight));
   ion_chamber->Copy((*((TS800&)obj).time_of_flight));
@@ -100,7 +100,7 @@ int TS800::BuildHits(){
     const TRawEvent::GEBS800Header *head = ((const TRawEvent::GEBS800Header*)geb->GetPayload());
     ptr += sizeof(TRawEvent::GEBS800Header);     //  Here, we are now pointing at the size of the next S800 thing.  Inclusive in shorts.
     //std::string buffer = Form("all0x%04x",*((unsigned short*)(geb->GetPayload()+ptr+2)));
-    
+
     //printf("head.total_size == %i\n",head->total_size); fflush(stdout);
 
     char data[2048];
@@ -109,15 +109,15 @@ int TS800::BuildHits(){
 
       unsigned short size_in_bytes = (*((unsigned short*)(geb->GetPayload()+ptr))*2);
       unsigned short type          = *((unsigned short*)(geb->GetPayload()+ptr+2));
-      
+
       memcpy(data,geb->GetPayload()+ptr,size_in_bytes);//(*((unsigned short*)(geb->GetPayload()+ptr))*2));
       ptr +=  (*((unsigned short*)(geb->GetPayload()+ptr))*2);
-     
+
       switch(type) {
         case 0x5801:
           HandleTriggerPacket(data+4,size_in_bytes-4);
           break;
-        case 0x5802: 
+        case 0x5802:
           HandleTOFPacket(data+4,size_in_bytes-4);
           break;
         case 0x5810:
@@ -156,20 +156,14 @@ int TS800::BuildHits(){
       };
 
 
-      if(ptr>=(head->total_size*2)) 
+      if(ptr>=(head->total_size*2))
         break;
       //buffer += Form("0x%04x",type);//*((unsigned short*)(geb->GetPayload()+ptr+2)));
-       
+
     }
 
 
     //printf("buffer.c_str == %s\n",buffer.c_str());
-//    geb->Print(buffer.c_str());
-//    unsigned short last          = *((unsigned short*)(geb->GetPayload()+ptr-2));
-//    std::cout << "head: " << *head << std::endl;
-//    std::cout << "ptr:         " << ptr              << std::endl;
-//    std::cout << "total size:  " << head->total_size << std::endl;
-//    printf(      "last:        0x%04x\n",last);
     SetEventCounter(head->GetEventNumber());
     //       *((Long_t*)(geb.GetPayload()+26)) & 0x0000ffffffffffff);
     //geb->Print("all0x5800");
@@ -179,7 +173,7 @@ int TS800::BuildHits(){
 }
 
 bool TS800::HandleTriggerPacket(char *data,unsigned short size) {
-  
+
   //printf(BLUE "0x%04x\t0x%04x" RESET_COLOR "\n",*((unsigned short*)data),*((unsigned short*)(data+2)) );
   //  Data read from the Lecroy 2367 ULM module and a Phillips 7186H TDC. One trigger pattern followed by up to four times.
   if(size<4) //min size to fit the above(2 shorts).
@@ -213,12 +207,12 @@ bool TS800::HandleTriggerPacket(char *data,unsigned short size) {
 bool TS800::HandleHODOPacket(char *data,unsigned short size) {
   if(!size)
     return false;
-  //printf("HODO id: 0x%04x\n",(*((unsigned short*)data))); 
+  //printf("HODO id: 0x%04x\n",(*((unsigned short*)data)));
   int id = (*((unsigned short*)data));
   for(int x=2;x<size;x+=2) {
     THodoHit *hit =0;
     unsigned short temp = (*((unsigned short*)data));
-    //printf("\tHODO : 0x%04x\n",(*((unsigned short*)data))); 
+    //printf("\tHODO : 0x%04x\n",(*((unsigned short*)data)));
     switch(id) {
       case 0:
         hit = (THodoHit*)hodo->ConstructedAt(hodo->GetEntries());
@@ -237,7 +231,7 @@ bool TS800::HandleHODOPacket(char *data,unsigned short size) {
         return true;
     }
   }
-  
+
   return true;
 }
 
@@ -251,8 +245,8 @@ bool TS800::HandleTOFPacket(char *data,unsigned short size) {
     return false;
   for(int i=0;i<size;i+=2) {
     TTOFHit *tof = (TTOFHit*)time_of_flight->ConstructedAt(time_of_flight->GetEntries());
-    tof->Set(*((unsigned short*)(data+i))); 
-  } 
+    tof->Set(*((unsigned short*)(data+i)));
+  }
   return true;
 }
 
@@ -274,7 +268,7 @@ bool TS800::HandleFPScintPacket(char *data,unsigned short size) {
 
 bool TS800::HandleIonChamberPacket(char *data,unsigned short size) {
   //Zero suppressed energies from the ionization chamber, read from a Phillips 7164 ADC.
-  //Note, this data is in a "sub-packet".  
+  //Note, this data is in a "sub-packet".
   int x =0;
   if(*(data+2) == 0x5821)
     x+=4;
@@ -295,9 +289,9 @@ bool TS800::HandleCRDCPacket(char *data,unsigned short size) {
   short zerobuffer = *((short*)(data+ptr)); ptr += 2;
   int lastsampe = 0;
 
-  //for(int x=0;x<crdc1->GetSize();x++) 
+  //for(int x=0;x<crdc1->GetSize();x++)
   //  ((TCrdcPad*)crdc1->At(x))->Clear();
-  //for(int x=0;x<crdc2->GetSize();x++) 
+  //for(int x=0;x<crdc2->GetSize();x++)
   //  ((TCrdcPad*)crdc2->At(x))->Clear();
 
   std::map<int,std::map<int,int> > pad;
@@ -307,12 +301,12 @@ bool TS800::HandleCRDCPacket(char *data,unsigned short size) {
     if((word1&0x8000)!=0x8000) { continue; }
     unsigned short word2 = *((unsigned short*)(data+ptr)); ptr += 2;
 
-    printf("[%i]\t0x%04x\t0x%04x\n",x,word1,word2);
+    //printf("[%i]\t0x%04x\t0x%04x\n",x,word1,word2);
     int sample_number    = (word1&(0x7fc0)) >> 6;
     int channel_number   =  word1&(0x003f);
     int connector_number = (word2&(0x0c00)) >> 10;
     int databits         = (word2&(0x03ff));
-    
+
     int real_channel = (connector_number << 6) + channel_number;
     pad[real_channel][sample_number] = databits;
   }
@@ -328,17 +322,17 @@ bool TS800::HandleCRDCPacket(char *data,unsigned short size) {
     } else if(id==1) {
       crdcpad = (TCrdcPad*)crdc2->ConstructedAt(crdc2->GetEntries());
     }
-    if(crdcpad) { 
+    if(crdcpad) {
       crdcpad->SetChannel(it1->first);
-      for(it2=it1->second.begin();it2!=it1->second.end();it2++) { 
+      for(it2=it1->second.begin();it2!=it1->second.end();it2++) {
         //printf("\t%i\t%i\n",it2->first,it2->second);
-        crdcpad->SetPoint(it2->first,it2->second);      
+        crdcpad->SetPoint(it2->first,it2->second);
       }
     } else {
       return false;
     }
   }
-  
+
   unsigned short word1 = *((unsigned short*)(data+ptr)); ptr += 2;
   unsigned short word2 = *((unsigned short*)(data+ptr)); ptr += 2;
   if(id==0) {
@@ -370,13 +364,13 @@ bool TS800::HandleIntermediatePPACPacket(char *data,unsigned short size) {
 
   for(int x=1;x<subsize;x+=2) {
     unsigned short word1 = *((unsigned short*)(data+ptr)); ptr += 2;
-    //if((word1&0x8000)!=0x8000) { continue; }
+    if((word1&0x8000)!=0x8000) { continue; }
     unsigned short word2 = *((unsigned short*)(data+ptr)); ptr += 2;
     int sample_number    = (word1&(0x7fc0)) >> 6;
     int channel_number   =  word1&(0x003f);
     int connector_number = (word2&(0x0c00)) >> 10;
     int databits         = (word2&(0x03ff));
-    
+
     int real_channel = (connector_number << 6) + channel_number;
     pad[real_channel][sample_number] = databits;
   }
@@ -393,10 +387,10 @@ bool TS800::HandleIntermediatePPACPacket(char *data,unsigned short size) {
     } else if(id==1) {
       ppac = (TCrdcPad*)ppac2->ConstructedAt(crdc2->GetEntries());
     }
-    if(ppac) { 
+    if(ppac) {
       ppac->SetChannel(it1->first);
-      for(it2=it1->second.begin();it2!=it1->second.end();it2++) 
-        ppac->SetPoint(it2->first,it2->second);      
+      for(it2=it1->second.begin();it2!=it1->second.end();it2++)
+        ppac->SetPoint(it2->first,it2->second);
     } else {
       return false;
     }

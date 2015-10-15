@@ -34,6 +34,8 @@ int TBank29::BuildHits(){
     hit.BuildFrom(geb->GetPayloadBuffer());
     InsertHit(hit);
   }
+  if(Size()) 
+    SetTimestamp(((TMode3Hit*)channels->At(0))->GetLed());
   return Size();
 }
 
