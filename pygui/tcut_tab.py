@@ -32,6 +32,30 @@ class TCutTab(object):
         for cut in self.cuts.values():
             cut.Write()
 
+    def _tcut_patterns(self):
+        output = []
+        for name, cut in self.cuts:
+            points = []
+            for i in xrange(cut.GetN()):
+                points.append((cut.GetX()[i], cut.GetY()[i]))
+
+            pattern = {'name':name,
+                       'points':points,
+                       'varx':cut.GetVarX(),
+                       'vary':cut.GetVarY(),
+                }
+            output.append(pattern)
+        return output
+
+    def _load_tcut_patterns(self, patterns):
+        for pattern in patterns:
+            cut = ROOT.TCutG(pattern['name'],len(pattern['points']))
+            cut.SetVarX(pattern['varx'])
+            cut.SetVarY(pattern['vary'])
+            for i,(x,y) in enumerate(pattern['points']):
+                cut.SetPoint(i, x, y)
+            self.AddCut(cut)
+
     def _check_for_tcut(self):
         # Does CUTG exist?
         cutg = ROOT.gROOT.GetListOfSpecials().FindObject('CUTG')

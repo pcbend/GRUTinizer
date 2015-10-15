@@ -1,5 +1,6 @@
 #!/usr/bin/env grut-python-exec
 
+import gc
 import os
 import sys
 import warnings
@@ -20,12 +21,18 @@ ident = threading.current_thread().ident
 
 def update():
     try:
-        if threading.current_thread().ident == ident:
+        if (threading.current_thread().ident == ident and
+            window is not None):
             window.Update()
     except tk.TclError:
         pass
     except Exception as e:
         print e
+
+def on_close():
+    global window
+    window = None
+    gc.collect()
 
 window = MainWindow()
 #window.Run()

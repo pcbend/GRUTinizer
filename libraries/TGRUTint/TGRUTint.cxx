@@ -380,6 +380,11 @@ void TGRUTint::Terminate(Int_t status){
     fCommandServer->Delete();
     fCommandServer = NULL;
   }
+
+  if(TGRUTOptions::Get()->StartGUI()){
+    TPython::Exec("on_close()");
+  }
+
   TGRUTLoop::Get()->Stop();
   TDataLoop::DeleteInstance();
 
