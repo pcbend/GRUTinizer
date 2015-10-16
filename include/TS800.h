@@ -39,7 +39,8 @@ private:
   //bool HandleScintPacket(unsigned short*,int); //!
   //bool HandleFPStPacket(char*,int);     //!
   //bool HandleIonCPacket(unsigned short*,int);     //!
-  //bool HandleCRDCPacket(char*,int);     //!
+  //bool HandleIonCPacket(char*,int);     //!
+  bool HandleCRDCPacket(unsigned short*,int);     //!
   //bool HandlePPACPacket(char*,int);     //!
   //bool HandleHODOPacket(char*,int);     //!
   //bool HandleMTDCPacket(char*,int);     //!
@@ -48,7 +49,7 @@ private:
   TTrigger     trigger;
   TTof         tof;
   //TIonChamber  ion;
-  //TCrdc        crdc[2];
+  TCrdc        crdc[2];
   //THodoscope   hodo[32];
   //TMultiHitTof multi_tof;
  

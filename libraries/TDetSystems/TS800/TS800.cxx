@@ -65,6 +65,7 @@ int TS800::BuildHits(){
       case 0x5820:  // S800 Ion Chamber
 	break;
       case 0x5840:  // CRDC Packet
+        HandleCRDCPacket(dptr+1,sizeleft);
 	break;
       case 0x5850:  // II CRDC Packet
 	break;
@@ -155,6 +156,60 @@ bool TS800::HandleTOFPacket(unsigned short *data ,int size){
 
   return true;
 }
+
+
+bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
+  TCrdc *current_crdc=0;
+  if((*data)<3)
+    current_crdc = &crdc[*data];
+  if(!current_crdc)
+    return false;
+  current_crdc->SetId(*data);
+  int x =1;
+  int subsize = *(data+x); 
+  x++;
+  int subtype = *(data+x);
+  x++;
+
+  std::map<int,std::map<int,int> > pad;
+  for(;x<subsize;x+=2) {
+    unsigned short word1 = *(data+x); 
+    if((word1&0x8000)!=0x8000) { continue; }
+    unsigned short word2 = *(data+x); 
+
+    int sample_number    = (word1&(0x7fc0)) >> 6;
+    int channel_number   =  word1&(0x003f);
+    int connector_number = (word2&(0x0c00)) >> 10;
+    int databits         = (word2&(0x03ff));
+    int real_channel = (connector_number << 6) + channel_number;
+    pad[real_channel][sample_number] = databits;
+  }
+  x+=2;
+  std::map<int,std::map<int,int> >::iterator it1;
+  std::map<int,int>::iterator it2;
+
+  for(it1=pad.begin();it1!=pad.end();it1++) {
+    //printf("channel[%03i]\n",it1->first);
+    for(it2=it1->second.begin();it2!=it1->second.end();it2++) {
+      //printf("\t%i\t%i\n",it2->first,it2->second);
+      crdc->AddPoint(it1->first,it2->first,it2->second);
+    }
+  }
+  if(x>=size)
+      return true;
+  subsize = *(data+x);
+  x++;
+  subtype = *(data+x);
+  x++;
+  current_crdc->SetAnode(*(data+x));
+  x++;
+  current_crdc->SetTime(*(data+x));
+
+  return true;
+}
+
+
+
 
 /*
 bool TS800::HandleHODOPacket(char *data,unsigned short size) {
