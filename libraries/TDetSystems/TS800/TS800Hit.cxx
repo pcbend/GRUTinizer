@@ -29,8 +29,6 @@ void TTrigger::Clear(Option_t *opt) {
 
 void TTrigger::Print(Option_t *opt) const {  }
 
-
-
 TTof::TTof() {
   Clear();
 }
@@ -59,6 +57,36 @@ void TTof::Clear(Option_t *opt) {
 }
 
 void TTof::Print(Option_t *opt) const {  }
+
+/******* End of Ttof.  Beginning of TScintillator **********/
+
+TScintillator::TScintillator() {
+  Clear();
+}
+
+TScintillator::~TScintillator() {
+}
+
+void TScintillator::Copy(TObject &obj) const { 
+  TDetectorHit::Copy(obj);
+  TScintillator &scint =(TScintillator&)obj;
+  scint.fID            = fID;
+  scint.fdE_up         = fdE_up;
+  scint.fdE_down       = fdE_down;
+  scint.fTime_up       = fTime_up;
+  scint.fTime_down     = fTime_down;
+
+}
+
+void TScintillator::Clear(Option_t *opt) { 
+  fID        = -1;
+  fdE_up     = -1;
+  fdE_down   = -1;
+  fTime_up   = -1;
+  fTime_down = -1;
+}
+
+void TScintillator::Print(Option_t *opt) const { }
 
 TCrdc::TCrdc() { 
   Clear();

@@ -19,6 +19,15 @@ void TS800::Copy(TObject& obj) const {
 
 void TS800::Clear(Option_t* opt){
   TDetector::Clear(opt);
+  crdc[0].Clear();
+  crdc[1].Clear();
+  
+  scint[0].Clear();
+  scint[1].Clear();
+  scint[2].Clear(); 
+  
+  tof.Clear();
+  trigger.Clear();
 
 }
 
@@ -57,10 +66,11 @@ int TS800::BuildHits(){
 	break;
       case 0x5802:  // S800 TOF.
 	//event.Print("all0x5802");
-	tof.Clear();
 	HandleTOFPacket(dptr+1,sizeleft);
 	break;
       case 0x5810:  // S800 Scint
+	//event.Print("all0x5810");
+	HandleScintPacket(dptr+1,sizeleft);
 	break;
       case 0x5820:  // S800 Ion Chamber
 	break;
@@ -208,8 +218,80 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
   return true;
 }
 
+bool TS800::HandleScintPacket(unsigned short* data, int size){
+  
+  for(int x = 0; x<size;x+=2){ 
+    unsigned short current = *(data+x);
+    unsigned short current_p1 = *(data+x+1);
+    
+    if(((current)&(0xf000))==((current_p1)&(0xf000))){    
+      switch(current&0xf000){
+      case 0x0000: 
+	scint[0].SetdE_Up(current&0x0fff);
+	scint[0].SetTime_Up(current_p1&0x0fff);
+	scint[0].SetID(1);
+	
+	//std::cout << " Channel 1 Up " << std::endl;
+	//std::cout << " Energy : " << scint[0].GetdE_Up() << std::endl;
+	//std::cout << " Time : " << scint[0].GetTime_Up() << std::endl;
+	break;
+      case 0x1000: 
+	scint[0].SetdE_Down(current&0x0fff);
+	scint[0].SetTime_Down(current_p1&0x0fff);
+	scint[0].SetID(1);
+	
+	//std::cout << " Channel 1 Down " << std::endl;
+	//std::cout << " Energy : " << scint[0].GetdE_Down() << std::endl;
+	//std::cout << " Time : " << scint[0].GetTime_Down() << std::endl;
+	break;
+      case 0x2000: 
+	scint[1].SetdE_Up(current&0x0fff);
+	scint[1].SetTime_Up(current_p1&0x0fff);
+	scint[1].SetID(2);
+	
+	//std::cout << " Channel 2 Up " << std::endl;
+	//std::cout << " Energy : " << scint[1].GetdE_Up() << std::endl;
+	//std::cout << " Time : " << scint[1].GetTime_Up() << std::endl;
+	break;
+      case 0x3000: 
+	scint[1].SetdE_Down(current&0x0fff);
+	scint[1].SetTime_Down(current_p1&0x0fff);
+	scint[1].SetID(2);
+	
+	//std::cout << " Channel 2 Down " << std::endl;
+	//std::cout << " Energy : " << scint[1].GetdE_Down() << std::endl;
+	//	std::cout << " Time : " << scint[1].GetTime_Down() << std::endl;
+	break;
+      case 0x4000: 
+	scint[2].SetdE_Up(current&0x0fff);
+	scint[2].SetTime_Up(current_p1&0x0fff);
+	scint[2].SetID(3);
+	
+	//std::cout << " Channel 3 Up " << std::endl;
+	//std::cout << " Energy : " << scint[2].GetdE_Up() << std::endl;
+	//std::cout << " Time : " << scint[2].GetTime_Up() << std::endl;
+	break;
+      case 0x5000: 
+	scint[2].SetdE_Down(current&0x0fff);
+	scint[2].SetTime_Down(current_p1&0x0fff);
+	scint[2].SetID(3);
+	
+	//std::cout << " Channel 3 Down " << std::endl;
+	//std::cout << " Energy : " << scint[2].GetdE_Down() << std::endl;
+	//std::cout << " Time : " << scint[2].GetTime_Down() << std::endl;	
+	break;
+      default:
+	return false;
+	break;
+      }
+    }
+    else return false;
+    
+  }
 
-
+  
+  return true;
+}
 
 /*
 bool TS800::HandleHODOPacket(char *data,unsigned short size) {

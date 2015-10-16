@@ -35,8 +35,8 @@ private:
   virtual int  BuildHits();
   
   bool HandleTrigPacket(unsigned short*,int);     //!
-  bool HandleTOFPacket(unsigned short*,int);     //!
-  //bool HandleScintPacket(unsigned short*,int); //!
+  bool HandleTOFPacket(unsigned short*,int);      //!
+  bool HandleScintPacket(unsigned short*,int);    //!
   //bool HandleFPStPacket(char*,int);     //!
   //bool HandleIonCPacket(unsigned short*,int);     //!
   //bool HandleIonCPacket(char*,int);     //!
@@ -45,7 +45,7 @@ private:
   //bool HandleHODOPacket(char*,int);     //!
   //bool HandleMTDCPacket(char*,int);     //!
 
-  //TScintillatr scint[3];
+  TScintillator scint[3];
   TTrigger     trigger;
   TTof         tof;
   //TIonChamber  ion;

@@ -150,6 +150,39 @@ class TCrdc : public TDetectorHit {
 };
 
 
+class TScintillator : public TDetectorHit {
+  public:
+    TScintillator();
+    ~TScintillator();
+
+    void SetID(int id)         { fID=id; }
+    void SetdE_Up(float de)    { fdE_up = de; }
+    void SetdE_Down(float de)  { fdE_down = de; }
+    void SetTime_Up(float t)   { fTime_up = t; }
+    void SetTime_Down(float t) { fTime_down = t; }
+
+    int GetID()          { return fID; }
+    float GetdE_Up()     { return fdE_up; }
+    float GetdE_Down()   { return fdE_down; }
+    float GetTime_Up()   { return fTime_up; }
+    float GetTime_Down() { return fTime_down; }
+
+    virtual void Copy(TObject&) const;
+    virtual void Print(Option_t *opt="") const;
+    virtual void Clear(Option_t *opt="");
+
+  private:
+    virtual int Charge() const { return 0; }
+    int fID;
+    float fdE_up;
+    float fdE_down;
+    float fTime_up;
+    float fTime_down;
+    
+    ClassDef(TScintillator,1)
+};
+
+
 
 
 
