@@ -39,6 +39,8 @@ private:
   template<typename T, typename... Params>
   friend void TDataLoop::CreateDataLoop(Params&&... params);
 
+  void InitOutfile(kFileType file_type, const char* output);
+
   void ProcessFromQueue(TRawEvent& event);
 
   TGRUTLoop();

@@ -38,6 +38,8 @@ public:
   virtual void Finalize()   { }
   virtual int ProcessEvent(TRawEvent& event) { AbstractMethod("ProcessEvent()"); }
 
+  bool IsRunning() { return running; }
+
 
   template<typename T, typename... Params>
   static void CreateDataLoop(Params&&... params){

@@ -48,24 +48,22 @@ int TGRUTLoop::ProcessEvent(TRawEvent& event){
 
 void TGRUTLoop::ProcessFile(const char* input, const char* output){
   TDataLoop::ProcessFile(input, TGRUTOptions::Get()->IsOnline());
-  switch(TGRUTOptions::Get()->DetermineFileType(input)) {
-    case kFileType::NSCL_EVT:
-      outfile = new TRootOutfileNSCL();
-      break;
-    case kFileType::GRETINA_MODE2:
-    case kFileType::GRETINA_MODE3:
-      outfile = new TRootOutfileGEB();
-      break;
-    default:
-      fprintf(stderr,"%s: trying to sort unknown filetype:%s\n",__PRETTY_FUNCTION__,input);
-      exit(1);
-  };
-  outfile->Init(output);
+  if(!outfile){
+    InitOutfile(TGRUTOptions::Get()->DetermineFileType(input),
+                output);
+  }
 }
 
 void TGRUTLoop::ProcessFile(const std::vector<std::string>& input, const char* output){
   TDataLoop::ProcessFile(input);
-  switch(TGRUTOptions::Get()->DetermineFileType(input.at(0))) {
+  if(!outfile){
+    InitOutfile(TGRUTOptions::Get()->DetermineFileType(input.at(0)),
+                output);
+  }
+}
+
+void TGRUTLoop::InitOutfile(kFileType file_type, const char* output) {
+  switch(file_type) {
     case kFileType::NSCL_EVT:
       outfile = new TRootOutfileNSCL();
       break;
@@ -74,10 +72,9 @@ void TGRUTLoop::ProcessFile(const std::vector<std::string>& input, const char* o
       outfile = new TRootOutfileGEB();
       break;
     default:
-      fprintf(stderr,"%s: trying to sort unknown filetype:%s\n",__PRETTY_FUNCTION__,input.at(0).c_str());
+      fprintf(stderr,"%s: trying to sort unknown filetype:%s\n",__PRETTY_FUNCTION__,file_type);
       exit(1);
   };
-  //outfile = new TRootOutfile();
   outfile->Init(output);
 }
 

@@ -4,6 +4,7 @@
 #include <thread>
 
 #include "FileSize.h"
+#include "TGRUTLoop.h"
 
 TRawEventOnlineFileSource::TRawEventOnlineFileSource(const std::string& filename, kFileType file_type)
   : TRawEventByteSource(file_type), fFilename(filename) {
@@ -19,6 +20,9 @@ int TRawEventOnlineFileSource::ReadBytes(char* buf, size_t size){
   while(true){
     size_t output = single_read(buf, size);
     if(output == -1){
+      if(!TGRUTLoop::Get()->IsRunning()){
+        return -1;
+      }
       std::this_thread::sleep_for(std::chrono::seconds(5));
     } else {
       return output;
