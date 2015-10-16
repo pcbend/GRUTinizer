@@ -10,6 +10,7 @@
 //#pragma link C++ class std::map<int,int>+;
 
 #pragma link C++ class TTrigger+;
+#pragma link C++ class TTof+;
 
 #pragma link C++ class TS800Channel+;
 

@@ -52,42 +52,45 @@ int TS800::BuildHits(){
       int sizeleft = size-2;
       //ptr +=  (*((unsigned short*)(geb->GetPayload()+ptr))*2);
       switch(*dptr) {
-        case 0x5801:  //S800 TriggerPacket.
-          HandleTrigPacket(dptr+1,sizeleft);
-          break;
-        case 0x5802:
-          break;
-        case 0x5810:
-          break;
-        case 0x5820:
-          break;
-        case 0x5840:
-          break;
-        case 0x5850:
-          break;
-        case 0x5860:
-          break;
-        case 0x5870:
-          break;
-        case 0x5880:
-          break;
-        case 0x5890:
-          break;
-        case 0x58a0:
-          break;
-        case 0x58b0:
-          break;
-        case 0x58c0:
-          break;
-        case 0x58d0:
-          break;
-        case 0x58e0:
-          break;
-        case 0x58f0:
-          break;
-        default:
-          fprintf(stderr,"unknown data S800 type: 0x%04x\n",*dptr);
-          return 0;
+      case 0x5801:  //S800 TriggerPacket.
+	HandleTrigPacket(dptr+1,sizeleft);
+	break;
+      case 0x5802:  // S800 TOF.
+	//event.Print("all0x5802");
+	tof.Clear();
+	HandleTOFPacket(dptr+1,sizeleft);
+	break;
+      case 0x5810:  // S800 Scint
+	break;
+      case 0x5820:  // S800 Ion Chamber
+	break;
+      case 0x5840:  // CRDC Packet
+	break;
+      case 0x5850:  // II CRDC Packet
+	break;
+      case 0x5860:  // TA Pin Packet
+	break;
+      case 0x5870:  // II Track Packet
+	break;
+      case 0x5880:  // II PPAC
+	break;
+      case 0x5890:  // Obj Scint
+	break;
+      case 0x58a0:  // Obj Pin Packet
+	break;
+      case 0x58b0:  // S800 Hodoscope
+	break;
+      case 0x58c0:  // VME ADC 
+	break;
+      case 0x58d0:  // Galotte
+	break;
+      case 0x58e0:
+	break;
+      case 0x58f0:
+	break;
+      default:
+	fprintf(stderr,"unknown data S800 type: 0x%04x\n",*dptr);
+	return 0;
       };
     }
     SetEventCounter(head->GetEventNumber());
@@ -99,24 +102,58 @@ int TS800::BuildHits(){
 bool TS800::HandleTrigPacket(unsigned short *data,int size) {
   if(size<2)
     return false;
+
   trigger.SetRegistr(*data);
-  for(int x=1;x<size;x++) {
+    for(int x=1;x<size;x++) {
     unsigned short current = *(data+x);
     switch(current&0xf000) {
-      case 0x8000:  //S800
-        trigger.SetS800Source(current&0x0fff);
-        break;
-      case 0x9000:  //External1 source
-        trigger.SetExternalSource1(current&0x0fff);
-        break;
-      case 0xa000:  //External2 source
-        trigger.SetExternalSource2(current&0x0fff);
-        break;
-      case 0xb000:  //Secondary source
-        trigger.SetSecondarySource(current&0x0fff);
-        break;
+    case 0x8000:  //S800
+      trigger.SetS800Source(current&0x0fff);
+      break;
+    case 0x9000:  //External1 source
+      trigger.SetExternalSource1(current&0x0fff);
+      break;
+    case 0xa000:  //External2 source
+      trigger.SetExternalSource2(current&0x0fff);
+      break;
+    case 0xb000:  //Secondary source
+      trigger.SetSecondarySource(current&0x0fff);
+      break;
     };
   }
+  return true;
+}
+
+bool TS800::HandleTOFPacket(unsigned short *data ,int size){
+ 
+  for(int x = 0; x < size; x++){
+    unsigned short current = *(data+x);
+    switch(current&0xf000){
+    case 0xc000: // RF 
+      tof.SetRF(current&0x0fff);
+      break;
+    case 0xd000: // Object Scin
+      tof.SetOBJ(current&0x0fff);
+      break;
+    case 0xe000: // XFP scint
+      tof.SetXFP(current&0x0fff);
+      break;
+    case 0xf000: // Si
+      tof.SetSI(current&0x0fff);
+      break;
+    case 0x4000: // TAC XFP scint
+      tof.SetTacXFP(current&0x0fff);
+      break;
+    case 0x5000: // TAC Object Scint
+      tof.SetTacOBJ(current&0x0fff);
+      break;
+    default:
+      return false;
+      break;
+    }
+  }
+
+  return true;
 }
 
 /*

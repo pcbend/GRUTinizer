@@ -47,7 +47,7 @@ class TTrigger : public TDetectorHit {
     void SetSecondarySource(short sou)  { fsecondarysource=sou; }
 
     unsigned short GetRegistr() { return fregistr; }
-    short GetS800Source()       { return fregistr; }
+    short GetS800Source()       { return fs800source; }
     short GetExternalSource1()  { return fexternalsource1; }
     short GetExternalSource2()  { return fexternalsource2; }
     short GetSecondarySource()  { return fsecondarysource; }
@@ -69,7 +69,42 @@ class TTrigger : public TDetectorHit {
 };
 
 
+class TTof : public TDetectorHit { // S800 Time of Flight
+  public:
+    TTof();
+    ~TTof();
 
+    void SetRF(short rf)                { frf=rf; }
+    void SetOBJ(short obj)              { fobj=obj; }
+    void SetXFP(short xfp)              { fxfp=xfp; }
+    void SetSI(short si)                { fsi=si; }
+    void SetTacOBJ(short obj)           { ftac_obj=obj; }
+    void SetTacXFP(short xfp)           { ftac_xfp=xfp; }
+
+    short GetRF()                         { return frf;}
+    short GetOBJ()                        { return fobj;}
+    short GetXFP()                        { return fxfp;}
+    short GetSI()                         { return fsi;}
+    short GetTacOBJ()                     { return ftac_obj;}
+    short GetTacXFP()                     { return ftac_xfp;}
+    
+
+    virtual void Copy(TObject &)         const;
+    virtual void Print(Option_t *opt="") const;
+    virtual void Clear(Option_t *opt="");
+
+  private:
+    virtual int Charge() const { return 0; }
+        
+    short frf;
+    short fobj;
+    short fxfp;
+    short fsi;
+    short ftac_obj;
+    short ftac_xfp;
+
+  ClassDef(TTof,1);
+};
 
 
 

@@ -31,6 +31,37 @@ void TTrigger::Print(Option_t *opt) const {  }
 
 
 
+TTof::TTof() {
+  Clear();
+}
+
+TTof::~TTof() {
+}
+
+void TTof::Copy(TObject &obj) const { 
+  TDetectorHit::Copy(obj);
+  TTof &tof =(TTof&)obj;
+  tof.frf      = frf;
+  tof.fobj     = fobj;
+  tof.fxfp     = fxfp;
+  tof.fsi      = fsi;
+  tof.ftac_obj = ftac_obj; 
+  tof.ftac_xfp = ftac_xfp;
+}
+
+void TTof::Clear(Option_t *opt) { 
+   frf      = -1;
+   fobj     = -1;
+   fxfp     = -1;
+   fsi      = -1;
+   ftac_obj = -1;
+   ftac_xfp = -1;
+}
+
+void TTof::Print(Option_t *opt) const {  }
+
+
+
 
 
 
