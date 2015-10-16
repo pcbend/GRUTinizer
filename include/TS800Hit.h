@@ -65,12 +65,54 @@ class TTrigger : public TDetectorHit {
     short fexternalsource2;
     short fsecondarysource;
 
-  ClassDef(TTrigger,1);
+  ClassDef(TTrigger,1)
 };
 
 
 
 
+class TCrdc : public TDetectorHit {
+  public:
+    TCrdc();
+    ~TCrdc();
+
+    short GetId()    { return fId;   }
+    short GetAnode() { return anode; }
+    short GetTime()  { return time;  }
+
+    int  Size()        { return sample.size(); }
+    int  GetNSamples() { return sample.size(); }
+
+    void SetId(short id)    { fId = id;  }
+    void SetAnode(short an) {anode = an; }
+    void SetTime(short ti)  {time = ti;  }
+
+    void AddPoint(int chan,int samp,int dat) { channel.push_back(chan);  
+                                               sample.push_back(samp);   
+                                               data.push_back(dat);    } 
+    int GetChannel(int i)    { return channel.at(i);    } 
+    int GetSample(int i)     { return sample.at(i);     } 
+    int GetData(int i)       { return data.at(i);       } 
+
+    int GetWidth();
+
+
+    virtual void Copy(TObject&) const;
+    virtual void Print(Option_t *opt="") const;
+    virtual void Clear(Option_t *opt="");
+
+  private:
+    virtual int Charge() const { return 0; }
+    short fId;
+    std::vector<int> channel;
+    std::vector<int> sample;
+    std::vector<int> data;
+
+    unsigned short anode;
+    unsigned short time;
+
+  ClassDef(TCrdc,1)
+};
 
 
 

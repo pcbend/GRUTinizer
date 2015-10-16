@@ -31,6 +31,44 @@ void TTrigger::Print(Option_t *opt) const {  }
 
 
 
+TCrdc::TCrdc() { 
+  Clear();
+}
+
+TCrdc::~TCrdc() { 
+}
+
+int TCrdc::GetWidth() { 
+  if(Size()<2)
+    return 0;
+  return sample.back()-sample.front()+1;
+}
+
+void TCrdc::Copy(TObject &obj) const {
+  TDetectorHit::Copy(obj);
+  TCrdc &c = (TCrdc&)obj;
+  c.fId      = fId;
+  c.channel  = channel;
+  c.sample   = sample;
+  c.data     = data;
+  c.anode    = anode;
+  c.time     = time;
+}
+
+void TCrdc::Clear(Option_t *opt) { 
+  TDetectorHit::Clear(opt);
+  fId   = -1;
+  anode = -1;
+  time  = -1;
+  channel.clear();
+  sample.clear();  
+  data.clear();    
+} 
+
+void TCrdc::Print(Option_t *opt) const { } 
+
+
+
 
 
 
