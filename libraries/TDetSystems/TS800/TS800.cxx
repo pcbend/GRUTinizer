@@ -1,5 +1,4 @@
 #include "TS800.h"
-#include "TS800Hit.h"
 
 #include <cassert>
 #include <iostream>
@@ -7,203 +6,120 @@
 #include "TGEBEvent.h"
 
 TS800::TS800() {
-  time_of_flight = new TClonesArray("TTOFHit",10);
-  fp_scint       = new TClonesArray("TFPScint",10);
-  ion_chamber    = new TClonesArray("TIonChamber",20);
-  crdc1          = new TClonesArray("TCrdcPad",20);
-  crdc2          = new TClonesArray("TCrdcPad",20);
-  ppac1          = new TClonesArray("TCrdcPad",20);
-  ppac2          = new TClonesArray("TCrdcPad",20);
-  hodo           = new TClonesArray("THodoHit",10);
   Clear();
 }
 
 TS800::~TS800(){
-  time_of_flight->Delete();
-  fp_scint->Delete();
-  ion_chamber->Delete();
-  crdc1->Delete("C");
-  crdc2->Delete("C");
-  ppac1->Delete("C");
-  ppac2->Delete("C");
-  hodo->Delete();
 }
 
 void TS800::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 
-  time_of_flight->Copy((*((TS800&)obj).time_of_flight)) ;
-  fp_scint->Copy((*((TS800&)obj).time_of_flight));
-  ion_chamber->Copy((*((TS800&)obj).time_of_flight));
-  crdc1->Copy((*((TS800&)obj).crdc1));
-  crdc2->Copy((*((TS800&)obj).crdc2));
-  ppac1->Copy((*((TS800&)obj).ppac1));
-  ppac2->Copy((*((TS800&)obj).ppac2));
-  hodo->Copy((*((TS800&)obj).hodo));
-
-  ((TS800&)obj).crdc1_charge = crdc1_charge;
-  ((TS800&)obj).crdc2_charge = crdc2_charge;
-  ((TS800&)obj).crdc1_time = crdc1_time;
-  ((TS800&)obj).crdc2_time = crdc2_time;
-
-  ((TS800&)obj).ppac1_charge = ppac1_charge;
-  ((TS800&)obj).ppac2_charge = ppac2_charge;
-  ((TS800&)obj).ppac1_time = ppac1_time;
-  ((TS800&)obj).ppac2_time = ppac2_time;
-
-
-  ((TS800&)obj).hodo_hit_pattern1 = hodo_hit_pattern1;
-  ((TS800&)obj).hodo_hit_pattern2 = hodo_hit_pattern2;
-  ((TS800&)obj).hodo_hit_time     = hodo_hit_time;
 }
 
 void TS800::Clear(Option_t* opt){
   TDetector::Clear(opt);
 
-  //printf("S800 CLEAR.\n"); fflush(stdout);
-
-  fEventCounter   = -1;
-  fTriggerPattern = -1;
-  fTrigger        = -1;
-
-  time_of_flight->Clear();
-  fp_scint->Clear();
-  ion_chamber->Clear();
-  ppac1->Clear();
-  ppac2->Clear();
-  crdc1->Clear();
-  crdc2->Clear();
-  hodo->Clear();
-
-  crdc1_charge = -1;
-  crdc2_charge = -1;
-  crdc1_time   = -1;
-  crdc2_time   = -1;
-
-  ppac1_charge = -1;
-  ppac2_charge = -1;
-  ppac1_time   = -1;
-  ppac2_time   = -1;
-
-  hodo_hit_pattern1 = 0;
-  hodo_hit_pattern2 = 0;
-  hodo_hit_time     = -1;
 }
 
 int TS800::BuildHits(){
-  //printf("In S800 build events.\n");
-  //Clear();
-  for(auto& event : raw_data) {
+  for(auto& event : raw_data) { // should only be one..
     TGEBEvent* geb = (TGEBEvent*)&event;
     SetTimestamp(geb->GetTimestamp());
     int ptr = 0;
     const TRawEvent::GEBS800Header *head = ((const TRawEvent::GEBS800Header*)geb->GetPayload());
-    ptr += sizeof(TRawEvent::GEBS800Header);     //  Here, we are now pointing at the size of the next S800 thing.  Inclusive in shorts.
-    //std::string buffer = Form("all0x%04x",*((unsigned short*)(geb->GetPayload()+ptr+2)));
-
+    ptr += sizeof(TRawEvent::GEBS800Header);
+      //  Here, we are now pointing at the size of the next S800 thing.  Inclusive in shorts.
+      //  std::string buffer = Form("all0x%04x",*((unsigned short*)(geb->GetPayload()+ptr+2)));
     //printf("head.total_size == %i\n",head->total_size); fflush(stdout);
-
-    char data[2048];
-    while(ptr<((head->total_size*2)-2)) {
-      //printf("\tptr == %i\t0x%04x\t0x%04x\n",ptr,(*((unsigned short*)(geb->GetPayload()+ptr))) , (*((unsigned short*)(geb->GetPayload()+ptr+2)))       ); fflush(stdout);
-
-      unsigned short size_in_bytes = (*((unsigned short*)(geb->GetPayload()+ptr))*2);
-      unsigned short type          = *((unsigned short*)(geb->GetPayload()+ptr+2));
-
-      memcpy(data,geb->GetPayload()+ptr,size_in_bytes);//(*((unsigned short*)(geb->GetPayload()+ptr))*2));
-      ptr +=  (*((unsigned short*)(geb->GetPayload()+ptr))*2);
-
-      switch(type) {
-        case 0x5801:
-          HandleTriggerPacket(data+4,size_in_bytes-4);
+    //printf("sizeof(TRawEvent::GEBS800Header) == %i \n",sizeof(TRawEvent::GEBS800Header));
+    unsigned short *data = (unsigned short*)(geb->GetPayload()+ptr);
+    //printf("\t0x%04x\t0x%04x\t0x%04x\t0x%04x\n",*data,*(data+1),*(data+2),*(data+3));
+    //while(ptr<((head->total_size*2)-2)) {
+    std::string toprint = "all";
+    int x = 0;
+    while(x<(head->total_size-sizeof(TRawEvent::GEBS800Header)+16)) {  //total size is inclusive.
+      int size             = *(data+x);
+      unsigned short *dptr = (data+x+1);
+      //toprint.append(Form("0x%04x",*dptr));
+      x+=size;
+      //if(size==0) {
+      //  geb->Print(toprint.c_str());
+      //  printf("head size = %i\n",sizeof(head));
+      //  exit(0);
+      //}
+      //unsigned short size_in_bytes = (*((unsigned short*)(geb->GetPayload()+ptr))*2);
+      int sizeleft = size-2;
+      //ptr +=  (*((unsigned short*)(geb->GetPayload()+ptr))*2);
+      switch(*dptr) {
+        case 0x5801:  //S800 TriggerPacket.
+          HandleTrigPacket(dptr+1,sizeleft);
           break;
         case 0x5802:
-          HandleTOFPacket(data+4,size_in_bytes-4);
           break;
         case 0x5810:
-          HandleFPScintPacket(data+4,size_in_bytes-4);
           break;
         case 0x5820:
-          HandleIonChamberPacket(data+4,size_in_bytes-4);
           break;
         case 0x5840:
-          //HandleCRDCPacket(data+4,size_in_bytes-4);
           break;
         case 0x5850:
+          break;
         case 0x5860:
-          printf("S800 packet: 0x%04x.\n",type);
           break;
         case 0x5870:
-          //HandleIntermediatePPACPacket(data+4,size_in_bytes-4);
           break;
         case 0x5880:
+          break;
         case 0x5890:
-          //HandleIntermidatePPACPacket(data+4,size_in_bytes-4);
-          printf("S800 packet: 0x%04x.\n",type);
           break;
         case 0x58a0:
           break;
         case 0x58b0:
-          HandleHODOPacket(data+4,size_in_bytes-4);
           break;
         case 0x58c0:
+          break;
         case 0x58d0:
+          break;
         case 0x58e0:
           break;
         case 0x58f0:
-          HandleMTDCPacket(data+4,size_in_bytes-4);
           break;
+        default:
+          fprintf(stderr,"unknown data S800 type: 0x%04x\n",*dptr);
+          return 0;
       };
-
-
-      if(ptr>=(head->total_size*2))
-        break;
-      //buffer += Form("0x%04x",type);//*((unsigned short*)(geb->GetPayload()+ptr+2)));
-
     }
-
-
-    //printf("buffer.c_str == %s\n",buffer.c_str());
     SetEventCounter(head->GetEventNumber());
-    //       *((Long_t*)(geb.GetPayload()+26)) & 0x0000ffffffffffff);
-    //geb->Print("all0x5800");
-    //geb->Print(buffer.c_str());
+    //geb->Print(toprint.c_str());
   }
   return 0;
 }
 
-bool TS800::HandleTriggerPacket(char *data,unsigned short size) {
-
-  //printf(BLUE "0x%04x\t0x%04x" RESET_COLOR "\n",*((unsigned short*)data),*((unsigned short*)(data+2)) );
-  //  Data read from the Lecroy 2367 ULM module and a Phillips 7186H TDC. One trigger pattern followed by up to four times.
-  if(size<4) //min size to fit the above(2 shorts).
+bool TS800::HandleTrigPacket(unsigned short *data,int size) {
+  if(size<2)
     return false;
-  fTriggerPattern = *((unsigned short*)data);
-  for(int i=2;i<size;i+=2) {
-    unsigned short *temp = ((unsigned short*)(data+i));
-    switch((*temp)&0xf000) {
+  trigger.SetRegistr(*data);
+  for(int x=1;x<size;x++) {
+    unsigned short current = *(data+x);
+    switch(current&0xf000) {
       case 0x8000:  //S800
-        fTrigger  = *temp;
+        trigger.SetS800Source(current&0x0fff);
         break;
       case 0x9000:  //External1 source
-        fTrigger  = *temp;
-        //fprintf(stderr,"Trigger from !S800, External1!!");
+        trigger.SetExternalSource1(current&0x0fff);
         break;
       case 0xa000:  //External2 source
-        fTrigger  = *temp;
-        //fprintf(stderr,"Trigger from !S800, External2!!");
+        trigger.SetExternalSource2(current&0x0fff);
         break;
       case 0xb000:  //Secondary source
-        fTrigger  = *temp;
-        //fprintf(stderr,"Trigger from !S800, Secondary source!!");
+        trigger.SetSecondarySource(current&0x0fff);
         break;
     };
   }
-
-  return true;
 }
 
-
+/*
 bool TS800::HandleHODOPacket(char *data,unsigned short size) {
   if(!size)
     return false;
@@ -411,7 +327,7 @@ bool TS800::HandleIntermediatePPACPacket(char *data,unsigned short size) {
 
   return true;
 }
-
+*/
 
 void TS800::InsertHit(const TDetectorHit& hit){
   return;

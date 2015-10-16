@@ -5,69 +5,53 @@
 
 #include "TDetector.h"
 
+#include "TS800Hit.h"
+//class TTrigger;
+
 class TS800 : public TDetector {
 public:
   TS800();
   virtual ~TS800();
 
-  void Copy(TObject& obj) const;
 
-  virtual void Clear(Option_t* opt = "");
-
+  //////////////////////////////////////////////
   virtual void InsertHit(const TDetectorHit&);
   virtual TDetectorHit& GetHit(int i);
   virtual int Size();
-
+  /////////////////////////////////////////////
+  
+  void SetEventCounter(Long_t event) { fEventCounter = event; }
+  
   Long_t GetEventCounter() { return fEventCounter;}
-  void   SetEventCounter(Long_t counter) { fEventCounter = counter; }
-
-  short GetTriggerPattern() { return fTriggerPattern;       }
-  short GetTriggerChannel() { return (fTrigger&0xf000)>>12; }
-  short GetTrigger()        { return (fTrigger&0xfff);      }
-
   Long_t GetTimestamp()  { Timestamp(); }
+
+
+  virtual void Copy(TObject& obj)        const;
+  //virtual void Print(Option_t *opt = "") const;
+  virtual void Clear(Option_t* opt = "");
+
 
 private:
   virtual int  BuildHits();
-
-  void Build_VMUSB_Read(TSmartBuffer buf);         //!
-
-  bool HandleTriggerPacket(char*,unsigned short);  //!
-  bool HandleTOFPacket(char*,unsigned short);      //!
-  bool HandleFPScintPacket(char*,unsigned short);  //!
-  bool HandleIonChamberPacket(char*,unsigned short);     //!
-  bool HandleCRDCPacket(char*,unsigned short);     //!
-  bool HandleIntermediatePPACPacket(char*,unsigned short);     //!
-  bool HandleHODOPacket(char*,unsigned short);     //!
-  bool HandleMTDCPacket(char*,unsigned short);     //!
-
-  TClonesArray *time_of_flight;
-  TClonesArray *fp_scint;
-  TClonesArray *ion_chamber;
-  TClonesArray *crdc1;
-  TClonesArray *crdc2;
-  TClonesArray *hodo;
-  TClonesArray *ppac1;
-  TClonesArray *ppac2;
-
-  Long_t fEventCounter;
-
-  short fTriggerPattern;
-  short fTrigger;
-
-  short crdc1_charge;
-  short crdc2_charge;
-  short crdc1_time;
-  short crdc2_time;
   
-  short ppac1_charge;
-  short ppac2_charge;
-  short ppac1_time;
-  short ppac2_time;
+  bool HandleTrigPacket(unsigned short*,int);     //!
+  //bool HandleTOfFPacket(char*,int);     //!
+  //bool HandleFPStPacket(char*,int);     //!
+  //bool HandleIonCPacket(char*,int);     //!
+  //bool HandleCRDCPacket(char*,int);     //!
+  //bool HandlePPACPacket(char*,int);     //!
+  //bool HandleHODOPacket(char*,int);     //!
+  //bool HandleMTDCPacket(char*,int);     //!
 
-  unsigned short hodo_hit_pattern1;
-  unsigned short hodo_hit_pattern2;
-  unsigned short hodo_hit_time;
+  //TScintillatr scint[3];
+  TTrigger     trigger;
+  //TTof         tof;
+  //TIonChamber  ion;
+  //TCrdc        crdc[2];
+  //THodoscope   hodo[32];
+  //TMultiHitTof multi_tof;
+ 
+  Long_t fEventCounter;
 
   ClassDef(TS800,1);
 };

@@ -32,6 +32,8 @@
 #define Q7 17
 #define Q8 6
 
+#define BETA .37
+
 std::map<int,int> HoleQMap;
 std::map<int,std::string> LayerMap;
 
@@ -91,6 +93,16 @@ void MakeHistograms(TRuntimeObjects& obj) {
       //hist->Fill(hit.Charge()/INTEGRATION);
       hist->Fill(hit.Charge());
     }
+    if(s800) {
+      std::string histname = "S800_Bank29_time";
+      TH1 *s829time = (TH1*)list->FindObject(histname.c_str());
+      if(!s829time) {
+        s829time = new TH1F(histname.c_str(),histname.c_str(),200,-200,200);
+        list->Add(s829time);
+      }
+      s829time->Fill(bank29->Timestamp()-s800->Timestamp());
+      histname = "Gretina_t0_Bank29_time";
+    }
   }
 
 
@@ -131,35 +143,58 @@ void MakeHistograms(TRuntimeObjects& obj) {
       histname = "Gretina_Bank29_time";
       TH2 *g29time = (TH2*)list->FindObject(histname.c_str());
       if(!g29time) {
-        g29time = new TH2F(histname.c_str(),histname.c_str(),600,0,600,2000,0,4000);
+        g29time = new TH2F(histname.c_str(),histname.c_str(),1200,-600,600,2000,0,4000);
         list->Add(g29time);
       }
-      g29time->Fill(bank29->GetTimestamp()-hit.GetTimestamp(),hit.GetCoreEnergy());
+      g29time->Fill(bank29->Timestamp()-hit.GetTimestamp(),hit.GetCoreEnergy());
       histname = "Gretina_t0_Bank29_time";
       TH2 *gw29time = (TH2*)list->FindObject(histname.c_str());
       if(!gw29time) {
-        gw29time = new TH2F(histname.c_str(),histname.c_str(),600,0,600,2000,0,4000);
+        gw29time = new TH2F(histname.c_str(),histname.c_str(),1200,-600,600,2000,0,4000);
         list->Add(gw29time);
       }
-      gw29time->Fill(bank29->GetTimestamp()-hit.GetTime(),hit.GetCoreEnergy());
+      //printf("%.02f\t%.02f\n",bank29->Timestamp()-hit.GetTime(),hit.GetCoreEnergy());
+      gw29time->Fill(bank29->Timestamp()-hit.GetTime(),hit.GetCoreEnergy());
     }
     if(s800) {
       histname = "Gretina_S800_time";
       TH2 *g800time = (TH2*)list->FindObject(histname.c_str());
       if(!g800time) {
-        g800time = new TH2F(histname.c_str(),histname.c_str(),600,0,600,2000,0,4000);
+        g800time = new TH2F(histname.c_str(),histname.c_str(),1200,-600,600,2000,0,4000);
         list->Add(g800time);
       }
       g800time->Fill(s800->GetTimestamp()-hit.GetTimestamp(),hit.GetCoreEnergy());
       histname = "Gretina_t0_S800_time";
       TH2 *gw800time = (TH2*)list->FindObject(histname.c_str());
       if(!gw800time) {
-        gw800time = new TH2F(histname.c_str(),histname.c_str(),600,0,600,2000,0,4000);
+        gw800time = new TH2F(histname.c_str(),histname.c_str(),1200,-600,600,2000,0,4000);
         list->Add(gw800time);
       }
-      gw800time->Fill(s800->GetTimestamp()-hit.GetTime(),hit.GetCoreEnergy());
+      //printf("%.02f\t%.02f\n",s800->Timestamp()-hit.GetTime(),hit.GetCoreEnergy());
+      gw800time->Fill(s800->Timestamp()-hit.GetTime(),hit.GetCoreEnergy());
     }
+    
 
+
+
+
+    histname = Form("GretinaEnergyTheta");
+    TH2 *gret_energy_theta = (TH2*)list->FindObject(histname.c_str());
+    if(!gret_energy_theta) {
+      gret_energy_theta = new TH2F(histname.c_str(),histname.c_str(),4000,0,4000,314,0,3.14);
+      list->Add(gret_energy_theta);
+    }
+    gret_energy_theta->Fill(hit.GetCoreEnergy(),hit.GetTheta());
+
+
+
+    histname = Form("GretinaOverview");
+    TH2 *gret_summary = (TH2*)list->FindObject(histname.c_str());
+    if(!gret_summary) {
+      gret_summary = new TH2F(histname.c_str(),histname.c_str(),4000,0,4000,60,20,80);
+      list->Add(gret_summary);
+    }
+    gret_summary->Fill(hit.GetCoreEnergy(),hit.GetCrystalId());
 
 
 
@@ -190,6 +225,23 @@ void MakeHistograms(TRuntimeObjects& obj) {
       position->Fill(phi,theta);
 
     }
+    //for(int z=0;z<hit.NumberOfInteractions();z++) {
+    if(hit.GetSegmentEng(0)>990) {
+      seg_summary->Fill(hit.GetSegmentId(0),hit.GetSegmentEng(0));
+      int layer  = hit.GetSegmentId(0)/6;
+      histname = Form("GretinaPositionLargestPosition_%s",LayerMap[layer].c_str());
+      TH2 *position = (TH2*)list->FindObject(histname.c_str());
+      if(!position) {
+        position = new TH2F(histname.c_str(),histname.c_str(),628,0,6.28,314,0,3.14);
+        list->Add(position);
+      }
+      double theta = hit.GetInteractionPosition(0).Theta();
+      double phi   = hit.GetInteractionPosition(0).Phi();
+      if(phi<0)
+        phi = TMath::TwoPi()+phi;
+      position->Fill(phi,theta);
+    }
+    //}
     histname = Form("GretinaPosition");
     TH2 *total_position = (TH2*)list->FindObject(histname.c_str());
     if(!total_position) {
@@ -206,19 +258,40 @@ void MakeHistograms(TRuntimeObjects& obj) {
     }
     hist1d->Fill(hit.GetCoreEnergy());
     
+    histname = "GretinaDopplerSum";
+    hist1d = (TH1*)list->FindObject(histname.c_str());
+    if(!hist1d) {
+      hist1d = new TH1F(histname.c_str(),histname.c_str(),8000,0,4000);
+      list->Add(hist1d);
+    }
+    hist1d->Fill(hit.GetDoppler(BETA));
+    
+    histname = "GretinaDopplerBeta";
+    TH2 *doppler_beta = (TH2*)list->FindObject(histname.c_str());
+    if(!doppler_beta) {
+      doppler_beta = new TH2F(histname.c_str(),histname.c_str(),2000,0,4000,101,.2,.5);
+      list->Add(doppler_beta);
+    }
+    double beta = 0.2;
+    for(int z=0;z<100;z++) {
+      beta += .3/100.0;
+      doppler_beta->Fill(hit.GetDoppler(beta),beta);
+    }
+
+
     histname = Form("Q%iCoreCharge",HoleQMap[hit.GetCrystalId()/4]);
     //if(HoleQMap[hit.GetHoleNumber()]==0)
     //  printf("HoleQMap[hit.GetHoleNumber() = 0 is %i\n",hit.GetHoleNumber());
 
     TH2 *qchg = (TH2*)list->FindObject(histname.c_str());
     if(!qchg) {
-      qchg = new TH2F(histname.c_str(),histname.c_str(),4,0,4,8000,0,32000);
+      qchg = new TH2F(histname.c_str(),histname.c_str(),16,0,16,8000,0,32000);
       list->Add(qchg);
     }
-    qchg->Fill(0.,((double)hit.GetCoreCharge(0)));
-    qchg->Fill(1.,((double)hit.GetCoreCharge(1)));
-    qchg->Fill(2.,((double)hit.GetCoreCharge(2)));
-    qchg->Fill(3.,((double)hit.GetCoreCharge(3)));
+    qchg->Fill(4*hit.GetCrystalNumber()+0.,((double)hit.GetCoreCharge(0)));
+    qchg->Fill(4*hit.GetCrystalNumber()+1.,((double)hit.GetCoreCharge(1)));
+    qchg->Fill(4*hit.GetCrystalNumber()+2.,((double)hit.GetCoreCharge(2)));
+    qchg->Fill(4*hit.GetCrystalNumber()+3.,((double)hit.GetCoreCharge(3)));
 
     histname = "SegmentId_hitpattern";
     TH1 *seghit = (TH1*)list->FindObject(histname.c_str());

@@ -1,5 +1,5 @@
-#ifndef TS800Hit_H
-#define TS800HIT_H
+#ifndef TSEIGHTHUNDRADHIT_H
+#define TSEIGHTHUNDRADHIT_H
 
 #include <TObject.h>
 #include <TClass.h>
@@ -34,6 +34,45 @@ class TS800Channel : public TDetectorHit {
 
   ClassDef(TS800Channel,1);
 };
+
+class TTrigger : public TDetectorHit {
+  public:
+    TTrigger();
+    ~TTrigger();
+
+    void SetRegistr(unsigned short reg) { fregistr=reg; }
+    void SetS800Source(short sou)       { fs800source=sou; }
+    void SetExternalSource1(short sou)  { fexternalsource1=sou; }
+    void SetExternalSource2(short sou)  { fexternalsource2=sou; }
+    void SetSecondarySource(short sou)  { fsecondarysource=sou; }
+
+    unsigned short GetRegistr() { return fregistr; }
+    short GetS800Source()       { return fregistr; }
+    short GetExternalSource1()  { return fexternalsource1; }
+    short GetExternalSource2()  { return fexternalsource2; }
+    short GetSecondarySource()  { return fsecondarysource; }
+
+    virtual void Copy(TObject &)         const;
+    virtual void Print(Option_t *opt="") const;
+    virtual void Clear(Option_t *opt="");
+
+  private:
+    virtual int Charge() const { return 0; }
+        
+    unsigned short fregistr;
+    short fs800source;
+    short fexternalsource1;
+    short fexternalsource2;
+    short fsecondarysource;
+
+  ClassDef(TTrigger,1);
+};
+
+
+
+
+
+
 
 
 

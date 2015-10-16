@@ -2,6 +2,40 @@
 #include "TS800Hit.h"
 
 
+TTrigger::TTrigger() {
+  Clear();
+}
+
+TTrigger::~TTrigger() {
+}
+
+void TTrigger::Copy(TObject &obj) const { 
+  TDetectorHit::Copy(obj);
+  TTrigger &trig =(TTrigger&)obj;
+  trig.fregistr  = fregistr;
+  trig.fs800source      = fs800source;     
+  trig.fexternalsource1 = fexternalsource1;
+  trig.fexternalsource2 = fexternalsource2;
+  trig.fsecondarysource = fsecondarysource;
+}
+
+void TTrigger::Clear(Option_t *opt) { 
+  fregistr         = -1;
+  fs800source      = -1;     
+  fexternalsource1 = -1;
+  fexternalsource2 = -1;
+  fsecondarysource = -1;
+}
+
+void TTrigger::Print(Option_t *opt) const {  }
+
+
+
+
+
+
+
+
 
 TCrdcPad::TCrdcPad()  { Clear(); }
 
@@ -50,4 +84,15 @@ void TCrdcPad::Copy(TObject &obj) const {
   }
 
 }
+
+
+
+
+
+
+
+
+
+
+
 
