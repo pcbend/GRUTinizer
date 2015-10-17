@@ -3,6 +3,7 @@
 
 #include <TObject.h>
 #include <TClass.h>
+#include <iostream>
 
 #include <TDetectorHit.h>
 
@@ -182,8 +183,38 @@ class TScintillator : public TDetectorHit {
     ClassDef(TScintillator,1)
 };
 
+class TIonChamber : public TDetectorHit {
+  public:
+    TIonChamber();
+    ~TIonChamber();
+    
+    void Set(int ch, int data);
+    void SetdE(float val) { fdE = val;}
+
+    int GetData(int ch);
+    std::vector<int> GetChannels() { return fChan; }
+    std::vector<int> GetData()     { return fData; }
+    float GetdE();                  
+    
+    virtual void Copy(TObject&) const;
+    virtual void Print(Option_t *opt="") const;
+    virtual void Clear(Option_t *opt="");
+
+  private:
+    virtual int Charge() const { return 0; }
+    
+    std::vector<int> fChan;
+    std::vector<int> fData;
+    float            fdE;   // Average of all fData.
+    ClassDef(TIonChamber,1)
+};
 
 
+
+
+
+
+// ----------- ?? OLD ?? -----------
 
 
 class TTOFHit :  public TS800Channel {
@@ -264,6 +295,7 @@ class TFPScint :  public TS800Channel {
   ClassDef(TFPScint,1);
 };
 
+/*
 class TIonChamber : public TS800Channel {
   public:
     TIonChamber() { }
@@ -277,7 +309,7 @@ class TIonChamber : public TS800Channel {
     ClassDef(TIonChamber,1)
 
 };
-
+*/
 
 class TCrdcPad : public TDetectorHit {
  

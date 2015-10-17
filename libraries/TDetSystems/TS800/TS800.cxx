@@ -22,12 +22,13 @@ void TS800::Clear(Option_t* opt){
   crdc[0].Clear();
   crdc[1].Clear();
   
-  scint[0].Clear();
-  scint[1].Clear();
-  scint[2].Clear(); 
+  scint1.Clear();
+  scint2.Clear();
+  scint3.Clear(); 
   
   tof.Clear();
   trigger.Clear();
+  ion.Clear();
 
 }
 
@@ -73,6 +74,8 @@ int TS800::BuildHits(){
 	HandleScintPacket(dptr+1,sizeleft);
 	break;
       case 0x5820:  // S800 Ion Chamber
+	//event.Print("all0x5820");
+	HandleIonCPacket(dptr+1,sizeleft);
 	break;
       case 0x5840:  // CRDC Packet
         HandleCRDCPacket(dptr+1,sizeleft);
@@ -227,54 +230,54 @@ bool TS800::HandleScintPacket(unsigned short* data, int size){
     if(((current)&(0xf000))==((current_p1)&(0xf000))){    
       switch(current&0xf000){
       case 0x0000: 
-	scint[0].SetdE_Up(current&0x0fff);
-	scint[0].SetTime_Up(current_p1&0x0fff);
-	scint[0].SetID(1);
+	scint1.SetdE_Up(current&0x0fff);
+	scint1.SetTime_Up(current_p1&0x0fff);
+	scint1.SetID(1);
 	
 	//std::cout << " Channel 1 Up " << std::endl;
 	//std::cout << " Energy : " << scint[0].GetdE_Up() << std::endl;
 	//std::cout << " Time : " << scint[0].GetTime_Up() << std::endl;
 	break;
       case 0x1000: 
-	scint[0].SetdE_Down(current&0x0fff);
-	scint[0].SetTime_Down(current_p1&0x0fff);
-	scint[0].SetID(1);
+	scint1.SetdE_Down(current&0x0fff);
+	scint1.SetTime_Down(current_p1&0x0fff);
+	scint1.SetID(1);
 	
 	//std::cout << " Channel 1 Down " << std::endl;
 	//std::cout << " Energy : " << scint[0].GetdE_Down() << std::endl;
 	//std::cout << " Time : " << scint[0].GetTime_Down() << std::endl;
 	break;
       case 0x2000: 
-	scint[1].SetdE_Up(current&0x0fff);
-	scint[1].SetTime_Up(current_p1&0x0fff);
-	scint[1].SetID(2);
+	scint2.SetdE_Up(current&0x0fff);
+	scint2.SetTime_Up(current_p1&0x0fff);
+	scint2.SetID(2);
 	
 	//std::cout << " Channel 2 Up " << std::endl;
 	//std::cout << " Energy : " << scint[1].GetdE_Up() << std::endl;
 	//std::cout << " Time : " << scint[1].GetTime_Up() << std::endl;
 	break;
       case 0x3000: 
-	scint[1].SetdE_Down(current&0x0fff);
-	scint[1].SetTime_Down(current_p1&0x0fff);
-	scint[1].SetID(2);
+	scint2.SetdE_Down(current&0x0fff);
+	scint2.SetTime_Down(current_p1&0x0fff);
+	scint2.SetID(2);
 	
 	//std::cout << " Channel 2 Down " << std::endl;
 	//std::cout << " Energy : " << scint[1].GetdE_Down() << std::endl;
 	//	std::cout << " Time : " << scint[1].GetTime_Down() << std::endl;
 	break;
       case 0x4000: 
-	scint[2].SetdE_Up(current&0x0fff);
-	scint[2].SetTime_Up(current_p1&0x0fff);
-	scint[2].SetID(3);
+	scint3.SetdE_Up(current&0x0fff);
+	scint3.SetTime_Up(current_p1&0x0fff);
+	scint3.SetID(3);
 	
 	//std::cout << " Channel 3 Up " << std::endl;
 	//std::cout << " Energy : " << scint[2].GetdE_Up() << std::endl;
 	//std::cout << " Time : " << scint[2].GetTime_Up() << std::endl;
 	break;
       case 0x5000: 
-	scint[2].SetdE_Down(current&0x0fff);
-	scint[2].SetTime_Down(current_p1&0x0fff);
-	scint[2].SetID(3);
+	scint3.SetdE_Down(current&0x0fff);
+	scint3.SetTime_Down(current_p1&0x0fff);
+	scint3.SetID(3);
 	
 	//std::cout << " Channel 3 Down " << std::endl;
 	//std::cout << " Energy : " << scint[2].GetdE_Down() << std::endl;
@@ -289,6 +292,50 @@ bool TS800::HandleScintPacket(unsigned short* data, int size){
     
   }
 
+  
+  return true;
+}
+
+
+
+bool TS800::HandleIonCPacket(unsigned short* data, int size){
+  //  std::cout << "-------------------------------------" << std::endl;
+  //std::cout << "   In Handle Ion Chamber Packet " << std::endl;
+  int x = 0;
+  while(x<size){
+    int sub_size = (*(data+x)&(0xffff)); x++;
+    //std::cout << " Sub packet size : " << sub_size << std::endl;
+    //std::cout << " data+x          : " << std::hex << *(data+x) << std::endl;
+    //std::dec;
+    switch(*(data+x++)){
+    case 0x5821:
+      for(x; x<sub_size;x++){ 
+	unsigned short current = *(data+x);
+	int ch  = (current&0xf000)>>12;
+	int dat = (current&0x0fff);
+	ion.Set(ch,dat);
+	//std::cout << " --- " << std::endl;
+	//std::cout << " Channel : " << std::hex << ch << std::endl;
+	//std::cout << " Energy  : " << std::hex << dat << std::endl;
+	//std::cout << " Channel : " << std::hex << ((current&0xf000)>>12) << std::endl;
+	//std::cout << " Energy  : " << std::hex << ion.GetData(ch) << std::endl;
+	//std::dec;
+      }
+      ion.GetdE();
+      break;
+    case 0x5822: // Old Style 
+      for(x; x<sub_size;x++){ 
+	unsigned short current = *(data+x);
+	ion.Set((current&0xf000),(current&0x0fff));
+	//std::cout << " Channel : " << std::hex << (current&0xf000) << std::endl;
+	//std::cout << " Energy  : " << std::dec << ion.GetData((current&0xf000)) << std::endl;
+      }
+      break;
+    default:
+      return false;
+      break;
+    }
+  }
   
   return true;
 }

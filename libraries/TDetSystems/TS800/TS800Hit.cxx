@@ -38,13 +38,13 @@ TTof::~TTof() {
 
 void TTof::Copy(TObject &obj) const { 
   TDetectorHit::Copy(obj);
-  TTof &tof =(TTof&)obj;
-  tof.frf      = frf;
-  tof.fobj     = fobj;
-  tof.fxfp     = fxfp;
-  tof.fsi      = fsi;
-  tof.ftac_obj = ftac_obj; 
-  tof.ftac_xfp = ftac_xfp;
+  TTof &tof_ =(TTof&)obj;
+  tof_.frf      = frf;
+  tof_.fobj     = fobj;
+  tof_.fxfp     = fxfp;
+  tof_.fsi      = fsi;
+  tof_.ftac_obj = ftac_obj; 
+  tof_.ftac_xfp = ftac_xfp;
 }
 
 void TTof::Clear(Option_t *opt) { 
@@ -69,12 +69,12 @@ TScintillator::~TScintillator() {
 
 void TScintillator::Copy(TObject &obj) const { 
   TDetectorHit::Copy(obj);
-  TScintillator &scint =(TScintillator&)obj;
-  scint.fID            = fID;
-  scint.fdE_up         = fdE_up;
-  scint.fdE_down       = fdE_down;
-  scint.fTime_up       = fTime_up;
-  scint.fTime_down     = fTime_down;
+  TScintillator &scinti =(TScintillator&)obj;
+  scinti.fID            = fID;
+  scinti.fdE_up         = fdE_up;
+  scinti.fdE_down       = fdE_down;
+  scinti.fTime_up       = fTime_up;
+  scinti.fTime_down     = fTime_down;
 
 }
 
@@ -87,6 +87,56 @@ void TScintillator::Clear(Option_t *opt) {
 }
 
 void TScintillator::Print(Option_t *opt) const { }
+
+
+/******* End of TScintillator.  Beginning of TIonChamber **********/
+
+TIonChamber::TIonChamber() {
+  Clear();
+}
+
+TIonChamber::~TIonChamber() {
+}
+
+void TIonChamber::Set(int ch, int data){
+  fChan.push_back(ch);
+  fData.push_back(data);
+
+}
+
+int TIonChamber::GetData(int ch){
+  for(int x = 0; x < fChan.size();x++){
+    if(fChan[x]==ch)
+      return fData[x];    
+  }
+  return -1;
+}
+
+float TIonChamber::GetdE(){
+  for(int x = 0; x< fChan.size();x++){
+    fdE+=fData[x];
+  }
+  fdE = fdE/float(fChan.size());
+  return fdE;
+}
+
+void TIonChamber::Copy(TObject &obj) const { 
+  TDetectorHit::Copy(obj);
+  TIonChamber &ic =(TIonChamber&)obj;
+  ic.fChan = fChan;
+  ic.fData = fData;
+
+}
+
+void TIonChamber::Clear(Option_t *opt) { 
+  fChan.clear();
+  fData.clear();
+}
+
+void TIonChamber::Print(Option_t *opt) const { }
+
+/******* End of TIonChamber.  Beginning of TWhatever **********/
+
 
 TCrdc::TCrdc() { 
   Clear();

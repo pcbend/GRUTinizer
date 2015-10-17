@@ -37,18 +37,20 @@ private:
   bool HandleTrigPacket(unsigned short*,int);     //!
   bool HandleTOFPacket(unsigned short*,int);      //!
   bool HandleScintPacket(unsigned short*,int);    //!
-  //bool HandleFPStPacket(char*,int);     //!
-  //bool HandleIonCPacket(unsigned short*,int);     //!
-  //bool HandleIonCPacket(char*,int);     //!
+  bool HandleIonCPacket(unsigned short*,int);     //!
   bool HandleCRDCPacket(unsigned short*,int);     //!
+
+
+  //bool HandleFPStPacket(char*,int);     //!
+  //bool HandleIonCPacket(char*,int);     //!
   //bool HandlePPACPacket(char*,int);     //!
   //bool HandleHODOPacket(char*,int);     //!
   //bool HandleMTDCPacket(char*,int);     //!
 
-  TScintillator scint[3];
+  TScintillator scint1,scint2,scint3;
   TTrigger     trigger;
   TTof         tof;
-  //TIonChamber  ion;
+  TIonChamber  ion;
   TCrdc        crdc[2];
   //THodoscope   hodo[32];
   //TMultiHitTof multi_tof;

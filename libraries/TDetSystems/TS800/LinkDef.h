@@ -15,6 +15,7 @@
 #pragma link C++ class TTof+;
 #pragma link C++ class TCrdc+;
 #pragma link C++ class TScintillator+;
+#pragma link C++ class TIonChamber+;
 
 #pragma link C++ class TS800Channel+;
 
