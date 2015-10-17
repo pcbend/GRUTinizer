@@ -47,7 +47,7 @@ private:
   //bool HandleHODOPacket(char*,int);     //!
   //bool HandleMTDCPacket(char*,int);     //!
 
-  TScintillator scint1,scint2,scint3;
+  TScintillator scint[2];
   TTrigger     trigger;
   TTof         tof;
   TIonChamber  ion;
