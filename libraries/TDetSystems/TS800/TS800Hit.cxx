@@ -101,23 +101,22 @@ TIonChamber::~TIonChamber() {
 void TIonChamber::Set(int ch, int data){
   fChan.push_back(ch);
   fData.push_back(data);
-
-}
-
-int TIonChamber::GetData(int ch){
-  for(int x = 0; x < fChan.size();x++){
-    if(fChan[x]==ch)
-      return fData[x];    
-  }
-  return -1;
 }
 
 float TIonChamber::GetdE(){
-  for(int x = 0; x< fChan.size();x++){
-    fdE+=fData[x];
+  float temp =0.0;
+  //if(fdE==-1.0) {
+    for(int x=0;x<fData.size();x++) {   //std::vector<int>::iterator it=fData.begin();it!=fData.end();it++) {
+      //if(fdE==-1.0)
+      //  fdE=0.0;
+      temp+=fData.at(x); //it->first;
+    //}
+    //if(fdE!=-1.0)
+     // fdE = fdE/((float)fData.size());
   }
-  fdE = fdE/float(fChan.size());
-  return fdE;
+  if(temp>0)
+    temp = temp/((float)fData.size());
+  return temp;                   
 }
 
 void TIonChamber::Copy(TObject &obj) const { 
@@ -129,6 +128,8 @@ void TIonChamber::Copy(TObject &obj) const {
 }
 
 void TIonChamber::Clear(Option_t *opt) { 
+  TDetectorHit::Clear(opt);
+  //fdE = -1;
   fChan.clear();
   fData.clear();
 }

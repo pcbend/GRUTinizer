@@ -321,7 +321,6 @@ bool TS800::HandleIonCPacket(unsigned short* data, int size){
 	//std::cout << " Energy  : " << std::hex << ion.GetData(ch) << std::endl;
 	//std::dec;
       }
-      ion.GetdE();
       break;
     case 0x5822: // Old Style 
       for(x; x<sub_size;x++){ 

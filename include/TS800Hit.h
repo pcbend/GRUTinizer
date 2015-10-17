@@ -188,13 +188,12 @@ class TIonChamber : public TDetectorHit {
     TIonChamber();
     ~TIonChamber();
     
-    void Set(int ch, int data);
-    void SetdE(float val) { fdE = val;}
+    void Set(int ch, int data); // { fChan.push_back(ch); fData.push_back(data); }
 
-    int GetData(int ch);
-    std::vector<int> GetChannels() { return fChan; }
-    std::vector<int> GetData()     { return fData; }
-    float GetdE();                  
+    int GetChannel(int i) const { if(i>=Size()) return -1; return fChan.at(i); }
+    int GetData(int i)    const { if(i>=Size()) return -1; return fData.at(i); }
+    int Size() const { return fChan.size(); }
+    float GetdE(); 
     
     virtual void Copy(TObject&) const;
     virtual void Print(Option_t *opt="") const;
@@ -205,7 +204,7 @@ class TIonChamber : public TDetectorHit {
     
     std::vector<int> fChan;
     std::vector<int> fData;
-    float            fdE;   // Average of all fData.
+    //float            fdE;   //!          Average of all fData.
     ClassDef(TIonChamber,1)
 };
 
