@@ -146,6 +146,23 @@ TCrdc::TCrdc() {
 TCrdc::~TCrdc() { 
 }
 
+float TCrdc::GetPad(){
+  int temp = 0;
+  int place =0;
+  if(!data.size())
+    return -1.0;
+  temp = data.at(0);
+  for(int i = 0; i < data.size(); i++){
+    if(data.at(i)>temp) {
+      temp = data.at(i);
+      place = i;
+    }
+  }
+  
+  return (float)(channel.at(place));
+  
+}
+
 int TCrdc::GetWidth() { 
   if(Size()<2)
     return 0;

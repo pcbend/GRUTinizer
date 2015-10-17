@@ -25,6 +25,7 @@ public:
   Long_t GetEventCounter() { return fEventCounter;}
   Long_t GetTimestamp()  { Timestamp(); }
 
+  TVector3 CRDCTrack();
 
   virtual void Copy(TObject& obj)        const;
   //virtual void Print(Option_t *opt = "") const;

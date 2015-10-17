@@ -8,7 +8,10 @@
 #include <TDetectorHit.h>
 
 #define MAXCRDC 513
-
+#define CRDC_XSlope 2.54
+#define CRDC_XOffset -281.94
+#define CRDC_YSlope 2.54
+#define CRDC_YOffset -281.94
 
 class TS800Channel : public TDetectorHit {
   public:
@@ -132,6 +135,13 @@ class TCrdc : public TDetectorHit {
 
     int GetWidth();
 
+    float GetDispersiveX()      { return (GetPad()*CRDC_XSlope+CRDC_XOffset); }
+    float GetNonDispersiveY()   { return (GetPad()*CRDC_YSlope+CRDC_YOffset); }
+    
+
+    float GetPad();
+
+    void LoadInverseMap() {}
 
     virtual void Copy(TObject&) const;
     virtual void Print(Option_t *opt="") const;

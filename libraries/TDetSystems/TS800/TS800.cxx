@@ -17,6 +17,18 @@ void TS800::Copy(TObject& obj) const {
 
 }
 
+TVector3 TS800::CRDCTrack(){
+  TVector3 crdc1,crdc2;
+
+  crdc1.SetXYZ(crdc[0].GetDispersiveX(),crdc[0].GetNonDispersiveY(),0);
+  crdc2.SetXYZ(crdc[1].GetDispersiveX(),crdc[1].GetNonDispersiveY(),1000);
+   
+  TVector3 track = crdc2-crdc1;
+ 
+
+  return track;
+}
+
 void TS800::Clear(Option_t* opt){
   TDetector::Clear(opt);
   crdc[0].Clear();
