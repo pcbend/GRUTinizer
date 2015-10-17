@@ -7,7 +7,9 @@
 
 ClassImp(TDetector)
 
-TDetector::TDetector() { }
+TDetector::TDetector() { 
+  Class()->CanIgnoreTObjectStreamer();
+}
 
 TDetector::TDetector(const char* name,const char* title) {
   TNamed::SetNameTitle(name,title);
