@@ -126,9 +126,9 @@ class TCrdc : public TDetectorHit {
     void AddPoint(int chan,int samp,int dat) { channel.push_back(chan);  
                                                sample.push_back(samp);   
                                                data.push_back(dat);    } 
-    int GetChannel(int i)    { return channel.at(i);    } 
-    int GetSample(int i)     { return sample.at(i);     } 
-    int GetData(int i)       { return data.at(i);       } 
+    int GetChannel(int i)    { if(i>=Size()) return -1; return channel.at(i);    } 
+    int GetSample(int i)     { if(i>=Size()) return -1; return sample.at(i);     } 
+    int GetData(int i)       { if(i>=Size()) return -1; return data.at(i);       } 
 
     int GetWidth();
 
