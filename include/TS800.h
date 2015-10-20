@@ -25,14 +25,28 @@ public:
   Long_t GetEventCounter() { return fEventCounter;}
   Long_t GetTimestamp()  { Timestamp(); }
 
-  TVector3 CRDCTrack();
+  TVector3 CRDCTrack();  //
 
   virtual void Copy(TObject& obj)        const;
   //virtual void Print(Option_t *opt = "") const;
   virtual void Clear(Option_t* opt = "");
 
+  TCrdc         &GetCrdc(int x=0)  const { return (TCrdc&)crdc[x];   }
+  TTof          &GetTof()          const { return (TTof&)tof;        }
+  TMTof         &GetMTof()         const { return (TMTof&)mtof;        }
+  TIonChamber   &GetIonChamber()   const { return (TIonChamber&)ion; }
+  TScintillator &GetScint(int x=0) const { return (TScintillator&)scint[x]; }
 
-private:
+  float GetAFP() const { 
+      return  TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1000.0);  
+  }
+
+  float GetTofE1_TAC(float c1=0.00,float c2=0.00) const;
+  float GetTofE1_TDC(float c1=0.00,float c2=0.00) const;
+  float GetTofE1_MTDC(float c1=0.00,float c2=0.00);
+
+  //private:
+ public:
   virtual int  BuildHits();
   
   bool HandleTrigPacket(unsigned short*,int);     //!
@@ -40,6 +54,7 @@ private:
   bool HandleScintPacket(unsigned short*,int);    //!
   bool HandleIonCPacket(unsigned short*,int);     //!
   bool HandleCRDCPacket(unsigned short*,int);     //!
+  bool HandleMTDCPacket(unsigned short*,int);     //!
 
 
   //bool HandleFPStPacket(char*,int);     //!
@@ -48,15 +63,17 @@ private:
   //bool HandleHODOPacket(char*,int);     //!
   //bool HandleMTDCPacket(char*,int);     //!
 
-  TScintillator scint[2];
+  TScintillator scint[3];
   TTrigger     trigger;
   TTof         tof;
+  TMTof        mtof;
   TIonChamber  ion;
   TCrdc        crdc[2];
   //THodoscope   hodo[32];
   //TMultiHitTof multi_tof;
  
   Long_t fEventCounter;
+
 
   ClassDef(TS800,1);
 };

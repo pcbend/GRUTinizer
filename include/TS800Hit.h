@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include <TDetectorHit.h>
+#include <TMath.h>
 
 #define MAXCRDC 513
 #define CRDC_XSlope 2.54
@@ -85,12 +86,12 @@ class TTof : public TDetectorHit { // S800 Time of Flight
     void SetTacOBJ(short obj)           { ftac_obj=obj; }
     void SetTacXFP(short xfp)           { ftac_xfp=xfp; }
 
-    short GetRF()                         { return frf;}
-    short GetOBJ()                        { return fobj;}
-    short GetXFP()                        { return fxfp;}
-    short GetSI()                         { return fsi;}
-    short GetTacOBJ()                     { return ftac_obj;}
-    short GetTacXFP()                     { return ftac_xfp;}
+    short GetRF()                         { return frf;     }
+    short GetOBJ()                        { return fobj;    }  // tdc!
+    short GetXFP()                        { return fxfp;    }  // tdc!
+    short GetSI()                         { return fsi;     }
+    short GetTacOBJ()                     { return ftac_obj;}  // tac!
+    short GetTacXFP()                     { return ftac_xfp;}  // tac!
     
 
     virtual void Copy(TObject &)         const;
@@ -119,8 +120,8 @@ class TCrdc : public TDetectorHit {
     short GetAnode() { return anode; }
     short GetTime()  { return time;  }
 
-    int  Size()        { return sample.size(); }
-    int  GetNSamples() { return sample.size(); }
+    int  Size()        const { return sample.size(); }
+    int  GetNSamples() const { return sample.size(); }
 
     void SetId(short id)    { fId = id;  }
     void SetAnode(short an) {anode = an; }
@@ -135,8 +136,8 @@ class TCrdc : public TDetectorHit {
 
     int GetWidth();
 
-    float GetDispersiveX()      { return (GetPad()*CRDC_XSlope+CRDC_XOffset); }
-    float GetNonDispersiveY()   { return (GetPad()*CRDC_YSlope+CRDC_YOffset); }
+    float GetDispersiveX()      { if(GetPad()==-1) return -1; return (GetPad()*CRDC_XSlope+CRDC_XOffset); }
+    float GetNonDispersiveY()   { if(GetPad()==-1) return -1; return (GetPad()*CRDC_YSlope+CRDC_YOffset); }
     
 
     float GetPad();
@@ -147,6 +148,9 @@ class TCrdc : public TDetectorHit {
     virtual void Print(Option_t *opt="") const;
     virtual void Clear(Option_t *opt="");
 
+    virtual void DrawChannels(Option_t *opt="") const;
+    virtual void DrawHit(Option_t *opt="") const;
+    
   private:
     virtual int Charge() const { return 0; }
     short fId;
@@ -167,16 +171,16 @@ class TScintillator : public TDetectorHit {
     ~TScintillator();
 
     void SetID(int id)         { fID=id; }
-    void SetdE_Up(float de)    { fdE_up = de; }
-    void SetdE_Down(float de)  { fdE_down = de; }
-    void SetTime_Up(float t)   { fTime_up = t; }
-    void SetTime_Down(float t) { fTime_down = t; }
+    void SetdE_Up(float de)    { fdE_up     = de; }
+    void SetdE_Down(float de)  { fdE_down   = de; }
+    void SetTime_Up(float t)   { fTime_up   = t; }  // tdc
+    void SetTime_Down(float t) { fTime_down = t; }  // tdc
 
-    int GetID()          { return fID; }
-    float GetdE_Up()     { return fdE_up; }
-    float GetdE_Down()   { return fdE_down; }
-    float GetTime_Up()   { return fTime_up; }
-    float GetTime_Down() { return fTime_down; }
+    int GetID()         { return fID;        }
+    float GetEUp()      { return fdE_up;     }
+    float GetEDown()    { return fdE_down;   }
+    float GetTimeUp()   { return fTime_up;   }
+    float GetTimeDown() { return fTime_down; }
 
     virtual void Copy(TObject&) const;
     virtual void Print(Option_t *opt="") const;
@@ -204,13 +208,15 @@ class TIonChamber : public TDetectorHit {
     int GetData(int i)    const { if(i>=Size()) return -1; return fData.at(i); }
     int Size() const { return fChan.size(); }
     float GetdE(); 
+
     
     virtual void Copy(TObject&) const;
     virtual void Print(Option_t *opt="") const;
     virtual void Clear(Option_t *opt="");
-
+    int Charge() const { int sum=0;for(int i=0;i<Size();i++)sum+=GetData(i);return sum;}
+    //int GetSum() const { int sum=0;for(int i=0;i<Size();i++)sum+=GetData(i);return sum;}
   private:
-    virtual int Charge() const { return 0; }
+
     
     std::vector<int> fChan;
     std::vector<int> fData;
@@ -320,6 +326,51 @@ class TIonChamber : public TS800Channel {
 };
 */
 
+class TMTof : public TDetectorHit {
+  public:
+    TMTof();
+    ~TMTof();
+    TMTof(const TMTof&);
+
+    virtual void Copy(TObject&) const;
+    virtual void Print(Option_t *opt="") const;
+    virtual void Clear(Option_t *opt="");
+
+    int E1UpSize()       const { return fE1Up.size();   }       
+    int E1DownSize()     const { return fE1Down.size();  }  
+    int XfpSize()        const { return fXfp.size();      } 
+    int ObjSize()        const { return fObj.size();       }
+    int RfSize()         const { return fRf.size();        }
+    int Crdc1AnodeSize() const { return fCrdc1Anode.size();}
+    int Crdc2AnodeSize() const { return fCrdc2Anode.size();}
+    int HodoSize()       const { return fHodoscope.size(); }
+    int RefSize()        const { return fRef.size(); }
+
+
+
+
+  //private:
+
+    std::vector<unsigned short> fE1Up;         // Channel 0
+    std::vector<unsigned short> fE1Down;       // Channel 1
+    std::vector<unsigned short> fXfp;          // Channel 2
+    std::vector<unsigned short> fObj;          // Channel 3
+    std::vector<unsigned short> fRf;           // Channel 5
+    std::vector<unsigned short> fCrdc1Anode;   // Channel 6
+    std::vector<unsigned short> fCrdc2Anode;   // Channel 7
+    std::vector<unsigned short> fHodoscope;    // Channel 12
+    std::vector<unsigned short> fRef;          // Channel 15, same as E1Up (different cable.)
+
+    //std::vector<int> fGalotte;
+    //
+    //
+    virtual Int_t Charge() const  {return 0;}
+    //
+    //
+  ClassDef(TMTof,1)
+};
+
+
 class TCrdcPad : public TDetectorHit {
  
   public:
@@ -374,5 +425,14 @@ class TS800Hit : public TDetectorHit {
 
   ClassDef(TS800Hit,1);
 };
+
+
+
+
+
+
+
+
+
 
 #endif

@@ -5,6 +5,7 @@
 
 #include "TGEBEvent.h"
 
+
 TS800::TS800() {
   Clear();
 }
@@ -39,6 +40,7 @@ void TS800::Clear(Option_t* opt){
   scint[2].Clear(); 
   
   tof.Clear();
+  mtof.Clear();
   trigger.Clear();
   ion.Clear();
 
@@ -90,6 +92,7 @@ int TS800::BuildHits(){
 	HandleIonCPacket(dptr+1,sizeleft);
 	break;
       case 0x5840:  // CRDC Packet
+	//event.Print("all0x5840");
         HandleCRDCPacket(dptr+1,sizeleft);
 	break;
       case 0x5850:  // II CRDC Packet
@@ -113,6 +116,7 @@ int TS800::BuildHits(){
       case 0x58e0:
 	break;
       case 0x58f0:
+        HandleMTDCPacket(dptr+1,sizeleft);
 	break;
       default:
 	fprintf(stderr,"unknown data S800 type: 0x%04x\n",*dptr);
@@ -122,6 +126,7 @@ int TS800::BuildHits(){
     SetEventCounter(head->GetEventNumber());
     //geb->Print(toprint.c_str());
   }
+  //printf("-----------------------\n");
   return 0;
 }
 
@@ -184,11 +189,17 @@ bool TS800::HandleTOFPacket(unsigned short *data ,int size){
 
 
 bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
+  //std::cout << "----------------------" << std::endl;
+  //std::cout << " In Handle CRDC " << std::endl;
+  
   TCrdc *current_crdc=0;
   if((*data)<3)
     current_crdc = &crdc[*data];
   if(!current_crdc)
     return false;
+
+  //printf("crdc = [%i]\t0x%08x\n",(*data),crdc+(*data));
+
   current_crdc->SetId(*data);
   int x =1;
   int subsize = *(data+x); 
@@ -196,17 +207,32 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
   int subtype = *(data+x);
   x++;
 
+  //std::cout << " subsize : " << std::hex << subsize << std::endl;
+  //std::cout << " subtype : " << std::hex << subtype << std::endl;
+    
   std::map<int,std::map<int,int> > pad;
-  for(;x<subsize;x+=2) {
-    unsigned short word1 = *(data+x); 
+  //for(;x<subsize;x+=2) {
+  while(x<subsize){  
+    unsigned short word1 = *(data+x); x++;
+    //std::cout << std::hex << " word 1 " << word1 << std::endl;
     if((word1&0x8000)!=0x8000) { continue; }
-    unsigned short word2 = *(data+x); 
-
+    unsigned short word2 = *(data+x);
+    //std::cout << std::hex << " word 2 " << word2 << std::endl;
+    
+ 
     int sample_number    = (word1&(0x7fc0)) >> 6;
     int channel_number   =  word1&(0x003f);
     int connector_number = (word2&(0x0c00)) >> 10;
     int databits         = (word2&(0x03ff));
     int real_channel = (connector_number << 6) + channel_number;
+
+    /*std::cout << " sample Number    : " << std::dec << sample_number << std::endl;
+    std::cout << " channel Number   : " << std::dec << channel_number << std::endl;
+    std::cout << " connector Number : " << std::dec << connector_number << std::endl;
+    std::cout << " data bits        : " << std::dec << databits << std::endl;
+    std::cout << " real channel     : " << std::dec << real_channel << std::endl;
+    std::dec;
+    */
     pad[real_channel][sample_number] = databits;
   }
   x+=2;
@@ -217,9 +243,12 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
     //printf("channel[%03i]\n",it1->first);
     for(it2=it1->second.begin();it2!=it1->second.end();it2++) {
       //printf("\t%i\t%i\n",it2->first,it2->second);
-      crdc->AddPoint(it1->first,it2->first,it2->second);
+      current_crdc->AddPoint(it1->first,it2->first,it2->second);
     }
   }
+
+  //printf("\t0x%08x\t%i\n",currentcrdc,currentcrdc->
+
   if(x>=size)
       return true;
   subsize = *(data+x);
@@ -347,6 +376,11 @@ bool TS800::HandleIonCPacket(unsigned short* data, int size){
       break;
     }
   }
+  //printf("i am here.\n");
+  //for(int x=0;x<ion.Size();x++) {
+  // printf("\t[%02i]\t=\t%i\n",ion.GetChannel(x),ion.GetData(x));
+  //}
+
   
   return true;
 }
@@ -382,11 +416,59 @@ bool TS800::HandleHODOPacket(char *data,unsigned short size) {
 
   return true;
 }
+*/
 
-bool TS800::HandleMTDCPacket(char *data,unsigned short size) {
+bool TS800::HandleMTDCPacket(unsigned short *data,int size) {
+  int x = 0;
+  while(x<size){
+    //printf("0x%04x  ",*(data+x));
+    //x++;
+    //if((x%8)==0)
+    //  printf("\n");
+    
+    unsigned short word1 = *(data+x);
+    unsigned short word2 = *(data+x+1);
+    x+=2;
+    switch((word1&0x000f)) {
+      case 0: //E1up
+        mtof.fE1Up.push_back(word2);
+        break;
+      case 1: //E1down
+        mtof.fE1Down.push_back(word2);
+        break;
+      case 2: //Xfp
+        mtof.fXfp.push_back(word2);
+        break;
+      case 3: //Obj
+        mtof.fObj.push_back(word2);
+        break;
+      case 5: //Rf
+        mtof.fRf.push_back(word2);
+        break;
+      case 6: //crdc1 anode
+        mtof.fCrdc1Anode.push_back(word2);
+        break;
+      case 7: //crdc2 anode
+        mtof.fCrdc2Anode.push_back(word2);
+        break;
+      case 12: //Hodoscope
+        mtof.fHodoscope.push_back(word2);
+        break;
+      case 15: //Ref. (E1up)
+        mtof.fRef.push_back(word2);
+        break;
+      default:
+        //printf("unknown..\n");
+        break;
+    };
+    
+  } 
+  //printf("\n\n");
+  
   return true;
 }
 
+/*
 bool TS800::HandleTOFPacket(char *data,unsigned short size) {
   //some number of times read from both a Phillips 7186H TDC and an Ortec 566 TAC digitized by a Phillips 7164 ADC.
   if(size<2)
@@ -573,3 +655,38 @@ TDetectorHit& TS800::GetHit(int i){
   TDetectorHit *hit = new TS800Hit;
   return *hit;
 }
+
+
+ 
+
+
+float TS800::GetTofE1_TAC(float c1,float c2)  const {
+  return GetTof().GetTacOBJ() - c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+}
+
+
+float TS800::GetTofE1_TDC(float c1,float c2)  const {
+
+  return GetTof().GetOBJ() - GetScint().GetTimeUp() - c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+}
+
+float TS800::GetTofE1_MTDC(float c1,float c2)   {
+
+  std::vector<float> result;
+  for(int x=0;x<mtof.fObj.size();x++) {
+    if(mtof.fObj.at(x)>10200) {
+      for(int y=0;y<mtof.fE1Up.size();y++) {
+        if((mtof.fE1Up.at(y) <13500) && (mtof.fE1Up.at(y) >12500))
+          result.push_back( mtof.fObj.at(x) - mtof.fE1Up.at(y) - c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
+      }
+    }
+  }
+  if(result.size()==1)
+    return result.at(0);
+  return -1.0;
+  //return GetTof().GetOBJ() - GetScint().GetTimeUp() - c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+}
+
+
+
+

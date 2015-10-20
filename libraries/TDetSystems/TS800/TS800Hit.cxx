@@ -1,6 +1,8 @@
 
 #include "TS800Hit.h"
-
+#include "TRandom.h"
+#include "GCanvas.h"
+#include "TH2.h"
 
 TTrigger::TTrigger() {
   Clear();
@@ -151,17 +153,92 @@ float TCrdc::GetPad(){
   int place =0;
   if(!data.size())
     return -1.0;
+  
   temp = data.at(0);
   for(int i = 0; i < data.size(); i++){
+    /* std::cout << " ------ " << std::endl;
+    std::cout << " Data    : " << data.at(i) << " at " << i << std::endl;
+    std::cout << " Sample  : " << sample.at(i) << " at " << i << std::endl;
+    std::cout << " Channel : " << channel.at(i) << " at " << i << std::endl;
+    */
     if(data.at(i)>temp) {
       temp = data.at(i);
       place = i;
     }
   }
   
-  return (float)(channel.at(place));
+  return (float)(channel.at(place))+gRandom->Uniform();
   
 }
+
+void TCrdc::DrawChannels(Option_t *opt) const {
+  GCanvas *c = 0;
+  if(!gPad)
+    c = new GCanvas();
+  else {
+    //gPad->Clear();
+    c = (GCanvas*)gPad->GetCanvas();
+    c->Clear();
+  }
+  
+  std::vector<TH1I> hits;
+  512;
+  int currentchannel = -1;
+  TH1I *currenthist = 0;
+  for(int x=0;x<Size();x++) {
+    if(channel.at(x)!=currentchannel) {
+      
+      TH1I hist(Form("channel_%02i",channel.at(x)),Form("channel_%02i",channel.at(x)),512,0,512);
+      hits.push_back(hist);
+      currentchannel = channel.at(x);
+      currenthist = &(hits.back());
+    }
+    currenthist->Fill(sample.at(x),data.at(x));
+  }
+  c->Divide(1,hits.size());
+  for(int x=0;x<hits.size();x++) {
+    c->cd(x+1);
+    hits.at(x).DrawCopy();
+  }
+  return;
+}
+
+void TCrdc::DrawHit(Option_t *opt) const {
+  GCanvas *c = 0;
+  if(!gPad)
+    c = new GCanvas();
+  else {
+    //gPad->Clear();
+    c = (GCanvas*)gPad->GetCanvas();
+    c->Clear();
+  } 
+  TH1I *mat = new TH1I("hit_pattern","hit_pattern",256,0,256);
+  int currentchannel = -1;
+  int currentx = -1;
+  int currenty = -1;
+  int datasum =0;
+  for(int x=0;x<Size();x++) {
+    if(channel.at(x)!=currentchannel) {
+       if(currentchannel!=-1)
+         mat->Fill(currentx,datasum);
+       datasum = 0;
+       currentchannel = channel.at(x);
+       currentx = channel.at(x);
+       currenty = channel.at(x)%16;
+    } 
+    datasum+=data.at(x);
+    
+  }
+  if(currentchannel!=-1)
+    mat->Fill(currentx,datasum);
+
+  std::string options = "";
+  options.append(opt);
+  mat->Draw(options.c_str());
+
+  return;
+}
+
 
 int TCrdc::GetWidth() { 
   if(Size()<2)
@@ -250,6 +327,47 @@ void TCrdcPad::Copy(TObject &obj) const {
 
 
 
+TMTof::TMTof() { Clear(); }
+
+TMTof::~TMTof() { }
+
+TMTof::TMTof(const TMTof &mtof) {
+  mtof.Copy(*this);
+}
+
+
+void TMTof::Copy(TObject &obj) const {
+  TDetectorHit::Copy(obj);
+  
+  TMTof &mtof = ((TMTof&)obj);
+
+  mtof.fE1Up      = fE1Up;     
+  mtof.fE1Down    = fE1Down;
+  mtof.fXfp       = fXfp;
+  mtof.fObj       = fObj;
+  //mtof.fGalotte   = fGalotte;
+  mtof.fCrdc1Anode = fCrdc1Anode;
+  mtof.fCrdc2Anode = fCrdc2Anode;
+  mtof.fRf        = fRf;
+  mtof.fHodoscope = fHodoscope;
+  mtof.fRef       = fRef;
+}
+
+void TMTof::Clear(Option_t *opt) {
+
+  fE1Up.clear();     
+  fE1Down.clear();   
+  fXfp.clear();       
+  fObj.clear();      
+  //fGalotte.clear();
+  fCrdc1Anode.clear();
+  fCrdc2Anode.clear();
+  fRf.clear();       
+  fHodoscope.clear();
+  fRef.clear();
+}
+
+void TMTof::Print(Option_t *opt) const {    }
 
 
 

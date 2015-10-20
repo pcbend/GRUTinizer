@@ -109,11 +109,14 @@ void MakeHistograms(TRuntimeObjects& obj) {
   if(!gretina)
     return;
 
+
+  double gsum = 0.0;
   for(int y=0;y<gretina->Size();y++) {
     //printf("I am Here %i\n",2+y); fflush(stdout);
     TGretinaHit hit = gretina->GetGretinaHit(y);
     std::string histname;
-    
+    gsum += hit.GetCoreEnergy();
+
     for(int z=y+1;z<gretina->Size();z++) {
       TGretinaHit hit2 = gretina->GetGretinaHit(z);
       histname = "Gamma_Gamma";
@@ -305,8 +308,15 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   }
 
-
-  
+  std::string histname = "GCalorimeter";
+  TH1 *gcal = (TH1*)list->FindObject(histname.c_str());
+  if(!gcal) {
+    gcal = new TH1F(histname.c_str(),histname.c_str(),16000,0,8000);
+    list->Add(gcal);
+  }
+  if(gsum>1.0) {
+    gcal->Fill(gsum);
+  }
 
 
 

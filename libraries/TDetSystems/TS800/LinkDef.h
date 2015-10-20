@@ -13,6 +13,7 @@
 
 #pragma link C++ class TTrigger+;
 #pragma link C++ class TTof+;
+#pragma link C++ class TMTof+;
 #pragma link C++ class TCrdc+;
 #pragma link C++ class TScintillator+;
 #pragma link C++ class TIonChamber+;
