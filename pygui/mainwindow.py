@@ -16,6 +16,7 @@ from .run_command import run_command
 from .tree_tab import TreeTab
 from .hist_tab import HistTab
 from .tcut_tab import TCutTab
+from .variable_tab import VariableTab
 from .util import update_tcanvases
 
 class MainWindow(object):
@@ -155,6 +156,10 @@ class MainWindow(object):
         tcut_page = ttk.Frame(notebook)
         self.tcut_tab = TCutTab(self, tcut_page)
         notebook.add(tcut_page, text='Gates')
+
+        variable_page = ttk.Frame(notebook)
+        self.variable_tab = VariableTab(self, variable_page)
+        notebook.add(variable_page, text='Variables')
 
         tree_page = ttk.Frame(notebook)
         self.tree_tab = TreeTab(self, tree_page)

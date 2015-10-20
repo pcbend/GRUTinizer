@@ -3,8 +3,10 @@
 #include "TH1.h"
 #include "TH2.h"
 
-TRuntimeObjects::TRuntimeObjects(TList* detectors, TList* objects)
-  : detectors(detectors), objects(objects) { }
+#include "GValue.h"
+
+TRuntimeObjects::TRuntimeObjects(TList* detectors, TList* objects, TList* variables)
+  : detectors(detectors), objects(objects), variables(variables) { }
 
 void TRuntimeObjects::FillHistogram(std::string name,
                                     int bins, double low, double high, double value){
@@ -41,6 +43,10 @@ TList& TRuntimeObjects::GetObjects() {
   return *objects;
 }
 
+TList& TRuntimeObjects::GetVariables() {
+  return *variables;
+}
+
 TCutG* TRuntimeObjects::GetCut(const std::string& name) {
   TIter next(objects);
   TObject* obj;
@@ -51,4 +57,13 @@ TCutG* TRuntimeObjects::GetCut(const std::string& name) {
     }
   }
   return NULL;
+}
+
+double TRuntimeObjects::GetVariable(const char* name) {
+  TObject* obj = variables->FindObject(name);
+  if(obj && obj->InheritsFrom(GValue::Class())){
+    return ((GValue*)obj)->GetValue();
+  } else {
+    return std::sqrt(-1);
+  }
 }
