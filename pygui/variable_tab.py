@@ -6,6 +6,8 @@ import ttk
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
+from .util import PreserveGDir
+
 class VariableTab(object):
 
     def __init__(self, main, frame):
@@ -84,3 +86,29 @@ class VariableTab(object):
         name = event.widget.selection()[0]
         self.var_name.set(name)
         self.var_value.set(str(self.variables[name]))
+
+    def _dump_to_tfile(self):
+        if not ROOT.online_events:
+            return
+
+        tdir = ROOT.gDirectory.mkdir('variables')
+        with PreserveGDir(tdir):
+            for obj in ROOT.online_events.GetVariables():
+                print 'Saving {} = {}'.format(obj.GetName(), obj.GetValue())
+                obj.Write()
+
+    def _variable_patterns(self):
+        return self.variables
+
+    def _load_variable_patterns(self, patterns):
+        for name, value in patterns.items():
+            self.SetReplaceVariable(name, value)
+
+    def AddFile(self, tfile):
+        tdir = tfile.GetListOfKeys().FindObject('variables')
+        if tdir and ROOT.TClass(tdir.GetClassName()).InheritsFrom('TDirectory'):
+            tdir = tdir.ReadObj()
+            for key in tdir.GetListOfKeys():
+                obj = key.ReadObj()
+                self.SetReplaceVariable(obj.GetName(),
+                                        obj.GetValue())

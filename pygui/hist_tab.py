@@ -92,7 +92,7 @@ class HistTab(object):
 
     def _load_compiled_histograms(self, filename):
         if ROOT.online_events:
-            ROOT.online_events.LoadCompiledHistograms(filename)
+            ROOT.online_events.LoadCompiledHistogramLibrary(filename)
 
     def _compiled_histogram_filename(self):
         if ROOT.online_events:

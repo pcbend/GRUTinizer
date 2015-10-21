@@ -45,6 +45,8 @@ class MainWindow(object):
             self.tcut_tab._load_tcut_patterns(settings['tcuts'])
         if 'compiled_histograms' in settings:
             self.hist_tab._load_compiled_histograms(settings['compiled_histograms']['name'])
+        if 'variables' in settings:
+            self.variable_tab._load_variable_patterns(settings['variables'])
 
     def _save_gui_file(self, filename = None):
         if filename is None:
@@ -59,6 +61,7 @@ class MainWindow(object):
         output = {}
         output['histograms'] = self.hist_tab._hist_patterns()
         output['tcuts'] = self.tcut_tab._tcut_patterns()
+        output['variables'] = self.variable_tab._variable_patterns()
 
         if self.hist_tab._compiled_histogram_filename():
             output['compiled_histograms'] = {'name':self.hist_tab._compiled_histogram_filename()}
@@ -80,6 +83,7 @@ class MainWindow(object):
         output = ROOT.TFile(filename,'RECREATE')
         self.hist_tab._dump_to_tfile()
         self.tcut_tab._dump_to_tfile()
+        self.variable_tab._dump_to_tfile()
         output.Close()
 
     def _load_icons(self):
@@ -445,6 +449,7 @@ class MainWindow(object):
         self.hist_tab.Insert(tfile)
         self.tree_tab.AddFile(tfile)
         self.tcut_tab.AddFile(tfile)
+        self.variable_tab.AddFile(tfile)
 
     def Run(self):
         self.window.mainloop()

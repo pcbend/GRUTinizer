@@ -34,6 +34,21 @@ def increment_name(name):
         return name + '_1'
 
 
+class PreserveGDir(object):
+
+    def __init__(self, directory = None):
+        self.directory = directory
+
+    def __enter__(self):
+        self.gdir = ROOT.gDirectory
+        if self.directory is not None:
+            self.directory.cd()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.gdir.cd()
+
+
 class TKeyDict(dict):
     def __getitem__(self, key):
         output = super(TKeyDict,self).__getitem__(key)
