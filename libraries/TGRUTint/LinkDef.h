@@ -1,4 +1,4 @@
-// TGRUTint.h TGRUTOptions.h TGRUTTypes.h TDetectorEnv.h TGRUTServer.h TOnlineTree.h THashList_ThreadSafe.h
+// TGRUTint.h TGRUTOptions.h TGRUTTypes.h TDetectorEnv.h TGRUTServer.h TOnlineTree.h THashList_ThreadSafe.h GValue.h
 
 #ifdef __CINT__
 
@@ -19,6 +19,7 @@
 #pragma link C++ class THashList_ThreadSafe+;
 
 #pragma link C++ class TOnlineTree+;
+#pragma link C++ class GValue+;
 
 #pragma link C++ global gResponse;
 #pragma link C++ global online_events;

@@ -155,11 +155,11 @@ void TS800::Clear(Option_t* opt){
   TDetector::Clear(opt);
   crdc[0].Clear();
   crdc[1].Clear();
-  
+
   scint[0].Clear();
   scint[1].Clear();
-  scint[2].Clear(); 
-  
+  scint[2].Clear();
+
   tof.Clear();
   mtof.Clear();
   trigger.Clear();
@@ -240,7 +240,7 @@ int TS800::BuildHits(){
 	break;
       case 0x58b0:  // S800 Hodoscope
 	break;
-      case 0x58c0:  // VME ADC 
+      case 0x58c0:  // VME ADC
 	break;
       case 0x58d0:  // Galotte
 	break;
@@ -287,11 +287,11 @@ bool TS800::HandleTrigPacket(unsigned short *data,int size) {
 }
 
 bool TS800::HandleTOFPacket(unsigned short *data ,int size){
- 
+
   for(int x = 0; x < size; x++){
     unsigned short current = *(data+x);
     switch(current&0xf000){
-    case 0xc000: // RF 
+    case 0xc000: // RF
       tof.SetRF(current&0x0fff);
       break;
     case 0xd000: // Object Scin
@@ -322,7 +322,7 @@ bool TS800::HandleTOFPacket(unsigned short *data ,int size){
 bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
   //std::cout << "----------------------" << std::endl;
   //std::cout << " In Handle CRDC " << std::endl;
-  
+
   TCrdc *current_crdc=0;
   if((*data)<3)
     current_crdc = &crdc[*data];
@@ -333,24 +333,24 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
 
   current_crdc->SetId(*data);
   int x =1;
-  int subsize = *(data+x); 
+  int subsize = *(data+x);
   x++;
   int subtype = *(data+x);
   x++;
 
   //std::cout << " subsize : " << std::hex << subsize << std::endl;
   //std::cout << " subtype : " << std::hex << subtype << std::endl;
-    
+
   std::map<int,std::map<int,int> > pad;
   //for(;x<subsize;x+=2) {
-  while(x<subsize){  
+  while(x<subsize){
     unsigned short word1 = *(data+x); x++;
     //std::cout << std::hex << " word 1 " << word1 << std::endl;
     if((word1&0x8000)!=0x8000) { continue; }
     unsigned short word2 = *(data+x);
     //std::cout << std::hex << " word 2 " << word2 << std::endl;
-    
- 
+
+
     int sample_number    = (word1&(0x7fc0)) >> 6;
     int channel_number   =  word1&(0x003f);
     int connector_number = (word2&(0x0c00)) >> 10;
@@ -394,66 +394,66 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
 }
 
 bool TS800::HandleScintPacket(unsigned short* data, int size){
-  
-  for(int x = 0; x<size;x+=2){ 
+
+  for(int x = 0; x<size;x+=2){
     unsigned short current = *(data+x);
     unsigned short current_p1 = *(data+x+1);
-    
-    if(((current)&(0xf000))==((current_p1)&(0xf000))){    
+
+    if(((current)&(0xf000))==((current_p1)&(0xf000))){
       switch(current&0xf000){
-      case 0x0000: 
+      case 0x0000:
 	scint[0].SetdE_Up(current&0x0fff);
 	scint[0].SetTime_Up(current_p1&0x0fff);
 	scint[0].SetID(1);
-	
+
 	//std::cout << " Channel 1 Up " << std::endl;
 	//std::cout << " Energy : " << scint[0].GetdE_Up() << std::endl;
 	//std::cout << " Time : " << scint[0].GetTime_Up() << std::endl;
 	break;
-      case 0x1000: 
+      case 0x1000:
 	scint[0].SetdE_Down(current&0x0fff);
 	scint[0].SetTime_Down(current_p1&0x0fff);
 	scint[0].SetID(1);
-	
+
 	//std::cout << " Channel 1 Down " << std::endl;
 	//std::cout << " Energy : " << scint[0].GetdE_Down() << std::endl;
 	//std::cout << " Time : " << scint[0].GetTime_Down() << std::endl;
 	break;
-      case 0x2000: 
+      case 0x2000:
 	scint[1].SetdE_Up(current&0x0fff);
 	scint[1].SetTime_Up(current_p1&0x0fff);
 	scint[1].SetID(2);
-	
+
 	//std::cout << " Channel 2 Up " << std::endl;
 	//std::cout << " Energy : " << scint[1].GetdE_Up() << std::endl;
 	//std::cout << " Time : " << scint[1].GetTime_Up() << std::endl;
 	break;
-      case 0x3000: 
+      case 0x3000:
 	scint[1].SetdE_Down(current&0x0fff);
 	scint[1].SetTime_Down(current_p1&0x0fff);
 	scint[1].SetID(2);
-	
+
 	//std::cout << " Channel 2 Down " << std::endl;
 	//std::cout << " Energy : " << scint[1].GetdE_Down() << std::endl;
 	//	std::cout << " Time : " << scint[1].GetTime_Down() << std::endl;
 	break;
-      case 0x4000: 
+      case 0x4000:
 	scint[2].SetdE_Up(current&0x0fff);
 	scint[2].SetTime_Up(current_p1&0x0fff);
 	scint[2].SetID(3);
-	
+
 	//std::cout << " Channel 3 Up " << std::endl;
 	//std::cout << " Energy : " << scint[2].GetdE_Up() << std::endl;
 	//std::cout << " Time : " << scint[2].GetTime_Up() << std::endl;
 	break;
-      case 0x5000: 
+      case 0x5000:
 	scint[2].SetdE_Down(current&0x0fff);
 	scint[2].SetTime_Down(current_p1&0x0fff);
 	scint[2].SetID(3);
-	
+
 	//std::cout << " Channel 3 Down " << std::endl;
 	//std::cout << " Energy : " << scint[2].GetdE_Down() << std::endl;
-	//std::cout << " Time : " << scint[2].GetTime_Down() << std::endl;	
+	//std::cout << " Time : " << scint[2].GetTime_Down() << std::endl;
 	break;
       default:
 	return false;
@@ -461,10 +461,10 @@ bool TS800::HandleScintPacket(unsigned short* data, int size){
       }
     }
     else return false;
-    
+
   }
 
-  
+
   return true;
 }
 
@@ -481,7 +481,7 @@ bool TS800::HandleIonCPacket(unsigned short* data, int size){
     //std::dec;
     switch(*(data+x++)){
     case 0x5821:
-      for(x; x<sub_size;x++){ 
+      for(x; x<sub_size;x++){
 	unsigned short current = *(data+x);
 	int ch  = (current&0xf000)>>12;
 	int dat = (current&0x0fff);
@@ -494,8 +494,8 @@ bool TS800::HandleIonCPacket(unsigned short* data, int size){
 	//std::dec;
       }
       break;
-    case 0x5822: // Old Style 
-      for(x; x<sub_size;x++){ 
+    case 0x5822: // Old Style
+      for(x; x<sub_size;x++){
 	unsigned short current = *(data+x);
 	ion.Set((current&0xf000),(current&0x0fff));
 	//std::cout << " Channel : " << std::hex << (current&0xf000) << std::endl;
@@ -512,7 +512,7 @@ bool TS800::HandleIonCPacket(unsigned short* data, int size){
   // printf("\t[%02i]\t=\t%i\n",ion.GetChannel(x),ion.GetData(x));
   //}
 
-  
+
   return true;
 }
 
@@ -556,7 +556,7 @@ bool TS800::HandleMTDCPacket(unsigned short *data,int size) {
     //x++;
     //if((x%8)==0)
     //  printf("\n");
-    
+
     unsigned short word1 = *(data+x);
     unsigned short word2 = *(data+x+1);
     x+=2;
@@ -592,10 +592,10 @@ bool TS800::HandleMTDCPacket(unsigned short *data,int size) {
         //printf("unknown..\n");
         break;
     };
-    
-  } 
+
+  }
   //printf("\n\n");
-  
+
   return true;
 }
 
@@ -778,17 +778,13 @@ void TS800::InsertHit(const TDetectorHit& hit){
   return;
 }
 
-int TS800::Size(){
-  return 0;
-}
-
 TDetectorHit& TS800::GetHit(int i){
   TDetectorHit *hit = new TS800Hit;
   return *hit;
 }
 
 
- 
+
 
 
 float TS800::GetTofE1_TAC(float c1,float c2)  const {
@@ -817,7 +813,3 @@ float TS800::GetTofE1_MTDC(float c1,float c2)   {
   return -1.0;
   //return GetTof().GetOBJ() - GetScint().GetTimeUp() - c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
 }
-
-
-
-

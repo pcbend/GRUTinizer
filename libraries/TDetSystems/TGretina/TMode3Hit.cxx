@@ -37,7 +37,7 @@ void TMode3Hit::BuildFrom(TSmartBuffer buf){
   buf.Advance(sizeof(TRawEvent::GEBMode3Data));
 
   led = data->GetLed();
-  charge = data->GetEnergy();
+  charge = data->GetEnergy(*header);
   //SetCharge(data->GetEnergy(*header));
   SetAddress(GetHole(),GetCrystal(),GetSegmentId());
   cfd = data->GetCfd();

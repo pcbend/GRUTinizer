@@ -45,6 +45,10 @@ public:
 
   TList* GetHistograms();
 
+  TList* GetVariables();
+  void SetVariable(const char* name, double value);
+  void RemoveVariable(const char* name);
+
   void cd(){ saved_dir = gDirectory; directory.cd(); }
   void popd() {
     if(saved_dir) {
@@ -73,6 +77,7 @@ private:
 #endif
 
   TList detector_list;
+  TList variable_list;
   TCompiledHistograms compiled_histograms;
 
   TDirectory  directory;

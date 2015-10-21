@@ -6,6 +6,8 @@
 
 #include "ArgParser.h"
 
+#include <TEnv.h>
+
 TGRUTOptions* TGRUTOptions::Get(int argc, char** argv){
   static TGRUTOptions* item = NULL;
   if(!item){
@@ -46,6 +48,7 @@ void TGRUTOptions::Print(Option_t* opt) const { }
 void TGRUTOptions::Load(int argc, char** argv) {
   Clear();
   detector_environment = std::string(getenv("GRUTSYS")) + "/config/DetectorEnvironment.env";
+  compiled_histogram_file = gEnv->GetValue("GRUT.HistLib","");
 
   ArgParser parser;
 

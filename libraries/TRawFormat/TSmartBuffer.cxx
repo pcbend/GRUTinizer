@@ -5,44 +5,36 @@
 
 #include <algorithm>
 #include <iostream>
-//#include <mutex>
 
 TSmartBuffer::TSmartBuffer()
   : fAllocatedLocation(NULL), fData(NULL), fSize(0),
-    fReferenceCount(NULL), fReferenceMutex(NULL) { }
+    fReferenceCount(NULL) { }
 
 TSmartBuffer::TSmartBuffer(char* buffer, size_t size)
   : fAllocatedLocation(buffer), fData(buffer), fSize(size) {
-  fReferenceCount = new int(1);
-  fReferenceMutex = new std::mutex;
+  fReferenceCount = new std::atomic_int(1);
 }
 
 TSmartBuffer::~TSmartBuffer() {
   // This buffer didn't point to anything, so no need to clean anything up.
-  if(!fReferenceMutex){
+  if(!fReferenceCount){
     return;
   }
 
-  std::unique_lock<std::mutex> lock(*fReferenceMutex);
   (*fReferenceCount)--;
 
   if(*fReferenceCount==0){
-
     free(fAllocatedLocation);
     delete fReferenceCount;
-    lock.unlock();
-    delete fReferenceMutex;
   }
 }
 
 TSmartBuffer::TSmartBuffer(const TSmartBuffer& other)
   : fAllocatedLocation(other.fAllocatedLocation), fData(other.fData),
-    fSize(other.fSize), fReferenceCount(other.fReferenceCount),
-    fReferenceMutex(other.fReferenceMutex) {
+    fSize(other.fSize), fReferenceCount(other.fReferenceCount) {
 
 
-  if(fReferenceMutex){
-    std::unique_lock<std::mutex> lock(*fReferenceMutex);
+  if(fReferenceCount){
     (*fReferenceCount)++;
   }
 }
@@ -67,7 +59,6 @@ void TSmartBuffer::swap(TSmartBuffer& other){
   std::swap(fData, other.fData);
   std::swap(fSize, other.fSize);
   std::swap(fReferenceCount, other.fReferenceCount);
-  std::swap(fReferenceMutex, other.fReferenceMutex);
 }
 
 void TSmartBuffer::SetBuffer(char* buffer, size_t size){
@@ -105,15 +96,14 @@ void TSmartBuffer::Print(Option_t* opt) const {
               << "with a size of " << fSize << "bytes."
               << std::endl;
   }
-  if(fReferenceMutex){
-    std::unique_lock<std::mutex> lock(*fReferenceMutex);
+  if(fReferenceCount){
     std::cout << "There are " << *fReferenceCount << " TSmartBuffers sharing this C-buffer"
               << std::endl;
 
     // Full hexdump of the buffer contents
     //TString highlight_string = options(regexp);
     std::vector<TString> highlight_strings;
-    while(options.Contains(regexp)) { 
+    while(options.Contains(regexp)) {
       highlight_strings.push_back(options(regexp));
       options.ReplaceAll(highlight_strings.back(),"");
     }

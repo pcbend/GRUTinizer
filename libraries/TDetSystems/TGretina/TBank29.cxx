@@ -24,6 +24,7 @@ void TBank29::Copy(TObject& obj) const {
 void TBank29::InsertHit(const TDetectorHit& hit){
   TMode3* new_hit = (TMode3*)channels->ConstructedAt(Size());
   hit.Copy(*new_hit);
+  fSize++;
 }
 
 int TBank29::BuildHits(){
@@ -34,7 +35,7 @@ int TBank29::BuildHits(){
     hit.BuildFrom(geb->GetPayloadBuffer());
     InsertHit(hit);
   }
-  if(Size()) 
+  if(Size())
     SetTimestamp(((TMode3Hit*)channels->At(0))->GetLed());
   return Size();
 }

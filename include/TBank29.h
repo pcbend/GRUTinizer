@@ -22,7 +22,6 @@ public:
 
   virtual void          InsertHit(const TDetectorHit& hit);
   virtual TDetectorHit& GetHit(int i)        { return *(TDetectorHit*)channels->At(i); }
-  virtual int           Size()  const        { return channels->GetEntries(); }
 
   //void PrintHit(int i){ gretina_hits->At(i)->Print(); }
 

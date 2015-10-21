@@ -84,7 +84,7 @@ void TRawEvent::SwapMode3Data(TRawEvent::GEBMode3Data &data) {
 std::ostream& operator<<(std ::ostream& os, const TRawEvent::GEBMode3Data &data) {
   os << "Led                 : " << data.GetLed() << "\n"
      << "Cfd                 : " << data.GetCfd() << "\n"
-     << "Energy              : " << std::hex << "0x" << data.GetEnergy() << std::dec << "\n"
+     //<< "Energy              : " << std::hex << "0x" << data.GetEnergy() << std::dec << "\n"
      << "Energy Low          : " << data.energy_low << "\n"
      << "Energy High         : " << data.energy_high << "\n"
      << "Energy Low          : " << std::hex << "0x" << data.energy_low << std::dec << "\n"
@@ -139,7 +139,8 @@ std::ostream& operator<<(std::ostream& os,const TRawEvent::S800TOFPacket &tof) {
 
 Long_t TRawEvent::GEBMode3Data::GetLed() const { return (((long)led_high)<<32) + (((long)led_middle)<<16) + (((long)led_low)<<0); }
 Long_t TRawEvent::GEBMode3Data::GetCfd() const { return (((long)cfd_high)<<32) + (((long)cfd_middle)<<16) + (((long)cfd_low)<<0); }
-Int_t  TRawEvent::GEBMode3Data::GetEnergy() const  {
+Int_t  TRawEvent::GEBMode3Data::GetEnergy(GEBMode3Head &head) const  {
+  int channel = head.GetChannel();
   //if ((channel==1) &&( head.GetHole()==9) && (head.GetCrystal()==3) && (head.GetVME()==3))
     //channel = 9; //  Q5 e5 has an inverted radial box, treat it as a core.  pcb.
 
@@ -148,6 +149,8 @@ Int_t  TRawEvent::GEBMode3Data::GetEnergy() const  {
        temp = temp&0x00ffffff;
   if(sign)
     temp = temp - (int)0x01000000;
+  if(channel!=9)  // do not remove.  this is 100% needed. pcb.
+    temp = -temp;
   return temp;
 }
 

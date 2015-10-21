@@ -13,6 +13,7 @@
 #include "TRegexp.h"
 #include "TTreeFormula.h"
 
+#include "GValue.h"
 #include "TGRUTOptions.h"
 #include "TPreserveGDirectory.h"
 #include "TRuntimeObjects.h"
@@ -132,7 +133,7 @@ Int_t TOnlineTree::Fill(){
 }
 
 void TOnlineTree::FillCompiledHistograms() {
-  TRuntimeObjects obj(&detector_list, directory.GetList());
+  TRuntimeObjects obj(&detector_list, directory.GetList(), &variable_list);
   compiled_histograms.Call(obj);
 }
 
@@ -275,5 +276,26 @@ void TOnlineTree::ClearHistograms() {
       TH1* hist = (TH1*)obj;
       hist->Reset();
     }
+  }
+}
+
+TList* TOnlineTree::GetVariables() {
+  return &variable_list;
+}
+
+void TOnlineTree::SetVariable(const char* name, double value) {
+  GValue* val = (GValue*)variable_list.FindObject(name);
+  if(val){
+    val->SetValue(value);
+  } else {
+    GValue* val = new GValue(name, value);
+    variable_list.Add(val);
+  }
+}
+
+void TOnlineTree::RemoveVariable(const char* name) {
+  GValue* val = (GValue*)variable_list.FindObject(name);
+  if(val){
+    variable_list.Remove(val);
   }
 }

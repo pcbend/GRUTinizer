@@ -14,7 +14,9 @@
 class TRuntimeObjects : public TObject {
 public:
   /// Constructor
-  TRuntimeObjects(TList* detectors, TList* objects);
+  TRuntimeObjects(TList* detectors,
+                  TList* objects,
+                  TList* variables);
 
   /// Returns a pointer to the detector of type T
   /**
@@ -36,6 +38,7 @@ public:
 
   TList& GetDetectors();
   TList& GetObjects();
+  TList& GetVariables();
 
   void FillHistogram(std::string name,
                      int bins, double low, double high, double value);
@@ -43,9 +46,12 @@ public:
                      int Xbins, double Xlow, double Xhigh, double Xvalue,
                      int Ybins, double Ylow, double Yhigh, double Yvalue);
 
+  double GetVariable(const char* name);
+
 private:
   TList* detectors;
   TList* objects;
+  TList* variables;
 
 
   ClassDef(TRuntimeObjects, 0);

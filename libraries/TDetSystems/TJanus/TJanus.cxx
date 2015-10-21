@@ -40,10 +40,7 @@ int TJanus::BuildHits(){
 void TJanus::InsertHit(const TDetectorHit& hit){
   TJanusHit* new_hit = (TJanusHit*)janus_hits->ConstructedAt(Size());
   hit.Copy(*new_hit);
-}
-
-int TJanus::Size(){
-  return janus_hits->GetEntries();
+  fSize++;
 }
 
 TJanusHit& TJanus::GetJanusHit(int i){
