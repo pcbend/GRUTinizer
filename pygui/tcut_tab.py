@@ -17,7 +17,7 @@ class TCutTab(object):
 
         self.cuts = {}
 
-        frame.after_idle(self._repeatedly_check)
+        #frame.after_idle(self._repeatedly_check)
 
     def _setup_GUI(self, frame):
         self.frame = frame
@@ -60,12 +60,12 @@ class TCutTab(object):
         # Does CUTG exist?
         cutg = ROOT.gROOT.GetListOfSpecials().FindObject('CUTG')
         if not cutg:
-            return
+            return None
 
         # Does it have 3 or more points?
         npoints = cutg.GetN()
         if npoints < 3:
-            return
+            return None
 
         # Is the first point equal to the last point?
         xi = cutg.GetX()[0]
@@ -73,15 +73,16 @@ class TCutTab(object):
         xf = cutg.GetX()[npoints-1]
         yf = cutg.GetY()[npoints-1]
         if xi!=xf or yi!=yf:
-            return
-
+            return None
+        
+        return cutg
+        
         # Cut is finished, so grab it.
-        ROOT.gROOT.GetListOfSpecials().Remove(cutg)
-        name = self.next_name.get()
-        cutg.SetName(name)
-        self._increment_name()
-
-        self.AddCut(cutg)
+        #ROOT.gROOT.GetListOfSpecials().Remove(cutg)
+        #name = self.next_name.get()
+        #cutg.SetName(name)
+        #self._increment_name()
+        #self.AddCut(cutg)
 
     def AddFile(self, tfile):
         for key in tfile.GetListOfKeys():
@@ -90,18 +91,68 @@ class TCutTab(object):
 
     def AddCut(self, cut):
         name = cut.GetName()
+        cut.SetLineColor(ROOT.kRed)
+        cut.SetLineWidth(3)
         self.cuts[name] = cut
         self.tree.insert('', 'end', name, text=name, values='2D Cut',
                          image = self.main.icons['tcutg'])
         if ROOT.online_events:
             ROOT.online_events.GetDirectory().Add(cut)
+        ROOT.gPad.Modified()
+        ROOT.gPad.Update()
 
     def StartCut(self):
+
         ROOT.gROOT.SetEditorMode('CutG')
+        print "i am here, but it feels so wrong."
+
+
+    def SaveCut(self):
+        cutg = self._check_for_tcut()
+        if(cutg is None):
+            return
+
+        ROOT.gROOT.GetListOfSpecials().Remove(cutg)
+        cutg.SetName(self._increment_name())
+
+        self.AddCut(cutg)
+    
+    def DeleteCut(self):
+        cutg = self._check_for_tcut()
+        if(cutg is None):
+            return
+
+        cutg.Delete()
+
+        #ROOT.gROOT.GetListOfSpecials().Remove(cutg)
+        #name = self.next_name.get()
+        #cutg.SetName(name)
+        #self._increment_name()
+
+        #self.AddCut(cutg)
+
+    def CopyCut(self):
+        cuts = self.tree.selection()
+        if not cuts:
+            return
+        cutname = cuts[0]
+        tcutg = self.cuts[cutname]
+        newcut = tcutg.Clone(self._increment_name())
+
+        xmin = min(newcut.GetX()[i] for i in range(newcut.GetN()))
+        xmax = max(newcut.GetX()[i] for i in range(newcut.GetN()))
+        xshift = 0.5*(xmax-xmin)
+        for i in range(newcut.GetN()):
+            newcut.GetX()[i] += xshift
+
+
+        newcut.Draw('same')
+        self.AddCut(newcut)
 
     def _increment_name(self):
         name = self.next_name.get()
         self.next_name.set(increment_name(name))
+        return name
 
     def _MakeNaming(self, parent):
         self.next_name = tk.StringVar(value='tcutg_0')
@@ -112,8 +163,9 @@ class TCutTab(object):
 
         frame = tk.Frame(parent)
         tk.Button(frame, text='Make Gate', command=self.StartCut).pack(side=tk.LEFT)
-        tk.Button(frame, text='Save Gate', command=self.StartCut).pack(side=tk.LEFT)
-        tk.Button(frame, text='Delete Gate', command=self.StartCut).pack(side=tk.LEFT)
+        tk.Button(frame, text='Save Gate', command=self.SaveCut).pack(side=tk.LEFT)
+        tk.Button(frame, text='Copy Gate', command=self.CopyCut).pack(side=tk.LEFT)
+        tk.Button(frame, text='Delete Gate', command=self.DeleteCut).pack(side=tk.LEFT)
         frame.pack(fill=tk.X,expand=False)
 
     def _MakeTreeView(self, parent):
