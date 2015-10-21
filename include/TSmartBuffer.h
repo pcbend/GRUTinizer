@@ -4,6 +4,7 @@
 #ifndef __CINT__
 #ifndef __ROOTMACRO__
 #   include <mutex>
+#   include <atomic>
 #endif
 #endif
 //class  std::mutex;
@@ -142,15 +143,7 @@ private:
 #ifndef __CINT__
 #ifndef __ROOTMACRO__
   /// The location of the reference count.
-  int* fReferenceCount;
-
-  /// The mutex, protecting the reference count.
-  /**
-    Needed for the case of making buffer subsets on multiple threads.
-    The array is exposed to users of the class only as a const char*,
-      so only writing is possible, and no synchronization is needed there.
-   */
-  std::mutex* fReferenceMutex;
+  std::atomic_int* fReferenceCount;
 #endif
 #endif
 

@@ -17,11 +17,10 @@ public:
   //////////////////////////////////////////////
   virtual void InsertHit(const TDetectorHit&);
   virtual TDetectorHit& GetHit(int i);
-  virtual int Size();
   /////////////////////////////////////////////
-  
+
   void SetEventCounter(Long_t event) { fEventCounter = event; }
-  
+
   Long_t GetEventCounter() { return fEventCounter;}
   Long_t GetTimestamp()  { Timestamp(); }
 
@@ -37,8 +36,8 @@ public:
   TIonChamber   &GetIonChamber()   const { return (TIonChamber&)ion; }
   TScintillator &GetScint(int x=0) const { return (TScintillator&)scint[x]; }
 
-  float GetAFP() const { 
-      return  TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1000.0);  
+  float GetAFP() const {
+      return  TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1000.0);
   }
 
   float GetTofE1_TAC(float c1=0.00,float c2=0.00) const;
@@ -48,7 +47,7 @@ public:
   //private:
  public:
   virtual int  BuildHits();
-  
+
   bool HandleTrigPacket(unsigned short*,int);     //!
   bool HandleTOFPacket(unsigned short*,int);      //!
   bool HandleScintPacket(unsigned short*,int);    //!
@@ -71,7 +70,7 @@ public:
   TCrdc        crdc[2];
   //THodoscope   hodo[32];
   //TMultiHitTof multi_tof;
- 
+
   Long_t fEventCounter;
 
 
@@ -104,7 +103,7 @@ public:
 
 
 
-//S800 Focal Plane 
+//S800 Focal Plane
 //  -- FpScintillator E1
 //  -- FpScintillator E2  <-- most likely does not exist
 //  -- FpScintillator E3  <-- most likely does not exist
@@ -115,17 +114,17 @@ public:
 //  -- FpHodo  hodo
 
 
-//S800 Target 
+//S800 Target
 //  -- PPac ppac2 (why 2?) <-- class
 //  -- PIN  pin1 <-- class
 //  -- PIN  pin2 <-- class
-//  -- E 
+//  -- E
 
 //S800 Image
 //  -- Classic PPAC ppac1
 //  -- Classic PPAC ppac2
 //  -- double x
-//  -- double theta 
+//  -- double theta
 //  -- double y
 //  -- double phi
 //  -- double dp
@@ -144,7 +143,7 @@ public:
 //  -- s800
 //  -- external1
 //  -- external2
-//  -- secondary 
+//  -- secondary
 //  -- timestamp
 
 //S800 Time Of Flight
@@ -178,7 +177,7 @@ public:
 //  -- mobje1
 //  -- mxfpe1
 //  -- mrfe1
-//  -- 
+//  --
 //  -- diaor
 //  -- dia1
 //  -- dia2
@@ -200,14 +199,14 @@ public:
 //  -- rf_shift
 //  -- tac_obj_shift
 //  -- tac_xfp_shift
-//  -- 
+//  --
 //  --              // sc800.h +1253
 //
 
 
 //S800 LaBr
 //  -- eraw
-//  -- ecal 
+//  -- ecal
 //  -- traw
 //  -- tcal
 //  -- e_a0
@@ -221,4 +220,4 @@ public:
 
 
 
-#endif 
+#endif

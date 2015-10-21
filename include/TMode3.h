@@ -21,7 +21,6 @@ public:
 
   virtual void          InsertHit(const TDetectorHit& hit);
   virtual TDetectorHit& GetHit(const int &i)            { return *(TMode3Hit*)mode3_hits->At(i); }
-  virtual int           Size()                          { return mode3_hits->GetEntries(); }
 
   const TMode3Hit& GetMode3Hit(int i) { return *(TMode3Hit*)mode3_hits->At(i); }
   void PrintHit(int i){ mode3_hits->At(i)->Print(); }

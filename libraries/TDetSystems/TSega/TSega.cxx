@@ -32,6 +32,7 @@ void TSega::Clear(Option_t* opt){
 void TSega::InsertHit(const TDetectorHit& hit){
   TSegaHit* new_hit = (TSegaHit*)sega_hits->ConstructedAt(Size());
   hit.Copy(*new_hit);
+  fSize++;
 }
 
 TSegaHit& TSega::GetSegaHit(int i){
@@ -40,10 +41,6 @@ TSegaHit& TSega::GetSegaHit(int i){
 
 TDetectorHit& TSega::GetHit(int i){
   return *(TSegaHit*)sega_hits->At(i);
-}
-
-int TSega::Size(){
-  return sega_hits->GetEntries();
 }
 
 int TSega::BuildHits() {

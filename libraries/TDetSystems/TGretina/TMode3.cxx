@@ -22,6 +22,7 @@ void TMode3::Copy(TObject& obj) const {
 void TMode3::InsertHit(const TDetectorHit& hit){
   TMode3Hit* new_hit = (TMode3Hit*)mode3_hits->ConstructedAt(Size());
   hit.Copy(*new_hit);
+  fSize++;
 }
 
 int TMode3::BuildHits(){

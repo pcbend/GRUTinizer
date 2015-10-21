@@ -21,7 +21,6 @@ public:
 
   virtual void          InsertHit(const TDetectorHit& hit);
   virtual TDetectorHit& GetHit(const int &i)            { return *(TGretinaHit*)gretina_hits->At(i); }
-  virtual int           Size()                          { return gretina_hits->GetEntries(); }
 
   const TGretinaHit& GetGretinaHit(int i) { return *(TGretinaHit*)gretina_hits->At(i); }
   //const TGretinaHit& GetAddbackHit(int i) { return *(TGretinaHit*)addback_hits->At(i); }

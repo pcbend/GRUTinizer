@@ -17,7 +17,6 @@ public:
   virtual void InsertHit(const TDetectorHit&);
   virtual TSegaHit& GetSegaHit(int i);
   virtual TDetectorHit& GetHit(int i);
-  virtual int Size();
 
 private:
   virtual int BuildHits();

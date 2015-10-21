@@ -77,6 +77,7 @@ void TGretina::Copy(TObject& obj) const {
 void TGretina::InsertHit(const TDetectorHit& hit){
   TGretinaHit* new_hit = (TGretinaHit*)gretina_hits->ConstructedAt(Size());
   hit.Copy(*new_hit);
+  fSize++;
 }
 
 int TGretina::BuildHits(){
