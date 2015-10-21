@@ -2,7 +2,8 @@
 #define _TSEIGHTHUNDRAD_H_
 
 #include "TClonesArray.h"
-
+#include <iostream>
+#include <vector>
 #include "TDetector.h"
 
 #include "TS800Hit.h"
@@ -23,10 +24,12 @@ public:
   void SetEventCounter(Long_t event) { fEventCounter = event; }
   
   Long_t GetEventCounter() { return fEventCounter;}
-  Long_t GetTimestamp()  { Timestamp(); }
+  Long_t GetTimestamp()    { Timestamp(); }
 
-  TVector3 CRDCTrack();  //
-
+  TVector3 CRDCTrack();  // not a finished method
+  float GetAFP() const; 
+  float MapCalc(int param, float *input);
+  
   virtual void Copy(TObject& obj)        const;
   //virtual void Print(Option_t *opt = "") const;
   virtual void Clear(Option_t* opt = "");
@@ -37,16 +40,15 @@ public:
   TIonChamber   &GetIonChamber()   const { return (TIonChamber&)ion; }
   TScintillator &GetScint(int x=0) const { return (TScintillator&)scint[x]; }
 
-  float GetAFP() const { 
-      return  TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1000.0);  
-  }
+ 
 
   float GetTofE1_TAC(float c1=0.00,float c2=0.00) const;
   float GetTofE1_TDC(float c1=0.00,float c2=0.00) const;
   float GetTofE1_MTDC(float c1=0.00,float c2=0.00);
 
-  //private:
- public:
+ private:
+
+  bool ReadInvMap(const char* file);
   virtual int  BuildHits();
   
   bool HandleTrigPacket(unsigned short*,int);     //!
@@ -56,12 +58,25 @@ public:
   bool HandleCRDCPacket(unsigned short*,int);     //!
   bool HandleMTDCPacket(unsigned short*,int);     //!
 
-
-  //bool HandleFPStPacket(char*,int);     //!
-  //bool HandleIonCPacket(char*,int);     //!
-  //bool HandlePPACPacket(char*,int);     //!
-  //bool HandleHODOPacket(char*,int);     //!
-  //bool HandleMTDCPacket(char*,int);     //!
+  bool InvMapFileRead=false;
+  struct S800_InvMapLine {
+    float coef;
+    int order,exp[6];
+    void Clear(){ 
+      coef = -1; order = -1; 
+      for(int i=0;i<6;i++)
+	exp[i]=-1;
+    }
+  }; //!  
+  S800_InvMapLine fIML;                           //!
+  static std::vector<S800_InvMapLine> fIML_sec1;  //!
+  static std::vector<S800_InvMapLine> fIML_sec2;  //!
+  static std::vector<S800_InvMapLine> fIML_sec3;  //!
+  static std::vector<S800_InvMapLine> fIML_sec4;  //
+  static short fMaxOrder;                         //!  
+  static float fBrho;                             //!
+  static int fMass;                               //!
+  static int fCharge;                             //!
 
   TScintillator scint[3];
   TTrigger     trigger;
@@ -70,8 +85,7 @@ public:
   TIonChamber  ion;
   TCrdc        crdc[2];
   //THodoscope   hodo[32];
-  //TMultiHitTof multi_tof;
- 
+  
   Long_t fEventCounter;
 
 

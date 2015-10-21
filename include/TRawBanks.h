@@ -95,7 +95,6 @@ struct M_TDC_Data{
 
 
 
-
 typedef struct { // HPGe Segment Hit Type 1;
    Float_t     x;
    Float_t     y;

@@ -1,13 +1,29 @@
 #include "TS800.h"
 
+
 #include <cassert>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include "TGEBEvent.h"
+
+std::vector<TS800::S800_InvMapLine> TS800::fIML_sec1;  
+std::vector<TS800::S800_InvMapLine> TS800::fIML_sec2;  
+std::vector<TS800::S800_InvMapLine> TS800::fIML_sec3;  
+std::vector<TS800::S800_InvMapLine> TS800::fIML_sec4; 
+short TS800::fMaxOrder;                           
+float TS800::fBrho;                             
+int TS800::fMass;                               
+int TS800::fCharge;                             
 
 
 TS800::TS800() {
   Clear();
+  if(!InvMapFileRead){
+    ReadInvMap("invmap.inv");
+    InvMapFileRead=true;
+  }
 }
 
 TS800::~TS800(){
@@ -18,16 +34,121 @@ void TS800::Copy(TObject& obj) const {
 
 }
 
+bool TS800::ReadInvMap(const char* file){
+  std::string eat,I,COEF,ORDEXP;
+  int index,order,exp[6];
+  float coeff;
+  std::stringstream ssTest;
+  int par = 0;
+  ifstream inFile;
+  inFile.open(file);
+  getline(inFile,eat);
+  std::cout << eat << std::endl;
+  sscanf(eat.c_str(), "S800 inverse map - Brho=%g - M=%d - Q=%d", &fBrho, &fMass, &fCharge);
+  
+  inFile >> I >> COEF >> ORDEXP;
+  getline(inFile,eat);
+  
+  if(I!="I" && COEF!="COEFFICIENT"){
+    std::cout << " *** Bad S800 Inv Map File Format!!! " << std::endl;
+    std::cout << " *** Inv Map File Not Read !!! " << std::endl;
+    return false;
+  }
+  
+  while(!(inFile.eof())){
+    
+    if(ssTest.fail() == true){
+      std::cout << " *** sstream Failed while reading file : " << file << std::endl;
+      std::cout << " *** File not loaded!! " << std::endl;
+      return false;
+    }
+    ssTest.str(""); eat = "";
+    getline(inFile,eat); ssTest << eat;
+
+    
+    if(ssTest.str() == "    ----------------------------------------------\r"){
+      par++; continue;
+    }
+    else if (ssTest.str() == "     I  COEFFICIENT            ORDER EXPONENTS\r") continue;
+    else
+      ssTest >> index >> fIML.coef >> fIML.order >> fIML.exp[0]>> fIML.exp[1]>> fIML.exp[2]>> fIML.exp[3]>> fIML.exp[4] >> fIML.exp[5]; 
+    
+    
+    switch(par){
+    case 0:
+      fIML_sec1.push_back(fIML);
+      break;
+    case 1:
+      fIML_sec2.push_back(fIML);
+      break;
+    case 2:
+      fIML_sec3.push_back(fIML);
+      break;
+    case 3:
+      fIML_sec4.push_back(fIML);
+      break;
+    case 4:
+      // you get to 4 before the eof.
+      break;
+    default:
+      std::cout << " *** More than 4 sections!!" << std::endl
+		<< "     Leaving Now!!! File Not Read!! "<< std::endl;
+      return false;
+      break;
+    }
+  }
+  inFile.close();
+  return true;
+}
+
+
+float TS800::MapCalc(int param, float *input){
+  float cumul=0;
+  float multi;
+  int CalcOrder = 6; // Standard order in inv file.
+  std::vector<S800_InvMapLine> current_;
+  
+  switch(param){
+  case 0: current_ = fIML_sec1;  break;
+  case 1: current_ = fIML_sec2;  break;
+  case 2: current_ = fIML_sec3;  break;
+  case 3: current_ = fIML_sec4;  break;
+  default: printf(" *** Wrong Param passed to S800::MapCalc!!\n"); return 0;break;
+  }
+  for(int i=0; i<current_.size();i++){
+    if(CalcOrder<current_.at(i).order) break;
+    multi = 1;
+    //std::cout << " current coef : " << current_.at(i).coef << std::endl;
+    for(int j=0;j<CalcOrder;j++){
+      if(current_.at(i).exp[j]!=0){
+	multi *= pow(input[j],current_.at(i).exp[j]);
+      }
+    }
+    cumul += multi*current_.at(i).coef;
+  }
+  return cumul;  
+}
+
 TVector3 TS800::CRDCTrack(){
-  TVector3 crdc1,crdc2;
+  /*TVector3 crdc1,crdc2;
 
   crdc1.SetXYZ(crdc[0].GetDispersiveX(),crdc[0].GetNonDispersiveY(),0);
   crdc2.SetXYZ(crdc[1].GetDispersiveX(),crdc[1].GetNonDispersiveY(),1000);
    
-  TVector3 track = crdc2-crdc1;
- 
-
+  TVector3 track = crdc2-crdc1;*/
+  TVector3 track;
+  track.SetTheta(TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1000.0)); // rad
+  track.SetPhi(TMath::ATan((GetCrdc(0).GetNonDispersiveY()-GetCrdc(1).GetNonDispersiveY())/1000.0)); // rad
+  //track.SetPt(1) // need to do this.
+      
   return track;
+}
+
+float TS800::GetAFP() const{
+  
+  float AFP = TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1000.0); 
+  return AFP;
+
 }
 
 void TS800::Clear(Option_t* opt){
@@ -43,6 +164,16 @@ void TS800::Clear(Option_t* opt){
   mtof.Clear();
   trigger.Clear();
   ion.Clear();
+  
+  /*  fMaxCoef.clear();
+  fOrder.clear();
+  fExponent.clear();
+  fCoef.clear();*/
+  fMaxOrder = 0;
+  fMass     = 0;
+  fBrho     = -1;
+  fCharge   = 0;
+  
 
 }
 
