@@ -164,9 +164,7 @@ void TDataLoop::Stop() {
 void TDataLoop::ReadLoop() {
   std::cout << "Read loop starting" << std::endl;
 
-  int i=0;
-  while(running && i<10000){
-    i++;
+  while(running){
     {
       std::unique_lock<std::mutex> lock(pause_mutex);
       while(paused){
