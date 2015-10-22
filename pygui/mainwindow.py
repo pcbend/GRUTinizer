@@ -18,6 +18,7 @@ from .hist_tab import HistTab
 from .tcut_tab import TCutTab
 from .variable_tab import VariableTab
 from .util import update_tcanvases
+from .AnsiColorText import AnsiColorText
 
 class MainWindow(object):
 
@@ -170,6 +171,23 @@ class MainWindow(object):
         notebook.add(tree_page, text='Tree Viewer')
 
         notebook.pack(fill=tk.BOTH,expand=True)
+
+        self._setup_status_bar(self.window)
+
+    def _setup_status_bar(self, parent):
+        frame = tk.Frame(parent, height=40)
+        frame.propagate(False)
+        self.status_bar = AnsiColorText(frame, bg='black')
+        self.status_bar.pack(fill=tk.X,expand=True)
+        frame.pack(fill=tk.X, expand=False)
+        self.window.after_idle(self._update_status_bar)
+
+    def _update_status_bar(self):
+        self.status_bar.delete(1.0, tk.END)
+        infile = ROOT.TGRUTLoop.Get().GetInfile()
+        if infile:
+            self.status_bar.write(infile.Status())
+        self.window.after(1000, self._update_status_bar)
 
     def _SetOptStat(self):
         stat = ''
