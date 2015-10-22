@@ -3,8 +3,7 @@ Unix.*.Root.MacroPath: .:$(GRUTSYS)/util:$(ROOTSYS)/macros
 
 #default MakeHistos library
 GRUT.HistLib: $(GRUTSYS)/libraries/libMakeHistos.so
-
-
+GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
 
 #files to load at log in:
 Rint.Logon: $(GRUTSYS)/.grut_logon
