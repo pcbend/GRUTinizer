@@ -120,7 +120,10 @@ class MainWindow(object):
 
 
     def _setup_GUI(self):
-        self.window.geometry('450x850')
+        ws = self.window.winfo_screenwidth()
+        hs = self.window.winfo_screenheight()
+        
+        self.window.geometry('450x850+%d+%d' % (ws-475,25))
         self.window.wm_title("hist-o-matic")
         self.window.config(menu=self._MakeMenuBar())
 
@@ -325,6 +328,8 @@ class MainWindow(object):
         zonesmenu.add_checkbutton(label="2 x 1",onvalue='2x1',
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="2 x 2",onvalue='2x2',
+                                  variable=self.predefinedzones,command=self.set_zones)
+        zonesmenu.add_checkbutton(label="3 x 1",onvalue='3x1',
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="3 x 2",onvalue='3x2',
                                   variable=self.predefinedzones,command=self.set_zones)
