@@ -59,18 +59,18 @@ TRawEventSource* TRawEventSource::EventSource(const char* filename,
     file_type = TGRUTOptions::Get()->DetermineFileType(filename);
   }
 
-  // If we are reading active data, either from a ring, or from an in-progress file
+  // If it is a ring, open it
   if(is_ring){
     return new TRawEventRingSource(filename, file_type);
-  } else if (is_online){
-    return new TRawEventOnlineFileSource(filename, file_type);
-  }
-
-  // If it is offline data, check if it needs to be unpacked.
-  if(hasSuffix(filename,".bz2")){
+  // If it is an archived file, open it as such
+  } else if(hasSuffix(filename,".bz2")){
     return new TRawEventBZipSource(filename, file_type);
   } else if (hasSuffix(filename,".gz")){
     return new TRawEventGZipSource(filename, file_type);
+  // If it is an in-progress file, open it that way
+  } else if (is_online) {
+    return new TRawEventOnlineFileSource(filename, file_type);
+  // Otherwise, open it as a normal file.
   } else {
     return new TRawEventFileSource(filename, file_type);
   }
