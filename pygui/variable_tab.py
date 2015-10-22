@@ -94,7 +94,6 @@ class VariableTab(object):
         tdir = ROOT.gDirectory.mkdir('variables')
         with PreserveGDir(tdir):
             for obj in ROOT.online_events.GetVariables():
-                print 'Saving {} = {}'.format(obj.GetName(), obj.GetValue())
                 obj.Write()
 
     def _variable_patterns(self):

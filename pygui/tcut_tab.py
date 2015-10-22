@@ -34,7 +34,7 @@ class TCutTab(object):
 
     def _tcut_patterns(self):
         output = []
-        for name, cut in self.cuts.values():
+        for name, cut in self.cuts.items():
             points = []
             for i in xrange(cut.GetN()):
                 points.append((cut.GetX()[i], cut.GetY()[i]))
@@ -98,8 +98,9 @@ class TCutTab(object):
                          image = self.main.icons['tcutg'])
         if ROOT.online_events:
             ROOT.online_events.GetDirectory().Add(cut)
-        ROOT.gPad.Modified()
-        ROOT.gPad.Update()
+        if ROOT.gPad:
+            ROOT.gPad.Modified()
+            ROOT.gPad.Update()
 
     def StartCut(self):
 
@@ -179,3 +180,6 @@ class TCutTab(object):
         gate_name = event.widget.selection()[0]
         tcut = self.cuts[gate_name]
         tcut.Draw('same')
+        if ROOT.gPad:
+            ROOT.gPad.Modified()
+            ROOT.gPad.Update()
