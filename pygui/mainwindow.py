@@ -70,7 +70,7 @@ class MainWindow(object):
         with open(filename,'w') as f:
             pprint.pprint(output, f)
 
-    def _dump_root_file(self, filename = None):
+    def _dump_root_file(self, filename = None, include_histograms = True):
         if filename is None:
             filename = tkFileDialog.asksaveasfilename(filetypes=(("ROOT File", "*.root"),))
 
@@ -82,7 +82,8 @@ class MainWindow(object):
 
         self.RefreshHistograms()
         output = ROOT.TFile(filename,'RECREATE')
-        self.hist_tab._dump_to_tfile()
+        if include_histograms:
+            self.hist_tab._dump_to_tfile()
         self.tcut_tab._dump_to_tfile()
         self.variable_tab._dump_to_tfile()
         output.Close()
@@ -249,7 +250,9 @@ class MainWindow(object):
         filemenu.add_separator()
         filemenu.add_command(label="Open GUI",command=self.hello)
         filemenu.add_command(label="Save GUI",command=self._save_gui_file)
-        filemenu.add_command(label="Dump ROOT File",command=self._dump_root_file)
+        filemenu.add_command(label="Dump ROOT Config",
+                             command=lambda :self._dump_root_file(include_histograms=False))
+        filemenu.add_command(label="Dump ROOT Histograms",command=self._dump_root_file)
         filemenu.add_separator()
         filemenu.add_command(label="Exit",command=ROOT.TGRUTint.instance().Terminate)
         menubar.add_cascade(label="File",menu=filemenu)
