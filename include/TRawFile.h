@@ -1,25 +1,42 @@
 #ifndef _TRAWFILE_H_
 #define _TRAWFILE_H_
 
-#include "TRawEventFileSource.h"
-#include "TGRUTOptions.h"
+#include "TRawEventSource.h"
 
-class TRawFile : public TRawEventFileSource {
+class TRawFile : public TRawEventSource {
 public:
-  TRawFile(const std::string& filename, kFileType file_type = kFileType::UNKNOWN_FILETYPE)
-    : TRawEventFileSource(filename,
-                          (file_type==kFileType::UNKNOWN_FILETYPE) ?
-                          TGRUTOptions::Get()->DetermineFileType(filename) :
-                          file_type) { }
+  TRawFile(const char* filename, kFileType file_type = kFileType::UNKNOWN_FILETYPE);
+  ~TRawFile();
+
+  virtual std::string SourceDescription() const {
+    return wrapped->SourceDescription();
+  }
+
+  virtual std::string Status() const {
+    return wrapped->Status();
+  }
+
+  virtual int GetLastErrno() const {
+    return wrapped->GetLastErrno();
+  }
+
+  virtual std::string GetLastError() const {
+    return wrapped->GetLastError();
+  }
+
+
+private:
+  virtual int GetEvent(TRawEvent& event) {
+    return wrapped->Read(event);
+  }
+
+  TRawEventSource* wrapped;
 };
 
-class TRawFileIn : public TRawEventFileSource {
+class TRawFileIn : public TRawFile {
 public:
-  TRawFileIn(const std::string& filename, kFileType file_type = kFileType::UNKNOWN_FILETYPE)
-    : TRawEventFileSource(filename,
-                          (file_type==kFileType::UNKNOWN_FILETYPE) ?
-                          TGRUTOptions::Get()->DetermineFileType(filename) :
-                          file_type) { }
+  TRawFileIn(const char* filename, kFileType file_type = kFileType::UNKNOWN_FILETYPE)
+    : TRawFile(filename, file_type) { }
 };
 
 
