@@ -155,8 +155,7 @@ void TRootOutfile::FillAllTrees() {
 	}
       }
 
-      std::cout << "Dets built, filling tree" << std::endl;
-
+      elem.event_build_window_close = elem.build_window;
       elem.tree->Fill();
     }
   }

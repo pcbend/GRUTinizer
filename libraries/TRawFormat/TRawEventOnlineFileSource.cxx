@@ -24,6 +24,7 @@ int TRawEventOnlineFileSource::ReadBytes(char* buf, size_t size){
         return -1;
       }
       std::this_thread::sleep_for(std::chrono::seconds(5));
+      SetFileSize(FindFileSize(fFilename.c_str()));
     } else {
       return output;
     }
