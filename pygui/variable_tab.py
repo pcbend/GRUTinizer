@@ -28,7 +28,9 @@ class VariableTab(object):
         self.var_name = tk.StringVar()
         tk.Entry(frame, textvariable=self.var_name).grid(row=1, column=0)
         self.var_value = tk.StringVar()
-        tk.Entry(frame, textvariable=self.var_value).grid(row=1, column=1)
+        entry = tk.Entry(frame, textvariable=self.var_value)
+        entry.bind('<Return>',self.OnSetReplaceVariable_Click)
+        entry.grid(row=1, column=1)
         frame.pack(fill=tk.X,expand=False)
 
         # Buttons
@@ -63,7 +65,7 @@ class VariableTab(object):
         self.variables.pop(name, None)
         self.treeview.delete(name)
 
-    def OnSetReplaceVariable_Click(self):
+    def OnSetReplaceVariable_Click(self, *args):
         name = self.var_name.get()
         if not name:
             return
@@ -94,7 +96,6 @@ class VariableTab(object):
         tdir = ROOT.gDirectory.mkdir('variables')
         with PreserveGDir(tdir):
             for obj in ROOT.online_events.GetVariables():
-                print 'Saving {} = {}'.format(obj.GetName(), obj.GetValue())
                 obj.Write()
 
     def _variable_patterns(self):

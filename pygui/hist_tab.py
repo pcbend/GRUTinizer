@@ -105,7 +105,8 @@ class HistTab(object):
             not ROOT.TClass(obj.GetClassName()).InheritsFrom('TH1')):
             obj = obj.ReadObj()
 
-        if obj.InheritsFrom('TTree'):
+        if (obj.InheritsFrom('TTree') or
+            obj.InheritsFrom('TCutG')):
             return
 
         if parent:

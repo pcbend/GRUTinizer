@@ -34,7 +34,7 @@ class TCutTab(object):
 
     def _tcut_patterns(self):
         output = []
-        for name, cut in self.cuts:
+        for name, cut in self.cuts.items():
             points = []
             for i in xrange(cut.GetN()):
                 points.append((cut.GetX()[i], cut.GetY()[i]))
@@ -74,9 +74,9 @@ class TCutTab(object):
         yf = cutg.GetY()[npoints-1]
         if xi!=xf or yi!=yf:
             return None
-        
+
         return cutg
-        
+
         # Cut is finished, so grab it.
         #ROOT.gROOT.GetListOfSpecials().Remove(cutg)
         #name = self.next_name.get()
@@ -98,8 +98,9 @@ class TCutTab(object):
                          image = self.main.icons['tcutg'])
         if ROOT.online_events:
             ROOT.online_events.GetDirectory().Add(cut)
-        ROOT.gPad.Modified()
-        ROOT.gPad.Update()
+        if ROOT.gPad:
+            ROOT.gPad.Modified()
+            ROOT.gPad.Update()
 
     def StartCut(self):
 
@@ -116,7 +117,7 @@ class TCutTab(object):
         cutg.SetName(self._increment_name())
 
         self.AddCut(cutg)
-    
+
     def DeleteCut(self):
         cutg = self._check_for_tcut()
         if(cutg is None):
@@ -149,6 +150,7 @@ class TCutTab(object):
         newcut.Draw('same')
         self.AddCut(newcut)
 
+            
     def _increment_name(self):
         name = self.next_name.get()
         self.next_name.set(increment_name(name))
@@ -162,10 +164,10 @@ class TCutTab(object):
         frame.pack(fill=tk.X,expand=False)
 
         frame = tk.Frame(parent)
-        tk.Button(frame, text='Make Gate', command=self.StartCut).pack(side=tk.LEFT)
-        tk.Button(frame, text='Save Gate', command=self.SaveCut).pack(side=tk.LEFT)
-        tk.Button(frame, text='Copy Gate', command=self.CopyCut).pack(side=tk.LEFT)
-        tk.Button(frame, text='Delete Gate', command=self.DeleteCut).pack(side=tk.LEFT)
+        tk.Button(frame, text='Make Gate', fg="black",bg="light goldenrod", command=self.StartCut).pack(side=tk.LEFT)
+        tk.Button(frame, text='Save Gate', fg="black",bg="light goldenrod", command=self.SaveCut).pack(side=tk.LEFT)
+        tk.Button(frame, text='Copy Gate',fg="black",bg="light goldenrod", command=self.CopyCut).pack(side=tk.LEFT)
+        tk.Button(frame, text='Delete Gate',fg="black",bg="firebrick", command=self.DeleteCut).pack(side=tk.LEFT)
         frame.pack(fill=tk.X,expand=False)
 
     def _MakeTreeView(self, parent):
@@ -177,3 +179,8 @@ class TCutTab(object):
 
     def GateSelection(self, event):
         gate_name = event.widget.selection()[0]
+        tcut = self.cuts[gate_name]
+        tcut.Draw('same')
+        if ROOT.gPad:
+            ROOT.gPad.Modified()
+            ROOT.gPad.Update()

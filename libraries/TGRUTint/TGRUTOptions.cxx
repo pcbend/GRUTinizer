@@ -144,6 +144,12 @@ void TGRUTOptions::Load(int argc, char** argv) {
   for(auto& file : input_files){
     FileAutoDetect(file);
   }
+
+  std::string default_gui_config =  gEnv->GetValue("GRUT.GuiSetup","");
+  if(default_gui_config.length() &&
+     !input_gui_hist_files.size()){
+    input_gui_hist_files.push_back(default_gui_config);
+  }
 }
 
 kFileType TGRUTOptions::DetermineFileType(const std::string& filename) const{

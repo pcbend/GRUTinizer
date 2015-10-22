@@ -18,6 +18,7 @@ from .hist_tab import HistTab
 from .tcut_tab import TCutTab
 from .variable_tab import VariableTab
 from .util import update_tcanvases
+from .AnsiColorText import AnsiColorText
 
 class MainWindow(object):
 
@@ -69,7 +70,7 @@ class MainWindow(object):
         with open(filename,'w') as f:
             pprint.pprint(output, f)
 
-    def _dump_root_file(self, filename = None):
+    def _dump_root_file(self, filename = None, include_histograms = True):
         if filename is None:
             filename = tkFileDialog.asksaveasfilename(filetypes=(("ROOT File", "*.root"),))
 
@@ -81,7 +82,8 @@ class MainWindow(object):
 
         self.RefreshHistograms()
         output = ROOT.TFile(filename,'RECREATE')
-        self.hist_tab._dump_to_tfile()
+        if include_histograms:
+            self.hist_tab._dump_to_tfile()
         self.tcut_tab._dump_to_tfile()
         self.variable_tab._dump_to_tfile()
         output.Close()
@@ -119,7 +121,10 @@ class MainWindow(object):
 
 
     def _setup_GUI(self):
-        self.window.geometry('450x850')
+        ws = self.window.winfo_screenwidth()
+        hs = self.window.winfo_screenheight()
+        
+        self.window.geometry('450x850+%d+%d' % (ws-475,25))
         self.window.wm_title("hist-o-matic")
         self.window.config(menu=self._MakeMenuBar())
 
@@ -170,6 +175,23 @@ class MainWindow(object):
         notebook.add(tree_page, text='Tree Viewer')
 
         notebook.pack(fill=tk.BOTH,expand=True)
+
+        self._setup_status_bar(self.window)
+
+    def _setup_status_bar(self, parent):
+        frame = tk.Frame(parent, height=40)
+        frame.propagate(False)
+        self.status_bar = AnsiColorText(frame, bg='black')
+        self.status_bar.pack(fill=tk.X,expand=True)
+        frame.pack(fill=tk.X, expand=False)
+        self.window.after_idle(self._update_status_bar)
+
+    def _update_status_bar(self):
+        self.status_bar.delete(1.0, tk.END)
+        infile = ROOT.TGRUTLoop.Get().GetInfile()
+        if infile:
+            self.status_bar.write(infile.Status())
+        self.window.after(1000, self._update_status_bar)
 
     def _SetOptStat(self):
         stat = ''
@@ -231,7 +253,9 @@ class MainWindow(object):
         filemenu.add_separator()
         filemenu.add_command(label="Open GUI",command=self.hello)
         filemenu.add_command(label="Save GUI",command=self._save_gui_file)
-        filemenu.add_command(label="Dump ROOT File",command=self._dump_root_file)
+        filemenu.add_command(label="Dump ROOT Config",
+                             command=lambda :self._dump_root_file(include_histograms=False))
+        filemenu.add_command(label="Dump ROOT Histograms",command=self._dump_root_file)
         filemenu.add_separator()
         filemenu.add_command(label="Exit",command=ROOT.TGRUTint.instance().Terminate)
         menubar.add_cascade(label="File",menu=filemenu)
@@ -307,6 +331,8 @@ class MainWindow(object):
         zonesmenu.add_checkbutton(label="2 x 1",onvalue='2x1',
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="2 x 2",onvalue='2x2',
+                                  variable=self.predefinedzones,command=self.set_zones)
+        zonesmenu.add_checkbutton(label="3 x 1",onvalue='3x1',
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="3 x 2",onvalue='3x2',
                                   variable=self.predefinedzones,command=self.set_zones)
