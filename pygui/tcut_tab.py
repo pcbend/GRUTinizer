@@ -34,7 +34,7 @@ class TCutTab(object):
 
     def _tcut_patterns(self):
         output = []
-        for name, cut in self.cuts:
+        for name, cut in self.cuts.values():
             points = []
             for i in xrange(cut.GetN()):
                 points.append((cut.GetX()[i], cut.GetY()[i]))
@@ -74,9 +74,9 @@ class TCutTab(object):
         yf = cutg.GetY()[npoints-1]
         if xi!=xf or yi!=yf:
             return None
-        
+
         return cutg
-        
+
         # Cut is finished, so grab it.
         #ROOT.gROOT.GetListOfSpecials().Remove(cutg)
         #name = self.next_name.get()
@@ -116,7 +116,7 @@ class TCutTab(object):
         cutg.SetName(self._increment_name())
 
         self.AddCut(cutg)
-    
+
     def DeleteCut(self):
         cutg = self._check_for_tcut()
         if(cutg is None):
@@ -177,3 +177,5 @@ class TCutTab(object):
 
     def GateSelection(self, event):
         gate_name = event.widget.selection()[0]
+        tcut = self.cuts[gate_name]
+        tcut.Draw('same')
