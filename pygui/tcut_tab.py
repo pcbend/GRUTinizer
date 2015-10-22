@@ -150,6 +150,7 @@ class TCutTab(object):
         newcut.Draw('same')
         self.AddCut(newcut)
 
+            
     def _increment_name(self):
         name = self.next_name.get()
         self.next_name.set(increment_name(name))
@@ -163,10 +164,10 @@ class TCutTab(object):
         frame.pack(fill=tk.X,expand=False)
 
         frame = tk.Frame(parent)
-        tk.Button(frame, text='Make Gate', command=self.StartCut).pack(side=tk.LEFT)
-        tk.Button(frame, text='Save Gate', command=self.SaveCut).pack(side=tk.LEFT)
-        tk.Button(frame, text='Copy Gate', command=self.CopyCut).pack(side=tk.LEFT)
-        tk.Button(frame, text='Delete Gate', command=self.DeleteCut).pack(side=tk.LEFT)
+        tk.Button(frame, text='Make Gate', fg="black",bg="light goldenrod", command=self.StartCut).pack(side=tk.LEFT)
+        tk.Button(frame, text='Save Gate', fg="black",bg="light goldenrod", command=self.SaveCut).pack(side=tk.LEFT)
+        tk.Button(frame, text='Copy Gate',fg="black",bg="light goldenrod", command=self.CopyCut).pack(side=tk.LEFT)
+        tk.Button(frame, text='Delete Gate',fg="black",bg="firebrick", command=self.DeleteCut).pack(side=tk.LEFT)
         frame.pack(fill=tk.X,expand=False)
 
     def _MakeTreeView(self, parent):
