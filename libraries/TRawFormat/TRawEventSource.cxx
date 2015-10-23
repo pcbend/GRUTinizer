@@ -88,7 +88,8 @@ TRawEventByteSource::TRawEventByteSource(kFileType file_type)
 std::string TRawEventByteSource::Status() const {
   double runtime = clock.RealTime();
   clock.Continue();
-  return Form("%s %8.2f MB given %s / %s %8.2f MB total %s  => %s %3.02f MB/s processed %s",
+  return Form("%s: %s %8.2f MB given %s / %s %8.2f MB total %s  => %s %3.02f MB/s processed %s",
+              SourceDescription().c_str(),
               DCYAN, GetBytesGiven()/1e6, RESET_COLOR,
               BLUE,  GetFileSize()/1e6, RESET_COLOR,
               GREEN, GetBytesGiven()/(1e6*runtime), RESET_COLOR);

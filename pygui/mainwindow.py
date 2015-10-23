@@ -123,7 +123,7 @@ class MainWindow(object):
     def _setup_GUI(self):
         ws = self.window.winfo_screenwidth()
         hs = self.window.winfo_screenheight()
-        
+
         self.window.geometry('450x850+%d+%d' % (ws-475,25))
         self.window.wm_title("hist-o-matic")
         self.window.config(menu=self._MakeMenuBar())
@@ -179,7 +179,7 @@ class MainWindow(object):
         self._setup_status_bar(self.window)
 
     def _setup_status_bar(self, parent):
-        frame = tk.Frame(parent, height=40)
+        frame = tk.Frame(parent, height=60)
         frame.propagate(False)
         self.status_bar = AnsiColorText(frame, bg='black')
         self.status_bar.pack(fill=tk.X,expand=True)
@@ -453,7 +453,9 @@ class MainWindow(object):
 
     def LoadDataFile(self, filename = None):
         if filename is None:
-            filename = tkFileDialog.askopenfilename(filetypes=(("GEB File", "*.dat"),))
+            filename = tkFileDialog.askopenfilename(filetypes=(("GEB File", "*.dat"),
+                                                               ("GZip File", "*.gz"),
+                                                               ("NSCL Evt", "*.evt")))
 
         if not filename:
             return
