@@ -430,19 +430,45 @@ class MainWindow(object):
 
     def _draw_single(self,hist,color=1,nselected=1):
         canvas_exists = bool(filter(None,self.canvases))
-        if (not canvas_exists or
-            self.plotlocation.get()=='NewCanvas' or
-            not ROOT.gPad):
-            self.open_canvas(columns = self.zone_cols, rows = self.zone_rows)
+        
+        if(not canvas_exists or not ROOT.gPad):
+            self.open_canvas(columns=self.zone_cols,rows = self.zone_rows)
+            ROOT.gPad.GetCanvas().cd(self.zone_cols*self.zone_rows)
+            #ROOT.gPad.GetCanvas().cd(1)
 
-        currentnumber = ROOT.gPad.GetNumber()
-        if currentnumber>0:
-            ROOT.gPad.GetCanvas().cd(currentnumber+1)
-            if ROOT.gPad.GetNumber() == currentnumber:
-                ROOT.gPad.GetCanvas().cd(1)
+        if (self.plotlocation.get()=='NewCanvas'):
+            ROOT.gPad.GetCanvas().cd(0)
+            if (ROOT.gPad.GetListOfPrimitives().GetSize()==0):
+                ROOT.gPad.GetCanvas().Clear();
+                ROOT.gPad.Divide(self.zone_cols,self.zone_rows)
+            else:
+                self.open_canvas(columns=self.zone_cols,rows = self.zone_rows)
+            ROOT.gPad.GetCanvas().cd(self.zone_cols*self.zone_rows)
+
+        
+        if self.plotlocation.get()!='Replace' and self.plotlocation.get()!='Overlay':
+            if(self.zone_cols*self.zone_rows!=1):
+                self.plotlocation.set('NextPad')
+            #ROOT.gPad.GetCanvas().cd(self.zone_cols*self.zone_rows)
+        #print self.plotlocation.get()    
+            
+        #self.open_canvas(columns=self.zone_cols,rows = self.zone_rows)
+        #if self.zone_cols*self.zone_rows !=1:
+        #    self.plotlocation = 'NextPad'
+        #    ROOT.gPad.GetCanvas().cd(self.zone_cols*self.zone_rows)
+        #    print "where i am ploting: "+ str(self.zone_cols * self.zone_rows) 
+
 
         opt = []
-        if self.plotlocation.get() == 'Overlay':
+
+        currentnumber = ROOT.gPad.GetNumber()
+        #print currentnumber
+        if (self.plotlocation.get() == 'NextPad' and  currentnumber>0):
+           ROOT.gPad.GetCanvas().cd(currentnumber+1)
+           if ROOT.gPad.GetNumber() == currentnumber:
+                ROOT.gPad.GetCanvas().cd(1)
+
+        elif self.plotlocation.get() == 'Overlay':
             opt.append('same')
 
         if hist.GetDimension() > 1:
