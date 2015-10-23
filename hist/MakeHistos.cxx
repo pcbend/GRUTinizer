@@ -165,20 +165,20 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
       TH2 *mtdc_vs_dispx = GetMatrix(list,"MTDC_vs_DispX",1000,-5000,5000,600,-300,300);
       mtdc_vs_dispx->Fill(s800->GetTofE1_MTDC(MAFP_COEF,MCRDCX_COEF),s800->GetCrdc(0).GetDispersiveX());
-      TH2 *tdc_vs_dispx = GetMatrix(list,"TDC_vs_DispX",1000,-800,00,600,-300,300);
+      TH2 *tdc_vs_dispx = GetMatrix(list,"TDC_vs_DispX",1000,-1600,-800,600,-300,300);
       tdc_vs_dispx->Fill(s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),s800->GetCrdc(0).GetDispersiveX());
       
       
       TH2 *mtdc_vs_afp= GetMatrix(list,"MTDC_vs_AFP",1000,-5000,5000,600,-0.1,0.1);
       mtdc_vs_afp->Fill(s800->GetTofE1_MTDC(MAFP_COEF,MCRDCX_COEF),s800->GetAFP());
-      TH2 *tdc_vs_afp= GetMatrix(list,"TDC_vs_AFP",1000,-800,00,600,-0.1,0.1);
+      TH2 *tdc_vs_afp= GetMatrix(list,"TDC_vs_AFP",1000,-1600,-800,600,-0.1,0.1);
       tdc_vs_afp->Fill(s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),s800->GetAFP());
 
       double delta_t = s800->GetScint().GetTimeUp()-s800->GetTof().GetOBJ();
       
       TH2 *mtdc_vs_ic= GetMatrix(list,"PID_MTDC",1000,-2000,-1000,1000,0,25000);
       mtdc_vs_ic->Fill(s800->GetTofE1_MTDC(MAFP_COEF,MCRDCX_COEF),s800->GetIonChamber().Charge());
-      TH2 *tdc_vs_ic= GetMatrix(list,"PID_TDC",1000,-800,00,1000,0,25000);
+      TH2 *tdc_vs_ic= GetMatrix(list,"PID_TDC",1000,-1600,-800,1000,0,35000);
       tdc_vs_ic->Fill(s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),s800->GetIonChamber().Charge());
       
       if(delta_t>E1_TDC_low && delta_t<E1_TDC_high){
@@ -227,38 +227,98 @@ void MakeHistograms(TRuntimeObjects& obj) {
     hist1d = GetHistogram(list,"GretinaDopplerSum",1000,0,4000);
     hist1d->Fill(hit.GetDoppler(BETA));
 
-    TCutG *blob   = obj.GetCut("blob");
-    TCutG *blob_1 = obj.GetCut("blob_1");
-    TCutG *blob_2 = obj.GetCut("blob_2");
+    TCutG *Aar37 = obj.GetCut("Aar37");
+
+    TCutG *Cl35   = obj.GetCut("Cl35");
+
+    TCutG *S33 = obj.GetCut("S33");
+    TCutG *S32 = obj.GetCut("S32");
+
+    TCutG *P31 = obj.GetCut("P31");
+    TCutG *P30 = obj.GetCut("P30");
+
+    TCutG *Si29 = obj.GetCut("Si29");
+    TCutG *Si28 = obj.GetCut("Si28");
+    
     //TCutG *blob_Top = obj.GetCut("blob_Top");
     
     double pidx = s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF);
     double pidy = s800->GetIonChamber().Charge();
 
-    if(s800 && blob && blob->IsInside(pidx,pidy)){
-      hist1d = GetHistogram(list,"GretinaDopplerSum_blob",1000,0,4000);
+    if(s800 && Aar37 && Aar37->IsInside(pidx,pidy)){
+      hist1d = GetHistogram(list,"GretinaDopplerSum_Aar37",1000,0,4000);
       hist1d->Fill(hit.GetDoppler(BETA));
-      TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_blob",2000,0,4000,101,.2,.5);
+      TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_Aar37",2000,0,4000,101,.2,.5);
       double beta = 0.2;
       for(int z=0;z<100;z++) {
 	beta += .3/100.0;
 	doppler_beta->Fill(hit.GetDoppler(beta),beta);
       }
     }
-    if(s800 && blob_1 && blob_1->IsInside(pidx,pidy)){
-      hist1d = GetHistogram(list,"GretinaDopplerSum_blob_1",1000,0,4000);
+    if(s800 && Cl35 && Cl35->IsInside(pidx,pidy)){
+      hist1d = GetHistogram(list,"GretinaDopplerSum_Cl35",1000,0,4000);
       hist1d->Fill(hit.GetDoppler(BETA));
-      TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_blob_1",2000,0,4000,101,.2,.5);
+      TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_Cl35",2000,0,4000,101,.2,.5);
       double beta = 0.2;
       for(int z=0;z<100;z++) {
 	beta += .3/100.0;
 	doppler_beta->Fill(hit.GetDoppler(beta),beta);
       }
     }
-    if(s800 && blob_2 && blob_2->IsInside(pidx,pidy)){
-      hist1d = GetHistogram(list,"GretinaDopplerSum_blob_2",1000,0,4000);
+    if(s800 && S33 && S33->IsInside(pidx,pidy)){
+      hist1d = GetHistogram(list,"GretinaDopplerSum_S33",1000,0,4000);
       hist1d->Fill(hit.GetDoppler(BETA));
-      TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_blob_2",2000,0,4000,101,.2,.5);
+      TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_S33",2000,0,4000,101,.2,.5);
+      double beta = 0.2;
+      for(int z=0;z<100;z++) {
+	beta += .3/100.0;
+	doppler_beta->Fill(hit.GetDoppler(beta),beta);
+      }
+    }  
+    if(s800 && S32 && S32->IsInside(pidx,pidy)){
+      hist1d = GetHistogram(list,"GretinaDopplerSum_S32",1000,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA));
+      TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_S32",2000,0,4000,101,.2,.5);
+      double beta = 0.2;
+      for(int z=0;z<100;z++) {
+	beta += .3/100.0;
+	doppler_beta->Fill(hit.GetDoppler(beta),beta);
+      }
+    }
+    if(s800 && P31 && P31->IsInside(pidx,pidy)){
+      hist1d = GetHistogram(list,"GretinaDopplerSum_P31",1000,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA));
+      TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_P31",2000,0,4000,101,.2,.5);
+      double beta = 0.2;
+      for(int z=0;z<100;z++) {
+	beta += .3/100.0;
+	doppler_beta->Fill(hit.GetDoppler(beta),beta);
+      }
+    }
+    if(s800 && P30 && P30->IsInside(pidx,pidy)){
+      hist1d = GetHistogram(list,"GretinaDopplerSum_P30",1000,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA));
+      TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_P30",2000,0,4000,101,.2,.5);
+      double beta = 0.2;
+      for(int z=0;z<100;z++) {
+	beta += .3/100.0;
+	doppler_beta->Fill(hit.GetDoppler(beta),beta);
+      }
+    }
+    if(s800 && Si29 && Si29->IsInside(pidx,pidy)){
+      hist1d = GetHistogram(list,"GretinaDopplerSum_Si29",1000,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA));
+      TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_Si29",2000,0,4000,101,.2,.5);
+      double beta = 0.2;
+      for(int z=0;z<100;z++) {
+	beta += .3/100.0;
+	doppler_beta->Fill(hit.GetDoppler(beta),beta);
+      }
+    }
+    if(s800 && Si28 && Si28->IsInside(pidx,pidy)){
+      hist1d = GetHistogram(list,"GretinaDopplerSum_Si28",1000,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA));
+      TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_Si28",2000,0,4000,101,.2,.5);
       double beta = 0.2;
       for(int z=0;z<100;z++) {
 	beta += .3/100.0;
