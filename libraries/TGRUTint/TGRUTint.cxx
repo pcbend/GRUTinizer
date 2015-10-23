@@ -172,17 +172,31 @@ void TGRUTint::ApplyOptions() {
     RunMacroFile(filename);
   }
 
+  if(opt->SortTree() && !opt->StartGUI()) {
+    opt->SetStartGUI();
+  }
+
   if(opt->StartGUI()){
     std::string script_filename = program_path() + "/../util/grut-view.py";
     std::ifstream script(script_filename);
     std::string script_text((std::istreambuf_iterator<char>(script)),
                             std::istreambuf_iterator<char>());
     TPython::Exec(script_text.c_str());
+    TChain *chain = new TChain("EventTree");
     for(auto& filename : opt->RootInputFiles()){
       TPython::Exec(Form("window.LoadRootFile(\"%s\")",filename.c_str()));
-      OpenRootFile(filename); // Is this needed/sane?
+      TChain *chain = new TChain("EventTree");
+      //ok, we have open the root file, should we try to sort it?
     }
-
+    if(opt->SortTree()) { 
+      int num_added =0;
+      //for(int x=0;x<opt->RootInputFiles().size();x++) {
+      //   printf("\t sorting root file %s\n",opt->RootInputFiles().at(x).c_str());
+      
+      //}
+      printf("found NTrees: %i\n",chain->GetNtrees());
+    }
+    //ProcessFile(chain);
     for(auto& filename : opt->GuiSaveSetFiles()){
       TPython::Exec(Form("window.LoadGuiFile(\"%s\")",filename.c_str()));
     }
@@ -217,7 +231,7 @@ void TGRUTint::DefaultFunction(){
   std::cout << "I have been called " << i++ << " times before" << std::endl;
 }
 
-void TGRUTint::OpenRootFile(const std::string& filename){
+void TGRUTint::OpenRootFile(const std::string& filename,TChain *chain){
   if(!file_exists(filename)){
     std::cerr << "File \"" << filename << "\" does not exist" << std::endl;
     return;
@@ -231,6 +245,11 @@ void TGRUTint::OpenRootFile(const std::string& filename){
   TFile *file = (TFile*)gROOT->GetListOfFiles()->FindObject(filename.c_str());
   if(file){
     std::cout << "\tfile " << file->GetName() << " opened as _file" << fRootFilesOpened << std::endl;
+    if(chain) {
+      if(file->FindObjectAny("EventTree")) {
+          chain->Add(file->GetName());
+      }
+    }
   }
 
   fRootFilesOpened++;

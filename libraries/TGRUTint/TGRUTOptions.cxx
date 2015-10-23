@@ -74,6 +74,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("n no-sort", &fSortRaw)
     .description("Load raw data files without sorting")
     .default_value(true);
+  parser.option("s sort", &fSortTree)
+    .description("Try and loop over any loaded root file using libMakeHistos.so")
+    .default_value(false);
   parser.option("t time-sort", &fTimeSortInput)
     .description("Reorder raw events by time");
   parser.option("port", &fCommandPort)

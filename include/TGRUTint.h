@@ -14,6 +14,7 @@
 #include <TSysEvtHandler.h>
 #include <TRint.h>
 #include <TEnv.h>
+#include <TChain.h>
 
 #include "TGRUTServer.h"
 
@@ -54,7 +55,7 @@ public:
   void HandleFile(const std::string& filename);
 
  private:
-  void OpenRootFile(const std::string& filename);
+  void OpenRootFile(const std::string& filename,TChain *chain=0);
   void RunMacroFile(const std::string& filename);
 
 private:
