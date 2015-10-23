@@ -28,21 +28,10 @@ TRootOutfileGEB::TRootOutfileGEB() {
 
 TRootOutfileGEB::~TRootOutfileGEB() { }
 
-void TRootOutfileGEB::Init(const char* output_filename){
-  bool is_online = TGRUTOptions::Get()->IsOnline();
-
-  if(is_online){
-    SetOutfile(NULL);
-  } else {
-    if(output_filename==NULL){
-      output_filename = "my_output.root";
-    }
-    SetOutfile(output_filename);
-  }
-
-  //       Name          Title       Build?  Window  obvious
-  AddTree("EventTree", "Mode 2 data",true,    1000,  is_online);
-  AddTree("ScalerTree","ScalerTree", false,   -1,    is_online);
+void TRootOutfileGEB::Init(){
+  //       Name          Title       Build?  Window
+  AddTree("EventTree", "Mode 2 data",true,    1000);
+  AddTree("ScalerTree","ScalerTree", false,   -1);
 
   if(TDetectorEnv::Gretina()){
     AddBranch("EventTree", "TGretina", "TGretina",
@@ -74,16 +63,6 @@ void TRootOutfileGEB::Init(const char* output_filename){
   //   event_tree->Branch("TPhoswall","TPhoswall",&phoswall);
   //   det_list["TPhoswall"] = phoswall;
   // }
-  InitHists();
-
-}
-
-void TRootOutfileGEB::InitHists() {
-  return;
-}
-
-void TRootOutfileGEB::FillHists() {
-  return;
 }
 
 void TRootOutfileGEB::Clear(Option_t *opt) {

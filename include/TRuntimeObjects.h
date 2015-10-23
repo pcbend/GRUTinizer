@@ -19,9 +19,6 @@ public:
                   TList* variables);
 
   /// Returns a pointer to the detector of type T
-  /**
-
-   */
   template<typename T>
   T* GetDetector(){
     TIter next(detectors);

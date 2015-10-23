@@ -23,13 +23,13 @@ public:
   TRootOutfileGEB();
   ~TRootOutfileGEB();
 
-  virtual void Init(const char* output_filename);
-  virtual void InitHists();
-  virtual void FillHists();
 
   void HandleMode3(const TMode3&);
   void Clear(Option_t* option = "");
   void Print(Option_t* option = "") const;
+
+protected:
+  virtual void Init();
 
 private:
   TGretina*  gretina;

@@ -34,9 +34,25 @@ TRootOutfile::~TRootOutfile() {
   }
 }
 
+void TRootOutfile::InitFile(const char* output_filename){
+  bool is_online = TGRUTOptions::Get()->IsOnline();
+  if(is_online){
+    SetOutfile(NULL);
+  } else {
+    if(output_filename==NULL){
+      output_filename = "my_output.root";
+    }
+    SetOutfile(output_filename);
+  }
+
+  Init();
+}
+
 void TRootOutfile::AddTree(const char* tname,const char* ttitle,
-                             bool build, int build_window,
-                             bool is_online, int circular_size) {
+                           bool build, int build_window,
+                           int circular_size) {
+  bool is_online = TGRUTOptions::Get()->IsOnline();
+
   if(!outfile && !is_online) {
     fprintf(stderr,"%s, attempting to make tree with out associated file.\n",__PRETTY_FUNCTION__);
   }
@@ -98,10 +114,7 @@ void TRootOutfile::AddBranch(const char* treename, const char* branchname,
 
   tree->Branch(branchname, classname, obj);
   UpdateDetList(det_system, *obj, "EventTree");
-
-  if(tree->InheritsFrom(TOnlineTree::Class())){
-    ((TOnlineTree*)tree)->RegisterDetectorBranch(*obj);
-  }
+  compiled_histograms.RegisterDetector(*obj);
 }
 
 TRootOutfile::tree_element* TRootOutfile::FindTreeElement(const char* tname){
@@ -137,6 +150,7 @@ void TRootOutfile::FillTree(const char *tname, long next_timestamp) {
       item.second.det->Build();
     }
   }
+  compiled_histograms.Fill();
   elem->tree->Fill();
   Clear();
   elem->has_data = false;
@@ -230,6 +244,9 @@ void TRootOutfile::CloseFile(){
 
 
 void TRootOutfile::Print(Option_t* opt) const {
-
   return;
+}
+
+void TRootOutfile::LoadCompiledHistogramFile(const std::string& filename) {
+  compiled_histograms.Load(filename);
 }

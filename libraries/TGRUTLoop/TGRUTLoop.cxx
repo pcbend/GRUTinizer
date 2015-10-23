@@ -75,28 +75,13 @@ void TGRUTLoop::InitOutfile(kFileType file_type, const char* output) {
       fprintf(stderr,"%s: trying to sort unknown filetype:%s\n",__PRETTY_FUNCTION__,file_type);
       exit(1);
   };
-  outfile->Init(output);
+  outfile->InitFile(output);
+  if(TGRUTOptions::Get()->CompiledHistogramFile().length()){
+    outfile->LoadCompiledHistogramFile(TGRUTOptions::Get()->CompiledHistogramFile());
+  }
 }
 
 bool TGRUTLoop::Initialize(){
-  //printf("%s called.\n",__PRETTY_FUNCTION__);
-
-/*
-  if(!outfile){
-    switch(TGRUTOptions::Get()->DetermineFileType(input)) {
-      case kFileType::NSCL_EVT:
-        outfile = new TRootOutfileNSCL();
-        break;
-      case kFileType::GRETINA_MODE2:
-      case kFileType::GRETINA_MODE3:
-        outfile = new TRootOutfileGEB();
-        break;
-      default:
-        fprintf(stderr,"%s: trying to sort unknown filetype:%s\n",__PRETTY_FUNCTION__,input);
-        exit(1);
-    };
-  }
-*/
   if(!outfile) { // bad things are about to happen.
     std::cerr << "Cannot start data loop without output file defined" << std::endl;
     return false;

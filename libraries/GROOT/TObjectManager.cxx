@@ -66,8 +66,6 @@ void TObjectManager::SaveAndClose(Option_t* option){
     ParentChildMap::iterator it;
     for(it=fParentChildren.begin();it!=fParentChildren.end();it++) {
        TFile::cd("/");
-       printf("it->first = 0x%08x\n",it->first);
-       printf("getname() = %s\n",it->first->GetName());
        it->first->Write();
        if(it->second.size()){
          TFile::mkdir(it->first->GetName());

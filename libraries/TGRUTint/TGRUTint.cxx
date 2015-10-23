@@ -182,30 +182,26 @@ void TGRUTint::ApplyOptions() {
     std::string script_text((std::istreambuf_iterator<char>(script)),
                             std::istreambuf_iterator<char>());
     TPython::Exec(script_text.c_str());
-    TChain *chain = new TChain("EventTree");
+    //TChain *chain = new TChain("EventTree");
     for(auto& filename : opt->RootInputFiles()){
       TPython::Exec(Form("window.LoadRootFile(\"%s\")",filename.c_str()));
-      TChain *chain = new TChain("EventTree");
+      //TChain *chain = new TChain("EventTree");
       //ok, we have open the root file, should we try to sort it?
     }
-    if(opt->SortTree()) { 
-      int num_added =0;
-      //for(int x=0;x<opt->RootInputFiles().size();x++) {
-      //   printf("\t sorting root file %s\n",opt->RootInputFiles().at(x).c_str());
-      
-      //}
-      printf("found NTrees: %i\n",chain->GetNtrees());
-    }
+    // if(opt->SortTree()) {
+    //   int num_added =0;
+    //   //for(int x=0;x<opt->RootInputFiles().size();x++) {
+    //   //   printf("\t sorting root file %s\n",opt->RootInputFiles().at(x).c_str());
+
+    //   //}
+    //   printf("found NTrees: %i\n",chain->GetNtrees());
+    // }
     //ProcessFile(chain);
     for(auto& filename : opt->GuiSaveSetFiles()){
       TPython::Exec(Form("window.LoadGuiFile(\"%s\")",filename.c_str()));
     }
     fGuiTimer = new TTimer("TPython::Exec(\"update()\");",100);
     fGuiTimer->TurnOn();
-  }
-
-  if(online_events && opt->CompiledHistogramFile().length()){
-    online_events->LoadCompiledHistogramLibrary(opt->CompiledHistogramFile());
   }
 
   if (opt->RawInputFiles().size()){

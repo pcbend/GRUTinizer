@@ -6,13 +6,18 @@
 
 #include <sys/stat.h>
 
+#include "TH1.h"
+
 #include "FullPath.h"
+#include "GValue.h"
 
 typedef void* __attribute__((__may_alias__)) void_alias;
 
 TCompiledHistograms::TCompiledHistograms()
   : libname(""), library(nullptr), func(nullptr),
-    last_modified(0), last_checked(0), check_every(5) { }
+    last_modified(0), last_checked(0), check_every(5){
+  detectors.SetOwner(false);
+}
 
 TCompiledHistograms::TCompiledHistograms(std::string libname)
   : libname(full_path(libname)), check_every(5) {
@@ -21,6 +26,37 @@ TCompiledHistograms::TCompiledHistograms(std::string libname)
   *(void_alias*)(&func) = library->GetSymbol("MakeHistograms");
   last_modified = get_timestamp();
   last_checked = time(NULL);
+  detectors.SetOwner(false);
+}
+
+void TCompiledHistograms::RegisterDetector(TDetector* det){
+  detectors.Add(det);
+}
+
+void TCompiledHistograms::ClearHistograms() {
+  TIter next(&objects);
+  TObject* obj;
+  while((obj = next())){
+    if(obj->InheritsFrom(TH1::Class())){
+      TH1* hist = (TH1*)obj;
+      hist->Reset();
+    }
+  }
+}
+
+TList* TCompiledHistograms::GetHistograms() {
+  TList* output = new TList;
+  output->SetOwner(false);
+
+  TIter iter(&objects);
+  TObject* obj = NULL;
+  while((obj = iter.Next())){
+    if(obj->InheritsFrom(TH1::Class())){
+      output->Add(obj);
+    }
+  }
+
+  return output;
 }
 
 time_t TCompiledHistograms::get_timestamp() {
@@ -35,19 +71,19 @@ bool TCompiledHistograms::file_exists() {
 
 void TCompiledHistograms::Load(std::string libname) {
   TCompiledHistograms other(libname);
-  swap(other);
+  swap_lib(other);
 }
 
 void TCompiledHistograms::Reload() {
   if (file_exists() &&
       get_timestamp() > last_modified) {
     TCompiledHistograms other(libname);
-    swap(other);
+    swap_lib(other);
   }
   last_checked = time(NULL);
 }
 
-void TCompiledHistograms::swap(TCompiledHistograms& other) {
+void TCompiledHistograms::swap_lib(TCompiledHistograms& other) {
   std::swap(libname, other.libname);
   std::swap(library, other.library);
   std::swap(func, other.func);
@@ -56,13 +92,36 @@ void TCompiledHistograms::swap(TCompiledHistograms& other) {
   std::swap(check_every, other.check_every);
 }
 
-void TCompiledHistograms::Call(TRuntimeObjects& obj) {
+void TCompiledHistograms::Fill() {
+  if(time(NULL) > last_checked + check_every){
+    Reload();
+  }
+
   if(!library || !func){
     return;
   }
 
-  if(time(NULL) > last_checked + check_every){
-    Reload();
-  }
+  TRuntimeObjects obj(&detectors, &objects, &variables);
   func(obj);
+}
+
+TList* TCompiledHistograms::GetVariables() {
+  return &variables;
+}
+
+void TCompiledHistograms::SetReplaceVariable(const char* name, double value) {
+  GValue* val = (GValue*)variables.FindObject(name);
+  if(val){
+    val->SetValue(value);
+  } else {
+    GValue* val = new GValue(name, value);
+    variables.Add(val);
+  }
+}
+
+void TCompiledHistograms::RemoveVariable(const char* name) {
+  GValue* val = (GValue*)variables.FindObject(name);
+  if(val){
+    variables.Remove(val);
+  }
 }

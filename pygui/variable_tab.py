@@ -49,8 +49,10 @@ class VariableTab(object):
         self.treeview.bind("<Double-1>",self.VariableSelection)
 
     def SetReplaceVariable(self, name, value):
-        if ROOT.online_events:
-            ROOT.online_events.SetVariable(name, value)
+        outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
+        if outfile:
+            outfile.GetCompiledHistograms().SetReplaceVariable(name, value)
+
         self.variables[name] = value
 
         if name in self.treeview.get_children():
@@ -59,8 +61,9 @@ class VariableTab(object):
             self.treeview.insert('','end',name, text=name, values=(str(value),))
 
     def DeleteVariable(self, name):
-        if ROOT.online_events:
-            ROOT.online_events.RemoveVariable(name)
+        outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
+        if outfile:
+            outfile.GetCompiledHistograms().RemoveVariable(name)
 
         self.variables.pop(name, None)
         self.treeview.delete(name)

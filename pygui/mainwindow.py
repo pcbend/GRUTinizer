@@ -123,7 +123,7 @@ class MainWindow(object):
     def _setup_GUI(self):
         ws = self.window.winfo_screenwidth()
         hs = self.window.winfo_screenheight()
-        
+
         self.window.geometry('450x850+%d+%d' % (ws-475,25))
         self.window.wm_title("hist-o-matic")
         self.window.config(menu=self._MakeMenuBar())
@@ -272,6 +272,8 @@ class MainWindow(object):
         elif obj.InheritsFrom('TFile'):
             return self.icons['tfile']
         elif obj.InheritsFrom('TDirectory'):
+            return self.icons['folder_t']
+        elif obj.InheritsFrom('TList'):
             return self.icons['folder_t']
         elif obj.InheritsFrom('TTree'):
             return self.icons['ttree']
