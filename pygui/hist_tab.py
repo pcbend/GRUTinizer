@@ -91,12 +91,14 @@ class HistTab(object):
         self.CheckOnlineHists()
 
     def _load_compiled_histograms(self, filename):
-        if ROOT.online_events:
-            ROOT.online_events.LoadCompiledHistogramLibrary(filename)
+        outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
+        if outfile:
+            outfile.GetCompiledHistograms().SetReplaceVariable(name, value)
 
     def _compiled_histogram_filename(self):
-        if ROOT.online_events:
-            return ROOT.online_events.GetCompiledHistogramLibrary()
+        outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
+        if outfile:
+            return outfile.GetCompiledHistograms().GetLibraryName()
         else:
             return ''
 

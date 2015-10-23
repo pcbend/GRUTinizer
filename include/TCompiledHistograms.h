@@ -30,6 +30,8 @@ public:
   TList* GetHistograms();
   void ClearHistograms();
 
+  TList* GetObjects(){ return &objects; }
+
 private:
   void swap_lib(TCompiledHistograms& other);
   time_t get_timestamp();

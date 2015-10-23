@@ -93,12 +93,13 @@ class VariableTab(object):
         self.var_value.set(str(self.variables[name]))
 
     def _dump_to_tfile(self):
-        if not ROOT.online_events:
+        outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
+        if not outfile:
             return
 
         tdir = ROOT.gDirectory.mkdir('variables')
         with PreserveGDir(tdir):
-            for obj in ROOT.online_events.GetVariables():
+            for obj in outfile.GetCompiledHistograms().GetVariables():
                 obj.Write()
 
     def _variable_patterns(self):
