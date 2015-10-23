@@ -178,13 +178,14 @@ void TGRUTint::ApplyOptions() {
     std::string script_text((std::istreambuf_iterator<char>(script)),
                             std::istreambuf_iterator<char>());
     TPython::Exec(script_text.c_str());
-    for(auto& filename : opt->RootInputFiles()){
-      TPython::Exec(Form("window.LoadRootFile(\"%s\")",filename.c_str()));
-      OpenRootFile(filename); // Is this needed/sane?
-    }
 
     for(auto& filename : opt->GuiSaveSetFiles()){
       TPython::Exec(Form("window.LoadGuiFile(\"%s\")",filename.c_str()));
+    }
+
+    for(auto& filename : opt->RootInputFiles()){
+      TPython::Exec(Form("window.LoadRootFile(\"%s\")",filename.c_str()));
+      OpenRootFile(filename); // Is this needed/sane?
     }
     fGuiTimer = new TTimer("TPython::Exec(\"update()\");",100);
     fGuiTimer->TurnOn();

@@ -453,7 +453,9 @@ class MainWindow(object):
 
     def LoadDataFile(self, filename = None):
         if filename is None:
-            filename = tkFileDialog.askopenfilename(filetypes=(("GEB File", "*.dat"),))
+            filename = tkFileDialog.askopenfilename(filetypes=(("GEB File", "*.dat"),
+                                                               ("GZip File", "*.gz"),
+                                                               ("NSCL Evt", "*.evt")))
 
         if not filename:
             return
