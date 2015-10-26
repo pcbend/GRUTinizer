@@ -22,7 +22,7 @@ TRootOutfile::~TRootOutfile() {
   }
 
   if(outfile){
-    FinalizeFile();
+    //FinalizeFile();
     CloseFile();
     //outfile->Close();
     //delete outfile;
@@ -239,7 +239,7 @@ void TRootOutfile::FinalizeFile(){
     counter++;
   }
   printf("done. %i dirs written.\n",counter); fflush(stdout);
-  CloseFile();
+  //CloseFile();
 }
 
 void TRootOutfile::CloseFile(){
