@@ -66,7 +66,8 @@ void TGRUTLoop::ProcessFile(const std::vector<std::string>& input, const char* o
 void TGRUTLoop::ProcessTree(TTree* input, const char* output){
   tree = input;
   TDataLoop::ProcessFile("/dev/null");
-  InitOutfile(kFileType::GRETINA_MODE2, output);
+  InitOutfile(kFileType::GRETINA_MODE2, NULL);
+  outfile->InitTree(tree);
 }
 
 void TGRUTLoop::InitOutfile(kFileType file_type, const char* output) {
@@ -81,8 +82,12 @@ void TGRUTLoop::InitOutfile(kFileType file_type, const char* output) {
     default:
       fprintf(stderr,"%s: trying to sort unknown filetype:%s\n",__PRETTY_FUNCTION__,file_type);
       exit(1);
-  };
-  outfile->InitFile(output);
+  }
+  // Part of a dirty hack to loop over trees
+  // This way, I can initialize it myself, elsewhere
+  if(output){
+    outfile->InitFile(output);
+  }
   if(TGRUTOptions::Get()->CompiledHistogramFile().length()){
     outfile->LoadCompiledHistogramFile(TGRUTOptions::Get()->CompiledHistogramFile());
   }

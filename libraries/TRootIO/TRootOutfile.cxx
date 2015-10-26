@@ -57,7 +57,7 @@ void TRootOutfile::InitTree(TTree* tree) {
 void TRootOutfile::AddTree(const char* tname,const char* ttitle,
                            bool build, int build_window,
                            int circular_size) {
-  if(preexisting_tree && std::string(tname)=="EventTree"){
+  if(preexisting_tree){
     return;
   }
 
@@ -117,6 +117,7 @@ void TRootOutfile::AddBranch(const char* treename, const char* branchname,
                              kDetectorSystems det_system) {
   if(std::string(treename)=="EventTree" && preexisting_tree){
     preexisting_tree->SetBranchAddress(branchname, obj);
+    compiled_histograms.RegisterDetector(*obj);
     return;
   }
 
