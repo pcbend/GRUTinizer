@@ -76,7 +76,7 @@ void TRootOutfile::AddRawData(const TRawEvent& event, kDetectorSystems det_type)
     auto det = det_list.at(det_type);
     det.det->AddRawData(event);
     det.tree_elem->has_data = true;
-  } catch (std::out_of_range& e) { }
+  } catch (std::out_of_range& e) {  }
 }
 
 void TRootOutfile::UpdateDetList(kDetectorSystems det_system, TDetector* detector, const char* tree_name){
@@ -97,7 +97,7 @@ void TRootOutfile::AddBranch(const char* treename, const char* branchname,
   }
 
   tree->Branch(branchname, classname, obj);
-  UpdateDetList(det_system, *obj, "EventTree");
+  UpdateDetList(det_system, *obj, treename);
 
   if(tree->InheritsFrom(TOnlineTree::Class())){
     ((TOnlineTree*)tree)->RegisterDetectorBranch(*obj);

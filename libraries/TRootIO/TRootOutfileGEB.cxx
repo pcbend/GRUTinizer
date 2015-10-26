@@ -10,6 +10,7 @@
 #include "TBank29.h"
 #include "TMode3.h"
 #include "TS800.h"
+#include "TS800Scaler.h"
 
 ClassImp(TRootOutfileGEB)
 
@@ -23,6 +24,7 @@ TRootOutfileGEB::TRootOutfileGEB() {
   bank29  = new TBank29;
   mode3   = new TMode3;
   s800    = new TS800;
+  s800scaler = new TS800Scaler;
   // // phoswall = NULL;
 }
 
@@ -42,7 +44,7 @@ void TRootOutfileGEB::Init(const char* output_filename){
 
   //       Name          Title       Build?  Window  obvious
   AddTree("EventTree", "Mode 2 data",true,    1000,  is_online);
-  AddTree("ScalerTree","ScalerTree", false,   -1,    is_online);
+  AddTree("ScalerTree","ScalerTree", true,   -1,    is_online);
 
   if(TDetectorEnv::Gretina()){
     AddBranch("EventTree", "TGretina", "TGretina",
@@ -57,6 +59,11 @@ void TRootOutfileGEB::Init(const char* output_filename){
   if(TDetectorEnv::S800()){
     AddBranch("EventTree","TS800","TS800",
               (TDetector**)&s800, kDetectorSystems::S800);
+  }
+
+  if(TDetectorEnv::S800Scaler()){
+    AddBranch("ScalerTree","TS800Scaler","TS800Scaler",
+              (TDetector**)&s800scaler, kDetectorSystems::S800SCALER);
   }
 
   if(TDetectorEnv::Mode3()){

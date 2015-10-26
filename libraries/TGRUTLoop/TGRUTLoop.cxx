@@ -232,6 +232,8 @@ void TGRUTLoop::HandleGEBData(TGEBEvent& event){
       HandleGEBMode3(event, kDetectorSystems::BANK29);
       break;
     case 10:
+      gebout->AddRawData(event,kDetectorSystems::S800SCALER);
+      gebout->FillTree("ScalerTree");
       // S800 scaler data....
       break;
     case 17: //PWall Mode2 equivlant.

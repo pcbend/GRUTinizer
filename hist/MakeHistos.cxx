@@ -188,6 +188,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
       
       TH1 *E1_m_TDC = GetHistogram(list,"E1_m_TDC",8000,-8000,8000);
       E1_m_TDC->Fill(s800->GetScint().GetTimeUp()-s800->GetTof().GetOBJ());
+      
+      TH1 *hist1d = GetHistogram(list,"E1Raw",2000,0,8000);
+      hist1d->Fill(s800->GetScint().GetTimeUp());
     }
     
     TH2 *gret_energy_theta = GetMatrix(list,"GretinaEnergyTheta",4000,0,4000,314,0,3.14);
@@ -244,6 +247,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	beta += .3/100.0;
 	doppler_beta->Fill(hit.GetDoppler(beta),beta);
       }
+    
     }
     if(s800 && blob_1 && blob_1->IsInside(pidx,pidy)){
       hist1d = GetHistogram(list,"GretinaDopplerSum_blob_1",1000,0,4000);

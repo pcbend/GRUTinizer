@@ -35,7 +35,7 @@ public:
 
   virtual void Terminate(Int_t status = 0);
 
-  Long_t ProcessLine(const char* line, Bool_t sync=kFALSE,Int_t *error=0);
+  Long_t ProcessLine(const char* line, Bool_t sync=kTRUE,Int_t *error=0);
   TString ReverseObjectSearch(TString&);
 
 

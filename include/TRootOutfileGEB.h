@@ -16,6 +16,7 @@ class TGretina;
 class TMode3;
 //class TPhosWall;
 class TS800;
+class TS800Scaler;
 class TBank29;
 
 class TRootOutfileGEB : public TRootOutfile {
@@ -32,10 +33,11 @@ public:
   void Print(Option_t* option = "") const;
 
 private:
-  TGretina*  gretina;
-  TS800*     s800;
-  TMode3*    mode3;
-  TBank29*   bank29;
+  TGretina*    gretina;
+  TS800*       s800;
+  TS800Scaler* s800scaler;
+  TMode3*      mode3;
+  TBank29*     bank29;
   bool fMode3Init;
   // TPhoswall* phoswall;
 
