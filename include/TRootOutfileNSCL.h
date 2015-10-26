@@ -8,6 +8,7 @@
 
 class TJanus;
 class TSega;
+class TFastScint;
 
 class TRootOutfileNSCL : public TRootOutfile {
   public:
@@ -27,6 +28,8 @@ class TRootOutfileNSCL : public TRootOutfile {
  
     // TS800*     s800;
     // TCaesar*   caesar;
+
+    TFastScint* fastscint;
 
     //TTree* event_tree;
     //TTree* scaler_tree;

@@ -14,6 +14,8 @@ enum kDetectorSystems {
 
   SEGA = 64,
   JANUS = 65,
+  FASTSCINT =4,
+
 
   CAESAR = 80,
 

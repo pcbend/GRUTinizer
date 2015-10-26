@@ -5,7 +5,8 @@
 
 #include "TDetector.h"
 #include "TFastScintHit.h"
-#include "TNSCLEvent.h"
+
+class TNSCLEvent;
 
 class TFastScint : public TDetector {
 public:

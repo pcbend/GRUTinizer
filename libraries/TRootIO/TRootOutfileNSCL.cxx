@@ -6,6 +6,7 @@
 #include "TGRUTOptions.h"
 #include "TJanus.h"
 #include "TSega.h"
+#include "TFastScint.h"
 #include "TNSCLEvent.h"
 
 ClassImp(TRootOutfileNSCL);
@@ -15,7 +16,7 @@ TRootOutfileNSCL::TRootOutfileNSCL() {
   sega  = new TSega;
   // s800 = NULL;
   // caesar = NULL;
-
+  fastscint = new TFastScint;
 }
 
 TRootOutfileNSCL::~TRootOutfileNSCL() {
@@ -37,7 +38,7 @@ void TRootOutfileNSCL::Init(const char* output_filename){
     SetOutfile(output_filename);
   }
 
-  AddTree("EventTree","Events, yo.",true, 1000, is_online);
+  AddTree("EventTree","Events, yo.",true, -1, is_online);
   AddTree("ScalerTree","I can count.",false, -1, is_online);
 
   if(TDetectorEnv::Janus()){
@@ -49,6 +50,12 @@ void TRootOutfileNSCL::Init(const char* output_filename){
     AddBranch("EventTree","TSega","TSega",
               (TDetector**)&sega,kDetectorSystems::SEGA);
   }
+
+  if(TDetectorEnv::FastScint()){
+    AddBranch("EventTree","TFastScint","TFastScint",
+              (TDetector**)&fastscint,kDetectorSystems::FASTSCINT);
+  }
+
 
   InitHists();
 

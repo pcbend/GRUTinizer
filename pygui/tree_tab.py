@@ -213,7 +213,7 @@ class TreeTab(object):
                                  Xbins, Xlow, Xhigh)
             draw_command = Xvar
         else:
-            new_hist = ROOT.TH1I(name, name,
+            new_hist = ROOT.TH2I(name, name,
                                  Xbins, Xlow, Xhigh,
                                  Ybins, Ylow, Yhigh)
             draw_command = Yvar + ':' + Xvar

@@ -72,7 +72,6 @@ TDetectorHit& TFastScint::GetHit(int i){
 
 // This is where the unpacking happens:
 int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
-
   bool DEBUG = false;
 
   bool isQ = false;  
@@ -123,7 +122,9 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	hit.SetTime(-1);
 	if(Mq->isOOR()) hit.SetCharge(5000);
 	else            hit.SetCharge(Mq->Charge());	
-	
+
+	hit.SetEnergy();
+
 	if(Zero_Suppress){
 	  if(Mq->Charge()>0){
 	    InsertHit(hit);
@@ -131,10 +132,7 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	}
 	else{
 	  InsertHit(hit);
-	 
-	
 	}
-
 
 	if(DEBUG){
 	  std::cout << " QDC Q : " << std::hex << Mq->Charge() << std::endl;
@@ -168,6 +166,7 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	  TFastScintHit tdc_hit;
 	  tdc_hit.SetTime(Mt->Time());
 	  tdc_hit.SetCharge(-1);
+          tdc_hit.SetEnergy();
 	  
 	  if(Mt->isTrig())  tdc_hit.SetChannel(-10);
 	  else   	    tdc_hit.SetChannel(Mt->Chan());
