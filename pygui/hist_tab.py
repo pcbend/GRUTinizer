@@ -199,7 +199,9 @@ class HistTab(object):
         # The compiled histograms
         outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
         if outfile:
-            hists = outfile.GetCompiledHistograms().GetHistograms()
+            temp = outfile.GetCompiledHistograms()
+            print temp
+            hists = temp.GetHistograms()
             hists.SetName('Compiled Histograms')
             self.Insert(hists)
 

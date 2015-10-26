@@ -21,6 +21,7 @@ ClassImp(TGRUTLoop);
 TGRUTLoop::TGRUTLoop(){
   queue = new RawDataQueue;
   outfile = NULL;
+  tree = NULL;
 }
 
 TGRUTLoop::~TGRUTLoop(){
@@ -62,6 +63,12 @@ void TGRUTLoop::ProcessFile(const std::vector<std::string>& input, const char* o
   }
 }
 
+void TGRUTLoop::ProcessTree(TTree* input, const char* output){
+  tree = input;
+  TDataLoop::ProcessFile("/dev/null");
+  InitOutfile(kFileType::GRETINA_MODE2, output);
+}
+
 void TGRUTLoop::InitOutfile(kFileType file_type, const char* output) {
   switch(file_type) {
     case kFileType::NSCL_EVT:
@@ -92,6 +99,14 @@ bool TGRUTLoop::Initialize(){
 }
 
 void TGRUTLoop::WriteLoop(){
+  // Ugly hack to loop over a tree instead if
+  // Probably should have a different class entirely that holds the TRootOutfile.
+  // Will need some other way of letting the python GUI grab compiled histograms.
+  if(tree){
+    TreeLoop();
+    return;
+  }
+
   std::cout << "Write loop starting" << std::endl;
   while(running || queue->Size()){
     if(queue->Size()){
@@ -113,6 +128,19 @@ void TGRUTLoop::WriteLoop(){
   std::cout << "\nFlushing last event" << std::endl;
   outfile->FillAllTrees();
   std::cout << "Write loop ending" << std::endl;
+}
+
+void TGRUTLoop::TreeLoop(){
+  long nentries = tree->GetEntries();
+  for(long ientry = 0; ientry<nentries; ientry++){
+    if(ientry % 10000 == 0){
+      std::cout << "Tree loop: " << ientry << "     \r" << std::flush;
+    }
+
+    tree->GetEntry(ientry);
+    outfile->FillHistograms();
+  }
+  std::cout << std::endl;
 }
 
 void TGRUTLoop::ProcessFromQueue(TRawEvent& event){

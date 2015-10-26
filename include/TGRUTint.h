@@ -44,6 +44,8 @@ public:
 
   Int_t TabCompletionHook(char* buf, int* pLoc, std::ostream& out);
 
+  TFile* OpenRootFile(const std::string& filename,TChain *chain=0);
+
 public:
   TObject* DelayedProcessLine(std::string message);
   //GUI interface commands;
@@ -55,7 +57,6 @@ public:
   void HandleFile(const std::string& filename);
 
  private:
-  void OpenRootFile(const std::string& filename,TChain *chain=0);
   void RunMacroFile(const std::string& filename);
 
 private:
@@ -76,6 +77,8 @@ private:
   TObject* fNewChild;
   bool fIsTabComplete;
   TGRUTServer *fCommandServer;
+
+  TChain* fChain;
 
   void Init();
   void ApplyOptions();

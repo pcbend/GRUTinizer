@@ -472,7 +472,7 @@ class MainWindow(object):
             return
 
         filename = os.path.abspath(filename)
-        tfile = ROOT.TObjectManager.Get(filename,"read")
+        tfile = ROOT.TGRUTint.instance().OpenRootFile(filename)
         self.files[filename] = tfile
         self.hist_tab.Insert(tfile)
         self.tree_tab.AddFile(tfile)

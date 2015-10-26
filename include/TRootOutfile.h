@@ -20,6 +20,7 @@ public:
   ~TRootOutfile();
 
   void InitFile(const char* output_filename);
+  void InitTree(TTree* tree);
 
   // Common to all.
   void AddRawData(const TRawEvent& event, kDetectorSystems det_type);
@@ -34,6 +35,9 @@ public:
   void LoadCompiledHistogramFile(const std::string& filename);
   TCompiledHistograms& GetCompiledHistograms() {
     return compiled_histograms;
+  }
+  void FillHistograms() {
+    compiled_histograms.Fill();
   }
 
 protected:
@@ -79,6 +83,9 @@ private:
 
   TFile* outfile;
   TCompiledHistograms compiled_histograms;
+
+  // Part of the hack to have TGRUTLoop loop over a tree from file.
+  TTree* preexisting_tree;
 
   ClassDef(TRootOutfile, 0);
 };

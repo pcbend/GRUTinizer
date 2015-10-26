@@ -13,6 +13,7 @@ ClassImp(TRootOutfile)
 
 TRootOutfile::TRootOutfile() {
   outfile     = NULL;
+  preexisting_tree = NULL;
 }
 
 TRootOutfile::~TRootOutfile() {
@@ -48,9 +49,18 @@ void TRootOutfile::InitFile(const char* output_filename){
   Init();
 }
 
+void TRootOutfile::InitTree(TTree* tree) {
+  preexisting_tree = tree;
+  Init();
+}
+
 void TRootOutfile::AddTree(const char* tname,const char* ttitle,
                            bool build, int build_window,
                            int circular_size) {
+  if(preexisting_tree && std::string(tname)=="EventTree"){
+    return;
+  }
+
   bool is_online = TGRUTOptions::Get()->IsOnline();
 
   if(!outfile && !is_online) {
@@ -105,6 +115,11 @@ void TRootOutfile::UpdateDetList(kDetectorSystems det_system, TDetector* detecto
 void TRootOutfile::AddBranch(const char* treename, const char* branchname,
                              const char* classname, TDetector** obj,
                              kDetectorSystems det_system) {
+  if(std::string(treename)=="EventTree" && preexisting_tree){
+    preexisting_tree->SetBranchAddress(branchname, obj);
+    return;
+  }
+
   TTree* tree = FindTree(treename);
 
   if(!tree){
@@ -113,7 +128,7 @@ void TRootOutfile::AddBranch(const char* treename, const char* branchname,
   }
 
   tree->Branch(branchname, classname, obj);
-  UpdateDetList(det_system, *obj, "EventTree");
+  UpdateDetList(det_system, *obj, treename);
   compiled_histograms.RegisterDetector(*obj);
 }
 
@@ -150,7 +165,7 @@ void TRootOutfile::FillTree(const char *tname, long next_timestamp) {
       item.second.det->Build();
     }
   }
-  compiled_histograms.Fill();
+  FillHistograms();
   elem->tree->Fill();
   Clear();
   elem->has_data = false;

@@ -171,7 +171,7 @@ void TObjectManager::Append(TObject* obj, Bool_t replace){
 }
 
 void TObjectManager::ObjectAppended(TObject* obj) {
-  Emit("ObjectAppended(TObject*)",(long)obj);
+  //Emit("ObjectAppended(TObject*)",(long)obj);
 }
 
 void TObjectManager::AddRelationship(TObject* parent, TObject* child){

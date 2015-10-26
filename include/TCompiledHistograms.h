@@ -1,6 +1,9 @@
 #ifndef _TCOMPILEDHISTOGRAMS_H_
 #define _TCOMPILEDHISTOGRAMS_H_
 
+#ifndef __CINT__
+#include <mutex>
+#endif
 #include <memory>
 #include <string>
 
@@ -40,6 +43,7 @@ private:
   std::string libname;
 #ifndef __CINT__
   std::shared_ptr<DynamicLibrary> library;
+  std::mutex mutex;
 #endif
   void (*func)(TRuntimeObjects&);
   time_t last_modified;

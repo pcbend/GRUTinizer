@@ -34,6 +34,8 @@ void TCompiledHistograms::RegisterDetector(TDetector* det){
 }
 
 void TCompiledHistograms::ClearHistograms() {
+  std::lock_guard<std::mutex> lock(mutex);
+
   TIter next(&objects);
   TObject* obj;
   while((obj = next())){
@@ -45,6 +47,8 @@ void TCompiledHistograms::ClearHistograms() {
 }
 
 TList* TCompiledHistograms::GetHistograms() {
+  std::lock_guard<std::mutex> lock(mutex);
+
   TList* output = new TList;
   output->SetOwner(false);
 
@@ -93,6 +97,7 @@ void TCompiledHistograms::swap_lib(TCompiledHistograms& other) {
 }
 
 void TCompiledHistograms::Fill() {
+  std::lock_guard<std::mutex> lock(mutex);
   if(time(NULL) > last_checked + check_every){
     Reload();
   }
