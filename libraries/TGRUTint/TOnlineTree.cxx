@@ -36,24 +36,13 @@ TOnlineTree::TOnlineTree(const char* name, const char* title, int circular_size)
   } else if(!strcmp(name,"ScalerTree")){
     online_scalers = this;
   }
-
-  detector_list.SetOwner(false);
 }
 
 TOnlineTree::~TOnlineTree() { }
 
-void TOnlineTree::RegisterDetectorBranch(TDetector* det){
-  detector_list.Add(det);
-}
-
 TObject* TOnlineTree::GetObjectStringLeaves(){
-  std::stringstream ss;
-  for(auto& elem : GetStringLeaves()){
-    ss << elem << "\n";
-  }
-  return new TObjString(ss.str().c_str());
+  return GetObjectStringLeaves(this);
 }
-
 
 TObject* TOnlineTree::GetObjectStringLeaves(TTree *tree){
   std::stringstream ss;
@@ -64,15 +53,7 @@ TObject* TOnlineTree::GetObjectStringLeaves(TTree *tree){
 }
 
 std::vector<std::string> TOnlineTree::GetStringLeaves() {
-  std::vector<std::string> output;
-
-  TIter leaves(TTree::GetListOfBranches());
-  TObject* obj = NULL;
-  while((obj = leaves.Next())){
-    recurse_down(output, obj->GetName(), (TBranch*)obj);
-  }
-
-  return output;
+  return GetStringLeaves(this);
 }
 
 std::vector<std::string> TOnlineTree::GetStringLeaves(TTree *tree) {
@@ -123,18 +104,11 @@ Int_t TOnlineTree::Fill(){
   event_num = actual_event_num++;
   Int_t output = TTree::Fill();
 
-  FillCompiledHistograms();
-
   if(actual_event_num - last_fill > circular_size * 0.7){
     FillParsedHistograms_MutexTaken();
   }
 
   return output;
-}
-
-void TOnlineTree::FillCompiledHistograms() {
-  TRuntimeObjects obj(&detector_list, directory.GetList(), &variable_list);
-  compiled_histograms.Call(obj);
 }
 
 void TOnlineTree::AddHistogram(const char* name,
@@ -258,14 +232,6 @@ std::string TOnlineTree::GetHistPattern(std::string name) {
   return "";
 }
 
-std::string TOnlineTree::GetCompiledHistogramLibrary() const {
-  return compiled_histograms.GetLibraryName();
-}
-
-void TOnlineTree::LoadCompiledHistogramLibrary(const std::string& filename) {
-  compiled_histograms.Load(filename);
-}
-
 void TOnlineTree::ClearHistograms() {
   std::lock_guard<std::mutex> lock(fill_mutex);
 
@@ -276,26 +242,5 @@ void TOnlineTree::ClearHistograms() {
       TH1* hist = (TH1*)obj;
       hist->Reset();
     }
-  }
-}
-
-TList* TOnlineTree::GetVariables() {
-  return &variable_list;
-}
-
-void TOnlineTree::SetVariable(const char* name, double value) {
-  GValue* val = (GValue*)variable_list.FindObject(name);
-  if(val){
-    val->SetValue(value);
-  } else {
-    GValue* val = new GValue(name, value);
-    variable_list.Add(val);
-  }
-}
-
-void TOnlineTree::RemoveVariable(const char* name) {
-  GValue* val = (GValue*)variable_list.FindObject(name);
-  if(val){
-    variable_list.Remove(val);
   }
 }

@@ -34,7 +34,7 @@ public:
   bool IsPaused();
   void Join();
 
-  virtual bool Initialize() { }
+  virtual bool Initialize() { return true; }
   virtual void Finalize()   { }
   virtual int ProcessEvent(TRawEvent& event) { AbstractMethod("ProcessEvent()"); }
 

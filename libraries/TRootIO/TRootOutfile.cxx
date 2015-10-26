@@ -13,6 +13,7 @@ ClassImp(TRootOutfile)
 
 TRootOutfile::TRootOutfile() {
   outfile     = NULL;
+  preexisting_tree = NULL;
 }
 
 TRootOutfile::~TRootOutfile() {
@@ -21,7 +22,7 @@ TRootOutfile::~TRootOutfile() {
   }
 
   if(outfile){
-    FinalizeFile();
+    //FinalizeFile();
     CloseFile();
     //outfile->Close();
     //delete outfile;
@@ -34,9 +35,34 @@ TRootOutfile::~TRootOutfile() {
   }
 }
 
+void TRootOutfile::InitFile(const char* output_filename){
+  bool is_online = TGRUTOptions::Get()->IsOnline();
+  if(is_online){
+    SetOutfile(NULL);
+  } else {
+    if(output_filename==NULL){
+      output_filename = "my_output.root";
+    }
+    SetOutfile(output_filename);
+  }
+
+  Init();
+}
+
+void TRootOutfile::InitTree(TTree* tree) {
+  preexisting_tree = tree;
+  Init();
+}
+
 void TRootOutfile::AddTree(const char* tname,const char* ttitle,
-                             bool build, int build_window,
-                             bool is_online, int circular_size) {
+                           bool build, int build_window,
+                           int circular_size) {
+  if(preexisting_tree){
+    return;
+  }
+
+  bool is_online = TGRUTOptions::Get()->IsOnline();
+
   if(!outfile && !is_online) {
     fprintf(stderr,"%s, attempting to make tree with out associated file.\n",__PRETTY_FUNCTION__);
   }
@@ -89,6 +115,12 @@ void TRootOutfile::UpdateDetList(kDetectorSystems det_system, TDetector* detecto
 void TRootOutfile::AddBranch(const char* treename, const char* branchname,
                              const char* classname, TDetector** obj,
                              kDetectorSystems det_system) {
+  if(std::string(treename)=="EventTree" && preexisting_tree){
+    preexisting_tree->SetBranchAddress(branchname, obj);
+    compiled_histograms.RegisterDetector(*obj);
+    return;
+  }
+
   TTree* tree = FindTree(treename);
 
   if(!tree){
@@ -98,10 +130,7 @@ void TRootOutfile::AddBranch(const char* treename, const char* branchname,
 
   tree->Branch(branchname, classname, obj);
   UpdateDetList(det_system, *obj, treename);
-
-  if(tree->InheritsFrom(TOnlineTree::Class())){
-    ((TOnlineTree*)tree)->RegisterDetectorBranch(*obj);
-  }
+  compiled_histograms.RegisterDetector(*obj);
 }
 
 TRootOutfile::tree_element* TRootOutfile::FindTreeElement(const char* tname){
@@ -137,6 +166,7 @@ void TRootOutfile::FillTree(const char *tname, long next_timestamp) {
       item.second.det->Build();
     }
   }
+  FillHistograms();
   elem->tree->Fill();
   Clear();
   elem->has_data = false;
@@ -210,7 +240,7 @@ void TRootOutfile::FinalizeFile(){
     counter++;
   }
   printf("done. %i dirs written.\n",counter); fflush(stdout);
-  CloseFile();
+  //CloseFile();
 }
 
 void TRootOutfile::CloseFile(){
@@ -230,6 +260,9 @@ void TRootOutfile::CloseFile(){
 
 
 void TRootOutfile::Print(Option_t* opt) const {
-
   return;
+}
+
+void TRootOutfile::LoadCompiledHistogramFile(const std::string& filename) {
+  compiled_histograms.Load(filename);
 }

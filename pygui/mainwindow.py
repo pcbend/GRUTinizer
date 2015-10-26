@@ -273,6 +273,8 @@ class MainWindow(object):
             return self.icons['tfile']
         elif obj.InheritsFrom('TDirectory'):
             return self.icons['folder_t']
+        elif obj.InheritsFrom('TList'):
+            return self.icons['folder_t']
         elif obj.InheritsFrom('TTree'):
             return self.icons['ttree']
         else:
@@ -498,7 +500,7 @@ class MainWindow(object):
             return
 
         filename = os.path.abspath(filename)
-        tfile = ROOT.TObjectManager.Get(filename,"read")
+        tfile = ROOT.TGRUTint.instance().OpenRootFile(filename)
         self.files[filename] = tfile
         self.hist_tab.Insert(tfile)
         self.tree_tab.AddFile(tfile)
