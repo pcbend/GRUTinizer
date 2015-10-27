@@ -288,7 +288,7 @@ class MainWindow(object):
         return array
 
     def _MakeRefreshMenu(self,menubar):
-        self.refreshrate  = tk.IntVar(value='-1')
+        self.refreshrate  = tk.IntVar(value='1')
 
         refreshmenu = tk.Menu(menubar,tearoff=0)
         refreshmenu.add_checkbutton(label="Off",onvalue=-1,
@@ -406,10 +406,10 @@ class MainWindow(object):
         menubar.add_cascade(label="Send Help",menu=helpmenu)
 
     def RefreshHistograms(self):
-        if ROOT.online_events:
-            ROOT.online_events.FillParsedHistograms()
-        if ROOT.online_scalers:
-            ROOT.online_scalers.FillParsedHistograms()
+        # if ROOT.online_events:
+        #     ROOT.online_events.FillParsedHistograms()
+        # if ROOT.online_scalers:
+        #     ROOT.online_scalers.FillParsedHistograms()
         update_tcanvases()
 
     def ResetHistograms(self,hist=None):
@@ -430,7 +430,7 @@ class MainWindow(object):
 
     def _draw_single(self,hist,color=1,nselected=1):
         canvas_exists = bool(filter(None,self.canvases))
-        
+
         if(not canvas_exists or not ROOT.gPad):
             self.open_canvas(columns=self.zone_cols,rows = self.zone_rows)
             ROOT.gPad.GetCanvas().cd(self.zone_cols*self.zone_rows)
@@ -445,18 +445,18 @@ class MainWindow(object):
                 self.open_canvas(columns=self.zone_cols,rows = self.zone_rows)
             ROOT.gPad.GetCanvas().cd(self.zone_cols*self.zone_rows)
 
-        
+
         if self.plotlocation.get()!='Replace' and self.plotlocation.get()!='Overlay':
             if(self.zone_cols*self.zone_rows!=1):
                 self.plotlocation.set('NextPad')
             #ROOT.gPad.GetCanvas().cd(self.zone_cols*self.zone_rows)
-        #print self.plotlocation.get()    
-            
+        #print self.plotlocation.get()
+
         #self.open_canvas(columns=self.zone_cols,rows = self.zone_rows)
         #if self.zone_cols*self.zone_rows !=1:
         #    self.plotlocation = 'NextPad'
         #    ROOT.gPad.GetCanvas().cd(self.zone_cols*self.zone_rows)
-        #    print "where i am ploting: "+ str(self.zone_cols * self.zone_rows) 
+        #    print "where i am ploting: "+ str(self.zone_cols * self.zone_rows)
 
 
         opt = []

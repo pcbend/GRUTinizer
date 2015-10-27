@@ -23,6 +23,8 @@ TRootOutfileNSCL::~TRootOutfileNSCL() {
     GetOutfile()->Close();
     GetOutfile()->Delete();
   }
+  delete janus;
+  delete sega;
 }
 
 void TRootOutfileNSCL::Init(const char* output_filename){
