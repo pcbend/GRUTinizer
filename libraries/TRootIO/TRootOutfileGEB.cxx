@@ -86,23 +86,6 @@ void TRootOutfileGEB::Clear(Option_t *opt) {
   if(s800)    s800->Clear();
 }
 
-
-void TRootOutfileGEB::HandleMode3(const TMode3 &rhs) {
-  //printf("mode3 = 0x%08x\n",mode3);  fflush(stdout);
-  if(!fMode3Init) {
-    AddTree("Data","Mode 3 data");
-    TTree *mode3_tree = FindTree("Data");
-    mode3_tree->Branch("TMode3","TMode3",&mode3);
-    fMode3Init=true;
-  }
-  //printf("mode3 = 0x%08x\n",mode3);  fflush(stdout);
-  rhs.Copy(*mode3);
-  FindTree("Data")->Fill();
-}
-
-
-
-
 void TRootOutfileGEB::Print(Option_t* opt) const {
   std::cout << "Comming Soon!\n"
             << std::flush;
