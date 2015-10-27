@@ -73,7 +73,11 @@ void TRootOutfile::AddTree(const char* tname,const char* ttitle,
   }
 
   tree_element elem;
-  elem.tree = new TTree(tname,ttitle);
+  if(is_online){
+    elem.tree = NULL;
+  } else {
+    elem.tree = new TTree(tname,ttitle);
+  }
 
   //elem.tree->SetMaxTreeSize(1000000000); //outfile limited to 1gb, than outfle_%i opened.
   elem.build_det = build;
@@ -115,16 +119,14 @@ void TRootOutfile::AddBranch(const char* treename, const char* branchname,
     return;
   }
 
-  TTree* tree = FindTree(treename);
-
-  if(!tree){
-    std::cerr << "Could not find ttree: " << treename << std::endl;
-    return;
-  }
-
-  tree->Branch(branchname, classname, obj);
   UpdateDetList(det_system, *obj, treename);
   compiled_histograms.RegisterDetector(*obj);
+
+  TTree* tree = FindTree(treename);
+
+  if(tree){
+    tree->Branch(branchname, classname, obj);
+  }
 }
 
 TRootOutfile::tree_element* TRootOutfile::FindTreeElement(const char* tname){
@@ -161,7 +163,9 @@ void TRootOutfile::FillTree(const char *tname, long next_timestamp) {
     }
   }
   FillHistograms();
-  elem->tree->Fill();
+  if(elem->tree){
+    elem->tree->Fill();
+  }
   Clear();
   elem->has_data = false;
   elem->event_build_window_close = next_timestamp + elem->build_window;
@@ -180,7 +184,9 @@ void TRootOutfile::FillAllTrees() {
       }
 
       elem.event_build_window_close = elem.build_window;
-      elem.tree->Fill();
+      if(elem.tree){
+        elem.tree->Fill();
+      }
     }
   }
 }

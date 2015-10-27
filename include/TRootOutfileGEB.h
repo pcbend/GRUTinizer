@@ -24,8 +24,6 @@ public:
   TRootOutfileGEB();
   ~TRootOutfileGEB();
 
-
-  void HandleMode3(const TMode3&);
   void Clear(Option_t* option = "");
   void Print(Option_t* option = "") const;
 
