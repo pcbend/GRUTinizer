@@ -10,7 +10,7 @@ TBank29::TBank29(){
 }
 
 TBank29::~TBank29() {
-  channels->Delete();
+  delete channels;
 }
 
 void TBank29::Copy(TObject& obj) const {

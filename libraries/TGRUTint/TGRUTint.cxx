@@ -83,14 +83,14 @@ void TGRUTint::Init() {
 //  TMode3 *mode3 = new TMode3;
 //  mode3->Class();
 
-  TFile *tempfile = TFile::Open("/var/tmp/mytemp.root","recreate");
-  TTree *temptree = new TTree("temp","temp");
-  TMode3 *mode3=0;
-  temptree->Branch("TMode3","TMode3",&mode3);
-  temptree->Fill();
-  temptree->Write();
-  delete tempfile;
-  gSystem->Unlink("/var/tmp/mytemp.root");
+  // TFile *tempfile = TFile::Open("/var/tmp/mytemp.root","recreate");
+  // TTree *temptree = new TTree("temp","temp");
+  // TMode3 *mode3=0;
+  // temptree->Branch("TMode3","TMode3",&mode3);
+  // temptree->Fill();
+  // temptree->Write();
+  // delete tempfile;
+  // gSystem->Unlink("/var/tmp/mytemp.root");
 
   std::string grutpath = getenv("GRUTSYS");
 

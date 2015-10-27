@@ -281,7 +281,7 @@ class MainWindow(object):
         return array
 
     def _MakeRefreshMenu(self,menubar):
-        self.refreshrate  = tk.IntVar(value='-1')
+        self.refreshrate  = tk.IntVar(value='1')
 
         refreshmenu = tk.Menu(menubar,tearoff=0)
         refreshmenu.add_checkbutton(label="Off",onvalue=-1,
@@ -436,7 +436,6 @@ class MainWindow(object):
         if self.plotlocation.get()!='Replace' and self.plotlocation.get()!='Overlay':
             if(self.zone_cols*self.zone_rows!=1):
                 self.plotlocation.set('NextPad')
-
 
         opt = []
 

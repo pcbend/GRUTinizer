@@ -28,7 +28,13 @@ TRootOutfileGEB::TRootOutfileGEB() {
   // // phoswall = NULL;
 }
 
-TRootOutfileGEB::~TRootOutfileGEB() { }
+TRootOutfileGEB::~TRootOutfileGEB() {
+  delete gretina;
+  delete bank29;
+  delete mode3;
+  delete s800;
+  delete s800scaler;
+}
 
 void TRootOutfileGEB::Init(){
   //       Name          Title       Build?  Window
