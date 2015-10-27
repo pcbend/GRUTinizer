@@ -23,6 +23,9 @@ public:
   void ProcessFile(const char* input, const char* output);
   void ProcessFile(const std::vector<std::string>& input, const char* output);
 
+  // Part of the hack to loop over a tree.
+  void ProcessTree(TTree* input, const char* output);
+
   void PrintQueue();
   void StatusQueue();
 
@@ -53,6 +56,12 @@ private:
 
   RawDataQueue* queue;
   TRootOutfile* outfile;
+
+  // Temporary hack to be cleaned up later.
+  // If a tree has been given, then WriteLoop() will loop over the tree.
+  // Otherwise, it will loop over the raw data.
+  TTree* tree;
+  void TreeLoop();
 
 #ifndef __CINT__
   std::thread write_thread;

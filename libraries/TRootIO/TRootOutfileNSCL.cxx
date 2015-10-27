@@ -27,20 +27,9 @@ TRootOutfileNSCL::~TRootOutfileNSCL() {
   delete sega;
 }
 
-void TRootOutfileNSCL::Init(const char* output_filename){
-  bool is_online = TGRUTOptions::Get()->IsOnline();
-
-  if(is_online){
-    SetOutfile(NULL);
-  } else {
-    if(output_filename==NULL){
-      output_filename = "my_output.root";
-    }
-    SetOutfile(output_filename);
-  }
-
-  AddTree("EventTree","Events, yo.",true, 1000, is_online);
-  AddTree("ScalerTree","I can count.",false, -1, is_online);
+void TRootOutfileNSCL::Init(){
+  AddTree("EventTree", "Events, yo.", true, 1000);
+  AddTree("ScalerTree","I can count.",false, -1);
 
   if(TDetectorEnv::Janus()){
     AddBranch("EventTree","TJanus","TJanus",
@@ -52,8 +41,6 @@ void TRootOutfileNSCL::Init(const char* output_filename){
               (TDetector**)&sega,kDetectorSystems::SEGA);
   }
 
-  InitHists();
-
   // if(TDetectorEnv::S800()){
   //   event_tree->Branch("TS800","TS800",&s800);
   //   det_list["TS800"] = s800;
@@ -64,15 +51,6 @@ void TRootOutfileNSCL::Init(const char* output_filename){
   //   det_list["TSega"] = sega;
   // }
 
-}
-
-void TRootOutfileNSCL::InitHists() {
-
-  return;
-}
-
-void TRootOutfileNSCL::FillHists() {
-  return;
 }
 
 

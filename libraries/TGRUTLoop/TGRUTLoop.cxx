@@ -21,6 +21,7 @@ ClassImp(TGRUTLoop);
 TGRUTLoop::TGRUTLoop(){
   queue = new RawDataQueue;
   outfile = NULL;
+  tree = NULL;
 }
 
 TGRUTLoop::~TGRUTLoop(){
@@ -62,6 +63,13 @@ void TGRUTLoop::ProcessFile(const std::vector<std::string>& input, const char* o
   }
 }
 
+void TGRUTLoop::ProcessTree(TTree* input, const char* output){
+  tree = input;
+  TDataLoop::ProcessFile("/dev/null");
+  InitOutfile(kFileType::GRETINA_MODE2, NULL);
+  outfile->InitTree(tree);
+}
+
 void TGRUTLoop::InitOutfile(kFileType file_type, const char* output) {
   switch(file_type) {
     case kFileType::NSCL_EVT:
@@ -74,29 +82,18 @@ void TGRUTLoop::InitOutfile(kFileType file_type, const char* output) {
     default:
       fprintf(stderr,"%s: trying to sort unknown filetype:%s\n",__PRETTY_FUNCTION__,file_type);
       exit(1);
-  };
-  outfile->Init(output);
+  }
+  // Part of a dirty hack to loop over trees
+  // This way, I can initialize it myself, elsewhere
+  if(output){
+    outfile->InitFile(output);
+  }
+  if(TGRUTOptions::Get()->CompiledHistogramFile().length()){
+    outfile->LoadCompiledHistogramFile(TGRUTOptions::Get()->CompiledHistogramFile());
+  }
 }
 
 bool TGRUTLoop::Initialize(){
-  //printf("%s called.\n",__PRETTY_FUNCTION__);
-
-/*
-  if(!outfile){
-    switch(TGRUTOptions::Get()->DetermineFileType(input)) {
-      case kFileType::NSCL_EVT:
-        outfile = new TRootOutfileNSCL();
-        break;
-      case kFileType::GRETINA_MODE2:
-      case kFileType::GRETINA_MODE3:
-        outfile = new TRootOutfileGEB();
-        break;
-      default:
-        fprintf(stderr,"%s: trying to sort unknown filetype:%s\n",__PRETTY_FUNCTION__,input);
-        exit(1);
-    };
-  }
-*/
   if(!outfile) { // bad things are about to happen.
     std::cerr << "Cannot start data loop without output file defined" << std::endl;
     return false;
@@ -107,6 +104,14 @@ bool TGRUTLoop::Initialize(){
 }
 
 void TGRUTLoop::WriteLoop(){
+  // Ugly hack to loop over a tree instead if
+  // Probably should have a different class entirely that holds the TRootOutfile.
+  // Will need some other way of letting the python GUI grab compiled histograms.
+  if(tree){
+    TreeLoop();
+    return;
+  }
+
   std::cout << "Write loop starting" << std::endl;
   while(running || queue->Size()){
     if(queue->Size()){
@@ -128,6 +133,19 @@ void TGRUTLoop::WriteLoop(){
   std::cout << "\nFlushing last event" << std::endl;
   outfile->FillAllTrees();
   std::cout << "Write loop ending" << std::endl;
+}
+
+void TGRUTLoop::TreeLoop(){
+  long nentries = tree->GetEntries();
+  for(long ientry = 0; ientry<nentries; ientry++){
+    if(ientry % 10000 == 0){
+      std::cout << "Tree loop: " << ientry << "     \r" << std::flush;
+    }
+
+    tree->GetEntry(ientry);
+    outfile->FillHistograms();
+  }
+  std::cout << std::endl;
 }
 
 void TGRUTLoop::ProcessFromQueue(TRawEvent& event){

@@ -36,6 +36,7 @@ public:
   bool ShowedHelp()         const { return fHelp; }
   bool ShowLogo()           const { return fShowLogo; }
   bool SortRaw()            const { return fSortRaw; }
+  bool SortTree()           const { return fSortTree; }
   bool IgnoreMode3()        const { return fIgnoreMode3; }
   bool CommandServer()      const { return fCommandServer; }
   bool ExtractWaves()       const { return fExtractWaves;  }
@@ -53,6 +54,9 @@ public:
 
   std::string GenerateOutputFilename(const std::string& filename);
   std::string GenerateOutputFilename(const std::vector<std::string>& filename);
+
+
+  bool SetStartGUI(bool flag=true) { fStartGui=flag; }
 
 private:
   TGRUTOptions(int argc, char** argv);
@@ -80,6 +84,7 @@ private:
   bool fHelp;
   bool fShowLogo;
   bool fSortRaw;
+  bool fSortTree;
   bool fIgnoreErrors;
   bool fIgnoreMode3;
   bool fCommandServer;
