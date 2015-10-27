@@ -22,9 +22,6 @@
 #include "TGRUTOptions.h"
 #include "TGRUTLoop.h"
 #include "TGRUTUtilities.h"
-#include "TObjectManager.h"
-
-#include "TOnlineTree.h"
 
 //extern "C" G__value G__getitem(const char* item);
 //#include "FastAllocString.h"
@@ -95,32 +92,16 @@ void TGRUTint::Init() {
   delete tempfile;
   gSystem->Unlink("/var/tmp/mytemp.root");
 
-
-  if(TGRUTOptions::Get()->MakeBackupFile()){
-    //TObjectManager::Get("GRUT_Manager", "GRUT Manager");
-  }
-
-
-
   std::string grutpath = getenv("GRUTSYS");
 
   gInterpreter->AddIncludePath(Form("%s/include",grutpath.c_str()));
-  //gSystem->AddIncludePath(Form("-I%s/include",grutpath.c_str()));
-  //gSystem->AddDynamicPath(Form("-%s/libraries",grutpath.c_str()));
 
   if(TGRUTOptions::Get()->ShowLogo()){
     PopupLogo(false);
     WaitLogo();
   }
 
-  // if(TGRUTOptions::Get()->ShowLogo()){
-  //   PopupLogo(false);
-  //   WaitLogo();
-  // }
   ApplyOptions();
-  //printf("gManager = 0x%08x\n",gManager);   fflush(stdout);
-  //gManager->Print();
-  //gManager->Connect("TObjectManager", "ObjectAppended(TObject*)", "TGRUTint", this, "ObjectAppended(TObject*)");
 }
 
 /*********************************/
@@ -236,8 +217,6 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, TChain *chain){
     return NULL;
   }
 
-  // const char* command = Form("TFile *_file%i = TObjectManager::Get(\"%s\",\"read\")",
-  //       		      fRootFilesOpened, filename.c_str());
   const char* command = Form("TFile *_file%i = new TFile(\"%s\",\"read\")",
                              fRootFilesOpened, filename.c_str());
   ProcessLine(command);
@@ -348,31 +327,7 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
 
   fNewChild = NULL;
   long result =  TRint::ProcessLine(sline.Data(),sync,error);
-
-  if(!fNewChild){
-    return result;
-  }
-
-  if((index = sline.Index("Project",TString::kIgnoreCase))    != kNPOS   ||
-     (index = sline.Index("Projection",TString::kIgnoreCase)) != kNPOS   ||
-     (index = sline.Index("Profile",TString::kIgnoreCase))    != kNPOS   ||
-     (index = sline.Index("Draw",TString::kIgnoreCase))       != kNPOS ) {
-
-    TString newline = ReverseObjectSearch(sline);
-    TObject *parent = gROOT->FindObject(newline.Data());
-
-    if(parent){
-      gManager->AddRelationship(parent, fNewChild);
-    }
-  }
-
-  fNewChild = NULL;
   return result;
-}
-
-
-TObject* TGRUTint::ObjectAppended(TObject* obj){
-  //fNewChild = obj;
 }
 
 
@@ -405,11 +360,6 @@ void TGRUTint::Terminate(Int_t status){
 
   TGRUTLoop::Get()->Stop();
   TDataLoop::DeleteInstance();
-
-  // TIter iter(TObjectManager::GetListOfManagers());
-  // while(TObjectManager *om = (TObjectManager*)iter.Next()) {
-  //   om->SaveAndClose();
-  // }
 
   //Be polite when you leave.
   printf(DMAGENTA "\nbye,bye\t" DCYAN "%s" RESET_COLOR  "\n",getlogin());

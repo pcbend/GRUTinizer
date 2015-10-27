@@ -65,6 +65,7 @@ TH1 *GetHistogram(TList *list, std::string histname,int xbins,double xlow,double
   TH1   *hist = (TH1*)list->FindObject(histname.c_str());
   if(!hist) {
     hist= new TH1I(histname.c_str(),histname.c_str(),xbins,xlow,xhigh);
+    hist->SetDirectory(0);
     list->Add(hist);
   }
   return hist;
@@ -77,6 +78,7 @@ TH2 *GetMatrix(TList *list, std::string histname,int xbins, double xlow,double x
   if(!mat) {
     mat = new TH2I(histname.c_str(),histname.c_str(),xbins,xlow,xhigh,
                                                      ybins,ylow,yhigh);
+    mat->SetDirectory(0);
     list->Add(mat);
   }
   return mat;
@@ -188,7 +190,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
       TH1 *E1_m_TDC = GetHistogram(list,"E1_m_TDC",8000,-8000,8000);
       E1_m_TDC->Fill(s800->GetScint().GetTimeUp()-s800->GetTof().GetOBJ());
-      
+
       TH1 *hist1d = GetHistogram(list,"E1Raw",2000,0,8000);
       hist1d->Fill(s800->GetScint().GetTimeUp());
     }
@@ -247,7 +249,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	beta += .3/100.0;
 	doppler_beta->Fill(hit.GetDoppler(beta),beta);
       }
-    
+
     }
     if(s800 && blob_1 && blob_1->IsInside(pidx,pidy)){
       hist1d = GetHistogram(list,"GretinaDopplerSum_blob_1",1000,0,4000);

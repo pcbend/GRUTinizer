@@ -1,4 +1,4 @@
-// GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GCanvas.h TObjectManager.h GPeak.h GEfficiency.h
+// GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GCanvas.h GPeak.h GEfficiency.h
 
 #ifdef __CINT__
 #pragma link off all globals;
@@ -32,8 +32,6 @@
 
 #pragma link C++ global gManager;
 #pragma link C++ global gBaseManager;
-
-#pragma link C++ class TObjectManager+;
 
 #pragma link C++ class GMarker+;
 #pragma link C++ class GCanvas+;

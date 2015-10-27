@@ -7,7 +7,6 @@
 #include "TJanus.h"
 #include "TSega.h"
 #include "TNSCLEvent.h"
-#include "TOnlineTree.h"
 
 ClassImp(TRootOutfile)
 
@@ -74,12 +73,7 @@ void TRootOutfile::AddTree(const char* tname,const char* ttitle,
   }
 
   tree_element elem;
-
-  if(is_online){
-    elem.tree = new TOnlineTree(tname, ttitle, circular_size);
-  } else {
-    elem.tree = new TTree(tname,ttitle);
-  }
+  elem.tree = new TTree(tname,ttitle);
 
   //elem.tree->SetMaxTreeSize(1000000000); //outfile limited to 1gb, than outfle_%i opened.
   elem.build_det = build;

@@ -39,9 +39,6 @@ public:
   Long_t ProcessLine(const char* line, Bool_t sync=kTRUE,Int_t *error=0);
   TString ReverseObjectSearch(TString&);
 
-
-  TObject* ObjectAppended(TObject* obj);
-
   Int_t TabCompletionHook(char* buf, int* pLoc, std::ostream& out);
 
   TFile* OpenRootFile(const std::string& filename,TChain *chain=0);

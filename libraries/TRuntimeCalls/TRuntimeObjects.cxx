@@ -15,6 +15,7 @@ void TRuntimeObjects::FillHistogram(std::string name,
     hist->Fill(value);
   } else {
     TH1* newHist = new TH1I(name.c_str(),name.c_str(),bins,low,high);
+    newHist->SetDirectory(0);
     newHist->Fill(value);
     GetObjects().Add(newHist);
   }
@@ -30,6 +31,7 @@ void TRuntimeObjects::FillHistogram(std::string name,
     TH2* newHist = new TH2I(name.c_str(),name.c_str(),
                             Xbins, Xlow, Xhigh,
                             Ybins, Ylow, Yhigh);
+    newHist->SetDirectory(0);
     newHist->Fill(Xvalue, Yvalue);
     GetObjects().Add(newHist);
   }
