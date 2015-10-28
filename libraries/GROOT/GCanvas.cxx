@@ -624,6 +624,38 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       RemoveMarker("all");
       edited = true;
       break;
+    case kKey_z: {
+        printf("you pressed z!\n");           
+        GCanvas *c = (GCanvas*)gPad->GetCanvas();
+        TIter iter(c->GetListOfPrimitives());
+        while(TObject *obj = iter.Next()) {
+          if(!obj->InheritsFrom(TCanvas::Class()))
+            continue;
+          TCanvas *c = ((TCanvas*)obj);
+          if(!c->GetLogz())
+            c->SetLogz(1);
+        }
+      }
+      edited = true;
+      break;
+    case kKey_Z: {
+        GCanvas *c = (GCanvas*)gPad->GetCanvas();
+        TIter iter(c->GetListOfPrimitives());
+        while(TObject *obj = iter.Next()) {
+          if(!obj->InheritsFrom(TCanvas::Class()))
+            continue;
+          TCanvas *c = ((TCanvas*)obj);
+          if(c->GetLogz())
+            c->SetLogz(0);
+        }
+      }
+      edited = true;
+      break;
+
+
+
+
+
   };
   return edited;
 }

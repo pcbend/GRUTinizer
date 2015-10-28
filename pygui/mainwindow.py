@@ -281,7 +281,7 @@ class MainWindow(object):
         return array
 
     def _MakeRefreshMenu(self,menubar):
-        self.refreshrate  = tk.IntVar(value='1')
+        self.refreshrate  = tk.IntVar(value='-1')
 
         refreshmenu = tk.Menu(menubar,tearoff=0)
         refreshmenu.add_checkbutton(label="Off",onvalue=-1,

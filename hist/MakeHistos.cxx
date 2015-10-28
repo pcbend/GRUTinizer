@@ -165,26 +165,31 @@ void MakeHistograms(TRuntimeObjects& obj) {
       TH2 *gw800time = GetMatrix(list,"Gretina_t0_S800_time",1200,-600,600,2000,0,4000);
       gw800time->Fill(s800->Timestamp()-hit.GetTime(),hit.GetCoreEnergy());
 
-      TH2 *mtdc_vs_dispx = GetMatrix(list,"MTDC_vs_DispX",1000,-5000,5000,600,-300,300);
+      TH2 *mtdc_vs_dispx = GetMatrix(list,"MTDC_vs_DispX",2000,-5000,5000,600,-300,300);
       mtdc_vs_dispx->Fill(s800->GetTofE1_MTDC(MAFP_COEF,MCRDCX_COEF),s800->GetCrdc(0).GetDispersiveX());
-      TH2 *tdc_vs_dispx = GetMatrix(list,"TDC_vs_DispX",1000,-800,00,600,-300,300);
+      TH2 *tdc_vs_dispx = GetMatrix(list,"TDC_vs_DispX",2000,-2000,00,600,-300,300);
       tdc_vs_dispx->Fill(s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),s800->GetCrdc(0).GetDispersiveX());
 
 
       TH2 *mtdc_vs_afp= GetMatrix(list,"MTDC_vs_AFP",1000,-5000,5000,600,-0.1,0.1);
       mtdc_vs_afp->Fill(s800->GetTofE1_MTDC(MAFP_COEF,MCRDCX_COEF),s800->GetAFP());
-      TH2 *tdc_vs_afp= GetMatrix(list,"TDC_vs_AFP",1000,-800,00,600,-0.1,0.1);
+      TH2 *tdc_vs_afp= GetMatrix(list,"TDC_vs_AFP",2000,-2000,00,600,-0.1,0.1);
       tdc_vs_afp->Fill(s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),s800->GetAFP());
+      
+
+
+
+
 
       double delta_t = s800->GetScint().GetTimeUp()-s800->GetTof().GetOBJ();
 
-      TH2 *mtdc_vs_ic= GetMatrix(list,"PID_MTDC",1000,-2000,-1000,1000,0,25000);
+      TH2 *mtdc_vs_ic= GetMatrix(list,"PID_MTDC",2000,-2000,0,2000,20000,40000);
       mtdc_vs_ic->Fill(s800->GetTofE1_MTDC(MAFP_COEF,MCRDCX_COEF),s800->GetIonChamber().Charge());
-      TH2 *tdc_vs_ic= GetMatrix(list,"PID_TDC",1000,-800,00,1000,0,25000);
+      TH2 *tdc_vs_ic= GetMatrix(list,"PID_TDC",2000,-2000,0,2000,10000,40000);
       tdc_vs_ic->Fill(s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),s800->GetIonChamber().Charge());
 
       if(delta_t>E1_TDC_low && delta_t<E1_TDC_high){
-	TH2 *tdc_vs_ic_Prompt= GetMatrix(list,"PID_TDC_Prompt",1000,-800,0,1000,0,25000);
+	TH2 *tdc_vs_ic_Prompt= GetMatrix(list,"PID_TDC_Prompt",4000,-8000,8000,2000,20000,40000);
 	tdc_vs_ic_Prompt->Fill(s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),s800->GetIonChamber().Charge());
       }
 
@@ -291,7 +296,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
 
     TH2 *qchg = GetMatrix(list,Form("Q%iCoreCharge",HoleQMap[hit.GetCrystalId()/4]),
-                          16,0,16,8000,0,32000);
+                          16,0,16,8000,0,64000);
     qchg->Fill(4*hit.GetCrystalNumber()+0.,((double)hit.GetCoreCharge(0)));
     qchg->Fill(4*hit.GetCrystalNumber()+1.,((double)hit.GetCoreCharge(1)));
     qchg->Fill(4*hit.GetCrystalNumber()+2.,((double)hit.GetCoreCharge(2)));
