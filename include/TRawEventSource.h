@@ -4,6 +4,8 @@
 #include "Globals.h"
 
 #include <cstdio>
+#include <ctime>
+#include <deque>
 #include <string>
 
 #include "TStopwatch.h"
@@ -42,6 +44,7 @@ public:
 
   bool IsFinished() const { return fIsFinished; }
   size_t GetBytesGiven() const { return fBytesGiven; }
+  double GetAverageRate() const;
 
 protected:
   void SetLastErrno(int error) { fLastErrno = error; }
@@ -55,6 +58,8 @@ private:
    */
   virtual int GetEvent(TRawEvent& event) = 0;
 
+  void UpdateByteThroughput(int bytes);
+
   static kFileType DefaultFileType();
 
 
@@ -62,6 +67,10 @@ private:
   int fLastErrno;
   bool fIsFinished;
   std::string fLastError;
+
+  std::deque<size_t> fBytesPerSecond;
+  time_t current_time;
+  int seconds_to_average;
 
   ClassDef(TRawEventSource, 0);
 };

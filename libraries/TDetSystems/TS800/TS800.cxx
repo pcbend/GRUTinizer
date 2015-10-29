@@ -50,8 +50,8 @@ bool TS800::ReadInvMap(const char* file){
   getline(inFile,eat);
   
   if(I!="I" && COEF!="COEFFICIENT"){
-    std::cout << " *** Bad S800 Inv Map File Format!!! " << std::endl;
-    std::cout << " *** Inv Map File Not Read !!! " << std::endl;
+    //std::cout << " *** Bad S800 Inv Map File Format!!! " << std::endl;
+    //std::cout << " *** Inv Map File Not Read !!! " << std::endl;
     return false;
   }
   

@@ -174,11 +174,6 @@ void TGRUTint::ApplyOptions() {
     for(auto& filename : opt->GuiSaveSetFiles()){
       TPython::Exec(Form("window.LoadGuiFile(\"%s\")",filename.c_str()));
     }
-
-    for(auto& filename : opt->RootInputFiles()){
-      TPython::Exec(Form("window.LoadRootFile(\"%s\")",filename.c_str()));
-      OpenRootFile(filename); // Is this needed/sane?
-    }
     fGuiTimer = new TTimer("TPython::Exec(\"update()\");",100);
     fGuiTimer->TurnOn();
   }
