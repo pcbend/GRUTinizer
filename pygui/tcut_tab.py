@@ -77,13 +77,6 @@ class TCutTab(object):
 
         return cutg
 
-        # Cut is finished, so grab it.
-        #ROOT.gROOT.GetListOfSpecials().Remove(cutg)
-        #name = self.next_name.get()
-        #cutg.SetName(name)
-        #self._increment_name()
-        #self.AddCut(cutg)
-
     def AddFile(self, tfile):
         for key in tfile.GetListOfKeys():
             if key.GetClassName()=='TCutG':
@@ -96,21 +89,20 @@ class TCutTab(object):
         self.cuts[name] = cut
         self.tree.insert('', 'end', name, text=name, values='2D Cut',
                          image = self.main.icons['tcutg'])
-        if ROOT.online_events:
-            ROOT.online_events.GetDirectory().Add(cut)
+
+        outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
+        if outfile:
+            outfile.GetCompiledHistograms().GetObjects().Add(cut)
         if ROOT.gPad:
             ROOT.gPad.Modified()
             ROOT.gPad.Update()
 
     def StartCut(self):
-
         ROOT.gROOT.SetEditorMode('CutG')
-        print "i am here, but it feels so wrong."
-
 
     def SaveCut(self):
         cutg = self._check_for_tcut()
-        if(cutg is None):
+        if cutg is None:
             return
 
         ROOT.gROOT.GetListOfSpecials().Remove(cutg)
@@ -150,7 +142,7 @@ class TCutTab(object):
         newcut.Draw('same')
         self.AddCut(newcut)
 
-            
+
     def _increment_name(self):
         name = self.next_name.get()
         self.next_name.set(increment_name(name))

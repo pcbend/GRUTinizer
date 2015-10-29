@@ -9,7 +9,7 @@ TGretina::TGretina(){
 }
 
 TGretina::~TGretina() {
-  gretina_hits->Delete();
+  delete gretina_hits;
   //addback_hits->Delete();
 }
 

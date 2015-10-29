@@ -8,7 +8,7 @@ TMode3::TMode3(){
 }
 
 TMode3::~TMode3() {
-  mode3_hits->Delete();
+  delete mode3_hits;
 }
 
 void TMode3::Copy(TObject& obj) const {

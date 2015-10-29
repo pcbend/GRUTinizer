@@ -21,8 +21,6 @@ public:
               int circular_size = 32768);
   virtual ~TOnlineTree();
 
-  void RegisterDetectorBranch(TDetector* det);
-
   void AddHistogram(const char* name,
                     int bins, double low, double high, const char* varexp,
                     const char* gate = "");
@@ -45,10 +43,6 @@ public:
 
   TList* GetHistograms();
 
-  TList* GetVariables();
-  void SetVariable(const char* name, double value);
-  void RemoveVariable(const char* name);
-
   void cd(){ saved_dir = gDirectory; directory.cd(); }
   void popd() {
     if(saved_dir) {
@@ -61,24 +55,16 @@ public:
 
   std::string GetHistPattern(std::string name);
 
-  std::string GetCompiledHistogramLibrary() const;
-  void LoadCompiledHistogramLibrary(const std::string& filename);
-
   void ClearHistograms();
 
 private:
   static void recurse_down(std::vector<std::string>& terminal_leaves, std::string current_branch, TBranch* branch);
 
-  void FillCompiledHistograms();
   void FillParsedHistograms_MutexTaken();
 
 #ifndef __CINT__
   std::mutex fill_mutex;
 #endif
-
-  TList detector_list;
-  TList variable_list;
-  TCompiledHistograms compiled_histograms;
 
   TDirectory  directory;
   TDirectory* saved_dir;

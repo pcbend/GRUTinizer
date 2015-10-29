@@ -1,4 +1,4 @@
-// TS800.h TS800Hit.h
+// TS800.h TS800Hit.h TS800Scaler.h
 
 #ifdef __CINT__
 
@@ -26,7 +26,9 @@
 #pragma link C++ class TCrdcPad+;
 #pragma link C++ class THodoHit+;
 
+
 #pragma link C++ class TS800Hit+;
 #pragma link C++ class TS800+;
+#pragma link C++ class TS800Scaler+;
 
 #endif

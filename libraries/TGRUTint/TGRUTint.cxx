@@ -76,6 +76,7 @@ TGRUTint::~TGRUTint() {
 
 void TGRUTint::Init() {
   TGRUTLoop::CreateDataLoop<TGRUTLoop>();
+  fChain = new TChain("EventTree");
 
   if(TGRUTOptions::Get()->ShouldExit()){
     Terminate();
@@ -85,18 +86,18 @@ void TGRUTint::Init() {
 //  TMode3 *mode3 = new TMode3;
 //  mode3->Class();
 
-  TFile *tempfile = TFile::Open("/var/tmp/mytemp.root","recreate");
-  TTree *temptree = new TTree("temp","temp");
-  TMode3 *mode3=0;
-  temptree->Branch("TMode3","TMode3",&mode3);
-  temptree->Fill();
-  temptree->Write();
-  delete tempfile;
-  gSystem->Unlink("/var/tmp/mytemp.root");
+  // TFile *tempfile = TFile::Open("/var/tmp/mytemp.root","recreate");
+  // TTree *temptree = new TTree("temp","temp");
+  // TMode3 *mode3=0;
+  // temptree->Branch("TMode3","TMode3",&mode3);
+  // temptree->Fill();
+  // temptree->Write();
+  // delete tempfile;
+  // gSystem->Unlink("/var/tmp/mytemp.root");
 
 
   if(TGRUTOptions::Get()->MakeBackupFile()){
-    TObjectManager::Get("GRUT_Manager", "GRUT Manager");
+    //TObjectManager::Get("GRUT_Manager", "GRUT Manager");
   }
 
 
@@ -119,7 +120,7 @@ void TGRUTint::Init() {
   ApplyOptions();
   //printf("gManager = 0x%08x\n",gManager);   fflush(stdout);
   //gManager->Print();
-  gManager->Connect("TObjectManager", "ObjectAppended(TObject*)", "TGRUTint", this, "ObjectAppended(TObject*)");
+  //gManager->Connect("TObjectManager", "ObjectAppended(TObject*)", "TGRUTint", this, "ObjectAppended(TObject*)");
 }
 
 /*********************************/
@@ -145,6 +146,7 @@ void TGRUTint::ApplyOptions() {
 
   TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
 
+  bool need_loop = false;
   if(opt->RawInputFiles().size()==1 && opt->SortRaw()){
     std::string filename = opt->RawInputFiles()[0];
     std::string outfile = opt->OutputFile();
@@ -152,6 +154,7 @@ void TGRUTint::ApplyOptions() {
       outfile = opt->GenerateOutputFilename(filename);
     }
     TGRUTLoop::Get()->ProcessFile(filename.c_str(), outfile.c_str());
+    need_loop = true;
 
   } else if (opt->RawInputFiles().size()>1 && opt->SortRaw()){
     std::vector<std::string> filenames = opt->RawInputFiles();
@@ -160,6 +163,7 @@ void TGRUTint::ApplyOptions() {
       outfile = opt->GenerateOutputFilename(filenames);
     }
     TGRUTLoop::Get()->ProcessFile(filenames, outfile.c_str());
+    need_loop = true;
   }
 
   if(!opt->StartGUI()) {
@@ -172,6 +176,10 @@ void TGRUTint::ApplyOptions() {
     RunMacroFile(filename);
   }
 
+  if(opt->SortTree() && !opt->StartGUI()) {
+    opt->SetStartGUI();
+  }
+
   if(opt->StartGUI()){
     std::string script_filename = program_path() + "/../util/grut-view.py";
     std::ifstream script(script_filename);
@@ -179,6 +187,9 @@ void TGRUTint::ApplyOptions() {
                             std::istreambuf_iterator<char>());
     TPython::Exec(script_text.c_str());
 
+    for(auto& filename : opt->RootInputFiles()){
+      TPython::Exec(Form("window.LoadRootFile(\"%s\")",filename.c_str()));
+    }
     for(auto& filename : opt->GuiSaveSetFiles()){
       TPython::Exec(Form("window.LoadGuiFile(\"%s\")",filename.c_str()));
     }
@@ -191,11 +202,12 @@ void TGRUTint::ApplyOptions() {
     fGuiTimer->TurnOn();
   }
 
-  if(online_events && opt->CompiledHistogramFile().length()){
-    online_events->LoadCompiledHistogramLibrary(opt->CompiledHistogramFile());
+  if(opt->SortTree() && fChain->GetEntries()){
+    TGRUTLoop::Get()->ProcessTree(fChain, "/dev/null");
+    need_loop = true;
   }
 
-  if (opt->RawInputFiles().size()){
+  if (need_loop){
     TGRUTLoop::Get()->Start();
   }
 
@@ -218,23 +230,28 @@ void TGRUTint::DefaultFunction(){
   std::cout << "I have been called " << i++ << " times before" << std::endl;
 }
 
-void TGRUTint::OpenRootFile(const std::string& filename){
+TFile* TGRUTint::OpenRootFile(const std::string& filename, TChain *chain){
   if(!file_exists(filename)){
     std::cerr << "File \"" << filename << "\" does not exist" << std::endl;
-    return;
+    return NULL;
   }
 
-  const char* command = Form("TFile *_file%i = TObjectManager::Get(\"%s\",\"read\")",
-			      fRootFilesOpened, filename.c_str());
-  //const char* command = Form("TFile *_file%i = new TFile(\"%s\",\"read\")",
+  // const char* command = Form("TFile *_file%i = TObjectManager::Get(\"%s\",\"read\")",
+  //       		      fRootFilesOpened, filename.c_str());
+  const char* command = Form("TFile *_file%i = new TFile(\"%s\",\"read\")",
+                             fRootFilesOpened, filename.c_str());
   ProcessLine(command);
 
   TFile *file = (TFile*)gROOT->GetListOfFiles()->FindObject(filename.c_str());
   if(file){
     std::cout << "\tfile " << file->GetName() << " opened as _file" << fRootFilesOpened << std::endl;
+    if(file->FindObjectAny("EventTree")) {
+      fChain->Add(file->GetName());
+    }
   }
 
   fRootFilesOpened++;
+  return file;
 }
 
 void TGRUTint::RunMacroFile(const std::string& filename){
@@ -355,7 +372,7 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
 
 
 TObject* TGRUTint::ObjectAppended(TObject* obj){
-  fNewChild = obj;
+  //fNewChild = obj;
 }
 
 
@@ -389,10 +406,10 @@ void TGRUTint::Terminate(Int_t status){
   TGRUTLoop::Get()->Stop();
   TDataLoop::DeleteInstance();
 
-  TIter iter(TObjectManager::GetListOfManagers());
-  while(TObjectManager *om = (TObjectManager*)iter.Next()) {
-    om->SaveAndClose();
-  }
+  // TIter iter(TObjectManager::GetListOfManagers());
+  // while(TObjectManager *om = (TObjectManager*)iter.Next()) {
+  //   om->SaveAndClose();
+  // }
 
   //Be polite when you leave.
   printf(DMAGENTA "\nbye,bye\t" DCYAN "%s" RESET_COLOR  "\n",getlogin());

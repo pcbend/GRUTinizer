@@ -67,7 +67,7 @@ TH1 *GetHistogram(TList *list, std::string histname,int xbins,double xlow,double
     hist= new TH1I(histname.c_str(),histname.c_str(),xbins,xlow,xhigh);
     list->Add(hist);
   }
-  return hist; 
+  return hist;
 }
 
 TH2 *GetMatrix(TList *list, std::string histname,int xbins, double xlow,double xhigh,
@@ -79,7 +79,7 @@ TH2 *GetMatrix(TList *list, std::string histname,int xbins, double xlow,double x
                                                      ybins,ylow,yhigh);
     list->Add(mat);
   }
-  return mat; 
+  return mat;
 }
 
 
@@ -102,6 +102,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   TList *list = &(obj.GetObjects());
 
+
   TCutG *Ar37 = obj.GetCut("Ar37");
   TCutG *Ar36 = obj.GetCut("Ar6");
   TCutG *Cl35   = obj.GetCut("Cl35");
@@ -114,7 +115,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
   TCutG *Si29 = obj.GetCut("Si29");
   TCutG *Si28 = obj.GetCut("Si28");
   
-
   //if(cut) cut->Print();
   double MAFP_COEF = obj.GetVariable("MAFP_COEF");
   double MCRDCX_COEF = obj.GetVariable("MCRDCX_COEF");
@@ -123,8 +123,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
   double BETA = obj.GetVariable("BETA");
   double E1_TDC_low = obj.GetVariable("E1_TDC_low");
   double E1_TDC_high = obj.GetVariable("E1_TDC_high");
- 
-  
+
+
   int numobj = list->GetSize();
 
   if(bank29) {
@@ -154,7 +154,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       TH2 *energy_mat = GetMatrix(list,"Gamma_Gamma",2000,0,4000,2000,0,4000);
       energy_mat->Fill(hit.GetCoreEnergy(),hit2.GetCoreEnergy());
       energy_mat->Fill(hit2.GetCoreEnergy(),hit.GetCoreEnergy());
-      
+
       TH2 *energy_time = GetMatrix(list,"Gamma_Gamma_Time",800,-400,400,2000,0,4000);
       energy_time->Fill(hit2.GetTime()-hit.GetTime(),hit2.GetCoreEnergy());
       energy_time->Fill(hit.GetTime()-hit2.GetTime(),hit.GetCoreEnergy());
@@ -177,29 +177,32 @@ void MakeHistograms(TRuntimeObjects& obj) {
       mtdc_vs_dispx->Fill(s800->GetTofE1_MTDC(MAFP_COEF,MCRDCX_COEF),s800->GetCrdc(0).GetDispersiveX());
       TH2 *tdc_vs_dispx = GetMatrix(list,"TDC_vs_DispX",1000,-1600,-800,600,-300,300);
       tdc_vs_dispx->Fill(s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),s800->GetCrdc(0).GetDispersiveX());
-      
-      
+
+
       TH2 *mtdc_vs_afp= GetMatrix(list,"MTDC_vs_AFP",1000,-5000,5000,600,-0.1,0.1);
       mtdc_vs_afp->Fill(s800->GetTofE1_MTDC(MAFP_COEF,MCRDCX_COEF),s800->GetAFP());
       TH2 *tdc_vs_afp= GetMatrix(list,"TDC_vs_AFP",1000,-1600,-800,600,-0.1,0.1);
       tdc_vs_afp->Fill(s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),s800->GetAFP());
 
       double delta_t = s800->GetScint().GetTimeUp()-s800->GetTof().GetOBJ();
-      
+
       TH2 *mtdc_vs_ic= GetMatrix(list,"PID_MTDC",1000,-2000,-1000,1000,0,25000);
       mtdc_vs_ic->Fill(s800->GetTofE1_MTDC(MAFP_COEF,MCRDCX_COEF),s800->GetIonChamber().Charge());
       TH2 *tdc_vs_ic= GetMatrix(list,"PID_TDC",1000,-1600,-800,1000,0,35000);
       tdc_vs_ic->Fill(s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),s800->GetIonChamber().Charge());
-      
+
       if(delta_t>E1_TDC_low && delta_t<E1_TDC_high){
 	TH2 *tdc_vs_ic_Prompt= GetMatrix(list,"PID_TDC_Prompt",1000,-800,0,1000,0,25000);
 	tdc_vs_ic_Prompt->Fill(s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),s800->GetIonChamber().Charge());
       }
-      
+
       TH1 *E1_m_TDC = GetHistogram(list,"E1_m_TDC",8000,-8000,8000);
       E1_m_TDC->Fill(s800->GetScint().GetTimeUp()-s800->GetTof().GetOBJ());
+      
+      TH1 *hist1d = GetHistogram(list,"E1Raw",2000,0,8000);
+      hist1d->Fill(s800->GetScint().GetTimeUp());
     }
-    
+
     TH2 *gret_energy_theta = GetMatrix(list,"GretinaEnergyTheta",4000,0,4000,314,0,3.14);
     gret_energy_theta->Fill(hit.GetCoreEnergy(),hit.GetTheta());
 
@@ -209,8 +212,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
     TH2 *seg_summary = GetMatrix(list,Form("GretinaSummaryX%02i",hit.GetCrystalId()),
                                  40,0,40,2000,0,4000);
 
-   
-    
+
+
     //seg_summary->Fill(36,hit.GetCoreCharge(0)/INTEGRATION);
     //seg_summary->Fill(37,hit.GetCoreCharge(1)/INTEGRATION);
     //seg_summary->Fill(38,hit.GetCoreCharge(2)/INTEGRATION);
@@ -227,20 +230,20 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     }
     //for(int z=0;z<hit.NumberOfInteractions();z++) {
-    
+
     TH2 *total_position = GetMatrix(list,"GretinaPosition",628,0,6.28,314,0,3.14);
     total_position->Fill(hit.GetPhi(),hit.GetTheta());
 
     TH1 *hist1d = GetHistogram(list,"GretinaEnergySum",8000,0,4000);
     hist1d->Fill(hit.GetCoreEnergy());
-   
+
     hist1d = GetHistogram(list,"GretinaDopplerSum",1000,0,4000);
     hist1d->Fill(hit.GetDoppler(BETA));
 
    
     
     //TCutG *blob_Top = obj.GetCut("blob_Top");
-    
+
     double pidx = s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF);
     double pidy = s800->GetIonChamber().Charge();
     
@@ -414,6 +417,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	beta += .3/100.0;
 	doppler_beta->Fill(hit.GetDoppler(beta),beta);
       }
+    
     }
     if(s800 && Si29 && Si29->IsInside(pidx,pidy)){
       hist1d = GetHistogram(list,"GretinaDopplerSum_Si29",1000,0,4000);
@@ -443,7 +447,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	doppler_beta->Fill(hit.GetDoppler(beta),beta);
       }
     }
-   
+
     TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta",2000,0,4000,101,.2,.5);
     double beta = 0.2;
     for(int z=0;z<100;z++) {
@@ -451,7 +455,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       doppler_beta->Fill(hit.GetDoppler(beta),beta);
     }
 
-    
+
     TH2 *qchg = GetMatrix(list,Form("Q%iCoreCharge",HoleQMap[hit.GetCrystalId()/4]),
                           16,0,16,8000,0,32000);
     qchg->Fill(4*hit.GetCrystalNumber()+0.,((double)hit.GetCoreCharge(0)));

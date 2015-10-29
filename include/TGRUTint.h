@@ -14,6 +14,7 @@
 #include <TSysEvtHandler.h>
 #include <TRint.h>
 #include <TEnv.h>
+#include <TChain.h>
 
 #include "TGRUTServer.h"
 
@@ -35,13 +36,15 @@ public:
 
   virtual void Terminate(Int_t status = 0);
 
-  Long_t ProcessLine(const char* line, Bool_t sync=kFALSE,Int_t *error=0);
+  Long_t ProcessLine(const char* line, Bool_t sync=kTRUE,Int_t *error=0);
   TString ReverseObjectSearch(TString&);
 
 
   TObject* ObjectAppended(TObject* obj);
 
   Int_t TabCompletionHook(char* buf, int* pLoc, std::ostream& out);
+
+  TFile* OpenRootFile(const std::string& filename,TChain *chain=0);
 
 public:
   TObject* DelayedProcessLine(std::string message);
@@ -54,7 +57,6 @@ public:
   void HandleFile(const std::string& filename);
 
  private:
-  void OpenRootFile(const std::string& filename);
   void RunMacroFile(const std::string& filename);
 
 private:
@@ -75,6 +77,8 @@ private:
   TObject* fNewChild;
   bool fIsTabComplete;
   TGRUTServer *fCommandServer;
+
+  TChain* fChain;
 
   void Init();
   void ApplyOptions();

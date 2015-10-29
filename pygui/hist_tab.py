@@ -91,12 +91,14 @@ class HistTab(object):
         self.CheckOnlineHists()
 
     def _load_compiled_histograms(self, filename):
-        if ROOT.online_events:
-            ROOT.online_events.LoadCompiledHistogramLibrary(filename)
+        outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
+        if outfile:
+            outfile.GetCompiledHistograms().SetReplaceVariable(name, value)
 
     def _compiled_histogram_filename(self):
-        if ROOT.online_events:
-            return ROOT.online_events.GetCompiledHistogramLibrary()
+        outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
+        if outfile:
+            return outfile.GetCompiledHistograms().GetLibraryName()
         else:
             return ''
 
@@ -186,13 +188,20 @@ class HistTab(object):
         self.main.window.after(5000, self._PeriodicHistogramCheck)
 
     def CheckOnlineHists(self):
+        # The parsed histograms
         if ROOT.online_events:
-
             self.Insert(ROOT.online_events.GetDirectory(),
                         online_tree=ROOT.online_events)
         if ROOT.online_scalers:
             self.Insert(ROOT.online_scalers.GetDirectory(),
                         online_tree=ROOT.online_scalers)
+
+        # The compiled histograms
+        outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
+        if outfile:
+            hists = outfile.GetCompiledHistograms().GetHistograms()
+            hists.SetName('Compiled Histograms')
+            self.Insert(hists)
 
     def GetFormatOnline(self, hist):
         pass
