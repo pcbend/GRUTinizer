@@ -7,12 +7,18 @@
 
 #include <TDetectorHit.h>
 #include <TMath.h>
+#include "TRandom.h"
 
 #define MAXCRDC 513
-#define CRDC_XSlope 2.54
-#define CRDC_XOffset -281.94
-#define CRDC_YSlope 2.54
-#define CRDC_YOffset -281.94
+//#define CRDC_XSlope 2.54
+//#define CRDC_XOffset -281.94
+//#define CRDC_YSlope 2.54
+//#define CRDC_YOffset -281.94
+//#define CRDC_XSlope 1
+//#define CRDC_YSlope 1
+//#define CRDC_XOffset 0
+//#define CRDC_YOffset 0
+
 
 class TS800Channel : public TDetectorHit {
   public:
@@ -119,6 +125,7 @@ class TCrdc : public TDetectorHit {
     short GetId()    { return fId;   }
     short GetAnode() { return anode; }
     short GetTime()  { return time;  }
+    float GetTimeRand()  { return ((float)(time)+gRandom->Uniform());  }
 
     int  Size()        const { return sample.size(); }
     int  GetNSamples() const { return sample.size(); }
@@ -126,6 +133,12 @@ class TCrdc : public TDetectorHit {
     void SetId(short id)    { fId = id;  }
     void SetAnode(short an) {anode = an; }
     void SetTime(short ti)  {time = ti;  }
+
+    void SetXslope (float xm)  { fCRDCXslope = xm; }
+    void SetYslope (float ym)  { fCRDCYslope = ym; }
+    void SetXoffset (float xo) { fCRDCXoff = xo;   }
+    void SetYoffset (float yo) { fCRDCYoff = yo;   }
+
 
     void AddPoint(int chan,int samp,int dat) { channel.push_back(chan);  
                                                sample.push_back(samp);   
@@ -135,9 +148,12 @@ class TCrdc : public TDetectorHit {
     int GetData(int i)       { if(i>=Size()) return -1; return data.at(i);       } 
 
     int GetWidth();
-
-    float GetDispersiveX()      { if(GetPad()==-1) return -1; return (GetPad()*CRDC_XSlope+CRDC_XOffset); }
-    float GetNonDispersiveY()   { if(GetPad()==-1) return -1; return (GetPad()*CRDC_YSlope+CRDC_YOffset); }
+    float GetDispersiveX()      { if(GetPad()==-1) return -10000; return (GetPad()*fCRDCXslope+fCRDCXoff); }
+    float GetNonDispersiveY()   { if(GetPad()==-1) return -1000; return (GetTimeRand()*fCRDCYslope+fCRDCYoff); }
+    float GetXslope ()  { return fCRDCXslope; }
+    float GetYslope ()  { return fCRDCYslope; }
+    float GetXoffset () { return fCRDCXoff;   }
+    float GetYoffset () { return fCRDCYoff;   }
     
 
     float GetPad();
@@ -157,6 +173,11 @@ class TCrdc : public TDetectorHit {
     std::vector<int> channel;
     std::vector<int> sample;
     std::vector<int> data;
+
+    float fCRDCXslope; //!
+    float fCRDCYslope; //!
+    float fCRDCXoff;   //!
+    float fCRDCYoff;   //!
 
     unsigned short anode;
     unsigned short time;

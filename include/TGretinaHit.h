@@ -73,6 +73,9 @@ public:
     return tmp;
   }
 
+  double GetDoppler_dB(double beta,const TVector3 *vec=0, double Dta=0);
+
+
 
   Int_t   GetFirstIntPoint()             const { return fFirstInteraction;     }
   Int_t   GetSecondIntPoint()            const { return fSecondInteraction;    }

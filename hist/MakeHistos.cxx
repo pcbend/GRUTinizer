@@ -102,6 +102,17 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   TList *list = &(obj.GetObjects());
 
+  TCutG *Ar37 = obj.GetCut("Ar37");
+  TCutG *Ar36 = obj.GetCut("Ar6");
+  TCutG *Cl35   = obj.GetCut("Cl35");
+  TCutG *Cl34   = obj.GetCut("Cl34");
+  TCutG *S34 = obj.GetCut("S34");
+  TCutG *S33 = obj.GetCut("S33");
+  TCutG *S32 = obj.GetCut("S32");
+  TCutG *P31 = obj.GetCut("P31");
+  TCutG *P30 = obj.GetCut("P30");
+  TCutG *Si29 = obj.GetCut("Si29");
+  TCutG *Si28 = obj.GetCut("Si28");
   
 
   //if(cut) cut->Print();
@@ -143,7 +154,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
       TH2 *energy_mat = GetMatrix(list,"Gamma_Gamma",2000,0,4000,2000,0,4000);
       energy_mat->Fill(hit.GetCoreEnergy(),hit2.GetCoreEnergy());
       energy_mat->Fill(hit2.GetCoreEnergy(),hit.GetCoreEnergy());
-      
       
       TH2 *energy_time = GetMatrix(list,"Gamma_Gamma_Time",800,-400,400,2000,0,4000);
       energy_time->Fill(hit2.GetTime()-hit.GetTime(),hit2.GetCoreEnergy());
@@ -227,28 +237,94 @@ void MakeHistograms(TRuntimeObjects& obj) {
     hist1d = GetHistogram(list,"GretinaDopplerSum",1000,0,4000);
     hist1d->Fill(hit.GetDoppler(BETA));
 
-    TCutG *Aar37 = obj.GetCut("Aar37");
-
-    TCutG *Cl35   = obj.GetCut("Cl35");
-
-    TCutG *S33 = obj.GetCut("S33");
-    TCutG *S32 = obj.GetCut("S32");
-
-    TCutG *P31 = obj.GetCut("P31");
-    TCutG *P30 = obj.GetCut("P30");
-
-    TCutG *Si29 = obj.GetCut("Si29");
-    TCutG *Si28 = obj.GetCut("Si28");
+   
     
     //TCutG *blob_Top = obj.GetCut("blob_Top");
     
     double pidx = s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF);
     double pidy = s800->GetIonChamber().Charge();
+    
+    TVector3 *vect = new TVector3();
+    TVector3 *DirkVect = new TVector3();
+  
 
-    if(s800 && Aar37 && Aar37->IsInside(pidx,pidy)){
-      hist1d = GetHistogram(list,"GretinaDopplerSum_Aar37",1000,0,4000);
+
+    if(s800){
+
+      double xsin = s800->GetAta();
+      double ysin = s800->GetBta();
+      double s800_phi   = 0;
+      double s800_theta = 0;
+
+      xsin = TMath::Sin(xsin);
+      ysin = TMath::Sin(ysin);
+
+      if(xsin>0 && ysin>0)      s800_phi =  2.0*TMath::Pi()-TMath::ATan(ysin/xsin);
+      else if(xsin<0 && ysin>0) s800_phi =  TMath::Pi()+TMath::ATan(ysin/TMath::Abs(xsin));
+      else if(xsin<0 && ysin<0) s800_phi =  TMath::Pi()-TMath::ATan(TMath::Abs(ysin)/TMath::Abs(xsin));
+      else if(xsin>0 && ysin<0) s800_phi =  TMath::ATan(TMath::Abs(ysin)/xsin);
+      else                      s800_phi =  0.0;
+      s800_theta = TMath::ASin(TMath::Sqrt(xsin*xsin+ysin*ysin));
+      
+      vect->SetXYZ(s800->GetAta(),-s800->GetBta(),1);
+      DirkVect->SetPtThetaPhi(1,s800_theta,s800_phi);
+
+      if(Si28 && Si28->IsInside(pidx,pidy)){
+	TH2* Si28_EnVsPhi = GetMatrix(list,"Si28_EnVsPhi",1000,0,4000,1000,-0.1,6.3);
+	TH2* Si28_EnVsTheta = GetMatrix(list,"Si28_EnVsTheta",1000,0,4000,800,-0.05,0.3);
+	TH2* Si28_EnVsDTA = GetMatrix(list,"Si28_EnVsDTA",1000,0,4000,800,-0.3,0.3);
+	TH2* Si28_EnVsPhi_CorVec = GetMatrix(list,"Si28_EnVsPhi_CorVec",1000,0,4000,1000,-0.1,6.3);
+	TH2* Si28_EnVsTheta_CorVec = GetMatrix(list,"Si28_EnVsTheta_CorVec",1000,0,4000,800,-0.05,0.3);
+	TH2* Si28_EnVsDTA_CorVec = GetMatrix(list,"Si28_EnVsDTA_CorVec",1000,0,4000,800,-0.3,0.3);
+	TH2* Si28_EnVsPhi_CorVec_dB = GetMatrix(list,"Si28_EnVsPhi_CorVec_dB",1000,0,4000,1000,-0.1,6.3);
+	TH2* Si28_EnVsTheta_CorVec_dB = GetMatrix(list,"Si28_EnVsTheta_CorVec_dB",1000,0,4000,800,-0.05,0.3);
+	TH2* Si28_EnVsDTA_CorVec_dB = GetMatrix(list,"Si28_EnVsDTA_CorVec_dB",1000,0,4000,800,-0.3,0.3);
+	Si28_EnVsPhi->Fill(hit.GetDoppler(BETA),s800_phi);
+	Si28_EnVsTheta->Fill(hit.GetDoppler(BETA),s800_theta);
+	Si28_EnVsDTA->Fill(hit.GetDoppler(BETA),s800->GetDta());
+	Si28_EnVsPhi_CorVec->Fill(hit.GetDoppler(BETA,DirkVect),s800_phi);
+	Si28_EnVsTheta_CorVec->Fill(hit.GetDoppler(BETA,DirkVect),s800_theta);
+	Si28_EnVsDTA_CorVec->Fill(hit.GetDoppler(BETA,DirkVect),s800->GetDta());
+	Si28_EnVsPhi_CorVec_dB->Fill(hit.GetDoppler_dB(BETA,DirkVect,s800->GetDta()),s800_phi);
+	Si28_EnVsTheta_CorVec_dB->Fill(hit.GetDoppler_dB(BETA,DirkVect,s800->GetDta()),s800_theta);
+	Si28_EnVsDTA_CorVec_dB->Fill(hit.GetDoppler_dB(BETA,DirkVect,s800->GetDta()),s800->GetDta());
+      }
+    }
+    else{
+      vect->SetXYZ(0,0,0);
+      DirkVect->SetXYZ(0,0,0);
+    }
+
+    if(s800){
+
+      TH2* CRDC_yvb = GetMatrix(list,"CRDC_yvb",200,-200,200,800,-1,1);
+      CRDC_yvb->Fill(s800->GetCrdc(0).GetNonDispersiveY(),s800->GetBFP());
+
+      TH2* CRDC1_xy = GetMatrix(list,"CRDC1_xy",300,-300,+300,200,-200,200);
+      TH2* CRDC2_xy = GetMatrix(list,"CRDC2_xy",300,-300,+300,200,-200,200);
+      CRDC1_xy->Fill(s800->GetCrdc(0).GetDispersiveX(),s800->GetCrdc(0).GetNonDispersiveY());
+      CRDC2_xy->Fill(s800->GetCrdc(1).GetDispersiveX(),s800->GetCrdc(1).GetNonDispersiveY());
+    }
+
+
+    if(s800 && Ar37 && Ar37->IsInside(pidx,pidy)){
+      hist1d = GetHistogram(list,"GretinaDopplerSum_Ar37",1000,0,4000);
       hist1d->Fill(hit.GetDoppler(BETA));
-      TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_Aar37",2000,0,4000,101,.2,.5);
+      hist1d = GetHistogram(list,"GretinaDopplerSum_WithTrackCor_Ar37",1000,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA,vect));
+      TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_Ar37",2000,0,4000,101,.2,.5);
+      double beta = 0.2;
+      for(int z=0;z<100;z++) {
+	beta += .3/100.0;
+	doppler_beta->Fill(hit.GetDoppler(beta),beta);
+      }
+    }
+    if(s800 && Ar36 && Ar36->IsInside(pidx,pidy)){
+      hist1d = GetHistogram(list,"GretinaDopplerSum_Ar36",1000,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA));
+      hist1d = GetHistogram(list,"GretinaDopplerSum_WithTrackCor_Ar36",1000,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA,vect));
+      TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_Ar36",2000,0,4000,101,.2,.5);
       double beta = 0.2;
       for(int z=0;z<100;z++) {
 	beta += .3/100.0;
@@ -258,6 +334,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
     if(s800 && Cl35 && Cl35->IsInside(pidx,pidy)){
       hist1d = GetHistogram(list,"GretinaDopplerSum_Cl35",1000,0,4000);
       hist1d->Fill(hit.GetDoppler(BETA));
+      hist1d = GetHistogram(list,"GretinaDopplerSum_WithTrackCor_Cl35",1000,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA,vect));
       TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_Cl35",2000,0,4000,101,.2,.5);
       double beta = 0.2;
       for(int z=0;z<100;z++) {
@@ -265,9 +343,35 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	doppler_beta->Fill(hit.GetDoppler(beta),beta);
       }
     }
+  if(s800 && Cl34 && Cl34->IsInside(pidx,pidy)){
+      hist1d = GetHistogram(list,"GretinaDopplerSum_Cl34",1000,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA));
+      hist1d = GetHistogram(list,"GretinaDopplerSum_WithTrackCor_Cl34",1000,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA,vect));
+      TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_Cl34",2000,0,4000,101,.2,.5);
+      double beta = 0.2;
+      for(int z=0;z<100;z++) {
+	beta += .3/100.0;
+	doppler_beta->Fill(hit.GetDoppler(beta),beta);
+      }
+    }
+    if(s800 && S34 && S34->IsInside(pidx,pidy)){
+      hist1d = GetHistogram(list,"GretinaDopplerSum_S34",1000,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA));
+      hist1d = GetHistogram(list,"GretinaDopplerSum_WithTrackCor_S34",1000,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA,vect));
+      TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_S34",2000,0,4000,101,.2,.5);
+      double beta = 0.2;
+      for(int z=0;z<100;z++) {
+	beta += .3/100.0;
+	doppler_beta->Fill(hit.GetDoppler(beta),beta);
+      }
+    }  
     if(s800 && S33 && S33->IsInside(pidx,pidy)){
       hist1d = GetHistogram(list,"GretinaDopplerSum_S33",1000,0,4000);
       hist1d->Fill(hit.GetDoppler(BETA));
+      hist1d = GetHistogram(list,"GretinaDopplerSum_WithTrackCor_S33",1000,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA,vect));
       TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_S33",2000,0,4000,101,.2,.5);
       double beta = 0.2;
       for(int z=0;z<100;z++) {
@@ -278,6 +382,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
     if(s800 && S32 && S32->IsInside(pidx,pidy)){
       hist1d = GetHistogram(list,"GretinaDopplerSum_S32",1000,0,4000);
       hist1d->Fill(hit.GetDoppler(BETA));
+      hist1d = GetHistogram(list,"GretinaDopplerSum_WithTrackCor_S32",1000,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA,vect));
       TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_S32",2000,0,4000,101,.2,.5);
       double beta = 0.2;
       for(int z=0;z<100;z++) {
@@ -288,6 +394,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
     if(s800 && P31 && P31->IsInside(pidx,pidy)){
       hist1d = GetHistogram(list,"GretinaDopplerSum_P31",1000,0,4000);
       hist1d->Fill(hit.GetDoppler(BETA));
+      hist1d = GetHistogram(list,"GretinaDopplerSum_WithTrackCor_P31",1000,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA,vect));
       TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_P31",2000,0,4000,101,.2,.5);
       double beta = 0.2;
       for(int z=0;z<100;z++) {
@@ -298,6 +406,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
     if(s800 && P30 && P30->IsInside(pidx,pidy)){
       hist1d = GetHistogram(list,"GretinaDopplerSum_P30",1000,0,4000);
       hist1d->Fill(hit.GetDoppler(BETA));
+      hist1d = GetHistogram(list,"GretinaDopplerSum_WithTrackCor_P30",1000,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA,vect));
       TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_P30",2000,0,4000,101,.2,.5);
       double beta = 0.2;
       for(int z=0;z<100;z++) {
@@ -308,6 +418,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
     if(s800 && Si29 && Si29->IsInside(pidx,pidy)){
       hist1d = GetHistogram(list,"GretinaDopplerSum_Si29",1000,0,4000);
       hist1d->Fill(hit.GetDoppler(BETA));
+      hist1d = GetHistogram(list,"GretinaDopplerSum_WithTrackCor_Si29",1000,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA,vect));
       TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_Si29",2000,0,4000,101,.2,.5);
       double beta = 0.2;
       for(int z=0;z<100;z++) {
@@ -316,8 +428,14 @@ void MakeHistograms(TRuntimeObjects& obj) {
       }
     }
     if(s800 && Si28 && Si28->IsInside(pidx,pidy)){
-      hist1d = GetHistogram(list,"GretinaDopplerSum_Si28",1000,0,4000);
+      hist1d = GetHistogram(list,"GretinaDopplerSum_Si28",500,0,4000);
       hist1d->Fill(hit.GetDoppler(BETA));
+      hist1d = GetHistogram(list,"GretinaDopplerSum_WithTrackCorANB_Si28",500,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA,vect));
+      hist1d = GetHistogram(list,"GretinaDopplerSum_WithTrackCorDirk_Si28",500,0,4000);
+      hist1d->Fill(hit.GetDoppler(BETA,DirkVect));
+      hist1d = GetHistogram(list,"GretinaDopplerSum_WithTrackCorDirk_dB_Si28",500,0,4000);
+      hist1d->Fill(hit.GetDoppler_dB(BETA,DirkVect,s800->GetDta()));
       TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_Si28",2000,0,4000,101,.2,.5);
       double beta = 0.2;
       for(int z=0;z<100;z++) {
@@ -325,16 +443,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	doppler_beta->Fill(hit.GetDoppler(beta),beta);
       }
     }
-//    if(s800 && blob_Top && blob_Top->IsInside(s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),s800->GetIonChamber().Charge())){
-//      hist1d = GetHistogram(list,"GretinaDopplerSum_blobT",1000,0,4000);
-//      hist1d->Fill(hit.GetDoppler(BETA));
-//      TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta_blobT",2000,0,4000,101,.2,.5);
-//      double beta = 0.2;
-//      for(int z=0;z<100;z++) {
-//	beta += .3/100.0;
-//	doppler_beta->Fill(hit.GetDoppler(beta),beta);
-    //  }
-    //}
    
     TH2* doppler_beta = GetMatrix(list,"GretinaDopplerBeta",2000,0,4000,101,.2,.5);
     double beta = 0.2;
