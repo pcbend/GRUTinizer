@@ -19,10 +19,8 @@ public:
   TCompiledHistograms(std::string libname);
 
   void Load(std::string libname);
-  void Fill();
+  void Fill(TUnpackedEvent& detectors);
   void Reload();
-
-  void RegisterDetector(TDetector* det);
 
   std::string GetLibraryName() const { return libname; }
 
@@ -30,10 +28,11 @@ public:
   void SetReplaceVariable(const char* name, double value);
   void RemoveVariable(const char* name);
 
-  TList* GetHistograms();
   void ClearHistograms();
 
   TList* GetObjects(){ return &objects; }
+
+  void Write();
 
 private:
   void swap_lib(TCompiledHistograms& other);
@@ -51,7 +50,6 @@ private:
 
   int check_every;
 
-  TList detectors;
   TList objects;
   TList variables;
 

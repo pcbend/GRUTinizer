@@ -89,18 +89,9 @@ extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
   //printf("I am Here 1\n"); fflush(stdout);
   InitMap();
-  TGretina *gretina = 0;
-  TBank29  *bank29  = 0;
-  TS800    *s800    = 0;
-  TIter iter(&obj.GetDetectors());
-  while(TObject *object = iter.Next()) {
-    if(object->InheritsFrom(TGretina::Class()))
-        gretina = (TGretina*)object;
-    if(object->InheritsFrom(TS800::Class()))
-        s800 = (TS800*)object;
-    if(object->InheritsFrom(TBank29::Class()))
-        bank29 = (TBank29*)object;
-  }
+  TGretina *gretina = obj.GetDetector<TGretina>();
+  TBank29  *bank29  = obj.GetDetector<TBank29>();
+  TS800    *s800    = obj.GetDetector<TS800>();
 
   TList *list = &(obj.GetObjects());
 

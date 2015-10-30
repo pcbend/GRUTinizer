@@ -25,6 +25,7 @@ class TMultiRawFile : public TRawEventSource {
 public:
   TMultiRawFile();
   ~TMultiRawFile();
+  // TODO, can I disable these somehow without annoying ROOT?
   TMultiRawFile(const TMultiRawFile& other) { }
   TMultiRawFile& operator=(const TMultiRawFile& other) { }
 

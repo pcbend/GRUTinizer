@@ -15,12 +15,12 @@ ClassImp(TRawEventSource);
 
 int TRawEventSource::Read(TRawEvent& event){
   if(fIsFinished){
-    return 0;
+    return -6;
   } else {
     int result = GetEvent(event);
     if(result > 0){
       fBytesGiven += event.GetTotalSize();
-    } else {
+    } else if (result < 0) {
       fIsFinished = true;
     }
     return result;
@@ -31,7 +31,7 @@ int TRawEventSource::Read(TRawEvent* event){
   if(event){
     return Read(*event);
   } else {
-    return -1;
+    return -7;
   }
 }
 
@@ -104,7 +104,7 @@ int TRawEventByteSource::GetEvent(TRawEvent& rawevent) {
 
     default:
       std::cout << "Unknown file type: " << fFileType << std::endl;
-      return 0;
+      return -4;
       break;
   }
 
@@ -112,7 +112,9 @@ int TRawEventByteSource::GetEvent(TRawEvent& rawevent) {
   rawevent.SetFileType(fFileType);
 
   int bytes_read_header = FillBuffer(sizeof(TRawEvent::RawHeader));
-  if(bytes_read_header < 0){
+  if(bytes_read_header == 0) {
+    return 0;
+  } else if(bytes_read_header < 0){
     return -1;
   }
 
@@ -140,7 +142,7 @@ int TRawEventByteSource::GetEvent(TRawEvent& rawevent) {
 
 int TRawEventByteSource::FillBuffer(size_t bytes_requested) {
   if(fCurrentBuffer.GetSize() >= bytes_requested){
-    return 0;
+    return bytes_requested;
   }
 
   size_t bytes_allocating = std::max(fDefaultBufferSize, bytes_requested);
@@ -167,7 +169,7 @@ int TRawEventByteSource::FillBuffer(size_t bytes_requested) {
     SetLastError(strerror(errno));
     return -2;
   } else {
-    return bytes_read;
+    return bytes_requested;
   }
 }
 

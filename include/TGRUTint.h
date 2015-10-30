@@ -17,6 +17,7 @@
 #include <TChain.h>
 
 #include "TGRUTServer.h"
+#include "TPipeline.h"
 
 extern TObject* gResponse;
 
@@ -55,6 +56,7 @@ public:
 
  private:
   void RunMacroFile(const std::string& filename);
+  void SetupPipeline();
 
 private:
 #ifndef __CINT__
@@ -66,16 +68,15 @@ private:
   TTimer* fGuiTimer;
 
   TTimer* fCommandTimer;
+  TGRUTServer *fCommandServer;
   std::queue<std::string> fLinesToProcess;
   std::queue<TObject*> fCommandResults;
 
   int fRootFilesOpened;
 
-  TObject* fNewChild;
   bool fIsTabComplete;
-  TGRUTServer *fCommandServer;
 
-  TChain* fChain;
+  TPipeline* fPipeline;
 
   void Init();
   void ApplyOptions();

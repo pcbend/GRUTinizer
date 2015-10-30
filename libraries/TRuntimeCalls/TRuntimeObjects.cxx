@@ -5,7 +5,7 @@
 
 #include "GValue.h"
 
-TRuntimeObjects::TRuntimeObjects(TList* detectors, TList* objects, TList* variables)
+TRuntimeObjects::TRuntimeObjects(TUnpackedEvent& detectors, TList* objects, TList* variables)
   : detectors(detectors), objects(objects), variables(variables) { }
 
 void TRuntimeObjects::FillHistogram(std::string name,
@@ -35,10 +35,6 @@ void TRuntimeObjects::FillHistogram(std::string name,
     newHist->Fill(Xvalue, Yvalue);
     GetObjects().Add(newHist);
   }
-}
-
-TList& TRuntimeObjects::GetDetectors() {
-  return *detectors;
 }
 
 TList& TRuntimeObjects::GetObjects() {
