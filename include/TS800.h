@@ -27,7 +27,8 @@ public:
 
   TVector3 CRDCTrack();  // not a finished method
   float GetAFP() const; 
-  float MapCalc(int param, float *input);
+  float GetBFP() const; 
+  void MapCalc(float *input);
   
   virtual void Copy(TObject& obj)        const;
   //virtual void Print(Option_t *opt = "") const;
@@ -73,7 +74,7 @@ public:
   static std::vector<S800_InvMapLine> fIML_sec1;  //!
   static std::vector<S800_InvMapLine> fIML_sec2;  //!
   static std::vector<S800_InvMapLine> fIML_sec3;  //!
-  static std::vector<S800_InvMapLine> fIML_sec4;  //
+  static std::vector<S800_InvMapLine> fIML_sec4;  //!
   static short fMaxOrder;                         //!  
   static float fBrho;                             //!
   static int fMass;                               //!
@@ -86,8 +87,18 @@ public:
   TIonChamber  ion;
   TCrdc        crdc[2];
   //THodoscope   hodo[32];
-  
+ 
   //TMultiHitTof multi_tof;
+  
+  Float_t fAta;
+  Float_t fYta;
+  Float_t fBta;
+  Float_t fDta;
+  Float_t GetAta(){return fAta;};
+  Float_t GetYta(){return fYta;};
+  Float_t GetBta(){return fBta;};
+  Float_t GetDta(){return fDta;};
+  
 
   Long_t fEventCounter;
 

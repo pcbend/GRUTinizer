@@ -109,8 +109,8 @@ void TGRUTint::Init() {
   //gSystem->AddDynamicPath(Form("-%s/libraries",grutpath.c_str()));
 
   if(TGRUTOptions::Get()->ShowLogo()){
-    PopupLogo(false);
-    WaitLogo();
+    std::thread splashscreen(&TGRUTint::SplashPopNWait,this,false);
+    splashscreen.detach();
   }
 
   // if(TGRUTOptions::Get()->ShowLogo()){
@@ -122,6 +122,12 @@ void TGRUTint::Init() {
   //gManager->Print();
   //gManager->Connect("TObjectManager", "ObjectAppended(TObject*)", "TGRUTint", this, "ObjectAppended(TObject*)");
 }
+
+void TGRUTint::SplashPopNWait(bool flag) {
+  PopupLogo(false);
+  WaitLogo();
+}
+
 
 /*********************************/
 

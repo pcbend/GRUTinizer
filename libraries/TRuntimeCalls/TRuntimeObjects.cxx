@@ -64,6 +64,7 @@ double TRuntimeObjects::GetVariable(const char* name) {
   if(obj && obj->InheritsFrom(GValue::Class())){
     return ((GValue*)obj)->GetValue();
   } else {
-    return std::sqrt(-1);
+    return 0.00;
+    //return std::sqrt(-1);
   }
 }

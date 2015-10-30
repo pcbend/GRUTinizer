@@ -58,6 +58,7 @@ public:
 
  private:
   void RunMacroFile(const std::string& filename);
+  void SplashPopNWait(bool flag);
 
 private:
 #ifndef __CINT__

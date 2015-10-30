@@ -102,31 +102,38 @@ bool TS800::ReadInvMap(const char* file){
 }
 
 
-float TS800::MapCalc(int param, float *input){
+void TS800::MapCalc(float *input){
   float cumul=0;
   float multi;
   int CalcOrder = 6; // Standard order in inv file.
   std::vector<S800_InvMapLine> current_;
-  
-  switch(param){
-  case 0: current_ = fIML_sec1;  break;
-  case 1: current_ = fIML_sec2;  break;
-  case 2: current_ = fIML_sec3;  break;
-  case 3: current_ = fIML_sec4;  break;
-  default: printf(" *** Wrong Param passed to S800::MapCalc!!\n"); return 0;break;
-  }
-  for(int i=0; i<current_.size();i++){
-    if(CalcOrder<current_.at(i).order) break;
-    multi = 1;
-    //std::cout << " current coef : " << current_.at(i).coef << std::endl;
-    for(int j=0;j<CalcOrder;j++){
-      if(current_.at(i).exp[j]!=0){
-	multi *= pow(input[j],current_.at(i).exp[j]);
-      }
+  for(int param = 0; param<4;param++){
+    switch(param){
+    case 0: current_ = fIML_sec1;  break;
+    case 1: current_ = fIML_sec2;  break;
+    case 2: current_ = fIML_sec3;  break;
+    case 3: current_ = fIML_sec4;  break;
+    default: printf(" *** Wrong Param passed to S800::MapCalc!!\n"); return;break;
     }
-    cumul += multi*current_.at(i).coef;
+    for(int i=0; i<current_.size();i++){
+      if(CalcOrder<current_.at(i).order) break;
+      multi = 1;
+      //std::cout << " current coef : " << current_.at(i).coef << std::endl;
+      for(int j=0;j<CalcOrder;j++){
+	if(current_.at(i).exp[j]!=0){
+	  multi *= pow(input[j],current_.at(i).exp[j]);
+	}
+      }
+      cumul += multi*current_.at(i).coef;
+    }
+    switch(param){
+    case 0: fAta = cumul; break;
+    case 1: fYta = cumul; break;
+    case 2: fBta = cumul; break;
+    case 3: fDta = cumul; break;
+    }
   }
-  return cumul;  
+  //return cumul;  
 }
 
 TVector3 TS800::CRDCTrack(){
@@ -137,8 +144,8 @@ TVector3 TS800::CRDCTrack(){
    
   TVector3 track = crdc2-crdc1;*/
   TVector3 track;
-  track.SetTheta(TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1000.0)); // rad
-  track.SetPhi(TMath::ATan((GetCrdc(0).GetNonDispersiveY()-GetCrdc(1).GetNonDispersiveY())/1000.0)); // rad
+  track.SetTheta(TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1073.0)); // rad
+  track.SetPhi(TMath::ATan((GetCrdc(0).GetNonDispersiveY()-GetCrdc(1).GetNonDispersiveY())/1073.0)); // rad
   //track.SetPt(1) // need to do this.
       
   return track;
@@ -146,8 +153,15 @@ TVector3 TS800::CRDCTrack(){
 
 float TS800::GetAFP() const{
   
-  float AFP = TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1000.0); 
+  float AFP = TMath::ATan((GetCrdc(1).GetDispersiveX()-GetCrdc(0).GetDispersiveX())/1073.0); 
   return AFP;
+
+}
+
+float TS800::GetBFP() const{
+  
+  float BFP = TMath::ATan((GetCrdc(1).GetNonDispersiveY()-GetCrdc(0).GetNonDispersiveY())/1073.0); 
+  return BFP;
 
 }
 
@@ -173,7 +187,12 @@ void TS800::Clear(Option_t* opt){
   fMass     = 0;
   fBrho     = -1;
   fCharge   = 0;
-  
+ 
+  fAta = sqrt(-1);
+  fYta = sqrt(-1);
+  fBta = sqrt(-1);
+  fDta = sqrt(-1);
+
 
 }
 
@@ -257,6 +276,17 @@ int TS800::BuildHits(){
     SetEventCounter(head->GetEventNumber());
     //geb->Print(toprint.c_str());
   }
+  //Raytracing(
+  float input[6];
+  input[0] = GetCrdc(0).GetDispersiveX();
+  input[1] = GetAFP();
+  input[2] = GetCrdc(0).GetNonDispersiveY();
+  input[3] = GetBFP();
+  input[4] = 0;
+  input[5] = 0;
+
+  MapCalc(input);
+
   //printf("-----------------------\n");
   return 0;
 }

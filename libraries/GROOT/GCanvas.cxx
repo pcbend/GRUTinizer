@@ -336,7 +336,7 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
   if(!hist)
      return false;
   if(event == 0x00000007) {
-    new GCanvas();
+    GCanvas *g = new GCanvas();
     TString options;
     if(hist->GetDimension()==2)
       options.Append("colz");

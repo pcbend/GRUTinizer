@@ -110,7 +110,7 @@ TBrowserImp *GRootGuiFactory::CreateBrowserImp(TBrowser *b, const char *title,
    if (opt && strlen(opt))
       browserOptions = opt;
 
-   //browserOptions = "FECI";
+   //browserOptions = "FCI";
 
    browserOptions.ToUpper();
    if (browserOptions.Contains("LITE"))
@@ -124,7 +124,7 @@ TBrowserImp *GRootGuiFactory::CreateBrowserImp(TBrowser *b, const char *title,
         return imp;
       }
    }
-   //printf(" and never here.\n");
+   printf(" and never here.\n");
    return new TRootBrowserLite(b, title, width, height);
 }
 
