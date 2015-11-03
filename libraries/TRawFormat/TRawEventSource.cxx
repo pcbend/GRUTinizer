@@ -114,7 +114,7 @@ int TRawEventByteSource::GetEvent(TRawEvent& rawevent) {
   int bytes_read_header = FillBuffer(sizeof(TRawEvent::RawHeader));
   if(bytes_read_header == 0) {
     return 0;
-  } else if(bytes_read_header < 0){
+  } else if(GetLastErrno()){
     return -1;
   }
 
@@ -160,10 +160,12 @@ int TRawEventByteSource::FillBuffer(size_t bytes_requested) {
   fCurrentBuffer = TSmartBuffer(buf, bytes_to_copy + bytes_read);
 
   // Set the error flags and return code appropriately.
-  if(bytes_read == 0){
+  if(bytes_read == 0 && GetLastErrno()){
     SetLastErrno(0);
     SetLastError("EOF");
     return -1;
+  } else if (bytes_read == 0) {
+    return 0;
   } else if ((bytes_read+bytes_to_copy) < bytes_requested){
     SetLastErrno(errno);
     SetLastError(strerror(errno));

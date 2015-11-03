@@ -16,10 +16,12 @@ typedef void* __attribute__((__may_alias__)) void_alias;
 
 TCompiledHistograms::TCompiledHistograms()
   : libname(""), library(nullptr), func(nullptr),
-    last_modified(0), last_checked(0), check_every(5) { }
+    last_modified(0), last_checked(0), check_every(5),
+    default_directory(0) { }
 
 TCompiledHistograms::TCompiledHistograms(std::string libname)
-  : libname(full_path(libname)), check_every(5) {
+  : libname(full_path(libname)), check_every(5),
+    default_directory(0) {
   library = std::make_shared<DynamicLibrary>(this->libname.c_str(), true);
   // Casting required to keep gcc from complaining.
   *(void_alias*)(&func) = library->GetSymbol("MakeHistograms");

@@ -27,8 +27,10 @@ public:
   /// Reads the next event.
   /** @param event The location of the event to be written.
       @returns The number of bytes read.
-               If 0 is returned, the source has been read to completion.
-               If a negative number is returned, there was an error while reading.
+               If 0 is returned, no event has been read, but the source may provide an event later.
+                 This is useful for online data analysis.
+               If a negative number is returned, there was an error while reading,
+                 possibly the end of file.
    */
   int Read(TRawEvent& event);
 

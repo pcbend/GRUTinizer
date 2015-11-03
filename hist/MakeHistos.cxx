@@ -95,8 +95,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   TList *list = &(obj.GetObjects());
 
-
-
   //if(cut) cut->Print();
   double MAFP_COEF = obj.GetVariable("MAFP_COEF");
   double MCRDCX_COEF = obj.GetVariable("MCRDCX_COEF");
@@ -105,7 +103,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
   double BETA = obj.GetVariable("BETA");
   double E1_TDC_low = obj.GetVariable("E1_TDC_low");
   double E1_TDC_high = obj.GetVariable("E1_TDC_high");
-
 
   int numobj = list->GetSize();
 

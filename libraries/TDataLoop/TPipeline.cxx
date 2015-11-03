@@ -1,14 +1,17 @@
 #include "TPipeline.h"
 
 #include <iostream>
+#include <sstream>
 
 #include "TChain.h"
+#include "TFile.h"
 
 #include "TDataLoop.h"
 #include "THistogramLoop.h"
 #include "TRawEventSource.h"
 #include "TMultiRawFile.h"
 #include "TOrderedRawFile.h"
+#include "TPreserveGDirectory.h"
 #include "TRootInputLoop.h"
 #include "TSequentialRawFile.h"
 #include "TTerminalLoop.h"
@@ -16,11 +19,26 @@
 #include "TWriteLoop.h"
 
 TPipeline::TPipeline()
-  : is_online(false), time_order(false), time_order_depth(1000) { }
+  : output_file(NULL),
+    data_loop(NULL), unpack_loop(NULL), root_input_loop(NULL),
+    histogram_loop(NULL), write_loop(NULL), terminal_loop(NULL),
+    is_online(false), time_order(false), time_order_depth(1000) { }
 
 TPipeline::~TPipeline() {
   Stop();
   Join();
+  Write();
+
+  if(output_file){
+    output_file->Close();
+    delete output_file;
+  } else if(output_directory) {
+    delete output_directory;
+  }
+
+  for(auto thread : pipeline){
+    delete thread;
+  }
 }
 
 bool TPipeline::CanStart(bool print_reason) {
@@ -48,9 +66,9 @@ bool TPipeline::CanStart(bool print_reason) {
   return true;
 }
 
-void TPipeline::Initialize() {
+int TPipeline::Initialize() {
   if(!CanStart()){
-    return;
+    return 1;
   }
 
   if(input_raw_files.size()) {
@@ -59,8 +77,14 @@ void TPipeline::Initialize() {
     SetupRootReadLoop();
   }
 
+  TPreserveGDirectory preserve;
+  SetupOutputFile();
+  GetDirectory().cd();
+
   SetupHistogramLoop();
   SetupOutputLoop();
+
+  return 0;
 }
 
 void TPipeline::SetupRawReadLoop() {
@@ -78,9 +102,9 @@ void TPipeline::SetupRawReadLoop() {
     event_source = sequential;
   }
 
-  TDataLoop* data_loop = new TDataLoop(event_source, raw_event_queue);
+  data_loop = new TDataLoop(event_source, raw_event_queue);
   pipeline.push_back(data_loop);
-  TUnpackLoop* unpack_loop = new TUnpackLoop(raw_event_queue, unpacked_event_queue);
+  unpack_loop = new TUnpackLoop(raw_event_queue, unpacked_event_queue);
   pipeline.push_back(unpack_loop);
 }
 
@@ -90,29 +114,40 @@ void TPipeline::SetupRootReadLoop() {
     event_tree->Add(filename.c_str());
   }
 
-  TRootInputLoop* loop = new TRootInputLoop(event_tree);
-  pipeline.push_back(loop);
+  root_input_loop = new TRootInputLoop(event_tree);
+  pipeline.push_back(root_input_loop);
+}
+
+void TPipeline::SetupOutputFile() {
+  if(output_root_file.length()) {
+    output_file = new TFile(output_root_file.c_str(), "RECREATE");
+    output_directory = output_file;
+  } else {
+    // TODO: Does this work, or do I need to explicitly give it a name?
+    output_directory = new TDirectory;
+  }
+}
+
+TDirectory& TPipeline::GetDirectory() {
+  return *output_directory;
 }
 
 void TPipeline::SetupHistogramLoop() {
-  THistogramLoop* histogram_loop;
+  histogram_loop = new THistogramLoop(unpacked_event_queue,
+                                      post_histogram_queue,
+                                      &GetDirectory());
   if (histogram_library.length()){
-    histogram_loop = new THistogramLoop(unpacked_event_queue,
-                                        post_histogram_queue,
-                                        histogram_library);
-  } else {
-    histogram_loop = new THistogramLoop(unpacked_event_queue,
-                                        post_histogram_queue);
+    histogram_loop->LoadLibrary(histogram_library);
   }
   pipeline.push_back(histogram_loop);
 }
 
 void TPipeline::SetupOutputLoop() {
   if(output_root_file.length() && !input_root_files.size()){
-    TWriteLoop* write_loop = new TWriteLoop(post_histogram_queue, output_root_file);
+    write_loop = new TWriteLoop(post_histogram_queue, GetDirectory());
     pipeline.push_back(write_loop);
   } else {
-    TTerminalLoop* terminal_loop = new TTerminalLoop(post_histogram_queue);
+    terminal_loop = new TTerminalLoop(post_histogram_queue);
     pipeline.push_back(terminal_loop);
   }
 }
@@ -127,13 +162,80 @@ TRawEventSource* TPipeline::OpenSingleFile(const std::string& filename) {
   return output;
 }
 
-void TPipeline::Start() { }
+bool TPipeline::IsFinished() {
+  if(pipeline.size()){
+    // Finished if the data loop has stopped running
+    //   and all queues are empty.
+    return (!pipeline[0]->IsRunning() &&
+            AllQueuesEmpty());
+  } else {
+    return true;
+  }
+}
 
-void TPipeline::Stop() { }
+bool TPipeline::AllQueuesEmpty() {
+  return !(raw_event_queue.Size() ||
+           unpacked_event_queue.Size() ||
+           post_histogram_queue.Size());
+}
 
-void TPipeline::Join() { }
+void TPipeline::Start() {
+  int error = Initialize();
+  if(error){
+    return;
+  }
 
-void TPipeline::ProgressBar() { }
+  Resume();
+}
+
+void TPipeline::Stop() {
+  for(auto thread : pipeline){
+    thread->Stop();
+  }
+}
+
+void TPipeline::Pause() {
+  for(auto thread : pipeline){
+    thread->Pause();
+  }
+}
+
+void TPipeline::Resume() {
+  for(auto thread : pipeline){
+    thread->Resume();
+  }
+}
+
+void TPipeline::Join() {
+  for(auto thread : pipeline){
+    thread->Join();
+  }
+}
+
+std::string TPipeline::Status() {
+  std::stringstream ss;
+  ss << raw_event_queue.ItemsPushed() << "/" << raw_event_queue.ItemsPopped() << "\t"
+     << unpacked_event_queue.ItemsPushed() << "/" << unpacked_event_queue.ItemsPopped() << "\t"
+     << post_histogram_queue.ItemsPushed() << "/" << post_histogram_queue.ItemsPopped();
+  return ss.str();
+
+  // if(pipeline.size()){
+  //   return pipeline[0]->Status();
+  // } else {
+  //   return "";
+  // }
+}
+
+void TPipeline::Write() {
+  TPreserveGDirectory(preserve);
+  GetDirectory().cd();
+  if(histogram_loop) {
+    histogram_loop->Write();
+  }
+  if(write_loop) {
+    write_loop->Write();
+  }
+}
 
 void TPipeline::AddRawDataFile(std::string filename) {
   input_raw_files.push_back(filename);

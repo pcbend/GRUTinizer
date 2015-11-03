@@ -1,22 +1,20 @@
 #include "THistogramLoop.h"
 
-THistogramLoop::THistogramLoop(ThreadsafeQueue<TUnpackedEvent*>& input_queue,
-                               ThreadsafeQueue<TUnpackedEvent*>& output_queue)
-  : input_queue(input_queue), output_queue(output_queue) { }
+#include "TPreserveGDirectory.h"
 
 THistogramLoop::THistogramLoop(ThreadsafeQueue<TUnpackedEvent*>& input_queue,
                                ThreadsafeQueue<TUnpackedEvent*>& output_queue,
-                               std::string libname)
-  : compiled_histograms(libname),
-    input_queue(input_queue), output_queue(output_queue) { }
+                               TDirectory* dir)
+  : input_queue(input_queue), output_queue(output_queue),
+    output_dir(dir) {
+  compiled_histograms.SetDefaultDirectory(dir);
+}
 
 bool THistogramLoop::Iteration() {
   TUnpackedEvent* event = NULL;
   int error = input_queue.Pop(event);
 
-  if(error && input_queue.IsClosed()){
-    return false;
-  } else if (error){
+  if (error){
     return true;
   }
 
@@ -24,6 +22,7 @@ bool THistogramLoop::Iteration() {
     compiled_histograms.Fill(*event);
     output_queue.Push(event);
   }
+  return true;
 }
 
 void THistogramLoop::ClearHistograms() {
@@ -31,5 +30,17 @@ void THistogramLoop::ClearHistograms() {
 }
 
 void THistogramLoop::Write() {
+  TPreserveGDirectory preserve;
+  if(output_dir){
+    output_dir->cd();
+  }
   compiled_histograms.Write();
+}
+
+void THistogramLoop::LoadLibrary(std::string library) {
+  compiled_histograms.Load(library);
+}
+
+std::string THistogramLoop::GetLibraryName() const {
+  return compiled_histograms.GetLibraryName();
 }

@@ -5,6 +5,8 @@
 #include <type_traits>
 #endif
 
+#include "TClass.h"
+
 #include "TDetector.h"
 #include "TGRUTTypes.h"
 #include "TRawEvent.h"
@@ -32,12 +34,12 @@ template<typename T>
 T* TUnpackedEvent::GetDetector(bool make_if_not_found) {
   static_assert(std::is_base_of<TDetector, T>::value,
                 "T must be a subclass of TDetector");
-    for(auto det : detectors) {
-      T* output = dynamic_cast<T*>(det);
-      if(output){
-        return output;
-      }
+  for(auto det : detectors) {
+    T* output = dynamic_cast<T*>(det);
+    if(output){
+      return output;
     }
+  }
 
   if(make_if_not_found) {
     T* output = new T;

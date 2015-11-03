@@ -28,6 +28,9 @@ public:
   void SetReplaceVariable(const char* name, double value);
   void RemoveVariable(const char* name);
 
+  void SetDefaultDirectory(TDirectory* dir) { default_directory = dir; }
+  TDirectory* GetDefaultDirectory() { return default_directory; }
+
   void ClearHistograms();
 
   TList* GetObjects(){ return &objects; }
@@ -52,6 +55,8 @@ private:
 
   TList objects;
   TList variables;
+
+  TDirectory* default_directory;
 
   ClassDef(TCompiledHistograms, 0);
 };

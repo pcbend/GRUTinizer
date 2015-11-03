@@ -24,6 +24,8 @@ public:
 
   const TRawEventSource& GetSource() const { return *source; }
 
+  std::string Status();
+
 protected:
   bool Iteration();
 

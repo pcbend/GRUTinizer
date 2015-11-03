@@ -4,11 +4,20 @@
 #include <string>
 #include <vector>
 
+#include "TDirectory.h"
+
 #include "StoppableThread.h"
 #include "ThreadsafeQueue.h"
 #include "TRawEvent.h"
 #include "TRawEventSource.h"
 #include "TUnpackedEvent.h"
+
+class TDataLoop;
+class TUnpackLoop;
+class TRootInputLoop;
+class THistogramLoop;
+class TWriteLoop;
+class TTerminalLoop;
 
 class TPipeline {
 public:
@@ -16,12 +25,16 @@ public:
   virtual ~TPipeline();
 
   bool CanStart(bool print_reason = false);
-  void Initialize();
 
   void Start();
+  void Pause();
+  void Resume();
   void Stop();
   void Join();
-  void ProgressBar();
+  std::string Status();
+  void Write();
+
+  TDirectory& GetDirectory();
 
   /// Adds a raw data file.  If called multiple times, will open files sequentially.
   void AddRawDataFile(std::string filename);
@@ -44,12 +57,25 @@ public:
   /// Sets the input ring.
   void SetInputRing(std::string ringname);
 
+  bool IsFinished();
+
 private:
+  TPipeline(const TPipeline&) { }
+  TPipeline& operator=(const TPipeline&) { }
+
+  bool AllQueuesEmpty();
+
+  int Initialize();
+
   void SetupRawReadLoop();
   void SetupRootReadLoop();
+  void SetupOutputFile();
   void SetupHistogramLoop();
   void SetupOutputLoop();
   TRawEventSource* OpenSingleFile(const std::string& filename);
+
+  TFile* output_file;
+  TDirectory* output_directory;
 
   // Output of the TDataLoop.  Unused if reading from a root file.
   ThreadsafeQueue<TRawEvent> raw_event_queue;
@@ -61,6 +87,12 @@ private:
   ThreadsafeQueue<TUnpackedEvent*> post_histogram_queue;
 
   std::vector<StoppableThread*> pipeline;
+  TDataLoop* data_loop;
+  TUnpackLoop* unpack_loop;
+  TRootInputLoop* root_input_loop;
+  THistogramLoop* histogram_loop;
+  TWriteLoop* write_loop;
+  TTerminalLoop* terminal_loop;
 
   // The setup parameters
   std::vector<std::string> input_raw_files;
@@ -73,6 +105,8 @@ private:
 
   bool time_order;
   int time_order_depth;
+
+  ClassDef(TPipeline, 0);
 };
 
 #endif /* _TPIPELINE_H_ */

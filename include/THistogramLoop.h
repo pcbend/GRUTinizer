@@ -10,12 +10,10 @@
 class THistogramLoop : public StoppableThread {
 public:
   THistogramLoop(ThreadsafeQueue<TUnpackedEvent*>& input_queue,
-                 ThreadsafeQueue<TUnpackedEvent*>& output_queue);
-
-  THistogramLoop(ThreadsafeQueue<TUnpackedEvent*>& input_queue,
                  ThreadsafeQueue<TUnpackedEvent*>& output_queue,
-                 std::string libname);
+                 TDirectory* dir = NULL);
 
+  void LoadLibrary(std::string library);
   std::string GetLibraryName() const;
   void ClearHistograms();
 
@@ -29,6 +27,8 @@ private:
 
   ThreadsafeQueue<TUnpackedEvent*>& input_queue;
   ThreadsafeQueue<TUnpackedEvent*>& output_queue;
+
+  TDirectory* output_dir;
 };
 
 #endif /* _THISTOGRAMLOOP_H_ */

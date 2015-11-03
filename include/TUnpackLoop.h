@@ -36,10 +36,6 @@ private:
   void HandleGEBMode3(TGEBEvent& event, kDetectorSystems system);
   void HandleS800Scaler(TGEBEvent& event);
 
-#ifndef __CINT__
-  std::thread thread;
-#endif
-
   ThreadsafeQueue<TRawEvent>& input_queue;
   ThreadsafeQueue<TUnpackedEvent*>& output_queue;
 

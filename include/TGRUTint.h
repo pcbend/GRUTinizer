@@ -44,6 +44,8 @@ public:
 
   TFile* OpenRootFile(const std::string& filename,TChain *chain=0);
 
+  TPipeline* GetPipeline() { return fPipeline; }
+
 public:
   TObject* DelayedProcessLine(std::string message);
   //GUI interface commands;

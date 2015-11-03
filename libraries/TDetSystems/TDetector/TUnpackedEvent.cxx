@@ -1,5 +1,7 @@
 #include "TUnpackedEvent.h"
 
+#include "TClass.h"
+
 #include "TBank29.h"
 #include "TGretina.h"
 #include "TJanus.h"

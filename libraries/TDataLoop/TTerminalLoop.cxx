@@ -10,10 +10,6 @@ bool TTerminalLoop::Iteration() {
   TUnpackedEvent* event = NULL;
   int error = input_queue.Pop(event);
 
-  if(error && input_queue.IsClosed()){
-    return false;
-  }
-
   if(!error) {
     delete event;
   }

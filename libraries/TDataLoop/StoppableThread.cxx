@@ -1,5 +1,7 @@
 #include "StoppableThread.h"
 
+#include <iostream>
+
 StoppableThread::StoppableThread()
   : running(true), paused(true) {
   thread = std::thread(&StoppableThread::Loop, this);
@@ -10,7 +12,7 @@ StoppableThread::~StoppableThread() {
   thread.join();
 }
 
-void StoppableThread::Start() {
+void StoppableThread::Resume() {
   if(running) {
     paused = false;
     paused_wait.notify_one();
@@ -49,9 +51,12 @@ void StoppableThread::Loop() {
         paused_wait.wait(lock);
       }
     }
-    bool error = Iteration();
-    if(error){
+    bool success = Iteration();
+    if(!success){
+      running = false;
       break;
     }
   }
+
+  std::cout << "End of thread, running = " << running << std::endl;
 }

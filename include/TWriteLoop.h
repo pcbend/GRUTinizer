@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "TClass.h"
+#include "TDirectory.h"
 #include "TTree.h"
 
 #include "StoppableThread.h"
@@ -13,11 +14,13 @@
 
 class TWriteLoop : public StoppableThread {
 public:
-  TWriteLoop(ThreadsafeQueue<TUnpackedEvent*>& input_queue, std::string filename);
+  TWriteLoop(ThreadsafeQueue<TUnpackedEvent*>& input_queue, TDirectory& dir);
   virtual ~TWriteLoop();
 
   void SetLearningPhaseLength(int length) { learning_phase_length = length; }
   int GetLearningPhaseLength(int length) const { return learning_phase_length; }
+
+  void Write();
 
 protected:
   bool Iteration();
@@ -36,6 +39,8 @@ private:
   std::vector<TUnpackedEvent*> learning_queue;
   bool in_learning_phase;
   int learning_phase_length;
+
+  TDirectory& output_dir;
 };
 
 

@@ -1,13 +1,12 @@
 #include "TWriteLoop.h"
 
-#include "TFile.h"
-
 #include "TPreserveGDirectory.h"
 
-TWriteLoop::TWriteLoop(ThreadsafeQueue<TUnpackedEvent*>& input_queue, std::string filename)
-  : input_queue(input_queue), in_learning_phase(true), learning_phase_length(1000) {
-  TPreserveGDirectory(preserve);
-  TFile* output_file = new TFile(filename.c_str(), "RECREATE");
+TWriteLoop::TWriteLoop(ThreadsafeQueue<TUnpackedEvent*>& input_queue, TDirectory& dir)
+  : input_queue(input_queue), in_learning_phase(true), learning_phase_length(1000),
+    output_dir(dir) {
+  TPreserveGDirectory preserve;
+  dir.cd();
   event_tree = new TTree("EventTree","EventTree");
   //scaler_tree = new TTree("ScalerTree","ScalerTree");
 }
@@ -16,8 +15,6 @@ TWriteLoop::~TWriteLoop() {
   if(in_learning_phase){
     EndLearningPhase();
   }
-
-  event_tree->GetCurrentFile()->Close();
 
   for(auto& elem : det_map){
     delete *elem.second;
@@ -29,14 +26,16 @@ bool TWriteLoop::Iteration() {
   TUnpackedEvent* event = NULL;
   int error = input_queue.Pop(event);
 
-  if(error && input_queue.IsClosed()){
-    return false;
-  }
-
   if(!error) {
     HandleEvent(event);
   }
   return true;
+}
+
+void TWriteLoop::Write() {
+  TPreserveGDirectory preserve;
+  output_dir.cd();
+  event_tree->Write();
 }
 
 void TWriteLoop::HandleEvent(TUnpackedEvent* event) {

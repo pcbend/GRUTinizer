@@ -1,5 +1,7 @@
 #include "TRootInputLoop.h"
 
+#include <sstream>
+
 #include "TBranchElement.h"
 
 TRootInputLoop::TRootInputLoop(TTree* tree)
@@ -44,4 +46,11 @@ void TRootInputLoop::SetupBranches() {
     det_map[cls] = det;
     tree->SetBranchAddress(branch->GetName(), det);
   }
+}
+
+std::string TRootInputLoop::Status() {
+  std::stringstream ss;
+  ss << tree->GetName() << ": "
+     << std::setw(8) << ientry << " / " << nentries;
+  return ss.str();
 }

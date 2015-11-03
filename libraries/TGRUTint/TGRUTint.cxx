@@ -146,7 +146,13 @@ void TGRUTint::ApplyOptions() {
   }
 
   if(opt->ExitAfterSorting()){
-    fPipeline->ProgressBar();
+    while(!fPipeline->IsFinished()){
+      std::cout << "\r" << fPipeline->Status() << std::flush;
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+    std::cout << std::endl;
+    fPipeline->Write();
+
     this->Terminate();
   } else if(opt->CommandServer()) {
     fCommandServer = new TGRUTServer(opt->CommandPort());
@@ -166,6 +172,10 @@ void TGRUTint::SetupPipeline() {
 
   if(opt->OutputFile().length()){
     fPipeline->SetOutputRootFile(opt->OutputFile());
+  }
+
+  if(opt->CompiledHistogramFile().length()) {
+    fPipeline->SetHistogramLibrary(opt->CompiledHistogramFile());
   }
 
   if(opt->SortTree()){

@@ -28,10 +28,8 @@ bool TUnpackLoop::Iteration(){
   TRawEvent event;
   int error = input_queue.Pop(event);
 
-  if(error && input_queue.IsClosed()){
-    return false; // No more events will ever come
-  } else if (error){
-    return true; // More events might come later
+  if(error){
+    return true;
   }
 
   switch(event.GetFileType()){
@@ -85,6 +83,7 @@ void TUnpackLoop::HandleNSCLData(TNSCLEvent& event) {
 
 void TUnpackLoop::CheckBuildWindow(long timestamp) {
   if(timestamp > event_start + build_window) {
+    next_event->Build();
     output_queue.Push(next_event);
     next_event = new TUnpackedEvent;
     event_start = timestamp;

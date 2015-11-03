@@ -30,3 +30,7 @@ bool TDataLoop::Iteration() {
     return true;
   }
 }
+
+std::string TDataLoop::Status() {
+  return source->Status();
+}

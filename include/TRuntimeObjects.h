@@ -4,6 +4,7 @@
 #include <string>
 
 #include "TCutG.h"
+#include "TDirectory.h"
 #include "TList.h"
 
 #include "TUnpackedEvent.h"
@@ -18,7 +19,8 @@ public:
   /// Constructor
   TRuntimeObjects(TUnpackedEvent& detectors,
                   TList* objects,
-                  TList* variables);
+                  TList* variables,
+                  TDirectory* directory=NULL);
 
   /// Returns a pointer to the detector of type T
   template<typename T>
@@ -43,6 +45,7 @@ private:
   TUnpackedEvent& detectors;
   TList* objects;
   TList* variables;
+  TDirectory* directory;
 
 
   ClassDef(TRuntimeObjects, 0);

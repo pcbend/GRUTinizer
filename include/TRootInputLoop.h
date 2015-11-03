@@ -1,6 +1,8 @@
 #ifndef _TROOTINPUTLOOP_H_
 #define _TROOTINPUTLOOP_H_
 
+#include <string>
+
 #include "TClass.h"
 #include "TTree.h"
 
@@ -15,6 +17,7 @@ public:
   virtual ~TRootInputLoop();
 
   ThreadsafeQueue<TUnpackedEvent*>& GetOutputQueue() { return output_queue; }
+  std::string Status();
 
 protected:
   bool Iteration();

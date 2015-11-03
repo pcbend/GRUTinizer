@@ -7,27 +7,31 @@
 #include <thread>
 #endif
 
+#include <string>
+
+#include "TObject.h"
+
 class StoppableThread {
 public:
   StoppableThread();
   virtual ~StoppableThread();
 
-#ifndef __CINT__
-  StoppableThread(const StoppableThread& other) = delete;
-  StoppableThread& operator=(const StoppableThread& other) = delete;
-#endif
-
-  void Start();
+  void Resume();
   void Pause();
   void Stop();
   bool IsPaused();
   bool IsRunning();
   void Join();
 
+  virtual std::string Status() { return ""; }
+
 protected:
   virtual bool Iteration() = 0;
 
 private:
+  StoppableThread(const StoppableThread& other) { }
+  StoppableThread& operator=(const StoppableThread& other) { }
+
   void Loop();
 
 #ifndef __CINT__
@@ -38,6 +42,8 @@ private:
   std::condition_variable paused_wait;
   std::mutex pause_mutex;
 #endif
+
+  ClassDef(StoppableThread, 0);
 };
 
 
