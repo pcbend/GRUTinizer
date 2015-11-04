@@ -191,29 +191,32 @@ void TCrdc::DrawChannels(Option_t *opt) const {
     c = new GCanvas();
   else {
     //gPad->Clear();
-    c = (GCanvas*)gPad->GetCanvas();
-    c->Clear();
+    //c = (GCanvas*)gPad->GetCanvas();
+    //c->Clear();
   }
   
   std::vector<TH1I> hits;
   512;
   int currentchannel = -1;
-  TH1I *currenthist = 0;
+  //TH2I *currenthist = 0;
+  TH2I hist(Form("crdc_%i",fId),Form("crdc_%i",fId),224,0,224,128,0,128);
   for(int x=0;x<Size();x++) {
-    if(channel.at(x)!=currentchannel) {
+    //if(channel.at(x)!=currentchannel) {
       
-      TH1I hist(Form("channel_%02i",channel.at(x)),Form("channel_%02i",channel.at(x)),512,0,512);
-      hits.push_back(hist);
-      currentchannel = channel.at(x);
-      currenthist = &(hits.back());
-    }
-    currenthist->Fill(sample.at(x),data.at(x));
+      //TH1I hist(Form("channel_%02i",channel.at(x)),Form("channel_%02i",channel.at(x)),512,0,512);
+      //hits.push_back(hist);
+      //currentchannel = channel.at(x);
+      //currenthist = &(hits.back());
+      hist.Fill(channel.at(x),sample.at(x),data.at(x));
+    //}
+    //hist.Fill(sample.at(x),data.at(x));
   }
-  c->Divide(1,hits.size());
-  for(int x=0;x<hits.size();x++) {
-    c->cd(x+1);
-    hits.at(x).DrawCopy();
-  }
+  //c->Divide(1,hits.size());
+  //for(int x=0;x<hits.size();x++) {
+  //  c->cd(x+1);
+  //  hits.at(x).DrawCopy();
+  //}
+  hist.DrawCopy("colz");
   return;
 }
 
