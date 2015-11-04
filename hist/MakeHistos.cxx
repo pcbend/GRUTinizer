@@ -198,6 +198,15 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
       TH1 *hist1d = GetHistogram(list,"E1Raw",2000,0,8000);
       hist1d->Fill(s800->GetScint().GetTimeUp());
+      
+      TH1 *crdc1x = GetHistogram(list,"CRDC1_X",800,-400,400);
+      crdc1x->Fill(s800->GetCrdc(0).GetDispersiveX());
+      
+      TH1 *crdc2x = GetHistogram(list,"CRDC2_X",800,-400,400);
+      crdc2x->Fill(s800->GetCrdc(1).GetDispersiveX());
+      
+      TH1 *ion_sum = GetHistogram(list,"Ion Chamber Sum",8000,0,64000);
+      ion_sum->Fill(s800->GetIonChamber().Charge());
     }
 
     TH2 *gret_energy_theta = GetMatrix(list,"GretinaEnergyTheta",4000,0,4000,314,0,3.14);

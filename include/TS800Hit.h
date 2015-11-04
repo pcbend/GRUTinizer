@@ -136,8 +136,8 @@ class TCrdc : public TDetectorHit {
 
     int GetWidth();
 
-    float GetDispersiveX()      { if(GetPad()==-1) return -1; return (GetPad()*CRDC_XSlope+CRDC_XOffset); }
-    float GetNonDispersiveY()   { if(GetPad()==-1) return -1; return (GetPad()*CRDC_YSlope+CRDC_YOffset); }
+    float GetDispersiveX()      { if(GetPad()==-1) return sqrt(-1); return (GetPad()*CRDC_XSlope+CRDC_XOffset); }
+    float GetNonDispersiveY()   { if(GetPad()==-1) return sqrt(-1); return (GetPad()*CRDC_YSlope+CRDC_YOffset); }
     
 
     float GetPad();
@@ -204,8 +204,8 @@ class TIonChamber : public TDetectorHit {
     
     void Set(int ch, int data); // { fChan.push_back(ch); fData.push_back(data); }
 
-    int GetChannel(int i) const { if(i>=Size()) return -1; return fChan.at(i); }
-    int GetData(int i)    const { if(i>=Size()) return -1; return fData.at(i); }
+    int GetChannel(int i) const { if(i>=Size()) return sqrt(-1); return fChan.at(i); }
+    int GetData(int i)    const { if(i>=Size()) return sqrt(-1); return fData.at(i); }
     int Size() const { return fChan.size(); }
     float GetdE(); 
 
