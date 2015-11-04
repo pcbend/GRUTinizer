@@ -240,6 +240,10 @@ std::string TPipeline::Status() {
 }
 
 void TPipeline::Write() {
+  if(!output_file){
+    return;
+  }
+
   TPreserveGDirectory(preserve);
   GetDirectory()->cd();
   if(histogram_loop) {

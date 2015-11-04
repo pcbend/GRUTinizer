@@ -149,7 +149,7 @@ void TGRUTint::ApplyOptions() {
     RunMacroFile(filename);
   }
 
-  if(fPipeline->CanStart()){
+  if(fPipeline->CanStart(true)){
     fPipeline->Start();
   }
 

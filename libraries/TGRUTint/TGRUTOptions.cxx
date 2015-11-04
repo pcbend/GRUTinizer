@@ -49,6 +49,7 @@ void TGRUTOptions::Load(int argc, char** argv) {
   Clear();
   detector_environment = std::string(getenv("GRUTSYS")) + "/config/DetectorEnvironment.env";
   compiled_histogram_file = gEnv->GetValue("GRUT.HistLib","");
+  output_file = "temp.root";
 
   ArgParser parser;
 
