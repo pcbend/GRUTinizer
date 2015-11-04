@@ -42,6 +42,7 @@ class MainWindow(object):
         if 'compiled_histograms' in settings:
             self.hist_tab._load_compiled_histograms(settings['compiled_histograms']['name'])
         if 'variables' in settings:
+            #print " THIS IS WHERE I CALL YOU"
             self.variable_tab._load_variable_patterns(settings['variables'])
 
     def _save_gui_file(self, filename = None):
@@ -325,6 +326,8 @@ class MainWindow(object):
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="2 x 2",onvalue='2x2',
                                   variable=self.predefinedzones,command=self.set_zones)
+        zonesmenu.add_checkbutton(label="2 x 3",onvalue='2x3',
+                                  variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="3 x 1",onvalue='3x1',
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="3 x 2",onvalue='3x2',
@@ -436,6 +439,14 @@ class MainWindow(object):
         if self.plotlocation.get()!='Replace' and self.plotlocation.get()!='Overlay':
             if(self.zone_cols*self.zone_rows!=1):
                 self.plotlocation.set('NextPad')
+            #ROOT.gPad.GetCanvas().cd(self.zone_cols*self.zone_rows)
+
+        #self.open_canvas(columns=self.zone_cols,rows = self.zone_rows)
+        #if self.zone_cols*self.zone_rows !=1:
+        #    self.plotlocation = 'NextPad'
+        #    ROOT.gPad.GetCanvas().cd(self.zone_cols*self.zone_rows)
+
+
 
         opt = []
 
@@ -468,6 +479,7 @@ class MainWindow(object):
         ROOT.TGRUTLoop.Get().Start()
 
     def LoadRootFile(self,filename=None):
+        #print "In py LoadRooFile " + filename
         if filename is None:
             filename = tkFileDialog.askopenfilename(filetypes=(("ROOT File", "*.root"),))
 

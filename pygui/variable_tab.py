@@ -54,11 +54,14 @@ class VariableTab(object):
             outfile.GetCompiledHistograms().SetReplaceVariable(name, value)
 
         self.variables[name] = value
-
+        #print " Name : " + name 
+        #print " Value : " + str(value)
         if name in self.treeview.get_children():
             self.treeview.item(name, values=(str(value),))
+            #print " in IF"
         else:
             self.treeview.insert('','end',name, text=name, values=(str(value),))
+            #print " in ELSE"
 
     def DeleteVariable(self, name):
         outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
@@ -106,6 +109,7 @@ class VariableTab(object):
         return self.variables
 
     def _load_variable_patterns(self, patterns):
+        #print "In Load Variable Patterns !!"
         for name, value in patterns.items():
             self.SetReplaceVariable(name, value)
 
@@ -115,5 +119,7 @@ class VariableTab(object):
             tdir = tdir.ReadObj()
             for key in tdir.GetListOfKeys():
                 obj = key.ReadObj()
+                #print " Name : " + obj.GetName()
+                #print " Value : " + str(obj.GetValue())
                 self.SetReplaceVariable(obj.GetName(),
                                         obj.GetValue())

@@ -24,6 +24,22 @@ TS800::TS800() {
     ReadInvMap("invmap.inv");
     InvMapFileRead=true;
   }
+
+  GetCrdc(0).SetXslope(2.54);
+  GetCrdc(0).SetYslope(-0.1074866936);
+  GetCrdc(0).SetXoffset(-281.94);
+  GetCrdc(0).SetYoffset(95.9966);
+  //GetCrdc(0).SetYoffset(129.1513428524);
+  
+  GetCrdc(1).SetXslope(2.54);
+  GetCrdc(1).SetYslope(0.1110700359);
+  GetCrdc(1).SetXoffset(-281.94);
+  GetCrdc(1).SetYoffset(-122.8);
+  //GetCrdc(1).SetYoffset(-131.4070990297);
+
+
+  //  std::cout << " Slopes and offsets are SET" << std::endl;
+  //std::cout << " For Example : " <<     GetCrdc(0).GetYslope() << std::endl;
 }
 
 TS800::~TS800(){
@@ -32,6 +48,22 @@ TS800::~TS800(){
 void TS800::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 
+  TS800& other = (TS800&)obj;
+  other.fAta = fAta;
+  other.fYta = fYta;
+  other.fBta = fBta;
+  other.fDta = fDta;
+
+  for(int i = 0; i<3; i++){
+    scint[i].Copy(other.scint[i]);
+  }
+  trigger.Copy(other.trigger);
+  tof.Copy(other.tof);
+  mtof.Copy(other.mtof);
+  ion.Copy(other.ion);
+  for(int i=0; i<2; i++){
+    crdc[i].Copy(other.crdc[i]);
+  }
 }
 
 bool TS800::ReadInvMap(const char* file){
@@ -76,16 +108,16 @@ bool TS800::ReadInvMap(const char* file){
     
     switch(par){
     case 0:
-      fIML_sec1.push_back(fIML);
+      fIML_sec1.push_back(fIML); 
       break;
     case 1:
-      fIML_sec2.push_back(fIML);
+      fIML_sec2.push_back(fIML); 
       break;
     case 2:
-      fIML_sec3.push_back(fIML);
+      fIML_sec3.push_back(fIML); 
       break;
     case 3:
-      fIML_sec4.push_back(fIML);
+      fIML_sec4.push_back(fIML); 
       break;
     case 4:
       // you get to 4 before the eof.
@@ -102,31 +134,38 @@ bool TS800::ReadInvMap(const char* file){
 }
 
 
-float TS800::MapCalc(int param, float *input){
+void TS800::MapCalc(float *input){
   float cumul=0;
   float multi;
   int CalcOrder = 6; // Standard order in inv file.
   std::vector<S800_InvMapLine> current_;
-  
-  switch(param){
-  case 0: current_ = fIML_sec1;  break;
-  case 1: current_ = fIML_sec2;  break;
-  case 2: current_ = fIML_sec3;  break;
-  case 3: current_ = fIML_sec4;  break;
-  default: printf(" *** Wrong Param passed to S800::MapCalc!!\n"); return 0;break;
-  }
-  for(int i=0; i<current_.size();i++){
-    if(CalcOrder<current_.at(i).order) break;
-    multi = 1;
-    //std::cout << " current coef : " << current_.at(i).coef << std::endl;
-    for(int j=0;j<CalcOrder;j++){
-      if(current_.at(i).exp[j]!=0){
-	multi *= pow(input[j],current_.at(i).exp[j]);
-      }
+  for(int param = 0; param<4;param++){
+    switch(param){
+    case 0: current_ = fIML_sec1;  break;
+    case 1: current_ = fIML_sec2;  break;
+    case 2: current_ = fIML_sec3;  break;
+    case 3: current_ = fIML_sec4;  break;
+    default: printf(" *** Wrong Param passed to S800::MapCalc!!\n"); return;break;
     }
-    cumul += multi*current_.at(i).coef;
+    for(int i=0; i<current_.size();i++){
+      if(CalcOrder<current_.at(i).order) break;
+      multi = 1;
+      //std::cout << " current coef : " << current_.at(i).coef << std::endl;
+      for(int j=0;j<CalcOrder;j++){
+	if(current_.at(i).exp[j]!=0){
+	  multi *= pow(input[j],current_.at(i).exp[j]);
+	}
+      }
+      cumul += multi*current_.at(i).coef;
+    }
+    switch(param){
+    case 0: fAta = cumul-0.004406; break; std::cout << " HAVE A HARDCODED SI28 VALUE HERE"<<std::endl;
+    case 1: fYta = cumul; break;
+    case 2: fBta = cumul-0.008173; break;
+    case 3: fDta = cumul; break;
+    }
   }
-  return cumul;  
+  //return cumul;  
 }
 
 TVector3 TS800::CRDCTrack(){
@@ -137,8 +176,8 @@ TVector3 TS800::CRDCTrack(){
    
   TVector3 track = crdc2-crdc1;*/
   TVector3 track;
-  track.SetTheta(TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1000.0)); // rad
-  track.SetPhi(TMath::ATan((GetCrdc(0).GetNonDispersiveY()-GetCrdc(1).GetNonDispersiveY())/1000.0)); // rad
+  track.SetTheta(TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1073.0)); // rad
+  track.SetPhi(TMath::ATan((GetCrdc(0).GetNonDispersiveY()-GetCrdc(1).GetNonDispersiveY())/1073.0)); // rad
   //track.SetPt(1) // need to do this.
       
   return track;
@@ -146,8 +185,15 @@ TVector3 TS800::CRDCTrack(){
 
 float TS800::GetAFP() const{
   
-  float AFP = TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1000.0); 
+  float AFP = TMath::ATan((GetCrdc(1).GetDispersiveX()-GetCrdc(0).GetDispersiveX())/1073.0); 
   return AFP;
+
+}
+
+float TS800::GetBFP() const{
+  
+  float BFP = TMath::ATan((GetCrdc(1).GetNonDispersiveY()-GetCrdc(0).GetNonDispersiveY())/1073.0); 
+  return BFP;
 
 }
 
@@ -165,15 +211,16 @@ void TS800::Clear(Option_t* opt){
   trigger.Clear();
   ion.Clear();
   
-  /*  fMaxCoef.clear();
-  fOrder.clear();
-  fExponent.clear();
-  fCoef.clear();*/
   fMaxOrder = 0;
   fMass     = 0;
   fBrho     = -1;
   fCharge   = 0;
-  
+ 
+  fAta = sqrt(-1);
+  fYta = sqrt(-1);
+  fBta = sqrt(-1);
+  fDta = sqrt(-1);
+
 
 }
 
@@ -223,7 +270,7 @@ int TS800::BuildHits(){
 	HandleIonCPacket(dptr+1,sizeleft);
 	break;
       case 0x5840:  // CRDC Packet
-	//event.Print("all0x5840");
+	//event.Print("all0x58400x5845");
         HandleCRDCPacket(dptr+1,sizeleft);
 	break;
       case 0x5850:  // II CRDC Packet
@@ -257,6 +304,21 @@ int TS800::BuildHits(){
     SetEventCounter(head->GetEventNumber());
     //geb->Print(toprint.c_str());
   }
+  //Raytracing(
+  float input[6];
+  input[0] = -GetCrdc(0).GetDispersiveX()/1000.0; // divide to get to units of meters
+  input[1] = -GetAFP(); // this is in radians.
+  input[2] = GetCrdc(0).GetNonDispersiveY()/1000.0;
+  input[3] = GetBFP();
+  //input[2] = GetCrdc(0).GetNonDispersiveY()/1000.0 - 0.033;
+  //input[3] = GetBFP() + 0.034;
+  input[4] = 0;
+  input[5] = 0;
+
+  //printf("-----------------------  --------------------\n");
+  //std::cout << " BFP : " << input[3] << "  " << GetBFP() << std::endl;
+  MapCalc(input);
+
   //printf("-----------------------\n");
   return 0;
 }
@@ -332,6 +394,11 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
   //printf("crdc = [%i]\t0x%08x\n",(*data),crdc+(*data));
 
   current_crdc->SetId(*data);
+  /*std::cout << std::hex << " data : " <<  *data << std::endl;
+  std::cout << std::hex << " ID   : " << current_crdc->GetId() << std::endl;
+  std::dec;
+  */
+
   int x =1;
   int subsize = *(data+x);
   x++;
@@ -366,7 +433,7 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
     */
     pad[real_channel][sample_number] = databits;
   }
-  x+=2;
+  x+=1;
   std::map<int,std::map<int,int> >::iterator it1;
   std::map<int,int>::iterator it2;
 
@@ -390,6 +457,12 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
   x++;
   current_crdc->SetTime(*(data+x));
 
+  /*std::cout << " subsize   : " << std::hex << subsize << std::endl;
+  std::cout << " subtype   : " << subtype << std::endl;
+  std::cout << " ID   : " << current_crdc->GetId() << std::endl;
+  std::cout << " CRDC Time : " << current_crdc->GetTime() << std::endl;
+  std::cout << " CRDC Anod : " << current_crdc->GetAnode() << std::endl;
+  std::dec;*/
   return true;
 }
 
@@ -788,23 +861,25 @@ TDetectorHit& TS800::GetHit(int i){
 
 
 float TS800::GetTofE1_TAC(float c1,float c2)  const {
-  return GetTof().GetTacOBJ() - c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+  return GetTof().GetTacOBJ() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
 }
 
 
 float TS800::GetTofE1_TDC(float c1,float c2)  const {
 
-  return GetTof().GetOBJ() - GetScint().GetTimeUp() - c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+  return GetTof().GetOBJ() - GetScint().GetTimeUp() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
 }
 
 float TS800::GetTofE1_MTDC(float c1,float c2)   {
 
   std::vector<float> result;
+  if(mtof.fObj.size()<0)
+    std::cout << " In GetTOF MTDC, Size = " << mtof.fObj.size() << std::endl;
   for(int x=0;x<mtof.fObj.size();x++) {
     if(mtof.fObj.at(x)>10200) {
       for(int y=0;y<mtof.fE1Up.size();y++) {
         if((mtof.fE1Up.at(y) <13500) && (mtof.fE1Up.at(y) >12500))
-          result.push_back( mtof.fObj.at(x) - mtof.fE1Up.at(y) - c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
+          result.push_back( mtof.fObj.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
       }
     }
   }

@@ -7,6 +7,9 @@
 #include <sys/stat.h>
 
 #include "TH1.h"
+#include "TFile.h"
+#include "TDirectory.h"
+
 
 #include "FullPath.h"
 #include "GValue.h"
@@ -55,7 +58,9 @@ TList* TCompiledHistograms::GetHistograms() {
   TIter iter(&objects);
   TObject* obj = NULL;
   while((obj = iter.Next())){
-    if(obj->InheritsFrom(TH1::Class())){
+    if(obj->InheritsFrom(TH1::Class()) || 
+       (obj->InheritsFrom(TDirectory::Class()) &&
+	!obj->InheritsFrom(TFile::Class()))){
       output->Add(obj);
     }
   }

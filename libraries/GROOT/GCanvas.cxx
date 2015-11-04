@@ -537,9 +537,9 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
          edited = PhotoPeakFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
        }
        break;
-    //case kKey_g:
-    //   edited = GausFit();
-    //   break;
+  case kKey_g:
+    edited = GausFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
+    break;
     //case kKey_G:
     //   edited = GausBGFit();
     //   break;

@@ -151,6 +151,8 @@ TCrdc::~TCrdc() {
 float TCrdc::GetPad(){
   int temp = 0;
   int place =0;
+  float WeightedSumNum = 0;
+  float WeightedSumDen = 0;
   if(!data.size())
     return -1.0;
   
@@ -161,12 +163,24 @@ float TCrdc::GetPad(){
     std::cout << " Sample  : " << sample.at(i) << " at " << i << std::endl;
     std::cout << " Channel : " << channel.at(i) << " at " << i << std::endl;
     */
+    
+    /*if(data.at(i)>0){
+      WeightedSumNum += float(data.at(i))*float(channel.at(i));
+      WeightedSumDen += float(channel.at(i));
+      
+    }*/
+
     if(data.at(i)>temp) {
-      temp = data.at(i);
-      place = i;
+    temp = data.at(i);
+    place = i;
     }
   }
   
+  //for(int j = 0; j < 6; j++){
+    
+  //}
+  
+  //return float(WeightedSumNum/WeightedSumDen)+gRandom->Uniform();
   return (float)(channel.at(place))+gRandom->Uniform();
   
 }
@@ -258,6 +272,11 @@ void TCrdc::Copy(TObject &obj) const {
   c.data     = data;
   c.anode    = anode;
   c.time     = time;
+  c.fCRDCXslope = fCRDCXslope;
+  c.fCRDCYslope = fCRDCYslope;
+  c.fCRDCXoff = fCRDCXoff;
+  c.fCRDCYoff = fCRDCYoff;
+
 }
 
 void TCrdc::Clear(Option_t *opt) { 

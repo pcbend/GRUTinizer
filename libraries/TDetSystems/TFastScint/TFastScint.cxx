@@ -28,9 +28,8 @@ void TFastScint::Copy(TObject& obj) const {
 void TFastScint::Clear(Option_t* opt){
   TDetector::Clear(opt);
 
-  tdc_trigger = -1;
-  qdc_channels = -1;
-  tdc_channels = -1;
+  tdc_TS = -1;
+  qdc_TS = -1;
   fs_hits->Clear(opt);
 }
 
@@ -93,7 +92,7 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
   // NOTE -> buffer_size is 2*PayloadSize.
   buffer_size = *((UShort_t*)(data));
   data+=2;
-  
+
   if(DEBUG){
     event.Print("all");
     std::cout << " Payload Size : " << PayloadSize << std::endl;
@@ -129,13 +128,9 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	    InsertHit(hit);
 	  }
 	}
-	else{
+	else
 	  InsertHit(hit);
 	 
-	
-	}
-
-
 	if(DEBUG){
 	  std::cout << " QDC Q : " << std::hex << Mq->Charge() << std::endl;
 	  std::cout << " QDC ch: " << std::dec << Mq->Chan() << std::endl;
@@ -147,7 +142,6 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	
 	detNumber = -1;
 	detNumber = GetDetNumberIn_fs_hits(Int_t(Mt->Chan()));
-
 	
 	if(detNumber!=-1){
 	  TFastScintHit *qdc_hit = GetLaBrHit(detNumber);
@@ -200,8 +194,37 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	std::cout << " Filler " << std::endl;
     }
     else if(Mword->isEOE()){
+      // Here we want to set the timestamp.
+      const TRawEvent::Mesy_EOE* Meoe = (TRawEvent::Mesy_EOE*)Mword;
+
+      if(isQ){
+	SetQDC_TimeStamp(Meoe->TS());
+	
+	if(DEBUG){
+	  std::cout << " QDC TS : " << std::hex << Meoe->TS() << std::endl;
+	  std::dec;
+	}
+      }
+      else if (isT){
+	SetTDC_TimeStamp(Meoe->TS());
+	
+	if(DEBUG){
+	  std::cout << " TDC TS : " << std::hex << Meoe->TS() << std::endl;
+	  std::dec;
+	}
+      }
+      else
+	std::cout << " *** Error -- Timestamp not for TDC or QDC *** " << std::endl;
+      
       if(DEBUG) std::cout << " EOE " << std::endl;
-    }    
+    }
+    else if(Mword->isALLF()){
+      if(DEBUG) std::cout << " All F " << std::endl;
+    }
   }
+
+  // Sort array:
+  //TFastScintHit *hit_sort = 
+  
   return 0;
 }

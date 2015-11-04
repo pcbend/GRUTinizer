@@ -1,5 +1,6 @@
 // GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GCanvas.h GPeak.h GEfficiency.h
 
+
 #ifdef __CINT__
 #pragma link off all globals;
 #pragma link off all classes;
@@ -21,6 +22,7 @@
 #pragma link C++ function ShowPeaks;
 #pragma link C++ function RemovePeaks;
 #pragma link C++ function PhotoPeakFit;
+#pragma link C++ function GausFit;
 
 #pragma link C++ function MergeStrings;
 
