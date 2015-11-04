@@ -27,8 +27,6 @@
 //#include "GROOTGuiFactory.h"
 #include "GRootCommands.h"
 
-#include "TObjectManager.h"
-
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -447,28 +445,28 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
     break;
 
   case kMyArrowUp: {
-    //printf("Up.\n");
-    //printf("start: 0x%08x\n",hists.at(0));
-    TH1* temph = (TH1*)gManager->FindObjectAny(hists.at(0)->GetName());
-    temph = gManager->GetNext1D(temph, false);
-    //printf("next:  0x%08x\n",temph);
-    if(temph) {
-      temph->GetXaxis()->SetRange(first,last);
-      temph->Draw();
-      edited = true;
-    }
+    // //printf("Up.\n");
+    // //printf("start: 0x%08x\n",hists.at(0));
+    // TH1* temph = (TH1*)gManager->FindObjectAny(hists.at(0)->GetName());
+    // temph = gManager->GetNext1D(temph, false);
+    // //printf("next:  0x%08x\n",temph);
+    // if(temph) {
+    //   temph->GetXaxis()->SetRange(first,last);
+    //   temph->Draw();
+    //   edited = true;
+    // }
   }
     break;
   case kMyArrowDown: {
-    //printf("Down.\n");
-    //TH1* temph = gManager->GetNext1D(hists.at(0), true);
-    TH1* temph = (TH1*)gManager->FindObjectAny(hists.at(0)->GetName());
-    temph = gManager->GetNext1D(temph, false);
-    if(temph) {
-      temph->GetXaxis()->SetRange(first,last);
-      temph->Draw();
-      edited = true;
-    }
+    // //printf("Down.\n");
+    // //TH1* temph = gManager->GetNext1D(hists.at(0), true);
+    // TH1* temph = (TH1*)gManager->FindObjectAny(hists.at(0)->GetName());
+    // temph = gManager->GetNext1D(temph, false);
+    // if(temph) {
+    //   temph->GetXaxis()->SetRange(first,last);
+    //   temph->Draw();
+    //   edited = true;
+    // }
   }
     break;
   default:
@@ -539,9 +537,9 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
          edited = PhotoPeakFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
        }
        break;
-    //case kKey_g:
-    //   edited = GausFit();
-    //   break;
+  case kKey_g:
+    edited = GausFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
+    break;
     //case kKey_G:
     //   edited = GausBGFit();
     //   break;
@@ -626,6 +624,38 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       RemoveMarker("all");
       edited = true;
       break;
+    case kKey_z: {
+        printf("you pressed z!\n");           
+        GCanvas *c = (GCanvas*)gPad->GetCanvas();
+        TIter iter(c->GetListOfPrimitives());
+        while(TObject *obj = iter.Next()) {
+          if(!obj->InheritsFrom(TCanvas::Class()))
+            continue;
+          TCanvas *c = ((TCanvas*)obj);
+          if(!c->GetLogz())
+            c->SetLogz(1);
+        }
+      }
+      edited = true;
+      break;
+    case kKey_Z: {
+        GCanvas *c = (GCanvas*)gPad->GetCanvas();
+        TIter iter(c->GetListOfPrimitives());
+        while(TObject *obj = iter.Next()) {
+          if(!obj->InheritsFrom(TCanvas::Class()))
+            continue;
+          TCanvas *c = ((TCanvas*)obj);
+          if(c->GetLogz())
+            c->SetLogz(0);
+        }
+      }
+      edited = true;
+      break;
+
+
+
+
+
   };
   return edited;
 }

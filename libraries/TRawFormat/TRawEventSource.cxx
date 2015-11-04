@@ -19,7 +19,7 @@ int TRawEventSource::Read(TRawEvent& event){
   } else {
     int result = GetEvent(event);
     if(result > 0){
-      fBytesGiven += event.GetTotalSize();
+      UpdateByteThroughput(event.GetTotalSize());
     } else {
       fIsFinished = true;
     }
@@ -32,6 +32,24 @@ int TRawEventSource::Read(TRawEvent* event){
     return Read(*event);
   } else {
     return -1;
+  }
+}
+
+void TRawEventSource::UpdateByteThroughput(int bytes) {
+  if(!fBytesPerSecond.size()){
+    fBytesPerSecond.push_back(0);
+    current_time = time(NULL);
+  }
+
+  fBytesGiven += bytes;
+  fBytesPerSecond.back() += bytes;
+
+  if(current_time != time(NULL)){
+    current_time = time(NULL);
+    fBytesPerSecond.push_back(0);
+    if(fBytesPerSecond.size() > 5) {
+      fBytesPerSecond.pop_front();
+    }
   }
 }
 
@@ -76,6 +94,17 @@ TRawEventSource* TRawEventSource::EventSource(const char* filename,
   }
 }
 
+double TRawEventSource::GetAverageRate() const {
+  ((TRawEventSource*)this)->UpdateByteThroughput(0);
+
+  int n = 0;
+  double sum = 0;
+  for(auto val : fBytesPerSecond) {
+    n++;
+    sum += val;
+  }
+  return sum/n;
+}
 
 ClassImp(TRawEventByteSource);
 
@@ -92,7 +121,7 @@ std::string TRawEventByteSource::Status() const {
               SourceDescription().c_str(),
               DCYAN, GetBytesGiven()/1e6, RESET_COLOR,
               BLUE,  GetFileSize()/1e6, RESET_COLOR,
-              GREEN, GetBytesGiven()/(1e6*runtime), RESET_COLOR);
+              GREEN, GetAverageRate()/1e6, RESET_COLOR);
 }
 
 int TRawEventByteSource::GetEvent(TRawEvent& rawevent) {

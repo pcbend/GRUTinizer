@@ -82,8 +82,8 @@ bool TS800::ReadInvMap(const char* file){
   getline(inFile,eat);
   
   if(I!="I" && COEF!="COEFFICIENT"){
-    std::cout << " *** Bad S800 Inv Map File Format!!! " << std::endl;
-    std::cout << " *** Inv Map File Not Read !!! " << std::endl;
+    //std::cout << " *** Bad S800 Inv Map File Format!!! " << std::endl;
+    //std::cout << " *** Inv Map File Not Read !!! " << std::endl;
     return false;
   }
   
@@ -108,16 +108,16 @@ bool TS800::ReadInvMap(const char* file){
     
     switch(par){
     case 0:
-      fIML_sec1.push_back(fIML);
+      fIML_sec1.push_back(fIML); 
       break;
     case 1:
-      fIML_sec2.push_back(fIML);
+      fIML_sec2.push_back(fIML); 
       break;
     case 2:
-      fIML_sec3.push_back(fIML);
+      fIML_sec3.push_back(fIML); 
       break;
     case 3:
-      fIML_sec4.push_back(fIML);
+      fIML_sec4.push_back(fIML); 
       break;
     case 4:
       // you get to 4 before the eof.
@@ -159,9 +159,9 @@ void TS800::MapCalc(float *input){
       cumul += multi*current_.at(i).coef;
     }
     switch(param){
-    case 0: fAta = cumul; break;
+    case 0: fAta = cumul-0.004406; break; std::cout << " HAVE A HARDCODED SI28 VALUE HERE"<<std::endl;
     case 1: fYta = cumul; break;
-    case 2: fBta = cumul; break;
+    case 2: fBta = cumul-0.008173; break;
     case 3: fDta = cumul; break;
     }
   }
@@ -211,10 +211,6 @@ void TS800::Clear(Option_t* opt){
   trigger.Clear();
   ion.Clear();
   
-  /*  fMaxCoef.clear();
-  fOrder.clear();
-  fExponent.clear();
-  fCoef.clear();*/
   fMaxOrder = 0;
   fMass     = 0;
   fBrho     = -1;
@@ -877,6 +873,8 @@ float TS800::GetTofE1_TDC(float c1,float c2)  const {
 float TS800::GetTofE1_MTDC(float c1,float c2)   {
 
   std::vector<float> result;
+  if(mtof.fObj.size()<0)
+    std::cout << " In GetTOF MTDC, Size = " << mtof.fObj.size() << std::endl;
   for(int x=0;x<mtof.fObj.size();x++) {
     if(mtof.fObj.at(x)>10200) {
       for(int y=0;y<mtof.fE1Up.size();y++) {

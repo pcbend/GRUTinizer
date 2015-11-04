@@ -22,7 +22,7 @@
 
 class TS800Channel : public TDetectorHit {
   public:
-    TS800Channel()                     { Clear();         }
+    TS800Channel()                     { Clear();    }
     TS800Channel(short value)          { Set(value); }
     TS800Channel(unsigned short value) { Set(value); }
     ~TS800Channel()                    {}
@@ -31,7 +31,7 @@ class TS800Channel : public TDetectorHit {
     void Set(unsigned short value) { fValue = value; }
 
     virtual short GetId()      const { return (((fValue)&0xf000)>>12);  }
-    short GetValue()   const { return fValue&0x0fff;  }
+    short GetValue()           const { return fValue&0x0fff;  }
 
     virtual void Clear(Option_t *opt="")       { TDetectorHit::Clear(opt); fValue = 0; }
     virtual void Print(Option_t *opt="") const { printf("[%i] = %i\n",GetId(),GetValue());}
@@ -157,8 +157,6 @@ class TCrdc : public TDetectorHit {
     
 
     float GetPad();
-
-    void LoadInverseMap() {}
 
     virtual void Copy(TObject&) const;
     virtual void Print(Option_t *opt="") const;

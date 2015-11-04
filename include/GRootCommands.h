@@ -13,6 +13,7 @@ bool ShowPeaks(TH1**,unsigned int);
 bool RemovePeaks(TH1**,unsigned int);
 
 bool PhotoPeakFit(TH1*,double,double,Option_t *opt="");
+bool GausFit(TH1*,double,double,Option_t *opt="");
 
 std::string MergeStrings(const std::vector<std::string>& strings, char split='\n');
 

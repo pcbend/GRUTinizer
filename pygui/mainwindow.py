@@ -13,7 +13,6 @@ import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 from .run_command import run_command
-from .tree_tab import TreeTab
 from .hist_tab import HistTab
 from .tcut_tab import TCutTab
 from .variable_tab import VariableTab
@@ -31,8 +30,6 @@ class MainWindow(object):
         self.canvases = []
         self.files = {}
 
-        self.is_online = ROOT.TGRUTOptions.Get().IsOnline()
-
         self._setup_GUI()
 
     def LoadGuiFile(self, filename):
@@ -40,13 +37,12 @@ class MainWindow(object):
             text = f.read()
             settings = ast.literal_eval(text)
 
-        if 'histograms' in settings:
-            self.hist_tab._load_online_patterns(settings['histograms'])
         if 'tcuts' in settings:
             self.tcut_tab._load_tcut_patterns(settings['tcuts'])
         if 'compiled_histograms' in settings:
             self.hist_tab._load_compiled_histograms(settings['compiled_histograms']['name'])
         if 'variables' in settings:
+            #print " THIS IS WHERE I CALL YOU"
             self.variable_tab._load_variable_patterns(settings['variables'])
 
     def _save_gui_file(self, filename = None):
@@ -170,10 +166,6 @@ class MainWindow(object):
         self.variable_tab = VariableTab(self, variable_page)
         notebook.add(variable_page, text='Variables')
 
-        tree_page = ttk.Frame(notebook)
-        self.tree_tab = TreeTab(self, tree_page)
-        notebook.add(tree_page, text='Tree Viewer')
-
         notebook.pack(fill=tk.BOTH,expand=True)
 
         self._setup_status_bar(self.window)
@@ -290,7 +282,7 @@ class MainWindow(object):
         return array
 
     def _MakeRefreshMenu(self,menubar):
-        self.refreshrate  = tk.IntVar(value='1')
+        self.refreshrate  = tk.IntVar(value='-1')
 
         refreshmenu = tk.Menu(menubar,tearoff=0)
         refreshmenu.add_checkbutton(label="Off",onvalue=-1,
@@ -410,10 +402,6 @@ class MainWindow(object):
         menubar.add_cascade(label="Send Help",menu=helpmenu)
 
     def RefreshHistograms(self):
-        # if ROOT.online_events:
-        #     ROOT.online_events.FillParsedHistograms()
-        # if ROOT.online_scalers:
-        #     ROOT.online_scalers.FillParsedHistograms()
         update_tcanvases()
 
     def ResetHistograms(self,hist=None):
@@ -426,11 +414,10 @@ class MainWindow(object):
         update_tcanvases()
 
     def ResetAllHistograms(self):
-        if ROOT.online_events:
-            ROOT.online_events.ClearHistograms()
-        if ROOT.online_scalers:
-            ROOT.online_scalers.ClearHistograms()
-        self.RefreshHistograms()
+        outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
+        if outfile:
+            outfile.GetCompiledHistograms().ClearHistograms()
+            self.RefreshHistograms()
 
     def _draw_single(self,hist,color=1,nselected=1):
         canvas_exists = bool(filter(None,self.canvases))
@@ -438,7 +425,6 @@ class MainWindow(object):
         if(not canvas_exists or not ROOT.gPad):
             self.open_canvas(columns=self.zone_cols,rows = self.zone_rows)
             ROOT.gPad.GetCanvas().cd(self.zone_cols*self.zone_rows)
-            #ROOT.gPad.GetCanvas().cd(1)
 
         if (self.plotlocation.get()=='NewCanvas'):
             ROOT.gPad.GetCanvas().cd(0)
@@ -465,7 +451,6 @@ class MainWindow(object):
         opt = []
 
         currentnumber = ROOT.gPad.GetNumber()
-        #print currentnumber
         if (self.plotlocation.get() == 'NextPad' and  currentnumber>0):
            ROOT.gPad.GetCanvas().cd(currentnumber+1)
            if ROOT.gPad.GetNumber() == currentnumber:
@@ -494,6 +479,7 @@ class MainWindow(object):
         ROOT.TGRUTLoop.Get().Start()
 
     def LoadRootFile(self,filename=None):
+        #print "In py LoadRooFile " + filename
         if filename is None:
             filename = tkFileDialog.askopenfilename(filetypes=(("ROOT File", "*.root"),))
 
@@ -504,7 +490,6 @@ class MainWindow(object):
         tfile = ROOT.TGRUTint.instance().OpenRootFile(filename)
         self.files[filename] = tfile
         self.hist_tab.Insert(tfile)
-        self.tree_tab.AddFile(tfile)
         self.tcut_tab.AddFile(tfile)
         self.variable_tab.AddFile(tfile)
 

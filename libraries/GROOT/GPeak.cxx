@@ -110,9 +110,9 @@ bool GPeak::InitParams(TH1 *fithist){
   //printf("largest y = %.1f\n",largesty);
 
   TF1::SetParLimits(1,xlow,xhigh);
-  TF1::SetParLimits(2,0.1,xhigh-xlow); // sigma should be less than the window width - JKS
+  TF1::SetParLimits(2,0.1,xhigh-xlow); 
   TF1::SetParLimits(3,0.000,10);
-  TF1::SetParLimits(4,0,100); // this is a percentage. no reason for it to go to 500% - JKS
+  TF1::SetParLimits(4,0,100); // 
   //Step size is allow to vary to anything. If it goes below 0, the code will fix it to 0
   TF1::SetParLimits(6,0.0,fithist->GetBinContent(bin)*1.4);
   //this->SetParLimits(9,xlow,xhigh);
@@ -122,7 +122,7 @@ bool GPeak::InitParams(TH1 *fithist){
   TF1::SetParameter("Height",largesty);  //fithist->GetBinContent(bin));
   TF1::SetParameter("centroid",largestx);          //GetParameter("centroid"));
   //TF1::SetParameter("sigma",(xhigh-xlow)*0.5);
-  TF1::SetParameter("sigma",2.0/binWidth); //
+  TF1::SetParameter("sigma",(xhigh-xlow));//2.0/binWidth); //
   TF1::SetParameter("beta",0.5);
   TF1::SetParameter("R", 1.0);
   TF1::SetParameter("step",1.0);
