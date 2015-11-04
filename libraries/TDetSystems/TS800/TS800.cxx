@@ -16,7 +16,7 @@ short TS800::fMaxOrder;
 float TS800::fBrho;
 int TS800::fMass;
 int TS800::fCharge;
-
+bool TS800::InvMapFileRead = false;
 
 TS800::TS800() {
   Clear();
@@ -30,7 +30,7 @@ TS800::TS800() {
   GetCrdc(0).SetXoffset(-281.94);
   GetCrdc(0).SetYoffset(95.9966);
   //GetCrdc(0).SetYoffset(129.1513428524);
-  
+
   GetCrdc(1).SetXslope(2.54);
   GetCrdc(1).SetYslope(0.1110700359);
   GetCrdc(1).SetXoffset(-281.94);
@@ -108,16 +108,16 @@ bool TS800::ReadInvMap(const char* file){
 
     switch(par){
     case 0:
-      fIML_sec1.push_back(fIML); 
+      fIML_sec1.push_back(fIML);
       break;
     case 1:
-      fIML_sec2.push_back(fIML); 
+      fIML_sec2.push_back(fIML);
       break;
     case 2:
-      fIML_sec3.push_back(fIML); 
+      fIML_sec3.push_back(fIML);
       break;
     case 3:
-      fIML_sec4.push_back(fIML); 
+      fIML_sec4.push_back(fIML);
       break;
     case 4:
       // you get to 4 before the eof.
@@ -165,7 +165,7 @@ void TS800::MapCalc(float *input){
     case 3: fDta = cumul; break;
     }
   }
-  //return cumul; 
+  //return cumul;
   return;
 }
 
@@ -185,14 +185,14 @@ TVector3 TS800::CRDCTrack(){
 }
 
 float TS800::GetAFP() const{
-  float AFP = TMath::ATan((GetCrdc(1).GetDispersiveX()-GetCrdc(0).GetDispersiveX())/1073.0); 
+  float AFP = TMath::ATan((GetCrdc(1).GetDispersiveX()-GetCrdc(0).GetDispersiveX())/1073.0);
   return AFP;
 
 }
 
 float TS800::GetBFP() const{
-  
-  float BFP = TMath::ATan((GetCrdc(1).GetNonDispersiveY()-GetCrdc(0).GetNonDispersiveY())/1073.0); 
+
+  float BFP = TMath::ATan((GetCrdc(1).GetNonDispersiveY()-GetCrdc(0).GetNonDispersiveY())/1073.0);
   return BFP;
 
 }
@@ -214,7 +214,7 @@ void TS800::Clear(Option_t* opt){
   fMass     = 0;
   fBrho     = -1;
   fCharge   = 0;
- 
+
   fAta = sqrt(-1);
   fYta = sqrt(-1);
   fBta = sqrt(-1);

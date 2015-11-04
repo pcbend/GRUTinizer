@@ -26,16 +26,16 @@ public:
   Long_t GetTimestamp()    { Timestamp(); }
 
   TVector3 CRDCTrack();  // not a finished method
-  float GetAFP() const; 
-  float GetBFP() const; 
+  float GetAFP() const;
+  float GetBFP() const;
   void MapCalc(float *input);
   Float_t GetAta()         { return fAta; }
   Float_t GetYta()         { return fYta; }
   Float_t GetBta()         { return fBta; }
   Float_t GetDta()         { return fDta; }
- 
 
- 
+
+
   virtual void Copy(TObject& obj)        const;
   //virtual void Print(Option_t *opt = "") const;
   virtual void Clear(Option_t* opt = "");
@@ -66,22 +66,22 @@ public:
   bool HandleCRDCPacket(unsigned short*,int);     //!
   bool HandleMTDCPacket(unsigned short*,int);     //!
 
-  bool InvMapFileRead=false;
+  static bool InvMapFileRead;
   struct S800_InvMapLine {
     float coef;
     int order,exp[6];
-    void Clear(){ 
-      coef = -1; order = -1; 
+    void Clear(){
+      coef = -1; order = -1;
       for(int i=0;i<6;i++)
 	exp[i]=-1;
     }
-  }; //!  
+  }; //!
   S800_InvMapLine fIML;                           //!
   static std::vector<S800_InvMapLine> fIML_sec1;  //!
   static std::vector<S800_InvMapLine> fIML_sec2;  //!
   static std::vector<S800_InvMapLine> fIML_sec3;  //!
   static std::vector<S800_InvMapLine> fIML_sec4;  //!
-  static short fMaxOrder;                         //!  
+  static short fMaxOrder;                         //!
   static float fBrho;                             //!
   static int fMass;                               //!
   static int fCharge;                             //!
@@ -93,14 +93,14 @@ public:
   TIonChamber  ion;
   TCrdc        crdc[2];
   //THodoscope   hodo[32];
- 
+
   //TMultiHitTof multi_tof;
-  
+
   Float_t fAta;
   Float_t fYta;
   Float_t fBta;
   Float_t fDta;
-   
+
 
   Long_t fEventCounter;
 
