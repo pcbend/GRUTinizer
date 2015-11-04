@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -70,7 +71,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="functions.html"><span>All</span></a></li>
       <li><a href="functions_func.html"><span>Functions</span></a></li>
       <li class="current"><a href="functions_vars.html"><span>Variables</span></a></li>
-      <li><a href="functions_type.html"><span>Typedefs</span></a></li>
       <li><a href="functions_enum.html"><span>Enumerations</span></a></li>
       <li><a href="functions_eval.html"><span>Enumerator</span></a></li>
       <li><a href="functions_rela.html"><span>Related&#160;Functions</span></a></li>
@@ -98,6 +98,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="functions_vars_0x72.html#index_r"><span>r</span></a></li>
       <li><a href="functions_vars_0x73.html#index_s"><span>s</span></a></li>
       <li><a href="functions_vars_0x74.html#index_t"><span>t</span></a></li>
+      <li><a href="functions_vars_0x75.html#index_u"><span>u</span></a></li>
       <li><a href="functions_vars_0x76.html#index_v"><span>v</span></a></li>
       <li><a href="functions_vars_0x77.html#index_w"><span>w</span></a></li>
       <li><a href="functions_vars_0x78.html#index_x"><span>x</span></a></li>
@@ -111,7 +112,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -137,35 +138,53 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>energy_coeff
 : <a class="el" href="classTChannel.html#a5356fe6efe4e89a8aad4a8958d03518a">TChannel</a>
 </li>
+<li>energy_fraction
+: <a class="el" href="structinteraction__point.html#aa897ba5faf9da6eb0e845157b903bbad">interaction_point</a>
+</li>
 <li>energy_high
-: <a class="el" href="structGEBMode3Data.html#a22398278383486aac38decc527c4136b">GEBMode3Data</a>
-, <a class="el" href="structTRawEvent_1_1GEBMode3Data.html#af81be4958dcb124cfe9d274bfe65268a">TRawEvent::GEBMode3Data</a>
+: <a class="el" href="structTRawEvent_1_1GEBMode3Data.html#af81be4958dcb124cfe9d274bfe65268a">TRawEvent::GEBMode3Data</a>
+, <a class="el" href="structGEBMode3Data.html#a22398278383486aac38decc527c4136b">GEBMode3Data</a>
 </li>
 <li>energy_hit
 : <a class="el" href="struct____attribute____.html#a8b4fd1c0f081352169656b688d707181">__attribute__</a>
 , <a class="el" href="structTRawEvent_1_1____attribute____.html#a729e97f7e321f747c2cb9c2b37464904">TRawEvent::__attribute__</a>
 </li>
 <li>energy_low
-: <a class="el" href="structTRawEvent_1_1GEBMode3Data.html#a8c5e54527bec7f0202c6d69787c16d8b">TRawEvent::GEBMode3Data</a>
-, <a class="el" href="structGEBMode3Data.html#af2074c3f10b383fa9ef7e175bd8cb221">GEBMode3Data</a>
+: <a class="el" href="structGEBMode3Data.html#af2074c3f10b383fa9ef7e175bd8cb221">GEBMode3Data</a>
+, <a class="el" href="structTRawEvent_1_1GEBMode3Data.html#a8c5e54527bec7f0202c6d69787c16d8b">TRawEvent::GEBMode3Data</a>
 </li>
 <li>energy_sum
-: <a class="el" href="structTDDASEvent_1_1DDAS__Energy__Sum.html#a5d2495343e43db419042c05181c1afe8">TDDASEvent::DDAS_Energy_Sum</a>
-, <a class="el" href="classTDDASEvent.html#a3315809a9f3fb1a52d2d8a0c24420dd0">TDDASEvent</a>
+: <a class="el" href="classTDDASEvent.html#a3315809a9f3fb1a52d2d8a0c24420dd0">TDDASEvent</a>
 , <a class="el" href="structDDAS__Energy__Sum.html#a6ab96f878d731f20bd78f0a19d8c5fdd">DDAS_Energy_Sum</a>
+, <a class="el" href="structTDDASEvent_1_1DDAS__Energy__Sum.html#a5d2495343e43db419042c05181c1afe8">TDDASEvent::DDAS_Energy_Sum</a>
 </li>
 <li>energy_tracelength
-: <a class="el" href="structTDDASEvent_1_1DDASHeader.html#afbc3461330f90fb6ce679c8c5a185b11">TDDASEvent::DDASHeader</a>
-, <a class="el" href="structDDASHeader.html#ace748b4fda5b6c0badcc398ff5f97f30">DDASHeader</a>
+: <a class="el" href="structDDASHeader.html#ace748b4fda5b6c0badcc398ff5f97f30">DDASHeader</a>
+, <a class="el" href="structTDDASEvent_1_1DDASHeader.html#afbc3461330f90fb6ce679c8c5a185b11">TDDASEvent::DDASHeader</a>
 </li>
 <li>env
 : <a class="el" href="classTDetectorEnv.html#a4e1e679ccba47af293768d5ec887f361">TDetectorEnv</a>
+</li>
+<li>errors
+: <a class="el" href="classTFastScint.html#ab913c78b7b5a788b535e54049fb32371">TFastScint</a>
+</li>
+<li>event_queue
+: <a class="el" href="classTOrderedRawFile.html#a15749abdb2d6953d832805785b52dcd4">TOrderedRawFile</a>
+</li>
+<li>event_start
+: <a class="el" href="classTUnpackLoop.html#ae584edd071b3f092318a8b8880de5c70">TUnpackLoop</a>
+</li>
+<li>event_tree
+: <a class="el" href="classTWriteLoop.html#a558198b7ed275f4eaeb63090371e9adb">TWriteLoop</a>
+</li>
+<li>exp
+: <a class="el" href="structTS800_1_1S800__InvMapLine.html#a75b404153be7db1e13fcd5d31c447b33">TS800::S800_InvMapLine</a>
 </li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 1 2015 15:28:58 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 4 2015 17:27:57 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

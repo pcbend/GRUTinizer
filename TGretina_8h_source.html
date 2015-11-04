@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -68,7 +69,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -79,7 +80,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_8d46cf37b8943c9254bd5ebc2d3e8433.html">include</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -110,38 +111,37 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span>          <a class="code" href="classTGretina.html#afc51a35dfe62731c632ee4b3a908fe40">InsertHit</a>(<span class="keyword">const</span> <a class="code" href="classTDetectorHit.html">TDetectorHit</a>&amp; hit);</div>
 <div class="line"><a name="l00023"></a><span class="lineno"><a class="code" href="classTGretina.html#a018f2afc06bde8709e67d1ea789f1172">   23</a></span>&#160;  <span class="keyword">virtual</span> <a class="code" href="classTDetectorHit.html">TDetectorHit</a>&amp; <a class="code" href="classTGretina.html#a018f2afc06bde8709e67d1ea789f1172">GetHit</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> &amp;i)            { <span class="keywordflow">return</span> *(<a class="code" href="classTGretinaHit.html">TGretinaHit</a>*)<a class="code" href="classTGretina.html#ac95ae380d780337511d79d664d3e9def">gretina_hits</a>-&gt;At(i); }</div>
-<div class="line"><a name="l00024"></a><span class="lineno"><a class="code" href="classTGretina.html#a7b7b4931f65ae7e37fed321ba35f6f96">   24</a></span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span>           <a class="code" href="classTGretina.html#a7b7b4931f65ae7e37fed321ba35f6f96">Size</a>()                          { <span class="keywordflow">return</span> <a class="code" href="classTGretina.html#ac95ae380d780337511d79d664d3e9def">gretina_hits</a>-&gt;GetEntries(); }</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno"><a class="code" href="classTGretina.html#a92613fd26f8bcfe24905afd34c0d4ff8">   26</a></span>&#160;  <span class="keyword">const</span> <a class="code" href="classTGretinaHit.html">TGretinaHit</a>&amp; <a class="code" href="classTGretina.html#a92613fd26f8bcfe24905afd34c0d4ff8">GetGretinaHit</a>(<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> *(<a class="code" href="classTGretinaHit.html">TGretinaHit</a>*)<a class="code" href="classTGretina.html#ac95ae380d780337511d79d664d3e9def">gretina_hits</a>-&gt;At(i); }</div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="code" href="classTGretina.html#a6e0054198d2a68d8dace700cf2724fef">   27</a></span>&#160;  <a class="code" href="classTGretinaHit.html">TGretinaHit</a>&amp; <a class="code" href="classTGretina.html#a6e0054198d2a68d8dace700cf2724fef">GetAddbackHit</a>(<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> *(<a class="code" href="classTGretinaHit.html">TGretinaHit</a>*)<a class="code" href="classTGretina.html#a848c397965a9c742b7f4a21d2559b011">addback_hits</a>-&gt;At(i); }</div>
-<div class="line"><a name="l00028"></a><span class="lineno"><a class="code" href="classTGretina.html#aaf7ce5d6cf10dd9bf48878fa7176afdb">   28</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classTGretina.html#aaf7ce5d6cf10dd9bf48878fa7176afdb">PrintHit</a>(<span class="keywordtype">int</span> i){ <a class="code" href="classTGretina.html#ac95ae380d780337511d79d664d3e9def">gretina_hits</a>-&gt;At(i)-&gt;Print(); }</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keyword">static</span> TVector3 <a class="code" href="classTGretina.html#a975199d8a8fdf762956b424608baeaf9">CrystalToGlobal</a>(<span class="keywordtype">int</span> cryId,</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;                                  Float_t localX=0,Float_t localY=0,Float_t localZ=0);</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classTGretina.html#a0fc2111bf76afc40db49edb33646e4bd">BuildHits</a>();</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classTGretina.html#aee6fa4e8acdeb86911c5ddcec2f8c9db">BuildAddbackHits</a>();</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
-<div class="line"><a name="l00037"></a><span class="lineno"><a class="code" href="classTGretina.html#ac95ae380d780337511d79d664d3e9def">   37</a></span>&#160;  TClonesArray* <a class="code" href="classTGretina.html#ac95ae380d780337511d79d664d3e9def">gretina_hits</a>;<span class="comment">//(&quot;TGretinaHit&quot;);</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno"><a class="code" href="classTGretina.html#a848c397965a9c742b7f4a21d2559b011">   38</a></span>&#160;  TClonesArray* <a class="code" href="classTGretina.html#a848c397965a9c742b7f4a21d2559b011">addback_hits</a>;<span class="comment">//(&quot;TGretinaHit&quot;);</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
-<div class="line"><a name="l00040"></a><span class="lineno"><a class="code" href="classTGretina.html#a4a641b51b45422f76571366f1e208647">   40</a></span>&#160;  <span class="keyword">static</span> Float_t <a class="code" href="classTGretina.html#a4a641b51b45422f76571366f1e208647">crmat</a>[32][4][4][4];</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classTGretina.html#a6ebb3125e53f19aed1a8ff88156279ff">SetCRMAT</a>();</div>
-<div class="line"><a name="l00042"></a><span class="lineno"><a class="code" href="classTGretina.html#a1112c4d85e6164540ed10681b581f6cb">   42</a></span>&#160;  <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="classTGretina.html#a1112c4d85e6164540ed10681b581f6cb">fCRMATSet</a>;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <a class="code" href="classTGretina.html#ac62a08cb8b6a278713f21e4282b875fa">ClassDef</a>(<a class="code" href="classTGretina.html">TGretina</a>,3);</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;};</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="code" href="classTGretina.html#a92613fd26f8bcfe24905afd34c0d4ff8">   25</a></span>&#160;  <span class="keyword">const</span> <a class="code" href="classTGretinaHit.html">TGretinaHit</a>&amp; <a class="code" href="classTGretina.html#a92613fd26f8bcfe24905afd34c0d4ff8">GetGretinaHit</a>(<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> *(<a class="code" href="classTGretinaHit.html">TGretinaHit</a>*)<a class="code" href="classTGretina.html#ac95ae380d780337511d79d664d3e9def">gretina_hits</a>-&gt;At(i); }</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="comment">//const TGretinaHit&amp; GetAddbackHit(int i) { return *(TGretinaHit*)addback_hits-&gt;At(i); }</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="code" href="classTGretina.html#aaf7ce5d6cf10dd9bf48878fa7176afdb">   27</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classTGretina.html#aaf7ce5d6cf10dd9bf48878fa7176afdb">PrintHit</a>(<span class="keywordtype">int</span> i){ <a class="code" href="classTGretina.html#ac95ae380d780337511d79d664d3e9def">gretina_hits</a>-&gt;At(i)-&gt;Print(); }</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keyword">static</span> TVector3 <a class="code" href="classTGretina.html#a975199d8a8fdf762956b424608baeaf9">CrystalToGlobal</a>(<span class="keywordtype">int</span> cryId,</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;                                  Float_t localX=0,Float_t localY=0,Float_t localZ=0);</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classTGretina.html#a0fc2111bf76afc40db49edb33646e4bd">BuildHits</a>();</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="comment">//void BuildAddbackHits();</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="code" href="classTGretina.html#ac95ae380d780337511d79d664d3e9def">   36</a></span>&#160;  TClonesArray* <a class="code" href="classTGretina.html#ac95ae380d780337511d79d664d3e9def">gretina_hits</a>;<span class="comment">//(&quot;TGretinaHit&quot;);</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="comment">//TClonesArray* addback_hits;//(&quot;TGretinaHit&quot;);</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="code" href="classTGretina.html#a4a641b51b45422f76571366f1e208647">   39</a></span>&#160;  <span class="keyword">static</span> Float_t <a class="code" href="classTGretina.html#a4a641b51b45422f76571366f1e208647">crmat</a>[32][4][4][4];</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classTGretina.html#a6ebb3125e53f19aed1a8ff88156279ff">SetCRMAT</a>();</div>
+<div class="line"><a name="l00041"></a><span class="lineno"><a class="code" href="classTGretina.html#a1112c4d85e6164540ed10681b581f6cb">   41</a></span>&#160;  <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="classTGretina.html#a1112c4d85e6164540ed10681b581f6cb">fCRMATSet</a>;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <a class="code" href="classTGretina.html#ac62a08cb8b6a278713f21e4282b875fa">ClassDef</a>(<a class="code" href="classTGretina.html">TGretina</a>,3);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;};</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 1 2015 15:28:57 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 4 2015 17:27:53 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

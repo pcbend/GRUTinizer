@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -70,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -98,8 +99,8 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:adba20c833445ad7eeb6e141ad1f84f1f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classTRawFileIn.html">TRawFileIn</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFileEvent.html#adba20c833445ad7eeb6e141ad1f84f1f">file</a></td></tr>
-<tr class="memitem:a2a29e17153c88a455b89b9a301bd63bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classTGEBEvent.html">TGEBEvent</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFileEvent.html#a2a29e17153c88a455b89b9a301bd63bc">next_event</a></td></tr>
+<tr class="memitem:a345fec7df771c031d3778913a94afa1e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classTRawEventSource.html">TRawEventSource</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFileEvent.html#a345fec7df771c031d3778913a94afa1e">file</a></td></tr>
+<tr class="memitem:ad90b4297ef9663a1438e220cd35dbb79"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classTRawEvent.html">TRawEvent</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFileEvent.html#ad90b4297ef9663a1438e220cd35dbb79">next_event</a></td></tr>
 </table>
 <h2>Member Function Documentation</h2>
 <a class="anchor" id="a913927ab13a881e77f4f72e1eeef72ad"></a>
@@ -119,24 +120,24 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <h2>Member Data Documentation</h2>
-<a class="anchor" id="adba20c833445ad7eeb6e141ad1f84f1f"></a>
+<a class="anchor" id="a345fec7df771c031d3778913a94afa1e"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classTRawFileIn.html">TRawFileIn</a>* FileEvent::file</td>
+          <td class="memname"><a class="el" href="classTRawEventSource.html">TRawEventSource</a>* FileEvent::file</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a2a29e17153c88a455b89b9a301bd63bc"></a>
+<a class="anchor" id="ad90b4297ef9663a1438e220cd35dbb79"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classTGEBEvent.html">TGEBEvent</a> FileEvent::next_event</td>
+          <td class="memname"><a class="el" href="classTRawEvent.html">TRawEvent</a> FileEvent::next_event</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -150,7 +151,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 1 2015 15:28:58 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 4 2015 17:27:55 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

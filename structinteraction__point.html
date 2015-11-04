@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -70,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -92,17 +93,19 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a2cdc760dfe4527c24297ee9c57da7440"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structinteraction__point.html#a2cdc760dfe4527c24297ee9c57da7440">interaction_point</a> (int <a class="el" href="structinteraction__point.html#a0ed0bac71cc35c6a7e738d1984f56873">segnum</a>, TVector3 <a class="el" href="structinteraction__point.html#a983428b33aafa63dca0cbd5432eba69b">pos</a>, float <a class="el" href="structinteraction__point.html#aad1cf743ab350db4112476994cbf872d">energy</a>)</td></tr>
+<tr class="memitem:ad6f97222482370db3213742666d57e88"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structinteraction__point.html#ad6f97222482370db3213742666d57e88">interaction_point</a> (int <a class="el" href="structinteraction__point.html#a0ed0bac71cc35c6a7e738d1984f56873">segnum</a>, TVector3 <a class="el" href="structinteraction__point.html#a983428b33aafa63dca0cbd5432eba69b">pos</a>, TVector3 loc, float <a class="el" href="structinteraction__point.html#aad1cf743ab350db4112476994cbf872d">energy</a>)</td></tr>
 <tr class="memitem:a281abf8f12753f94baa02cc20b333b7f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structinteraction__point.html#a281abf8f12753f94baa02cc20b333b7f">operator&lt;</a> (const <a class="el" href="structinteraction__point.html">interaction_point</a> &amp;other) const </td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a0ed0bac71cc35c6a7e738d1984f56873"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structinteraction__point.html#a0ed0bac71cc35c6a7e738d1984f56873">segnum</a></td></tr>
 <tr class="memitem:a983428b33aafa63dca0cbd5432eba69b"><td class="memItemLeft" align="right" valign="top">TVector3&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structinteraction__point.html#a983428b33aafa63dca0cbd5432eba69b">pos</a></td></tr>
+<tr class="memitem:aedce1db8b9b31c8db153eb0b4b5a448c"><td class="memItemLeft" align="right" valign="top">TVector3&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structinteraction__point.html#aedce1db8b9b31c8db153eb0b4b5a448c">local_pos</a></td></tr>
 <tr class="memitem:aad1cf743ab350db4112476994cbf872d"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structinteraction__point.html#aad1cf743ab350db4112476994cbf872d">energy</a></td></tr>
+<tr class="memitem:aa897ba5faf9da6eb0e845157b903bbad"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structinteraction__point.html#aa897ba5faf9da6eb0e845157b903bbad">energy_fraction</a></td></tr>
 </table>
 <h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a2cdc760dfe4527c24297ee9c57da7440"></a>
+<a class="anchor" id="ad6f97222482370db3213742666d57e88"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -120,6 +123,12 @@ Public Attributes</h2></td></tr>
           <td></td>
           <td class="paramtype">TVector3&#160;</td>
           <td class="paramname"><em>pos</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TVector3&#160;</td>
+          <td class="paramname"><em>loc</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -180,6 +189,30 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="aa897ba5faf9da6eb0e845157b903bbad"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float interaction_point::energy_fraction</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aedce1db8b9b31c8db153eb0b4b5a448c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TVector3 interaction_point::local_pos</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a983428b33aafa63dca0cbd5432eba69b"></a>
 <div class="memitem">
 <div class="memproto">
@@ -210,7 +243,7 @@ Public Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 1 2015 15:28:58 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 4 2015 17:27:55 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

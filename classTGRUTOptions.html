@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -70,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -104,20 +105,32 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a25a1fcc8624c21f2af6c15c15163decb"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::string &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a25a1fcc8624c21f2af6c15c15163decb">RootInputFiles</a> ()</td></tr>
 <tr class="memitem:a4f0a857d98b89e87edc76f448480afd0"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::string &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a4f0a857d98b89e87edc76f448480afd0">CalInputFiles</a> ()</td></tr>
 <tr class="memitem:ab4254a52181d509bb4d480c87da20e52"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::string &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#ab4254a52181d509bb4d480c87da20e52">MacroInputFiles</a> ()</td></tr>
-<tr class="memitem:a120f42803ec4804c792b99c0c4408f09"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a120f42803ec4804c792b99c0c4408f09">DetectorEnvironment</a> ()</td></tr>
-<tr class="memitem:a21d7c527c247c137f5316ac541b08159"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a21d7c527c247c137f5316ac541b08159">OutputFile</a> ()</td></tr>
+<tr class="memitem:a4c7c44f1350adfe54db86fe40a5738cc"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::string &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a4c7c44f1350adfe54db86fe40a5738cc">GuiSaveSetFiles</a> ()</td></tr>
+<tr class="memitem:aa6f7c58138d356cfffb60a28bb77445d"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#aa6f7c58138d356cfffb60a28bb77445d">DetectorEnvironment</a> ()</td></tr>
+<tr class="memitem:a0449ee868c1685ac061a1d5f8fecdfb4"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a0449ee868c1685ac061a1d5f8fecdfb4">OutputFile</a> ()</td></tr>
 <tr class="memitem:a2a1e88c20992cb9bf619e362091b1249"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a2a1e88c20992cb9bf619e362091b1249">InputRing</a> ()</td></tr>
+<tr class="memitem:aca2549e9f8535b786f0847589184af5e"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#aca2549e9f8535b786f0847589184af5e">CompiledHistogramFile</a> ()</td></tr>
+<tr class="memitem:a16db56f367cfdb6e0c3665e28462246f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a16db56f367cfdb6e0c3665e28462246f">CommandPort</a> ()</td></tr>
 <tr class="memitem:ac40a6b013763bb0ef5a73c9cc7fb5ea1"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::string &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#ac40a6b013763bb0ef5a73c9cc7fb5ea1">OptionFiles</a> ()</td></tr>
 <tr class="memitem:a51a0de6f3adc41572776108a9b365652"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a51a0de6f3adc41572776108a9b365652">IgnoreErrors</a> ()</td></tr>
 <tr class="memitem:aeb7dc6e3b68f476443052c6e4213e67b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#aeb7dc6e3b68f476443052c6e4213e67b">ExitAfterSorting</a> () const </td></tr>
 <tr class="memitem:ac11d4b01344696142e4436e10aee2abb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#ac11d4b01344696142e4436e10aee2abb">ShowedHelp</a> () const </td></tr>
 <tr class="memitem:aac3b26d7c3f66ff23f41c20688a3f8b2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#aac3b26d7c3f66ff23f41c20688a3f8b2">ShowLogo</a> () const </td></tr>
 <tr class="memitem:af1a37788a9c432c378fa35dc30884460"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#af1a37788a9c432c378fa35dc30884460">SortRaw</a> () const </td></tr>
+<tr class="memitem:a19805dcf2984e503230e43ca8e26e26d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a19805dcf2984e503230e43ca8e26e26d">SortTree</a> () const </td></tr>
 <tr class="memitem:a0e1ec6e68017872fcef8d1e2a772e408"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a0e1ec6e68017872fcef8d1e2a772e408">IgnoreMode3</a> () const </td></tr>
+<tr class="memitem:a2bd7b1a11da94cfc43245756c28a5326"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a2bd7b1a11da94cfc43245756c28a5326">CommandServer</a> () const </td></tr>
+<tr class="memitem:a4c98ce50068870d9ea37dd54a4715511"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a4c98ce50068870d9ea37dd54a4715511">ExtractWaves</a> () const </td></tr>
+<tr class="memitem:a18ce0c4bb755323ffdd51d76aa6ee125"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a18ce0c4bb755323ffdd51d76aa6ee125">StartGUI</a> () const </td></tr>
+<tr class="memitem:a57da7ef7fb62bff96e8e204d36553dd9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a57da7ef7fb62bff96e8e204d36553dd9">IsOnline</a> () const </td></tr>
+<tr class="memitem:a04fde9536a175cf2805737e97362258c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a04fde9536a175cf2805737e97362258c">TimeSortInput</a> () const </td></tr>
 <tr class="memitem:a2eb54aba0bda0c72a2df1ac3d807c12f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a2eb54aba0bda0c72a2df1ac3d807c12f">ShouldExitImmediately</a> () const </td></tr>
-<tr class="memitem:a80b01bc65b1995389993fd79806e1817"><td class="memItemLeft" align="right" valign="top"><a class="el" href="TGRUTTypes_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a80b01bc65b1995389993fd79806e1817">DetermineFileType</a> (const std::string &amp;filename)</td></tr>
+<tr class="memitem:af64eb4dcac0f4a71552fc17bc866fe2c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#af64eb4dcac0f4a71552fc17bc866fe2c">MakeBackupFile</a> () const </td></tr>
+<tr class="memitem:a4dc0c10fda5de0049a016f1eb6abd0b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="TGRUTTypes_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a4dc0c10fda5de0049a016f1eb6abd0b2">DefaultFileType</a> () const </td></tr>
+<tr class="memitem:a37e93d3ded46453a4e648227cf782bb1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="TGRUTTypes_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a37e93d3ded46453a4e648227cf782bb1">DetermineFileType</a> (const std::string &amp;filename) const </td></tr>
 <tr class="memitem:ab4192f7787dcc0a72a9b500535992ede"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#ab4192f7787dcc0a72a9b500535992ede">GenerateOutputFilename</a> (const std::string &amp;filename)</td></tr>
 <tr class="memitem:a6adea0bd6ef1479a88ab29fd3778a599"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a6adea0bd6ef1479a88ab29fd3778a599">GenerateOutputFilename</a> (const std::vector&lt; std::string &gt; &amp;filename)</td></tr>
+<tr class="memitem:af9f995adb98381350c5a6cefe44703be"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#af9f995adb98381350c5a6cefe44703be">SetStartGUI</a> (bool flag=true)</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -135,17 +148,28 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:aecbcc888ea7a4ddd9244bf9b6a6f8855"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#aecbcc888ea7a4ddd9244bf9b6a6f8855">input_root_files</a></td></tr>
 <tr class="memitem:afb13f2678164f74ad5ca18b38bcf683e"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#afb13f2678164f74ad5ca18b38bcf683e">input_cal_files</a></td></tr>
 <tr class="memitem:a4fca88cbf069450f74192fa977cdba89"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a4fca88cbf069450f74192fa977cdba89">input_macro_files</a></td></tr>
+<tr class="memitem:a067e0cb82814c3c80aaad8da65f76eaa"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a067e0cb82814c3c80aaad8da65f76eaa">input_gui_hist_files</a></td></tr>
 <tr class="memitem:aeb25f96e7a7c84eb7b73b87f186b4c21"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#aeb25f96e7a7c84eb7b73b87f186b4c21">input_ring</a></td></tr>
 <tr class="memitem:a1e1606709bdce061f2c51022034a342f"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a1e1606709bdce061f2c51022034a342f">output_file</a></td></tr>
 <tr class="memitem:a5cd26b4482475a2bcfa2ead3c2403036"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a5cd26b4482475a2bcfa2ead3c2403036">detector_environment</a></td></tr>
+<tr class="memitem:a596113fe1c27a72d6cf981881a1835d9"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a596113fe1c27a72d6cf981881a1835d9">compiled_histogram_file</a></td></tr>
 <tr class="memitem:ad89f3f19efc82b40ae0e7725481e3661"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#ad89f3f19efc82b40ae0e7725481e3661">options_file</a></td></tr>
+<tr class="memitem:a3d9ffa198f8e07011dd0c5ba3d214fe7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a3d9ffa198f8e07011dd0c5ba3d214fe7">fCommandPort</a></td></tr>
+<tr class="memitem:a327e518d014ab0fd1321ec302fbb2b94"><td class="memItemLeft" align="right" valign="top"><a class="el" href="TGRUTTypes_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a327e518d014ab0fd1321ec302fbb2b94">fDefaultFileType</a></td></tr>
 <tr class="memitem:aad47f4fb1a154a45c2e1a1b3d75bb58f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#aad47f4fb1a154a45c2e1a1b3d75bb58f">fExitAfterSorting</a></td></tr>
 <tr class="memitem:a49b3ff3b72246eda8c1b3b366a06ccdd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a49b3ff3b72246eda8c1b3b366a06ccdd">fHelp</a></td></tr>
 <tr class="memitem:a6c7da815be7d6ee9ae68c59bfb977c60"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a6c7da815be7d6ee9ae68c59bfb977c60">fShowLogo</a></td></tr>
 <tr class="memitem:a35e1ed9d14597eabc64e384c6e055f8c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a35e1ed9d14597eabc64e384c6e055f8c">fSortRaw</a></td></tr>
+<tr class="memitem:a73cc968fb08110efd84ecef1a5fa16dc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a73cc968fb08110efd84ecef1a5fa16dc">fSortTree</a></td></tr>
 <tr class="memitem:a80a429ea350eede5684244c6467ced07"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a80a429ea350eede5684244c6467ced07">fIgnoreErrors</a></td></tr>
 <tr class="memitem:a7c243d7e62d48b51fd1eb46c1ba1e0bc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a7c243d7e62d48b51fd1eb46c1ba1e0bc">fIgnoreMode3</a></td></tr>
+<tr class="memitem:a3b509b0b788d6061646b8a559ef01ff8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a3b509b0b788d6061646b8a559ef01ff8">fCommandServer</a></td></tr>
+<tr class="memitem:adcb35d37a89897706d51f6116a64306b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#adcb35d37a89897706d51f6116a64306b">fExtractWaves</a></td></tr>
+<tr class="memitem:aed5f1e6b3d2cc7b34055e213415bea45"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#aed5f1e6b3d2cc7b34055e213415bea45">fIsOnline</a></td></tr>
+<tr class="memitem:a5c656681dd6fbb805dce6b693657f687"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a5c656681dd6fbb805dce6b693657f687">fStartGui</a></td></tr>
+<tr class="memitem:a0209f38e1a2d9b9ad18a7e12fdf54f37"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a0209f38e1a2d9b9ad18a7e12fdf54f37">fTimeSortInput</a></td></tr>
 <tr class="memitem:a326825483584087d136a768c6206164e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a326825483584087d136a768c6206164e">fShouldExit</a></td></tr>
+<tr class="memitem:a8ca9326e1ec2ba0b9a1b7d7e58bbb3db"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTOptions.html#a8ca9326e1ec2ba0b9a1b7d7e58bbb3db">fMakeBackupFile</a></td></tr>
 </table>
 <h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a503bf1b5be560c9d28594f228d9fbb88"></a>
@@ -256,7 +280,7 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a120f42803ec4804c792b99c0c4408f09"></a>
+<a class="anchor" id="a16db56f367cfdb6e0c3665e28462246f"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -264,7 +288,7 @@ Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const std::string TGRUTOptions::DetectorEnvironment </td>
+          <td class="memname">int TGRUTOptions::CommandPort </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -279,7 +303,99 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a80b01bc65b1995389993fd79806e1817"></a>
+<a class="anchor" id="a2bd7b1a11da94cfc43245756c28a5326"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TGRUTOptions::CommandServer </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aca2549e9f8535b786f0847589184af5e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string TGRUTOptions::CompiledHistogramFile </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a4dc0c10fda5de0049a016f1eb6abd0b2"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="TGRUTTypes_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a> TGRUTOptions::DefaultFileType </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aa6f7c58138d356cfffb60a28bb77445d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::string&amp; TGRUTOptions::DetectorEnvironment </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a37e93d3ded46453a4e648227cf782bb1"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -288,7 +404,7 @@ Private Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>filename</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -304,6 +420,29 @@ Private Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">bool TGRUTOptions::ExitAfterSorting </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a4c98ce50068870d9ea37dd54a4715511"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TGRUTOptions::ExtractWaves </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -408,6 +547,29 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a4c7c44f1350adfe54db86fe40a5738cc"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt;std::string&gt;&amp; TGRUTOptions::GuiSaveSetFiles </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a51a0de6f3adc41572776108a9b365652"></a>
 <div class="memitem">
 <div class="memproto">
@@ -477,6 +639,29 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a57da7ef7fb62bff96e8e204d36553dd9"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TGRUTOptions::IsOnline </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a0c8d9c9c9aa71599602a09bbfa380c5b"></a>
 <div class="memitem">
 <div class="memproto">
@@ -526,6 +711,29 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="af64eb4dcac0f4a71552fc17bc866fe2c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TGRUTOptions::MakeBackupFile </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="ac40a6b013763bb0ef5a73c9cc7fb5ea1"></a>
 <div class="memitem">
 <div class="memproto">
@@ -549,7 +757,7 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a21d7c527c247c137f5316ac541b08159"></a>
+<a class="anchor" id="a0449ee868c1685ac061a1d5f8fecdfb4"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -557,7 +765,7 @@ Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const std::string TGRUTOptions::OutputFile </td>
+          <td class="memname">const std::string&amp; TGRUTOptions::OutputFile </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -622,6 +830,30 @@ Private Attributes</h2></td></tr>
           <td class="memname">const std::vector&lt;std::string&gt;&amp; TGRUTOptions::RootInputFiles </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af9f995adb98381350c5a6cefe44703be"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TGRUTOptions::SetStartGUI </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>flag</em> = <code>true</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -749,7 +981,96 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a19805dcf2984e503230e43ca8e26e26d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TGRUTOptions::SortTree </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a18ce0c4bb755323ffdd51d76aa6ee125"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TGRUTOptions::StartGUI </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a04fde9536a175cf2805737e97362258c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TGRUTOptions::TimeSortInput </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <h2>Member Data Documentation</h2>
+<a class="anchor" id="a596113fe1c27a72d6cf981881a1835d9"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string TGRUTOptions::compiled_histogram_file</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a5cd26b4482475a2bcfa2ead3c2403036"></a>
 <div class="memitem">
 <div class="memproto">
@@ -770,6 +1091,66 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a3d9ffa198f8e07011dd0c5ba3d214fe7"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int TGRUTOptions::fCommandPort</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a3b509b0b788d6061646b8a559ef01ff8"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TGRUTOptions::fCommandServer</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a327e518d014ab0fd1321ec302fbb2b94"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="TGRUTTypes_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a> TGRUTOptions::fDefaultFileType</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="aad47f4fb1a154a45c2e1a1b3d75bb58f"></a>
 <div class="memitem">
 <div class="memproto">
@@ -779,6 +1160,26 @@ Private Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">bool TGRUTOptions::fExitAfterSorting</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="adcb35d37a89897706d51f6116a64306b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TGRUTOptions::fExtractWaves</td>
         </tr>
       </table>
   </td>
@@ -850,6 +1251,46 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="aed5f1e6b3d2cc7b34055e213415bea45"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TGRUTOptions::fIsOnline</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a8ca9326e1ec2ba0b9a1b7d7e58bbb3db"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TGRUTOptions::fMakeBackupFile</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a326825483584087d136a768c6206164e"></a>
 <div class="memitem">
 <div class="memproto">
@@ -910,6 +1351,66 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a73cc968fb08110efd84ecef1a5fa16dc"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TGRUTOptions::fSortTree</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a5c656681dd6fbb805dce6b693657f687"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TGRUTOptions::fStartGui</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a0209f38e1a2d9b9ad18a7e12fdf54f37"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TGRUTOptions::fTimeSortInput</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="afb13f2678164f74ad5ca18b38bcf683e"></a>
 <div class="memitem">
 <div class="memproto">
@@ -919,6 +1420,26 @@ Private Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">std::vector&lt;std::string&gt; TGRUTOptions::input_cal_files</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a067e0cb82814c3c80aaad8da65f76eaa"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::string&gt; TGRUTOptions::input_gui_hist_files</td>
         </tr>
       </table>
   </td>
@@ -1057,7 +1578,7 @@ Private Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 1 2015 15:28:58 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 4 2015 17:27:56 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

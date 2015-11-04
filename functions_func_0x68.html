@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -70,7 +71,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="functions.html"><span>All</span></a></li>
       <li class="current"><a href="functions_func.html"><span>Functions</span></a></li>
       <li><a href="functions_vars.html"><span>Variables</span></a></li>
-      <li><a href="functions_type.html"><span>Typedefs</span></a></li>
       <li><a href="functions_enum.html"><span>Enumerations</span></a></li>
       <li><a href="functions_eval.html"><span>Enumerator</span></a></li>
       <li><a href="functions_rela.html"><span>Related&#160;Functions</span></a></li>
@@ -89,6 +89,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li class="current"><a href="functions_func_0x68.html#index_h"><span>h</span></a></li>
       <li><a href="functions_func_0x69.html#index_i"><span>i</span></a></li>
       <li><a href="functions_func_0x6a.html#index_j"><span>j</span></a></li>
+      <li><a href="functions_func_0x6b.html#index_k"><span>k</span></a></li>
       <li><a href="functions_func_0x6c.html#index_l"><span>l</span></a></li>
       <li><a href="functions_func_0x6d.html#index_m"><span>m</span></a></li>
       <li><a href="functions_func_0x6e.html#index_n"><span>n</span></a></li>
@@ -99,6 +100,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="functions_func_0x74.html#index_t"><span>t</span></a></li>
       <li><a href="functions_func_0x75.html#index_u"><span>u</span></a></li>
       <li><a href="functions_func_0x77.html#index_w"><span>w</span></a></li>
+      <li><a href="functions_func_0x78.html#index_x"><span>x</span></a></li>
       <li><a href="functions_func_0x7e.html#index_0x7e"><span>~</span></a></li>
     </ul>
   </div>
@@ -108,7 +110,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -130,20 +132,116 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>handle_short_flag()
 : <a class="el" href="classArgParser.html#a31b6b6363fb183e4f8b553822b5c1371">ArgParser</a>
 </li>
+<li>HandleArrowKeyPress()
+: <a class="el" href="classGCanvas.html#a78c2db92c86e006636b303a418c8b3a0">GCanvas</a>
+</li>
 <li>HandleBuiltNSCLData()
-: <a class="el" href="classTGRUTLoop.html#a59b6ebfc317656796b1141a1c1c338e4">TGRUTLoop</a>
+: <a class="el" href="classTUnpackLoop.html#ad8a0235a6a77fae49a07a28be277f01c">TUnpackLoop</a>
+</li>
+<li>HandleButton()
+: <a class="el" href="classGRootContainer.html#aeadb62ac7d3d7eb7979fd7d03037e1c8">GRootContainer</a>
+</li>
+<li>HandleConfigureNotify()
+: <a class="el" href="classGRootContainer.html#a3e3a1a15295ac44d6ddf57c75a4f98c0">GRootContainer</a>
+</li>
+<li>HandleContainerButton()
+: <a class="el" href="classGRootCanvas.html#a9eed51018b1ec02e8d62db13c231b878">GRootCanvas</a>
+</li>
+<li>HandleContainerConfigure()
+: <a class="el" href="classGRootCanvas.html#a3b75917012192774248232e3a51b9b5b">GRootCanvas</a>
+</li>
+<li>HandleContainerCrossing()
+: <a class="el" href="classGRootCanvas.html#afbb58ce4a1a08cb442620da2ffb1cd13">GRootCanvas</a>
+</li>
+<li>HandleContainerDoubleClick()
+: <a class="el" href="classGRootCanvas.html#a1fd56d8113c17774cf098abffc0c5c23">GRootCanvas</a>
+</li>
+<li>HandleContainerExpose()
+: <a class="el" href="classGRootCanvas.html#aacc76486fca600aa1033dca22d85a6b0">GRootCanvas</a>
+</li>
+<li>HandleContainerKey()
+: <a class="el" href="classGRootCanvas.html#a1c694d7bdf23eef287d950d1b0a25578">GRootCanvas</a>
+</li>
+<li>HandleContainerMotion()
+: <a class="el" href="classGRootCanvas.html#a7fc3c074d4bbfe5d52f8c477973ab729">GRootCanvas</a>
+</li>
+<li>HandleCRDCPacket()
+: <a class="el" href="classTS800.html#a3c17bba288931aa1304b575cac462e34">TS800</a>
+</li>
+<li>HandleCrossing()
+: <a class="el" href="classGRootContainer.html#ae614323b4207ee3549f951d7a725fbe9">GRootContainer</a>
+</li>
+<li>HandleDNDDrop()
+: <a class="el" href="classGRootCanvas.html#a7b880ca6fc7c12186c249380bdb9f7c4">GRootCanvas</a>
+</li>
+<li>HandleDNDEnter()
+: <a class="el" href="classGRootCanvas.html#ab5ac510cd1b09131a613270d6844d877">GRootCanvas</a>
+</li>
+<li>HandleDNDLeave()
+: <a class="el" href="classGRootCanvas.html#acb7b9f75535adf311f34a41b1f64658b">GRootCanvas</a>
+</li>
+<li>HandleDNDPosition()
+: <a class="el" href="classGRootCanvas.html#a72ddd73b08538a2b12c58d6ebf200ab0">GRootCanvas</a>
+</li>
+<li>HandleDoubleClick()
+: <a class="el" href="classGRootContainer.html#a289b63d966f601c6cf75f0f853347074">GRootContainer</a>
+</li>
+<li>HandleEvent()
+: <a class="el" href="classTWriteLoop.html#aa04494752325b313189efc18787be5ca">TWriteLoop</a>
+</li>
+<li>HandleExpose()
+: <a class="el" href="classGRootContainer.html#a4027ce4f4f0a810d663d9a07c3577973">GRootContainer</a>
+</li>
+<li>HandleFile()
+: <a class="el" href="classTGRUTint.html#a4d19c6c2f47f5c771aafc65fe54d367c">TGRUTint</a>
 </li>
 <li>HandleGEBData()
-: <a class="el" href="classTGRUTLoop.html#ac2ea9fa340422db0026c964cfd689d8b">TGRUTLoop</a>
+: <a class="el" href="classTUnpackLoop.html#a38b158e3f7d930c3a9cdd066452b333d">TUnpackLoop</a>
 </li>
 <li>HandleGEBMode3()
-: <a class="el" href="classTGRUTLoop.html#a3ea795ba83de4532c86083dd1946d12b">TGRUTLoop</a>
+: <a class="el" href="classTUnpackLoop.html#ac65e85f035767e7cafbd51c7ad31c218">TUnpackLoop</a>
 </li>
-<li>HandleMode3()
-: <a class="el" href="classTRootOutfileGEB.html#a3fce8a2dfd13baa53a6f17d1c813dfe7">TRootOutfileGEB</a>
+<li>HandleInput()
+: <a class="el" href="classGCanvas.html#a6e7503b64feef85f11d23cbea64415e8">GCanvas</a>
+</li>
+<li>HandleIonCPacket()
+: <a class="el" href="classTS800.html#a5308af40e9337d38e887bd3d9628d841">TS800</a>
+</li>
+<li>HandleKey()
+: <a class="el" href="classGRootContainer.html#a51c823e9fcd5f09fe942a551272a69ec">GRootContainer</a>
+</li>
+<li>HandleKeyboardPress()
+: <a class="el" href="classGCanvas.html#af528ed8b32b5b3aeed8c34f8fb2833e7">GCanvas</a>
+</li>
+<li>HandleMotion()
+: <a class="el" href="classGRootContainer.html#a15dd5d7bf04f526c2886eda48c15897b">GRootContainer</a>
+</li>
+<li>HandleMousePress()
+: <a class="el" href="classGCanvas.html#a242d1faf2a50a9e2d11841a2780da865">GCanvas</a>
+</li>
+<li>HandleMTDCPacket()
+: <a class="el" href="classTS800.html#a50f889bbb0b67f87bed29c85a55a4499">TS800</a>
+</li>
+<li>HandleNSCLData()
+: <a class="el" href="classTUnpackLoop.html#a1d3e533716002eb1099b2725b0bf38e4">TUnpackLoop</a>
+</li>
+<li>HandleS800Scaler()
+: <a class="el" href="classTUnpackLoop.html#a0e3c9a21ae8ed3c424517431061fc671">TUnpackLoop</a>
+</li>
+<li>HandleScintPacket()
+: <a class="el" href="classTS800.html#a8df4518471d925821a5badd714ecdc5d">TS800</a>
+</li>
+<li>HandleTOFPacket()
+: <a class="el" href="classTS800.html#a323d9af342d4451e9c3e5b7f41f5670f">TS800</a>
+</li>
+<li>HandleTrigPacket()
+: <a class="el" href="classTS800.html#a108c9cd32d505e706dbf06924f26ce54">TS800</a>
 </li>
 <li>HandleUnbuiltNSCLData()
-: <a class="el" href="classTGRUTLoop.html#a721b751a806c7476c4da7629faf9a0a5">TGRUTLoop</a>
+: <a class="el" href="classTUnpackLoop.html#aa5939d28728e1a531097ef957ea4f8ba">TUnpackLoop</a>
+</li>
+<li>HasEditor()
+: <a class="el" href="classGRootCanvas.html#aec9a5f07d373d3143e37bc13b01e78e9">GRootCanvas</a>
 </li>
 <li>HasEnergySum()
 : <a class="el" href="classTDDASEvent.html#a4ce5eefbc27e349c8302d9df1a21d81d">TDDASEvent</a>
@@ -151,17 +249,32 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>HasInteractions()
 : <a class="el" href="classTGretinaHit.html#a4c5f4a00195131dc3d726b17c555099c">TGretinaHit</a>
 </li>
+<li>HasMenuBar()
+: <a class="el" href="classGRootCanvas.html#ad9aad5648b417886296e3b9c76437876">GRootCanvas</a>
+</li>
 <li>HasQDCSum()
 : <a class="el" href="classTDDASEvent.html#a25c7cf82f31c04fe7628dbb37a8064d0">TDDASEvent</a>
 </li>
+<li>HasStatusBar()
+: <a class="el" href="classGRootCanvas.html#a8f38e478306827afd18665f6a7497006">GRootCanvas</a>
+</li>
+<li>HasToolBar()
+: <a class="el" href="classGRootCanvas.html#ab715a512d4ec894b7774e7d262af07a8">GRootCanvas</a>
+</li>
+<li>HasToolTips()
+: <a class="el" href="classGRootCanvas.html#ab1cfc8fd6e1ff613b45a25ce2a831fc0">GRootCanvas</a>
+</li>
 <li>header_zeros()
 : <a class="el" href="structCAEN__ADC.html#aa137a86de8fbd01c16f06d81a89d57fa">CAEN_ADC</a>
+</li>
+<li>HodoSize()
+: <a class="el" href="classTMTof.html#a6c8944c5350021176ba8069ebdcda735">TMTof</a>
 </li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 1 2015 15:28:58 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 4 2015 17:27:57 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

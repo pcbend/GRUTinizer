@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -70,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -84,9 +85,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
-<a href="#pri-methods">Private Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
-<a href="#pri-static-attribs">Static Private Attributes</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="classTDetectorEnv-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">TDetectorEnv Class Reference</div>  </div>
@@ -103,38 +103,39 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa6453f53152200ec65c522d6f421f509"><td class="memItemLeft" align="right" valign="top">Int_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#aa6453f53152200ec65c522d6f421f509">ParseInputData</a> (const char *inputdata)</td></tr>
 <tr class="memitem:a94afd42b0b243bbc0f7420c66095972d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#a94afd42b0b243bbc0f7420c66095972d">Print</a> (Option_t *opt=&quot;&quot;) const </td></tr>
 <tr class="memitem:a4c33e591d0388b736e8b75ab99a3166d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#a4c33e591d0388b736e8b75ab99a3166d">Clear</a> (Option_t *opt=&quot;&quot;)</td></tr>
+<tr class="memitem:af43ed7e0425b68b36b7eeee07c939cab"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#af43ed7e0425b68b36b7eeee07c939cab">TDetectorEnv</a> ()</td></tr>
+<tr class="memitem:ad82c953f999b796932c2b174bc89aca2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#ad82c953f999b796932c2b174bc89aca2">ClassDef</a> (<a class="el" href="classTDetectorEnv.html">TDetectorEnv</a>, 1)</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a6a54fef74d81fb72f894f69051dc837c"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classTDetectorEnv.html">TDetectorEnv</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#a6a54fef74d81fb72f894f69051dc837c">Get</a> (const char *name=&quot;&quot;)</td></tr>
 <tr class="memitem:a0e315eb04e24d1f211f0e705662d4a70"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#a0e315eb04e24d1f211f0e705662d4a70">Caesar</a> ()</td></tr>
 <tr class="memitem:a2b7cbeb75de14c657dd6d49512960833"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#a2b7cbeb75de14c657dd6d49512960833">Gretina</a> ()</td></tr>
+<tr class="memitem:a7d31ba06522ffc04d200d09d2bb11a4f"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#a7d31ba06522ffc04d200d09d2bb11a4f">Bank29</a> ()</td></tr>
 <tr class="memitem:a0459bd1201c58c211dc0a8be695e524b"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#a0459bd1201c58c211dc0a8be695e524b">Mode3</a> ()</td></tr>
 <tr class="memitem:a8197fdaf1b782a56d26ea50251167b32"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#a8197fdaf1b782a56d26ea50251167b32">Janus</a> ()</td></tr>
 <tr class="memitem:a7248a8d635c47665f7714a27601c152e"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#a7248a8d635c47665f7714a27601c152e">Phoswall</a> ()</td></tr>
 <tr class="memitem:a02d0a64c7853768c2bb53ceef1b3fe6a"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#a02d0a64c7853768c2bb53ceef1b3fe6a">S800</a> ()</td></tr>
+<tr class="memitem:a624f3a85f7199690b9369bd773966636"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#a624f3a85f7199690b9369bd773966636">S800Scaler</a> ()</td></tr>
 <tr class="memitem:aadb09f48f0836af2ec74bc71dd7f1cc2"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#aadb09f48f0836af2ec74bc71dd7f1cc2">Sega</a> ()</td></tr>
 <tr class="memitem:aa0864f44b03450daa99738033bf1da09"><td class="memItemLeft" align="right" valign="top">static const std::vector&lt; int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#aa0864f44b03450daa99738033bf1da09">CaesarIDs</a> ()</td></tr>
 <tr class="memitem:aadada77e0100e093af143999988eb84f"><td class="memItemLeft" align="right" valign="top">static const std::vector&lt; int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#aadada77e0100e093af143999988eb84f">SegaIDs</a> ()</td></tr>
 <tr class="memitem:a1a0c272bc16e6945118ba893b89b1663"><td class="memItemLeft" align="right" valign="top">static const std::vector&lt; int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#a1a0c272bc16e6945118ba893b89b1663">S800IDs</a> ()</td></tr>
+<tr class="memitem:aebe53eda0eefafebc67197d644ef9b5d"><td class="memItemLeft" align="right" valign="top">static const std::vector&lt; int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#aebe53eda0eefafebc67197d644ef9b5d">S800ScalerIDs</a> ()</td></tr>
 <tr class="memitem:a80c43d47f486635b524d3d89278c73ff"><td class="memItemLeft" align="right" valign="top">static const std::vector&lt; int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#a80c43d47f486635b524d3d89278c73ff">PhoswallIDs</a> ()</td></tr>
 <tr class="memitem:a59094b64edc61eb08cc04e89e62486b0"><td class="memItemLeft" align="right" valign="top">static const std::vector&lt; int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#a59094b64edc61eb08cc04e89e62486b0">JANUSIDs</a> ()</td></tr>
 <tr class="memitem:abd8ae15af7f6f0a1ec1d6061bb2050bd"><td class="memItemLeft" align="right" valign="top">static const std::vector&lt; int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#abd8ae15af7f6f0a1ec1d6061bb2050bd">GretinaIDs</a> ()</td></tr>
 <tr class="memitem:afe38b2debc7a0f0cf17240428c1a92ec"><td class="memItemLeft" align="right" valign="top">static const std::vector&lt; int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#afe38b2debc7a0f0cf17240428c1a92ec">Mode3IDs</a> ()</td></tr>
+<tr class="memitem:a3c6674f4bdbf3f11a61ca012def62801"><td class="memItemLeft" align="right" valign="top">static const std::vector&lt; int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#a3c6674f4bdbf3f11a61ca012def62801">Bank29IDs</a> ()</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2><a name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr class="memitem:af43ed7e0425b68b36b7eeee07c939cab"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#af43ed7e0425b68b36b7eeee07c939cab">TDetectorEnv</a> ()</td></tr>
-<tr class="memitem:ad82c953f999b796932c2b174bc89aca2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#ad82c953f999b796932c2b174bc89aca2">ClassDef</a> (<a class="el" href="classTDetectorEnv.html">TDetectorEnv</a>, 1)</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2><a name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
 <tr class="memitem:a26b392c76fcec047d142ed57cec478dc"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="TGRUTTypes_8h.html#a6f4793c3f0dce322c8f24e795de0635d">kDetectorSystems</a>, <br class="typebreak"/>
 std::vector&lt; int &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#a26b392c76fcec047d142ed57cec478dc">source_ids</a></td></tr>
 <tr class="memitem:a7ba1178afd16bc41b814ac86f3b75260"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#a7ba1178afd16bc41b814ac86f3b75260">filename</a></td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2><a name="pri-static-attribs"></a>
-Static Private Attributes</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2><a name="pub-static-attribs"></a>
+Static Public Attributes</h2></td></tr>
 <tr class="memitem:a4e1e679ccba47af293768d5ec887f361"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classTDetectorEnv.html">TDetectorEnv</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDetectorEnv.html#a4e1e679ccba47af293768d5ec887f361">env</a> = NULL</td></tr>
 </table>
 <h2>Constructor &amp; Destructor Documentation</h2>
@@ -154,7 +155,7 @@ Static Private Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -162,6 +163,52 @@ Static Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2>Member Function Documentation</h2>
+<a class="anchor" id="a7d31ba06522ffc04d200d09d2bb11a4f"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool TDetectorEnv::Bank29 </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a3c6674f4bdbf3f11a61ca012def62801"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static const std::vector&lt;int&gt;&amp; TDetectorEnv::Bank29IDs </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a0e315eb04e24d1f211f0e705662d4a70"></a>
 <div class="memitem">
 <div class="memproto">
@@ -211,9 +258,6 @@ Static Private Attributes</h2></td></tr>
 <a class="anchor" id="ad82c953f999b796932c2b174bc89aca2"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">TDetectorEnv::ClassDef </td>
@@ -233,11 +277,6 @@ Static Private Attributes</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -592,6 +631,52 @@ Static Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a624f3a85f7199690b9369bd773966636"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool TDetectorEnv::S800Scaler </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aebe53eda0eefafebc67197d644ef9b5d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static const std::vector&lt;int&gt;&amp; TDetectorEnv::S800ScalerIDs </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="aadb09f48f0836af2ec74bc71dd7f1cc2"></a>
 <div class="memitem">
 <div class="memproto">
@@ -652,7 +737,7 @@ Static Private Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -662,19 +747,11 @@ Static Private Attributes</h2></td></tr>
 <a class="anchor" id="a7ba1178afd16bc41b814ac86f3b75260"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">std::string TDetectorEnv::filename</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -682,19 +759,11 @@ Static Private Attributes</h2></td></tr>
 <a class="anchor" id="a26b392c76fcec047d142ed57cec478dc"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">std::map&lt;<a class="el" href="TGRUTTypes_8h.html#a6f4793c3f0dce322c8f24e795de0635d">kDetectorSystems</a>, std::vector&lt;int&gt; &gt; TDetectorEnv::source_ids</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -706,7 +775,7 @@ Static Private Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 1 2015 15:28:58 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 4 2015 17:27:55 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

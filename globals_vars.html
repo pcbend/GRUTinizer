@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -68,6 +69,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="globals.html"><span>All</span></a></li>
       <li><a href="globals_func.html"><span>Functions</span></a></li>
       <li class="current"><a href="globals_vars.html"><span>Variables</span></a></li>
+      <li><a href="globals_type.html"><span>Typedefs</span></a></li>
       <li><a href="globals_enum.html"><span>Enumerations</span></a></li>
       <li><a href="globals_eval.html"><span>Enumerator</span></a></li>
       <li><a href="globals_defs.html"><span>Macros</span></a></li>
@@ -84,13 +86,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="#index_f"><span>f</span></a></li>
       <li><a href="#index_g"><span>g</span></a></li>
       <li><a href="#index_h"><span>h</span></a></li>
+      <li><a href="#index_i"><span>i</span></a></li>
       <li><a href="#index_j"><span>j</span></a></li>
       <li><a href="#index_l"><span>l</span></a></li>
+      <li><a href="#index_n"><span>n</span></a></li>
       <li><a href="#index_p"><span>p</span></a></li>
       <li><a href="#index_q"><span>q</span></a></li>
       <li><a href="#index_r"><span>r</span></a></li>
       <li><a href="#index_s"><span>s</span></a></li>
       <li><a href="#index_t"><span>t</span></a></li>
+      <li><a href="#index_v"><span>v</span></a></li>
     </ul>
   </div>
 </div><!-- top -->
@@ -99,7 +104,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -114,8 +119,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <h3><a class="anchor" id="index__"></a>- _ -</h3><ul>
 <li>__attribute__
 : <a class="el" href="TRawBanks_8h.html#afc1c5ff7bdffc142c499251ae15b8a66">TRawBanks.h</a>
-, <a class="el" href="TRawFile_8h.html#abd7072f8660e6f6af29eb0e527f0966e">TRawFile.h</a>
+, <a class="el" href="TRawEventBZipSource_8h.html#a69cda17a59879afff430cbacddbd629a">TRawEventBZipSource.h</a>
 , <a class="el" href="TRawEvent_8h.html#ab122e43d7b9eef697bbe46f3d68ea830">TRawEvent.h</a>
+, <a class="el" href="DynamicLibrary_8h.html#ac11f4baa6e7fa0779c479b5a1489cd05">DynamicLibrary.h</a>
 , <a class="el" href="DDASDataFormat_8h.html#afcf4715c2fee0a2f5a79bb04409aa39b">DDASDataFormat.h</a>
 </li>
 </ul>
@@ -175,12 +181,19 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>cfd_pt2_low
 : <a class="el" href="TRawBanks_8h.html#a045f1feef9f032ce4470486741b8a05b">TRawBanks.h</a>
 </li>
+<li>channel_time
+: <a class="el" href="TRawBanks_8h.html#a4c1be32254e3838932ca3959a1e71de0">TRawBanks.h</a>
+</li>
+<li>channel_time_number
+: <a class="el" href="TRawBanks_8h.html#a3ef8461e242142220fdb83b1edaf6492">TRawBanks.h</a>
+</li>
 </ul>
 
 
 <h3><a class="anchor" id="index_d"></a>- d -</h3><ul>
 <li>data
-: <a class="el" href="JanusDataFormat_8h.html#aa6e451eccf9519b0809baad41f5ab241">JanusDataFormat.h</a>
+: <a class="el" href="JanusDataFormat_8h.html#a1826364185b5f16e173efb8cff518f6d">JanusDataFormat.h</a>
+, <a class="el" href="TRawBanks_8h.html#a1826364185b5f16e173efb8cff518f6d">TRawBanks.h</a>
 </li>
 <li>datum1
 : <a class="el" href="TRawBanks_8h.html#a2d52bb734c7f031641b8e51eaa1f278e">TRawBanks.h</a>
@@ -218,9 +231,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <h3><a class="anchor" id="index_g"></a>- g -</h3><ul>
-<li>gManager
-: <a class="el" href="TObjectManager_8h.html#aae2fc078f8908c2823bd4201c4be79d2">TObjectManager.h</a>
-, <a class="el" href="TObjectManager_8cxx.html#aae2fc078f8908c2823bd4201c4be79d2">TObjectManager.cxx</a>
+<li>gResponse
+: <a class="el" href="TGRUTint_8h.html#ac6c8b14077b71af7d38763f5c6093c8d">TGRUTint.h</a>
+, <a class="el" href="TGRUTint_8cxx.html#ac6c8b14077b71af7d38763f5c6093c8d">TGRUTint.cxx</a>
 </li>
 </ul>
 
@@ -228,6 +241,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <h3><a class="anchor" id="index_h"></a>- h -</h3><ul>
 <li>head
 : <a class="el" href="JanusDataFormat_8h.html#ae0411d119b6e19281b04bbe57cc854bc">JanusDataFormat.h</a>
+</li>
+<li>HoleQMap
+: <a class="el" href="MakeHistos_8cxx.html#a0cc30266a659831c0e3a77e4f4e79abb">MakeHistos.cxx</a>
+</li>
+</ul>
+
+
+<h3><a class="anchor" id="index_i"></a>- i -</h3><ul>
+<li>id
+: <a class="el" href="TRawBanks_8h.html#a05369f3c36ed795681561076b6e22ee2">TRawBanks.h</a>
 </li>
 </ul>
 
@@ -249,6 +272,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>label
 : <a class="el" href="Root2Rad_8cxx.html#aff6109cfa21faacc257b6aba4a7c0df3">Root2Rad.cxx</a>
 </li>
+<li>LayerMap
+: <a class="el" href="MakeHistos_8cxx.html#a1d8dc8b90169565e58246a95f27fe160">MakeHistos.cxx</a>
+</li>
 <li>led_high
 : <a class="el" href="TRawBanks_8h.html#adbf359d16ac411cc28116112a86503d9">TRawBanks.h</a>
 </li>
@@ -260,6 +286,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>lengthGA
 : <a class="el" href="TRawBanks_8h.html#ad37598336d760a275ffeb317f46ba5ca">TRawBanks.h</a>
+</li>
+</ul>
+
+
+<h3><a class="anchor" id="index_n"></a>- n -</h3><ul>
+<li>nose
+: <a class="el" href="TRawBanks_8h.html#af70768c5906c47720f61a956c26c55bb">TRawBanks.h</a>
+</li>
+<li>number
+: <a class="el" href="TRawBanks_8h.html#a5163bf212cef3d3216df425df027d12d">TRawBanks.h</a>
 </li>
 </ul>
 
@@ -286,6 +322,36 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <h3><a class="anchor" id="index_s"></a>- s -</h3><ul>
+<li>S800_eventnumber_high
+: <a class="el" href="TRawBanks_8h.html#af67420b1645274abd1f2a6bac1aa3a5a">TRawBanks.h</a>
+</li>
+<li>S800_eventnumber_low
+: <a class="el" href="TRawBanks_8h.html#a70084dc3f675ce43f1bf49db7e27acbe">TRawBanks.h</a>
+</li>
+<li>S800_eventnumber_middle
+: <a class="el" href="TRawBanks_8h.html#ad88af5030d5ca2c46e3fc330ef19c095">TRawBanks.h</a>
+</li>
+<li>S800_eventnumber_packet
+: <a class="el" href="TRawBanks_8h.html#a4f49f8bb1052bf0869b512013da783d6">TRawBanks.h</a>
+</li>
+<li>S800_eventnumber_packet_size
+: <a class="el" href="TRawBanks_8h.html#a3557ba48695f2b62c21ebc34aff88feb">TRawBanks.h</a>
+</li>
+<li>S800_packet
+: <a class="el" href="TRawBanks_8h.html#ae5ddef979fccdc59942a3f703ac5b669">TRawBanks.h</a>
+</li>
+<li>S800_packet_size
+: <a class="el" href="TRawBanks_8h.html#ad4b23ff28af17ccec8336437c148ca9f">TRawBanks.h</a>
+</li>
+<li>S800_timestamp
+: <a class="el" href="TRawBanks_8h.html#ae27dfc4c42f9590fa00f764ebbf3d4b4">TRawBanks.h</a>
+</li>
+<li>S800_timestamp_packet
+: <a class="el" href="TRawBanks_8h.html#af0704dcf8ba69c466b1cec9cd32a513d">TRawBanks.h</a>
+</li>
+<li>S800_version
+: <a class="el" href="TRawBanks_8h.html#afa51e8dd714473fad89d86984b9d1a00">TRawBanks.h</a>
+</li>
 <li>size
 : <a class="el" href="DDASBanks_8h.html#a1e8d0f589051e7fa5ab0f6a20f9e152b">DDASBanks.h</a>
 , <a class="el" href="Root2Rad_8cxx.html#af8fd9ce16b371c8a3bf5e0b37a69419f">Root2Rad.cxx</a>
@@ -296,12 +362,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>status
 : <a class="el" href="DDASBanks_8h.html#aeed08ea57af6f7be240e2bf66162389f">DDASBanks.h</a>
 </li>
+<li>subid
+: <a class="el" href="TRawBanks_8h.html#a203ecdee478949103e95188c7847fb85">TRawBanks.h</a>
+</li>
 </ul>
 
 
 <h3><a class="anchor" id="index_t"></a>- t -</h3><ul>
 <li>tail
-: <a class="el" href="JanusDataFormat_8h.html#ace756213e1bd262b8d63eaf28e6249c9">JanusDataFormat.h</a>
+: <a class="el" href="JanusDataFormat_8h.html#a5de3e04efb506cbc33601ba85f5b9098">JanusDataFormat.h</a>
+, <a class="el" href="TRawBanks_8h.html#a5de3e04efb506cbc33601ba85f5b9098">TRawBanks.h</a>
 </li>
 <li>time_high_cfd
 : <a class="el" href="DDASBanks_8h.html#aeb02b6986e158e6358574ad74c3b818f">DDASBanks.h</a>
@@ -312,11 +382,27 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>timestamp
 : <a class="el" href="TRawBanks_8h.html#ac5deed89768140dbc80dbc6529a5e14a">TRawBanks.h</a>
 </li>
+<li>total_size
+: <a class="el" href="TRawBanks_8h.html#a9b6eace34ed2c5b925cd236563efe6a7">TRawBanks.h</a>
+</li>
+<li>total_size2
+: <a class="el" href="TRawBanks_8h.html#a276a479f5c68fdb22b0be3f7fe1343f9">TRawBanks.h</a>
+</li>
+<li>trgger_pattern
+: <a class="el" href="TRawBanks_8h.html#ab064a8902a26b251f4574cfce43d3a9c">TRawBanks.h</a>
+</li>
+</ul>
+
+
+<h3><a class="anchor" id="index_v"></a>- v -</h3><ul>
+<li>value
+: <a class="el" href="TRawBanks_8h.html#abe204c8f5446428990b2f3261a2f1e3b">TRawBanks.h</a>
+</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 1 2015 15:28:58 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 4 2015 17:27:58 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

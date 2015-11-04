@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -70,7 +71,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="functions.html"><span>All</span></a></li>
       <li class="current"><a href="functions_func.html"><span>Functions</span></a></li>
       <li><a href="functions_vars.html"><span>Variables</span></a></li>
-      <li><a href="functions_type.html"><span>Typedefs</span></a></li>
       <li><a href="functions_enum.html"><span>Enumerations</span></a></li>
       <li><a href="functions_eval.html"><span>Enumerator</span></a></li>
       <li><a href="functions_rela.html"><span>Related&#160;Functions</span></a></li>
@@ -89,6 +89,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="functions_func_0x68.html#index_h"><span>h</span></a></li>
       <li><a href="functions_func_0x69.html#index_i"><span>i</span></a></li>
       <li><a href="functions_func_0x6a.html#index_j"><span>j</span></a></li>
+      <li><a href="functions_func_0x6b.html#index_k"><span>k</span></a></li>
       <li><a href="functions_func_0x6c.html#index_l"><span>l</span></a></li>
       <li><a href="functions_func_0x6d.html#index_m"><span>m</span></a></li>
       <li><a href="functions_func_0x6e.html#index_n"><span>n</span></a></li>
@@ -99,6 +100,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="functions_func_0x74.html#index_t"><span>t</span></a></li>
       <li><a href="functions_func_0x75.html#index_u"><span>u</span></a></li>
       <li><a href="functions_func_0x77.html#index_w"><span>w</span></a></li>
+      <li><a href="functions_func_0x78.html#index_x"><span>x</span></a></li>
       <li><a href="functions_func_0x7e.html#index_0x7e"><span>~</span></a></li>
     </ul>
   </div>
@@ -108,7 +110,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -122,18 +124,32 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <h3><a class="anchor" id="index_a"></a>- a -</h3><ul>
 <li>A()
-: <a class="el" href="classTPhosWallHit.html#a4c06f077189c680b275dd6fcce4567d5">TPhosWallHit</a>
+: <a class="el" href="classTPhosWallHit.html#a9753b73372dbbb811a70a9f9cdf98cf2">TPhosWallHit</a>
+</li>
+<li>Activated()
+: <a class="el" href="classGRootCanvas.html#a480dcad3d2eb40bc89fda399979e2ba0">GRootCanvas</a>
 </li>
 <li>adcvalue()
 : <a class="el" href="structCAEN__ADC.html#ae2f870ef802f5f49596bdaf2a373ee6e">CAEN_ADC</a>
 </li>
 <li>Add()
-: <a class="el" href="classTGEBMultiFile.html#a993c9a30e4308e1de4089f59ce25aac0">TGEBMultiFile</a>
-, <a class="el" href="classTObjectManager.html#ac8914a283246a48bf3a4e29fc8544d5f">TObjectManager</a>
-, <a class="el" href="classTGEBMultiFile.html#aa94cdc6df6db99346b19a74da2c1c355">TGEBMultiFile</a>
+: <a class="el" href="classTGEBMultiFile.html#aa94cdc6df6db99346b19a74da2c1c355">TGEBMultiFile</a>
+, <a class="el" href="classTSequentialRawFile.html#a30e0068f4f7ffca984e7e053900add40">TSequentialRawFile</a>
+</li>
+<li>AddAfter()
+: <a class="el" href="classTHashList__ThreadSafe.html#ad058740be7c3139ffe823c31791a218e">THashList_ThreadSafe</a>
+</li>
+<li>AddAt()
+: <a class="el" href="classTHashList__ThreadSafe.html#a371e100383711cb13beb4146a5625165">THashList_ThreadSafe</a>
+</li>
+<li>AddBefore()
+: <a class="el" href="classTHashList__ThreadSafe.html#a50f869a18b5b9d52199e3abc98e01fb2">THashList_ThreadSafe</a>
 </li>
 <li>AddChannel()
 : <a class="el" href="classTChannel.html#a63cf8bd28312a330dec250d0085eca4e">TChannel</a>
+</li>
+<li>AddDetector()
+: <a class="el" href="classTUnpackedEvent.html#aee5beecb9f5762185fae431a59433292">TUnpackedEvent</a>
 </li>
 <li>AddEfficiencyCoeff()
 : <a class="el" href="classTChannel.html#a6fb351694e96b3e362d7cf3d06c5673f">TChannel</a>
@@ -142,33 +158,56 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classTChannel.html#aae69ffde90cb120f070eedef72b18ca8">TChannel</a>
 </li>
 <li>AddFile()
-: <a class="el" href="classTMultiRawFile.html#af22596aecb361110903de8bccd635b5d">TMultiRawFile</a>
+: <a class="el" href="classTMultiRawFile.html#ac52725e440cbc00e379582e67d9d4550">TMultiRawFile</a>
+</li>
+<li>AddFirst()
+: <a class="el" href="classTHashList__ThreadSafe.html#a12d92d9e88f8973bb7fa49b22a60ff17">THashList_ThreadSafe</a>
+</li>
+<li>AddInputRootFile()
+: <a class="el" href="classTPipeline.html#a0b0ac675a584f1a489b4e2492e91122f">TPipeline</a>
+</li>
+<li>AddLast()
+: <a class="el" href="classTHashList__ThreadSafe.html#a28f1ea3e9ee8645ec10a5e220c220f9a">THashList_ThreadSafe</a>
+</li>
+<li>AddMarker()
+: <a class="el" href="classGCanvas.html#ac49bb8a47944b0b6386bb0996af7c99f">GCanvas</a>
+</li>
+<li>AddPoint()
+: <a class="el" href="classTCrdc.html#a75a1f173e2fd90d3039e332acc965766">TCrdc</a>
 </li>
 <li>AddRawData()
 : <a class="el" href="classTDetector.html#af2a499ca511599eaec889c695561c01a">TDetector</a>
-, <a class="el" href="classTRootOutfile.html#a6ec6caa13efbba27c7c0c974a0a35f09">TRootOutfile</a>
+, <a class="el" href="classTUnpackedEvent.html#aa948ed731eea50f23d10b74498516b9b">TUnpackedEvent</a>
 </li>
-<li>AddRelationship()
-: <a class="el" href="classTObjectManager.html#a23a149e5d4ae6de48cab625de8d5de08">TObjectManager</a>
+<li>AddRawDataFile()
+: <a class="el" href="classTPipeline.html#a808032f54bd096f347e16f3998cf40fb">TPipeline</a>
 </li>
 <li>Address()
 : <a class="el" href="classTDetectorHit.html#adeeb534c279e58bfbe9ca03eaf5b0e66">TDetectorHit</a>
-, <a class="el" href="classTMode3.html#a078aef61048a335010d8d2aba0271634">TMode3</a>
 </li>
 <li>AddToSelf()
 : <a class="el" href="classTGretinaHit.html#a1db63786219d0486d38893e49e36a4be">TGretinaHit</a>
 </li>
-<li>AddTree()
-: <a class="el" href="classTRootOutfile.html#a11a85bfbc3928aee8bc80d474b6b7d1c">TRootOutfile</a>
+<li>AddTransition()
+: <a class="el" href="classTNucleus.html#ae1199d58bee397cced8f137656414e9a">TNucleus</a>
+</li>
+<li>AdjustSize()
+: <a class="el" href="classGRootCanvas.html#a5a3faa4bfd7a45d89d959584c10b0572">GRootCanvas</a>
 </li>
 <li>Advance()
 : <a class="el" href="classTSmartBuffer.html#aa457f7be69b73c81cf36aa984b2bbee5">TSmartBuffer</a>
 </li>
+<li>AllQueuesEmpty()
+: <a class="el" href="classTPipeline.html#add7556dbcaf035534058751e398707e8">TPipeline</a>
+</li>
 <li>AlphaSort()
 : <a class="el" href="classTChannel.html#ad27a38910374a4fc1184aaba6f762183">TChannel</a>
 </li>
-<li>Append()
-: <a class="el" href="classTObjectManager.html#a6f623c4ce98e5d06e75528c4146cda3f">TObjectManager</a>
+<li>AnalysisAngDist()
+: <a class="el" href="classTReaction.html#a757797ac07189f9fc1fc7f7781a9c823">TReaction</a>
+</li>
+<li>AnalysisBeta()
+: <a class="el" href="classTReaction.html#ab70048d6226bd2f096d8f811b8688c32">TReaction</a>
 </li>
 <li>AppendChannel()
 : <a class="el" href="classTChannel.html#aa194547e05298125071e9f877cede18a">TChannel</a>
@@ -180,9 +219,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classArgParseConfig.html#aef9e71c2d88c3794b8adb2b5fd179639">ArgParseConfig&lt; T &gt;</a>
 </li>
 <li>ArgParseConfigT()
-: <a class="el" href="classArgParseConfigT_3_01bool_01_4.html#aeb2ccd937af2314a4f5c4a460da22cf4">ArgParseConfigT&lt; bool &gt;</a>
-, <a class="el" href="classArgParseConfigT_3_01std_1_1vector_3_01T_01_4_01_4.html#a927808543001e4ab352d7f7634489250">ArgParseConfigT&lt; std::vector&lt; T &gt; &gt;</a>
+: <a class="el" href="classArgParseConfigT_3_01std_1_1vector_3_01T_01_4_01_4.html#a927808543001e4ab352d7f7634489250">ArgParseConfigT&lt; std::vector&lt; T &gt; &gt;</a>
 , <a class="el" href="classArgParseConfigT.html#ab54f94b1b436c6ae8c362b4b44677271">ArgParseConfigT&lt; T &gt;</a>
+, <a class="el" href="classArgParseConfigT_3_01bool_01_4.html#aeb2ccd937af2314a4f5c4a460da22cf4">ArgParseConfigT&lt; bool &gt;</a>
 </li>
 <li>ArgParseItem()
 : <a class="el" href="classArgParseItem.html#aaf104d97790818ccc6552435a3778c22">ArgParseItem</a>
@@ -200,7 +239,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 1 2015 15:28:58 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 4 2015 17:27:57 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

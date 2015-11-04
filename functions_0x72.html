@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -70,7 +71,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li class="current"><a href="functions.html"><span>All</span></a></li>
       <li><a href="functions_func.html"><span>Functions</span></a></li>
       <li><a href="functions_vars.html"><span>Variables</span></a></li>
-      <li><a href="functions_type.html"><span>Typedefs</span></a></li>
       <li><a href="functions_enum.html"><span>Enumerations</span></a></li>
       <li><a href="functions_eval.html"><span>Enumerator</span></a></li>
       <li><a href="functions_rela.html"><span>Related&#160;Functions</span></a></li>
@@ -114,7 +114,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -127,8 +127,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="textblock">Here is a list of all class members with links to the classes they belong to:</div>
 
 <h3><a class="anchor" id="index_r"></a>- r -</h3><ul>
+<li>RaiseWindow()
+: <a class="el" href="classGRootCanvas.html#a76b99138093b5c7e9afb2e266cf954ea">GRootCanvas</a>
+</li>
 <li>raw_data
 : <a class="el" href="classTDetector.html#a7cf606e907949b9c2e74f49757d2d3b3">TDetector</a>
+</li>
+<li>raw_event_queue
+: <a class="el" href="classTPipeline.html#a229f63cad1082f2644a123035548b775">TPipeline</a>
 </li>
 <li>RawDataQueue()
 : <a class="el" href="classRawDataQueue.html#adb49b7dfe7756d900fe5b38f90828a39">RawDataQueue</a>
@@ -137,11 +143,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classTGRUTOptions.html#ada6fff910f416d1b95554a491ba506f1">TGRUTOptions</a>
 </li>
 <li>Read()
-: <a class="el" href="classTGEBMultiFile.html#a7c16d7535ba5a694aed4474dfa7dbfc1">TGEBMultiFile</a>
-, <a class="el" href="classTRawEventSource.html#ac526fa41f6e3dbfc23b9c9fc886fa0d1">TRawEventSource</a>
+: <a class="el" href="classTRawEventSource.html#ac526fa41f6e3dbfc23b9c9fc886fa0d1">TRawEventSource</a>
+, <a class="el" href="classTGEBMultiFile.html#a7c16d7535ba5a694aed4474dfa7dbfc1">TGEBMultiFile</a>
+, <a class="el" href="classTRawEventSource.html#ad293e4082772b860c12a29e59566bc04">TRawEventSource</a>
 </li>
-<li>read_thread
-: <a class="el" href="classTDataLoop.html#a9bdfdfcf22121227572f4585808f5d54">TDataLoop</a>
+<li>ReadBytes()
+: <a class="el" href="classTRawEventFileSource.html#ac6421bd707bbb45cfe7aad0974526f61">TRawEventFileSource</a>
+, <a class="el" href="classTRawEventGZipSource.html#ae8ef9c206f5e858a8b146f6582d99f1d">TRawEventGZipSource</a>
+, <a class="el" href="classTRawEventOnlineFileSource.html#ad2cc8515a1e2fa262e8567f26cbdd013">TRawEventOnlineFileSource</a>
+, <a class="el" href="classTRawEventByteSource.html#a134048c75b6d5be5599c72f723c2cc4b">TRawEventByteSource</a>
+, <a class="el" href="classTRawEventPipeSource.html#ad1af35720a7f4a5111770088606ebd32">TRawEventPipeSource</a>
 </li>
 <li>ReadCalFile()
 : <a class="el" href="classTChannel.html#af627908b2505a0d9425ca06c3c1231e8">TChannel</a>
@@ -149,17 +160,46 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>ReadFile()
 : <a class="el" href="classTDetectorEnv.html#a5648f59e857226b98cdbedca822486c9">TDetectorEnv</a>
 </li>
-<li>ReadLoop()
-: <a class="el" href="classTDataLoop.html#afe6b78ada7cd77491b4fd317655c5bd2">TDataLoop</a>
+<li>ReadInvMap()
+: <a class="el" href="classTS800.html#ae24a163a7a4c15bb4b4239887ac98096">TS800</a>
+</li>
+<li>readlist
+: <a class="el" href="classTGRUTServer.html#a874bef5d748e639fc27c1c1cda76a3ef">TGRUTServer</a>
+</li>
+<li>ReallyDelete()
+: <a class="el" href="classGRootCanvas.html#af75008e31ebdecddb62a3349bb7e77b6">GRootCanvas</a>
 </li>
 <li>RecursiveRemove()
-: <a class="el" href="classTObjectManager.html#a4a35870c76b33c69b3ce312e2dfb31ec">TObjectManager</a>
+: <a class="el" href="classTHashList__ThreadSafe.html#a3493063ae67a34fc71805391f47f2834">THashList_ThreadSafe</a>
+</li>
+<li>RefSize()
+: <a class="el" href="classTMTof.html#afbbaf401289e8438f07a739bed737643">TMTof</a>
+</li>
+<li>Rehash()
+: <a class="el" href="classTHashList__ThreadSafe.html#a7d2243e5cd239ed73a8d88510fd04986">THashList_ThreadSafe</a>
+</li>
+<li>Reload()
+: <a class="el" href="classTCompiledHistograms.html#a179563afb7db7cb633e85890c14edfcd">TCompiledHistograms</a>
+</li>
+<li>Remove()
+: <a class="el" href="classTHashList__ThreadSafe.html#ac55829a6ceffcfe3c98c9bb87c76d69f">THashList_ThreadSafe</a>
 </li>
 <li>RemoveChannel()
 : <a class="el" href="classTChannel.html#a7e63d2fc0cc09e2a7054347b02179100">TChannel</a>
 </li>
+<li>RemoveMarker()
+: <a class="el" href="classGCanvas.html#ad7adf13fe8eee0adfaf40164e06eac9d">GCanvas</a>
+</li>
+<li>RemoveVariable()
+: <a class="el" href="classTCompiledHistograms.html#a60da9e1f2e7b95e456546067004bf911">TCompiledHistograms</a>
+, <a class="el" href="classTHistogramLoop.html#a5ee7ef72353f88ec20dd62cd44d93075">THistogramLoop</a>
+, <a class="el" href="classTPipeline.html#aa6456075754d95246ecac2685f5b5c51">TPipeline</a>
+</li>
 <li>ReplaceChannel()
 : <a class="el" href="classTChannel.html#a8bc9983498c92aa3acd51cc0bcbd3576">TChannel</a>
+</li>
+<li>ReplaceRawDataFile()
+: <a class="el" href="classTPipeline.html#a2ccc19b7fc32cfaf5456d76cb565ff34">TPipeline</a>
 </li>
 <li>required()
 : <a class="el" href="classArgParseConfig.html#a9f3154e949c45b664c371680c1a9c53c">ArgParseConfig&lt; T &gt;</a>
@@ -167,30 +207,59 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>required_
 : <a class="el" href="classArgParseConfig.html#a23a4051da18c2074b63cc2b07a4b6bbc">ArgParseConfig&lt; T &gt;</a>
 </li>
+<li>res()
+: <a class="el" href="structTRawEvent_1_1Mesy__Header.html#a72899a517778b7dfbc73cfa6eb3800f0">TRawEvent::Mesy_Header</a>
+, <a class="el" href="structMesy__Header.html#a84ee010632b379d203c97d462f1ea7b6">Mesy_Header</a>
+</li>
 <li>Resume()
-: <a class="el" href="classTDataLoop.html#a13a52621524567254d1e63e0ecf7e6f2">TDataLoop</a>
+: <a class="el" href="classTPipeline.html#a2028f4ad2d7c8aad3256652f00819f41">TPipeline</a>
+, <a class="el" href="classStoppableThread.html#a4fb4c7ce9c43caa1460c24c2ffd95162">StoppableThread</a>
 </li>
 <li>ReverseObjectSearch()
 : <a class="el" href="classTGRUTint.html#a42af0a03e32798d34c9470c4c6932573">TGRUTint</a>
 </li>
 <li>revision
-: <a class="el" href="structDDASHeader.html#a82f6a1e47864d5fe889d3cc227d2e73a">DDASHeader</a>
-, <a class="el" href="structTDDASEvent_1_1DDASHeader.html#afeda9be0fc3b75227f9def9a96aec1e7">TDDASEvent::DDASHeader</a>
+: <a class="el" href="structTDDASEvent_1_1DDASHeader.html#afeda9be0fc3b75227f9def9a96aec1e7">TDDASEvent::DDASHeader</a>
+, <a class="el" href="structDDASHeader.html#a82f6a1e47864d5fe889d3cc227d2e73a">DDASHeader</a>
+</li>
+<li>RfSize()
+: <a class="el" href="classTMTof.html#a9e49606d32b2912320e69c592de08b65">TMTof</a>
+</li>
+<li>root_input_loop
+: <a class="el" href="classTPipeline.html#ad9f80c603506ea96965769e4ff1364ad">TPipeline</a>
 </li>
 <li>RootInputFiles()
 : <a class="el" href="classTGRUTOptions.html#a25a1fcc8624c21f2af6c15c15163decb">TGRUTOptions</a>
 </li>
+<li>Run()
+: <a class="el" href="classTGRUTServer.html#af37cb209e6a71edecdcdabea82f982f2">TGRUTServer</a>
+</li>
+<li>RunMacroFile()
+: <a class="el" href="classTGRUTint.html#af00db8968d8c9aa8cd0d86e9cfc6ee45">TGRUTint</a>
+</li>
 <li>running
-: <a class="el" href="classTDataLoop.html#af4aab0a794691561d85181acd6520112">TDataLoop</a>
+: <a class="el" href="classStoppableThread.html#a8b351e30c184f934d3bd5252a4a7b290">StoppableThread</a>
 </li>
 <li>RunPoll()
 : <a class="el" href="classTStripChart.html#a725ce87538a68dda2e5c54bec7ff27f0">TStripChart</a>
+</li>
+<li>RuntimeException()
+: <a class="el" href="structRuntimeException.html#ad5152f7e83ec0760a081a840957dc00a">RuntimeException</a>
+</li>
+<li>RuntimeFileNotFound()
+: <a class="el" href="structRuntimeFileNotFound.html#a18bde4bedd2fde8ef5465a5bfded4258">RuntimeFileNotFound</a>
+</li>
+<li>RuntimeSymlinkCreation()
+: <a class="el" href="structRuntimeSymlinkCreation.html#a8f68d32af2172c290742ea3c0f6cccef">RuntimeSymlinkCreation</a>
+</li>
+<li>RutherfordVsTheta()
+: <a class="el" href="classTReaction.html#ac4715e9fdb76af08d5539e5674bec03c">TReaction</a>
 </li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 1 2015 15:28:58 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 4 2015 17:27:57 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

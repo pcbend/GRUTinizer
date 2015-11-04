@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['d2r',['D2R',['../TReaction_8h.html#a0a3cc1d5cde549e408f825ddd7f5853d',1,'TReaction.h']]],
   ['dblack',['DBLACK',['../Globals_8h.html#a2469054c121245df4df9bd60a18570c2',1,'Globals.h']]],
   ['dblue',['DBLUE',['../Globals_8h.html#a82e4da5718eb63f4ce3f51f73cb49232',1,'Globals.h']]],
   ['dcyan',['DCYAN',['../Globals_8h.html#a9abe1243cfcf86c811d8321920b26fe2',1,'Globals.h']]],

@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -70,7 +71,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="functions.html"><span>All</span></a></li>
       <li class="current"><a href="functions_func.html"><span>Functions</span></a></li>
       <li><a href="functions_vars.html"><span>Variables</span></a></li>
-      <li><a href="functions_type.html"><span>Typedefs</span></a></li>
       <li><a href="functions_enum.html"><span>Enumerations</span></a></li>
       <li><a href="functions_eval.html"><span>Enumerator</span></a></li>
       <li><a href="functions_rela.html"><span>Related&#160;Functions</span></a></li>
@@ -89,6 +89,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="functions_func_0x68.html#index_h"><span>h</span></a></li>
       <li><a href="functions_func_0x69.html#index_i"><span>i</span></a></li>
       <li><a href="functions_func_0x6a.html#index_j"><span>j</span></a></li>
+      <li><a href="functions_func_0x6b.html#index_k"><span>k</span></a></li>
       <li><a href="functions_func_0x6c.html#index_l"><span>l</span></a></li>
       <li><a href="functions_func_0x6d.html#index_m"><span>m</span></a></li>
       <li><a href="functions_func_0x6e.html#index_n"><span>n</span></a></li>
@@ -99,6 +100,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="functions_func_0x74.html#index_t"><span>t</span></a></li>
       <li><a href="functions_func_0x75.html#index_u"><span>u</span></a></li>
       <li><a href="functions_func_0x77.html#index_w"><span>w</span></a></li>
+      <li><a href="functions_func_0x78.html#index_x"><span>x</span></a></li>
       <li class="current"><a href="functions_func_0x7e.html#index_0x7e"><span>~</span></a></li>
     </ul>
   </div>
@@ -108,7 +110,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -130,11 +132,44 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>~ArgParser()
 : <a class="el" href="classArgParser.html#a009aec50b9052516b3deabd5d756df03">ArgParser</a>
 </li>
+<li>~DynamicLibrary()
+: <a class="el" href="classDynamicLibrary.html#a25dd7a7cd386fbc1c8abde597c39c881">DynamicLibrary</a>
+</li>
+<li>~GCanvas()
+: <a class="el" href="classGCanvas.html#a1ae66d10272b5cf6ca3b14c509966da0">GCanvas</a>
+</li>
+<li>~GEfficiency()
+: <a class="el" href="classGEfficiency.html#a84a4bbf4ef6a0f36eb53c6aec704e958">GEfficiency</a>
+</li>
+<li>~GMarker()
+: <a class="el" href="classGMarker.html#a4ead580c1027b23637e6dc5c6c946840">GMarker</a>
+</li>
+<li>~GPeak()
+: <a class="el" href="classGPeak.html#ae0b76fa647ee533daaf791d32ed82c00">GPeak</a>
+</li>
+<li>~GRootCanvas()
+: <a class="el" href="classGRootCanvas.html#a9d59c526cc35f6880c154695f27702ad">GRootCanvas</a>
+</li>
+<li>~GRootGuiFactory()
+: <a class="el" href="classGRootGuiFactory.html#a6de897f4b8f5e3ab1db4174227c77c41">GRootGuiFactory</a>
+</li>
 <li>~RawDataQueue()
 : <a class="el" href="classRawDataQueue.html#a877621027c1c2e4ae2da2f1da1d51d6b">RawDataQueue</a>
 </li>
+<li>~StoppableThread()
+: <a class="el" href="classStoppableThread.html#a618fbc69b415e4fdb8900ab0c2aa7a34">StoppableThread</a>
+</li>
+<li>~TBank29()
+: <a class="el" href="classTBank29.html#a652ff71864dd51b908f0c666211c6e9a">TBank29</a>
+</li>
 <li>~TChannel()
 : <a class="el" href="classTChannel.html#adcb7b5d62adeeb87076f6b8b7290a3e7">TChannel</a>
+</li>
+<li>~TCrdc()
+: <a class="el" href="classTCrdc.html#abf125baf481fc5a82c1e37cef0c26474">TCrdc</a>
+</li>
+<li>~TCrdcPad()
+: <a class="el" href="classTCrdcPad.html#ae64f90f544447d5680ab831333dd16ed">TCrdcPad</a>
 </li>
 <li>~TDataLoop()
 : <a class="el" href="classTDataLoop.html#abde218cd6a6b24049018f4abdfed6180">TDataLoop</a>
@@ -145,11 +180,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>~TDetectorHit()
 : <a class="el" href="classTDetectorHit.html#a3671c190d2c3f7f09aa86644b90e1dbf">TDetectorHit</a>
 </li>
+<li>~TFastScint()
+: <a class="el" href="classTFastScint.html#ad53a7543a4a281b007f52e74254df82f">TFastScint</a>
+</li>
+<li>~TFPScint()
+: <a class="el" href="classTFPScint.html#adb1fc42f5444bf175629c5e161ef074e">TFPScint</a>
+</li>
 <li>~TGEBEvent()
 : <a class="el" href="classTGEBEvent.html#a89b0991c339b3796e12668616429b937">TGEBEvent</a>
-</li>
-<li>~TGEBMode3Event()
-: <a class="el" href="classTGEBMode3Event.html#ad0dc7bd3d6a457e80b5a9a7506b6e4eb">TGEBMode3Event</a>
 </li>
 <li>~TGEBMultiFile()
 : <a class="el" href="classTGEBMultiFile.html#a0f7b62ec147a29dbe9e57031bb394287">TGEBMultiFile</a>
@@ -163,8 +201,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>~TGRUTint()
 : <a class="el" href="classTGRUTint.html#a27c48053441f2d8ae96c7ffb383163a7">TGRUTint</a>
 </li>
-<li>~TGRUTLoop()
-: <a class="el" href="classTGRUTLoop.html#a0d9718becde763ce54e4250eff00b500">TGRUTLoop</a>
+<li>~TGRUTServer()
+: <a class="el" href="classTGRUTServer.html#a88f6c93fb643786c922df0049c75d543">TGRUTServer</a>
+</li>
+<li>~THodoHit()
+: <a class="el" href="classTHodoHit.html#a53ba413321376aaf63c7ddaa376db6f1">THodoHit</a>
+</li>
+<li>~ThreadsafeQueue()
+: <a class="el" href="classThreadsafeQueue.html#a1e12f9a5d5bfa2e62fb077ac135abb76">ThreadsafeQueue&lt; T &gt;</a>
+</li>
+<li>~TIonChamber()
+: <a class="el" href="classTIonChamber.html#aeeea18e74ccaee0b4da7a845c4072c44">TIonChamber</a>
 </li>
 <li>~TJanus()
 : <a class="el" href="classTJanus.html#a4467ae5de8985bbfdea09effe97dda7d">TJanus</a>
@@ -172,14 +219,26 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>~TMode3()
 : <a class="el" href="classTMode3.html#a858c60a5bc342e4d18559b2c9e9ac2da">TMode3</a>
 </li>
+<li>~TMode3Hit()
+: <a class="el" href="classTMode3Hit.html#a6c7f9872b6e6fea959dce4e08388b4d2">TMode3Hit</a>
+</li>
+<li>~TMTof()
+: <a class="el" href="classTMTof.html#a829f3aa233fafa9c5be756f53705f3e6">TMTof</a>
+</li>
 <li>~TMultiRawFile()
 : <a class="el" href="classTMultiRawFile.html#aa347147ad4a0ebcfdd1f859315156d83">TMultiRawFile</a>
 </li>
 <li>~TNSCLEvent()
 : <a class="el" href="classTNSCLEvent.html#a8f9a734dc056ac55c36a515552bac179">TNSCLEvent</a>
 </li>
-<li>~TObjectManager()
-: <a class="el" href="classTObjectManager.html#a8258fa58c989768541a917342f083e50">TObjectManager</a>
+<li>~TNucleus()
+: <a class="el" href="classTNucleus.html#a7d7d9fafa66e90cb5f188065519d5489">TNucleus</a>
+</li>
+<li>~TOrderedRawFile()
+: <a class="el" href="classTOrderedRawFile.html#ac2eb40250aedcf0cbe5834f76566041f">TOrderedRawFile</a>
+</li>
+<li>~TPeakFinder()
+: <a class="el" href="classTPeakFinder.html#af8cbaf77d64fa405b4e4c3091001e49f">TPeakFinder</a>
 </li>
 <li>~TPhosWall()
 : <a class="el" href="classTPhosWall.html#a8a0cd61d41b6e6df0850772a2981f191">TPhosWall</a>
@@ -187,8 +246,32 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>~TPhosWallHit()
 : <a class="el" href="classTPhosWallHit.html#a99d57d06481e9d5f95b330c6e77057a2">TPhosWallHit</a>
 </li>
+<li>~TPipeline()
+: <a class="el" href="classTPipeline.html#a8158731d1071d552e36891949c1a67ed">TPipeline</a>
+</li>
+<li>~TPreserveGDirectory()
+: <a class="el" href="classTPreserveGDirectory.html#a86bdeb32c5fb96afa5eb92a4cf6a82d6">TPreserveGDirectory</a>
+</li>
 <li>~TRawEvent()
 : <a class="el" href="classTRawEvent.html#a2c0846280fb88a71e1cb5f7936b8d673">TRawEvent</a>
+</li>
+<li>~TRawEventBZipSource()
+: <a class="el" href="classTRawEventBZipSource.html#a4c8983c8d1a26cb94a6c88407be1f9aa">TRawEventBZipSource</a>
+</li>
+<li>~TRawEventFileSource()
+: <a class="el" href="classTRawEventFileSource.html#a8a66fc307865667292204274f9c8cc2e">TRawEventFileSource</a>
+</li>
+<li>~TRawEventGZipSource()
+: <a class="el" href="classTRawEventGZipSource.html#aa6851244d974f6bdba2c73876fd1d3c7">TRawEventGZipSource</a>
+</li>
+<li>~TRawEventOnlineFileSource()
+: <a class="el" href="classTRawEventOnlineFileSource.html#abf0e8d3dbe0237ec902550b7dac7373c">TRawEventOnlineFileSource</a>
+</li>
+<li>~TRawEventPipeSource()
+: <a class="el" href="classTRawEventPipeSource.html#ad7b75db57b9fc486237040f89618532c">TRawEventPipeSource</a>
+</li>
+<li>~TRawEventRingSource()
+: <a class="el" href="classTRawEventRingSource.html#ac22cb038a0a706bad46341c173c3e2e8">TRawEventRingSource</a>
 </li>
 <li>~TRawEventSource()
 : <a class="el" href="classTRawEventSource.html#a98fae5d882bad8911b8bdd78e9e38896">TRawEventSource</a>
@@ -196,23 +279,29 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>~TRawFile()
 : <a class="el" href="classTRawFile.html#a9dc51873935fcd6c926cd2a6efbad4d0">TRawFile</a>
 </li>
-<li>~TRawFileIn()
-: <a class="el" href="classTRawFileIn.html#ab36fce9174f7d94271feb1a02b36e460">TRawFileIn</a>
+<li>~TRootInputLoop()
+: <a class="el" href="classTRootInputLoop.html#a64a97a9c060f8396b5501031ef822d7a">TRootInputLoop</a>
 </li>
-<li>~TRawFileOut()
-: <a class="el" href="classTRawFileOut.html#a3a56ffabaddc5caffa94fdf933ac8b87">TRawFileOut</a>
+<li>~TS800()
+: <a class="el" href="classTS800.html#addebb9e1ec5fd7f35ff6f9890d37f4be">TS800</a>
 </li>
-<li>~TRootOutfile()
-: <a class="el" href="classTRootOutfile.html#a63b14e57b1b91d5f436b10907f4bd2c5">TRootOutfile</a>
+<li>~TS800Channel()
+: <a class="el" href="classTS800Channel.html#a5cc4040aeb1a760c78560605a7290795">TS800Channel</a>
 </li>
-<li>~TRootOutfileGEB()
-: <a class="el" href="classTRootOutfileGEB.html#a79fcd99fced30a38268f5a87d9b640b3">TRootOutfileGEB</a>
+<li>~TS800Hit()
+: <a class="el" href="classTS800Hit.html#a327cd25f04e638ac024af5a7415f42bc">TS800Hit</a>
 </li>
-<li>~TRootOutfileNSCL()
-: <a class="el" href="classTRootOutfileNSCL.html#a996dae7a7408d4370e3641948541094e">TRootOutfileNSCL</a>
+<li>~TS800Scaler()
+: <a class="el" href="classTS800Scaler.html#af802432ef4f838b453ac99c44d10375f">TS800Scaler</a>
+</li>
+<li>~TScintillator()
+: <a class="el" href="classTScintillator.html#a28dda58c8f37609b063ab4be59794908">TScintillator</a>
 </li>
 <li>~TSega()
 : <a class="el" href="classTSega.html#abf240824440ebae01510c974ee4fbe82">TSega</a>
+</li>
+<li>~TSequentialRawFile()
+: <a class="el" href="classTSequentialRawFile.html#a9b50127b6f6cf1c62cc72dae5c6330de">TSequentialRawFile</a>
 </li>
 <li>~TSmartBuffer()
 : <a class="el" href="classTSmartBuffer.html#a2e5c5164bc7d4c49a777ffab156ba856">TSmartBuffer</a>
@@ -223,11 +312,35 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>~TStripChartItem()
 : <a class="el" href="classTStripChartItem.html#ad47c133f17abbe6cedae7bd57605b960">TStripChartItem</a>
 </li>
+<li>~TTerminalLoop()
+: <a class="el" href="classTTerminalLoop.html#ae9239fff31922751d0195f85151a5a72">TTerminalLoop</a>
+</li>
+<li>~TTof()
+: <a class="el" href="classTTof.html#a65ca6d31312b0e3d5c5becaa43a9f2dd">TTof</a>
+</li>
+<li>~TTOFHit()
+: <a class="el" href="classTTOFHit.html#a6375d2909b73ee2d71b0831a733a2d13">TTOFHit</a>
+</li>
+<li>~TTransition()
+: <a class="el" href="classTTransition.html#a09cad457179313faf4f5e67a23245ff5">TTransition</a>
+</li>
+<li>~TTrigger()
+: <a class="el" href="classTTrigger.html#a15b40e7beecef981f3b5c8e7e93e82ab">TTrigger</a>
+</li>
+<li>~TUnpackedEvent()
+: <a class="el" href="classTUnpackedEvent.html#ab6e9b7b3001265ca7d20956028ddfaaf">TUnpackedEvent</a>
+</li>
+<li>~TUnpackLoop()
+: <a class="el" href="classTUnpackLoop.html#a4cacdb6c4f3943091416f1677d14be3d">TUnpackLoop</a>
+</li>
+<li>~TWriteLoop()
+: <a class="el" href="classTWriteLoop.html#a7d03a1d7498f138abf88050478befd3b">TWriteLoop</a>
+</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 1 2015 15:28:58 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 4 2015 17:27:57 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -68,7 +69,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -79,7 +80,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_8d46cf37b8943c9254bd5ebc2d3e8433.html">include</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -95,23 +96,23 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00006"></a><span class="lineno"><a class="code" href="Globals_8h.html#a376515a3df44d8f89ea3c90d5be618cb">    6</a></span>&#160;<span class="preprocessor">#define GRUT_RELEASE &quot;0.01 &quot;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00008"></a><span class="lineno"><a class="code" href="Globals_8h.html#ad7c3b975e5552a122f836b02fa138502">    8</a></span>&#160;<span class="preprocessor">#define RESET_COLOR &quot;\033[m&quot;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno"><a class="code" href="Globals_8h.html#a79d10e672abb49ad63eeaa8aaef57c38">    9</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define BLUE &quot;\033[1;34m&quot;</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno"><a class="code" href="Globals_8h.html#abf681265909adf3d3e8116c93c0ba179">   10</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define YELLOW &quot;\033[1;33m&quot;</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno"><a class="code" href="Globals_8h.html#acfbc006ea433ad708fdee3e82996e721">   11</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define GREEN &quot;\033[1;32m&quot;</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno"><a class="code" href="Globals_8h.html#a8d23feea868a983c8c2b661e1e16972f">   12</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define RED &quot;\033[1;31m&quot;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno"><a class="code" href="Globals_8h.html#a7b3b25cba33b07c303f3060fe41887f6">   13</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define BLACK &quot;\033[1;30m&quot;</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno"><a class="code" href="Globals_8h.html#a6f699060902f800f12aaae150f3a708e">   14</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define MAGENTA &quot;\033[1;35m&quot;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno"><a class="code" href="Globals_8h.html#ad243f93c16bc4c1d3e0a13b84421d760">   15</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define CYAN &quot;\033[1;36m&quot;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno"><a class="code" href="Globals_8h.html#a87b537f5fa5c109d3c05c13d6b18f382">   16</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define WHITE &quot;\033[1;37m&quot;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno"><a class="code" href="Globals_8h.html#a79d10e672abb49ad63eeaa8aaef57c38">    9</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define BLUE       &quot;\033[1;34m&quot;</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno"><a class="code" href="Globals_8h.html#abf681265909adf3d3e8116c93c0ba179">   10</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define YELLOW     &quot;\033[1;33m&quot;</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno"><a class="code" href="Globals_8h.html#acfbc006ea433ad708fdee3e82996e721">   11</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define GREEN      &quot;\033[1;32m&quot;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno"><a class="code" href="Globals_8h.html#a8d23feea868a983c8c2b661e1e16972f">   12</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define RED        &quot;\033[1;31m&quot;</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno"><a class="code" href="Globals_8h.html#a7b3b25cba33b07c303f3060fe41887f6">   13</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define BLACK      &quot;\033[1;30m&quot;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno"><a class="code" href="Globals_8h.html#a6f699060902f800f12aaae150f3a708e">   14</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define MAGENTA    &quot;\033[1;35m&quot;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno"><a class="code" href="Globals_8h.html#ad243f93c16bc4c1d3e0a13b84421d760">   15</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define CYAN       &quot;\033[1;36m&quot;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno"><a class="code" href="Globals_8h.html#a87b537f5fa5c109d3c05c13d6b18f382">   16</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define WHITE      &quot;\033[1;37m&quot;</span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00018"></a><span class="lineno"><a class="code" href="Globals_8h.html#a82e4da5718eb63f4ce3f51f73cb49232">   18</a></span>&#160;<span class="preprocessor">#define DBLUE &quot;\033[0;34m&quot;</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno"><a class="code" href="Globals_8h.html#a59524b4cf113f646696e5955023df6a4">   19</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define DYELLOW &quot;\033[0;33m&quot;</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno"><a class="code" href="Globals_8h.html#a6d970e4c4769c52d19f321a08d531cf0">   20</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define DGREEN &quot;\033[0;32m&quot;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno"><a class="code" href="Globals_8h.html#a6cd26ccb39c45583e5a1bd90bc2bbb66">   21</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define DRED &quot;\033[0;31m&quot;</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno"><a class="code" href="Globals_8h.html#a2469054c121245df4df9bd60a18570c2">   22</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define DBLACK &quot;\033[0;30m&quot;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno"><a class="code" href="Globals_8h.html#ae730fad7256d25796fff0f5daa94e52a">   23</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define DMAGENTA &quot;\033[0;35m&quot;</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno"><a class="code" href="Globals_8h.html#a9abe1243cfcf86c811d8321920b26fe2">   24</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define DCYAN &quot;\033[0;36m&quot;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno"><a class="code" href="Globals_8h.html#a1d2c3965a42096b8b455017ffff419c7">   25</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define DWHITE &quot;\033[0;37m&quot;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno"><a class="code" href="Globals_8h.html#a82e4da5718eb63f4ce3f51f73cb49232">   18</a></span>&#160;<span class="preprocessor">#define DBLUE      &quot;\033[0;34m&quot;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno"><a class="code" href="Globals_8h.html#a59524b4cf113f646696e5955023df6a4">   19</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define DYELLOW    &quot;\033[0;33m&quot;</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno"><a class="code" href="Globals_8h.html#a6d970e4c4769c52d19f321a08d531cf0">   20</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define DGREEN     &quot;\033[0;32m&quot;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno"><a class="code" href="Globals_8h.html#a6cd26ccb39c45583e5a1bd90bc2bbb66">   21</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define DRED       &quot;\033[0;31m&quot;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno"><a class="code" href="Globals_8h.html#a2469054c121245df4df9bd60a18570c2">   22</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define DBLACK     &quot;\033[0;30m&quot;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="code" href="Globals_8h.html#ae730fad7256d25796fff0f5daa94e52a">   23</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define DMAGENTA   &quot;\033[0;35m&quot;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno"><a class="code" href="Globals_8h.html#a9abe1243cfcf86c811d8321920b26fe2">   24</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define DCYAN      &quot;\033[0;36m&quot;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="code" href="Globals_8h.html#a1d2c3965a42096b8b455017ffff419c7">   25</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define DWHITE     &quot;\033[0;37m&quot;</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00027"></a><span class="lineno"><a class="code" href="Globals_8h.html#a6beded3f171517df3902c52f79f6fea2">   27</a></span>&#160;<span class="preprocessor">#define BG_WHITE   &quot;\033[47m&quot;</span></div>
 <div class="line"><a name="l00028"></a><span class="lineno"><a class="code" href="Globals_8h.html#ac317d04c219b630f9c36b0241d9d4be7">   28</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define BG_RED     &quot;\033[41m&quot;</span></div>
@@ -147,7 +148,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 1 2015 15:28:57 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 4 2015 17:27:53 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

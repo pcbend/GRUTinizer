@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['createdataloop',['CreateDataLoop',['../classTGRUTLoop.html#ac33446b05cbbe5d108ec186af9a25214',1,'TGRUTLoop']]]
+  ['tnucleus',['TNucleus',['../classTTransition.html#a7261ff7697162ea0cbdd32b99636288f',1,'TTransition']]]
 ];

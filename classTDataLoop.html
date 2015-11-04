@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -70,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -83,11 +84,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="#pri-methods">Private Member Functions</a> &#124;
-<a href="#pri-static-attribs">Static Private Attributes</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classTDataLoop-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">TDataLoop Class Reference</div>  </div>
@@ -101,61 +100,69 @@ Inheritance diagram for TDataLoop:</div>
  <div class="center">
   <img src="classTDataLoop.png" usemap="#TDataLoop_map" alt=""/>
   <map id="TDataLoop_map" name="TDataLoop_map">
-<area href="classTGRUTLoop.html" alt="TGRUTLoop" shape="rect" coords="0,56,79,80"/>
+<area href="classStoppableThread.html" alt="StoppableThread" shape="rect" coords="0,0,108,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a5ecde4c4e7bb97134b382ab9e0c9142e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a5ecde4c4e7bb97134b382ab9e0c9142e">TDataLoop</a> (<a class="el" href="classTRawEventSource.html">TRawEventSource</a> *<a class="el" href="classTDataLoop.html#ae407031f85d5850be8171e4127fd295c">source</a>, <a class="el" href="classThreadsafeQueue.html">ThreadsafeQueue</a>&lt; <a class="el" href="classTRawEvent.html">TRawEvent</a> &gt; &amp;<a class="el" href="classTDataLoop.html#a8dc1dbefb4dc19540f3a131dac4956da">output_queue</a>)</td></tr>
 <tr class="memitem:abde218cd6a6b24049018f4abdfed6180"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#abde218cd6a6b24049018f4abdfed6180">~TDataLoop</a> ()</td></tr>
-<tr class="memitem:abb7458400f081b4729dec1c6754a0dba"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#abb7458400f081b4729dec1c6754a0dba">ProcessFile</a> (const char *filename, <a class="el" href="TGRUTTypes_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a> file_type=<a class="el" href="TGRUTTypes_8h.html#aa52857f83d8b7cda6be7f0bec0f45229af689ece8bca5208697d68cadac8d1927">kFileType::UNKNOWN_FILETYPE</a>)</td></tr>
-<tr class="memitem:a10590772c7203adeadfcbe55cc80ed10"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a10590772c7203adeadfcbe55cc80ed10">ProcessFile</a> (const std::vector&lt; std::string &gt; &amp;filenames)</td></tr>
-<tr class="memitem:a509bf1ce14bb930942cba7eab82e2db2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a509bf1ce14bb930942cba7eab82e2db2">ProcessRing</a> (const char *filename)</td></tr>
-<tr class="memitem:ae3f59b4173b82665bf3c345459c2025a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#ae3f59b4173b82665bf3c345459c2025a">Start</a> ()</td></tr>
-<tr class="memitem:abaa7522d79bd8a21af5bcf24b1be0956"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#abaa7522d79bd8a21af5bcf24b1be0956">Pause</a> ()</td></tr>
-<tr class="memitem:a13a52621524567254d1e63e0ecf7e6f2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a13a52621524567254d1e63e0ecf7e6f2">Resume</a> ()</td></tr>
-<tr class="memitem:a41a7649abb73e4dbdc8371374eacea71"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a41a7649abb73e4dbdc8371374eacea71">Stop</a> ()</td></tr>
-<tr class="memitem:a2dec3dd7a02a60fa4c556bff2c08330a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a2dec3dd7a02a60fa4c556bff2c08330a">IsPaused</a> ()</td></tr>
-<tr class="memitem:af7c0338028da0d9d375db800c455fcef"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#af7c0338028da0d9d375db800c455fcef">Join</a> ()</td></tr>
-<tr class="memitem:a542c608514b14350af12525157b72854"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a542c608514b14350af12525157b72854">Initialize</a> ()</td></tr>
-<tr class="memitem:af9bae807f9ff74e9832f1badd877febf"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#af9bae807f9ff74e9832f1badd877febf">Finalize</a> ()</td></tr>
-<tr class="memitem:a163e7095bfbb5e26019514a25b042aec"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a163e7095bfbb5e26019514a25b042aec">ProcessEvent</a> (<a class="el" href="classTRawEvent.html">TRawEvent</a> &amp;event)</td></tr>
-<tr class="memitem:aeb893c6ef7a958c0ad4b890c0e0fd569"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classTRawEventSource.html">TRawEventSource</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#aeb893c6ef7a958c0ad4b890c0e0fd569">GetInfile</a> ()</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2><a name="pub-static-methods"></a>
-Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a471ce7be48b22537a314727e83fd34c9"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classTDataLoop.html">TDataLoop</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a471ce7be48b22537a314727e83fd34c9">Instance</a> ()</td></tr>
-<tr class="memitem:ab3b3fd1a55638001717658369fc9635f"><td class="memTemplParams" colspan="2">template&lt;typename T , typename... Params&gt; </td></tr>
-<tr class="memitem:ab3b3fd1a55638001717658369fc9635f"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#ab3b3fd1a55638001717658369fc9635f">CreateDataLoop</a> (Params &amp;&amp;...params)</td></tr>
+<tr class="memitem:a0cbdcfd0a09f5dec32e8121a11886dba"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classTRawEventSource.html">TRawEventSource</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a0cbdcfd0a09f5dec32e8121a11886dba">GetSource</a> () const </td></tr>
+<tr class="memitem:a322ce2ea80853385bedd9f4f2ffbe0ad"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a322ce2ea80853385bedd9f4f2ffbe0ad">Status</a> ()</td></tr>
+<tr class="inherit_header pub_methods_classStoppableThread"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classStoppableThread')"><img src="closed.png" alt="-"/>&nbsp;Public Member Functions inherited from <a class="el" href="classStoppableThread.html">StoppableThread</a></td></tr>
+<tr class="memitem:a00b7433fa105c542066e77753f8245d8 inherit pub_methods_classStoppableThread"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStoppableThread.html#a00b7433fa105c542066e77753f8245d8">StoppableThread</a> ()</td></tr>
+<tr class="memitem:a618fbc69b415e4fdb8900ab0c2aa7a34 inherit pub_methods_classStoppableThread"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStoppableThread.html#a618fbc69b415e4fdb8900ab0c2aa7a34">~StoppableThread</a> ()</td></tr>
+<tr class="memitem:a4fb4c7ce9c43caa1460c24c2ffd95162 inherit pub_methods_classStoppableThread"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStoppableThread.html#a4fb4c7ce9c43caa1460c24c2ffd95162">Resume</a> ()</td></tr>
+<tr class="memitem:a7ea38cd9c9c65ccc4ce776a326894ab7 inherit pub_methods_classStoppableThread"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStoppableThread.html#a7ea38cd9c9c65ccc4ce776a326894ab7">Pause</a> ()</td></tr>
+<tr class="memitem:a816956826eabf74cf40c034466c7a178 inherit pub_methods_classStoppableThread"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStoppableThread.html#a816956826eabf74cf40c034466c7a178">Stop</a> ()</td></tr>
+<tr class="memitem:a34658723be83bff3f1b98e22488b1fce inherit pub_methods_classStoppableThread"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStoppableThread.html#a34658723be83bff3f1b98e22488b1fce">IsPaused</a> ()</td></tr>
+<tr class="memitem:a53d6222ee0e1cf4a0d5eefae3a271357 inherit pub_methods_classStoppableThread"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStoppableThread.html#a53d6222ee0e1cf4a0d5eefae3a271357">IsRunning</a> ()</td></tr>
+<tr class="memitem:a33897b2a9af9241851b3b735b35fed68 inherit pub_methods_classStoppableThread"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStoppableThread.html#a33897b2a9af9241851b3b735b35fed68">Join</a> ()</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a0558ebea52e3567d4e6e3dfcf7b2dc4e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a0558ebea52e3567d4e6e3dfcf7b2dc4e">TDataLoop</a> ()</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2><a name="pro-attribs"></a>
-Protected Attributes</h2></td></tr>
-<tr class="memitem:abab0c51ed19f7e3f9d39b9ab4ce3563b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classTRawEventSource.html">TRawEventSource</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#abab0c51ed19f7e3f9d39b9ab4ce3563b">infile</a></td></tr>
-<tr class="memitem:a9bdfdfcf22121227572f4585808f5d54"><td class="memItemLeft" align="right" valign="top">std::thread&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a9bdfdfcf22121227572f4585808f5d54">read_thread</a></td></tr>
-<tr class="memitem:af4aab0a794691561d85181acd6520112"><td class="memItemLeft" align="right" valign="top">std::atomic_bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#af4aab0a794691561d85181acd6520112">running</a></td></tr>
-<tr class="memitem:aeed81530c7e04997c23f81a249a2703e"><td class="memItemLeft" align="right" valign="top">std::atomic_bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#aeed81530c7e04997c23f81a249a2703e">initialized</a></td></tr>
-<tr class="memitem:a8abd0733732209d5cfe04fe8bb5529a2"><td class="memItemLeft" align="right" valign="top">std::atomic_bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a8abd0733732209d5cfe04fe8bb5529a2">paused</a></td></tr>
-<tr class="memitem:aa3016306443d4a9499ab570d7b85fd04"><td class="memItemLeft" align="right" valign="top">std::condition_variable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#aa3016306443d4a9499ab570d7b85fd04">paused_wait</a></td></tr>
-<tr class="memitem:af41bffc90d9f5fd0598c3347d5c333f2"><td class="memItemLeft" align="right" valign="top">std::mutex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#af41bffc90d9f5fd0598c3347d5c333f2">pause_mutex</a></td></tr>
+<tr class="memitem:aa7fba844823cc17d129c8f167892f398"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#aa7fba844823cc17d129c8f167892f398">Iteration</a> ()</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
-<tr class="memitem:afe6b78ada7cd77491b4fd317655c5bd2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#afe6b78ada7cd77491b4fd317655c5bd2">ReadLoop</a> ()</td></tr>
-<tr class="memitem:a2b321c6e9aef3ee69ed1a4da5d60c0cd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a2b321c6e9aef3ee69ed1a4da5d60c0cd">Iteration</a> ()</td></tr>
-<tr class="memitem:ac4d70f6b797fada943f9a1b450f24b43"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#ac4d70f6b797fada943f9a1b450f24b43">ProcessSource</a> ()</td></tr>
+<tr class="memitem:a0558ebea52e3567d4e6e3dfcf7b2dc4e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a0558ebea52e3567d4e6e3dfcf7b2dc4e">TDataLoop</a> ()</td></tr>
 <tr class="memitem:a2398fd6624b43a339424dd509863a2a2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a2398fd6624b43a339424dd509863a2a2">TDataLoop</a> (const <a class="el" href="classTDataLoop.html">TDataLoop</a> &amp;other)</td></tr>
 <tr class="memitem:a432e27b5a497ee569fdc774efc15ad8a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classTDataLoop.html">TDataLoop</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a432e27b5a497ee569fdc774efc15ad8a">operator=</a> (const <a class="el" href="classTDataLoop.html">TDataLoop</a> &amp;other)</td></tr>
 <tr class="memitem:a2cd9302262d5bbe3106908ab8e020ee3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a2cd9302262d5bbe3106908ab8e020ee3">ClassDef</a> (<a class="el" href="classTDataLoop.html">TDataLoop</a>, 0)</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2><a name="pri-static-attribs"></a>
-Static Private Attributes</h2></td></tr>
-<tr class="memitem:a7e1e981bf3a427315735b6489e3c72c9"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classTDataLoop.html">TDataLoop</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a7e1e981bf3a427315735b6489e3c72c9">data_loop</a> = NULL</td></tr>
+<tr class="heading"><td colspan="2"><h2><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr class="memitem:a8dc1dbefb4dc19540f3a131dac4956da"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classThreadsafeQueue.html">ThreadsafeQueue</a>&lt; <a class="el" href="classTRawEvent.html">TRawEvent</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#a8dc1dbefb4dc19540f3a131dac4956da">output_queue</a></td></tr>
+<tr class="memitem:ae407031f85d5850be8171e4127fd295c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classTRawEventSource.html">TRawEventSource</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTDataLoop.html#ae407031f85d5850be8171e4127fd295c">source</a></td></tr>
 </table>
 <h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a5ecde4c4e7bb97134b382ab9e0c9142e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TDataLoop::TDataLoop </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classTRawEventSource.html">TRawEventSource</a> *&#160;</td>
+          <td class="paramname"><em>source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classThreadsafeQueue.html">ThreadsafeQueue</a>&lt; <a class="el" href="classTRawEvent.html">TRawEvent</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>output_queue</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="abde218cd6a6b24049018f4abdfed6180"></a>
 <div class="memitem">
 <div class="memproto">
@@ -195,7 +202,7 @@ Static Private Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -219,7 +226,7 @@ Static Private Attributes</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -261,33 +268,7 @@ Static Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ab3b3fd1a55638001717658369fc9635f"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename T , typename... Params&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void TDataLoop::CreateDataLoop </td>
-          <td>(</td>
-          <td class="paramtype">Params &amp;&amp;...&#160;</td>
-          <td class="paramname"><em>params</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af9bae807f9ff74e9832f1badd877febf"></a>
+<a class="anchor" id="a0cbdcfd0a09f5dec32e8121a11886dba"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -295,35 +276,10 @@ template&lt;typename T , typename... Params&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void TDataLoop::Finalize </td>
+          <td class="memname">const <a class="el" href="classTRawEventSource.html">TRawEventSource</a>&amp; TDataLoop::GetSource </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Reimplemented in <a class="el" href="classTGRUTLoop.html#a9bafe185f97d2b448da2ca6533986a84">TGRUTLoop</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="aeb893c6ef7a958c0ad4b890c0e0fd569"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="classTRawEventSource.html">TRawEventSource</a>* TDataLoop::GetInfile </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -335,7 +291,7 @@ template&lt;typename T , typename... Params&gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a542c608514b14350af12525157b72854"></a>
+<a class="anchor" id="aa7fba844823cc17d129c8f167892f398"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -343,7 +299,7 @@ template&lt;typename T , typename... Params&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void TDataLoop::Initialize </td>
+          <td class="memname">bool TDataLoop::Iteration </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -351,88 +307,12 @@ template&lt;typename T , typename... Params&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classTGRUTLoop.html#aac9f9089dc80db01e386018db7223fb5">TGRUTLoop</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a471ce7be48b22537a314727e83fd34c9"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classTDataLoop.html">TDataLoop</a> * TDataLoop::Instance </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a2dec3dd7a02a60fa4c556bff2c08330a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool TDataLoop::IsPaused </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a2b321c6e9aef3ee69ed1a4da5d60c0cd"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void TDataLoop::Iteration </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af7c0338028da0d9d375db800c455fcef"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void TDataLoop::Join </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
+<p>Implements <a class="el" href="classStoppableThread.html#afeb34fff4155683116a473cade35f054">StoppableThread</a>.</p>
 
 </div>
 </div>
@@ -453,128 +333,6 @@ template&lt;typename T , typename... Params&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="abaa7522d79bd8a21af5bcf24b1be0956"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void TDataLoop::Pause </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a163e7095bfbb5e26019514a25b042aec"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual int TDataLoop::ProcessEvent </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classTRawEvent.html">TRawEvent</a> &amp;&#160;</td>
-          <td class="paramname"><em>event</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Reimplemented in <a class="el" href="classTGRUTLoop.html#acf7f402f98d6c0dd48393e89f9017252">TGRUTLoop</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="abb7458400f081b4729dec1c6754a0dba"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void TDataLoop::ProcessFile </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>filename</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="TGRUTTypes_8h.html#aa52857f83d8b7cda6be7f0bec0f45229">kFileType</a>&#160;</td>
-          <td class="paramname"><em>file_type</em> = <code><a class="el" href="TGRUTTypes_8h.html#aa52857f83d8b7cda6be7f0bec0f45229af689ece8bca5208697d68cadac8d1927">kFileType::UNKNOWN_FILETYPE</a></code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a10590772c7203adeadfcbe55cc80ed10"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void TDataLoop::ProcessFile </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;&#160;</td>
-          <td class="paramname"><em>filenames</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a509bf1ce14bb930942cba7eab82e2db2"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void TDataLoop::ProcessRing </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>filename</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac4d70f6b797fada943f9a1b450f24b43"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void TDataLoop::ProcessSource </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
 <span class="mlabels"><span class="mlabel">private</span></span>  </td>
   </tr>
 </table>
@@ -582,7 +340,7 @@ template&lt;typename T , typename... Params&gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="afe6b78ada7cd77491b4fd317655c5bd2"></a>
+<a class="anchor" id="a322ce2ea80853385bedd9f4f2ffbe0ad"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -590,7 +348,7 @@ template&lt;typename T , typename... Params&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void TDataLoop::ReadLoop </td>
+          <td class="memname">std::string TDataLoop::Status </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -598,60 +356,17 @@ template&lt;typename T , typename... Params&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<a class="anchor" id="a13a52621524567254d1e63e0ecf7e6f2"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void TDataLoop::Resume </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ae3f59b4173b82665bf3c345459c2025a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void TDataLoop::Start </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a41a7649abb73e4dbdc8371374eacea71"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void TDataLoop::Stop </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
+<p>Reimplemented from <a class="el" href="classStoppableThread.html#ae9e0855021ae248968dc7a878ea70daa">StoppableThread</a>.</p>
 
 </div>
 </div>
 <h2>Member Data Documentation</h2>
-<a class="anchor" id="a7e1e981bf3a427315735b6489e3c72c9"></a>
+<a class="anchor" id="a8dc1dbefb4dc19540f3a131dac4956da"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -659,19 +374,19 @@ template&lt;typename T , typename... Params&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classTDataLoop.html">TDataLoop</a> * TDataLoop::data_loop = NULL</td>
+          <td class="memname"><a class="el" href="classThreadsafeQueue.html">ThreadsafeQueue</a>&lt;<a class="el" href="classTRawEvent.html">TRawEvent</a>&gt;&amp; TDataLoop::output_queue</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="abab0c51ed19f7e3f9d39b9ab4ce3563b"></a>
+<a class="anchor" id="ae407031f85d5850be8171e4127fd295c"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -679,132 +394,12 @@ template&lt;typename T , typename... Params&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classTRawEventSource.html">TRawEventSource</a>* TDataLoop::infile</td>
+          <td class="memname"><a class="el" href="classTRawEventSource.html">TRawEventSource</a>* TDataLoop::source</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aeed81530c7e04997c23f81a249a2703e"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::atomic_bool TDataLoop::initialized</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af41bffc90d9f5fd0598c3347d5c333f2"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::mutex TDataLoop::pause_mutex</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a8abd0733732209d5cfe04fe8bb5529a2"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::atomic_bool TDataLoop::paused</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aa3016306443d4a9499ab570d7b85fd04"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::condition_variable TDataLoop::paused_wait</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a9bdfdfcf22121227572f4585808f5d54"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::thread TDataLoop::read_thread</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af4aab0a794691561d85181acd6520112"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::atomic_bool TDataLoop::running</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -818,7 +413,7 @@ template&lt;typename T , typename... Params&gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 1 2015 15:28:58 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 4 2015 17:27:55 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['can_5fpop',['can_pop',['../classRawDataQueue.html#a859216d81f1007f2ca2b31523c3d6e68',1,'RawDataQueue']]],
-  ['can_5fpush',['can_push',['../classRawDataQueue.html#a81c79cba3b836c13d3913b0617afc428',1,'RawDataQueue']]],
+  ['can_5fpop',['can_pop',['../classRawDataQueue.html#a859216d81f1007f2ca2b31523c3d6e68',1,'RawDataQueue::can_pop()'],['../classThreadsafeQueue.html#aa3fdf6223360f198ae18bbb764f75cbf',1,'ThreadsafeQueue::can_pop()']]],
+  ['can_5fpush',['can_push',['../classRawDataQueue.html#a81c79cba3b836c13d3913b0617afc428',1,'RawDataQueue::can_push()'],['../classThreadsafeQueue.html#aef93460b6b7fd1d45a116c9ef5017bf1',1,'ThreadsafeQueue::can_push()']]],
   ['canvas',['canvas',['../classTStripChart.html#ae70a68872c1c6109580781ec71034d57',1,'TStripChart']]],
-  ['cfd',['cfd',['../classTMode3.html#a63e8ac3849ffcd5b0e7ebc3fff6828d9',1,'TMode3::cfd()'],['../struct____attribute____.html#a27e2b356701649031049005738a5c6de',1,'__attribute__::cfd()'],['../structTRawEvent_1_1____attribute____.html#ad7048c128cbf851fce67326f93aae582',1,'TRawEvent::__attribute__::cfd()']]],
+  ['cfd',['cfd',['../classTMode3Hit.html#a75ed43c61b90c0c2af3aa7733642e89a',1,'TMode3Hit::cfd()'],['../struct____attribute____.html#a27e2b356701649031049005738a5c6de',1,'__attribute__::cfd()'],['../structTRawEvent_1_1____attribute____.html#ad7048c128cbf851fce67326f93aae582',1,'TRawEvent::__attribute__::cfd()']]],
   ['cfd_5fhigh',['cfd_high',['../structGEBMode3Data.html#a881804f9504baf9042565fddb85af385',1,'GEBMode3Data::cfd_high()'],['../structTRawEvent_1_1GEBMode3Data.html#a2a7fc6b7d994280d7caef789cbc985e9',1,'TRawEvent::GEBMode3Data::cfd_high()'],['../TRawBanks_8h.html#ade6b6b02037625119c0d98e535885902',1,'cfd_high():&#160;TRawBanks.h']]],
   ['cfd_5flow',['cfd_low',['../structGEBMode3Data.html#aad22413cd04cf66733cf4c88c7b48c95',1,'GEBMode3Data::cfd_low()'],['../structTRawEvent_1_1GEBMode3Data.html#ad25f6f155e086600b48bfd9bf74fc67f',1,'TRawEvent::GEBMode3Data::cfd_low()'],['../TRawBanks_8h.html#a621f473c4f80a5fedb6e0dd80a5f2314',1,'cfd_low():&#160;TRawBanks.h']]],
   ['cfd_5fmiddle',['cfd_middle',['../structGEBMode3Data.html#a24df4eb6e062dd60fda52609ec3dab84',1,'GEBMode3Data::cfd_middle()'],['../structTRawEvent_1_1GEBMode3Data.html#a3f39822d0acc3a43296f9b834520ecdc',1,'TRawEvent::GEBMode3Data::cfd_middle()'],['../TRawBanks_8h.html#a2ad3df037fefdd9d3a116036fc2f163a',1,'cfd_middle():&#160;TRawBanks.h']]],
@@ -12,11 +12,23 @@ var searchData=
   ['cfd_5fpt2_5fhigh',['cfd_pt2_high',['../structGEBMode3Data.html#abdb9f48fdbc899892c9f558ce4cccefe',1,'GEBMode3Data::cfd_pt2_high()'],['../structTRawEvent_1_1GEBMode3Data.html#a943a4600637f56404905fbd22d8c340f',1,'TRawEvent::GEBMode3Data::cfd_pt2_high()'],['../TRawBanks_8h.html#a37d378d7ae707e3b3d31593df528a26a',1,'cfd_pt2_high():&#160;TRawBanks.h']]],
   ['cfd_5fpt2_5flow',['cfd_pt2_low',['../structGEBMode3Data.html#a5bfed84ba89dc082034fd046fafa19f2',1,'GEBMode3Data::cfd_pt2_low()'],['../structTRawEvent_1_1GEBMode3Data.html#a043536786f15313fc347e633aa8f0d21',1,'TRawEvent::GEBMode3Data::cfd_pt2_low()'],['../TRawBanks_8h.html#a045f1feef9f032ce4470486741b8a05b',1,'cfd_pt2_low():&#160;TRawBanks.h']]],
   ['chan_5fid',['chan_id',['../struct____attribute____.html#ab44e35fee0407f7d388f05dfeab42a43',1,'__attribute__::chan_id()'],['../structTRawEvent_1_1____attribute____.html#a56437c8afdb4c530807dba767e402671',1,'TRawEvent::__attribute__::chan_id()']]],
+  ['channel',['channel',['../classTCrdc.html#a1b918c9da6bcfe00f865ecb852dcb1da',1,'TCrdc']]],
+  ['channel_5ftime',['channel_time',['../structS800TriggerPacket.html#a8a66dee3bdc7e8dd6e8c5697356ae4f8',1,'S800TriggerPacket::channel_time()'],['../structTRawEvent_1_1S800TriggerPacket.html#a6dd58de9fd6d51c4518dcebc001435db',1,'TRawEvent::S800TriggerPacket::channel_time()'],['../TRawBanks_8h.html#a4c1be32254e3838932ca3959a1e71de0',1,'channel_time():&#160;TRawBanks.h']]],
+  ['channel_5ftime_5fnumber',['channel_time_number',['../structS800TriggerPacket.html#abf3da9c9a974d1a205ae673762240263',1,'S800TriggerPacket::channel_time_number()'],['../structTRawEvent_1_1S800TriggerPacket.html#a5ce7566cd3a0054d1c2ad56c6a862a5e',1,'TRawEvent::S800TriggerPacket::channel_time_number()'],['../TRawBanks_8h.html#a3ef8461e242142220fdb83b1edaf6492',1,'channel_time_number():&#160;TRawBanks.h']]],
+  ['channels',['channels',['../classTBank29.html#aceeb023fc4e720ef463b16d678a41f86',1,'TBank29']]],
+  ['charge',['charge',['../classTMode3Hit.html#af7ca623f7c78d7f14a1800a2813b908d',1,'TMode3Hit']]],
   ['chart',['chart',['../structTStripChart_1_1ChartValues.html#aa734e27202eca5ecb151c40ae2d91234',1,'TStripChart::ChartValues']]],
   ['charts',['charts',['../classTStripChart.html#ada59f56c2b1c79c29de0b6383894e267',1,'TStripChart']]],
+  ['check_5fevery',['check_every',['../classTCompiledHistograms.html#a0366b25bd9c15dd6dbdd9f36d4596ec2',1,'TCompiledHistograms']]],
   ['chisq',['chisq',['../struct____attribute____.html#a2a4d023d926e777f2a2c7d306384074f',1,'__attribute__::chisq()'],['../structTRawEvent_1_1____attribute____.html#ae01fb2e5f4d9953ad836380e22d42737',1,'TRawEvent::__attribute__::chisq()']]],
-  ['clock',['clock',['../classRawDataQueue.html#a526a58eb23210f04a3935f8b9dcf1efc',1,'RawDataQueue::clock()'],['../classTRawFile.html#a9e11a77673b35e0cedda48450a51bd35',1,'TRawFile::clock()']]],
+  ['clock',['clock',['../classRawDataQueue.html#a526a58eb23210f04a3935f8b9dcf1efc',1,'RawDataQueue::clock()'],['../classTRawEventByteSource.html#af4d09a367d3547b4c81697de5a4f4f06',1,'TRawEventByteSource::clock()']]],
+  ['coef',['coef',['../structTS800_1_1S800__InvMapLine.html#ae31c4070891cbcaa3bd767c6209f9dc7',1,'TS800::S800_InvMapLine']]],
+  ['compiled_5fhistogram_5ffile',['compiled_histogram_file',['../classTGRUTOptions.html#a596113fe1c27a72d6cf981881a1835d9',1,'TGRUTOptions']]],
+  ['compiled_5fhistograms',['compiled_histograms',['../classTHistogramLoop.html#a46bf72b4516f553024624804d14a8a80',1,'THistogramLoop']]],
+  ['control_5fkey',['control_key',['../classGCanvas.html#aee86f1a9b84df0638fa1afaefb16d84f',1,'GCanvas']]],
   ['core_5fe',['core_e',['../struct____attribute____.html#a48358d2e94cb91592d54d87e49e50140',1,'__attribute__::core_e()'],['../structTRawEvent_1_1____attribute____.html#a5e1a85b643a38be7b59b7fbd87930578',1,'TRawEvent::__attribute__::core_e()']]],
+  ['crdc',['crdc',['../classTS800.html#abb43181af7e334a5c460cdbd5eceecd5',1,'TS800']]],
   ['crmat',['crmat',['../classTGretina.html#a4a641b51b45422f76571366f1e208647',1,'TGretina']]],
-  ['crystal_5fid',['crystal_id',['../struct____attribute____.html#a33892c89ebaa2796cabe91ac8776f1c1',1,'__attribute__::crystal_id()'],['../structTRawEvent_1_1____attribute____.html#ac00b191274b291510e663746da3ab505',1,'TRawEvent::__attribute__::crystal_id()']]]
+  ['crystal_5fid',['crystal_id',['../struct____attribute____.html#a33892c89ebaa2796cabe91ac8776f1c1',1,'__attribute__::crystal_id()'],['../structTRawEvent_1_1____attribute____.html#ac00b191274b291510e663746da3ab505',1,'TRawEvent::__attribute__::crystal_id()']]],
+  ['current_5ftime',['current_time',['../classTRawEventSource.html#addb87fd3a15b250b00e23d93f7f8aac5',1,'TRawEventSource']]]
 ];

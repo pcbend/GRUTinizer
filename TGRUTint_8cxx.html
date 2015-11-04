@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -68,7 +69,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -79,12 +80,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_bc0718b08fb2015b8e59c47b2805f60c.html">libraries</a></li><li class="navelem"><a class="el" href="dir_b12a46877b12129e384daa31d25a18cf.html">TGRUTint</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_dcbde524f0645b06be8c5068343f7c22.html">libraries</a></li><li class="navelem"><a class="el" href="dir_d0dc3fb84c0e05773006e4ac4368d878.html">TGRUTint</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">TGRUTint.cxx File Reference</div>  </div>
 </div><!--header-->
@@ -92,23 +94,68 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="textblock"><code>#include &lt;<a class="el" href="Globals_8h_source.html">Globals.h</a>&gt;</code><br/>
 <code>#include &quot;<a class="el" href="TGRUTint_8h_source.html">TGRUTint.h</a>&quot;</code><br/>
 <code>#include &lt;fstream&gt;</code><br/>
+<code>#include &lt;iostream&gt;</code><br/>
+<code>#include &quot;Getline.h&quot;</code><br/>
+<code>#include &quot;TClass.h&quot;</code><br/>
+<code>#include &quot;TGFileDialog.h&quot;</code><br/>
 <code>#include &quot;TFile.h&quot;</code><br/>
+<code>#include &quot;TH1.h&quot;</code><br/>
+<code>#include &quot;TInterpreter.h&quot;</code><br/>
+<code>#include &quot;<a class="el" href="TMode3_8h_source.html">TMode3.h</a>&quot;</code><br/>
+<code>#include &quot;TPython.h&quot;</code><br/>
+<code>#include &quot;TROOT.h&quot;</code><br/>
+<code>#include &quot;TString.h&quot;</code><br/>
+<code>#include &quot;TTree.h&quot;</code><br/>
+<code>#include &quot;TUnixSystem.h&quot;</code><br/>
+<code>#include &quot;<a class="el" href="GRootGuiFactory_8h_source.html">GRootGuiFactory.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="ProgramPath_8h_source.html">ProgramPath.h</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="TDetectorEnv_8h_source.html">TDetectorEnv.h</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="TGRUTOptions_8h_source.html">TGRUTOptions.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="TGRUTLoop_8h_source.html">TGRUTLoop.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="TObjectManager_8h_source.html">TObjectManager.h</a>&quot;</code><br/>
-<code>#include &lt;TClass.h&gt;</code><br/>
-<code>#include &lt;TROOT.h&gt;</code><br/>
-<code>#include &lt;TString.h&gt;</code><br/>
-<code>#include &lt;TTree.h&gt;</code><br/>
-<code>#include &lt;<a class="el" href="TMode3_8h_source.html">TMode3.h</a>&gt;</code><br/>
+<code>#include &quot;<a class="el" href="TGRUTUtilities_8h_source.html">TGRUTUtilities.h</a>&quot;</code><br/>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a27ff880aa5068a43248f416c13a577f6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TGRUTint_8cxx.html#a27ff880aa5068a43248f416c13a577f6">PopupLogo</a> (bool)</td></tr>
 <tr class="memitem:a3246d1a05a1da11e9321f97802f98617"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TGRUTint_8cxx.html#a3246d1a05a1da11e9321f97802f98617">WaitLogo</a> ()</td></tr>
+<tr class="memitem:a650f863608672daad0d75c8fedb74e4d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TGRUTint_8cxx.html#a650f863608672daad0d75c8fedb74e4d">GetNPipelines</a> ()</td></tr>
+<tr class="memitem:a4a51fa996a3e822c9ea55de976145a84"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classTPipeline.html">TPipeline</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TGRUTint_8cxx.html#a4a51fa996a3e822c9ea55de976145a84">GetPipeline</a> (int i)</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:ac6c8b14077b71af7d38763f5c6093c8d"><td class="memItemLeft" align="right" valign="top">TObject *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TGRUTint_8cxx.html#ac6c8b14077b71af7d38763f5c6093c8d">gResponse</a> = NULL</td></tr>
 </table>
 <h2>Function Documentation</h2>
+<a class="anchor" id="a650f863608672daad0d75c8fedb74e4d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int GetNPipelines </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a4a51fa996a3e822c9ea55de976145a84"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classTPipeline.html">TPipeline</a>* GetPipeline </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a27ff880aa5068a43248f416c13a577f6"></a>
 <div class="memitem">
 <div class="memproto">
@@ -140,10 +187,23 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<h2>Variable Documentation</h2>
+<a class="anchor" id="ac6c8b14077b71af7d38763f5c6093c8d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TObject* gResponse = NULL</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 1 2015 15:28:57 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 4 2015 17:27:54 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

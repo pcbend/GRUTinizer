@@ -37,6 +37,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -70,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -99,10 +100,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a27c48053441f2d8ae96c7ffb383163a7"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#a27c48053441f2d8ae96c7ffb383163a7">~TGRUTint</a> ()</td></tr>
 <tr class="memitem:ad54c5ffdc2e68afb181274d8c9f78641"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#ad54c5ffdc2e68afb181274d8c9f78641">Terminate</a> (Int_t <a class="el" href="DDASBanks_8h.html#aeed08ea57af6f7be240e2bf66162389f">status</a>=0)</td></tr>
-<tr class="memitem:a563d3588f113a55b84e5f36c412a401b"><td class="memItemLeft" align="right" valign="top">Long_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#a563d3588f113a55b84e5f36c412a401b">ProcessLine</a> (const char *line, Bool_t sync=kFALSE, Int_t *error=0)</td></tr>
+<tr class="memitem:a97aead3351ad19446cf8375585f27aa6"><td class="memItemLeft" align="right" valign="top">Long_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#a97aead3351ad19446cf8375585f27aa6">ProcessLine</a> (const char *line, Bool_t sync=kTRUE, Int_t *error=0)</td></tr>
 <tr class="memitem:a42af0a03e32798d34c9470c4c6932573"><td class="memItemLeft" align="right" valign="top">TString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#a42af0a03e32798d34c9470c4c6932573">ReverseObjectSearch</a> (TString &amp;)</td></tr>
-<tr class="memitem:a325ec559c0c239dcbd1d40e7a43b6c3e"><td class="memItemLeft" align="right" valign="top">TObject *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#a325ec559c0c239dcbd1d40e7a43b6c3e">ObjectAppended</a> (TObject *obj)</td></tr>
 <tr class="memitem:ada353c3b045b744c8c45b2cdc2869a29"><td class="memItemLeft" align="right" valign="top">Int_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#ada353c3b045b744c8c45b2cdc2869a29">TabCompletionHook</a> (char *buf, int *pLoc, std::ostream &amp;out)</td></tr>
+<tr class="memitem:a3eb756d210f713a77295a11044b6c608"><td class="memItemLeft" align="right" valign="top">TFile *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#a3eb756d210f713a77295a11044b6c608">OpenRootFile</a> (const std::string &amp;filename, TChain *chain=0)</td></tr>
+<tr class="memitem:ab267ee1ee1b21a383c4321f54280cac9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#ab267ee1ee1b21a383c4321f54280cac9">GetNPipelines</a> ()</td></tr>
+<tr class="memitem:a2044256e1de3dbd81733c1af9fbb3b65"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classTPipeline.html">TPipeline</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#a2044256e1de3dbd81733c1af9fbb3b65">GetPipeline</a> (int i)</td></tr>
+<tr class="memitem:a10638b8c3f6381bc2760cdeae7b9cbe9"><td class="memItemLeft" align="right" valign="top">TObject *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#a10638b8c3f6381bc2760cdeae7b9cbe9">DelayedProcessLine</a> (std::string message)</td></tr>
+<tr class="memitem:a142022fa736e634fab433c01b36e79fd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#a142022fa736e634fab433c01b36e79fd">OpenFileDialog</a> ()</td></tr>
+<tr class="memitem:a6badd96d97fd2d0dc8c11fc4b92b83d3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#a6badd96d97fd2d0dc8c11fc4b92b83d3">DefaultFunction</a> ()</td></tr>
+<tr class="memitem:a9c06b864a01a7b32314c29bc85ee9cbd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#a9c06b864a01a7b32314c29bc85ee9cbd">DelayedProcessLine_ProcessItem</a> ()</td></tr>
+<tr class="memitem:a4d19c6c2f47f5c771aafc65fe54d367c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#a4d19c6c2f47f5c771aafc65fe54d367c">HandleFile</a> (const std::string &amp;filename)</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -111,14 +119,27 @@ Static Public Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
 <tr class="memitem:a1575859a7a87f0addcbbaeca3d9a0228"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#a1575859a7a87f0addcbbaeca3d9a0228">TGRUTint</a> (int argc, char **argv, void *opts=0, int numOptions=0, bool noLogo=true, const char *appClassName=&quot;grutinizer&quot;)</td></tr>
+<tr class="memitem:af00db8968d8c9aa8cd0d86e9cfc6ee45"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#af00db8968d8c9aa8cd0d86e9cfc6ee45">RunMacroFile</a> (const std::string &amp;filename)</td></tr>
+<tr class="memitem:af4a4b81d5eba036f80fa96abeae50ef0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#af4a4b81d5eba036f80fa96abeae50ef0">SetupPipeline</a> ()</td></tr>
 <tr class="memitem:ac4065e8ecb21c1eade63ead949c6f474"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#ac4065e8ecb21c1eade63ead949c6f474">Init</a> ()</td></tr>
 <tr class="memitem:ac6fe70b53f06036fc3de0935a7bd7fa9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#ac6fe70b53f06036fc3de0935a7bd7fa9">ApplyOptions</a> ()</td></tr>
+<tr class="memitem:afa799c7e039f13a6d26ecaf0e236e446"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#afa799c7e039f13a6d26ecaf0e236e446">LoadGRootGraphics</a> ()</td></tr>
 <tr class="memitem:ae6880f699aade467c09bfa0bc08dec96"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#ae6880f699aade467c09bfa0bc08dec96">ClassDef</a> (<a class="el" href="classTGRUTint.html">TGRUTint</a>, 0)</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:af35ff7ab0d487caa076a3dcea1729482"><td class="memItemLeft" align="right" valign="top">TObject *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#af35ff7ab0d487caa076a3dcea1729482">fNewChild</a></td></tr>
+<tr class="memitem:a3655aed9a663a583830187c02ac29ea2"><td class="memItemLeft" align="right" valign="top">std::mutex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#a3655aed9a663a583830187c02ac29ea2">fCommandListMutex</a></td></tr>
+<tr class="memitem:ac4fedbf07fc5cb938419f1af7fd97358"><td class="memItemLeft" align="right" valign="top">std::mutex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#ac4fedbf07fc5cb938419f1af7fd97358">fResultListMutex</a></td></tr>
+<tr class="memitem:ac82e75bfbd09d5f8a39d2c1e2656f39a"><td class="memItemLeft" align="right" valign="top">std::mutex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#ac82e75bfbd09d5f8a39d2c1e2656f39a">fCommandWaitingMutex</a></td></tr>
+<tr class="memitem:ae9de6aea1bec9a74b1a50ac70914d2d1"><td class="memItemLeft" align="right" valign="top">std::condition_variable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#ae9de6aea1bec9a74b1a50ac70914d2d1">fNewResult</a></td></tr>
+<tr class="memitem:aba7d02c5fa17fe60cb4db8cb82ae23a2"><td class="memItemLeft" align="right" valign="top">TTimer *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#aba7d02c5fa17fe60cb4db8cb82ae23a2">fGuiTimer</a></td></tr>
+<tr class="memitem:ab392b5d52a3cc729271f0f3bf6381c68"><td class="memItemLeft" align="right" valign="top">TTimer *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#ab392b5d52a3cc729271f0f3bf6381c68">fCommandTimer</a></td></tr>
+<tr class="memitem:a2cfdffab014bc5aca544967a8d091958"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classTGRUTServer.html">TGRUTServer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#a2cfdffab014bc5aca544967a8d091958">fCommandServer</a></td></tr>
+<tr class="memitem:ac164679b97a7a41254b1f46cedc56d88"><td class="memItemLeft" align="right" valign="top">std::queue&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#ac164679b97a7a41254b1f46cedc56d88">fLinesToProcess</a></td></tr>
+<tr class="memitem:aea0b9fdf8a446218c9daa0e2254d4871"><td class="memItemLeft" align="right" valign="top">std::queue&lt; TObject * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#aea0b9fdf8a446218c9daa0e2254d4871">fCommandResults</a></td></tr>
+<tr class="memitem:a23a76667aa6603aa16ecd44d4aa76698"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#a23a76667aa6603aa16ecd44d4aa76698">fRootFilesOpened</a></td></tr>
 <tr class="memitem:a34084c88329726b887ca58937a660fe4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#a34084c88329726b887ca58937a660fe4">fIsTabComplete</a></td></tr>
+<tr class="memitem:a19097f91523b47518046f221a6b1583c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classTPipeline.html">TPipeline</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classTGRUTint.html#a19097f91523b47518046f221a6b1583c">fPipeline</a></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pri-static-attribs"></a>
 Static Private Attributes</h2></td></tr>
@@ -265,6 +286,99 @@ Static Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a6badd96d97fd2d0dc8c11fc4b92b83d3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TGRUTint::DefaultFunction </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a10638b8c3f6381bc2760cdeae7b9cbe9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TObject * TGRUTint::DelayedProcessLine </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>message</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a9c06b864a01a7b32314c29bc85ee9cbd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TGRUTint::DelayedProcessLine_ProcessItem </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ab267ee1ee1b21a383c4321f54280cac9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int TGRUTint::GetNPipelines </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a2044256e1de3dbd81733c1af9fbb3b65"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classTPipeline.html">TPipeline</a> * TGRUTint::GetPipeline </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a4d19c6c2f47f5c771aafc65fe54d367c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TGRUTint::HandleFile </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="ac4065e8ecb21c1eade63ead949c6f474"></a>
 <div class="memitem">
 <div class="memproto">
@@ -346,15 +460,37 @@ Static Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a325ec559c0c239dcbd1d40e7a43b6c3e"></a>
+<a class="anchor" id="afa799c7e039f13a6d26ecaf0e236e446"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TGRUTint::LoadGRootGraphics </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a142022fa736e634fab433c01b36e79fd"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">TObject * TGRUTint::ObjectAppended </td>
+          <td class="memname">void TGRUTint::OpenFileDialog </td>
           <td>(</td>
-          <td class="paramtype">TObject *&#160;</td>
-          <td class="paramname"><em>obj</em></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -362,7 +498,33 @@ Static Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a563d3588f113a55b84e5f36c412a401b"></a>
+<a class="anchor" id="a3eb756d210f713a77295a11044b6c608"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TFile * TGRUTint::OpenRootFile </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>filename</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">TChain *&#160;</td>
+          <td class="paramname"><em>chain</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a97aead3351ad19446cf8375585f27aa6"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -376,7 +538,7 @@ Static Private Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Bool_t&#160;</td>
-          <td class="paramname"><em>sync</em> = <code>kFALSE</code>, </td>
+          <td class="paramname"><em>sync</em> = <code>kTRUE</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -406,6 +568,53 @@ Static Private Attributes</h2></td></tr>
           <td></td>
         </tr>
       </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af00db8968d8c9aa8cd0d86e9cfc6ee45"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TGRUTint::RunMacroFile </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af4a4b81d5eba036f80fa96abeae50ef0"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TGRUTint::SetupPipeline </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>
@@ -467,6 +676,106 @@ Static Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2>Member Data Documentation</h2>
+<a class="anchor" id="a3655aed9a663a583830187c02ac29ea2"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::mutex TGRUTint::fCommandListMutex</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aea0b9fdf8a446218c9daa0e2254d4871"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::queue&lt;TObject*&gt; TGRUTint::fCommandResults</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a2cfdffab014bc5aca544967a8d091958"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classTGRUTServer.html">TGRUTServer</a>* TGRUTint::fCommandServer</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ab392b5d52a3cc729271f0f3bf6381c68"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">TTimer* TGRUTint::fCommandTimer</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ac82e75bfbd09d5f8a39d2c1e2656f39a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::mutex TGRUTint::fCommandWaitingMutex</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a5798457a1a3cf3ab78927adc950a6701"></a>
 <div class="memitem">
 <div class="memproto">
@@ -481,6 +790,26 @@ Static Private Attributes</h2></td></tr>
   </td>
   <td class="mlabels-right">
 <span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aba7d02c5fa17fe60cb4db8cb82ae23a2"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">TTimer* TGRUTint::fGuiTimer</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -507,7 +836,7 @@ Static Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="af35ff7ab0d487caa076a3dcea1729482"></a>
+<a class="anchor" id="ac164679b97a7a41254b1f46cedc56d88"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -515,7 +844,87 @@ Static Private Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">TObject* TGRUTint::fNewChild</td>
+          <td class="memname">std::queue&lt;std::string&gt; TGRUTint::fLinesToProcess</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ae9de6aea1bec9a74b1a50ac70914d2d1"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::condition_variable TGRUTint::fNewResult</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a19097f91523b47518046f221a6b1583c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classTPipeline.html">TPipeline</a>* TGRUTint::fPipeline</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ac4fedbf07fc5cb938419f1af7fd97358"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::mutex TGRUTint::fResultListMutex</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a23a76667aa6603aa16ecd44d4aa76698"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int TGRUTint::fRootFilesOpened</td>
         </tr>
       </table>
   </td>
@@ -554,7 +963,7 @@ Static Private Attributes</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Sep 1 2015 15:28:58 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 4 2015 17:27:56 for GRUTinizer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>
