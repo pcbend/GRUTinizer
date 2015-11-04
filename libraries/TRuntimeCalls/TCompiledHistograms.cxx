@@ -92,6 +92,9 @@ void TCompiledHistograms::Fill(TUnpackedEvent& detectors) {
     return;
   }
 
+  TPreserveGDirectory preserve;
+  default_directory->cd();
+
   TRuntimeObjects obj(detectors, &objects, &variables);
   func(obj);
 }

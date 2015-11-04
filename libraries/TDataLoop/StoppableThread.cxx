@@ -8,8 +8,8 @@ StoppableThread::StoppableThread()
 }
 
 StoppableThread::~StoppableThread() {
-  running = false;
-  thread.join();
+  Stop();
+  Join();
 }
 
 void StoppableThread::Resume() {
@@ -57,6 +57,4 @@ void StoppableThread::Loop() {
       break;
     }
   }
-
-  std::cout << "End of thread, running = " << running << std::endl;
 }

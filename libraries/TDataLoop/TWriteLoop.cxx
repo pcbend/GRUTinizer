@@ -33,6 +33,7 @@ bool TWriteLoop::Iteration() {
 }
 
 void TWriteLoop::Write() {
+  EndLearningPhase();
   TPreserveGDirectory preserve;
   output_dir.cd();
   event_tree->Write();
@@ -56,6 +57,7 @@ void TWriteLoop::LearningPhase(TUnpackedEvent* event) {
       TDetector** det = new TDetector*;
       *det = (TDetector*)cls->New();
       det_map[cls] = det;
+      // TODO: Place this mutex here
       event_tree->Branch(cls->GetName(), cls->GetName(), det);
     }
   }

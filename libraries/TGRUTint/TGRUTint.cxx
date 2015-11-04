@@ -2,6 +2,7 @@
 #include "TGRUTint.h"
 
 #include <fstream>
+#include <iostream>
 
 #include "Getline.h"
 #include "TClass.h"
@@ -236,22 +237,22 @@ void TGRUTint::HandleFile(const std::string& filename){
 
   kFileType filetype = opt->DetermineFileType(filename);
   switch(filetype){
-  case NSCL_EVT:
-  case GRETINA_MODE2:
-  case GRETINA_MODE3:
-    //TODO, make this part work.
-  break;
+    case NSCL_EVT:
+    case GRETINA_MODE2:
+    case GRETINA_MODE3:
+      //TODO, make this part work.
+      break;
 
-  case ROOT_DATA:
-    OpenRootFile(filename);
-    break;
+    case ROOT_DATA:
+      OpenRootFile(filename);
+      break;
 
-  case ROOT_MACRO:
-    RunMacroFile(filename);
-    break;
+    case ROOT_MACRO:
+      RunMacroFile(filename);
+      break;
 
-  default:
-    std::cerr << "Unknown file type for " << filename << std::endl;
+    default:
+      std::cerr << "Unknown file type for " << filename << std::endl;
   }
 }
 
@@ -267,7 +268,7 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   // If you print while fIsTabComplete is true, you will break tab complete.
   // Any diagnostic print statements should be done after this if statement.
   if(fIsTabComplete){
-    return TRint::ProcessLine(line, sync, error);
+    return TRint::ProcessLine(line, true, error);
   }
   TString sline(line);
   if(!sline.Length()){
@@ -280,11 +281,11 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
      sline.Contains("if") ||
      sline.Contains("{") ||
      sline.Contains("TPython")){
-     return TRint::ProcessLine(sline.Data(), sync, error);
+    return TRint::ProcessLine(sline.Data(), true, error);
   }
 
   if(!sline.CompareTo("clear")) {
-    return TRint::ProcessLine(".! clear");
+    return TRint::ProcessLine(".! clear", true);
   }
 
   Ssiz_t index;
@@ -302,7 +303,7 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   }
 
 
-  long result =  TRint::ProcessLine(sline.Data(),sync,error);
+  long result =  TRint::ProcessLine(sline.Data(),true,error);
   return result;
 }
 
@@ -412,4 +413,25 @@ void TGRUTint::DelayedProcessLine_ProcessItem(){
   }
 
   fNewResult.notify_one();
+}
+
+
+int TGRUTint::GetNPipelines() {
+  return 1;
+}
+
+TPipeline* TGRUTint::GetPipeline(int i) {
+  if(i==0){
+    return fPipeline;
+  } else {
+    return NULL;
+  }
+}
+
+int GetNPipelines() {
+  return TGRUTint::instance()->GetNPipelines();
+}
+
+TPipeline* GetPipeline(int i) {
+  return TGRUTint::instance()->GetPipeline(i);
 }

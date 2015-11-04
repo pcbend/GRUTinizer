@@ -19,6 +19,10 @@ public:
 
   void Write();
 
+  void SetReplaceVariable(const char* name, double value);
+  void RemoveVariable(const char* name);
+  TList* GetVariables();
+
 protected:
   bool Iteration();
 

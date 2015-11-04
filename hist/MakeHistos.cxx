@@ -65,7 +65,6 @@ TH1 *GetHistogram(TList *list, std::string histname,int xbins,double xlow,double
   TH1   *hist = (TH1*)list->FindObject(histname.c_str());
   if(!hist) {
     hist= new TH1I(histname.c_str(),histname.c_str(),xbins,xlow,xhigh);
-    hist->SetDirectory(0);
     list->Add(hist);
   }
   return hist;
@@ -78,7 +77,6 @@ TH2 *GetMatrix(TList *list, std::string histname,int xbins, double xlow,double x
   if(!mat) {
     mat = new TH2I(histname.c_str(),histname.c_str(),xbins,xlow,xhigh,
                                                      ybins,ylow,yhigh);
-    mat->SetDirectory(0);
     list->Add(mat);
   }
   return mat;

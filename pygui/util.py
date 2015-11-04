@@ -18,7 +18,7 @@ def update_tcanvases(objects=None):
         objects = ROOT.gROOT.GetListOfCanvases()
 
     for obj in objects:
-        if obj.InheritsFrom('TPad'):
+        if isinstance(obj, ROOT.TPad):
             obj.Modified()
             obj.Update()
             update_tcanvases(obj.GetListOfPrimitives())
@@ -52,7 +52,7 @@ class PreserveGDir(object):
 class TKeyDict(dict):
     def __getitem__(self, key):
         output = super(TKeyDict,self).__getitem__(key)
-        if output.InheritsFrom('TKey'):
+        if isinstance(output, ROOT.TKey):
             print 'Reading key ',output.GetName()
             value = output.ReadObj().Clone()
             value.SetDirectory(0)
@@ -65,6 +65,6 @@ class TKeyDict(dict):
     def is_tkey(self, key):
         output = super(TKeyDict,self).__getitem__(key)
         try:
-            return output.InheritsFrom('TKey')
+            return isinstance(output, ROOT.TKey)
         except AttributeError:
             return False

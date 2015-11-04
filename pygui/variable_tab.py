@@ -49,9 +49,9 @@ class VariableTab(object):
         self.treeview.bind("<Double-1>",self.VariableSelection)
 
     def SetReplaceVariable(self, name, value):
-        outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
-        if outfile:
-            outfile.GetCompiledHistograms().SetReplaceVariable(name, value)
+        pipeline = ROOT.GetPipeline(0)
+        if pipeline:
+            pipeline.SetReplaceVariable(name, value)
 
         self.variables[name] = value
 
@@ -61,9 +61,9 @@ class VariableTab(object):
             self.treeview.insert('','end',name, text=name, values=(str(value),))
 
     def DeleteVariable(self, name):
-        outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
-        if outfile:
-            outfile.GetCompiledHistograms().RemoveVariable(name)
+        pipeline = ROOT.GetPipeline(0)
+        if pipeline:
+            pipeline.RemoveVariable(name, value)
 
         self.variables.pop(name, None)
         self.treeview.delete(name)
@@ -93,13 +93,13 @@ class VariableTab(object):
         self.var_value.set(str(self.variables[name]))
 
     def _dump_to_tfile(self):
-        outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
-        if not outfile:
+        pipeline = ROOT.GetPipeline(0)
+        if not pipeline:
             return
 
         tdir = ROOT.gDirectory.mkdir('variables')
         with PreserveGDir(tdir):
-            for obj in outfile.GetCompiledHistograms().GetVariables():
+            for obj in pipeline.GetVariables():
                 obj.Write()
 
     def _variable_patterns(self):
@@ -111,7 +111,8 @@ class VariableTab(object):
 
     def AddFile(self, tfile):
         tdir = tfile.GetListOfKeys().FindObject('variables')
-        if tdir and ROOT.TClass(tdir.GetClassName()).InheritsFrom('TDirectory'):
+        if (tdir and
+            issubclass(getattr(ROOT, tdir.GetClassName()), ROOT.TDirectory)):
             tdir = tdir.ReadObj()
             for key in tdir.GetListOfKeys():
                 obj = key.ReadObj()

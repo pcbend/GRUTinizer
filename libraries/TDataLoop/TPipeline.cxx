@@ -19,7 +19,7 @@
 #include "TWriteLoop.h"
 
 TPipeline::TPipeline()
-  : output_file(NULL),
+  : output_file(NULL), output_directory(NULL),
     data_loop(NULL), unpack_loop(NULL), root_input_loop(NULL),
     histogram_loop(NULL), write_loop(NULL), terminal_loop(NULL),
     is_online(false), time_order(false), time_order_depth(1000) { }
@@ -79,7 +79,7 @@ int TPipeline::Initialize() {
 
   TPreserveGDirectory preserve;
   SetupOutputFile();
-  GetDirectory().cd();
+  GetDirectory()->cd();
 
   SetupHistogramLoop();
   SetupOutputLoop();
@@ -123,19 +123,18 @@ void TPipeline::SetupOutputFile() {
     output_file = new TFile(output_root_file.c_str(), "RECREATE");
     output_directory = output_file;
   } else {
-    // TODO: Does this work, or do I need to explicitly give it a name?
-    output_directory = new TDirectory;
+    output_directory = new TDirectory("_", "_");
   }
 }
 
-TDirectory& TPipeline::GetDirectory() {
-  return *output_directory;
+TDirectory* TPipeline::GetDirectory() {
+  return output_directory;
 }
 
 void TPipeline::SetupHistogramLoop() {
   histogram_loop = new THistogramLoop(unpacked_event_queue,
                                       post_histogram_queue,
-                                      &GetDirectory());
+                                      GetDirectory());
   if (histogram_library.length()){
     histogram_loop->LoadLibrary(histogram_library);
   }
@@ -144,7 +143,7 @@ void TPipeline::SetupHistogramLoop() {
 
 void TPipeline::SetupOutputLoop() {
   if(output_root_file.length() && !input_root_files.size()){
-    write_loop = new TWriteLoop(post_histogram_queue, GetDirectory());
+    write_loop = new TWriteLoop(post_histogram_queue, *GetDirectory());
     pipeline.push_back(write_loop);
   } else {
     terminal_loop = new TTerminalLoop(post_histogram_queue);
@@ -186,6 +185,13 @@ void TPipeline::Start() {
   }
 
   Resume();
+
+  // TODO: Use mutexes to prevent this sleep from being needed
+  //       The problem is that TTree::Branch is not threadsafe.
+  //       I can't find everywhere that needs a mutex to prevent this.
+  while(InLearningPhase()){
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
 }
 
 void TPipeline::Stop() {
@@ -213,22 +219,23 @@ void TPipeline::Join() {
 }
 
 std::string TPipeline::Status() {
-  std::stringstream ss;
-  ss << raw_event_queue.ItemsPushed() << "/" << raw_event_queue.ItemsPopped() << "\t"
-     << unpacked_event_queue.ItemsPushed() << "/" << unpacked_event_queue.ItemsPopped() << "\t"
-     << post_histogram_queue.ItemsPushed() << "/" << post_histogram_queue.ItemsPopped();
-  return ss.str();
+  // TODO: Give clear summary of each queue, not just the first element of the loop.
+  // std::stringstream ss;
+  // ss << raw_event_queue.ItemsPushed() << "/" << raw_event_queue.ItemsPopped() << "\t"
+  //    << unpacked_event_queue.ItemsPushed() << "/" << unpacked_event_queue.ItemsPopped() << "\t"
+  //    << post_histogram_queue.ItemsPushed() << "/" << post_histogram_queue.ItemsPopped();
+  // return ss.str();
 
-  // if(pipeline.size()){
-  //   return pipeline[0]->Status();
-  // } else {
-  //   return "";
-  // }
+  if(pipeline.size()){
+    return pipeline[0]->Status();
+  } else {
+    return "";
+  }
 }
 
 void TPipeline::Write() {
   TPreserveGDirectory(preserve);
-  GetDirectory().cd();
+  GetDirectory()->cd();
   if(histogram_loop) {
     histogram_loop->Write();
   }
@@ -247,6 +254,13 @@ void TPipeline::SetOutputRootFile(std::string filename) {
 
 void TPipeline::SetHistogramLibrary(std::string filename) {
   histogram_library = filename;
+  if(histogram_loop) {
+    histogram_loop->LoadLibrary(filename);
+  }
+}
+
+std::string TPipeline::GetHistogramLibrary() const {
+  return histogram_library;
 }
 
 void TPipeline::SetInputRing(std::string ringname) {
@@ -263,4 +277,45 @@ void TPipeline::SetTimeOrdering(bool time_order) {
 
 void TPipeline::AddInputRootFile(std::string filename) {
   input_root_files.push_back(filename);
+}
+
+void TPipeline::ClearHistograms() {
+  if(histogram_loop) {
+    histogram_loop->ClearHistograms();
+  }
+}
+
+void TPipeline::ReplaceRawDataFile(std::string filename) {
+  TRawEventSource* event_source = OpenSingleFile(filename);
+  delete data_loop;
+  data_loop = new TDataLoop(event_source, raw_event_queue);
+}
+
+
+void TPipeline::SetReplaceVariable(const char* name, double value){
+  if(histogram_loop) {
+    histogram_loop->SetReplaceVariable(name, value);
+  }
+}
+
+void TPipeline::RemoveVariable(const char* name) {
+  if(histogram_loop) {
+    histogram_loop->RemoveVariable(name);
+  }
+}
+
+TList* TPipeline::GetVariables() {
+  if(histogram_loop) {
+    return histogram_loop->GetVariables();
+  } else {
+    return NULL;
+  }
+}
+
+bool TPipeline::InLearningPhase() {
+  if(write_loop){
+    return write_loop->InLearningPhase();
+  } else {
+    return false;
+  }
 }

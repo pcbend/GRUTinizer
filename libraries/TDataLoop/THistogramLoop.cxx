@@ -44,3 +44,15 @@ void THistogramLoop::LoadLibrary(std::string library) {
 std::string THistogramLoop::GetLibraryName() const {
   return compiled_histograms.GetLibraryName();
 }
+
+void THistogramLoop::SetReplaceVariable(const char* name, double value) {
+  compiled_histograms.SetReplaceVariable(name, value);
+}
+
+void THistogramLoop::RemoveVariable(const char* name) {
+  compiled_histograms.RemoveVariable(name);
+}
+
+TList* THistogramLoop::GetVariables() {
+  return compiled_histograms.GetVariables();
+}

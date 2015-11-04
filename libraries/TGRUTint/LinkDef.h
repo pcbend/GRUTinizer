@@ -22,4 +22,7 @@
 
 #pragma link C++ global gResponse;
 
+#pragma link C++ function GetNPipelines;
+#pragma link C++ function GetPipeline;
+
 #endif

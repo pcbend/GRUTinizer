@@ -44,7 +44,8 @@ public:
 
   TFile* OpenRootFile(const std::string& filename,TChain *chain=0);
 
-  TPipeline* GetPipeline() { return fPipeline; }
+  int GetNPipelines();
+  TPipeline* GetPipeline(int i);
 
 public:
   TObject* DelayedProcessLine(std::string message);
@@ -87,6 +88,9 @@ private:
   ClassDef(TGRUTint,0);
 };
 
+
+int GetNPipelines();
+TPipeline* GetPipeline(int i);
 
 class TGRUTInterruptHandler : public TSignalHandler {
 public:

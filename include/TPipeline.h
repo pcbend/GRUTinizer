@@ -34,16 +34,32 @@ public:
   std::string Status();
   void Write();
 
-  TDirectory& GetDirectory();
 
+  TDirectory* GetDirectory();
+  ///////////////////////////////////////////////////////////////
+  /// These are safe to called after the pipeline has started ///
+  ///////////////////////////////////////////////////////////////
+  void ClearHistograms();
+  void ReplaceRawDataFile(std::string filename);
+
+  /// Sets the histogram library to be used.
+  void SetHistogramLibrary(std::string filename);
+  std::string GetHistogramLibrary() const;
+
+  void SetReplaceVariable(const char* name, double value);
+  void RemoveVariable(const char* name);
+  TList* GetVariables();
+
+  bool InLearningPhase();
+
+  ///////////////////////////////////////////////////////////////
+  /// These should only be called before calling "initialize" ///
+  ///////////////////////////////////////////////////////////////
   /// Adds a raw data file.  If called multiple times, will open files sequentially.
   void AddRawDataFile(std::string filename);
 
   /// Sets the output root file.
   void SetOutputRootFile(std::string filename);
-
-  /// Sets the histogram library to be used.
-  void SetHistogramLibrary(std::string filename);
 
   /// When reading a raw data file, should it be repeatedly checked for new data.
   void SetIsOnline(bool is_online);
