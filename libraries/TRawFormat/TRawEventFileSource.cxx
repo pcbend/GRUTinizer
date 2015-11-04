@@ -15,8 +15,14 @@ TRawEventFileSource::~TRawEventFileSource() {
 int TRawEventFileSource::ReadBytes(char* buf, size_t size){
   size_t output = fread(buf, 1, size, fFile);
   if(output != size){
-    SetLastErrno(ferror(fFile));
-    SetLastError(strerror(GetLastErrno()));
+    if(feof(fFile)){
+      SetLastErrno(-1);
+      SetLastError("EOF");
+    } else {
+      int error = ferror(fFile);
+      SetLastErrno(error);
+      SetLastError(strerror(error));
+    }
   }
   return output;
 }

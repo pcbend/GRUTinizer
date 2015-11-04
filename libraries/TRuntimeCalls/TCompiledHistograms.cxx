@@ -13,27 +13,23 @@
 
 #include "FullPath.h"
 #include "GValue.h"
+#include "TPreserveGDirectory.h"
 
 typedef void* __attribute__((__may_alias__)) void_alias;
 
 TCompiledHistograms::TCompiledHistograms()
   : libname(""), library(nullptr), func(nullptr),
-    last_modified(0), last_checked(0), check_every(5){
-  detectors.SetOwner(false);
-}
+    last_modified(0), last_checked(0), check_every(5),
+    default_directory(0) { }
 
 TCompiledHistograms::TCompiledHistograms(std::string libname)
-  : libname(full_path(libname)), check_every(5) {
+  : libname(full_path(libname)), check_every(5),
+    default_directory(0) {
   library = std::make_shared<DynamicLibrary>(this->libname.c_str(), true);
   // Casting required to keep gcc from complaining.
   *(void_alias*)(&func) = library->GetSymbol("MakeHistograms");
   last_modified = get_timestamp();
   last_checked = time(NULL);
-  detectors.SetOwner(false);
-}
-
-void TCompiledHistograms::RegisterDetector(TDetector* det){
-  detectors.Add(det);
 }
 
 void TCompiledHistograms::ClearHistograms() {
@@ -49,25 +45,6 @@ void TCompiledHistograms::ClearHistograms() {
   }
 }
 
-TList* TCompiledHistograms::GetHistograms() {
-  std::lock_guard<std::mutex> lock(mutex);
-
-  TList* output = new TList;
-  output->SetOwner(false);
-
-  TIter iter(&objects);
-  TObject* obj = NULL;
-  while((obj = iter.Next())){
-    if(obj->InheritsFrom(TH1::Class()) || 
-       (obj->InheritsFrom(TDirectory::Class()) &&
-	!obj->InheritsFrom(TFile::Class()))){
-      output->Add(obj);
-    }
-  }
-
-  return output;
-}
-
 time_t TCompiledHistograms::get_timestamp() {
   struct stat buf;
   stat(libname.c_str(), &buf);
@@ -76,6 +53,13 @@ time_t TCompiledHistograms::get_timestamp() {
 
 bool TCompiledHistograms::file_exists() {
   return std::ifstream(libname);
+}
+
+void TCompiledHistograms::Write() {
+  objects.Write();
+  TPreserveGDirectory preserve;
+  gDirectory->mkdir("variables")->cd();
+  variables.Write();
 }
 
 void TCompiledHistograms::Load(std::string libname) {
@@ -101,7 +85,7 @@ void TCompiledHistograms::swap_lib(TCompiledHistograms& other) {
   std::swap(check_every, other.check_every);
 }
 
-void TCompiledHistograms::Fill() {
+void TCompiledHistograms::Fill(TUnpackedEvent& detectors) {
   std::lock_guard<std::mutex> lock(mutex);
   if(time(NULL) > last_checked + check_every){
     Reload();
@@ -111,7 +95,10 @@ void TCompiledHistograms::Fill() {
     return;
   }
 
-  TRuntimeObjects obj(&detectors, &objects, &variables);
+  TPreserveGDirectory preserve;
+  default_directory->cd();
+
+  TRuntimeObjects obj(detectors, &objects, &variables);
   func(obj);
 }
 

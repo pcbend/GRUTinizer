@@ -90,9 +90,9 @@ class TCutTab(object):
         self.tree.insert('', 'end', name, text=name, values='2D Cut',
                          image = self.main.icons['tcutg'])
 
-        outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
-        if outfile:
-            outfile.GetCompiledHistograms().GetObjects().Add(cut)
+        pipeline = ROOT.GetPipeline(0)
+        if pipeline:
+            pipeline.GetDirectory().GetList().Add(cut)
         if ROOT.gPad:
             ROOT.gPad.Modified()
             ROOT.gPad.Update()

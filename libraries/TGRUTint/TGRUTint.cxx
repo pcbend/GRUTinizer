@@ -2,6 +2,7 @@
 #include "TGRUTint.h"
 
 #include <fstream>
+#include <iostream>
 
 #include "Getline.h"
 #include "TClass.h"
@@ -20,7 +21,6 @@
 #include "ProgramPath.h"
 #include "TDetectorEnv.h"
 #include "TGRUTOptions.h"
-#include "TGRUTLoop.h"
 #include "TGRUTUtilities.h"
 
 //extern "C" G__value G__getitem(const char* item);
@@ -48,7 +48,8 @@ TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions
 
 TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t noLogo,const char *appClassName)
   :TRint(appClassName, &argc, argv, options, numOptions,noLogo),
-   fCommandServer(NULL), fGuiTimer(NULL), fCommandTimer(NULL), fRootFilesOpened(0), fIsTabComplete(false) {
+   fCommandServer(NULL), fGuiTimer(NULL), fCommandTimer(NULL), fRootFilesOpened(0),
+   fIsTabComplete(false), fPipeline(NULL) {
 
   fGRUTEnv = gEnv;
   GetSignalHandler()->Remove();
@@ -72,25 +73,10 @@ TGRUTint::~TGRUTint() {
 
 
 void TGRUTint::Init() {
-  TGRUTLoop::CreateDataLoop<TGRUTLoop>();
-  fChain = new TChain("EventTree");
-
   if(TGRUTOptions::Get()->ShouldExit()){
     Terminate();
     return;
   }
-  //printf("%s called.\n",__PRETTY_FUNCTION__);
-//  TMode3 *mode3 = new TMode3;
-//  mode3->Class();
-
-  // TFile *tempfile = TFile::Open("/var/tmp/mytemp.root","recreate");
-  // TTree *temptree = new TTree("temp","temp");
-  // TMode3 *mode3=0;
-  // temptree->Branch("TMode3","TMode3",&mode3);
-  // temptree->Fill();
-  // temptree->Write();
-  // delete tempfile;
-  // gSystem->Unlink("/var/tmp/mytemp.root");
 
   std::string grutpath = getenv("GRUTSYS");
 
@@ -127,38 +113,12 @@ void TGRUTint::ApplyOptions() {
 
   TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
 
-  bool need_loop = false;
-  if(opt->RawInputFiles().size()==1 && opt->SortRaw()){
-    std::string filename = opt->RawInputFiles()[0];
-    std::string outfile = opt->OutputFile();
-    if(!outfile.length() && !opt->IsOnline()){
-      outfile = opt->GenerateOutputFilename(filename);
-    }
-    TGRUTLoop::Get()->ProcessFile(filename.c_str(), outfile.c_str());
-    need_loop = true;
-
-  } else if (opt->RawInputFiles().size()>1 && opt->SortRaw()){
-    std::vector<std::string> filenames = opt->RawInputFiles();
-    std::string outfile = opt->OutputFile();
-    if(!outfile.length() && !opt->IsOnline()){
-      outfile = opt->GenerateOutputFilename(filenames);
-    }
-    TGRUTLoop::Get()->ProcessFile(filenames, outfile.c_str());
-    need_loop = true;
-  }
+  SetupPipeline();
 
   if(!opt->StartGUI()) {
     for(auto& filename : opt->RootInputFiles()){
       OpenRootFile(filename);
     }
-  }
-
-  for(auto& filename : opt->MacroInputFiles()){
-    RunMacroFile(filename);
-  }
-
-  if(opt->SortTree() && !opt->StartGUI()) {
-    opt->SetStartGUI();
   }
 
   if(opt->StartGUI()){
@@ -185,19 +145,22 @@ void TGRUTint::ApplyOptions() {
     fGuiTimer->TurnOn();
   }
 
-  if(opt->SortTree() && fChain->GetEntries()){
-    TGRUTLoop::Get()->ProcessTree(fChain, "/dev/null");
-    need_loop = true;
+  for(auto& filename : opt->MacroInputFiles()){
+    RunMacroFile(filename);
   }
 
-  if (need_loop){
-    TGRUTLoop::Get()->Start();
+  if(fPipeline->CanStart()){
+    fPipeline->Start();
   }
 
   if(opt->ExitAfterSorting()){
-    TGRUTLoop::Get()->Status();
-    std::cout << "Waiting for join" << std::endl;
-    TGRUTLoop::Get()->Join();
+    while(!fPipeline->IsFinished()){
+      std::cout << "\r" << fPipeline->Status() << std::flush;
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+    std::cout << std::endl;
+    fPipeline->Write();
+
     this->Terminate();
   } else if(opt->CommandServer()) {
     fCommandServer = new TGRUTServer(opt->CommandPort());
@@ -205,6 +168,35 @@ void TGRUTint::ApplyOptions() {
     fCommandTimer = new TTimer("",10);
     fCommandTimer->TurnOn();
   }
+}
+
+void TGRUTint::SetupPipeline() {
+  TGRUTOptions* opt = TGRUTOptions::Get();
+
+  fPipeline = new TPipeline;
+  for(auto& filename : opt->RawInputFiles()){
+    fPipeline->AddRawDataFile(filename);
+  }
+
+  if(opt->OutputFile().length()){
+    fPipeline->SetOutputRootFile(opt->OutputFile());
+  }
+
+  if(opt->CompiledHistogramFile().length()) {
+    fPipeline->SetHistogramLibrary(opt->CompiledHistogramFile());
+  }
+
+  if(opt->SortTree()){
+    for(auto& filename : opt->RootInputFiles()){
+      fPipeline->AddInputRootFile(filename);
+    }
+  }
+
+  if(opt->InputRing().length()){
+    fPipeline->SetInputRing(opt->InputRing());
+  }
+
+  fPipeline->SetIsOnline(opt->IsOnline());
 }
 
 void TGRUTint::DefaultFunction(){
@@ -226,9 +218,6 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, TChain *chain){
   TFile *file = (TFile*)gROOT->GetListOfFiles()->FindObject(filename.c_str());
   if(file){
     std::cout << "\tfile " << file->GetName() << " opened as _file" << fRootFilesOpened << std::endl;
-    if(file->FindObjectAny("EventTree")) {
-      fChain->Add(file->GetName());
-    }
   }
 
   fRootFilesOpened++;
@@ -255,28 +244,22 @@ void TGRUTint::HandleFile(const std::string& filename){
 
   kFileType filetype = opt->DetermineFileType(filename);
   switch(filetype){
-  case NSCL_EVT:
-  case GRETINA_MODE2:
-  case GRETINA_MODE3:
-  {
-    std::string outfile = opt->OutputFile();
-    if(!outfile.length()){
-      outfile = opt->GenerateOutputFilename(filename);
-    }
-    TGRUTLoop::Get()->ProcessFile(filename.c_str(), outfile.c_str());
-  }
-  break;
+    case NSCL_EVT:
+    case GRETINA_MODE2:
+    case GRETINA_MODE3:
+      //TODO, make this part work.
+      break;
 
-  case ROOT_DATA:
-    OpenRootFile(filename);
-    break;
+    case ROOT_DATA:
+      OpenRootFile(filename);
+      break;
 
-  case ROOT_MACRO:
-    RunMacroFile(filename);
-    break;
+    case ROOT_MACRO:
+      RunMacroFile(filename);
+      break;
 
-  default:
-    std::cerr << "Unknown file type for " << filename << std::endl;
+    default:
+      std::cerr << "Unknown file type for " << filename << std::endl;
   }
 }
 
@@ -292,7 +275,7 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   // If you print while fIsTabComplete is true, you will break tab complete.
   // Any diagnostic print statements should be done after this if statement.
   if(fIsTabComplete){
-    return TRint::ProcessLine(line, sync, error);
+    return TRint::ProcessLine(line, true, error);
   }
   TString sline(line);
   if(!sline.Length()){
@@ -305,11 +288,11 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
      sline.Contains("if") ||
      sline.Contains("{") ||
      sline.Contains("TPython")){
-     return TRint::ProcessLine(sline.Data(), sync, error);
+    return TRint::ProcessLine(sline.Data(), true, error);
   }
 
   if(!sline.CompareTo("clear")) {
-    return TRint::ProcessLine(".! clear");
+    return TRint::ProcessLine(".! clear", true);
   }
 
   Ssiz_t index;
@@ -327,8 +310,7 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   }
 
 
-  fNewChild = NULL;
-  long result =  TRint::ProcessLine(sline.Data(),sync,error);
+  long result =  TRint::ProcessLine(sline.Data(),true,error);
   return result;
 }
 
@@ -360,8 +342,7 @@ void TGRUTint::Terminate(Int_t status){
     TPython::Exec("on_close()");
   }
 
-  TGRUTLoop::Get()->Stop();
-  TDataLoop::DeleteInstance();
+  fPipeline->Stop();
 
   //Be polite when you leave.
   printf(DMAGENTA "\nbye,bye\t" DCYAN "%s" RESET_COLOR  "\n",getlogin());
@@ -439,4 +420,25 @@ void TGRUTint::DelayedProcessLine_ProcessItem(){
   }
 
   fNewResult.notify_one();
+}
+
+
+int TGRUTint::GetNPipelines() {
+  return 1;
+}
+
+TPipeline* TGRUTint::GetPipeline(int i) {
+  if(i==0){
+    return fPipeline;
+  } else {
+    return NULL;
+  }
+}
+
+int GetNPipelines() {
+  return TGRUTint::instance()->GetNPipelines();
+}
+
+TPipeline* GetPipeline(int i) {
+  return TGRUTint::instance()->GetPipeline(i);
 }

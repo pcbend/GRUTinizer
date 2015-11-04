@@ -6,6 +6,7 @@ import sys
 import warnings
 import threading
 import Tkinter as tk
+import time
 
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True

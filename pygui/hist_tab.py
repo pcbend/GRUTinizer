@@ -30,7 +30,7 @@ class HistTab(object):
 
     def OnHistClick(self,event):
         objects = [self.hist_lookup[i] for i in event.widget.selection()]
-        histograms = [h for h in objects if h.InheritsFrom('TH1')]
+        histograms = [h for h in objects if isinstance(h, ROOT.TH1)]
 
         color = 1;
         for obj in histograms:
@@ -47,24 +47,27 @@ class HistTab(object):
             self.hist_lookup[key].Write()
 
     def _load_compiled_histograms(self, filename):
-        outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
+        pipeline = ROOT.GetPipeline(0)
         if outfile:
-            outfile.GetCompiledHistograms().SetReplaceVariable(name, value)
+            pipeline.SetHistogramLibrary(filename)
 
     def _compiled_histogram_filename(self):
-        outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
-        if outfile:
-            return outfile.GetCompiledHistograms().GetLibraryName()
+        pipeline = ROOT.GetPipeline(0)
+        if pipeline:
+            return pipeline.GetLibraryName()
         else:
             return ''
 
     def Insert(self,obj,parent=''):
-        if (obj.InheritsFrom('TKey') and
-            not ROOT.TClass(obj.GetClassName()).InheritsFrom('TH1')):
+        if not obj:
+            return
+
+        if (isinstance(obj, ROOT.TKey) and
+            not issubclass(getattr(ROOT, obj.GetClassName()), ROOT.TH1)):
             obj = obj.ReadObj()
 
-        if (obj.InheritsFrom('TTree') or
-            obj.InheritsFrom('TCutG')):
+        if (isinstance(obj, ROOT.TTree) or
+            isinstance(obj, ROOT.TCutG)):
             return
 
         if parent:
@@ -74,9 +77,9 @@ class HistTab(object):
 
         self._insert_single_nonrecursive(obj, parent, name)
 
-        if obj.InheritsFrom('TList'):
+        if isinstance(obj, ROOT.TList):
             iterable = obj
-        elif obj.InheritsFrom('TDirectory'):
+        elif isinstance(obj, ROOT.TDirectory):
             iterable = obj.GetListOfKeys()
             if not iterable:
                 iterable = obj.GetList()
@@ -88,9 +91,9 @@ class HistTab(object):
                 self.Insert(obj, name)
 
     def _insert_single_nonrecursive(self, obj, parent, name):
-        is_histogram_key = (obj.InheritsFrom('TKey') and
-                            ROOT.TClass(obj.GetClassName()).InheritsFrom('TH1'))
-        is_histogram = obj.InheritsFrom('TH1')
+        is_histogram_key = (isinstance(obj, ROOT.TKey) and
+                            issubclass(getattr(ROOT, obj.GetClassName()), ROOT.TH1))
+        is_histogram = isinstance(obj, ROOT.TH1)
 
         if (is_histogram_key and
             name in self.hist_lookup and
@@ -113,11 +116,13 @@ class HistTab(object):
         self.main.window.after(5000, self._PeriodicHistogramCheck)
 
     def CheckOnlineHists(self):
-        outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
-        if outfile:
-            hists = outfile.GetCompiledHistograms().GetHistograms()
-            hists.SetName('Compiled Histograms')
-            self.Insert(hists)
+        pipeline = ROOT.GetPipeline(0)
+        if pipeline and pipeline.GetDirectory():
+            tdir = pipeline.GetDirectory()
+            if tdir.GetList():
+                self.Insert(tdir.GetList())
+            elif tdir.GetListOfKeys():
+                self.Insert(tdir.GetListOfKeys())
 
     def InsertHist(self, hist):
         dirname = hist.GetDirectory().GetName()

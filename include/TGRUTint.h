@@ -17,6 +17,7 @@
 #include <TChain.h>
 
 #include "TGRUTServer.h"
+#include "TPipeline.h"
 
 extern TObject* gResponse;
 
@@ -43,6 +44,9 @@ public:
 
   TFile* OpenRootFile(const std::string& filename,TChain *chain=0);
 
+  int GetNPipelines();
+  TPipeline* GetPipeline(int i);
+
 public:
   TObject* DelayedProcessLine(std::string message);
   //GUI interface commands;
@@ -55,6 +59,7 @@ public:
 
  private:
   void RunMacroFile(const std::string& filename);
+  void SetupPipeline();
 
 private:
 #ifndef __CINT__
@@ -66,16 +71,15 @@ private:
   TTimer* fGuiTimer;
 
   TTimer* fCommandTimer;
+  TGRUTServer *fCommandServer;
   std::queue<std::string> fLinesToProcess;
   std::queue<TObject*> fCommandResults;
 
   int fRootFilesOpened;
 
-  TObject* fNewChild;
   bool fIsTabComplete;
-  TGRUTServer *fCommandServer;
 
-  TChain* fChain;
+  TPipeline* fPipeline;
 
   void Init();
   void ApplyOptions();
@@ -84,6 +88,9 @@ private:
   ClassDef(TGRUTint,0);
 };
 
+
+int GetNPipelines();
+TPipeline* GetPipeline(int i);
 
 class TGRUTInterruptHandler : public TSignalHandler {
 public:

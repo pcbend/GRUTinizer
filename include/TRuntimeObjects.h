@@ -4,7 +4,10 @@
 #include <string>
 
 #include "TCutG.h"
+#include "TDirectory.h"
 #include "TList.h"
+
+#include "TUnpackedEvent.h"
 
 /// Object passed to the online histograms.
 /**
@@ -14,26 +17,19 @@
 class TRuntimeObjects : public TObject {
 public:
   /// Constructor
-  TRuntimeObjects(TList* detectors,
+  TRuntimeObjects(TUnpackedEvent& detectors,
                   TList* objects,
-                  TList* variables);
+                  TList* variables,
+                  TDirectory* directory=NULL);
 
   /// Returns a pointer to the detector of type T
   template<typename T>
   T* GetDetector(){
-    TIter next(detectors);
-    TObject* obj;
-    while((obj = next())){
-      if(obj->InheritsFrom(T::Class())){
-        return (T*)obj;
-      }
-    }
-    return NULL;
+    return detectors.GetDetector<T>();
   }
 
   TCutG* GetCut(const std::string& name);
 
-  TList& GetDetectors();
   TList& GetObjects();
   TList& GetVariables();
 
@@ -46,9 +42,10 @@ public:
   double GetVariable(const char* name);
 
 private:
-  TList* detectors;
+  TUnpackedEvent& detectors;
   TList* objects;
   TList* variables;
+  TDirectory* directory;
 
 
   ClassDef(TRuntimeObjects, 0);

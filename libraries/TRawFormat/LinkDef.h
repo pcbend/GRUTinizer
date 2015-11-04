@@ -1,4 +1,4 @@
-// TRawEventSource.h TRawEvent.h TRawEventGZipSource.h TRawEventBZipSource.h TRawEventFileSource.h TSmartBuffer.h TMultiRawFile.h TOrderedRawFile.h TRawEventRingSource.h TRawEventOnlineFileSource.h TRawFile.h
+// TRawEventSource.h TRawEvent.h TRawEventGZipSource.h TRawEventBZipSource.h TRawEventFileSource.h TSmartBuffer.h TMultiRawFile.h TOrderedRawFile.h TRawEventRingSource.h TRawEventOnlineFileSource.h TRawFile.h TSequentialRawFile.h
 
 #ifdef __CINT__
 
@@ -26,6 +26,7 @@
 
 #pragma link C++ class TMultiRawFile+;
 #pragma link C++ class TOrderedRawFile+;
+#pragma link C++ class TSequentialRawFile+;
 
 
 

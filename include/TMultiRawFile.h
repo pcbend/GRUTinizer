@@ -25,8 +25,6 @@ class TMultiRawFile : public TRawEventSource {
 public:
   TMultiRawFile();
   ~TMultiRawFile();
-  TMultiRawFile(const TMultiRawFile& other) { }
-  TMultiRawFile& operator=(const TMultiRawFile& other) { }
 
   void AddFile(TRawEventSource* infile);
   void AddFile(const char* filename);
@@ -39,6 +37,9 @@ public:
   virtual std::string GetLastError() const;
 
 private:
+  TMultiRawFile(const TMultiRawFile& other) { }
+  TMultiRawFile& operator=(const TMultiRawFile& other) { }
+
   std::set<TRawEventSource*> fFileList; // This list does not get modified frequently
   std::set<FileEvent> fFileEvents; // This list is modified frequently
 

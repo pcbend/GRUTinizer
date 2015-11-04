@@ -22,7 +22,6 @@ from .AnsiColorText import AnsiColorText
 class MainWindow(object):
 
     def __init__(self):
-
         self.window = tk.Tk()
         self._load_icons()
         self._load_default_style()
@@ -180,9 +179,9 @@ class MainWindow(object):
 
     def _update_status_bar(self):
         self.status_bar.delete(1.0, tk.END)
-        infile = ROOT.TGRUTLoop.Get().GetInfile()
-        if infile:
-            self.status_bar.write(infile.Status())
+        pipeline = ROOT.GetPipeline(0)
+        if pipeline:
+            self.status_bar.write(pipeline.Status())
         self.window.after(1000, self._update_status_bar)
 
     def _SetOptStat(self):
@@ -254,20 +253,20 @@ class MainWindow(object):
 
     def _PickIcon(self, obj):
         # If this is a TKey, look up the icon for the thing it points to.
-        if obj.InheritsFrom('TKey'):
+        if isinstance(obj, ROOT.TKey):
             obj = ROOT.TClass(obj.GetClassName())
 
-        if obj.InheritsFrom('TH2'):
+        if isinstance(obj, ROOT.TH2):
             return self.icons['h2_t']
-        elif obj.InheritsFrom('TH1'):
+        elif isinstance(obj, ROOT.TH1):
             return self.icons['h1_t']
-        elif obj.InheritsFrom('TFile'):
+        elif isinstance(obj, ROOT.TFile):
             return self.icons['tfile']
-        elif obj.InheritsFrom('TDirectory'):
+        elif isinstance(obj, ROOT.TDirectory):
             return self.icons['folder_t']
-        elif obj.InheritsFrom('TList'):
+        elif isinstance(obj, ROOT.TList):
             return self.icons['folder_t']
-        elif obj.InheritsFrom('TTree'):
+        elif isinstance(obj, ROOT.TTree):
             return self.icons['ttree']
         else:
             return ''
@@ -407,16 +406,16 @@ class MainWindow(object):
     def ResetHistograms(self,hist=None):
         if hist is None:
             for obj in ROOT.gPad.GetListOfPrimitives():
-                if obj.InheritsFrom(ROOT.TH1.Class()):
+                if isinstance(obj, ROOT.TH1):
                     obj.Reset()
         else:
             hist.Reset()
         update_tcanvases()
 
     def ResetAllHistograms(self):
-        outfile = ROOT.TGRUTLoop.Get().GetRootOutfile()
-        if outfile:
-            outfile.GetCompiledHistograms().ClearHistograms()
+        pipeline = ROOT.GetPipeline()
+        if pipeline:
+            pipeline.ClearHistograms()
             self.RefreshHistograms()
 
     def _draw_single(self,hist,color=1,nselected=1):
@@ -474,9 +473,9 @@ class MainWindow(object):
         if not filename:
             return
 
-        ROOT.TGRUTLoop.Get().Stop()
-        ROOT.TGRUTLoop.Get().ProcessFile(filename,'')
-        ROOT.TGRUTLoop.Get().Start()
+        pipeline = ROOT.GetPipeline(0)
+        if pipeline:
+            pipeline.ReplaceRawDataFile(filename)
 
     def LoadRootFile(self,filename=None):
         #print "In py LoadRooFile " + filename
@@ -488,10 +487,13 @@ class MainWindow(object):
 
         filename = os.path.abspath(filename)
         tfile = ROOT.TGRUTint.instance().OpenRootFile(filename)
-        self.files[filename] = tfile
-        self.hist_tab.Insert(tfile)
-        self.tcut_tab.AddFile(tfile)
-        self.variable_tab.AddFile(tfile)
+        if tfile:
+            self.files[filename] = tfile
+            self.hist_tab.Insert(tfile)
+            self.tcut_tab.AddFile(tfile)
+            self.variable_tab.AddFile(tfile)
+        else:
+            print 'MainWindow.LoadRootFile: Could not open {}'.format(filename)
 
     def Run(self):
         self.window.mainloop()

@@ -65,7 +65,6 @@ TH1 *GetHistogram(TList *list, std::string histname,int xbins,double xlow,double
   TH1   *hist = (TH1*)list->FindObject(histname.c_str());
   if(!hist) {
     hist= new TH1I(histname.c_str(),histname.c_str(),xbins,xlow,xhigh);
-    hist->SetDirectory(0);
     list->Add(hist);
   }
   return hist;
@@ -78,7 +77,6 @@ TH2 *GetMatrix(TList *list, std::string histname,int xbins, double xlow,double x
   if(!mat) {
     mat = new TH2I(histname.c_str(),histname.c_str(),xbins,xlow,xhigh,
                                                      ybins,ylow,yhigh);
-    mat->SetDirectory(0);
     list->Add(mat);
   }
   return mat;
@@ -89,22 +87,11 @@ extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
   //printf("I am Here 1\n"); fflush(stdout);
   InitMap();
-  TGretina *gretina = 0;
-  TBank29  *bank29  = 0;
-  TS800    *s800    = 0;
-  TIter iter(&obj.GetDetectors());
-  while(TObject *object = iter.Next()) {
-    if(object->InheritsFrom(TGretina::Class()))
-        gretina = (TGretina*)object;
-    if(object->InheritsFrom(TS800::Class()))
-        s800 = (TS800*)object;
-    if(object->InheritsFrom(TBank29::Class()))
-        bank29 = (TBank29*)object;
-  }
+  TGretina *gretina = obj.GetDetector<TGretina>();
+  TBank29  *bank29  = obj.GetDetector<TBank29>();
+  TS800    *s800    = obj.GetDetector<TS800>();
 
   TList *list = &(obj.GetObjects());
-
-
 
   //if(cut) cut->Print();
   double MAFP_COEF = obj.GetVariable("MAFP_COEF");
@@ -114,7 +101,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
   double BETA = obj.GetVariable("BETA");
   double E1_TDC_low = obj.GetVariable("E1_TDC_low");
   double E1_TDC_high = obj.GetVariable("E1_TDC_high");
-
 
   int numobj = list->GetSize();
 
