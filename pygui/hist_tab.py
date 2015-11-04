@@ -16,6 +16,7 @@ class HistTab(object):
 
         self.CheckOnlineHists()
         self.main.window.after_idle(self._PeriodicHistogramCheck)
+        self._requires_resort = False
 
     def _setup_GUI(self, frame):
         self.frame = frame
@@ -108,6 +109,7 @@ class HistTab(object):
             self.hist_lookup[name] = obj
 
         if name not in self.treeview.get_children(parent):
+            self._requires_resort = True
             icon = self.main._PickIcon(obj)
             self.treeview.insert(parent,'end', name, text=obj.GetName(),image=icon)
 
@@ -123,6 +125,23 @@ class HistTab(object):
                 self.Insert(tdir.GetList())
             elif tdir.GetListOfKeys():
                 self.Insert(tdir.GetListOfKeys())
+
+            if self._requires_resort:
+                self.Resort()
+                self._requires_resort = False
+
+    def Resort(self, parent=''):
+        children = list(self.treeview.get_children(parent))
+        if not children:
+            return
+
+        children.sort()
+        for index, name in enumerate(children):
+            self.treeview.move(name, parent, index)
+
+        for child in children:
+            self.Resort(child)
+
 
     def InsertHist(self, hist):
         dirname = hist.GetDirectory().GetName()
