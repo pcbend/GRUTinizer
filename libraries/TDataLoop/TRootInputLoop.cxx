@@ -4,8 +4,9 @@
 
 #include "TBranchElement.h"
 
-TRootInputLoop::TRootInputLoop(TTree* tree)
-  : tree(tree), ientry(0), nentries(tree->GetEntries()) {
+TRootInputLoop::TRootInputLoop(TTree* tree, ThreadsafeQueue<TUnpackedEvent*>& output_queue)
+  : tree(tree), ientry(0), nentries(tree->GetEntries()),
+    output_queue(output_queue) {
   SetupBranches();
 }
 

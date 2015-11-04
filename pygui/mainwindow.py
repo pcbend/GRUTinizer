@@ -476,10 +476,13 @@ class MainWindow(object):
 
         filename = os.path.abspath(filename)
         tfile = ROOT.TGRUTint.instance().OpenRootFile(filename)
-        self.files[filename] = tfile
-        self.hist_tab.Insert(tfile)
-        self.tcut_tab.AddFile(tfile)
-        self.variable_tab.AddFile(tfile)
+        if tfile:
+            self.files[filename] = tfile
+            self.hist_tab.Insert(tfile)
+            self.tcut_tab.AddFile(tfile)
+            self.variable_tab.AddFile(tfile)
+        else:
+            print 'MainWindow.LoadRootFile: Could not open {}'.format(filename)
 
     def Run(self):
         self.window.mainloop()

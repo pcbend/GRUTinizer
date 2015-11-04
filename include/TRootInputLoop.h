@@ -13,10 +13,9 @@
 
 class TRootInputLoop : public StoppableThread {
 public:
-  TRootInputLoop(TTree* tree);
+  TRootInputLoop(TTree* tree, ThreadsafeQueue<TUnpackedEvent*>& output_queue);
   virtual ~TRootInputLoop();
 
-  ThreadsafeQueue<TUnpackedEvent*>& GetOutputQueue() { return output_queue; }
   std::string Status();
 
 protected:
@@ -29,7 +28,7 @@ private:
   size_t ientry;
   size_t nentries;
   std::map<TClass*,TDetector**> det_map;
-  ThreadsafeQueue<TUnpackedEvent*> output_queue;
+  ThreadsafeQueue<TUnpackedEvent*>& output_queue;
 };
 
 

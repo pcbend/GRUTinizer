@@ -111,10 +111,16 @@ void TPipeline::SetupRawReadLoop() {
 void TPipeline::SetupRootReadLoop() {
   TChain* event_tree = new TChain("EventTree");
   for(auto& filename : input_root_files) {
-    event_tree->Add(filename.c_str());
+    TFile file(filename.c_str());
+    TObject* obj =file.Get("EventTree");
+    file.Close();
+
+    if(obj){
+      event_tree->Add(filename.c_str());
+    }
   }
 
-  root_input_loop = new TRootInputLoop(event_tree);
+  root_input_loop = new TRootInputLoop(event_tree, unpacked_event_queue);
   pipeline.push_back(root_input_loop);
 }
 
