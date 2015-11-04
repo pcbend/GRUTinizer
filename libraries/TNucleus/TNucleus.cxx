@@ -37,6 +37,7 @@ std::string TNucleus::massfile = program_path() + "/../libraries/SourceData/mass
 TNucleus::TNucleus(const char *name){
 	//Creates a nucleus based on symbol (ex. 26Na OR Na26) and sets all parameters from mass.dat
 	std::string Name = name;
+	//fName=name;
 	//SetMassFile();
 	int Number = 0;
 	std::string symbol;
@@ -108,8 +109,9 @@ TNucleus::TNucleus(const char *name){
   SetMassExcess(mass/1000.0);
   SetMass();
 	SetSymbol(symbol.c_str());
-  SetName(element.c_str());
+	//SetName(element.c_str());
   //SetSourceData();
+  this->LoadTransitionFile();
 }
 /*
 */
@@ -120,7 +122,8 @@ TNucleus::TNucleus(int charge, int neutrons, double mass, const char* symbol){
   fN = neutrons;
   fSymbol = symbol;
   fMass = mass;
-  SetName(symbol);
+  //SetName(symbol);
+  this->LoadTransitionFile();
   //SetSourceData();
 }
 
@@ -160,12 +163,13 @@ TNucleus::TNucleus(int charge, int neutrons, const char* MassFile){
   //max_elements=i;
 
   mass_file.close();
-	std::string name = fSymbol;
-	std::string number = name.substr(0,name.find_first_not_of("0123456789 "));
-
-	name = name.substr(name.find_first_not_of("0123456789 "));
-	name.append(number);
-  SetName(name.c_str());
+  std::string name = fSymbol;
+  std::string number = name.substr(0,name.find_first_not_of("0123456789 "));
+  
+  name = name.substr(name.find_first_not_of("0123456789 "));
+  name.append(number);
+  //SetName(name.c_str());
+  this->LoadTransitionFile();
   //SetSourceData();
 }
 
@@ -333,43 +337,44 @@ bool TNucleus::SetSourceData() {
 }
 */
 
-/*void TNucleus::AddTransition(Double_t energy, Double_t intensity, Double_t energy_uncertainty, Double_t intensity_uncertainty){
-   TTransition * tran = new TTransition;
-   tran->fEnergy = energy;
-   tran->fEnUncertainty = energy_uncertainty;
-   tran->fIntensity = intensity;
-   tran->fIntUncertainty = intensity_uncertainty;
 
-   AddTransition(tran);
-   }*/
+void TNucleus::AddTransition(Double_t energy, Double_t intensity, Double_t energy_uncertainty, Double_t intensity_uncertainty){
+  TTransition *tran = new TTransition();
+  tran->fEnergy = energy;
+  tran->fEnUncertainty = energy_uncertainty;
+  tran->fIntensity = intensity;
+  tran->fIntUncertainty = intensity_uncertainty;
 
-/*
-void TNucleus::AddTransition(TTransition* tran){
-   TransitionList.Add(tran);
-   }*/
-
-Bool_t TNucleus::RemoveTransition(Int_t idx){
-   //TGRSITransition *tran;
-   //tran = (TGRSITransition*)TransitionList.RemoveAt(idx);
-   //if(tran){
-   //   printf("Removed transition: ");
-   //   printf("%d\t eng: %.02f\tinten: %.02f\n",idx,tran->fenergy,tran->fintensity);
-   //   delete tran;
-   //   return true;
-   //}
-   //else{
-   //   printf("Out of range\n");
-      return false;
-   //}
+  AddTransition(tran);
 }
 
-//TGRSITransition* TNucleus::GetTransition(Int_t idx){
-//   TGRSITransition *tran = (TGRSITransition*)TransitionList.At(idx);
-//   if(!tran)
-//      printf("Out of Range\n");
 
-//   return tran;
-//}
+void TNucleus::AddTransition(TTransition* tran){
+   TransitionList.Add(tran);
+}
+/*
+Bool_t TNucleus::RemoveTransition(Int_t idx){
+  TGRSITransition *tran;
+  tran = (TGRSITransition*)TransitionList.RemoveAt(idx);
+  if(tran){
+    printf("Removed transition: ");
+    printf("%d\t eng: %.02f\tinten: %.02f\n",idx,tran->fenergy,tran->fintensity);
+    delete tran;
+    return true;
+  }
+  else{
+    printf("Out of range\n");
+    return false;
+  }
+  }*/
+
+TTransition* TNucleus::GetTransition(Int_t idx){
+  TTransition *tran = (TTransition*)TransitionList.At(idx);
+   if(!tran)
+      printf("Out of Range\n");
+
+   return tran;
+}
 
 void TNucleus::Print(Option_t *opt) const{
 //Prints out the Name of the nucleus, as well as the numerated transition list
@@ -384,14 +389,51 @@ void TNucleus::WriteSourceFile(std::string outfilename){
    if(outfilename.length() > 0) {
 	  std::ofstream sourceout;
      sourceout.open(outfilename.c_str());
-     //for(int i=0; i < TransitionList.GetSize(); i++)   {
-     //   std::string transtr = ((TGRSITransition*)(TransitionList.At(i)))->PrintToString();
-     //   sourceout << transtr.c_str();
-     //   sourceout << std::endl;
-     //}
+     for(int i=0; i < TransitionList.GetSize(); i++)   {
+        std::string transtr = ((TTransition*)(TransitionList.At(i)))->PrintToString();
+        sourceout << transtr.c_str();
+        sourceout << std::endl;
+     }
      sourceout << std::endl;
      sourceout.close();
    } 
+
+}
+
+bool TNucleus::LoadTransitionFile(){
+  std::stringstream ss1,ssName;
+  std::string fileName1,fileName2,NucName,eat;
+  Double_t En,EnUn,Ints,IntsUn;
+  fileName1 =   program_path() + "/../libraries/SourceData/";
+  ss1 << this->GetSymbol();  ssName << this->GetSymbol();
+  ss1 << this->GetA();       ssName << this->GetA();
+  ssName >> NucName;
+  SetName(NucName.c_str());
+  ss1 << ".sou";
+  ss1 >> fileName2;
+  
+  fileName1.append(fileName2);
+
+  ifstream transFile;
+  transFile.open(fileName1.c_str());
+
+  if(!transFile){
+    std::cout << " *** ERROR : File - " << fileName1
+	      << " does not exist!!! Not Loading!! " << std::endl;
+    return false;
+  }
+
+  TransitionList.Clear();
+  while(!(transFile.eof())){
+    transFile >> En >> EnUn >> Ints >> IntsUn;
+    getline(transFile,eat);
+    this->AddTransition(En,Ints,EnUn,IntsUn);
+  }
+  
+  transFile.close();
+  std::cout << " File        : " << fileName2 <<  std::endl
+	    << " Opened from : " << "../libraries/SourceData/" << std::endl;
+  return true;
 
 }
 

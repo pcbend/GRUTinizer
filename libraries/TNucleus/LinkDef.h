@@ -1,4 +1,4 @@
-//TNucleus.h 
+//TNucleus.h TTransition.h TPeakFinder.h
 
 #ifdef __CINT__
 
@@ -8,6 +8,8 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class TNucleus+;
+#pragma link C++ class TTransition+;
+#pragma link C++ class TPeakFinder+;
 //#pragma link C++ class TGRSITransition+;
 
 #endif
