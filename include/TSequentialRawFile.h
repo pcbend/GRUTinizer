@@ -1,7 +1,7 @@
 #ifndef _TSEQUENTIALRAWFILE_H_
 #define _TSEQUENTIALRAWFILE_H_
 
-#include "TRawEventSource.h"
+#include "TRawSource.h"
 
 class TSequentialRawFile : public TRawEventSource {
 public:

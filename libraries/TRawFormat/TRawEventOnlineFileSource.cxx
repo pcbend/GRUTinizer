@@ -1,9 +1,8 @@
-#include "TRawEventOnlineFileSource.h"
+#include "TRawSource.h"
 
 #include <chrono>
 #include <thread>
 
-#include "FileSize.h"
 
 TRawEventOnlineFileSource::TRawEventOnlineFileSource(const std::string& filename, kFileType file_type)
   : TRawEventByteSource(file_type), fFilename(filename) {

@@ -1,4 +1,4 @@
-#include "TRawEventGZipSource.h"
+#include "TRawSource.h"
 
 
 TRawEventGZipSource::TRawEventGZipSource(const std::string& filename, kFileType file_type)

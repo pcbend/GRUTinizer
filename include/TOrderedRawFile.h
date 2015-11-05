@@ -4,7 +4,7 @@
 #include <map>
 
 #include "TRawEvent.h"
-#include "TRawEventSource.h"
+#include "TRawSource.h"
 
 class TOrderedRawFile : public TRawEventSource {
 

@@ -1,4 +1,4 @@
-#include "TRawEventBZipSource.h"
+#include "TRawSource.h"
 
 TRawEventBZipSource::TRawEventBZipSource(const std::string& filename, kFileType file_type)
   : TRawEventPipeSource("bzip2 -dc " + filename, file_type),

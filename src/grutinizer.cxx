@@ -1,20 +1,22 @@
 
-#include <Globals.h>
+#include "Globals.h"
 
 #include <cstdio>
 #include <ctime>
 #include <string>
-#include <sys/stat.h>
-#include <sys/socket.h>
-#include <netdb.h>
+//#include <sys/stat.h>
+//#include <sys/socket.h>
+//#include <netdb.h>
 
 #include "TEnv.h"
 #include "TPluginManager.h"
 #include "TPython.h"
 
 #include "TGRUTint.h"
-#include "TROOT_Shim.h"
-#include "LoadGRUTEnv.h"
+//#include "TROOT_Shim.h"
+//#include "LoadGRUTEnv.h"
+
+
 
 #ifdef __APPLE__
 #define HAVE_UTMPX_H
@@ -27,7 +29,7 @@
 #endif
 #endif
 
-
+/*
 #ifdef HAVE_UTMPX_H
 #include <utmpx.h>
 #define STRUCT_UTMP struct utmpx
@@ -35,24 +37,35 @@
 #include <utmp.h>
 #define STRUCT_UTMP struct utmp
 #endif
+*/
+
+//extern void PopupGrutLogo(bool);
 
 
-extern void PopupGrutLogo(bool);
+//static int ReadUtmp();
+//static STRUCT_UTMP *SearchEntry(int, const char*);
+//static STRUCT_UTMP *gUtmpContents;
+
+//static void SetDisplay();
+//void SetGRUTPluginHandlers();
 
 
-static int ReadUtmp();
-static STRUCT_UTMP *SearchEntry(int, const char*);
-static STRUCT_UTMP *gUtmpContents;
+void LoadGRUTEnv() {
+  // Set the GRUTSYS variable based on the executable path.
+  // If GRUTSYS has already been defined, don't overwrite.
+  //setenv("GRUTSYS", (program_path()+"/..").c_str(), 0);
+  std::string grut_path = Form("%s/.grutrc",getenv("GRUTSYS")); // + "/../.grutrc";
+  gEnv->ReadFile(grut_path.c_str(),kEnvChange);
+}
 
-static void SetDisplay();
-void SetGRUTPluginHandlers();
+
 
 int main(int argc, char **argv) {
   //Find the grut environment variable so that we can read in .grutrc
   LoadGRUTEnv();
-  ReplaceCleanups();
+  //ReplaceCleanups();
 
-  SetDisplay();
+  //SetDisplay();
   //SetGRUTPluginHandlers();
   TGRUTint *input = 0;
 
@@ -69,7 +82,7 @@ int main(int argc, char **argv) {
 
 
 void SetGRUTPluginHandlers() {
-   //gPluginMgr->AddHandler("GRootCanvas","grsi","GRootCanvas"
+   //gPluginMgr->AddHandler("GRootCanvas","grut","GRootCanvas"
 //   gPluginMgr->AddHandler("TGuiFactory","root","GROOTGuiFactory","Gui","GROOTGuiFactory()");
 //   gPluginMgr->AddHandler("TBrowserImp","GRootBrowser","GRootBrowser",
 //                          "Gui","NewBrowser(TBrowser *,const char *,Int_t,Int_t,UInt_t,UInt_t");
@@ -77,7 +90,7 @@ void SetGRUTPluginHandlers() {
 //                          "Gui","NewBrowser(TBrowser *,const char *,Int_t,Int_t");
 }
 
-
+/*
 
 static void SetDisplay()  {
   // Set DISPLAY environment variable.
@@ -174,3 +187,6 @@ static STRUCT_UTMP *SearchEntry(int n, const char *tty) {
    }
    return 0;
 }
+
+*/
+

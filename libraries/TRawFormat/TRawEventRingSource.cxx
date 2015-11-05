@@ -1,4 +1,4 @@
-#include "TRawEventRingSource.h"
+#include "TRawSource.h"
 
 #include <cstdlib>
 #include <iostream>

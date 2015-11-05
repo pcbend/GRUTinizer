@@ -8,12 +8,30 @@
 #include <deque>
 #include <string>
 
+#include <zlib.h>
+
+
 #include "TStopwatch.h"
 
 #include "TGRUTTypes.h"
 #include "TGRUTOptions.h"
 #include "TRawEvent.h"
 #include "TSmartBuffer.h"
+
+
+
+#include <fstream>
+//#include <ios>
+
+inline size_t FindFileSize(const char* fname) {
+  ifstream temp;
+  temp.open(fname, std::ios::in | std::ios::ate);
+  size_t fsize = temp.tellg();
+  temp.close();
+  return fsize;
+}
+
+
 
 
 class TRawEventSource {
@@ -130,5 +148,127 @@ private:
 
   ClassDef(TRawEventPipeSource,0);
 };
+
+
+class TRawEventGZipSource : public TRawEventByteSource {
+public:
+  TRawEventGZipSource(const std::string& filename, kFileType file_type);
+  ~TRawEventGZipSource();
+
+  virtual int ReadBytes(char* buf, size_t size);
+
+  virtual std::string SourceDescription() const;
+private:
+  std::string fFilename;
+  FILE* fFile;
+  gzFile* fGzFile;
+
+  ClassDef(TRawEventGZipSource,0);
+};
+
+
+class TRawEventBZipSource : public TRawEventPipeSource {
+public:
+  TRawEventBZipSource(const std::string& filename, kFileType file_type);
+  ~TRawEventBZipSource() { }
+
+  virtual std::string SourceDescription() const;
+
+private:
+  std::string fFilename;
+
+  ClassDef(TRawEventBZipSource,0);
+};
+
+class TRawEventFileSource : public TRawEventByteSource {
+public:
+  TRawEventFileSource(const std::string& filename, kFileType file_type);
+  ~TRawEventFileSource();
+
+  virtual int ReadBytes(char* buf, size_t size);
+
+  virtual std::string SourceDescription() const;
+private:
+  std::string fFilename;
+  FILE* fFile;
+
+  ClassDef(TRawEventFileSource,0);
+};
+
+
+class TRawEventRingSource : public TRawEventPipeSource {
+public:
+  TRawEventRingSource(const std::string& ringname, kFileType file_type);
+  ~TRawEventRingSource() { }
+
+  virtual std::string SourceDescription() const;
+
+private:
+  std::string fRingName;
+
+  ClassDef(TRawEventRingSource,0);
+};
+
+
+class TRawEventOnlineFileSource : public TRawEventByteSource {
+public:
+  TRawEventOnlineFileSource(const std::string& filename, kFileType file_type);
+  ~TRawEventOnlineFileSource();
+
+  virtual int ReadBytes(char* buf, size_t size);
+
+  virtual std::string SourceDescription() const;
+private:
+  int single_read(char* buf, size_t size);
+
+  std::string fFilename;
+  FILE* fFile;
+
+  ClassDef(TRawEventOnlineFileSource,0);
+};
+
+
+
+class TRawFile : public TRawEventSource {
+public:
+  TRawFile(const char* filename, kFileType file_type = kFileType::UNKNOWN_FILETYPE);
+  ~TRawFile();
+
+  virtual std::string SourceDescription() const {
+    return wrapped->SourceDescription();
+  }
+
+  virtual std::string Status() const {
+    return wrapped->Status();
+  }
+
+  virtual int GetLastErrno() const {
+    return wrapped->GetLastErrno();
+  }
+
+  virtual std::string GetLastError() const {
+    return wrapped->GetLastError();
+  }
+
+
+private:
+  virtual int GetEvent(TRawEvent& event) {
+    return wrapped->Read(event);
+  }
+
+  TRawEventSource* wrapped;
+};
+
+class TRawFileIn : public TRawFile {
+public:
+  TRawFileIn(const char* filename, kFileType file_type = kFileType::UNKNOWN_FILETYPE)
+    : TRawFile(filename, file_type) { }
+};
+
+
+
+
+
+
 
 #endif /* _TRAWEVENTSOURCE_H_ */

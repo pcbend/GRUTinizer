@@ -1,15 +1,10 @@
-#include "TRawEventSource.h"
+#include "TRawSource.h"
 
 #include <cassert>
 
 #include "TString.h"
 
 #include "TGRUTOptions.h"
-#include "TRawEventBZipSource.h"
-#include "TRawEventFileSource.h"
-#include "TRawEventGZipSource.h"
-#include "TRawEventRingSource.h"
-#include "TRawEventOnlineFileSource.h"
 
 ClassImp(TRawEventSource);
 

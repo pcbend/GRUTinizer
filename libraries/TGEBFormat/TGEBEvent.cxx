@@ -2,7 +2,6 @@
 
 #include "TString.h"
 
-#include "TMode3.h"
 
 ClassImp(TGEBEvent);
 
