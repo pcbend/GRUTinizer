@@ -1,40 +1,40 @@
-#include "Globals.h"
+#include <Globals.h>
 #include "TGRUTint.h"
 
 #include <fstream>
+#include <iostream>
 
-#include <Getline.h>
-#include <TClass.h>
-#include <TFile.h>
-#include <TInterpreter.h>
-#include <TPython.h>
-#include <TROOT.h>
-#include <TString.h>
-#include <TTree.h>
-#include <TUnixSystem.h>
+#include "Getline.h"
+#include "TClass.h"
+#include "TGFileDialog.h"
+#include "TFile.h"
+#include "TH1.h"
+#include "TInterpreter.h"
+#include "TMode3.h"
+#include "TPython.h"
+#include "TROOT.h"
+#include "TString.h"
+#include "TTree.h"
+#include "TUnixSystem.h"
 
-//#include "GRootGuiFactory.h"
-//#include "ProgramPath.h"
-//#include "TDetectorEnv.h"
+#include "GRootGuiFactory.h"
+#include "ProgramPath.h"
+#include "TDetectorEnv.h"
 #include "TGRUTOptions.h"
-//#include "TGRUTLoop.h"
-//#include "TGRUTUtilities.h"
-//#include "TObjectManager.h"
-
-//#include "TOnlineTree.h"
+#include "TGRUTUtilities.h"
 
 //extern "C" G__value G__getitem(const char* item);
 //#include "FastAllocString.h"
 //char* G__valuemonitor(G__value buf, G__FastAllocString& temp);
 
-//extern void PopupLogo(bool);
-//extern void WaitLogo();
+extern void PopupLogo(bool);
+extern void WaitLogo();
 
 ClassImp(TGRUTint)
 
 TGRUTint *TGRUTint::fTGRUTint = NULL;
 TEnv    *TGRUTint::fGRUTEnv  = NULL;
-//TObject *gResponse = NULL;
+TObject *gResponse = NULL;
 
 
 TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions, bool noLogo, const char *appClassName) {
@@ -48,8 +48,8 @@ TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions
 
 TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t noLogo,const char *appClassName)
   :TRint(appClassName, &argc, argv, options, numOptions,noLogo),
-   fIsTabComplete(false) {
-   //fCommandServer(NULL), fGuiTimer(NULL), fCommandTimer(NULL), fRootFilesOpened(0), fIsTabComplete(false) {
+   fCommandServer(NULL), fGuiTimer(NULL), fCommandTimer(NULL), fRootFilesOpened(0),
+   fIsTabComplete(false), fPipeline(NULL) {
 
   fGRUTEnv = gEnv;
   GetSignalHandler()->Remove();
@@ -63,68 +63,32 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
 
 
 TGRUTint::~TGRUTint() {
-  //if(fCommandTimer){
-  //  delete fCommandTimer;
-  //}
-  //if(fGuiTimer){
-  //  delete fGuiTimer;
-  //}
+  if(fCommandTimer){
+    delete fCommandTimer;
+  }
+  if(fGuiTimer){
+    delete fGuiTimer;
+  }
 }
 
 
 void TGRUTint::Init() {
-  //TGRUTLoop::CreateDataLoop<TGRUTLoop>();
-  //fChain = new TChain("EventTree");
-
   if(TGRUTOptions::Get()->ShouldExit()){
     Terminate();
     return;
   }
-  //printf("%s called.\n",__PRETTY_FUNCTION__);
-//  TMode3 *mode3 = new TMode3;
-//  mode3->Class();
-
-  // TFile *tempfile = TFile::Open("/var/tmp/mytemp.root","recreate");
-  // TTree *temptree = new TTree("temp","temp");
-  // TMode3 *mode3=0;
-  // temptree->Branch("TMode3","TMode3",&mode3);
-  // temptree->Fill();
-  // temptree->Write();
-  // delete tempfile;
-  // gSystem->Unlink("/var/tmp/mytemp.root");
-
-
-  if(TGRUTOptions::Get()->MakeBackupFile()){
-    //TObjectManager::Get("GRUT_Manager", "GRUT Manager");
-  }
-
-
 
   std::string grutpath = getenv("GRUTSYS");
+
   gInterpreter->AddIncludePath(Form("%s/include",grutpath.c_str()));
-  //gSystem->AddIncludePath(Form("-I%s/include",grutpath.c_str()));
-  //gSystem->AddDynamicPath(Form("-%s/libraries",grutpath.c_str()));
 
-//  if(TGRUTOptions::Get()->ShowLogo()){
-//    std::thread splashscreen(&TGRUTint::SplashPopNWait,this,false);
-//    splashscreen.detach();
-//  }
+  if(TGRUTOptions::Get()->ShowLogo()){
+    PopupLogo(false);
+    WaitLogo();
+  }
 
-  // if(TGRUTOptions::Get()->ShowLogo()){
-  //   PopupLogo(false);
-  //   WaitLogo();
-  // }
   ApplyOptions();
-  //printf("gManager = 0x%08x\n",gManager);   fflush(stdout);
-  //gManager->Print();
-  //gManager->Connect("TObjectManager", "ObjectAppended(TObject*)", "TGRUTint", this, "ObjectAppended(TObject*)");
 }
-
-void TGRUTint::SplashPopNWait(bool flag) {
-  //PopupLogo(false);
-  //WaitLogo();
-}
-
 
 /*********************************/
 
@@ -132,7 +96,7 @@ bool TGRUTInterruptHandler::Notify() {
   static int timespressed  = 0;
   timespressed++;
   if(timespressed>3) {
-    printf("\n" DRED BG_WHITE  "   No you shutup! " RESET_COLOR "\n");
+    printf("\n" DRED BG_WHITE  "   Quit hitting me... Force exiting. :( " RESET_COLOR "\n");
     exit(1);
   }
   printf("\n" DRED BG_WHITE  "   Control-c was pressed.   " RESET_COLOR "\n");
@@ -147,49 +111,29 @@ void TGRUTint::ApplyOptions() {
      LoadGRootGraphics();
   }
 
-  //TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
+  TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
 
-  bool need_loop = false;
-  if(opt->RawInputFiles().size()==1 && opt->SortRaw()){
-    std::string filename = opt->RawInputFiles()[0];
-    std::string outfile = opt->OutputFile();
-    if(!outfile.length() && !opt->IsOnline()){
-      outfile = opt->GenerateOutputFilename(filename);
+  SetupPipeline();
+
+  if(!opt->StartGUI()) {
+    for(auto& filename : opt->RootInputFiles()){
+      OpenRootFile(filename);
     }
-    //TGRUTLoop::Get()->ProcessFile(filename.c_str(), outfile.c_str());
-    need_loop = true;
-
-  } else if (opt->RawInputFiles().size()>1 && opt->SortRaw()){
-    std::vector<std::string> filenames = opt->RawInputFiles();
-    std::string outfile = opt->OutputFile();
-    if(!outfile.length() && !opt->IsOnline()){
-      outfile = opt->GenerateOutputFilename(filenames);
-    }
-    //TGRUTLoop::Get()->ProcessFile(filenames, outfile.c_str());
-    need_loop = true;
-  }
-
-  //if(!opt->StartGUI()) {
-  //  for(auto& filename : opt->RootInputFiles()){
-  //    OpenRootFile(filename);
-  //  }
-  //}
-
-  for(auto& filename : opt->MacroInputFiles()){
-    RunMacroFile(filename);
-  }
-
-  if(opt->SortTree() && !opt->StartGUI()) {
-    opt->SetStartGUI();
   }
 
   if(opt->StartGUI()){
-    //std::string script_filename = program_path() + "/../util/grut-view.py";
-    std::string script_filename = Form("%s/../util/grut-view.py",getenv("GRSISYS"));
+    std::string script_filename = program_path() + "/../util/grut-view.py";
     std::ifstream script(script_filename);
     std::string script_text((std::istreambuf_iterator<char>(script)),
                             std::istreambuf_iterator<char>());
     TPython::Exec(script_text.c_str());
+
+
+    std::string default_gui_config =  gEnv->GetValue("GRUT.GuiSetup","");
+    if(default_gui_config.length() &&
+       !opt->GuiSaveSetFiles().size()){
+      TPython::Exec(Form("window.LoadGuiFile(\"%s\")",default_gui_config.c_str()));
+    }
 
     for(auto& filename : opt->RootInputFiles()){
       TPython::Exec(Form("window.LoadRootFile(\"%s\")",filename.c_str()));
@@ -197,52 +141,78 @@ void TGRUTint::ApplyOptions() {
     for(auto& filename : opt->GuiSaveSetFiles()){
       TPython::Exec(Form("window.LoadGuiFile(\"%s\")",filename.c_str()));
     }
-
-    for(auto& filename : opt->RootInputFiles()){
-      TPython::Exec(Form("window.LoadRootFile(\"%s\")",filename.c_str()));
-      //OpenRootFile(filename); // Is this needed/sane?
-    }
-    //fGuiTimer = new TTimer("TPython::Exec(\"update()\");",100);
-    //fGuiTimer->TurnOn();
+    fGuiTimer = new TTimer("TPython::Exec(\"update()\");",100);
+    fGuiTimer->TurnOn();
   }
 
-  //if(opt->SortTree() && fChain->GetEntries()){
-  //  TGRUTLoop::Get()->ProcessTree(fChain, "/dev/null");
-  //  need_loop = true;
-  //}
+  for(auto& filename : opt->MacroInputFiles()){
+    RunMacroFile(filename);
+  }
 
-  //if (need_loop){
-  //  TGRUTLoop::Get()->Start();
-  //}
+  if(fPipeline->CanStart()){
+    fPipeline->Start();
+  }
 
   if(opt->ExitAfterSorting()){
-    //TGRUTLoop::Get()->Status();
-    //std::cout << "Waiting for join" << std::endl;
-    //TGRUTLoop::Get()->Join();
+    while(!fPipeline->IsFinished()){
+      std::cout << "\r" << fPipeline->Status() << std::flush;
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+    std::cout << std::endl;
+    fPipeline->Write();
+
     this->Terminate();
-  } //else if(opt->CommandServer()) {
-    //fCommandServer = new TGRUTServer(opt->CommandPort());
-    //fCommandServer->Start();
-    //fCommandTimer = new TTimer("",10);
-    //fCommandTimer->TurnOn();
-  //}
+  } else if(opt->CommandServer()) {
+    fCommandServer = new TGRUTServer(opt->CommandPort());
+    fCommandServer->Start();
+    fCommandTimer = new TTimer("",10);
+    fCommandTimer->TurnOn();
+  }
 }
 
-//void TGRUTint::DefaultFunction(){
-//  static int i = 0;
-//  std::cout << "I am a default function." << std::endl;
-//  std::cout << "I have been called " << i++ << " times before" << std::endl;
-//}
+void TGRUTint::SetupPipeline() {
+  TGRUTOptions* opt = TGRUTOptions::Get();
 
-/*
+  fPipeline = new TPipeline;
+  for(auto& filename : opt->RawInputFiles()){
+    fPipeline->AddRawDataFile(filename);
+  }
+
+  if(opt->OutputFile().length()){
+    fPipeline->SetOutputRootFile(opt->OutputFile());
+  }
+
+  if(opt->CompiledHistogramFile().length()) {
+    fPipeline->SetHistogramLibrary(opt->CompiledHistogramFile());
+  }
+
+  if(opt->SortTree()){
+    for(auto& filename : opt->RootInputFiles()){
+      fPipeline->AddInputRootFile(filename);
+    }
+  }
+
+  if(opt->InputRing().length()){
+    fPipeline->SetInputRing(opt->InputRing());
+  }
+
+  fPipeline->SetIsOnline(opt->IsOnline());
+
+  fPipeline->Initialize();
+}
+
+void TGRUTint::DefaultFunction(){
+  static int i = 0;
+  std::cout << "I am a default function." << std::endl;
+  std::cout << "I have been called " << i++ << " times before" << std::endl;
+}
+
 TFile* TGRUTint::OpenRootFile(const std::string& filename, TChain *chain){
   if(!file_exists(filename)){
     std::cerr << "File \"" << filename << "\" does not exist" << std::endl;
     return NULL;
   }
 
-  // const char* command = Form("TFile *_file%i = TObjectManager::Get(\"%s\",\"read\")",
-  //       		      fRootFilesOpened, filename.c_str());
   const char* command = Form("TFile *_file%i = new TFile(\"%s\",\"read\")",
                              fRootFilesOpened, filename.c_str());
   ProcessLine(command);
@@ -250,29 +220,22 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, TChain *chain){
   TFile *file = (TFile*)gROOT->GetListOfFiles()->FindObject(filename.c_str());
   if(file){
     std::cout << "\tfile " << file->GetName() << " opened as _file" << fRootFilesOpened << std::endl;
-    if(file->FindObjectAny("EventTree")) {
-      fChain->Add(file->GetName());
-    }
   }
 
   fRootFilesOpened++;
   return file;
 }
-*/
-
-
 
 void TGRUTint::RunMacroFile(const std::string& filename){
-//  if(!file_exists(filename)){
-//    std::cerr << "File \"" << filename << "\" does not exist" << std::endl;
-//    return;
-//  }
+  if(!file_exists(filename)){
+    std::cerr << "File \"" << filename << "\" does not exist" << std::endl;
+    return;
+  }
 
-//  const char* command = Form(".x %s", filename.c_str());
-//  ProcessLine(command);
+  const char* command = Form(".x %s", filename.c_str());
+  ProcessLine(command);
 }
 
-/*
 void TGRUTint::HandleFile(const std::string& filename){
   if(!file_exists(filename)){
     std::cerr << "File \"" << filename << "\" does not exist" << std::endl;
@@ -283,32 +246,24 @@ void TGRUTint::HandleFile(const std::string& filename){
 
   kFileType filetype = opt->DetermineFileType(filename);
   switch(filetype){
-  case NSCL_EVT:
-  case GRETINA_MODE2:
-  case GRETINA_MODE3:
-  {
-    std::string outfile = opt->OutputFile();
-    if(!outfile.length()){
-      outfile = opt->GenerateOutputFilename(filename);
-    }
-    TGRUTLoop::Get()->ProcessFile(filename.c_str(), outfile.c_str());
-  }
-  break;
+    case NSCL_EVT:
+    case GRETINA_MODE2:
+    case GRETINA_MODE3:
+      //TODO, make this part work.
+      break;
 
-  case ROOT_DATA:
-    OpenRootFile(filename);
-    break;
+    case ROOT_DATA:
+      OpenRootFile(filename);
+      break;
 
-  case ROOT_MACRO:
-    RunMacroFile(filename);
-    break;
+    case ROOT_MACRO:
+      RunMacroFile(filename);
+      break;
 
-  default:
-    std::cerr << "Unknown file type for " << filename << std::endl;
+    default:
+      std::cerr << "Unknown file type for " << filename << std::endl;
   }
 }
-*/
-
 
 Int_t TGRUTint::TabCompletionHook(char* buf, int* pLoc, std::ostream& out){
   fIsTabComplete = true;
@@ -322,24 +277,24 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   // If you print while fIsTabComplete is true, you will break tab complete.
   // Any diagnostic print statements should be done after this if statement.
   if(fIsTabComplete){
-    return TRint::ProcessLine(line, sync, error);
+    return TRint::ProcessLine(line, true, error);
   }
   TString sline(line);
   if(!sline.Length()){
     return 0;
   }
-  //sline.ReplaceAll("TCanvas","GCanvas");
+  sline.ReplaceAll("TCanvas","GCanvas");
 
   if(sline.Contains("for") ||
      sline.Contains("while") ||
      sline.Contains("if") ||
      sline.Contains("{") ||
      sline.Contains("TPython")){
-     return TRint::ProcessLine(sline.Data(), sync, error);
+    return TRint::ProcessLine(sline.Data(), true, error);
   }
 
   if(!sline.CompareTo("clear")) {
-    return TRint::ProcessLine(".! clear");
+    return TRint::ProcessLine(".! clear", true);
   }
 
   Ssiz_t index;
@@ -357,37 +312,11 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   }
 
 
-  //fNewChild = NULL;
-  long result =  TRint::ProcessLine(sline.Data(),sync,error);
-
-  //if(!fNewChild){
-  //  return result;
-  //}
-/*
-  if((index = sline.Index("Project",TString::kIgnoreCase))    != kNPOS   ||
-     (index = sline.Index("Projection",TString::kIgnoreCase)) != kNPOS   ||
-     (index = sline.Index("Profile",TString::kIgnoreCase))    != kNPOS   ||
-     (index = sline.Index("Draw",TString::kIgnoreCase))       != kNPOS ) {
-
-    TString newline = ReverseObjectSearch(sline);
-    TObject *parent = gROOT->FindObject(newline.Data());
-
-    if(parent){
-      gManager->AddRelationship(parent, fNewChild);
-    }
-  }
-
-  fNewChild = NULL;
-*/
+  long result =  TRint::ProcessLine(sline.Data(),true,error);
   return result;
 }
 
 
-//TObject* TGRUTint::ObjectAppended(TObject* obj){
-  //fNewChild = obj;
-//}
-
-/*
 TString TGRUTint::ReverseObjectSearch(TString &input) {
 
   int end = 0;
@@ -403,26 +332,19 @@ TString TGRUTint::ReverseObjectSearch(TString &input) {
   }
   return TString("");
 };
-*/
 
 void TGRUTint::Terminate(Int_t status){
-  //if(fCommandServer) {
-  //  fCommandServer->Stop();
-  //  fCommandServer->Delete();
-  //  fCommandServer = NULL;
-  //}
+  if(fCommandServer) {
+    fCommandServer->Stop();
+    fCommandServer->Delete();
+    fCommandServer = NULL;
+  }
 
   if(TGRUTOptions::Get()->StartGUI()){
     TPython::Exec("on_close()");
   }
 
-  //TGRUTLoop::Get()->Stop();
-  //TDataLoop::DeleteInstance();
-
-  // TIter iter(TObjectManager::GetListOfManagers());
-  // while(TObjectManager *om = (TObjectManager*)iter.Next()) {
-  //   om->SaveAndClose();
-  // }
+  fPipeline->Stop();
 
   //Be polite when you leave.
   printf(DMAGENTA "\nbye,bye\t" DCYAN "%s" RESET_COLOR  "\n",getlogin());
@@ -439,10 +361,10 @@ void TGRUTint::Terminate(Int_t status){
 }
 
 void TGRUTint::LoadGRootGraphics() {
-  //GRootGuiFactory::Init();
+  GRootGuiFactory::Init();
 }
 
-/*
+
 void TGRUTint::OpenFileDialog() {
   TGFileInfo file_info;
   const char *filetypes[] = { "ROOT File", "*.root",
@@ -457,8 +379,7 @@ void TGRUTint::OpenFileDialog() {
     HandleFile(file_info.fFilename);
   }
 }
-*/
-/*
+
 TObject* TGRUTint::DelayedProcessLine(std::string message){
   std::lock_guard<std::mutex> any_command_lock(fCommandWaitingMutex);
 
@@ -478,8 +399,7 @@ TObject* TGRUTint::DelayedProcessLine(std::string message){
   fCommandResults.pop();
   return result;
 }
-*/
-/*
+
 void TGRUTint::DelayedProcessLine_ProcessItem(){
   std::string message;
   {
@@ -503,4 +423,24 @@ void TGRUTint::DelayedProcessLine_ProcessItem(){
 
   fNewResult.notify_one();
 }
-*/
+
+
+int TGRUTint::GetNPipelines() {
+  return 1;
+}
+
+TPipeline* TGRUTint::GetPipeline(int i) {
+  if(i==0){
+    return fPipeline;
+  } else {
+    return NULL;
+  }
+}
+
+int GetNPipelines() {
+  return TGRUTint::instance()->GetNPipelines();
+}
+
+TPipeline* GetPipeline(int i) {
+  return TGRUTint::instance()->GetPipeline(i);
+}

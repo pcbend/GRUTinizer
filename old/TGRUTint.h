@@ -16,9 +16,10 @@
 #include <TEnv.h>
 #include <TChain.h>
 
-//#include "TGRUTServer.h"
+#include "TGRUTServer.h"
+#include "TPipeline.h"
 
-//extern TObject* gResponse;
+extern TObject* gResponse;
 
 class TGRUTint : public TRint {
 
@@ -35,49 +36,50 @@ public:
   virtual ~TGRUTint();
 
   virtual void Terminate(Int_t status = 0);
-  Long_t ProcessLine(const char* line, Bool_t sync=kTRUE,Int_t *error=0);
 
-  //TString ReverseObjectSearch(TString&);
-  //TObject* ObjectAppended(TObject* obj);
+  Long_t ProcessLine(const char* line, Bool_t sync=kTRUE,Int_t *error=0);
+  TString ReverseObjectSearch(TString&);
 
   Int_t TabCompletionHook(char* buf, int* pLoc, std::ostream& out);
 
-  //TFile* OpenRootFile(const std::string& filename,TChain *chain=0);
+  TFile* OpenRootFile(const std::string& filename,TChain *chain=0);
+
+  int GetNPipelines();
+  TPipeline* GetPipeline(int i);
 
 public:
-  //TObject* DelayedProcessLine(std::string message);
+  TObject* DelayedProcessLine(std::string message);
   //GUI interface commands;
-  //void OpenFileDialog();
-  //void DefaultFunction();
+  void OpenFileDialog();
+  void DefaultFunction();
 
-  //void DelayedProcessLine_ProcessItem();
+  void DelayedProcessLine_ProcessItem();
 
-  //void HandleFile(const std::string& filename);
+  void HandleFile(const std::string& filename);
 
  private:
   void RunMacroFile(const std::string& filename);
-  void SplashPopNWait(bool flag);
+  void SetupPipeline();
 
 private:
-//#ifndef __CINT__
-//  std::mutex fCommandListMutex;
-//  std::mutex fResultListMutex;
-//  std::mutex fCommandWaitingMutex;
-//  std::condition_variable fNewResult;
-//#endif
-  //TTimer* fGuiTimer;
+#ifndef __CINT__
+  std::mutex fCommandListMutex;
+  std::mutex fResultListMutex;
+  std::mutex fCommandWaitingMutex;
+  std::condition_variable fNewResult;
+#endif
+  TTimer* fGuiTimer;
 
-  //TTimer* fCommandTimer;
-  //std::queue<std::string> fLinesToProcess;
-  //std::queue<TObject*> fCommandResults;
+  TTimer* fCommandTimer;
+  TGRUTServer *fCommandServer;
+  std::queue<std::string> fLinesToProcess;
+  std::queue<TObject*> fCommandResults;
 
-  //int fRootFilesOpened;
+  int fRootFilesOpened;
 
-  //TObject* fNewChild;
   bool fIsTabComplete;
-  //TGRUTServer *fCommandServer;
 
-  //TChain* fChain;
+  TPipeline* fPipeline;
 
   void Init();
   void ApplyOptions();
@@ -86,6 +88,9 @@ private:
   ClassDef(TGRUTint,0);
 };
 
+
+int GetNPipelines();
+TPipeline* GetPipeline(int i);
 
 class TGRUTInterruptHandler : public TSignalHandler {
 public:
