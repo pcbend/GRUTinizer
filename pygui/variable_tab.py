@@ -54,14 +54,10 @@ class VariableTab(object):
             pipeline.SetReplaceVariable(name, value)
 
         self.variables[name] = value
-        #print " Name : " + name 
-        #print " Value : " + str(value)
         if name in self.treeview.get_children():
             self.treeview.item(name, values=(str(value),))
-            #print " in IF"
         else:
             self.treeview.insert('','end',name, text=name, values=(str(value),))
-            #print " in ELSE"
 
     def DeleteVariable(self, name):
         pipeline = ROOT.GetPipeline(0)
@@ -109,7 +105,6 @@ class VariableTab(object):
         return self.variables
 
     def _load_variable_patterns(self, patterns):
-        #print "In Load Variable Patterns !!"
         for name, value in patterns.items():
             self.SetReplaceVariable(name, value)
 

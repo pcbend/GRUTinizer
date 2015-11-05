@@ -91,7 +91,7 @@ void TCompiledHistograms::Fill(TUnpackedEvent& detectors) {
     Reload();
   }
 
-  if(!library || !func){
+  if(!library || !func || !default_directory){
     return;
   }
 

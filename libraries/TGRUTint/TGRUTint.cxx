@@ -149,7 +149,7 @@ void TGRUTint::ApplyOptions() {
     RunMacroFile(filename);
   }
 
-  if(fPipeline->CanStart(true)){
+  if(fPipeline->CanStart()){
     fPipeline->Start();
   }
 
@@ -197,6 +197,8 @@ void TGRUTint::SetupPipeline() {
   }
 
   fPipeline->SetIsOnline(opt->IsOnline());
+
+  fPipeline->Initialize();
 }
 
 void TGRUTint::DefaultFunction(){

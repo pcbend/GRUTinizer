@@ -19,7 +19,8 @@
 #include "TWriteLoop.h"
 
 TPipeline::TPipeline()
-  : output_file(NULL), output_directory(NULL),
+  : is_initialized(false),
+    output_file(NULL), output_directory(NULL),
     data_loop(NULL), unpack_loop(NULL), root_input_loop(NULL),
     histogram_loop(NULL), write_loop(NULL), terminal_loop(NULL),
     is_online(false), time_order(false), time_order_depth(1000) { }
@@ -67,6 +68,10 @@ bool TPipeline::CanStart(bool print_reason) {
 }
 
 int TPipeline::Initialize() {
+  if(is_initialized){
+    return 2;
+  }
+  
   if(!CanStart()){
     return 1;
   }
@@ -81,8 +86,10 @@ int TPipeline::Initialize() {
   SetupOutputFile();
   GetDirectory()->cd();
 
-  SetupHistogramLoop();
   SetupOutputLoop();
+  SetupHistogramLoop();
+
+  is_initialized = true;
 
   return 0;
 }
@@ -185,9 +192,11 @@ bool TPipeline::AllQueuesEmpty() {
 }
 
 void TPipeline::Start() {
-  int error = Initialize();
-  if(error){
-    return;
+  if(!is_initialized) {
+    int error = Initialize();
+    if(error){
+      return;
+    }
   }
 
   Resume();

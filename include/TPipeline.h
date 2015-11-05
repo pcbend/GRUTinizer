@@ -26,6 +26,7 @@ public:
 
   bool CanStart(bool print_reason = false);
 
+  int Initialize();
   void Start();
   void Pause();
   void Resume();
@@ -81,7 +82,6 @@ private:
 
   bool AllQueuesEmpty();
 
-  int Initialize();
 
   void SetupRawReadLoop();
   void SetupRootReadLoop();
@@ -89,6 +89,8 @@ private:
   void SetupHistogramLoop();
   void SetupOutputLoop();
   TRawEventSource* OpenSingleFile(const std::string& filename);
+
+  bool is_initialized;
 
   TFile* output_file;
   TDirectory* output_directory;

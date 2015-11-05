@@ -41,7 +41,6 @@ class MainWindow(object):
         if 'compiled_histograms' in settings:
             self.hist_tab._load_compiled_histograms(settings['compiled_histograms']['name'])
         if 'variables' in settings:
-            #print " THIS IS WHERE I CALL YOU"
             self.variable_tab._load_variable_patterns(settings['variables'])
 
     def _save_gui_file(self, filename = None):
