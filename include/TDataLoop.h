@@ -9,6 +9,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <map>
 
 #include "StoppableThread.h"
 #include "ThreadsafeQueue.h"
@@ -18,8 +19,8 @@ class TRawEventSource;
 
 class TDataLoop : public StoppableThread {
 public:
-  TDataLoop(TRawEventSource* source,
-            ThreadsafeQueue<TRawEvent>& output_queue);
+  static TDataLoop *GetDataLoop(std::string);
+  static int GetNDataLoops();
   virtual ~TDataLoop();
 
   const TRawEventSource& GetSource() const { return *source; }
@@ -28,14 +29,20 @@ public:
 
 protected:
   bool Iteration();
+  
 
 private:
+  TDataLoop(TRawEventSource* source,
+            ThreadsafeQueue<TRawEvent>& output_queue,std::string name="");
   TDataLoop();
   TDataLoop(const TDataLoop& other);
   TDataLoop& operator=(const TDataLoop& other);
+  static std::map<std::string,TDataLoop*> fdataloopmap;
 
   ThreadsafeQueue<TRawEvent>& output_queue;
   TRawEventSource* source;
+  std::string fname;
+
 
   ClassDef(TDataLoop, 0);
 };

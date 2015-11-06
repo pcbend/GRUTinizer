@@ -22,28 +22,25 @@
 
 class TGRUTint : public TRint {
 
-private:
-  TGRUTint(int argc, char **argv, void *opts=0,int numOptions=0,
-           bool noLogo = true, const char *appClassName = "grutinizer");
+  private:
+    TGRUTint(int argc, char **argv, void *opts=0,int numOptions=0,
+             bool noLogo = true, const char *appClassName = "grutinizer");
+    static TEnv *fGRUTEnv;
+    static TGRUTint *fTGRUTint;
 
-  static TEnv *fGRUTEnv;
-  static TGRUTint *fTGRUTint;
+  public:
+    static TGRUTint *instance(int argc=0,char **argv=0,void *opts=0,int numOptions=-1,
+                              bool noLogo=true,const char *appClassName="grutinizer");
+    virtual ~TGRUTint();
+    virtual void Terminate(Int_t status = 0);
+    Long_t ProcessLine(const char* line, Bool_t sync=kTRUE,Int_t *error=0);
 
-public:
-  static TGRUTint *instance(int argc=0,char **argv=0,void *opts=0,int numOptions=-1,
-                           bool noLogo=true,const char *appClassName="grutinizer");
-  virtual ~TGRUTint();
+    //TString ReverseObjectSearch(TString&);
+    //TObject* ObjectAppended(TObject* obj);
 
-  virtual void Terminate(Int_t status = 0);
-  Long_t ProcessLine(const char* line, Bool_t sync=kTRUE,Int_t *error=0);
-
-  //TString ReverseObjectSearch(TString&);
-  //TObject* ObjectAppended(TObject* obj);
-
-  Int_t TabCompletionHook(char* buf, int* pLoc, std::ostream& out);
-
-  //TFile* OpenRootFile(const std::string& filename,TChain *chain=0);
-
+    Int_t TabCompletionHook(char* buf, int* pLoc, std::ostream& out);
+    //TFile* OpenRootFile(const std::string& filename,TChain *chain=0);
+/*
 public:
   //TObject* DelayedProcessLine(std::string message);
   //GUI interface commands;
@@ -53,10 +50,13 @@ public:
   //void DelayedProcessLine_ProcessItem();
 
   //void HandleFile(const std::string& filename);
+*/
 
- private:
-  void RunMacroFile(const std::string& filename);
-  void SplashPopNWait(bool flag);
+ protected:
+   void RunMacroFile(const std::string& filename);
+   void SplashPopNWait(bool flag);
+   void CreateDataLoop();
+
 
 private:
 //#ifndef __CINT__

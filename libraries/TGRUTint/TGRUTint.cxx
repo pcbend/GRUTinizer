@@ -144,11 +144,23 @@ void TGRUTint::ApplyOptions() {
   TGRUTOptions* opt = TGRUTOptions::Get();
 
   if(!false) { //this can be change to something like, if(!ClassicRoot)
-     LoadGRootGraphics();
+     //LoadGRootGraphics();
   }
 
-  //TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
+  if(opt->RawInputFiles().size()){
+    for(int x=0;x<opt->RawInputFiles().size();x++) 
+      printf("I was passed rawfile %s\n",opt->RawInputFiles().at(x).c_str());
+  }  
 
+  if(opt->RootInputFiles().size()){
+    for(int x=0;x<opt->RootInputFiles().size();x++) 
+      printf("I was passed rootfile %s\n",opt->RootInputFiles().at(x).c_str());
+  }  
+
+
+
+  //TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
+/*
   bool need_loop = false;
   if(opt->RawInputFiles().size()==1 && opt->SortRaw()){
     std::string filename = opt->RawInputFiles()[0];
@@ -226,6 +238,8 @@ void TGRUTint::ApplyOptions() {
     //fCommandTimer = new TTimer("",10);
     //fCommandTimer->TurnOn();
   //}
+  //
+  */
 }
 
 //void TGRUTint::DefaultFunction(){

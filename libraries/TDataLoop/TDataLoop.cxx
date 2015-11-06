@@ -2,12 +2,25 @@
 
 #include <chrono>
 #include <thread>
+#include <utility>
 
-#include "TRawEventSource.h"
+#include "TRawSource.h"
+
+
+std::map<std::string,TDataLoop*> TDataLoop::fdataloopmap;
+
+
+
+
 
 TDataLoop::TDataLoop(TRawEventSource* source,
-                     ThreadsafeQueue<TRawEvent>& output_queue)
-  : output_queue(output_queue), source(source) { }
+                     ThreadsafeQueue<TRawEvent>& output_queue,std::string name)
+  : output_queue(output_queue), source(source) { 
+  if(!name.length())
+    name = Form("dataloop%i",GetNDataLoops());
+  fname = name;
+  map.insert(std::make_pair(fname,this));
+}
 
 TDataLoop::~TDataLoop(){
   delete source;
