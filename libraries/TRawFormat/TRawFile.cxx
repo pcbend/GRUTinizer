@@ -1,5 +1,8 @@
-#include "TRawSource.h"
 
+#include <string>
+#include <algorithm>
+
+#include "TRawSource.h"
 #include "TGRUTOptions.h"
 
 TRawFile::TRawFile(const char* filename, kFileType file_type) {
@@ -7,6 +10,10 @@ TRawFile::TRawFile(const char* filename, kFileType file_type) {
                                          TGRUTOptions::Get()->IsOnline(),
                                          false, //not a ring
                                          file_type);
+
+  std::string name = filename;
+  std::replace(name.begin(),name.end(),'/','_');
+
   SetNameTitle(filename,filename);
 }
 
