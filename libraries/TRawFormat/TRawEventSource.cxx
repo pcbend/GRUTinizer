@@ -87,8 +87,6 @@ TRawEventSource* TRawEventSource::EventSource(const char* filename,
   } else {
     source = new TRawEventFileSource(filename, file_type);
   }
-  if(source)
-    source->SetNameTitle(filename,filename);
   return source;
 }
 

@@ -34,7 +34,7 @@ inline size_t FindFileSize(const char* fname) {
 
 
 
-class TRawEventSource : public TNamed {
+class TRawEventSource  {
 public:
   TRawEventSource()
     : fBytesGiven(0), fLastErrno(0), fIsFinished(0) { }
@@ -229,7 +229,7 @@ private:
 
 
 
-class TRawFile : public TRawEventSource {
+class TRawFile : public TRawEventSource,public TNamed {
 public:
   TRawFile(const char* filename, kFileType file_type = kFileType::UNKNOWN_FILETYPE);
   ~TRawFile();

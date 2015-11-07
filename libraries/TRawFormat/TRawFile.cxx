@@ -7,6 +7,7 @@ TRawFile::TRawFile(const char* filename, kFileType file_type) {
                                          TGRUTOptions::Get()->IsOnline(),
                                          false, //not a ring
                                          file_type);
+  SetNameTitle(filename,filename);
 }
 
 TRawFile::~TRawFile() {
