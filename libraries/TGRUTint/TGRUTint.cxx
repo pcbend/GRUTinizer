@@ -313,7 +313,7 @@ TRawFileIn *TGRUTint::OpenRawFile(const std::string& filename) {
   const char* command = Form("TRawFileIn *_data%i = new TRawFileIn(\"%s\")",
                              fRawFilesOpened, filename.c_str());
   ProcessLine(command);
-  TRawFileIn *file = (TRawFileIn*)gROOT->FindObject(filename.c_str());
+  TRawFileIn *file = (TRawFileIn*)gROOT->FindObjectAny(filename.c_str());
   if(file){
     std::cout << "\tfile " << file->GetName() << " opened as _data" << fRawFilesOpened << std::endl;
   }

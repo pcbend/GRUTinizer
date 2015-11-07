@@ -67,14 +67,12 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .default_value(true);
   parser.option("r ring",&input_ring)
     .description("Input ring source (host/ringname).  Requires --format to be specified.");
-  parser.option("n online",&fIsOnline)
-    .description("Continually read the input file as it is written");
   parser.option("l no-logo", &fShowLogo)
     .description("Inhibit the startup logo")
     .default_value(true);
   parser.option("n no-sort", &fSortRaw)
     .description("Load raw data files without sorting")
-    .default_value(true);
+    .default_value(false);
   parser.option("s sort", &fSortTree)
     .description("Try and loop over any loaded root file using libMakeHistos.so")
     .default_value(false);
