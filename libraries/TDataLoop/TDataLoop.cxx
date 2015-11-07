@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "TRawSource.h"
-
+#include "TString.h"
 
 std::map<std::string,TDataLoop*> TDataLoop::fdataloopmap;
 
@@ -19,12 +19,29 @@ TDataLoop::TDataLoop(TRawEventSource* source,
   if(!name.length())
     name = Form("dataloop%i",GetNDataLoops());
   fname = name;
-  map.insert(std::make_pair(fname,this));
+  fdataloopmap.insert(std::make_pair(fname,this));
 }
 
 TDataLoop::~TDataLoop(){
   delete source;
 }
+
+int TDataLoop::GetNDataLoops() { 
+  return fdataloopmap.size();
+}
+
+TDataLoop *TDataLoop::Get(std::string name,TRawEventSource* source, ThreadsafeQueue<TRawEvent>* output_queue) { 
+  if(fdataloopmap.count(name))
+    return fdataloopmap.at(name);
+  else if(source)
+    return new TDataLoop(source,*output_queue,name);
+  else
+    return 0;
+}
+
+
+
+
 
 bool TDataLoop::Iteration() {
   TRawEvent evt;

@@ -19,7 +19,7 @@ class TRawEventSource;
 
 class TDataLoop : public StoppableThread {
 public:
-  static TDataLoop *GetDataLoop(std::string);
+  static TDataLoop *Get(std::string name, TRawEventSource* source=0,ThreadsafeQueue<TRawEvent>* output_queue=0);
   static int GetNDataLoops();
   virtual ~TDataLoop();
 
