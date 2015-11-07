@@ -15,6 +15,7 @@
 #include <TRint.h>
 #include <TEnv.h>
 #include <TChain.h>
+#include <TList.h>
 
 //#include "TGRUTServer.h"
 
@@ -86,6 +87,15 @@ private:
   void Init();
   void ApplyOptions();
   void LoadGRootGraphics();
+
+
+  public:
+    TList *GetListOfRawFiles() { return &fOpenedRawFiles; }
+
+  private:
+    TList fOpenedRawFiles; 
+
+
 
   ClassDef(TGRUTint,0);
 };
