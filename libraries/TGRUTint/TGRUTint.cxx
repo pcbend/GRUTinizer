@@ -322,7 +322,7 @@ TRawFileIn *TGRUTint::OpenRawFile(const std::string& filename) {
     std::cout << "\tfile " << filename << " opened as _data" << fRawFilesOpened << std::endl;
   //}
   fRawFilesOpened++;
-  return file;
+  return 0; //file;
 }
 
 
