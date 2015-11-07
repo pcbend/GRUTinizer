@@ -14,7 +14,7 @@ TRawFile::TRawFile(const char* filename, kFileType file_type) {
   std::string name = filename;
   std::replace(name.begin(),name.end(),'/','_');
 
-  SetNameTitle(filename,filename);
+  SetNameTitle(name.c_str(),name.c_str());
 }
 
 TRawFile::~TRawFile() {

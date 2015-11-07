@@ -2,6 +2,8 @@
 #include "TGRUTint.h"
 
 #include <fstream>
+#include <string>
+#include <algorithm>
 
 #include <Getline.h>
 #include <TClass.h>
@@ -315,7 +317,9 @@ TRawFileIn *TGRUTint::OpenRawFile(const std::string& filename) {
   ProcessLine(command);
   TRawFileIn *file = (TRawFileIn*)gROOT->FindObjectAny(filename.c_str());
   if(file){
-    std::cout << "\tfile " << file->GetName() << " opened as _data" << fRawFilesOpened << std::endl;
+    std::string name = file->GetName();
+    std::replace(name.begin(),name.end(),'_','/');
+    std::cout << "\tfile " << name << " opened as _data" << fRawFilesOpened << std::endl;
   }
   fRawFilesOpened++;
   return file;
