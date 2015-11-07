@@ -10,7 +10,7 @@
 
 #include <zlib.h>
 
-
+#include "TNamed.h"
 #include "TStopwatch.h"
 
 #include "TGRUTTypes.h"
@@ -34,7 +34,7 @@ inline size_t FindFileSize(const char* fname) {
 
 
 
-class TRawEventSource {
+class TRawEventSource : public TNamed {
 public:
   TRawEventSource()
     : fBytesGiven(0), fLastErrno(0), fIsFinished(0) { }
@@ -257,12 +257,14 @@ private:
   }
 
   TRawEventSource* wrapped;
+  ClassDef(TRawFile,1)
 };
 
 class TRawFileIn : public TRawFile {
 public:
   TRawFileIn(const char* filename, kFileType file_type = kFileType::UNKNOWN_FILETYPE)
     : TRawFile(filename, file_type) { }
+  ClassDef(TRawFileIn,0)
 };
 
 

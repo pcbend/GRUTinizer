@@ -71,22 +71,25 @@ TRawEventSource* TRawEventSource::EventSource(const char* filename,
     }
     file_type = TGRUTOptions::Get()->DetermineFileType(filename);
   }
-
+  TRawEventSource *source = 0;
   // If it is a ring, open it
   if(is_ring){
-    return new TRawEventRingSource(filename, file_type);
+    source = new TRawEventRingSource(filename, file_type);
   // If it is an archived file, open it as such
   } else if(hasSuffix(filename,".bz2")){
-    return new TRawEventBZipSource(filename, file_type);
+    source = new TRawEventBZipSource(filename, file_type);
   } else if (hasSuffix(filename,".gz")){
-    return new TRawEventGZipSource(filename, file_type);
+    source = new TRawEventGZipSource(filename, file_type);
   // If it is an in-progress file, open it that way
   } else if (is_online) {
-    return new TRawEventOnlineFileSource(filename, file_type);
+    source = new TRawEventOnlineFileSource(filename, file_type);
   // Otherwise, open it as a normal file.
   } else {
-    return new TRawEventFileSource(filename, file_type);
+    source = new TRawEventFileSource(filename, file_type);
   }
+  if(source)
+    source->SetNameTitle(filename,filename);
+  return source;
 }
 
 double TRawEventSource::GetAverageRate() const {

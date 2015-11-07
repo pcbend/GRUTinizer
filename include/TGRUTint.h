@@ -18,6 +18,8 @@
 
 //#include "TGRUTServer.h"
 
+class TRawFileIn;
+
 //extern TObject* gResponse;
 
 class TGRUTint : public TRint {
@@ -39,7 +41,8 @@ class TGRUTint : public TRint {
     //TObject* ObjectAppended(TObject* obj);
 
     Int_t TabCompletionHook(char* buf, int* pLoc, std::ostream& out);
-    //TFile* OpenRootFile(const std::string& filename,TChain *chain=0);
+    TFile* OpenRootFile(const std::string& filename,TChain *chain=0);
+    TRawFileIn* OpenRawFile(const std::string& filename);
 /*
 public:
   //TObject* DelayedProcessLine(std::string message);
@@ -71,13 +74,14 @@ private:
   //std::queue<std::string> fLinesToProcess;
   //std::queue<TObject*> fCommandResults;
 
-  //int fRootFilesOpened;
+  int fRootFilesOpened;
+  int fRawFilesOpened;
 
   //TObject* fNewChild;
   bool fIsTabComplete;
   //TGRUTServer *fCommandServer;
 
-  //TChain* fChain;
+  TChain* fChain;
 
   void Init();
   void ApplyOptions();

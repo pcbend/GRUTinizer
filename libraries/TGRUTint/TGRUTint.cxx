@@ -17,8 +17,9 @@
 //#include "ProgramPath.h"
 //#include "TDetectorEnv.h"
 #include "TGRUTOptions.h"
+#include "TRawSource.h"
 //#include "TGRUTLoop.h"
-//#include "TGRUTUtilities.h"
+#include "TGRUTUtilities.h"
 //#include "TObjectManager.h"
 
 //#include "TOnlineTree.h"
@@ -49,13 +50,18 @@ TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions
 TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t noLogo,const char *appClassName)
   :TRint(appClassName, &argc, argv, options, numOptions,noLogo),
    fIsTabComplete(false) {
-   //fCommandServer(NULL), fGuiTimer(NULL), fCommandTimer(NULL), fRootFilesOpened(0), fIsTabComplete(false) {
+   //fCommandServer(NULL), fGuiTimer(NULL), fCommandTimer(NULL),  fIsTabComplete(false) {
 
   fGRUTEnv = gEnv;
   GetSignalHandler()->Remove();
   TGRUTInterruptHandler *ih = new TGRUTInterruptHandler();
   ih->Add();
   //TH1::SetDefaultSumw2();
+
+  fChain = 0;
+  fRootFilesOpened = 0;
+  fRawFilesOpened  = 0;
+
 
   SetPrompt("GRizer [%d] ");
   TGRUTOptions::Get(argc, argv);
@@ -147,15 +153,41 @@ void TGRUTint::ApplyOptions() {
      //LoadGRootGraphics();
   }
 
-  if(opt->RawInputFiles().size()){
+  //if I am passed any calibrations, lets load those.
+  if(opt->CalInputFiles().size()) {
+    for(int x=0;x<opt->CalInputFiles().size();x++)
+      printf("I was passed calfile %s\n",opt->CalInputFiles().at(x).c_str());
+  }
+
+  //next most important thing, if given a raw file && told NOT to not sort!
+  if(opt->RawInputFiles().size() && opt->SortRaw()) {
     for(int x=0;x<opt->RawInputFiles().size();x++) 
       printf("I was passed rawfile %s\n",opt->RawInputFiles().at(x).c_str());
   }  
 
-  if(opt->RootInputFiles().size()){
+  //ok now, if told not to sort open any raw files as _data# (rootish like??)
+  if(opt->RawInputFiles().size() && !opt->SortRaw()) {
+    for(int x=0;x<opt->RawInputFiles().size();x++) 
+      OpenRawFile(opt->RawInputFiles().at(x));
+      //printf("I was passed rawfile %s\n",opt->RawInputFiles().at(x).c_str());
+  }
+
+  //next, if given a root file and told to sort it.
+  if(opt->RootInputFiles().size() && opt->SortTree()){
     for(int x=0;x<opt->RootInputFiles().size();x++) 
-      printf("I was passed rootfile %s\n",opt->RootInputFiles().at(x).c_str());
+      printf("I am going to sort this rootfile %s, someday.\n",opt->RootInputFiles().at(x).c_str());
   }  
+
+  //next, if given a root file and NOT told to sort it..
+  if(opt->RootInputFiles().size() && !opt->SortTree()){
+    for(int x=0;x<opt->RootInputFiles().size();x++) 
+      OpenRootFile(opt->RawInputFiles().at(x));
+    //now that my root file has been open, I may need to re-apply any passed in calfiles.
+    for(int x=0;x<opt->CalInputFiles().size();x++)
+      printf("I am reloading calfile %s!\n",opt->CalInputFiles().at(x).c_str());
+  }  
+
+
 
 
 
@@ -248,9 +280,9 @@ void TGRUTint::ApplyOptions() {
 //  std::cout << "I have been called " << i++ << " times before" << std::endl;
 //}
 
-/*
+
 TFile* TGRUTint::OpenRootFile(const std::string& filename, TChain *chain){
-  if(!file_exists(filename)){
+  if(!file_exists(filename.c_str())){
     std::cerr << "File \"" << filename << "\" does not exist" << std::endl;
     return NULL;
   }
@@ -260,19 +292,43 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, TChain *chain){
   const char* command = Form("TFile *_file%i = new TFile(\"%s\",\"read\")",
                              fRootFilesOpened, filename.c_str());
   ProcessLine(command);
-
   TFile *file = (TFile*)gROOT->GetListOfFiles()->FindObject(filename.c_str());
   if(file){
     std::cout << "\tfile " << file->GetName() << " opened as _file" << fRootFilesOpened << std::endl;
     if(file->FindObjectAny("EventTree")) {
+      if(!fChain)
+        fChain = new TChain("EventTree");
       fChain->Add(file->GetName());
     }
   }
-
   fRootFilesOpened++;
   return file;
 }
-*/
+
+TRawFileIn *TGRUTint::OpenRawFile(const std::string& filename) {
+  if(!file_exists(filename.c_str())){
+    std::cerr << "File \"" << filename << "\" does not exist" << std::endl;
+    return NULL;
+  }
+  const char* command = Form("TRawFileIn *_data%i = new TRawFileIn(\"%s\")",
+                             fRawFilesOpened, filename.c_str());
+  ProcessLine(command);
+  TRawFileIn *file = (TRawFileIn*)gROOT->FindObject(filename.c_str());
+  if(file){
+    std::cout << "\tfile " << file->GetName() << " opened as _data" << fRawFilesOpened << std::endl;
+  }
+  fRawFilesOpened++;
+  return file;
+}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -300,7 +356,7 @@ void TGRUTint::HandleFile(const std::string& filename){
   case NSCL_EVT:
   case GRETINA_MODE2:
   case GRETINA_MODE3:
-  {
+  
     std::string outfile = opt->OutputFile();
     if(!outfile.length()){
       outfile = opt->GenerateOutputFilename(filename);
@@ -426,9 +482,9 @@ void TGRUTint::Terminate(Int_t status){
   //  fCommandServer = NULL;
   //}
 
-  if(TGRUTOptions::Get()->StartGUI()){
-    TPython::Exec("on_close()");
-  }
+  //if(TGRUTOptions::Get()->StartGUI()){
+  //  TPython::Exec("on_close()");
+  //}
 
   //TGRUTLoop::Get()->Stop();
   //TDataLoop::DeleteInstance();

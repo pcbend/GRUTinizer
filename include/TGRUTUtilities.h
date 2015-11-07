@@ -3,6 +3,6 @@
 
 #include <string>
 
-bool file_exists(const std::string& filename);
+bool file_exists(const char *filename);
 
 #endif
