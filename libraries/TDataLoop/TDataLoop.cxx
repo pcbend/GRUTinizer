@@ -9,38 +9,30 @@
 
 std::map<std::string,TDataLoop*> TDataLoop::fdataloopmap;
 
-
-
-
-
-TDataLoop::TDataLoop(TRawEventSource* source,
-                     ThreadsafeQueue<TRawEvent>& output_queue,std::string name)
-  : output_queue(output_queue), source(source) { 
+TDataLoop::TDataLoop(std::string name,TRawEventSource* source) 
+  : source(source) { 
   if(!name.length())
     name = Form("dataloop%i",GetNDataLoops());
-  fname = name;
-  fdataloopmap.insert(std::make_pair(fname,this));
+  SetName(name.c_str());
+  fdataloopmap.insert(std::make_pair(name,this));
 }
 
 TDataLoop::~TDataLoop(){
-  delete source;
+  delete source; // do we really want the loop to take ownership?
 }
 
 int TDataLoop::GetNDataLoops() { 
   return fdataloopmap.size();
 }
 
-TDataLoop *TDataLoop::Get(std::string name,TRawEventSource* source, ThreadsafeQueue<TRawEvent>* output_queue) { 
+TDataLoop *TDataLoop::Get(std::string name,TRawEventSource* source) { 
   if(fdataloopmap.count(name))
     return fdataloopmap.at(name);
   else if(source)
-    return new TDataLoop(source,*output_queue,name);
+    return new TDataLoop(name,source);
   else
     return 0;
 }
-
-
-
 
 
 bool TDataLoop::Iteration() {
@@ -60,6 +52,7 @@ bool TDataLoop::Iteration() {
     return true;
   }
 }
+
 
 std::string TDataLoop::Status() {
   return source->Status();

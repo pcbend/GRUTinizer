@@ -23,6 +23,7 @@
 //#include "TGRUTLoop.h"
 #include "TGRUTUtilities.h"
 //#include "TObjectManager.h"
+#include "TChannel.h"
 
 //#include "TOnlineTree.h"
 
@@ -158,7 +159,8 @@ void TGRUTint::ApplyOptions() {
   //if I am passed any calibrations, lets load those.
   if(opt->CalInputFiles().size()) {
     for(int x=0;x<opt->CalInputFiles().size();x++)
-      printf("I was passed calfile %s\n",opt->CalInputFiles().at(x).c_str());
+      TChannel::ReadCalFile(opt->CalInputFiles().at(x).c_str());
+      //printf("I was passed calfile %s\n",opt->CalInputFiles().at(x).c_str());
   }
 
   //next most important thing, if given a raw file && told NOT to not sort!
@@ -296,7 +298,7 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, TChain *chain){
   ProcessLine(command);
   TFile *file = (TFile*)gROOT->GetListOfFiles()->FindObject(filename.c_str());
   if(file){
-    std::cout << "\tfile " << BLUE << file->GetName() << RESET_COLOR << BLUE <<  " opened as _file" << fRootFilesOpened << RESET_COLOR <<  std::endl;
+    std::cout << "\tfile " << BLUE << file->GetName() << RESET_COLOR <<  " opened as " << BLUE <<  "_file" << fRootFilesOpened << RESET_COLOR <<  std::endl;
     if(file->FindObjectAny("EventTree")) {
       if(!fChain)
         fChain = new TChain("EventTree");
@@ -320,21 +322,11 @@ TRawFileIn *TGRUTint::OpenRawFile(const std::string& filename) {
   if(file){
     //std::string name = file->GetName();
     //std::replace(name.begin(),name.end(),'_','/');
-    std::cout << "\tfile " << BLUE << filename << RESET_COLOR << " opened as _data" << BLUE <<  fRawFilesOpened << RESET_COLOR << std::endl;
+    std::cout << "\tfile " << BLUE << filename << RESET_COLOR << " opened as "<< BLUE << "_data" <<  fRawFilesOpened << RESET_COLOR << std::endl;
   }
   fRawFilesOpened++;
   return file;
 }
-
-
-
-
-
-
-
-
-
-
 
 
 void TGRUTint::RunMacroFile(const std::string& filename){

@@ -11,38 +11,40 @@
 #include <iostream>
 #include <map>
 
+#include <TNamed.h>
+
 #include "StoppableThread.h"
 #include "ThreadsafeQueue.h"
 #include "TRawEvent.h"
 
 class TRawEventSource;
 
-class TDataLoop : public StoppableThread {
+class TDataLoop : public TNamed, public StoppableThread  {
 public:
-  static TDataLoop *Get(std::string name, TRawEventSource* source=0,ThreadsafeQueue<TRawEvent>* output_queue=0);
+  static TDataLoop *Get(std::string name="", TRawEventSource* source=0); //,ThreadsafeQueue<TRawEvent>* output_queue=0);
   static int GetNDataLoops();
   virtual ~TDataLoop();
 
   const TRawEventSource& GetSource() const { return *source; }
 
+  //std::string GetName() { return fname; }
   std::string Status();
 
-protected:
+//protected:
   bool Iteration();
   
 
 private:
-  TDataLoop(TRawEventSource* source,
-            ThreadsafeQueue<TRawEvent>& output_queue,std::string name="");
+  TDataLoop(std::string name,TRawEventSource* source);
+            //ThreadsafeQueue<TRawEvent>& output_queue,std::string name="");
   TDataLoop();
   TDataLoop(const TDataLoop& other);
   TDataLoop& operator=(const TDataLoop& other);
   static std::map<std::string,TDataLoop*> fdataloopmap;
 
-  ThreadsafeQueue<TRawEvent>& output_queue;
+  ThreadsafeQueue<TRawEvent> output_queue;
   TRawEventSource* source;
-  std::string fname;
-
+  //std::string fname;
 
   ClassDef(TDataLoop, 0);
 };
