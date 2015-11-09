@@ -13,8 +13,8 @@ TDataLoop::TDataLoop(std::string name,TRawEventSource* source)
   : source(source) { 
   if(!name.length())
     name = Form("dataloop%i",GetNDataLoops());
-  SetName(name.c_str());
-  fdataloopmap.insert(std::make_pair(name,this));
+  fname = name;
+  fdataloopmap.insert(std::make_pair(fname,this));
 }
 
 TDataLoop::~TDataLoop(){

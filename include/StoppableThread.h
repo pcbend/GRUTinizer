@@ -25,7 +25,7 @@ public:
 
   virtual std::string Status() { return ""; }
 
-protected:
+//protected:
   virtual bool Iteration() = 0;
 
 private:

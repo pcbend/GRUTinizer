@@ -1,4 +1,4 @@
-// TDataLoop.h  TStoppableThread.h
+// TDataLoop.h  StoppableThread.h
 
 #ifdef __CINT__
 
@@ -8,6 +8,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class StoppableThread+;
+
 #pragma link C++ class TDataLoop+;
 
 //#pragma link C++ class TUnpackLoop+;

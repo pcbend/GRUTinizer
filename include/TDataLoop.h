@@ -19,7 +19,7 @@
 
 class TRawEventSource;
 
-class TDataLoop : public TNamed, public StoppableThread  {
+class TDataLoop : public StoppableThread  {
 public:
   static TDataLoop *Get(std::string name="", TRawEventSource* source=0); //,ThreadsafeQueue<TRawEvent>* output_queue=0);
   static int GetNDataLoops();
@@ -27,12 +27,13 @@ public:
 
   const TRawEventSource& GetSource() const { return *source; }
 
-  //std::string GetName() { return fname; }
+  std::string GetName() { return fname; }
   std::string Status();
 
 //protected:
   bool Iteration();
-  
+  int Pop(TRawEvent &event) { return output_queue.Pop(event); }
+
 
 private:
   TDataLoop(std::string name,TRawEventSource* source);
@@ -44,7 +45,7 @@ private:
 
   ThreadsafeQueue<TRawEvent> output_queue;
   TRawEventSource* source;
-  //std::string fname;
+  std::string fname;
 
   ClassDef(TDataLoop, 0);
 };
