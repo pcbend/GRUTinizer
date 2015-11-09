@@ -43,6 +43,9 @@ void StoppableThread::Join() {
   thread.join();
 }
 
+
+
+
 void StoppableThread::Loop() {
   while(running){
     {

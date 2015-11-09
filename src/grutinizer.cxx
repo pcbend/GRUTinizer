@@ -47,7 +47,7 @@
 //static STRUCT_UTMP *gUtmpContents;
 
 //static void SetDisplay();
-//void SetGRUTPluginHandlers();
+void SetGRUTPluginHandlers();
 
 
 void LoadGRUTEnv() {
@@ -63,10 +63,10 @@ void LoadGRUTEnv() {
 int main(int argc, char **argv) {
   //Find the grut environment variable so that we can read in .grutrc
   LoadGRUTEnv();
+  SetGRUTPluginHandlers();
   //ReplaceCleanups();
 
   //SetDisplay();
-  //SetGRUTPluginHandlers();
   TGRUTint *input = 0;
 
   //Create an instance of the grut interpreter so that we can run root-like interpretive mode
@@ -82,12 +82,12 @@ int main(int argc, char **argv) {
 
 
 void SetGRUTPluginHandlers() {
-   //gPluginMgr->AddHandler("GRootCanvas","grut","GRootCanvas"
-//   gPluginMgr->AddHandler("TGuiFactory","root","GROOTGuiFactory","Gui","GROOTGuiFactory()");
-//   gPluginMgr->AddHandler("TBrowserImp","GRootBrowser","GRootBrowser",
-//                          "Gui","NewBrowser(TBrowser *,const char *,Int_t,Int_t,UInt_t,UInt_t");
-//   gPluginMgr->AddHandler("TBrowserImp","GRootBrowser","GRootBrowser",
-//                          "Gui","NewBrowser(TBrowser *,const char *,Int_t,Int_t");
+  //gPluginMgr->AddHandler("GRootCanvas","grut","GRootCanvas"
+  gPluginMgr->AddHandler("TGuiFactory","root","GROOTGuiFactory","Gui","GROOTGuiFactory()");
+  gPluginMgr->AddHandler("TBrowserImp","GRootBrowser","GRootBrowser",
+                         "Gui","NewBrowser(TBrowser *,const char *,Int_t,Int_t,UInt_t,UInt_t");
+  gPluginMgr->AddHandler("TBrowserImp","GRootBrowser","GRootBrowser",
+                         "Gui","NewBrowser(TBrowser *,const char *,Int_t,Int_t");
 }
 
 /*

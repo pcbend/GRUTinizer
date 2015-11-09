@@ -15,11 +15,12 @@
 #include <TTree.h>
 #include <TUnixSystem.h>
 
-//#include "GRootGuiFactory.h"
+#include "GRootGuiFactory.h"
 //#include "ProgramPath.h"
 //#include "TDetectorEnv.h"
 #include "TGRUTOptions.h"
 #include "TRawSource.h"
+#include "TDataLoop.h"
 //#include "TGRUTLoop.h"
 #include "TGRUTUtilities.h"
 //#include "TObjectManager.h"
@@ -153,8 +154,26 @@ void TGRUTint::ApplyOptions() {
   TGRUTOptions* opt = TGRUTOptions::Get();
 
   if(!false) { //this can be change to something like, if(!ClassicRoot)
-     //LoadGRootGraphics();
+     LoadGRootGraphics();
   }
+
+  if(opt->StartGUI()){
+    //std::string script_filename = program_path() + "/../util/grut-view.py";
+    std::string   script_filename = Form("%s/util/grut-view.py",getenv("GRUTSYS"));
+    std::ifstream script(script_filename);
+    std::string   script_text((std::istreambuf_iterator<char>(script)),
+                               std::istreambuf_iterator<char>());
+    TPython::Exec(script_text.c_str());
+
+    for(auto& filename : opt->RootInputFiles()){
+      //TPython::Exec(Form("window.LoadRootFile(\"%s\")",filename.c_str()));
+      //OpenRootFile(filename); // Is this needed/sane?
+    }
+    TTimer *fGuiTimer = new TTimer("TPython::Exec(\"update()\");",10);
+    fGuiTimer->TurnOn();
+  }
+
+
 
   //if I am passed any calibrations, lets load those.
   if(opt->CalInputFiles().size()) {
@@ -165,8 +184,11 @@ void TGRUTint::ApplyOptions() {
 
   //next most important thing, if given a raw file && told NOT to not sort!
   if(opt->RawInputFiles().size() && opt->SortRaw()) {
-    for(int x=0;x<opt->RawInputFiles().size();x++) 
-      printf("I was passed rawfile %s\n",opt->RawInputFiles().at(x).c_str());
+    for(int x=0;x<opt->RawInputFiles().size();x++) {
+      TDataLoop *loop = TDataLoop::Get(Form("datasource%i",x),new TRawFileIn(opt->RawInputFiles().at(x).c_str()));
+      loop->Resume();
+    }
+      //printf("I was passed rawfile %s\n",opt->RawInputFiles().at(x).c_str());
   }  
 
   //ok now, if told not to sort open any raw files as _data# (rootish like??)
@@ -506,7 +528,7 @@ void TGRUTint::Terminate(Int_t status){
 }
 
 void TGRUTint::LoadGRootGraphics() {
-  //GRootGuiFactory::Init();
+  GRootGuiFactory::Init();
 }
 
 /*

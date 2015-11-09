@@ -118,17 +118,18 @@ class HistTab(object):
         self.main.window.after(5000, self._PeriodicHistogramCheck)
 
     def CheckOnlineHists(self):
-        pipeline = ROOT.GetPipeline(0)
-        if pipeline and pipeline.GetDirectory():
-            tdir = pipeline.GetDirectory()
-            if tdir.GetList():
-                self.Insert(tdir.GetList())
-            elif tdir.GetListOfKeys():
-                self.Insert(tdir.GetListOfKeys())
+        return
+        #pipeline = ROOT.GetPipeline(0)
+        #if pipeline and pipeline.GetDirectory():
+        #    tdir = pipeline.GetDirectory()
+        #    if tdir.GetList():
+        #        self.Insert(tdir.GetList())
+        #    elif tdir.GetListOfKeys():
+        #        self.Insert(tdir.GetListOfKeys())
 
-            if self._requires_resort:
-                self.Resort()
-                self._requires_resort = False
+        #    if self._requires_resort:
+        #        self.Resort()
+        #        self._requires_resort = False
 
     def Resort(self, parent=''):
         children = list(self.treeview.get_children(parent))
