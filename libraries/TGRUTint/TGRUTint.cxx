@@ -296,7 +296,7 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, TChain *chain){
   ProcessLine(command);
   TFile *file = (TFile*)gROOT->GetListOfFiles()->FindObject(filename.c_str());
   if(file){
-    std::cout << "\tfile " << file->GetName() << " opened as _file" << fRootFilesOpened << std::endl;
+    std::cout << "\tfile " << BLUE << file->GetName() << RESET_COLOR << BLUE <<  " opened as _file" << fRootFilesOpened << RESET_COLOR <<  std::endl;
     if(file->FindObjectAny("EventTree")) {
       if(!fChain)
         fChain = new TChain("EventTree");
@@ -312,15 +312,15 @@ TRawFileIn *TGRUTint::OpenRawFile(const std::string& filename) {
     std::cerr << "File \"" << filename << "\" does not exist" << std::endl;
     return NULL;
   }
-  const char* command1 = Form("TGRUTInt::Get()->GetListOfRawFiles()->Add(new TRawFileIn(\"%s\")",filename.c_str());
+  const char* command1 = Form("TGRUTint::instance()->GetListOfRawFiles()->Add(new TRawFileIn(\"%s\"))",filename.c_str());
   ProcessLine(command1);
-  const char* command2 = Form("TRawFileIn *_data%i = (TRawFileIn*)TGRUTInt::Get()->GetListOfRawFiles()->Last()",fRawFilesOpened);
+  const char* command2 = Form("TRawFileIn *_data%i = (TRawFileIn*)TGRUTint::instance()->GetListOfRawFiles()->Last()",fRawFilesOpened);
   ProcessLine(command2);
   TRawFileIn *file = (TRawFileIn*)GetListOfRawFiles()->Last();
   if(file){
     //std::string name = file->GetName();
     //std::replace(name.begin(),name.end(),'_','/');
-    std::cout << "\tfile " << filename << " opened as _data" << fRawFilesOpened << std::endl;
+    std::cout << "\tfile " << BLUE << filename << RESET_COLOR << " opened as _data" << BLUE <<  fRawFilesOpened << RESET_COLOR << std::endl;
   }
   fRawFilesOpened++;
   return file;
