@@ -12,38 +12,46 @@
 #include "TObject.h"
 
 class StoppableThread {
-public:
-  StoppableThread();
-  virtual ~StoppableThread();
+  public:
+    StoppableThread();
+    virtual ~StoppableThread();
 
-  void Resume();
-  void Pause();
-  void Stop();
-  bool IsPaused();
-  bool IsRunning();
-  void Join();
+    void Resume();
+    void Pause();
+    void Stop();
+    bool IsPaused();
+    bool IsRunning();
+    void Join();
 
-  virtual std::string Status() { return ""; }
+    virtual std::string Status() { return ""; }
 
-//protected:
-  virtual bool Iteration() = 0;
+    //protected:
+    virtual bool Iteration() = 0;
 
-private:
-  StoppableThread(const StoppableThread& other) { }
-  StoppableThread& operator=(const StoppableThread& other) { }
+  protected:
+    static std::map<std::string,StoppableThread*> fthreadmap;
 
-  void Loop();
+
+    static int GetNThreads();
+
+  private:
+    StoppableThread(const StoppableThread& other) { }
+    StoppableThread& operator=(const StoppableThread& other) { }
+
+    std::string fname;
+
+    void Loop();
 
 #ifndef __CINT__
-  std::thread thread;
-  std::atomic_bool running;
-  std::atomic_bool force_stop;
-  std::atomic_bool paused;
-  std::condition_variable paused_wait;
-  std::mutex pause_mutex;
+    std::thread thread;
+    std::atomic_bool running;
+    std::atomic_bool force_stop;
+    std::atomic_bool paused;
+    std::condition_variable paused_wait;
+    std::mutex pause_mutex;
 #endif
 
-  ClassDef(StoppableThread, 0);
+    ClassDef(StoppableThread, 0);
 };
 
 

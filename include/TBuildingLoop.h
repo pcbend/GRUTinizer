@@ -6,25 +6,25 @@
 #include "StoppableThread.h"
 #include "ThreadsafeQueue.h"
 #include "TRawEvent.h"
-#include "TUnpackedEvent.h"
+#include "TBuildingedEvent.h"
 
 class TNSCLEvent;
 class TGEBEvent;
 
-class TUnpackLoop : public StoppableThread {
+class TBuildingLoop : public StoppableThread {
 public:
-  TUnpackLoop(ThreadsafeQueue<TRawEvent>& input_queue,
-              ThreadsafeQueue<TUnpackedEvent*>& output_queue);
-  virtual ~TUnpackLoop();
+  TBuildingLoop(std::string name, ThreadsafeQueue<TRawEvent>& input_queue);
+              //ThreadsafeQueue<TBuildingedEvent*>& output_queue);
+  virtual ~TBuildingLoop();
 
-  ThreadsafeQueue<TUnpackedEvent*>& GetOutputQueue() { return output_queue; }
+  ThreadsafeQueue<TBuiltEvent*>& GetOutputQueue() { return output_queue; }
 
-protected:
+//protected:
   bool Iteration();
 
 private:
-  TUnpackLoop(const TUnpackLoop& other);
-  TUnpackLoop& operator=(const TUnpackLoop& other);
+  TBuildingLoop(const TBuildingLoop& other);
+  TBuildingLoop& operator=(const TBuildingLoop& other);
 
   void CheckBuildWindow(long timestamp);
 
@@ -37,9 +37,9 @@ private:
   void HandleS800Scaler(TGEBEvent& event);
 
   ThreadsafeQueue<TRawEvent>& input_queue;
-  ThreadsafeQueue<TUnpackedEvent*>& output_queue;
+  ThreadsafeQueue<TBuiltEvent*>& output_queue;
 
-  TUnpackedEvent* next_event;
+  TBuiltEvent* next_event;
   long event_start;
   long build_window;
 };
