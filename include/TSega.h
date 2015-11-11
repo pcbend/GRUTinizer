@@ -4,8 +4,6 @@
 #include "TDetector.h"
 #include "TSegaHit.h"
 
-class TClonesArray;
-
 class TSega : public TDetector {
 public:
   TSega();
@@ -21,9 +19,9 @@ public:
 private:
   virtual int BuildHits();
 
-  TClonesArray* sega_hits; //->
+  std::vector<TSegaHit> sega_hits;
 
-  ClassDef(TSega,1);
+  ClassDef(TSega,2);
 };
 
 #endif /* _TSEGA_H_ */

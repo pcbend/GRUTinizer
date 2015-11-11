@@ -2,45 +2,38 @@
 
 #include <iostream>
 
-#include "TClonesArray.h"
-
 #include "DDASDataFormat.h"
 #include "TNSCLEvent.h"
 
-TSega::TSega(){
-  sega_hits = new TClonesArray("TSegaHit");
-}
+TSega::TSega(){ }
 
-TSega::~TSega(){
-  delete sega_hits;
-}
+TSega::~TSega(){ }
 
 void TSega::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 
   TSega& sega = (TSega&)obj;
-  sega_hits->Copy(*sega.sega_hits);
+  sega.sega_hits = sega_hits;
   sega.raw_data.clear();
 }
 
 void TSega::Clear(Option_t* opt){
   TDetector::Clear(opt);
 
-  sega_hits->Clear(opt);
+  sega_hits.clear();
 }
 
 void TSega::InsertHit(const TDetectorHit& hit){
-  TSegaHit* new_hit = (TSegaHit*)sega_hits->ConstructedAt(Size());
-  hit.Copy(*new_hit);
+  sega_hits.push_back((const TSegaHit&)hit);
   fSize++;
 }
 
 TSegaHit& TSega::GetSegaHit(int i){
-  return *(TSegaHit*)sega_hits->At(i);
+  return sega_hits.at(i);
 }
 
 TDetectorHit& TSega::GetHit(int i){
-  return *(TSegaHit*)sega_hits->At(i);
+  return sega_hits.at(i);
 }
 
 int TSega::BuildHits() {

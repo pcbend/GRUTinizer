@@ -6,26 +6,22 @@
 #include "JanusDataFormat.h"
 #include "TNSCLEvent.h"
 
-TJanus::TJanus() {
-  janus_hits = new TClonesArray("TJanusHit");
-}
+TJanus::TJanus() { }
 
-TJanus::~TJanus(){
-  delete janus_hits;
-}
+TJanus::~TJanus(){ }
 
 void TJanus::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 
   TJanus& janus = (TJanus&)obj;
-  janus_hits->Copy(*janus.janus_hits);
+  janus.janus_hits = janus_hits;
   janus.raw_data.clear();
 }
 
 void TJanus::Clear(Option_t* opt){
   TDetector::Clear(opt);
 
-  janus_hits->Clear(opt);
+  janus_hits.clear();
 }
 
 int TJanus::BuildHits(){
@@ -38,17 +34,16 @@ int TJanus::BuildHits(){
 }
 
 void TJanus::InsertHit(const TDetectorHit& hit){
-  TJanusHit* new_hit = (TJanusHit*)janus_hits->ConstructedAt(Size());
-  hit.Copy(*new_hit);
+  janus_hits.push_back((const TJanusHit&)hit);
   fSize++;
 }
 
 TJanusHit& TJanus::GetJanusHit(int i){
-  return *(TJanusHit*)janus_hits->At(i);
+  return janus_hits.at(i);
 }
 
 TDetectorHit& TJanus::GetHit(int i){
-  return *(TJanusHit*)janus_hits->At(i);
+  return janus_hits.at(i);
 }
 
 
@@ -64,7 +59,7 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   int num_adc_channels = vmusb_header->size()/2 - 3;
 
   const VME_Timestamp* vme_timestamp = (VME_Timestamp*)(data + num_adc_channels*sizeof(CAEN_ADC));
-  long timestamp = vme_timestamp->ts1();
+  long timestamp = vme_timestamp->ts1()*20;
 
   int i;
   for(i=0; i<num_adc_channels; i++){
@@ -73,7 +68,7 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
 
     TJanusHit hit;
     hit.SetEntryType((char)adc->entry_type());
-    hit.SetTimestamp(timestamp);
+//    hit.SetTimestamp(timestamp);
 
     if(adc->IsValid()){
       int id = 32*(adc->card_num()-5) + adc->channel_num();
@@ -81,17 +76,10 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
       hit.SetOverflowBit(adc->overflow());
       hit.SetUnderflowBit(adc->underflow());
       hit.SetCharge(adc->adcvalue());
+      InsertHit(hit);
     }
-
-    InsertHit(hit);
   }
 
-  if(((VME_Timestamp*)data)->ts1() != timestamp){
-    std::cerr << "Inconsistent timestamp from VME-USB:\n"
-              << "\tOn first read:  " << timestamp << "\n"
-              << "\tOn second read: " << ((VME_Timestamp*)data)->ts1() << "\n"
-              << std::flush;
-  }
   data += sizeof(VME_Timestamp);
 
   //assert(data == buf.GetData() + buf.GetSize());

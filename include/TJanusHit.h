@@ -14,7 +14,7 @@ public:
   void SetOverflowBit(bool bit)   { fOverflowBit = bit; }
   void SetUnderflowBit(bool bit)  { fUnderflowBit = bit; }
   void SetEntryType(char type)    { fEntryType = type; }
-  void SetTimestamp(long ts)      { fTimestamp = ts; }
+//  void SetTimestamp(long ts)      { fTimestamp = ts; }
   void SetCharge(int chg)         { fCharge = chg; }
 
   virtual Int_t Charge() const { return fCharge;  }
@@ -22,12 +22,12 @@ public:
   bool GetOverflowBit()  const { return fOverflowBit; }
   bool GetUnderflowBit() const { return fUnderflowBit;}
   char GetEntryType() const  { return fEntryType; }
-  long GetTimestamp() const { return fTimestamp; }
+//  long GetTimestamp() const { return fTimestamp; }
 
   bool IsValid() const { return fEntryType == 0; } //CAEN_ADC::EntryType::Event
 
 private:
-  long  fTimestamp;
+//  long  fTimestamp;
   short fEntryType;
   int   fChannel;
   int   fCharge;

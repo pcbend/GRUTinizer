@@ -33,7 +33,7 @@ public:
 
   void ClearHistograms();
 
-  TList* GetObjects(){ return &objects; }
+  TList* GetObjects(){ return default_directory->GetList(); }
 
   void Write();
 
@@ -53,7 +53,7 @@ private:
 
   int check_every;
 
-  TList objects;
+  //TList objects;
   TList variables;
 
   TDirectory* default_directory;

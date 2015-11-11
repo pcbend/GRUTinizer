@@ -59,6 +59,7 @@ void TWriteLoop::LearningPhase(TUnpackedEvent* event) {
       det_map[cls] = det;
       // TODO: Place this mutex here
       event_tree->Branch(cls->GetName(), cls->GetName(), det);
+      std::cout << "Created branch: \"" << cls->GetName() << "\"" << std::endl;
     }
   }
   learning_queue.push_back(event);
@@ -81,7 +82,11 @@ void TWriteLoop::WriteEvent(TUnpackedEvent* event) {
   // Load current events
   for(auto det : event->GetDetectors()) {
     TClass* cls = det->IsA();
-    *det_map.at(cls) = det;
+    try{
+      *det_map.at(cls) = det;
+    } catch (std::out_of_range& e){
+      std::cout << "Detector type \"" << cls->GetName() << "\" not found in learning phase" << std::endl;
+    }
   }
 
   // Fill

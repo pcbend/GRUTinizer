@@ -1,8 +1,6 @@
 #ifndef _TJANUS_H_
 #define _TJANUS_H_
 
-#include "TClonesArray.h"
-
 #include "TDetector.h"
 #include "TJanusHit.h"
 
@@ -24,9 +22,9 @@ private:
 
   void Build_VMUSB_Read(TSmartBuffer buf);
 
-  TClonesArray* janus_hits; //->
+  std::vector<TJanusHit> janus_hits;
 
-  ClassDef(TJanus,1);
+  ClassDef(TJanus,2);
 };
 
 #endif /* _TJANUS_H_ */
