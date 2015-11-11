@@ -22,6 +22,7 @@ public:
   using TDataLoop::ProcessFile;
   void ProcessFile(const char* input, const char* output);
   void ProcessFile(const std::vector<std::string>& input, const char* output);
+  void ProcessRing(const char* input, const char* output);
 
   // Part of the hack to loop over a tree.
   void ProcessTree(TTree* input, const char* output);

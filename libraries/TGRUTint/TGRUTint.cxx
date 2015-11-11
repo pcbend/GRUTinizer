@@ -170,6 +170,13 @@ void TGRUTint::ApplyOptions() {
     }
     TGRUTLoop::Get()->ProcessFile(filenames, outfile.c_str());
     need_loop = true;
+  } else if (opt->InputRing().length() && opt->SortRaw()) {
+    std::string outfile = opt->OutputFile();
+    if(!outfile.length()){
+      outfile = opt->GenerateOutputFilename(opt->InputRing());
+    }
+    TGRUTLoop::Get()->ProcessRing(opt->InputRing().c_str(), outfile.c_str());
+    need_loop = true;
   }
 
   if(!opt->StartGUI()) {

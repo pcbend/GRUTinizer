@@ -18,8 +18,9 @@ namespace {
       std::cerr << "Environment variable DAQHOME not set, assuming DAQHOME=" << daqhome << std::endl;
     }
 
-    return (daqhome + "/bin/ringselector --source=tcp://" + ringname
-            + " --sample=PHYSICS_EVENT --non-blocking");
+    std::string command = (daqhome + "/bin/ringselector --source=tcp://" + ringname
+                           + " --sample=PHYSICS_EVENT --non-blocking");
+    return command;
   }
 }
 

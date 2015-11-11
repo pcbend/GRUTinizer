@@ -28,7 +28,7 @@ TRootOutfileNSCL::~TRootOutfileNSCL() {
 }
 
 void TRootOutfileNSCL::Init(){
-  AddTree("EventTree", "Events, yo.", true, 1000);
+  AddTree("EventTree", "Events, yo.", true, 30000);
   AddTree("ScalerTree","I can count.",false, -1);
 
   if(TDetectorEnv::Janus()){

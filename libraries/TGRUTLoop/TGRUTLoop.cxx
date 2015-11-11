@@ -63,6 +63,14 @@ void TGRUTLoop::ProcessFile(const std::vector<std::string>& input, const char* o
   }
 }
 
+void TGRUTLoop::ProcessRing(const char* input, const char* output) {
+  TDataLoop::ProcessRing(input);
+  if(!outfile){
+    InitOutfile(TGRUTOptions::Get()->DefaultFileType(),
+                output);
+  }
+}
+
 void TGRUTLoop::ProcessTree(TTree* input, const char* output){
   tree = input;
   TDataLoop::ProcessFile("/dev/null");
