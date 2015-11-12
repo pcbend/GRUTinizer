@@ -260,18 +260,18 @@ void TPipeline::Join() {
 }
 
 std::string TPipeline::Status() {
-  // TODO: Give clear summary of each queue, not just the first element of the loop.
-  std::stringstream ss;
-  ss << raw_event_queue.ItemsPushed() << "/" << raw_event_queue.ItemsPopped() << "\t"
-     << unpacked_event_queue.ItemsPushed() << "/" << unpacked_event_queue.ItemsPopped() << "\t"
-     << post_histogram_queue.ItemsPushed() << "/" << post_histogram_queue.ItemsPopped();
-  return ss.str();
+  // // TODO: Give clear summary of each queue, not just the first element of the loop.
+  // std::stringstream ss;
+  // ss << raw_event_queue.ItemsPushed() << "/" << raw_event_queue.ItemsPopped() << "\t"
+  //    << unpacked_event_queue.ItemsPushed() << "/" << unpacked_event_queue.ItemsPopped() << "\t"
+  //    << post_histogram_queue.ItemsPushed() << "/" << post_histogram_queue.ItemsPopped();
+  // return ss.str();
 
-  // if(pipeline.size()){
-  //   return pipeline[0]->Status();
-  // } else {
-  //   return "";
-  // }
+  if(pipeline.size()){
+    return pipeline[0]->Status();
+  } else {
+    return "";
+  }
 }
 
 void TPipeline::Write() {
