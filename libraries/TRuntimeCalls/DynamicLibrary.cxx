@@ -34,7 +34,7 @@ DynamicLibrary::DynamicLibrary(std::string libname, bool unique_name) {
       throw RuntimeSymlinkCreation("Could not make temp symlink");
     }
     library = dlopen(tempname.c_str(), RTLD_NOW);
-    //unlink(tempname.c_str());
+    unlink(tempname.c_str());
   } else {
     library = dlopen(libname.c_str(), RTLD_NOW);
   }

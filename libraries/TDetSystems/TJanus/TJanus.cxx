@@ -63,35 +63,51 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   // 3 additional 16-bit words for the timestamp
   int num_adc_channels = vmusb_header->size()/2 - 3;
 
-  const VME_Timestamp* vme_timestamp = (VME_Timestamp*)(data + num_adc_channels*sizeof(CAEN_ADC));
-  long timestamp = vme_timestamp->ts1();
+  const VME_Timestamp* vme_timestamp = (VME_Timestamp*)(data + num_adc_channels*sizeof(CAEN_DataPacket));
+  long timestamp = vme_timestamp->ts1() * 20;
 
-  int i;
-  for(i=0; i<num_adc_channels; i++){
-    const CAEN_ADC* adc = (CAEN_ADC*)data;
-    data += sizeof(CAEN_ADC);
+	std::map<int, TJanusHit> channels;
+  for(int i=0; i<num_adc_channels; i++){
+    const CAEN_DataPacket* adc = (CAEN_DataPacket*)data;
+    data += sizeof(CAEN_DataPacket);
 
-    TJanusHit hit;
-    hit.SetEntryType((char)adc->entry_type());
+		if(!adc->IsValid()){
+			 continue;
+		}
+
+		// ADCs are in slots 5-8, TDCs in slots 9-12
+		bool is_tdc = adc->card_num() >= 9;
+		int id = 32*(adc->card_num() - 5 - 4*is_tdc) + adc->channel_num();
+		
+		TJanusHit& hit = channels[id];
+		hit.SetAnalogChannel(id);
     hit.SetTimestamp(timestamp);
 
+		if(is_tdc){
+			 hit.SetTDCEntryType((char)adc->entry_type());
+		} else {
+			 hit.SetADCEntryType((char)adc->entry_type());
+		}
+
     if(adc->IsValid()){
-      int id = 32*(adc->card_num()-5) + adc->channel_num();
-      hit.SetAnalogChannel(id);
-      hit.SetOverflowBit(adc->overflow());
-      hit.SetUnderflowBit(adc->underflow());
-      hit.SetCharge(adc->adcvalue());
+			if(is_tdc){
+				 hit.SetTDCOverflowBit(adc->overflow());
+				 hit.SetTDCUnderflowBit(adc->underflow());
+				 hit.SetTDC(adc->adcvalue());
+				 // std::cout << "Channel: " << id << "\t" << "TDC:" << adc->adcvalue()
+				 // 					 << std::endl;
+			} else {
+				 hit.SetADCOverflowBit(adc->overflow());
+				 hit.SetADCUnderflowBit(adc->underflow());
+				 hit.SetCharge(adc->adcvalue());
+			}			
     }
-
-    InsertHit(hit);
   }
 
-  if(((VME_Timestamp*)data)->ts1() != timestamp){
-    std::cerr << "Inconsistent timestamp from VME-USB:\n"
-              << "\tOn first read:  " << timestamp << "\n"
-              << "\tOn second read: " << ((VME_Timestamp*)data)->ts1() << "\n"
-              << std::flush;
-  }
+	for(auto& elem : channels) {
+		 InsertHit(elem.second);
+	}
+
   data += sizeof(VME_Timestamp);
 
   //assert(data == buf.GetData() + buf.GetSize());
@@ -100,7 +116,6 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
               << "\tBuffer Start: " << (void*)buf.GetData() << "\tBuffer Size: " << buf.GetSize()
               << "\n\tBuffer End: " << (void*)(buf.GetData() + buf.GetSize())
               << "\n\tNum ADC chan: " << num_adc_channels
-              << "\n\ti: " << i
               << "\n\tPtr at end of read: " << (void*)(data)
               << "\n\tDiff: " << (buf.GetData() + buf.GetSize()) - data
               << std::endl;
