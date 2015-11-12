@@ -67,6 +67,7 @@ double TRuntimeObjects::GetVariable(const char* name) {
   if(obj && dynamic_cast<GValue*>(obj)){
     return ((GValue*)obj)->GetValue();
   } else {
-    return std::sqrt(-1);
+    return 0.00;
+    //return std::sqrt(-1);
   }
 }

@@ -11,30 +11,43 @@ public:
   void Copy(TObject& obj) const;
 
   void SetAnalogChannel(int chan) { fChannel = chan; }
-  void SetOverflowBit(bool bit)   { fOverflowBit = bit; }
-  void SetUnderflowBit(bool bit)  { fUnderflowBit = bit; }
-  void SetEntryType(char type)    { fEntryType = type; }
-//  void SetTimestamp(long ts)      { fTimestamp = ts; }
+  void SetADCOverflowBit(bool bit)   { fEnergyOverflowBit = bit; }
+  void SetADCUnderflowBit(bool bit)  { fEnergyUnderflowBit = bit; }
+  void SetADCEntryType(char type)    { fEnergyEntryType = type; }
+  void SetTDCOverflowBit(bool bit)   { fTimeOverflowBit = bit; }
+  void SetTDCUnderflowBit(bool bit)  { fTimeUnderflowBit = bit; }
+  void SetTDCEntryType(char type)    { fTimeEntryType = type; }
   void SetCharge(int chg)         { fCharge = chg; }
+  void SetTDC(int tdc) {fTDC = tdc;}
 
   virtual Int_t Charge() const { return fCharge;  }
   int GetAnalogChannel() const { return fChannel; }
-  bool GetOverflowBit()  const { return fOverflowBit; }
-  bool GetUnderflowBit() const { return fUnderflowBit;}
-  char GetEntryType() const  { return fEntryType; }
-//  long GetTimestamp() const { return fTimestamp; }
+  bool GetADCOverflowBit()  const { return fEnergyOverflowBit; }
+  bool GetADCUnderflowBit() const { return fEnergyUnderflowBit;}
+  char GetADCEntryType() const  { return fEnergyEntryType; }
 
-  bool IsValid() const { return fEntryType == 0; } //CAEN_ADC::EntryType::Event
+  int GetAnalogTDC() const { return fTDC; }
+  char GetTDCEntryType() const  { return fTimeEntryType; }
+  bool GetTDCOverflowBit()  const { return fTimeOverflowBit; }
+  bool GetTDCUnderflowBit() const { return fTimeUnderflowBit;}
+
+  bool IsADCValid() const { return fEnergyEntryType == 0; } //CAEN_ADC::EntryType::Event
+  bool IsTDCValid() const { return fTimeEntryType == 0; } //CAEN_ADC::EntryType::Event
 
 private:
-//  long  fTimestamp;
-  short fEntryType;
   int   fChannel;
+	 // Energy
   int   fCharge;
-  bool  fOverflowBit;
-  bool  fUnderflowBit;
+  char  fEnergyEntryType;
+  bool  fEnergyOverflowBit;
+  bool  fEnergyUnderflowBit;
+	 // Time
+  int   fTDC;
+  char  fTimeEntryType;
+  bool  fTimeOverflowBit;
+  bool  fTimeUnderflowBit;
 
-  ClassDef(TJanusHit,2);
+  ClassDef(TJanusHit,3);
 };
 
 #endif /* _TJANUSDETECTORHIT_H_ */

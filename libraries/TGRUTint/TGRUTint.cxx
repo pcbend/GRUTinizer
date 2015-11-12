@@ -83,12 +83,18 @@ void TGRUTint::Init() {
   gInterpreter->AddIncludePath(Form("%s/include",grutpath.c_str()));
 
   if(TGRUTOptions::Get()->ShowLogo()){
-    PopupLogo(false);
-    WaitLogo();
+    std::thread splashscreen(&TGRUTint::SplashPopNWait,this,false);
+    splashscreen.detach();
   }
 
   ApplyOptions();
 }
+
+void TGRUTint::SplashPopNWait(bool flag) {
+  PopupLogo(false);
+  WaitLogo();
+}
+
 
 /*********************************/
 
@@ -149,7 +155,7 @@ void TGRUTint::ApplyOptions() {
     RunMacroFile(filename);
   }
 
-  if(fPipeline->CanStart()){
+  if(fPipeline->CanStart(true)){
     fPipeline->Start();
   }
 
@@ -195,6 +201,8 @@ void TGRUTint::SetupPipeline() {
   if(opt->InputRing().length()){
     fPipeline->SetInputRing(opt->InputRing());
   }
+
+  fPipeline->SetFiletype(opt->DefaultFileType());
 
   fPipeline->SetIsOnline(opt->IsOnline());
 

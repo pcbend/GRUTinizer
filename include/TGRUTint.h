@@ -60,6 +60,7 @@ public:
  private:
   void RunMacroFile(const std::string& filename);
   void SetupPipeline();
+  void SplashPopNWait(bool flag);
 
 private:
 #ifndef __CINT__

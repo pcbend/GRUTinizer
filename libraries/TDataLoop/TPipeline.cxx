@@ -23,6 +23,7 @@ TPipeline::TPipeline()
     output_file(NULL), output_directory(NULL),
     data_loop(NULL), unpack_loop(NULL), root_input_loop(NULL),
     histogram_loop(NULL), write_loop(NULL), terminal_loop(NULL),
+    fFileType(kFileType::UNKNOWN_FILETYPE),
     is_online(false), time_order(false), time_order_depth(1000) { }
 
 TPipeline::~TPipeline() {
@@ -43,16 +44,37 @@ TPipeline::~TPipeline() {
 }
 
 bool TPipeline::CanStart(bool print_reason) {
-  if(!input_raw_files.size() && !input_root_files.size()){
+  if(!input_raw_files.size() && !input_root_files.size() && !input_ring.length()){
     if(print_reason){
-      std::cerr << "TPipeline: No input file given" << std::endl;
+      std::cerr << "TPipeline: No input source given" << std::endl;
     }
     return false;
   }
 
   if(input_raw_files.size() && input_root_files.size()){
     if(print_reason){
-      std::cerr << "TPipeline: Can't specify input root file and input raw file" << std::endl;
+      std::cerr << "TPipeline: Can't specify both input root file and input raw file" << std::endl;
+    }
+    return false;
+  }
+
+  if(input_raw_files.size() && input_ring.length()){
+    if(print_reason){
+      std::cerr << "TPipeline: Can't specify both input raw file and input ring" << std::endl;
+    }
+    return false;
+  }
+
+  if(input_root_files.size() && input_ring.length()){
+    if(print_reason){
+      std::cerr << "TPipeline: Can't specify both input root file and input ring" << std::endl;
+    }
+    return false;
+  }
+
+  if(input_ring.length() && fFileType==kFileType::UNKNOWN_FILETYPE){
+    if(print_reason){
+      std::cerr << "TPipeline: Must specify format when reading from a ring" << std::endl;
     }
     return false;
   }
@@ -71,12 +93,12 @@ int TPipeline::Initialize() {
   if(is_initialized){
     return 2;
   }
-  
+
   if(!CanStart()){
     return 1;
   }
 
-  if(input_raw_files.size()) {
+  if(input_raw_files.size() || input_ring.length()) {
     SetupRawReadLoop();
   } else if (input_root_files.size()) {
     SetupRootReadLoop();
@@ -86,8 +108,8 @@ int TPipeline::Initialize() {
   SetupOutputFile();
   GetDirectory()->cd();
 
-  SetupOutputLoop();
   SetupHistogramLoop();
+  SetupOutputLoop();
 
   is_initialized = true;
 
@@ -100,13 +122,17 @@ void TPipeline::SetupRawReadLoop() {
   if(input_raw_files.size() == 1){
     // Load a single data file
     event_source = OpenSingleFile(input_raw_files[0]);
-  } else {
+  } else if(input_raw_files.size() > 1){
     // Load multiple sequential data files
     TSequentialRawFile* sequential = new TSequentialRawFile;
     for(auto& filename : input_raw_files){
       sequential->Add(OpenSingleFile(filename));
     }
     event_source = sequential;
+  } else if(input_ring.length()){
+    event_source = OpenSingleFile(input_ring, true);
+  } else {
+    assert(false);
   }
 
   data_loop = new TDataLoop(event_source, raw_event_queue);
@@ -164,8 +190,8 @@ void TPipeline::SetupOutputLoop() {
   }
 }
 
-TRawEventSource* TPipeline::OpenSingleFile(const std::string& filename) {
-  TRawEventSource* output = TRawEventSource::EventSource(filename.c_str(), is_online);
+TRawEventSource* TPipeline::OpenSingleFile(const std::string& filename, bool is_ring) {
+  TRawEventSource* output = TRawEventSource::EventSource(filename.c_str(), is_online, is_ring);
   if(time_order){
     TOrderedRawFile* ordered = new TOrderedRawFile(output);
     ordered->SetDepth(time_order_depth);
@@ -235,17 +261,17 @@ void TPipeline::Join() {
 
 std::string TPipeline::Status() {
   // TODO: Give clear summary of each queue, not just the first element of the loop.
-  // std::stringstream ss;
-  // ss << raw_event_queue.ItemsPushed() << "/" << raw_event_queue.ItemsPopped() << "\t"
-  //    << unpacked_event_queue.ItemsPushed() << "/" << unpacked_event_queue.ItemsPopped() << "\t"
-  //    << post_histogram_queue.ItemsPushed() << "/" << post_histogram_queue.ItemsPopped();
-  // return ss.str();
+  std::stringstream ss;
+  ss << raw_event_queue.ItemsPushed() << "/" << raw_event_queue.ItemsPopped() << "\t"
+     << unpacked_event_queue.ItemsPushed() << "/" << unpacked_event_queue.ItemsPopped() << "\t"
+     << post_histogram_queue.ItemsPushed() << "/" << post_histogram_queue.ItemsPopped();
+  return ss.str();
 
-  if(pipeline.size()){
-    return pipeline[0]->Status();
-  } else {
-    return "";
-  }
+  // if(pipeline.size()){
+  //   return pipeline[0]->Status();
+  // } else {
+  //   return "";
+  // }
 }
 
 void TPipeline::Write() {
@@ -284,6 +310,10 @@ std::string TPipeline::GetHistogramLibrary() const {
 
 void TPipeline::SetInputRing(std::string ringname) {
   input_ring = ringname;
+}
+
+void TPipeline::SetFiletype(kFileType file_type) {
+  fFileType = file_type;
 }
 
 void TPipeline::SetIsOnline(bool is_online) {

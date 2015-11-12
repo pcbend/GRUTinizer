@@ -41,6 +41,10 @@ void TWriteLoop::Write() {
 
 void TWriteLoop::HandleEvent(TUnpackedEvent* event) {
   if(in_learning_phase) {
+    // if(learning_queue.size() % 100 == 0){
+    //   std::cout << "\rLearning phase: " << learning_queue.size() << "/"
+    //             << learning_phase_length << "          " << std::flush;
+    // }
     LearningPhase(event);
     if(learning_queue.size() > learning_phase_length){
       EndLearningPhase();
