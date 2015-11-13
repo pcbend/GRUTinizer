@@ -16,7 +16,7 @@ ClassImp(TUnpackLoop);
 TUnpackLoop::TUnpackLoop(ThreadsafeQueue<TRawEvent>& input_queue,
                          ThreadsafeQueue<TUnpackedEvent*>& output_queue)
   : input_queue(input_queue), output_queue(output_queue),
-    event_start(0), build_window(1000) {
+    event_start(0), build_window(10000) {
   next_event = new TUnpackedEvent;
 }
 

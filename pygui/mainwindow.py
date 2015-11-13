@@ -412,7 +412,7 @@ class MainWindow(object):
         update_tcanvases()
 
     def ResetAllHistograms(self):
-        pipeline = ROOT.GetPipeline()
+        pipeline = ROOT.GetPipeline(0)
         if pipeline:
             pipeline.ClearHistograms()
             self.RefreshHistograms()

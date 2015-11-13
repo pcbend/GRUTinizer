@@ -25,6 +25,7 @@
 void MakeJanusHistograms(TRuntimeObjects& obj, TJanus* janus);
 void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega);
 void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus);
+void MakeTimestampDiffs(TRuntimeObjects& obj, TSega* sega, TJanus* janus);
 
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
@@ -41,25 +42,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
     MakeCoincidenceHistograms(obj, sega, janus);
   }
 
+  MakeTimestampDiffs(obj, sega, janus);
 
-  // static long last_janus = 0;
-  // static long last_sega = 0;
-  // if(janus->Size()){
-  //   MakeJanusHistograms(janus, obj);
-  //   last_janus = janus->Timestamp();
-  //   obj.FillHistogram("sega_janus_tiff",
-  //                     10000, 0, 100000, last_janus - last_sega);
-  // }
-  // if(sega->Size()){
-  //   MakeSegaHistograms(sega, obj);
-  //   last_sega = sega->Timestamp();
-  //   obj.FillHistogram("janus_sega_tiff",
-  //                     10000, 0, 100000, last_sega - last_janus);
-  // }
-  // if(janus->Size() && sega->Size()){
-  //   obj.FillHistogram("janus_sega_tdiff",
-  //                     600, -3000, 3000, janus->Timestamp() - sega->Timestamp());
-  // }
 }
 
 void MakeJanusHistograms(TRuntimeObjects& obj, TJanus* janus) {
@@ -87,8 +71,7 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanus* janus) {
   }
 }
 
-void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus) {
-}
+
 
 void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega) {
   obj.FillHistogram("sega_size",
@@ -106,6 +89,9 @@ void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega) {
                       50000, 0, 50000, hit.Charge());
     if(hit.GetCrate()==1){
       obj.FillHistogram("sega_core_energy",
+                        32768, 0, 32768, hit.Charge());
+      obj.FillHistogram("sega_core_summary",
+                        16, 0, 16, hit.GetChannel(),
                         32768, 0, 32768, hit.Charge());
     }
     obj.FillHistogram("sega_energy_crate",
@@ -125,5 +111,74 @@ void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega) {
   if(cc_timestamp>0 && segment_timestamp>0){
     obj.FillHistogram("segment_core_tdiff",
                       1000, -5000, 5000, cc_timestamp - segment_timestamp);
+  }
+}
+
+void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus) { }
+
+void MakeTimestampDiffs(TRuntimeObjects& obj, TSega* sega, TJanus* janus) {
+  long crate1_ts = -1;
+  long crate2_ts = -1;
+  long crate3_ts = -1;
+  long analog_ts = -1;
+  if(janus){
+    analog_ts = janus->Timestamp();
+  }
+  if(sega){
+    for(int i=0; i<sega->Size(); i++){
+      TSegaHit& hit = sega->GetSegaHit(i);
+      if(hit.GetCrate()==1){
+        crate1_ts = hit.GetTimestamp();
+      } else if(hit.GetCrate()==2){
+        crate2_ts = hit.GetTimestamp();
+      } else if(hit.GetCrate()==3){
+        crate3_ts = hit.GetTimestamp();
+      }
+    }
+  }
+  if(crate1_ts!=-1 && crate2_ts!=-1){
+    obj.FillHistogram("tdiff_crate1_crate2",
+                      600, -3000, 3000, crate2_ts - crate1_ts);
+  }
+  if(crate1_ts!=-1 && crate3_ts!=-1){
+    obj.FillHistogram("tdiff_crate1_crate3",
+                      600, -3000, 3000, crate3_ts - crate1_ts);
+  }
+  if(crate2_ts!=-1 && crate3_ts!=-1){
+    obj.FillHistogram("tdiff_crate2_crate3",
+                      600, -3000, 3000, crate3_ts - crate2_ts);
+  }
+  if(analog_ts!=-1 && crate1_ts!=-1){
+    obj.FillHistogram("tdiff_analog_crate1",
+                      600, -3000, 3000, analog_ts - crate1_ts);
+  }
+  if(analog_ts!=-1 && crate2_ts!=-1){
+    obj.FillHistogram("tdiff_analog_crate2",
+                      600, -3000, 3000, analog_ts - crate2_ts);
+  }
+  if(analog_ts!=-1 && crate3_ts!=-1){
+    obj.FillHistogram("tdiff_analog_crate3",
+                      600, -3000, 3000, analog_ts - crate3_ts);
+  }
+
+  if(crate1_ts!=-1){
+    obj.FillHistogram("timestamp_sourceid",
+                      1000000, 0, 1000e9, crate1_ts,
+                      4, 1, 5, 1);
+  }
+  if(crate2_ts!=-1){
+    obj.FillHistogram("timestamp_sourceid",
+                      1000000, 0, 1000e9, crate2_ts,
+                      4, 1, 5, 2);
+  }
+  if(crate3_ts!=-1){
+    obj.FillHistogram("timestamp_sourceid",
+                      1000000, 0, 1000e9, crate3_ts,
+                      4, 1, 5, 3);
+  }
+  if(analog_ts!=-1){
+    obj.FillHistogram("timestamp_sourceid",
+                      1000000, 0, 1000e9, analog_ts,
+                      4, 1, 5, 4);
   }
 }

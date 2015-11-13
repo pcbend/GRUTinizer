@@ -230,9 +230,11 @@ void TPipeline::Start() {
   // TODO: Use mutexes to prevent this sleep from being needed
   //       The problem is that TTree::Branch is not threadsafe.
   //       I can't find everywhere that needs a mutex to prevent this.
+  std::cout << "Waiting for learning phase" << std::endl;
   while(InLearningPhase()){
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
+  std::cout << "Learning phase complete" << std::endl;
 }
 
 void TPipeline::Stop() {
