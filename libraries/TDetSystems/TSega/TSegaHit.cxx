@@ -3,47 +3,80 @@
 #include <algorithm>
 #include <iostream>
 
+TSegaHit::TSegaHit() {
+  Clear();
+}
+
 void TSegaHit::Copy(TObject& obj) const{
   TDetectorHit::Copy(obj);
 
   TSegaHit& sega = (TSegaHit&)obj;
-  sega.fChannel  = fChannel;
-  sega.fSlot     = fSlot;
-  sega.fCrate    = fCrate;
+  sega.fTimestamp = fTimestamp;
   sega.fCharge   = fCharge;
-  sega.fTraceLength = fTraceLength;
-  memcpy(sega.fTrace, fTrace, fTraceLength * sizeof(unsigned short));
-  
+  sega.fCfd = fCfd;
+  sega.fTrace = fTrace;
 }
 
 void TSegaHit::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
+  fTimestamp = -1;
   fCharge  = -1;
-  fSlot    = -1;
-  fCrate   = -1;
-  fChannel = -1;
-  fTraceLength = 0;
+  fCfd = -1;
+  fTrace.clear();
 }
 
 void TSegaHit::Print(Option_t *opt) const {
   std::cout << "TSegaHit:\n"
             << "\tChannel: " << GetChannel() << "\n"
-            << "\tSlot: " << GetSlot() << "\n"
-            << "\tCrate: " << GetCrate() << "\n"
             << "\tCharge: " << Charge() << "\n"
-            << "\tTrace length: " << GetTraceLength() << "\n"
             << std::flush;
 }
 
 void TSegaHit::SetTrace(unsigned int trace_length, const unsigned short* trace) {
   if(!trace){
-    fTraceLength = 0;
+    fTrace.clear();
     return;
   }
 
-  fTraceLength = trace_length;
-  unsigned int max_length = MAX_TRACE_LENGTH;
-  for(unsigned int i=0; i<std::min(trace_length, max_length); i++){
-    fTrace[i] = trace[i];
+  fTrace.clear();
+  fTrace.reserve(trace_length);
+  for(unsigned int i=0; i<trace_length; i++){
+    fTrace.push_back(trace[i]);
   }
+}
+
+int TSegaHit::GetDetnum() {
+  TChannel* chan = TChannel::GetChannel(fAddress);
+  if(chan){
+    return chan->GetArrayPosition();
+  } else if(fSegments.size()) {
+    return fSegments[0].GetDetnum();
+  } else {
+    return -1;
+  }
+}
+
+int TSegaHit::GetCrate() const {
+  return (fAddress&0x00ff0000)>>16;
+}
+
+int TSegaHit::GetSlot() const {
+  return (fAddress&0x0000ff00)>>8;
+}
+
+int TSegaHit::GetChannel() const {
+  return (fAddress&0x000000ff)>>0;
+}
+
+TSegaSegmentHit& TSegaHit::MakeSegmentByAddress(unsigned int address){
+  // for(auto& segment : fSegments){
+  //   if(segment.Address() == address){
+  //     return segment;
+  //   }
+  // }
+
+  fSegments.emplace_back();
+  TSegaSegmentHit& output = fSegments.back();
+  output.SetAddress(address);
+  return output;
 }

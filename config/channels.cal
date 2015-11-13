@@ -1,0 +1,1200 @@
+
+SEG01AP00 {
+  Address: 0x01010600
+  EnergyCoeff: 0 1
+}
+
+SEG02AP00 {
+  Address: 0x01010601
+  EnergyCoeff: 0 1
+}
+
+SEG03AP00 {
+  Address: 0x01010602
+  EnergyCoeff: 0 1
+}
+
+SEG04AP00 {
+  Address: 0x01010603
+  EnergyCoeff: 0 1
+}
+
+SEG05AP00 {
+  Address: 0x01010604
+  EnergyCoeff: 0 1
+}
+
+SEG06AP00 {
+  Address: 0x01010605
+  EnergyCoeff: 0 1
+}
+
+SEG07AP00 {
+  Address: 0x01010606
+  EnergyCoeff: 0 1
+}
+
+SEG08AP00 {
+  Address: 0x01010607
+  EnergyCoeff: 0 1
+}
+
+SEG09AP00 {
+  Address: 0x01010608
+  EnergyCoeff: 0 1
+}
+
+SEG10AP00 {
+  Address: 0x01010609
+  EnergyCoeff: 0 1
+}
+
+SEG11AP00 {
+  Address: 0x0101060a
+  EnergyCoeff: 0 1
+}
+
+SEG12AP00 {
+  Address: 0x0101060b
+  EnergyCoeff: 0 1
+}
+
+SEG13AP00 {
+  Address: 0x0101060c
+  EnergyCoeff: 0 1
+}
+
+SEG14AP00 {
+  Address: 0x0101060d
+  EnergyCoeff: 0 1
+}
+
+SEG15AP00 {
+  Address: 0x0101060e
+  EnergyCoeff: 0 1
+}
+
+SEG16AP00 {
+  Address: 0x0101060f
+  EnergyCoeff: 0 1
+}
+
+SEG01AN01 {
+  Address: 0x01030300
+  EnergyCoeff: 0 1
+}
+
+SEG01AN02 {
+  Address: 0x01030301
+  EnergyCoeff: 0 1
+}
+
+SEG01AN03 {
+  Address: 0x01030302
+  EnergyCoeff: 0 1
+}
+
+SEG01AN04 {
+  Address: 0x01030303
+  EnergyCoeff: 0 1
+}
+
+SEG01AN05 {
+  Address: 0x01030304
+  EnergyCoeff: 0 1
+}
+
+SEG01AN06 {
+  Address: 0x01030305
+  EnergyCoeff: 0 1
+}
+
+SEG01AN07 {
+  Address: 0x01030306
+  EnergyCoeff: 0 1
+}
+
+SEG01AN08 {
+  Address: 0x01030307
+  EnergyCoeff: 0 1
+}
+
+SEG01AN09 {
+  Address: 0x01030308
+  EnergyCoeff: 0 1
+}
+
+SEG01AN10 {
+  Address: 0x01030309
+  EnergyCoeff: 0 1
+}
+
+SEG01AN11 {
+  Address: 0x0103030a
+  EnergyCoeff: 0 1
+}
+
+SEG01AN12 {
+  Address: 0x0103030b
+  EnergyCoeff: 0 1
+}
+
+SEG01AN13 {
+  Address: 0x0103030c
+  EnergyCoeff: 0 1
+}
+
+SEG01AN14 {
+  Address: 0x0103030d
+  EnergyCoeff: 0 1
+}
+
+SEG01AN15 {
+  Address: 0x0103030e
+  EnergyCoeff: 0 1
+}
+
+SEG01AN16 {
+  Address: 0x0103030f
+  EnergyCoeff: 0 1
+}
+
+SEG01AN17 {
+  Address: 0x01030400
+  EnergyCoeff: 0 1
+}
+
+SEG01AN18 {
+  Address: 0x01030401
+  EnergyCoeff: 0 1
+}
+
+SEG01AN19 {
+  Address: 0x01030402
+  EnergyCoeff: 0 1
+}
+
+SEG01AN20 {
+  Address: 0x01030403
+  EnergyCoeff: 0 1
+}
+
+SEG01AN21 {
+  Address: 0x01030404
+  EnergyCoeff: 0 1
+}
+
+SEG01AN22 {
+  Address: 0x01030405
+  EnergyCoeff: 0 1
+}
+
+SEG01AN23 {
+  Address: 0x01030406
+  EnergyCoeff: 0 1
+}
+
+SEG01AN24 {
+  Address: 0x01030407
+  EnergyCoeff: 0 1
+}
+
+SEG01AN25 {
+  Address: 0x01030408
+  EnergyCoeff: 0 1
+}
+
+SEG01AN26 {
+  Address: 0x01030409
+  EnergyCoeff: 0 1
+}
+
+SEG01AN27 {
+  Address: 0x0103040a
+  EnergyCoeff: 0 1
+}
+
+SEG01AN28 {
+  Address: 0x0103040b
+  EnergyCoeff: 0 1
+}
+
+SEG01AN29 {
+  Address: 0x0103040c
+  EnergyCoeff: 0 1
+}
+
+SEG01AN30 {
+  Address: 0x0103040d
+  EnergyCoeff: 0 1
+}
+
+SEG01AN31 {
+  Address: 0x0103040e
+  EnergyCoeff: 0 1
+}
+
+SEG01AN32 {
+  Address: 0x0103040f
+  EnergyCoeff: 0 1
+}
+
+SEG03AN01 {
+  Address: 0x01030500
+  EnergyCoeff: 0 1
+}
+
+SEG03AN02 {
+  Address: 0x01030501
+  EnergyCoeff: 0 1
+}
+
+SEG03AN03 {
+  Address: 0x01030502
+  EnergyCoeff: 0 1
+}
+
+SEG03AN04 {
+  Address: 0x01030503
+  EnergyCoeff: 0 1
+}
+
+SEG03AN05 {
+  Address: 0x01030504
+  EnergyCoeff: 0 1
+}
+
+SEG03AN06 {
+  Address: 0x01030505
+  EnergyCoeff: 0 1
+}
+
+SEG03AN07 {
+  Address: 0x01030506
+  EnergyCoeff: 0 1
+}
+
+SEG03AN08 {
+  Address: 0x01030507
+  EnergyCoeff: 0 1
+}
+
+SEG03AN09 {
+  Address: 0x01030508
+  EnergyCoeff: 0 1
+}
+
+SEG03AN10 {
+  Address: 0x01030509
+  EnergyCoeff: 0 1
+}
+
+SEG03AN11 {
+  Address: 0x0103050a
+  EnergyCoeff: 0 1
+}
+
+SEG03AN12 {
+  Address: 0x0103050b
+  EnergyCoeff: 0 1
+}
+
+SEG03AN13 {
+  Address: 0x0103050c
+  EnergyCoeff: 0 1
+}
+
+SEG03AN14 {
+  Address: 0x0103050d
+  EnergyCoeff: 0 1
+}
+
+SEG03AN15 {
+  Address: 0x0103050e
+  EnergyCoeff: 0 1
+}
+
+SEG03AN16 {
+  Address: 0x0103050f
+  EnergyCoeff: 0 1
+}
+
+SEG03AN17 {
+  Address: 0x01030600
+  EnergyCoeff: 0 1
+}
+
+SEG03AN18 {
+  Address: 0x01030601
+  EnergyCoeff: 0 1
+}
+
+SEG03AN19 {
+  Address: 0x01030602
+  EnergyCoeff: 0 1
+}
+
+SEG03AN20 {
+  Address: 0x01030603
+  EnergyCoeff: 0 1
+}
+
+SEG03AN21 {
+  Address: 0x01030604
+  EnergyCoeff: 0 1
+}
+
+SEG03AN22 {
+  Address: 0x01030605
+  EnergyCoeff: 0 1
+}
+
+SEG03AN23 {
+  Address: 0x01030606
+  EnergyCoeff: 0 1
+}
+
+SEG03AN24 {
+  Address: 0x01030607
+  EnergyCoeff: 0 1
+}
+
+SEG03AN25 {
+  Address: 0x01030608
+  EnergyCoeff: 0 1
+}
+
+SEG03AN26 {
+  Address: 0x01030609
+  EnergyCoeff: 0 1
+}
+
+SEG03AN27 {
+  Address: 0x0103060a
+  EnergyCoeff: 0 1
+}
+
+SEG03AN28 {
+  Address: 0x0103060b
+  EnergyCoeff: 0 1
+}
+
+SEG03AN29 {
+  Address: 0x0103060c
+  EnergyCoeff: 0 1
+}
+
+SEG03AN30 {
+  Address: 0x0103060d
+  EnergyCoeff: 0 1
+}
+
+SEG03AN31 {
+  Address: 0x0103060e
+  EnergyCoeff: 0 1
+}
+
+SEG03AN32 {
+  Address: 0x0103060f
+  EnergyCoeff: 0 1
+}
+
+SEG05AN01 {
+  Address: 0x01030700
+  EnergyCoeff: 0 1
+}
+
+SEG05AN02 {
+  Address: 0x01030701
+  EnergyCoeff: 0 1
+}
+
+SEG05AN03 {
+  Address: 0x01030702
+  EnergyCoeff: 0 1
+}
+
+SEG05AN04 {
+  Address: 0x01030703
+  EnergyCoeff: 0 1
+}
+
+SEG05AN05 {
+  Address: 0x01030704
+  EnergyCoeff: 0 1
+}
+
+SEG05AN06 {
+  Address: 0x01030705
+  EnergyCoeff: 0 1
+}
+
+SEG05AN07 {
+  Address: 0x01030706
+  EnergyCoeff: 0 1
+}
+
+SEG05AN08 {
+  Address: 0x01030707
+  EnergyCoeff: 0 1
+}
+
+SEG05AN09 {
+  Address: 0x01030708
+  EnergyCoeff: 0 1
+}
+
+SEG05AN10 {
+  Address: 0x01030709
+  EnergyCoeff: 0 1
+}
+
+SEG05AN11 {
+  Address: 0x0103070a
+  EnergyCoeff: 0 1
+}
+
+SEG05AN12 {
+  Address: 0x0103070b
+  EnergyCoeff: 0 1
+}
+
+SEG05AN13 {
+  Address: 0x0103070c
+  EnergyCoeff: 0 1
+}
+
+SEG05AN14 {
+  Address: 0x0103070d
+  EnergyCoeff: 0 1
+}
+
+SEG05AN15 {
+  Address: 0x0103070e
+  EnergyCoeff: 0 1
+}
+
+SEG05AN16 {
+  Address: 0x0103070f
+  EnergyCoeff: 0 1
+}
+
+SEG05AN17 {
+  Address: 0x01030800
+  EnergyCoeff: 0 1
+}
+
+SEG05AN18 {
+  Address: 0x01030801
+  EnergyCoeff: 0 1
+}
+
+SEG05AN19 {
+  Address: 0x01030802
+  EnergyCoeff: 0 1
+}
+
+SEG05AN20 {
+  Address: 0x01030803
+  EnergyCoeff: 0 1
+}
+
+SEG05AN21 {
+  Address: 0x01030804
+  EnergyCoeff: 0 1
+}
+
+SEG05AN22 {
+  Address: 0x01030805
+  EnergyCoeff: 0 1
+}
+
+SEG05AN23 {
+  Address: 0x01030806
+  EnergyCoeff: 0 1
+}
+
+SEG05AN24 {
+  Address: 0x01030807
+  EnergyCoeff: 0 1
+}
+
+SEG05AN25 {
+  Address: 0x01030808
+  EnergyCoeff: 0 1
+}
+
+SEG05AN26 {
+  Address: 0x01030809
+  EnergyCoeff: 0 1
+}
+
+SEG05AN27 {
+  Address: 0x0103080a
+  EnergyCoeff: 0 1
+}
+
+SEG05AN28 {
+  Address: 0x0103080b
+  EnergyCoeff: 0 1
+}
+
+SEG05AN29 {
+  Address: 0x0103080c
+  EnergyCoeff: 0 1
+}
+
+SEG05AN30 {
+  Address: 0x0103080d
+  EnergyCoeff: 0 1
+}
+
+SEG05AN31 {
+  Address: 0x0103080e
+  EnergyCoeff: 0 1
+}
+
+SEG05AN32 {
+  Address: 0x0103080f
+  EnergyCoeff: 0 1
+}
+
+JAN00FN00 {
+  Address: 0x02000500
+  EnergyCoeff: 0 1
+}
+
+JAN00FN01 {
+  Address: 0x02000501
+  EnergyCoeff: 0 1
+}
+
+JAN00FN02 {
+  Address: 0x02000502
+  EnergyCoeff: 0 1
+}
+
+JAN00FN03 {
+  Address: 0x02000503
+  EnergyCoeff: 0 1
+}
+
+JAN00FN04 {
+  Address: 0x02000504
+  EnergyCoeff: 0 1
+}
+
+JAN00FN05 {
+  Address: 0x02000505
+  EnergyCoeff: 0 1
+}
+
+JAN00FN06 {
+  Address: 0x02000506
+  EnergyCoeff: 0 1
+}
+
+JAN00FN07 {
+  Address: 0x02000507
+  EnergyCoeff: 0 1
+}
+
+JAN00FN08 {
+  Address: 0x02000508
+  EnergyCoeff: 0 1
+}
+
+JAN00FN09 {
+  Address: 0x02000509
+  EnergyCoeff: 0 1
+}
+
+JAN00FN10 {
+  Address: 0x0200050a
+  EnergyCoeff: 0 1
+}
+
+JAN00FN11 {
+  Address: 0x0200050b
+  EnergyCoeff: 0 1
+}
+
+JAN00FN12 {
+  Address: 0x0200050c
+  EnergyCoeff: 0 1
+}
+
+JAN00FN13 {
+  Address: 0x0200050d
+  EnergyCoeff: 0 1
+}
+
+JAN00FN14 {
+  Address: 0x0200050e
+  EnergyCoeff: 0 1
+}
+
+JAN00FN15 {
+  Address: 0x0200050f
+  EnergyCoeff: 0 1
+}
+
+JAN00FN16 {
+  Address: 0x02000510
+  EnergyCoeff: 0 1
+}
+
+JAN00FN17 {
+  Address: 0x02000511
+  EnergyCoeff: 0 1
+}
+
+JAN00FN18 {
+  Address: 0x02000512
+  EnergyCoeff: 0 1
+}
+
+JAN00FN19 {
+  Address: 0x02000513
+  EnergyCoeff: 0 1
+}
+
+JAN00FN20 {
+  Address: 0x02000514
+  EnergyCoeff: 0 1
+}
+
+JAN00FN21 {
+  Address: 0x02000515
+  EnergyCoeff: 0 1
+}
+
+JAN00FN22 {
+  Address: 0x02000516
+  EnergyCoeff: 0 1
+}
+
+JAN00FN23 {
+  Address: 0x02000517
+  EnergyCoeff: 0 1
+}
+
+JAN00FN24 {
+  Address: 0x02000518
+  EnergyCoeff: 0 1
+}
+
+JAN00FN25 {
+  Address: 0x02000519
+  EnergyCoeff: 0 1
+}
+
+JAN00FN26 {
+  Address: 0x0200051a
+  EnergyCoeff: 0 1
+}
+
+JAN00FN27 {
+  Address: 0x0200051b
+  EnergyCoeff: 0 1
+}
+
+JAN00FN28 {
+  Address: 0x0200051c
+  EnergyCoeff: 0 1
+}
+
+JAN00FN29 {
+  Address: 0x0200051d
+  EnergyCoeff: 0 1
+}
+
+JAN00FN30 {
+  Address: 0x0200051e
+  EnergyCoeff: 0 1
+}
+
+JAN00FN31 {
+  Address: 0x0200051f
+  EnergyCoeff: 0 1
+}
+
+JAN00BN00 {
+  Address: 0x02000600
+  EnergyCoeff: 0 1
+}
+
+JAN00BN01 {
+  Address: 0x02000601
+  EnergyCoeff: 0 1
+}
+
+JAN00BN02 {
+  Address: 0x02000602
+  EnergyCoeff: 0 1
+}
+
+JAN00BN03 {
+  Address: 0x02000603
+  EnergyCoeff: 0 1
+}
+
+JAN00BN04 {
+  Address: 0x02000604
+  EnergyCoeff: 0 1
+}
+
+JAN00BN05 {
+  Address: 0x02000605
+  EnergyCoeff: 0 1
+}
+
+JAN00BN06 {
+  Address: 0x02000606
+  EnergyCoeff: 0 1
+}
+
+JAN00BN07 {
+  Address: 0x02000607
+  EnergyCoeff: 0 1
+}
+
+JAN00BN08 {
+  Address: 0x02000608
+  EnergyCoeff: 0 1
+}
+
+JAN00BN09 {
+  Address: 0x02000609
+  EnergyCoeff: 0 1
+}
+
+JAN00BN10 {
+  Address: 0x0200060a
+  EnergyCoeff: 0 1
+}
+
+JAN00BN11 {
+  Address: 0x0200060b
+  EnergyCoeff: 0 1
+}
+
+JAN00BN12 {
+  Address: 0x0200060c
+  EnergyCoeff: 0 1
+}
+
+JAN00BN13 {
+  Address: 0x0200060d
+  EnergyCoeff: 0 1
+}
+
+JAN00BN14 {
+  Address: 0x0200060e
+  EnergyCoeff: 0 1
+}
+
+JAN00BN15 {
+  Address: 0x0200060f
+  EnergyCoeff: 0 1
+}
+
+JAN00BN16 {
+  Address: 0x02000610
+  EnergyCoeff: 0 1
+}
+
+JAN00BN17 {
+  Address: 0x02000611
+  EnergyCoeff: 0 1
+}
+
+JAN00BN18 {
+  Address: 0x02000612
+  EnergyCoeff: 0 1
+}
+
+JAN00BN19 {
+  Address: 0x02000613
+  EnergyCoeff: 0 1
+}
+
+JAN00BN20 {
+  Address: 0x02000614
+  EnergyCoeff: 0 1
+}
+
+JAN00BN21 {
+  Address: 0x02000615
+  EnergyCoeff: 0 1
+}
+
+JAN00BN22 {
+  Address: 0x02000616
+  EnergyCoeff: 0 1
+}
+
+JAN00BN23 {
+  Address: 0x02000617
+  EnergyCoeff: 0 1
+}
+
+JAN00BN24 {
+  Address: 0x02000618
+  EnergyCoeff: 0 1
+}
+
+JAN00BN25 {
+  Address: 0x02000619
+  EnergyCoeff: 0 1
+}
+
+JAN00BN26 {
+  Address: 0x0200061a
+  EnergyCoeff: 0 1
+}
+
+JAN00BN27 {
+  Address: 0x0200061b
+  EnergyCoeff: 0 1
+}
+
+JAN00BN28 {
+  Address: 0x0200061c
+  EnergyCoeff: 0 1
+}
+
+JAN00BN29 {
+  Address: 0x0200061d
+  EnergyCoeff: 0 1
+}
+
+JAN00BN30 {
+  Address: 0x0200061e
+  EnergyCoeff: 0 1
+}
+
+JAN00BN31 {
+  Address: 0x0200061f
+  EnergyCoeff: 0 1
+}
+
+JAN01FN00 {
+  Address: 0x02000700
+  EnergyCoeff: 0 1
+}
+
+JAN01FN01 {
+  Address: 0x02000701
+  EnergyCoeff: 0 1
+}
+
+JAN01FN02 {
+  Address: 0x02000702
+  EnergyCoeff: 0 1
+}
+
+JAN01FN03 {
+  Address: 0x02000703
+  EnergyCoeff: 0 1
+}
+
+JAN01FN04 {
+  Address: 0x02000704
+  EnergyCoeff: 0 1
+}
+
+JAN01FN05 {
+  Address: 0x02000705
+  EnergyCoeff: 0 1
+}
+
+JAN01FN06 {
+  Address: 0x02000706
+  EnergyCoeff: 0 1
+}
+
+JAN01FN07 {
+  Address: 0x02000707
+  EnergyCoeff: 0 1
+}
+
+JAN01FN08 {
+  Address: 0x02000708
+  EnergyCoeff: 0 1
+}
+
+JAN01FN09 {
+  Address: 0x02000709
+  EnergyCoeff: 0 1
+}
+
+JAN01FN10 {
+  Address: 0x0200070a
+  EnergyCoeff: 0 1
+}
+
+JAN01FN11 {
+  Address: 0x0200070b
+  EnergyCoeff: 0 1
+}
+
+JAN01FN12 {
+  Address: 0x0200070c
+  EnergyCoeff: 0 1
+}
+
+JAN01FN13 {
+  Address: 0x0200070d
+  EnergyCoeff: 0 1
+}
+
+JAN01FN14 {
+  Address: 0x0200070e
+  EnergyCoeff: 0 1
+}
+
+JAN01FN15 {
+  Address: 0x0200070f
+  EnergyCoeff: 0 1
+}
+
+JAN01FN16 {
+  Address: 0x02000710
+  EnergyCoeff: 0 1
+}
+
+JAN01FN17 {
+  Address: 0x02000711
+  EnergyCoeff: 0 1
+}
+
+JAN01FN18 {
+  Address: 0x02000712
+  EnergyCoeff: 0 1
+}
+
+JAN01FN19 {
+  Address: 0x02000713
+  EnergyCoeff: 0 1
+}
+
+JAN01FN20 {
+  Address: 0x02000714
+  EnergyCoeff: 0 1
+}
+
+JAN01FN21 {
+  Address: 0x02000715
+  EnergyCoeff: 0 1
+}
+
+JAN01FN22 {
+  Address: 0x02000716
+  EnergyCoeff: 0 1
+}
+
+JAN01FN23 {
+  Address: 0x02000717
+  EnergyCoeff: 0 1
+}
+
+JAN01FN24 {
+  Address: 0x02000718
+  EnergyCoeff: 0 1
+}
+
+JAN01FN25 {
+  Address: 0x02000719
+  EnergyCoeff: 0 1
+}
+
+JAN01FN26 {
+  Address: 0x0200071a
+  EnergyCoeff: 0 1
+}
+
+JAN01FN27 {
+  Address: 0x0200071b
+  EnergyCoeff: 0 1
+}
+
+JAN01FN28 {
+  Address: 0x0200071c
+  EnergyCoeff: 0 1
+}
+
+JAN01FN29 {
+  Address: 0x0200071d
+  EnergyCoeff: 0 1
+}
+
+JAN01FN30 {
+  Address: 0x0200071e
+  EnergyCoeff: 0 1
+}
+
+JAN01FN31 {
+  Address: 0x0200071f
+  EnergyCoeff: 0 1
+}
+
+JAN01BN00 {
+  Address: 0x02000800
+  EnergyCoeff: 0 1
+}
+
+JAN01BN01 {
+  Address: 0x02000801
+  EnergyCoeff: 0 1
+}
+
+JAN01BN02 {
+  Address: 0x02000802
+  EnergyCoeff: 0 1
+}
+
+JAN01BN03 {
+  Address: 0x02000803
+  EnergyCoeff: 0 1
+}
+
+JAN01BN04 {
+  Address: 0x02000804
+  EnergyCoeff: 0 1
+}
+
+JAN01BN05 {
+  Address: 0x02000805
+  EnergyCoeff: 0 1
+}
+
+JAN01BN06 {
+  Address: 0x02000806
+  EnergyCoeff: 0 1
+}
+
+JAN01BN07 {
+  Address: 0x02000807
+  EnergyCoeff: 0 1
+}
+
+JAN01BN08 {
+  Address: 0x02000808
+  EnergyCoeff: 0 1
+}
+
+JAN01BN09 {
+  Address: 0x02000809
+  EnergyCoeff: 0 1
+}
+
+JAN01BN10 {
+  Address: 0x0200080a
+  EnergyCoeff: 0 1
+}
+
+JAN01BN11 {
+  Address: 0x0200080b
+  EnergyCoeff: 0 1
+}
+
+JAN01BN12 {
+  Address: 0x0200080c
+  EnergyCoeff: 0 1
+}
+
+JAN01BN13 {
+  Address: 0x0200080d
+  EnergyCoeff: 0 1
+}
+
+JAN01BN14 {
+  Address: 0x0200080e
+  EnergyCoeff: 0 1
+}
+
+JAN01BN15 {
+  Address: 0x0200080f
+  EnergyCoeff: 0 1
+}
+
+JAN01BN16 {
+  Address: 0x02000810
+  EnergyCoeff: 0 1
+}
+
+JAN01BN17 {
+  Address: 0x02000811
+  EnergyCoeff: 0 1
+}
+
+JAN01BN18 {
+  Address: 0x02000812
+  EnergyCoeff: 0 1
+}
+
+JAN01BN19 {
+  Address: 0x02000813
+  EnergyCoeff: 0 1
+}
+
+JAN01BN20 {
+  Address: 0x02000814
+  EnergyCoeff: 0 1
+}
+
+JAN01BN21 {
+  Address: 0x02000815
+  EnergyCoeff: 0 1
+}
+
+JAN01BN22 {
+  Address: 0x02000816
+  EnergyCoeff: 0 1
+}
+
+JAN01BN23 {
+  Address: 0x02000817
+  EnergyCoeff: 0 1
+}
+
+JAN01BN24 {
+  Address: 0x02000818
+  EnergyCoeff: 0 1
+}
+
+JAN01BN25 {
+  Address: 0x02000819
+  EnergyCoeff: 0 1
+}
+
+JAN01BN26 {
+  Address: 0x0200081a
+  EnergyCoeff: 0 1
+}
+
+JAN01BN27 {
+  Address: 0x0200081b
+  EnergyCoeff: 0 1
+}
+
+JAN01BN28 {
+  Address: 0x0200081c
+  EnergyCoeff: 0 1
+}
+
+JAN01BN29 {
+  Address: 0x0200081d
+  EnergyCoeff: 0 1
+}
+
+JAN01BN30 {
+  Address: 0x0200081e
+  EnergyCoeff: 0 1
+}
+
+JAN01BN31 {
+  Address: 0x0200081f
+  EnergyCoeff: 0 1
+}

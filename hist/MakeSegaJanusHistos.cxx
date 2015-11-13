@@ -81,22 +81,18 @@ void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega) {
   long segment_timestamp = -1;
   for(int i=0; i<sega->Size(); i++){
     TSegaHit& hit = sega->GetSegaHit(i);
-    obj.FillHistogram("sega_crate",
-                      50, 0, 50, hit.GetCrate());
-    obj.FillHistogram("sega_slot",
-                      15, 0, 15, hit.GetSlot());
     obj.FillHistogram("sega_energy",
                       50000, 0, 50000, hit.Charge());
-    if(hit.GetCrate()==1){
-      obj.FillHistogram("sega_core_energy",
-                        32768, 0, 32768, hit.Charge());
-      obj.FillHistogram("sega_core_summary",
-                        16, 0, 16, hit.GetChannel(),
-                        32768, 0, 32768, hit.Charge());
+    obj.FillHistogram("sega_core_summary",
+                      16, 0, 16, hit.GetChannel(),
+                      32768, 0, 32768, hit.Charge());
+
+    for(int segi=0; segi<hit.GetNumSegments(); segi++){
+      TSegaSegmentHit& seg = hit.GetSegment(segi);
+      obj.FillHistogram(Form("sega_det%d_segsummary", hit.GetDetnum()),
+                        32, 0, 32, seg.GetSegnum(),
+                        32768, 0, 32768, seg.Charge());
     }
-    obj.FillHistogram("sega_energy_crate",
-                      5, 0, 5, hit.GetCrate(),
-                      50000, 0, 50000, hit.Charge());
 
     if(hit.GetCrate()==1){
       cc_timestamp = hit.GetTimestamp();

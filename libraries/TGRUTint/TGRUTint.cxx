@@ -19,6 +19,7 @@
 
 #include "GRootGuiFactory.h"
 #include "ProgramPath.h"
+#include "TChannel.h"
 #include "TDetectorEnv.h"
 #include "TGRUTOptions.h"
 #include "TGRUTUtilities.h"
@@ -118,6 +119,10 @@ void TGRUTint::ApplyOptions() {
   }
 
   TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
+
+  for(auto& cal_file : opt->CalInputFiles()) {
+    TChannel::ReadCalFile(cal_file.c_str());
+  }
 
   SetupPipeline();
 

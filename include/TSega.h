@@ -12,11 +12,12 @@ public:
   void Copy(TObject& obj) const;
 
   virtual void Clear(Option_t* opt = "");
-  virtual void InsertHit(const TDetectorHit&);
   virtual TSegaHit& GetSegaHit(int i);
   virtual TDetectorHit& GetHit(int i);
 
 private:
+  TSegaHit& GetOrMakeHit(int detnum);
+
   virtual int BuildHits();
 
   std::vector<TSegaHit> sega_hits;

@@ -1,24 +1,22 @@
-#ifndef _TSEGAHIT_H_
-#define _TSEGAHIT_H_
+#ifndef _TSEGASEGMENTHIT_H_
+#define _TSEGASEGMENTHIT_H_
 
 #include "TDetectorHit.h"
-#include "TSegaSegmentHit.h"
 
 #define MAX_TRACE_LENGTH 100
 
-class TSegaHit : public TDetectorHit {
+class TSegaSegmentHit : public TDetectorHit {
 public:
-  TSegaHit();
+  TSegaSegmentHit() { }
 
   virtual void Copy(TObject&) const;
   virtual void Clear(Option_t *opt = "");
   virtual void Print(Option_t *opt = "") const;
 
-  virtual int Charge() const { return fCharge;}
+  int GetDetnum() const;
+  int GetSegnum() const;
 
-  int GetDetnum();
-  unsigned int GetNumSegments() const { return fSegments.size(); }
-  TSegaSegmentHit& GetSegment(int i) { return fSegments.at(i); }
+  virtual int Charge() const { return fCharge;}
 
   void SetCharge(int chg)   { fCharge  = chg;   }
 
@@ -28,8 +26,6 @@ public:
 
   long GetTimestamp() const { return fTimestamp; }
   void SetTimestamp(long ts) { fTimestamp = ts; }
-
-  TSegaSegmentHit& MakeSegmentByAddress(unsigned int address);
 
   int GetSlot() const;
   int GetCrate() const;
@@ -41,10 +37,9 @@ private:
   int fCfd;
 
   std::vector<unsigned short> fTrace;
-  std::vector<TSegaSegmentHit> fSegments;
 
 
-  ClassDef(TSegaHit,3);
+  ClassDef(TSegaSegmentHit,2);
 };
 
-#endif /* _TSEGAHIT_H_ */
+#endif /* _TSEGASEGMENTHIT_H_ */

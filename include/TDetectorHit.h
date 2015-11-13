@@ -1,6 +1,7 @@
 #ifndef _TDETECTORHIT_H_
 #define _TDETECTORHIT_H_
 
+#include "TChannel.h"
 #include "TObject.h"
 #include "TVector3.h"
 
@@ -28,6 +29,7 @@ public:
   Int_t  GetCrystal()   const { return ((fAddress&0x00ff0000)>>16); }
   Int_t  GetSegmentId() const { return ((fAddress&0x0000ffff)    ); }
 
+  void   SetAddress(unsigned int address) { fAddress = address; }
   void   SetAddress(unsigned char system,unsigned char type,unsigned short channel) {
     fAddress =
       (((unsigned int)system ) << 24) +
@@ -38,7 +40,7 @@ public:
 
   static const TVector3 BeamUnitVec; //!
 
-private:              //      System | Type  | Element
+protected:            //      System | Type  | Element
   Int_t    fAddress;  //   0x   ff   |  ff   |  ffff
   //Int_t    fCharge;
 
