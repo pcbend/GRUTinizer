@@ -8,12 +8,14 @@
 #endif
 
 #include <string>
+#include <map>
 
 #include "TObject.h"
 
 class StoppableThread {
   public:
-    StoppableThread();
+    StoppableThread(std::string name);
+    static StopppableThread *Get(std::string name);
     virtual ~StoppableThread();
 
     void Resume();
@@ -24,14 +26,13 @@ class StoppableThread {
     void Join();
 
     virtual std::string Status() { return ""; }
+    std::string Name() const     { return fname; }
 
     //protected:
     virtual bool Iteration() = 0;
 
   protected:
     static std::map<std::string,StoppableThread*> fthreadmap;
-
-
     static int GetNThreads();
 
   private:

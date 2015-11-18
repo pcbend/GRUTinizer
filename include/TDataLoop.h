@@ -21,13 +21,11 @@ class TRawEventSource;
 
 class TDataLoop : public StoppableThread  {
 public:
-  static TDataLoop *Get(std::string name="", TRawEventSource* source=0); //,ThreadsafeQueue<TRawEvent>* output_queue=0);
-  static int GetNDataLoops();
+  static TDataLoop *Get(std::string name="", TRawEventSource* source=0); 
   virtual ~TDataLoop();
 
   const TRawEventSource& GetSource() const { return *source; }
 
-  std::string GetName() { return fname; }
   std::string Status();
 
 //protected:
@@ -41,11 +39,9 @@ private:
   TDataLoop();
   TDataLoop(const TDataLoop& other);
   TDataLoop& operator=(const TDataLoop& other);
-  static std::map<std::string,TDataLoop*> fdataloopmap;
 
   ThreadsafeQueue<TRawEvent> output_queue;
   TRawEventSource* source;
-  std::string fname;
 
   ClassDef(TDataLoop, 0);
 };

@@ -10,11 +10,7 @@
 std::map<std::string,TDataLoop*> TDataLoop::fdataloopmap;
 
 TDataLoop::TDataLoop(std::string name,TRawEventSource* source) 
-  : source(source) { 
-  if(!name.length())
-    name = Form("dataloop%i",GetNDataLoops());
-  fname = name;
-  fdataloopmap.insert(std::make_pair(fname,this));
+  : StoppableThread(name), source(source) { 
 }
 
 TDataLoop::~TDataLoop(){
@@ -26,6 +22,12 @@ int TDataLoop::GetNDataLoops() {
 }
 
 TDataLoop *TDataLoop::Get(std::string name,TRawEventSource* source) { 
+  if(name.length()==0 && source) {
+    name = Form("dataloop%i",GetNDataLoops());
+    fname = name;
+  }
+  Stoppable::StoppableThread(name);
+  
   if(fdataloopmap.count(name))
     return fdataloopmap.at(name);
   else if(source)
