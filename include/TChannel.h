@@ -41,11 +41,11 @@ private:
 private:
   static std::map<unsigned int,TChannel*> fChannelMap;
   struct MNEMONIC {
-    int array_position;
-    int segment;
     std::string system;
+    int array_position;
     std::string arraysubposition;
     std::string collectedcharge;
+    int segment;
 
     void Unpack(std::string name);
     void Clear(Option_t* opt = "");

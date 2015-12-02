@@ -7,17 +7,11 @@ void TSegaSegmentHit::Copy(TObject& obj) const{
   TDetectorHit::Copy(obj);
 
   TSegaSegmentHit& sega = (TSegaSegmentHit&)obj;
-  sega.fTimestamp = fTimestamp;
-  sega.fCharge   = fCharge;
-  sega.fCfd = fCfd;
   sega.fTrace = fTrace;
 }
 
 void TSegaSegmentHit::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
-  fTimestamp = -1;
-  fCharge  = -1;
-  fCfd = -1;
   fTrace.clear();
 }
 
@@ -68,4 +62,12 @@ int TSegaSegmentHit::GetSlot() const {
 
 int TSegaSegmentHit::GetChannel() const {
   return (fAddress&0x000000ff)>>0;
+}
+
+Int_t TSegaSegmentHit::Charge() const {
+  if(fCharge > 30000) {
+    return fCharge - 32768;
+  } else {
+    return fCharge;
+  }
 }

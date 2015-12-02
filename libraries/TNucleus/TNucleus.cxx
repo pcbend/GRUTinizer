@@ -54,12 +54,12 @@ TNucleus::TNucleus(const char *name){
         Name.clear();
         Name.assign("h2");
         break;
-      case 't':   
-        Name.clear();   
+      case 't':
+        Name.clear();
         Name.assign("h3");
         break;
-      case 'a':   
-        Name.clear();   
+      case 'a':
+        Name.clear();
         Name.assign("he4");
         break;
       default:
@@ -86,14 +86,14 @@ TNucleus::TNucleus(const char *name){
         //printf("MassFile.c_str()
 	int z,n;
 	std::string sym_name;
-	double mass;	
+	double mass;
  	bool found = false;
 	while(getline(infile,line)) {
 		if(line.length() <1)
 			continue;
 //		printf("%s\n",line.c_str());
 		std::stringstream ss(line);
-		ss>>n; ss>>z; ss>>sym_name; ss>>mass; 		
+		ss>>n; ss>>z; ss>>sym_name; ss>>mass;
 		if(strcasecmp(element.c_str(),sym_name.c_str()) == 0) {
 			found = true;
 			break;
@@ -118,7 +118,7 @@ TNucleus::TNucleus(const char *name){
 TNucleus::TNucleus(int charge, int neutrons, double mass, const char* symbol){
 // Creates a nucleus with Z, N, mass, and symbol
   //SetMassFile();
-  fZ = charge;  
+  fZ = charge;
   fN = neutrons;
   fSymbol = symbol;
   fMass = mass;
@@ -135,7 +135,7 @@ TNucleus::TNucleus(int charge, int neutrons, const char* MassFile){
 	  //SMassFile.append(massfile);
 	  MassFile = SMassFile.c_str();
 	}
-  fZ = charge;  
+  fZ = charge;
   fN = neutrons;
   int i = 0,n,z;
   double emass;
@@ -159,13 +159,13 @@ TNucleus::TNucleus(int charge, int neutrons, const char* MassFile){
     }
     i++;
     mass_file.ignore(256,'\n');
-  }  
+  }
   //max_elements=i;
 
   mass_file.close();
   std::string name = fSymbol;
   std::string number = name.substr(0,name.find_first_not_of("0123456789 "));
-  
+
   name = name.substr(name.find_first_not_of("0123456789 "));
   name.append(number);
   //SetName(name.c_str());
@@ -200,12 +200,12 @@ const char* TNucleus::SortName(const char* name){
         Name.clear();
         Name.assign("h2");
         break;
-      case 't':   
-        Name.clear();   
+      case 't':
+        Name.clear();
         Name.assign("h3");
         break;
-      case 'a':   
-        Name.clear();   
+      case 'a':
+        Name.clear();
         Name.assign("he4");
         break;
       default:
@@ -227,7 +227,7 @@ const char* TNucleus::SortName(const char* name){
 	element.append(std::to_string((long long)Number)); element.append(symbol);
 
    return element.c_str();
-   
+
 }
 
 void TNucleus::SetZ(int charge){
@@ -294,9 +294,9 @@ bool TNucleus::SetSourceData() {
    std::string name = GetSymbol();
    if(name.length()==0)
       return false;
-  
+
    if(name[0]<='Z' && name[0]>='A')
-      name[0] = name[0]-'A'+'a'; 
+      name[0] = name[0]-'A'+'a';
    name = name + Form("%i",GetA()) + ".sou";
    std::string path = getenv("GRSISYS");
 	path +=  "/libraries/TGRSIAnalysis/SourceData/";
@@ -317,11 +317,11 @@ bool TNucleus::SetSourceData() {
    while(getline(sourcefile,line)) {
       linenumber++;
       int comment = line.find("//");
-      if (comment != std::string::npos) 
+      if (comment != std::string::npos)
          line = line.substr(0, comment);
       if(line.length()==0)
          continue;
-      //TGRSITransition *tran = new TGRSITransition; 
+      //TGRSITransition *tran = new TGRSITransition;
       //std::stringstream ss(line);
       //ss >> tran->fenergy;
       //ss >> tran->fenergy_uncertainty;
@@ -329,7 +329,7 @@ bool TNucleus::SetSourceData() {
       //ss >> tran->fintensity_uncertainty;
       //TransitionList.Add(tran);
     //  printf("eng: %.02f\tinten: %.02f\n",((TGRSITransition*)TransitionList.Last())->fenergy,((TGRSITransition*)TransitionList.Last())->fintensity);
-   }                                                                                                         
+   }
 
    printf("Found %d Transitions for %s\n",TransitionList.GetSize(),GetName());
    return true;
@@ -396,7 +396,7 @@ void TNucleus::WriteSourceFile(std::string outfilename){
      }
      sourceout << std::endl;
      sourceout.close();
-   } 
+   }
 
 }
 
@@ -411,7 +411,7 @@ bool TNucleus::LoadTransitionFile(){
   SetName(NucName.c_str());
   ss1 << ".sou";
   ss1 >> fileName2;
-  
+
   fileName1.append(fileName2);
 
   ifstream transFile;
@@ -429,13 +429,10 @@ bool TNucleus::LoadTransitionFile(){
     getline(transFile,eat);
     this->AddTransition(En,Ints,EnUn,IntsUn);
   }
-  
+
   transFile.close();
   std::cout << " File        : " << fileName2 <<  std::endl
 	    << " Opened from : " << "../libraries/SourceData/" << std::endl;
   return true;
 
 }
-
-
-

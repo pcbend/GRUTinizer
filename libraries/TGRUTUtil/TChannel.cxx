@@ -211,8 +211,11 @@ double TChannel::CalEnergy(double charge) {
   if(energy_coeff.size()==0)
      return charge;
   double cal_chg = 0.000;
-  for(int i=0;i<energy_coeff.size();i++) {
-     cal_chg += energy_coeff.at(i) * pow((charge),i);
+  // Evaluate the polynomial
+  for(int i=energy_coeff.size()-1; i>=0; i--){
+    double coef = energy_coeff[i];
+    cal_chg *= charge;
+    cal_chg += coef;
   }
   return cal_chg;
 }

@@ -13,9 +13,10 @@ public:
 
   virtual void Clear(Option_t* opt = "");
 
-  virtual void InsertHit(const TDetectorHit&);
   virtual TJanusHit&    GetJanusHit(int i);
   virtual TDetectorHit& GetHit(int i);
+
+  static TVector3 GetPosition(int detnum, int ring_num, int sector_num);
 
 private:
   virtual int  BuildHits();

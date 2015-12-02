@@ -3,7 +3,7 @@
 #include "TPreserveGDirectory.h"
 
 TWriteLoop::TWriteLoop(ThreadsafeQueue<TUnpackedEvent*>& input_queue, TDirectory& dir)
-  : input_queue(input_queue), in_learning_phase(true), learning_phase_length(1000),
+  : input_queue(input_queue), in_learning_phase(true), learning_phase_length(20000),
     output_dir(dir) {
   TPreserveGDirectory preserve;
   dir.cd();

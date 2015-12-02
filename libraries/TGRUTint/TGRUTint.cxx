@@ -23,6 +23,7 @@
 #include "TDetectorEnv.h"
 #include "TGRUTOptions.h"
 #include "TGRUTUtilities.h"
+#include "TSega.h"
 
 //extern "C" G__value G__getitem(const char* item);
 //#include "FastAllocString.h"
@@ -124,6 +125,8 @@ void TGRUTint::ApplyOptions() {
     TChannel::ReadCalFile(cal_file.c_str());
   }
 
+  TSega::LoadDetectorPositions();
+
   SetupPipeline();
 
   if(!opt->StartGUI()) {
@@ -170,7 +173,6 @@ void TGRUTint::ApplyOptions() {
       std::this_thread::sleep_for(std::chrono::seconds(1));
     }
     std::cout << std::endl;
-    fPipeline->Write();
 
     this->Terminate();
   } else if(opt->CommandServer()) {
@@ -358,6 +360,7 @@ void TGRUTint::Terminate(Int_t status){
   }
 
   fPipeline->Stop();
+  fPipeline->Write();
 
   //Be polite when you leave.
   printf(DMAGENTA "\nbye,bye\t" DCYAN "%s" RESET_COLOR  "\n",getlogin());

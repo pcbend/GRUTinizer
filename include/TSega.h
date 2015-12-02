@@ -15,12 +15,24 @@ public:
   virtual TSegaHit& GetSegaHit(int i);
   virtual TDetectorHit& GetHit(int i);
 
+  static TVector3 GetSegmentPosition(int detnum, int segnum);
+  static TVector3 CrystalToGlobal(int detnum, TVector3 crystal_pos);
+  static void LoadDetectorPositions();
+
 private:
   TSegaHit& GetOrMakeHit(int detnum);
 
   virtual int BuildHits();
 
   std::vector<TSegaHit> sega_hits;
+
+  struct Transformation {
+    TVector3 origin;
+    TVector3 x;
+    TVector3 y;
+    TVector3 z;
+  };
+  static std::map<int,Transformation> detector_positions;
 
   ClassDef(TSega,2);
 };

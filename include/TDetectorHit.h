@@ -10,6 +10,8 @@ public:
   TDetectorHit();
   virtual ~TDetectorHit();
 
+  virtual const char* GetName() const;
+
   virtual Int_t Compare(const TObject *obj) const; //needed for root containers
   virtual bool IsSortable() const { return true; }
 
@@ -18,35 +20,26 @@ public:
   virtual void  Print(Option_t *opt = "" ) const;
 
   Int_t  Address()   const { return fAddress; }
+  virtual Int_t  Charge() const { return fCharge;  }
+  Int_t  Time() const { return fTime; }
+  long   Timestamp() const { return fTimestamp; }
+
+  void SetAddress(unsigned int address) { fAddress = address; }
+  void SetCharge(unsigned int charge) { fCharge = charge;  }
+  void SetTime(unsigned int time) { fTime = time; }
+  void SetTimestamp(long timestamp) { fTimestamp = timestamp; }
+
   double GetEnergy() const;
-  virtual Int_t  Charge() const = 0;  //const { return fCharge;  }
-
-  Int_t  GetSystem()  const { return ((fAddress&0xff000000)>>24); }
-  Int_t  GetType()    const { return ((fAddress&0x00ff0000)>>16); }
-  Int_t  GetChannel() const { return ((fAddress&0x0000ffff)    ); }
-
-  Int_t  GetHole()      const { return ((fAddress&0xff000000)>>24); }
-  Int_t  GetCrystal()   const { return ((fAddress&0x00ff0000)>>16); }
-  Int_t  GetSegmentId() const { return ((fAddress&0x0000ffff)    ); }
-
-  void   SetAddress(unsigned int address) { fAddress = address; }
-  void   SetAddress(unsigned char system,unsigned char type,unsigned short channel) {
-    fAddress =
-      (((unsigned int)system ) << 24) +
-      (((unsigned int)type   ) << 16) +
-      (((unsigned int)channel) << 0);
-  }
-  //void   SetCharge(Int_t chg) { fCharge = chg; }
 
   static const TVector3 BeamUnitVec; //!
 
-protected:            //      System | Type  | Element
-  Int_t    fAddress;  //   0x   ff   |  ff   |  ffff
-  //Int_t    fCharge;
+protected:
+  Int_t fAddress;
+  Int_t fCharge;
+  Int_t fTime;
+  long fTimestamp;
 
-
-  ClassDef(TDetectorHit,1)
-
+  ClassDef(TDetectorHit,2)
 };
 
 #endif
