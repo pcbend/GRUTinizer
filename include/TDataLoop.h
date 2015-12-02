@@ -20,30 +20,35 @@
 class TRawEventSource;
 
 class TDataLoop : public StoppableThread  {
-public:
-  static TDataLoop *Get(std::string name="", TRawEventSource* source=0); 
-  virtual ~TDataLoop();
+  public:
+    static TDataLoop *Get(std::string name="", TRawEventSource* source=0); 
+    virtual ~TDataLoop();
 
-  const TRawEventSource& GetSource() const { return *source; }
+    const TRawEventSource& GetSource() const { return *source; }
 
-  std::string Status();
+    std::string Status();
 
-//protected:
-  bool Iteration();
-  int Pop(TRawEvent &event) { return output_queue.Pop(event); }
+    //protected:
+    bool Iteration();
+    
+    int Pop(TRawEvent &event); 
+
+    size_t GetItemsIn()  { return output_queue.ItemsPushed(); } 
+    size_t GetItemsOut() { return output_queue.ItemsPopped(); } 
+    size_t GetRate()     { return 0; } 
 
 
-private:
-  TDataLoop(std::string name,TRawEventSource* source);
-            //ThreadsafeQueue<TRawEvent>& output_queue,std::string name="");
-  TDataLoop();
-  TDataLoop(const TDataLoop& other);
-  TDataLoop& operator=(const TDataLoop& other);
+  private:
+    TDataLoop(std::string name,TRawEventSource* source);
+    //ThreadsafeQueue<TRawEvent>& output_queue,std::string name="");
+    TDataLoop();
+    TDataLoop(const TDataLoop& other);
+    TDataLoop& operator=(const TDataLoop& other);
 
-  ThreadsafeQueue<TRawEvent> output_queue;
-  TRawEventSource* source;
+    ThreadsafeQueue<TRawEvent> output_queue;
+    TRawEventSource* source;
 
-  ClassDef(TDataLoop, 0);
+    ClassDef(TDataLoop, 0);
 };
 
 #endif /* _TDATALOOP_H_ */

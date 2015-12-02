@@ -1,47 +1,121 @@
-#ifndef _TUNPACKLOOP_H_
-#define _TUNPACKLOOP_H_
+#ifndef _TBUILDINGLOOP_H_
+#define _TBUILDINGLOOP_H_
 
 #include "TNamed.h"
 
 #include "StoppableThread.h"
 #include "ThreadsafeQueue.h"
 #include "TRawEvent.h"
-#include "TBuildingedEvent.h"
+//#include "TBuildingEvent.h"
 
-class TNSCLEvent;
-class TGEBEvent;
+#ifndef __CINT__ 
+#include <condition_variable>
+#include <mutex>
+#include <queue>
+#endif
+
+#include "TRawEvent.h"
+#include "TStopwatch.h"
+
+
+class TDataLoop;
 
 class TBuildingLoop : public StoppableThread {
-public:
-  TBuildingLoop(std::string name, ThreadsafeQueue<TRawEvent>& input_queue);
-              //ThreadsafeQueue<TBuildingedEvent*>& output_queue);
-  virtual ~TBuildingLoop();
+  public:
+    static TBuildingLoop *Get(std::string name="",TDataLoop *input=0);
+    virtual ~TBuildingLoop();
 
-  ThreadsafeQueue<TBuiltEvent*>& GetOutputQueue() { return output_queue; }
+    //ThreadsafeQueue<TBuiltEvent*>& GetOutputQueue() { return output_queue; }
 
-//protected:
-  bool Iteration();
+    //protected:
+    bool Iteration();
 
-private:
-  TBuildingLoop(const TBuildingLoop& other);
-  TBuildingLoop& operator=(const TBuildingLoop& other);
+    size_t GetItemsIn()  { return output_queue.ItemsPushed(); }
+    size_t GetItemsOut() { return output_queue.ItemsPopped(); }
+    size_t GetRate()     { return 0; }
 
-  void CheckBuildWindow(long timestamp);
+    void SetBuildWindow(long clock_ticks) { build_window = clock_ticks; }
 
-  void HandleNSCLData(TNSCLEvent& event);
-  void HandleBuiltNSCLData(TNSCLEvent& event);
-  void HandleUnbuiltNSCLData(TNSCLEvent& event);
 
-  void HandleGEBData(TGEBEvent& event);
-  void HandleGEBMode3(TGEBEvent& event, kDetectorSystems system);
-  void HandleS800Scaler(TGEBEvent& event);
+  private:
+    TBuildingLoop(std::string name, TDataLoop*); //StoppableThread*);  //ThreadsafeQueue<TRawEvent>& input_queue);
+    TBuildingLoop(const TBuildingLoop& other);
+    TBuildingLoop& operator=(const TBuildingLoop& other);
 
-  ThreadsafeQueue<TRawEvent>& input_queue;
-  ThreadsafeQueue<TBuiltEvent*>& output_queue;
+    bool CheckBuildWindow(TRawEvent*);
 
-  TBuiltEvent* next_event;
-  long event_start;
-  long build_window;
+    //void HandleNSCLData(TNSCLEvent& event);
+    //void HandleBuiltNSCLData(TNSCLEvent& event);
+    //void HandleUnbuiltNSCLData(TNSCLEvent& event);
+
+    //void HandleGEBData(TGEBEvent& event);
+    //void HandleGEBMode3(TGEBEvent& event, kDetectorSystems system);
+    void HandleS800Scaler(TGEBEvent& event);
+
+    TDataLoop *input_source;
+
+    //ThreadsafeQueue<TRawEvent>               & input_queue;
+    ThreadsafeQueue<std::vector<TRawEvent> > output_queue;
+
+
+    std::vector<TRawEvent> next_event;
+    //TBuiltEvent* next_event;        //std::vector<TRawEvents>
+    long event_start;
+    long build_window;
 };
 
-#endif /* _TUNPACKLOOP_H_ */
+
+
+
+
+/*
+
+
+
+class RawDataQueue {
+public:
+  RawDataQueue();
+  virtual ~RawDataQueue();
+
+  TRawEvent Pop();
+  void Push(TRawEvent obj);
+  size_t Size();
+
+  void Print();
+  void Status();
+
+private:
+  std::mutex mutex;
+  std::queue<TRawEvent> queue;
+  std::condition_variable can_push;
+  std::condition_variable can_pop;
+
+  int queue_number;
+  size_t max_queue_size;
+  size_t items_pushed;
+  size_t items_popped;
+
+  size_t bytes_in_queue;
+  size_t bytes_pushed;
+  size_t bytes_popped;
+
+  static int num_opened;
+  static int num_closed;
+
+  TStopwatch clock;
+};
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+#endif /* _TBUILDINGLOOP_H_ */

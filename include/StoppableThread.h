@@ -15,7 +15,7 @@
 class StoppableThread {
   public:
     StoppableThread(std::string name);
-    static StopppableThread *Get(std::string name);
+    static StoppableThread *Get(std::string name);
     virtual ~StoppableThread();
 
     void Resume();
@@ -31,9 +31,29 @@ class StoppableThread {
     //protected:
     virtual bool Iteration() = 0;
 
+    virtual size_t GetItemsIn()  = 0; //{ return items_in; } 
+    virtual size_t GetItemsOut() = 0; //{ return items_out; } 
+    virtual size_t GetRate()     = 0; //{ return rate; } 
+
+    static int GetNThreads();
+
+    static void Print();
+    
+    #ifndef __CINT__ 
+    static std::thread status_thread;
+    #endif
+    static bool status_thread_on;
+    static void start_status_thread();
+    static void status_out_loop();
+    static void status_out();
+
+
   protected:
     static std::map<std::string,StoppableThread*> fthreadmap;
-    static int GetNThreads();
+  
+    //long items_in;
+    //long items_out;
+    //long rate;
 
   private:
     StoppableThread(const StoppableThread& other) { }
@@ -42,6 +62,9 @@ class StoppableThread {
     std::string fname;
 
     void Loop();
+
+
+
 
 #ifndef __CINT__
     std::thread thread;

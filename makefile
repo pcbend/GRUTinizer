@@ -145,7 +145,7 @@ $(foreach lib,$(LIBRARY_DIRS),$(eval $(call library_template,$(lib))))
 -include $(shell find .build -name '*.d' 2> /dev/null)
 
 clean:
-	@printf "\nCleaning up\n\n"
+	@printf "\n$(WARN_COLOR)Cleaning up$(NO_COLOR)\n\n"
 	@-$(RM) -rf .build
 	@-$(RM) -rf bin
 	@-$(RM) -f $(LIBRARY_OUTPUT)

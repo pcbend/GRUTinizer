@@ -7,7 +7,6 @@
 #include "TRawSource.h"
 #include "TString.h"
 
-std::map<std::string,TDataLoop*> TDataLoop::fdataloopmap;
 
 TDataLoop::TDataLoop(std::string name,TRawEventSource* source) 
   : StoppableThread(name), source(source) { 
@@ -17,23 +16,15 @@ TDataLoop::~TDataLoop(){
   delete source; // do we really want the loop to take ownership?
 }
 
-int TDataLoop::GetNDataLoops() { 
-  return fdataloopmap.size();
-}
 
 TDataLoop *TDataLoop::Get(std::string name,TRawEventSource* source) { 
-  if(name.length()==0 && source) {
-    name = Form("dataloop%i",GetNDataLoops());
-    fname = name;
-  }
-  Stoppable::StoppableThread(name);
-  
-  if(fdataloopmap.count(name))
-    return fdataloopmap.at(name);
-  else if(source)
-    return new TDataLoop(name,source);
-  else
-    return 0;
+  if(name.length()==0)
+    name = "input_loop";
+  //Stoppable::StoppableThread(name);
+  TDataLoop *loop = (TDataLoop*)StoppableThread::Get(name);
+  if(!loop && source)
+    loop = new TDataLoop(name,source);
+  return loop;
 }
 
 
@@ -53,6 +44,10 @@ bool TDataLoop::Iteration() {
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     return true;
   }
+}
+
+int TDataLoop::Pop(TRawEvent &event) {
+  return output_queue.Pop(event);
 }
 
 

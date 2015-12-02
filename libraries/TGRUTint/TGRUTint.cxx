@@ -20,11 +20,16 @@
 //#include "TDetectorEnv.h"
 #include "TGRUTOptions.h"
 #include "TRawSource.h"
-#include "TDataLoop.h"
 //#include "TGRUTLoop.h"
 #include "TGRUTUtilities.h"
 //#include "TObjectManager.h"
 #include "TChannel.h"
+
+
+
+#include "TDataLoop.h"
+#include "TBuildingLoop.h"
+
 
 //#include "TOnlineTree.h"
 
@@ -185,8 +190,11 @@ void TGRUTint::ApplyOptions() {
   //next most important thing, if given a raw file && told NOT to not sort!
   if(opt->RawInputFiles().size() && opt->SortRaw()) {
     for(int x=0;x<opt->RawInputFiles().size();x++) {
-      TDataLoop *loop = TDataLoop::Get(Form("datasource%i",x),new TRawFileIn(opt->RawInputFiles().at(x).c_str()));
+      TDataLoop *loop = TDataLoop::Get("",new TRawFileIn(opt->RawInputFiles().at(x).c_str()));
       loop->Resume();
+      TBuildingLoop *bloop = TBuildingLoop::Get("",loop);
+      bloop->Resume();
+
     }
       //printf("I was passed rawfile %s\n",opt->RawInputFiles().at(x).c_str());
   }  
