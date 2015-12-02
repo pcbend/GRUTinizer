@@ -1,0 +1,6 @@
+[root/file]
+pattern = *.spe
+icon = h1_s.xpm h1_t.xpm
+action = .x Browser_spe.C("%s")
+
+
