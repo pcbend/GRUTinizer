@@ -199,23 +199,24 @@ void TGRUTint::ApplyOptions() {
       TChannel::ReadCalFile(opt->CalInputFiles().at(x).c_str());
       //printf("I was passed calfile %s\n",opt->CalInputFiles().at(x).c_str());
   }
-
+  TDataLoop *loop = 0;
   //next most important thing, if given a raw file && told NOT to not sort!
   if(opt->RawInputFiles().size() && opt->SortRaw()) {
     for(int x=0;x<opt->RawInputFiles().size();x++) {
-      TDataLoop *loop = TDataLoop::Get("",new TRawFileIn(opt->RawInputFiles().at(x).c_str()));
+      loop = TDataLoop::Get("1_input_loop",new TRawFileIn(opt->RawInputFiles().at(x).c_str()));
       loop->Resume();
-      TBuildingLoop *boop = TBuildingLoop::Get("",loop);
+      TBuildingLoop *boop = TBuildingLoop::Get("2_build_loop",loop);
       boop->Resume();
-      TUnpackingLoop *uoop1 = TUnpackingLoop::Get("unpack1",boop);
+      TUnpackingLoop *uoop1 = TUnpackingLoop::Get("3_unpack1",boop);
       uoop1->Resume();
-      // TUnpackingLoop *uoop2 = TUnpackingLoop::Get("unpack2",boop);
-      // uoop2->Resume();
+      //TUnpackingLoop *uoop2 = TUnpackingLoop::Get("unpack2",boop);
+      //uoop2->Resume();
       // TUnpackingLoop *uoop3 = TUnpackingLoop::Get("unpack3",boop);
       // uoop3->Resume();
 
-      TWriteLoop* woop = TWriteLoop::Get("", opt->OutputFile());
+      TWriteLoop* woop = TWriteLoop::Get("4_write_loop", opt->OutputFile());
       woop->Connect(uoop1);
+      //woop->Connect(uoop2);
       woop->Resume();
     }
       //printf("I was passed rawfile %s\n",opt->RawInputFiles().at(x).c_str());
@@ -243,7 +244,18 @@ void TGRUTint::ApplyOptions() {
       printf("I am reloading calfile %s!\n",opt->CalInputFiles().at(x).c_str());
   }
 
-
+  if(opt->ExitAfterSorting()){
+    if(loop) {
+      while(loop->IsRunning()) {
+        std::cout << "\r" << loop->Status() << std::flush;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+      }
+    //TGRUTLoop::Get()->Status();
+    //std::cout << "Waiting for join" << std::endl;
+    //TGRUTLoop::Get()->Join();
+    }
+    this->Terminate();
+  } 
 
 
 

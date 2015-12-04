@@ -1,5 +1,7 @@
 #include "ThreadsafeQueue.h"
 
+#include <memory>
+
 #include "TUnpackedEvent.h"
 
 template<>

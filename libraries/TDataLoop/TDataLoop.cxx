@@ -33,12 +33,14 @@ bool TDataLoop::Iteration() {
 
   if(bytes_read < 0){
     // Error, and no point in trying again.
+    printf("file finished??\n");
     return false;
   } else if(bytes_read > 0){
     // A good event was returned
     output_queue.Push(evt);
     return true;
   } else {
+    printf("file finished??\n");
     // Nothing returned this time, but I might get something next time.
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     return true;

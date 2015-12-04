@@ -15,10 +15,17 @@ TRawEventGZipSource::~TRawEventGZipSource() {
 }
 
 int TRawEventGZipSource::ReadBytes(char* buf, size_t size){
-  size_t output = gzread(*fGzFile, buf, size);
+  int output = gzread(*fGzFile, buf, size);
   if(output != size){
-    SetLastErrno(errno);
-    SetLastError(strerror(GetLastErrno()));
+    if(gzeof(*fGzFile)){
+      SetLastErrno(-1);
+      SetLastError("EOF");
+    } else {
+      int errnum;
+      gzerror(*fGzFile, &errnum);
+      SetLastErrno(errnum);
+      SetLastError(strerror(GetLastErrno()));
+    }
   }
   return output;
 }

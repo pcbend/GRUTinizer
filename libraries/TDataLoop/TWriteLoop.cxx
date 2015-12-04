@@ -34,23 +34,23 @@ TWriteLoop::TWriteLoop(std::string name, std::string output_filename)
 }
 
 TWriteLoop::~TWriteLoop() {
-  std::cout << __PRETTY_FUNCTION__ << 0 << std::endl;
+  //std::cout << __PRETTY_FUNCTION__ << 0 << std::endl;
   if(in_learning_phase){
     EndLearningPhase();
   }
-  std::cout << __PRETTY_FUNCTION__ << 1 << std::endl;
+  //std::cout << __PRETTY_FUNCTION__ << 1 << std::endl;
   
   for(auto& elem : det_map){
-    delete *elem.second;
-    delete elem.second;
+    //delete *elem.second;
+    //delete elem.second;
   }
-  std::cout << __PRETTY_FUNCTION__ << 2 << std::endl;
+  //std::cout << __PRETTY_FUNCTION__ << 2 << std::endl;
 
   event_tree->Write();
-  std::cout << __PRETTY_FUNCTION__ << 3 << std::endl;
+  //std::cout << __PRETTY_FUNCTION__ << 3 << std::endl;
   output_file->Close();
   output_file->Delete();
-  std::cout << __PRETTY_FUNCTION__ << 4 << std::endl;
+  //std::cout << __PRETTY_FUNCTION__ << 4 << std::endl;
 }
 
 void TWriteLoop::Connect(TUnpackingLoop* input_queue){

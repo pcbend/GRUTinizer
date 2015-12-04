@@ -24,5 +24,6 @@ Canvas.UseScreenFactor: true
 
 
 Gui.IconPath:      $(GRUTSYS)/icons:$(ROOTSYS)/icons
-Gui.MimeTypeFile:  $(GRUTSYS)/.grut.mimes #$(ROOTSYS)/etc/root.mimes
+#$(ROOTSYS)/etc/root.mimes
+Gui.MimeTypeFile:  $(GRUTSYS)/.grut.mimes 
 

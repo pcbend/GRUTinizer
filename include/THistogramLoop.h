@@ -9,9 +9,7 @@
 
 class THistogramLoop : public StoppableThread {
 public:
-  THistogramLoop(ThreadsafeQueue<TUnpackedEvent*>& input_queue,
-                 ThreadsafeQueue<TUnpackedEvent*>& output_queue,
-                 TDirectory* dir = NULL);
+  static THistogramLoop* Get(std::string name="", TWriteLoop* input=0);
 
   void LoadLibrary(std::string library);
   std::string GetLibraryName() const;
@@ -27,6 +25,8 @@ protected:
   bool Iteration();
 
 private:
+  THistogramLoop(std::string name, TWriteLoop* input);
+  
   TCompiledHistograms compiled_histograms;
 
   ThreadsafeQueue<TUnpackedEvent*>& input_queue;
