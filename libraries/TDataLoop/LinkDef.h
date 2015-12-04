@@ -1,4 +1,4 @@
-// TDataLoop.h TBuildingLoop.h StoppableThread.h
+// TDataLoop.h TBuildingLoop.h TUnpackingLoop.h StoppableThread.h
 
 #ifdef __CINT__
 
@@ -11,6 +11,7 @@
 
 #pragma link C++ class TDataLoop+;
 #pragma link C++ class TBuildingLoop+;
+#pragma link C++ class TUnpackingLoop+;
 
 //#pragma link C++ class TUnpackLoop+;
 //#pragma link C++ class TPipeline+;

@@ -12,6 +12,10 @@
 #include <queue>
 #endif
 
+#include "TRawEvent.h"
+
+class TDetector;
+
 template<typename T>
 class ThreadsafeQueue {
 public:
@@ -23,6 +27,8 @@ public:
   size_t ItemsPushed();
   size_t ItemsPopped();
   size_t Size();
+
+  int ObjectSize(T&);
 
 private:
 #ifndef __CINT__
@@ -70,7 +76,7 @@ int ThreadsafeQueue<T>::Pop(T& output, int millisecond_wait) {
   }
 
   if(!queue.size()){
-    return 1;
+    return -1;
   }
 
   output = queue.front();
@@ -80,7 +86,7 @@ int ThreadsafeQueue<T>::Pop(T& output, int millisecond_wait) {
   items_in_queue--;
 
   can_push.notify_one();
-  return 0;
+  return ObjectSize(output);
 }
 
 template<typename T>

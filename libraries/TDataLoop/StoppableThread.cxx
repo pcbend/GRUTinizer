@@ -5,6 +5,8 @@
 
 #include <TString.h>
 
+#include "TDataLoop.h"
+
 std::map<std::string,StoppableThread*> StoppableThread::fthreadmap;
 bool StoppableThread::status_thread_on = false;
 std::thread StoppableThread::status_thread;
@@ -22,7 +24,64 @@ StoppableThread::StoppableThread(std::string name)
   //items_in  = 0;
   //items_out = 0;
   //rate      = 0;
-  
+
+}
+
+void StoppableThread::StopAll() {
+  std::cout << "Stopping status thread" << std::endl;
+  stop_status_thread();
+
+  std::cout << "Stopping each thread" << std::endl;
+  for(auto& elem : fthreadmap){
+    std::cout << "Stopping thread " << elem.first << std::endl;
+    StoppableThread* thread = elem.second;
+    thread->Stop();
+  }
+
+  for(auto& elem : fthreadmap){
+    std::cout << "Joining thread " << elem.first << std::endl;
+    StoppableThread* thread = elem.second;
+    thread->Join();
+  }
+
+  for(auto& elem : fthreadmap){
+    std::cout << "Deleting thread " << elem.first << std::endl;
+    StoppableThread* thread = elem.second;
+    delete thread;
+  }
+
+  std::cout << "Last status" << std::endl;
+  status_out();
+  std::cout << "End of function" << std::endl;
+}
+
+void StoppableThread::StopAllClean() {
+  stop_status_thread();
+
+  std::cout << "Stopping each TDataLoop" << std::endl;
+  for(auto& elem : fthreadmap){
+    TDataLoop* thread = dynamic_cast<TDataLoop*>(elem.second);
+    if(thread){
+      std::cout << "Stopping thread " << elem.first << std::endl;
+      thread->Stop();
+    }
+  }
+
+  for(auto& elem : fthreadmap){
+    std::cout << "Joining thread " << elem.first << std::endl;
+    StoppableThread* thread = elem.second;
+    thread->Join();
+  }
+
+  for(auto& elem : fthreadmap){
+    std::cout << "Deleting thread " << elem.first << std::endl;
+    StoppableThread* thread = elem.second;
+    delete thread;
+  }
+
+  std::cout << "Last status" << std::endl;
+  status_out();
+  std::cout << "End of function" << std::endl;
 }
 
 StoppableThread *StoppableThread::Get(std::string name) {
@@ -35,8 +94,6 @@ StoppableThread *StoppableThread::Get(std::string name) {
 
 
 StoppableThread::~StoppableThread() {
-  Stop();
-  Join();
   if(fthreadmap.count(fname)) {
      fthreadmap.erase(fname);
   }
@@ -48,6 +105,7 @@ StoppableThread::~StoppableThread() {
 
 void StoppableThread::Resume() {
   if(running) {
+    std::unique_lock<std::mutex> lock(pause_mutex);
     paused = false;
     paused_wait.notify_one();
   }
@@ -60,6 +118,7 @@ void StoppableThread::Pause() {
 }
 
 void StoppableThread::Stop() {
+  std::unique_lock<std::mutex> lock(pause_mutex);
   running = false;
   paused = false;
   paused_wait.notify_one();
@@ -81,8 +140,8 @@ void StoppableThread::Loop() {
   while(running){
     {
       std::unique_lock<std::mutex> lock(pause_mutex);
-      while(paused){
-        paused_wait.wait(lock);
+      while(paused && running){
+        paused_wait.wait_for(lock, std::chrono::milliseconds(100));
       }
     }
     bool success = Iteration();
@@ -96,7 +155,7 @@ void StoppableThread::Loop() {
 void StoppableThread::Print() {
   printf("%i Threads:\n",GetNThreads());
   int counter = 0;
-  for(auto it=fthreadmap.begin();it!=fthreadmap.end();it++) { 
+  for(auto it=fthreadmap.begin();it!=fthreadmap.end();it++) {
     printf("  %i\t%s @ 0x%08x\n",counter,it->first.c_str(),it->second);
     counter++;
   }
@@ -104,10 +163,22 @@ void StoppableThread::Print() {
 
 
 void StoppableThread::start_status_thread() {
-  status_thread_on = true;
-  status_thread = std::thread(StoppableThread::status_out_loop);
-  //status_thread.detach();
-} 
+  if(!status_thread_on){
+    status_thread_on = true;
+    status_thread = std::thread(StoppableThread::status_out_loop);
+  }
+}
+
+void StoppableThread::stop_status_thread() {
+  if(status_thread_on){
+    status_thread_on = false;
+  }
+}
+
+void StoppableThread::join_status_thread() {
+  stop_status_thread();
+  status_thread.join();
+}
 
 void StoppableThread::status_out_loop() {
   while(status_thread_on) {
@@ -115,7 +186,7 @@ void StoppableThread::status_out_loop() {
     status_out();
   }
  std::ofstream outfile(Form("%s/.grut_thread",getenv("GRUTSYS")));
- outfile << "---------------------------------------------------------------\n"; 
+ outfile << "---------------------------------------------------------------\n";
  outfile << "---------------------------------------------------------------\n";
 }
 
@@ -125,15 +196,14 @@ void StoppableThread::status_out() {
   outfile << "---------------------------------------------------------------\n"; // 64 -.
   for(auto it = fthreadmap.begin();it!=fthreadmap.end();it++) {
     StoppableThread *thread = it->second;
-    outfile << "- " << thread->Name() << std::string(64-3-thread->Name().length(),' ') << "-\n";
-    outfile << "- " << std::string(40,' ') << "items_in:  " << thread->GetItemsIn()  << "\n";
-    outfile << "- " << std::string(40,' ') << "items_out: " << thread->GetItemsOut() << "\n";
-    outfile << "- " << std::string(40,' ') << "rate:      " << thread->GetRate()     << "\n";
+    outfile << "- " << thread->Name() << std::string(64-2-thread->Name().length(),' ')   << "-\n";
+    outfile << "- " << std::string(40,' ') << "items_pushed:  " << thread->GetItemsPushed()  << "\n";
+    outfile << "- " << std::string(40,' ') << "items_popped:  " << thread->GetItemsPopped()  << "\n";
+    outfile << "- " << std::string(40,' ') << "items_current: " << thread->GetItemsCurrent() << "\n";
+    outfile << "- " << std::string(40,' ') << "rate:      " << thread->GetRate()         << "\n";
     outfile << "---------------------------------------------------------------\n"; // 64 -.
   }
   outfile << "---------------------------------------------------------------\n"; // 64 -.
 
 
 };
-
-

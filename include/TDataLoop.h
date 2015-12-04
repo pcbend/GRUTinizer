@@ -33,9 +33,10 @@ class TDataLoop : public StoppableThread  {
     
     int Pop(TRawEvent &event); 
 
-    size_t GetItemsIn()  { return output_queue.ItemsPushed(); } 
-    size_t GetItemsOut() { return output_queue.ItemsPopped(); } 
-    size_t GetRate()     { return 0; } 
+    size_t GetItemsPushed()  { return output_queue.ItemsPushed(); } 
+    size_t GetItemsPopped()  { return output_queue.ItemsPopped(); } 
+    size_t GetItemsCurrent() { return output_queue.Size();        }
+    size_t GetRate()         { return 0; } 
 
 
   private:

@@ -20,15 +20,16 @@ public:
   virtual void Clear(Option_t *opt = "");
 
   virtual void          InsertHit(const TDetectorHit& hit);
-  virtual TDetectorHit& GetHit(const int &i)            { return *(TMode3Hit*)mode3_hits->At(i); }
+  virtual TDetectorHit& GetHit(const int &i)            { return mode3_hits.at(i); }
 
-  const TMode3Hit& GetMode3Hit(int i) { return *(TMode3Hit*)mode3_hits->At(i); }
-  void PrintHit(int i){ mode3_hits->At(i)->Print(); }
+  const TMode3Hit& GetMode3Hit(int i) { return mode3_hits.at(i); }
+  void PrintHit(int i){ mode3_hits.at(i).Print(); }
 
 private:
   virtual int BuildHits();
 
-  TClonesArray* mode3_hits;//("TMode3Hit");
+  //TClonesArray* mode3_hits;//("TMode3Hit");
+  std::vector<TMode3Hit> mode3_hits;
 
   ClassDef(TMode3,3);
 };

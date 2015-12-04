@@ -30,11 +30,15 @@ class TBuildingLoop : public StoppableThread {
     //protected:
     bool Iteration();
 
-    size_t GetItemsIn()  { return output_queue.ItemsPushed(); }
-    size_t GetItemsOut() { return output_queue.ItemsPopped(); }
-    size_t GetRate()     { return 0; }
+    size_t GetItemsPushed()  { return output_queue.ItemsPushed(); } 
+    size_t GetItemsPopped()  { return output_queue.ItemsPopped(); } 
+    size_t GetItemsCurrent() { return output_queue.Size();        }
+    size_t GetRate()         { return 0; } 
 
     void SetBuildWindow(long clock_ticks) { build_window = clock_ticks; }
+
+
+    int Pop(std::vector<TRawEvent> &event); 
 
 
   private:
@@ -50,7 +54,7 @@ class TBuildingLoop : public StoppableThread {
 
     //void HandleGEBData(TGEBEvent& event);
     //void HandleGEBMode3(TGEBEvent& event, kDetectorSystems system);
-    void HandleS800Scaler(TGEBEvent& event);
+    //void HandleS800Scaler(TGEBEvent& event);
 
     TDataLoop *input_source;
 

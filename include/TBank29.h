@@ -21,7 +21,7 @@ public:
   virtual void Print(Option_t *opt = "") const;
 
   virtual void          InsertHit(const TDetectorHit& hit);
-  virtual TDetectorHit& GetHit(int i)        { return *(TDetectorHit*)channels->At(i); }
+  virtual TDetectorHit& GetHit(int i)        { return channels.at(i); }
 
   //void PrintHit(int i){ gretina_hits->At(i)->Print(); }
 
@@ -31,7 +31,7 @@ public:
 private:
   virtual int BuildHits();
 
-  TClonesArray* channels;//("TMode3Hit");
+  std::vector<TMode3Hit> channels;
 
   ClassDef(TBank29,1);
 };

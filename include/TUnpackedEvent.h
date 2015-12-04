@@ -25,6 +25,8 @@ public:
 
   void Build();
 
+  int Size() { return detectors.size(); }
+
 private:
   std::vector<TDetector*> detectors;
 };

@@ -95,17 +95,22 @@ Long_t TRawEvent::GetTimestamp() const {
     return fTimestamp;
   }
 
+  if( fFileType == kFileType::UNKNOWN_FILETYPE) {
+    printf("Unknown filetype: Size = %i\n",GetTotalSize());
+    fflush(stdout);
+    Print("all");
+    //return 0;
+  }
   assert(fFileType != kFileType::UNKNOWN_FILETYPE);
 
   switch(fFileType){
-  case NSCL_EVT:
-    return ((TNSCLEvent*)this)->GetTimestamp();
+   case NSCL_EVT:
+     return ((TNSCLEvent*)this)->GetTimestamp();
 
-  case GRETINA_MODE2:
-  case GRETINA_MODE3:
-    return ((TGEBEvent*)this)->GetTimestamp();
-
-  }
+   case GRETINA_MODE2:
+   case GRETINA_MODE3:
+     return ((TGEBEvent*)this)->GetTimestamp();
+  };
 
   return 0;
 }

@@ -8,20 +8,19 @@
 #include "TString.h"
 
 
-TDataLoop::TDataLoop(std::string name,TRawEventSource* source) 
-  : StoppableThread(name), source(source) { 
+TDataLoop::TDataLoop(std::string name,TRawEventSource* source)
+  : StoppableThread(name), source(source) {
 }
 
 TDataLoop::~TDataLoop(){
   delete source; // do we really want the loop to take ownership?
 }
 
-
-TDataLoop *TDataLoop::Get(std::string name,TRawEventSource* source) { 
+TDataLoop *TDataLoop::Get(std::string name,TRawEventSource* source) {
   if(name.length()==0)
     name = "input_loop";
   //Stoppable::StoppableThread(name);
-  TDataLoop *loop = (TDataLoop*)StoppableThread::Get(name);
+  TDataLoop *loop = dynamic_cast<TDataLoop*>(StoppableThread::Get(name));
   if(!loop && source)
     loop = new TDataLoop(name,source);
   return loop;

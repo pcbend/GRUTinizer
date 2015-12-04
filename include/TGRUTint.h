@@ -87,7 +87,7 @@ private:
   void Init();
   void ApplyOptions();
   void LoadGRootGraphics();
-
+  void LoadDetectorClasses();
 
   public:
     TList *GetListOfRawFiles() { return &fOpenedRawFiles; }

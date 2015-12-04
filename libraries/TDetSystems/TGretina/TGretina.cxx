@@ -3,13 +3,13 @@
 #include "TGEBEvent.h"
 
 TGretina::TGretina(){
-  gretina_hits = new TClonesArray("TGretinaHit");
+  //gretina_hits = new TClonesArray("TGretinaHit");
   //addback_hits = new TClonesArray("TGretinaHit");
   Clear();
 }
 
 TGretina::~TGretina() {
-  delete gretina_hits;
+  //delete gretina_hits;
   //addback_hits->Delete();
 }
 
@@ -69,14 +69,15 @@ void TGretina::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 
   TGretina& gretina = (TGretina&)obj;
-  gretina_hits->Copy(*gretina.gretina_hits);
+  gretina.gretina_hits = gretina_hits; // gretina_hits->Copy(*gretina.gretina_hits);
   //addback_hits->Copy(*gretina.addback_hits);
   gretina.raw_data.clear();
 }
 
 void TGretina::InsertHit(const TDetectorHit& hit){
-  TGretinaHit* new_hit = (TGretinaHit*)gretina_hits->ConstructedAt(Size());
-  hit.Copy(*new_hit);
+  //TGretinaHit* new_hit = (TGretinaHit*)gretina_hits->ConstructedAt(Size());
+  //hit.Copy(*new_hit);
+  gretina_hits.emplace_back((TGretinaHit&)hit);
   fSize++;
 }
 
@@ -165,7 +166,7 @@ void TGretina::Print(Option_t *opt) const { }
 
 void TGretina::Clear(Option_t *opt) {
   TDetector::Clear(opt);
-  gretina_hits->Clear(opt);//("TGretinaHit");
+  gretina_hits.clear(); //("TGretinaHit");
   //addback_hits->Clear(opt);//("TGretinaHit");
   raw_data.clear();
 }

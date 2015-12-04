@@ -25,11 +25,12 @@
 //#include "TObjectManager.h"
 #include "TChannel.h"
 
-
+#include "TS800.h"
 
 #include "TDataLoop.h"
 #include "TBuildingLoop.h"
-
+#include "TUnpackingLoop.h"
+#include "TWriteLoop.h"
 
 //#include "TOnlineTree.h"
 
@@ -120,6 +121,8 @@ void TGRUTint::Init() {
   //gSystem->AddIncludePath(Form("-I%s/include",grutpath.c_str()));
   //gSystem->AddDynamicPath(Form("-%s/libraries",grutpath.c_str()));
 
+  LoadDetectorClasses();
+
 //  if(TGRUTOptions::Get()->ShowLogo()){
 //    std::thread splashscreen(&TGRUTint::SplashPopNWait,this,false);
 //    splashscreen.detach();
@@ -140,6 +143,16 @@ void TGRUTint::SplashPopNWait(bool flag) {
   //WaitLogo();
 }
 
+void TGRUTint::LoadDetectorClasses() {
+  TS800 s800;
+  gROOT->LoadClass("TGretina");
+  gROOT->LoadClass("TS800");
+  //gROOT->LoadClass("TPhosWall",false);
+
+  gROOT->LoadClass("TSega");
+  gROOT->LoadClass("TJanus");
+
+}
 
 /*********************************/
 
@@ -192,34 +205,43 @@ void TGRUTint::ApplyOptions() {
     for(int x=0;x<opt->RawInputFiles().size();x++) {
       TDataLoop *loop = TDataLoop::Get("",new TRawFileIn(opt->RawInputFiles().at(x).c_str()));
       loop->Resume();
-      TBuildingLoop *bloop = TBuildingLoop::Get("",loop);
-      bloop->Resume();
+      TBuildingLoop *boop = TBuildingLoop::Get("",loop);
+      boop->Resume();
+      TUnpackingLoop *uoop1 = TUnpackingLoop::Get("unpack1",boop);
+      uoop1->Resume();
+      // TUnpackingLoop *uoop2 = TUnpackingLoop::Get("unpack2",boop);
+      // uoop2->Resume();
+      // TUnpackingLoop *uoop3 = TUnpackingLoop::Get("unpack3",boop);
+      // uoop3->Resume();
 
+      TWriteLoop* woop = TWriteLoop::Get("", opt->OutputFile());
+      woop->Connect(uoop1);
+      woop->Resume();
     }
       //printf("I was passed rawfile %s\n",opt->RawInputFiles().at(x).c_str());
-  }  
+  }
 
   //ok now, if told not to sort open any raw files as _data# (rootish like??)
   if(opt->RawInputFiles().size() && !opt->SortRaw()) {
-    for(int x=0;x<opt->RawInputFiles().size();x++) 
+    for(int x=0;x<opt->RawInputFiles().size();x++)
       OpenRawFile(opt->RawInputFiles().at(x));
       //printf("I was passed rawfile %s\n",opt->RawInputFiles().at(x).c_str());
   }
 
   //next, if given a root file and told to sort it.
   if(opt->RootInputFiles().size() && opt->SortTree()){
-    for(int x=0;x<opt->RootInputFiles().size();x++) 
+    for(int x=0;x<opt->RootInputFiles().size();x++)
       printf("I am going to sort this rootfile %s, someday.\n",opt->RootInputFiles().at(x).c_str());
-  }  
+  }
 
   //next, if given a root file and NOT told to sort it..
   if(opt->RootInputFiles().size() && !opt->SortTree()){
-    for(int x=0;x<opt->RootInputFiles().size();x++) 
+    for(int x=0;x<opt->RootInputFiles().size();x++)
       OpenRootFile(opt->RawInputFiles().at(x));
     //now that my root file has been open, I may need to re-apply any passed in calfiles.
     for(int x=0;x<opt->CalInputFiles().size();x++)
       printf("I am reloading calfile %s!\n",opt->CalInputFiles().at(x).c_str());
-  }  
+  }
 
 
 
@@ -383,7 +405,7 @@ void TGRUTint::HandleFile(const std::string& filename){
   case NSCL_EVT:
   case GRETINA_MODE2:
   case GRETINA_MODE3:
-  
+
     std::string outfile = opt->OutputFile();
     if(!outfile.length()){
       outfile = opt->GenerateOutputFilename(filename);
@@ -503,6 +525,8 @@ TString TGRUTint::ReverseObjectSearch(TString &input) {
 */
 
 void TGRUTint::Terminate(Int_t status){
+  StoppableThread::StopAllClean();
+
   //if(fCommandServer) {
   //  fCommandServer->Stop();
   //  fCommandServer->Delete();

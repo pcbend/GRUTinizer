@@ -74,8 +74,8 @@ int main(int argc, char **argv) {
   //PopupGrutLogo(true);
 
   //Run the code!
-  input->Run(true);
-
+  //input->Run(true);
+  input->Run(false);
   return 0;
 }
 
