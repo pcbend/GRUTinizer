@@ -5,4 +5,7 @@
 
 bool file_exists(const char *filename);
 
+std::string get_run_number(std::string input);
+
+
 #endif

@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "ArgParser.h"
+#include "TGRUTUtilities.h"
 
 #include <TEnv.h>
 
@@ -49,7 +50,7 @@ void TGRUTOptions::Load(int argc, char** argv) {
   Clear();
   detector_environment = std::string(getenv("GRUTSYS")) + "/config/DetectorEnvironment.env";
   compiled_histogram_file = gEnv->GetValue("GRUT.HistLib","");
-  output_file = "temp.root";
+  //output_file = "temp.root";
 
   ArgParser parser;
 
@@ -187,6 +188,7 @@ bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
     case kFileType::NSCL_EVT:
     case kFileType::GRETINA_MODE2:
     case kFileType::GRETINA_MODE3:
+      //std::cout << get_run_number(filename) << std::endl;
       input_raw_files.push_back(filename);
       return true;
 

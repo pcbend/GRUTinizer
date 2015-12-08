@@ -38,13 +38,13 @@ void TGretinaHit::Copy(TObject &rhs) const {
   ((TGretinaHit&)rhs).fFirstInteraction  = fFirstInteraction;
   ((TGretinaHit&)rhs).fSecondInteraction = fSecondInteraction;
   ((TGretinaHit&)rhs).fNumberOfInteractions = fNumberOfInteractions;
-  for(int i=0;i<fNumberOfInteractions;i++) {
-    ((TGretinaHit&)rhs).fSegmentNumber[i] = fSegmentNumber[i];
-    ((TGretinaHit&)rhs).fGlobalInteractionPosition[i] = fGlobalInteractionPosition[i];
-    ((TGretinaHit&)rhs).fLocalInteractionPosition[i]  = fLocalInteractionPosition[i];
-    ((TGretinaHit&)rhs).fInteractionEnergy[i] = fInteractionEnergy[i];
-    ((TGretinaHit&)rhs).fInteractionFraction[i] = fInteractionFraction[i];
-  }
+  //for(int i=0;i<fNumberOfInteractions;i++) {
+    ((TGretinaHit&)rhs).fSegmentNumber = fSegmentNumber;
+    ((TGretinaHit&)rhs).fGlobalInteractionPosition = fGlobalInteractionPosition;
+    ((TGretinaHit&)rhs).fLocalInteractionPosition  = fLocalInteractionPosition;
+    ((TGretinaHit&)rhs).fInteractionEnergy = fInteractionEnergy;
+    ((TGretinaHit&)rhs).fInteractionFraction = fInteractionFraction;
+  //}
 }
 
 
@@ -68,25 +68,30 @@ void TGretinaHit::BuildFrom(const TRawEvent::GEBBankType1& raw){
 
   fNumberOfInteractions = raw.num;
 
+  fPad = raw.pad;
+
   float first_interaction_value  = -1e99;
   float second_interaction_value = -1e99;
+
+
+
 
   for(int i=0; i<fNumberOfInteractions; i++) {
     //fSegmentNumber[i] = 36*fCrystalId + raw.intpts[i].seg;
     //printf("[%02i] : seg[%02i] = %.02f\n",i,raw.intpts[i].seg,raw.intpts[i].seg_ener); fflush(stdout);
-    fSegmentNumber[i] =  raw.intpts[i].seg;
-    fGlobalInteractionPosition[i] = TGretina::CrystalToGlobal(fCrystalId,
+    fSegmentNumber.push_back(raw.intpts[i].seg);
+    fGlobalInteractionPosition.push_back(TGretina::CrystalToGlobal(fCrystalId,
                                                               raw.intpts[i].x,
                                                               raw.intpts[i].y,
-                                                              raw.intpts[i].z);
-    fLocalInteractionPosition[i].SetXYZ(raw.intpts[i].x,
-                                        raw.intpts[i].y,
-                                        raw.intpts[i].z);
+                                                              raw.intpts[i].z));
+    fLocalInteractionPosition.push_back(TVector3(raw.intpts[i].x,
+                                                 raw.intpts[i].y,
+                                                 raw.intpts[i].z));
 
     float seg_ener = raw.intpts[i].seg_ener;
     float seg_frac = raw.intpts[i].e;
-    fInteractionEnergy[i] = seg_ener;
-    fInteractionFraction[i] = seg_frac;
+    fInteractionEnergy.push_back(seg_ener);
+    fInteractionFraction.push_back(seg_frac);
 
     if(seg_ener >= first_interaction_value){
       second_interaction_value = first_interaction_value;
@@ -216,16 +221,21 @@ void TGretinaHit::AddToSelf(const TGretinaHit& rhs, double& max_energy) {
 
   // Fill all interaction points
   fNumberOfInteractions = 0;
+  fSegmentNumber.clear();
+  fGlobalInteractionPosition.clear();
+  fLocalInteractionPosition.clear();
+  fInteractionEnergy.clear();
+  fInteractionFraction.clear();
   for(auto& point : ips){
     if(fNumberOfInteractions >= MAXHPGESEGMENTS){
       break;
     }
 
-    fSegmentNumber[fNumberOfInteractions] = point.segnum;
-    fGlobalInteractionPosition[fNumberOfInteractions] = point.pos;
-    fLocalInteractionPosition[fNumberOfInteractions] = point.local_pos;
-    fInteractionEnergy[fNumberOfInteractions] = point.energy;
-    fInteractionFraction[fNumberOfInteractions] = point.energy_fraction;
+    fSegmentNumber.push_back(point.segnum);
+    fGlobalInteractionPosition.push_back(point.pos);
+    fLocalInteractionPosition.push_back(point.local_pos);
+    fInteractionEnergy.push_back(point.energy);
+    fInteractionFraction.push_back(point.energy_fraction);
     fNumberOfInteractions++;
   }
 
@@ -328,11 +338,19 @@ void TGretinaHit::Clear(Option_t *opt) {
 
   fNumberOfInteractions = 0;
 
+  fSegmentNumber.clear();
+  fGlobalInteractionPosition.clear();
+  fLocalInteractionPosition.clear();
+  fInteractionEnergy.clear();
+  fInteractionFraction.clear();
+/*
   for(int i=0;i<MAXHPGESEGMENTS;i++) {
     fSegmentNumber[i]             = -1 ;
     fGlobalInteractionPosition[i].Clear(opt);
     fLocalInteractionPosition[i].Clear(opt);
     fInteractionEnergy[i]         = -1 ;
     fInteractionFraction[i]         = -1 ;
+  
   }
+  */
 }

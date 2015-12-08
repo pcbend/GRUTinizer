@@ -106,6 +106,8 @@ private:
   Float_t fCoreEnergy;
   Int_t   fCoreCharge[4];
 
+  Int_t   fPad;
+
   Int_t   fFirstInteraction;
   Int_t   fSecondInteraction;
 
@@ -116,7 +118,7 @@ private:
      Note: This is not equal to the segment number as read from the datastream.
      This is equal to 36*raw.crystal_id + raw.segnum.  ///not anymore pcb.
    */
-  Int_t    fSegmentNumber[MAXHPGESEGMENTS]; //[fNumberOfInteractions]
+  std::vector<Int_t> fSegmentNumber; //[fNumberOfInteractions]
 
   /// The position of the interaction point in lab coordinates
   /**
@@ -124,12 +126,12 @@ private:
      This has been transformed to lab coordinates.
      To get the crystal coordinate, use TGretinaHit::GetCrystalPosition(int i).
    */
-  TVector3 fGlobalInteractionPosition[MAXHPGESEGMENTS]; //[fNumberOfInteractions]
-  TVector3 fLocalInteractionPosition[MAXHPGESEGMENTS]; //[fNumberOfInteractions]
-  Float_t  fInteractionEnergy[MAXHPGESEGMENTS]; //[fNumberOfInteractions]
-  Float_t  fInteractionFraction[MAXHPGESEGMENTS]; //[fNumberOfInteractions]
+  std::vector<TVector3> fGlobalInteractionPosition; //[fNumberOfInteractions]
+  std::vector<TVector3> fLocalInteractionPosition; //[fNumberOfInteractions]
+  std::vector<Float_t>  fInteractionEnergy; //[fNumberOfInteractions]
+  std::vector<Float_t>  fInteractionFraction; //[fNumberOfInteractions]
 
-  ClassDef(TGretinaHit,3)
+  ClassDef(TGretinaHit,4)
 };
 
 

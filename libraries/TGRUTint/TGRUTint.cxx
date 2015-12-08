@@ -214,7 +214,12 @@ void TGRUTint::ApplyOptions() {
       // TUnpackingLoop *uoop3 = TUnpackingLoop::Get("unpack3",boop);
       // uoop3->Resume();
 
-      TWriteLoop* woop = TWriteLoop::Get("4_write_loop", opt->OutputFile());
+      std::string rootoutfile = "run" + get_run_number(opt->RawInputFiles().at(x)) + ".root";
+      if(opt->OutputFile().length()) {
+        rootoutfile = opt->OutputFile();
+      }
+
+      TWriteLoop* woop = TWriteLoop::Get("4_write_loop", rootoutfile);
       woop->Connect(uoop1);
       //woop->Connect(uoop2);
       woop->Resume();

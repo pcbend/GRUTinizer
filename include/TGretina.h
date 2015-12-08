@@ -37,8 +37,12 @@ private:
   //TClonesArray* addback_hits;//("TGretinaHit");
 
   static Float_t crmat[32][4][4][4];
+  static Float_t m_segpos[2][36][3];
   static void SetCRMAT();
+  static void SetSegmentCRMAT();
   static bool fCRMATSet;
+
+  //static TVector3 GetSegmentPosition(int hole,int segment); //return the position of the segemnt in the lab system
 
   ClassDef(TGretina,3);
 };

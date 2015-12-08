@@ -14,6 +14,7 @@ TGretina::~TGretina() {
 }
 
 Float_t TGretina::crmat[32][4][4][4];
+Float_t TGretina::m_segpos[2][36][3];
 bool    TGretina::fCRMATSet = false;
 
 void TGretina::SetCRMAT() {
@@ -63,6 +64,42 @@ void TGretina::SetCRMAT() {
   fCRMATSet = true;
   //printf("Read %i rotation matrix coefficients.\n", nn);
   /* Done! */
+}
+
+void TGretina::SetSegmentCRMAT() {
+  if(fCRMATSet)
+    return;
+  FILE *infile;
+  int NUMSEG = 36;
+  std::string temp = getenv("GRUTSYS");
+  temp.append("/libraries/TDetSystems/TGretina/crmat.dat");
+  infile = fopen(temp.c_str(),"r");
+  if(!infile) {
+    return;
+  }
+  // notice: In file type-A is first, then 
+  //         type-B but as type-B are even
+  //         det_ids in the data stream we
+  //         define type=0 for type-B not
+  //         type-A.
+  for(int type=0;type<2;type++) {
+    for(int seg=0;seg<NUMSEG;seg++) {
+      int rtval,segread;
+      rtval=fscanf(infile, "%d %lf %lf %lf",
+                   &segread,
+                   m_segpos[(type+1)%2][seg][0],
+                   m_segpos[(type+1)%2][seg][1],
+                   m_segpos[(type+1)%2][seg][2]);
+      if((seg+1)!=segread) {
+        fprintf(stderr,"%s: seg[%i] read but seg[%i] expected.\n",__PRETTY_FUNCTION__,segread,seg+1);
+      }
+      if(rtval==EOF) {
+        fprintf(stderr,"%s: unexpected EOF.\n",__PRETTY_FUNCTION__);
+        break;
+      }
+    }
+  }
+  fclose(infile);
 }
 
 void TGretina::Copy(TObject& obj) const {
