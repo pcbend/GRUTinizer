@@ -243,7 +243,8 @@ void TGRUTint::ApplyOptions() {
   //next, if given a root file and NOT told to sort it..
   if(opt->RootInputFiles().size() && !opt->SortTree()){
     for(int x=0;x<opt->RootInputFiles().size();x++)
-      OpenRootFile(opt->RawInputFiles().at(x));
+      OpenRootFile(opt->RootInputFiles().at(x));
+
     //now that my root file has been open, I may need to re-apply any passed in calfiles.
     for(int x=0;x<opt->CalInputFiles().size();x++)
       printf("I am reloading calfile %s!\n",opt->CalInputFiles().at(x).c_str());
