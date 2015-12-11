@@ -29,6 +29,7 @@ void TGretinaHit::Copy(TObject &rhs) const {
   ((TGretinaHit&)rhs).fTimeStamp      = fTimeStamp;
   ((TGretinaHit&)rhs).fWalkCorrection = fWalkCorrection;
   ((TGretinaHit&)rhs).fAddress        = fAddress;
+  ((TGretinaHit&)rhs).fPad            = fPad;
   ((TGretinaHit&)rhs).fCrystalId      = fCrystalId;
   ((TGretinaHit&)rhs).fCoreEnergy     = fCoreEnergy;
   ((TGretinaHit&)rhs).fCoreCharge[0]  = fCoreCharge[0];
@@ -62,19 +63,17 @@ void TGretinaHit::BuildFrom(const TRawEvent::GEBBankType1& raw){
   fCrystalId = raw.crystal_id;
   fCoreEnergy = raw.tot_e;
 
+  fAddress = (1<<24) + (fCrystalId<<16);
+
   for(int i=0; i<4; i++){
     fCoreCharge[i] = raw.core_e[i];
   }
 
   fNumberOfInteractions = raw.num;
-
   fPad = raw.pad;
 
-  float first_interaction_value  = -1e99;
-  float second_interaction_value = -1e99;
-
-
-
+  float first_interaction_value  = sqrt(-1);
+  float second_interaction_value = sqrt(-1);
 
   for(int i=0; i<fNumberOfInteractions; i++) {
     //fSegmentNumber[i] = 36*fCrystalId + raw.intpts[i].seg;
@@ -167,7 +166,7 @@ void TGretinaHit::SortHits(){
                                  fLocalInteractionPosition[i],
                                  fInteractionEnergy[i]));
   }
-
+  printf("ips.size() == %i\n",ips.size());
   // Fill all interaction points
   fNumberOfInteractions = 0;
   for(auto& point : ips){
@@ -283,7 +282,8 @@ TVector3 TGretinaHit::GetSecondIntPosition() const {
 void TGretinaHit::Print(Option_t *opt) const {
 
   std::cout << "TGretinaHit:" <<  std::endl;
-  std::cout << "\tAddress:        \t0x" << std::hex << fAddress << std::dec << std::endl;
+  //std::cout << "\tAddress:        \t0x" << std::hex << fAddress << std::dec << std::endl;
+  printf("\tAddress:        \t0x%08x\n",fAddress);
   std::cout << "\tHole:           \t" << GetHoleNumber()               << std::endl;
   std::cout << "\tCrystalNum      \t" << GetCrystalNumber()            << std::endl;
   std::cout << "\tCrystalId:      \t" << GetCrystalId()                << std::endl;
@@ -295,6 +295,7 @@ void TGretinaHit::Print(Option_t *opt) const {
     for(int i=0;i<4;i++)
       std::cout << "\tCharge[" << i << "]:       \t" << fCoreCharge[i] << std::endl;
   }
+  std::cout << "\tErrorCode:       \t" << fPad                         << std::endl;
   std::cout << "\tInteractions:    \t" << fNumberOfInteractions        << std::endl;
   std::cout << "\tFirst Int:       \t" << fFirstInteraction            << std::endl;
   std::cout << "\tSecond Int:      \t" << fSecondInteraction           << std::endl;
@@ -323,11 +324,11 @@ void TGretinaHit::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
 
   fTimeStamp      = -1;
-  fWalkCorrection = 0.00;
+  fWalkCorrection = sqrt(-1);
 
   fAddress        = -1;
   fCrystalId      = -1;
-  fCoreEnergy     = 0.0;
+  fCoreEnergy     = sqrt(-1);
   fCoreCharge[0]  = -1;
   fCoreCharge[1]  = -1;
   fCoreCharge[2]  = -1;
@@ -335,6 +336,8 @@ void TGretinaHit::Clear(Option_t *opt) {
 
   fFirstInteraction  = -1;
   fSecondInteraction = -1;
+
+  fPad = 0;
 
   fNumberOfInteractions = 0;
 
