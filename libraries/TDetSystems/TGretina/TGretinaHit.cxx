@@ -6,8 +6,8 @@
 #include "TGretina.h"
 
 struct interaction_point {
-  interaction_point(int segnum, TVector3 pos,TVector3 loc,float energy)
-    : segnum(segnum), pos(pos),local_pos(loc), energy(energy) { }
+  interaction_point(int segnum, TVector3 pos,TVector3 loc,float energy,float fraction=100.0)
+    : segnum(segnum), pos(pos),local_pos(loc), energy(energy), energy_fraction(fraction) { }
 
   int segnum;
   TVector3 pos;
@@ -102,8 +102,9 @@ void TGretinaHit::BuildFrom(const TRawEvent::GEBBankType1& raw){
       second_interaction_value = seg_ener;
     }
   }
-  //Print("all");
+  Print("all");
   SortHits();
+  Print("all");
 
 }
 
@@ -159,32 +160,45 @@ bool TGretinaHit::CheckAddback(const TGretinaHit& rhs) const {
 
 void TGretinaHit::SortHits(){
   // sets are sorted, so this will sort all properties together.
+  //
+  // !! When multiple interactions are assigned to a single 
+  //    segment, the first interaction is currenlty assigned
+  //    to that segment!
+  //
   std::set<interaction_point> ips;
   for(int i=0; i<fNumberOfInteractions; i++){
     ips.insert(interaction_point(fSegmentNumber[i],
                                  fGlobalInteractionPosition[i],
                                  fLocalInteractionPosition[i],
                                  fInteractionEnergy[i]));
+                                 //fInteractionFraction[i]));
   }
-  printf("ips.size() == %i\n",ips.size());
+  //printf("ips.size() == %i\n",ips.size());
   // Fill all interaction points
+  //
+  fSegmentNumber.clear();
+  fGlobalInteractionPosition.clear();
+  fLocalInteractionPosition.clear();
+  fInteractionEnergy.clear();
+  fInteractionFraction.clear();
+  //
   fNumberOfInteractions = 0;
   for(auto& point : ips){
     if(fNumberOfInteractions >= MAXHPGESEGMENTS){
       break;
     }
-
-    fSegmentNumber[fNumberOfInteractions] = point.segnum;
-    fGlobalInteractionPosition[fNumberOfInteractions] = point.pos;
-    fLocalInteractionPosition[fNumberOfInteractions] = point.local_pos;
-    fInteractionEnergy[fNumberOfInteractions] = point.energy;
-    fInteractionFraction[fNumberOfInteractions] = point.energy_fraction;
+    fSegmentNumber.push_back(point.segnum);
+    fGlobalInteractionPosition.push_back(point.pos);
+    fLocalInteractionPosition.push_back(point.local_pos);
+    fInteractionEnergy.push_back(point.energy);
+    fInteractionFraction.push_back(point.energy_fraction);
     fNumberOfInteractions++;
   }
   //Print("all");
   // Because they are now sorted
   fFirstInteraction = 0;
-  fSecondInteraction = 1;
+  if(fNumberOfInteractions>1)
+    fSecondInteraction = 1;
 }
 
 // TODO: Handle interactions points better
