@@ -102,9 +102,9 @@ void TGretinaHit::BuildFrom(const TRawEvent::GEBBankType1& raw){
       second_interaction_value = seg_ener;
     }
   }
-  Print("all");
+  //Print("all");
   SortHits();
-  Print("all");
+  //Print("all");
 
 }
 
