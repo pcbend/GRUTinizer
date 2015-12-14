@@ -80,7 +80,7 @@ public:
   Int_t   GetFirstIntPoint()             const { return fFirstInteraction;     }
   Int_t   GetSecondIntPoint()            const { return fSecondInteraction;    }
   Int_t   NumberOfInteractions()         const { return fNumberOfInteractions; }
-  Int_t   GetSegmentId(const int &i)     const { return fSegmentNumber[i]; }
+  Int_t   GetSegmentId(const int &i)     const { if(i>fNumberOfInteractions) return -1; return fSegmentNumber[i]; }
   Float_t GetSegmentEng(const int &i)    const { return fInteractionEnergy[i]; }
   TVector3 GetInteractionPosition(int i) const; //{ return fGlobalInteractionPosition[i]; }
   TVector3 GetLocalPosition(int i) const;

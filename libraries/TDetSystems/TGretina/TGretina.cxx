@@ -102,6 +102,15 @@ void TGretina::SetSegmentCRMAT() {
   fclose(infile);
 }
 
+
+TVector3 TGretina::GetSegmentPosition(int cry_id,int segment) {
+  SetCRMAT();
+  float x = m_segpos[cry_id%2][segment][0];
+  float y = m_segpos[cry_id%2][segment][1];
+  float z = m_segpos[cry_id%2][segment][2];
+  return CrystalToGlobal(cry_id,x,y,z);
+}
+
 void TGretina::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 

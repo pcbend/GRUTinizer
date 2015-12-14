@@ -28,6 +28,7 @@ public:
 
   static TVector3 CrystalToGlobal(int cryId,
                                   Float_t localX=0,Float_t localY=0,Float_t localZ=0);
+  static TVector3 GetSegmentPosition(int cryid,int segment); //return the position of the segemnt in the lab system
 
 private:
   virtual int BuildHits();
@@ -42,7 +43,6 @@ private:
   static void SetSegmentCRMAT();
   static bool fCRMATSet;
 
-  //static TVector3 GetSegmentPosition(int hole,int segment); //return the position of the segemnt in the lab system
 
   ClassDef(TGretina,3);
 };
