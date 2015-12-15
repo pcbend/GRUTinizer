@@ -10,8 +10,6 @@ import ttk
 import sys
 
 import ROOT
-ROOT.PyConfig.StartGuiThread = 'inputhook'
-ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 from .run_command import run_command
 from .hist_tab import HistTab
@@ -465,6 +463,13 @@ class MainWindow(object):
         hist.SetLineColor(color)
         hist.Draw(' '.join(opt))
 
+    def AddDirectory(self, tdir):
+        if tdir:
+            if 'online' in tdir.GetOption():
+                self.hist_tab.AddActiveDirectory(tdir)
+            else:
+                self.hist_tab.Insert(tdir)
+
     def LoadDataFile(self, filename = None):
         if filename is None:
             filename = tkFileDialog.askopenfilename(filetypes=(("GEB File", "*.dat"),
@@ -540,7 +545,7 @@ class MainWindow(object):
             canvas.cd(columns*rows)
         canvas.Modified()
         canvas.Update()
-        #ROOT.PyConfig.GUIThreadScheduleOnce+= [ canvas.Update ] 
+        #ROOT.PyConfig.GUIThreadScheduleOnce+= [ canvas.Update ]
         #ROOT.PyGUIThread.join(0.1)
 
         self.canvases.append(canvas)

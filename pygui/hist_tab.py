@@ -13,6 +13,7 @@ class HistTab(object):
     def __init__(self, main, frame):
         self.main = main
         self._setup_GUI(frame)
+        self.active_dirs = []
 
         self.CheckOnlineHists()
         self.main.window.after_idle(self._PeriodicHistogramCheck)
@@ -28,6 +29,9 @@ class HistTab(object):
         # Map from treeview name to ROOT object
         self.hist_lookup = TKeyDict()
         self.treeview.bind("<Double-1>", self.OnHistClick)
+
+    def AddActiveDirectory(self, tdir):
+        self.active_dirs.append(tdir)
 
     def OnHistClick(self,event):
         objects = [self.hist_lookup[i] for i in event.widget.selection()]
@@ -61,9 +65,12 @@ class HistTab(object):
         #else:
         return ''
 
-    def Insert(self,obj,parent=''):
+    def Insert(self,obj,parent='',objname=None,icon=None):
         if not obj:
             return
+
+        if objname is None:
+            objname = obj.GetName()
 
         if (isinstance(obj, ROOT.TKey) and
             not issubclass(getattr(ROOT, obj.GetClassName()), ROOT.TH1)):
@@ -74,11 +81,11 @@ class HistTab(object):
             return
 
         if parent:
-            name = parent + '/' + obj.GetName()
+            name = parent + '/' + objname
         else:
-            name = obj.GetName()
+            name = objname
 
-        self._insert_single_nonrecursive(obj, parent, name)
+        self._insert_single_nonrecursive(obj, parent, name, objname, icon)
 
         if isinstance(obj, ROOT.TList):
             iterable = obj
@@ -93,10 +100,14 @@ class HistTab(object):
             for obj in iterable:
                 self.Insert(obj, name)
 
-    def _insert_single_nonrecursive(self, obj, parent, name):
+    def _insert_single_nonrecursive(self, obj, parent, name,
+                                    objname=None, icon=None):
         is_histogram_key = (isinstance(obj, ROOT.TKey) and
                             issubclass(getattr(ROOT, obj.GetClassName()), ROOT.TH1))
         is_histogram = isinstance(obj, ROOT.TH1)
+
+        if objname is None:
+            objname = obj.GetName()
 
         if (is_histogram_key and
             name in self.hist_lookup and
@@ -112,26 +123,26 @@ class HistTab(object):
 
         if name not in self.treeview.get_children(parent):
             self._requires_resort = True
-            icon = self.main._PickIcon(obj)
-            self.treeview.insert(parent,'end', name, text=obj.GetName(),image=icon)
+            if icon is None:
+                icon = self.main._PickIcon(obj)
+            self.treeview.insert(parent,'end', name, text=objname,image=icon)
 
     def _PeriodicHistogramCheck(self):
         self.CheckOnlineHists()
         self.main.window.after(5000, self._PeriodicHistogramCheck)
 
     def CheckOnlineHists(self):
-        return
-        #pipeline = ROOT.GetPipeline(0)
-        #if pipeline and pipeline.GetDirectory():
-        #    tdir = pipeline.GetDirectory()
-        #    if tdir.GetList():
-        #        self.Insert(tdir.GetList())
-        #    elif tdir.GetListOfKeys():
-        #        self.Insert(tdir.GetListOfKeys())
+        for tdir in self.active_dirs:
+            if tdir.GetList():
+                self.Insert(tdir.GetList(),
+                            objname=tdir.GetName(), icon=self.main.icons['tfile'])
+            elif tdir.GetListOfKeys():
+                self.Insert(tdir.GetListOfKeys(),
+                            objname=tdir.GetName(), icon=self.main.icons['tfile'])
 
-        #    if self._requires_resort:
-        #        self.Resort()
-        #        self._requires_resort = False
+            if self._requires_resort:
+                self.Resort()
+                self._requires_resort = False
 
     def Resort(self, parent=''):
         children = list(self.treeview.get_children(parent))

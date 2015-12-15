@@ -1,7 +1,9 @@
 #include "THistogramLoop.h"
 
-#include "TPreserveGDirectory.h"
+#include "TFile.h"
 
+#include "TGRUTint.h"
+#include "TPreserveGDirectory.h"
 
 THistogramLoop * THistogramLoop::Get(std::string name) {
   if(name.length()==0)
@@ -21,14 +23,19 @@ THistogramLoop::THistogramLoop(ThreadsafeQueue<TUnpackedEvent*>& input_queue,
   compiled_histograms.SetDefaultDirectory(dir);
 }
 */
-THistogramLoop::THistogramLoop(std::string name) 
-  : StoppableThread(name), stopsent(false) {
+THistogramLoop::THistogramLoop(std::string name)
+  : StoppableThread(name), stopsent(false),
+    output_file(0), previous_dir(0), output_filename("last.root") {
   std::string libname = getenv("GRUTSYS");
-  libname.append("libraries/libMakeHistos.so");
+  libname.append("/libraries/libMakeHistos.so");
   LoadLib(libname);
 }
 
-int THistogramLoop::Push(TUnpackedEvent *event) { 
+THistogramLoop::~THistogramLoop() {
+  CloseFile();
+}
+
+int THistogramLoop::Push(TUnpackedEvent *event) {
   return input_queue.Push(event);
 }
 
@@ -36,14 +43,14 @@ int THistogramLoop::Push(TUnpackedEvent *event) {
 bool THistogramLoop::Iteration() {
   TUnpackedEvent* event = NULL;
   int error = input_queue.Pop(event);
-  //if (error==0){
-  //  return true;
-  //}
   if(event) {
+    if(!output_file){
+      OpenFile();
+    }
+
     compiled_histograms.Fill(*event);
     delete event;
-    //output_queue.Push(event);
-  } 
+  }
   if(stopsent && input_queue.Size()<1) {
     return false;
   }
@@ -54,10 +61,28 @@ void THistogramLoop::ClearHistograms() {
   compiled_histograms.ClearHistograms();
 }
 
+void THistogramLoop::OpenFile() {
+  TPreserveGDirectory preserve;
+  output_file = TGRUTint::instance()->OpenRootFile(output_filename,
+                                                   "RECREATEONLINE");
+  compiled_histograms.SetDefaultDirectory(output_file);
+}
+
+void THistogramLoop::CloseFile() {
+  if(output_file){
+    TPreserveGDirectory preserve;
+    output_file->cd();
+    compiled_histograms.Write();
+    output_file->Close();
+    output_file = 0;
+    output_filename = "last.root";
+  }
+}
+
 void THistogramLoop::Write() {
   TPreserveGDirectory preserve;
-  if(output_dir){
-    output_dir->cd();
+  if(output_file){
+    output_file->cd();
   }
   compiled_histograms.Write();
 }
@@ -80,4 +105,34 @@ void THistogramLoop::RemoveVariable(const char* name) {
 
 TList* THistogramLoop::GetVariables() {
   return compiled_histograms.GetVariables();
+}
+
+TList* THistogramLoop::GetObjects() {
+  return compiled_histograms.GetObjects();
+}
+
+void THistogramLoop::SetOutputFilename(const std::string& name){
+  output_filename = name;
+}
+
+std::string THistogramLoop::GetOutputFilename() const {
+  return output_filename;
+}
+
+void THistogramLoop::cd(Option_t* opt) {
+  if(strncmp(opt,"..",2)){
+    popd();
+  } else {
+    if(output_file){
+      previous_dir = gDirectory;
+      output_file->cd();
+    }
+  }
+}
+
+void THistogramLoop::popd() {
+  if(previous_dir){
+    previous_dir->cd();
+    previous_dir = 0;
+  }
 }

@@ -53,7 +53,7 @@ void TGretinaHit::BuildFrom(const TRawEvent::GEBBankType1& raw){
   //SetAddress(kDetectorSystems::GRETINA, 1, raw.crystal_id);
   //                     HOLE          CRYSTAL     SEGMENT
   //SetAddress(kDetectorSystems::GRETINA, 1, raw.crystal_id);
-  
+
   //std::cout << "-------------------------------------------------" << std::endl;
   //std::cout << raw << std::endl;
   Clear();
@@ -161,10 +161,11 @@ bool TGretinaHit::CheckAddback(const TGretinaHit& rhs) const {
 void TGretinaHit::SortHits(){
   // sets are sorted, so this will sort all properties together.
   //
-  // !! When multiple interactions are assigned to a single 
+  // !! When multiple interactions are assigned to a single
   //    segment, the first interaction is currenlty assigned
   //    to that segment!
   //
+
   std::set<interaction_point> ips;
   for(int i=0; i<fNumberOfInteractions; i++){
     ips.insert(interaction_point(fSegmentNumber[i],
@@ -194,6 +195,7 @@ void TGretinaHit::SortHits(){
     fInteractionFraction.push_back(point.energy_fraction);
     fNumberOfInteractions++;
   }
+
   //Print("all");
   // Because they are now sorted
   fFirstInteraction = 0;
@@ -367,7 +369,7 @@ void TGretinaHit::Clear(Option_t *opt) {
     fLocalInteractionPosition[i].Clear(opt);
     fInteractionEnergy[i]         = -1 ;
     fInteractionFraction[i]         = -1 ;
-  
+
   }
   */
 }

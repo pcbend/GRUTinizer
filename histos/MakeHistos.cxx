@@ -6,14 +6,6 @@
 
 #include <iostream>
 #include <map>
-// extern "C" is needed to prevent name mangling.
-// The function signature must be exactly as shown here,
-//   or else bad things will happen.
-//
-// Note: from TRuntimeObjects:
-//    TList& GetDetectors();
-//    TList& GetObjects();
-//
 
 
 
@@ -68,9 +60,12 @@ void InitMap() {
 
 #define INTEGRATION 128.0
 
+
+// extern "C" is needed to prevent name mangling.
+// The function signature must be exactly as shown here,
+//   or else bad things will happen.
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
-  //printf("I am Here 1\n"); fflush(stdout);
   InitMap();
   TGretina *gretina = obj.GetDetector<TGretina>();
   TBank29  *bank29  = obj.GetDetector<TBank29>();
@@ -229,20 +224,22 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     }
     //for(int z=0;z<hit.NumberOfInteractions();z++) {
-    if(hit.GetSegmentEng(0)>990) {
-      seg_summary->Fill(hit.GetSegmentId(0),hit.GetSegmentEng(0));
-      int layer  = hit.GetSegmentId(0)/6;
-      histname = Form("GretinaPositionLargestPosition_%s",LayerMap[layer].c_str());
-      TH2 *position = (TH2*)list->FindObject(histname.c_str());
-      if(!position) {
-        position = new TH2F(histname.c_str(),histname.c_str(),628,0,6.28,314,0,3.14);
-        list->Add(position);
+    if(hit.NumberOfInteractions()>0){
+      if(hit.GetSegmentEng(0)>990) {
+        seg_summary->Fill(hit.GetSegmentId(0),hit.GetSegmentEng(0));
+        int layer  = hit.GetSegmentId(0)/6;
+        histname = Form("GretinaPositionLargestPosition_%s",LayerMap[layer].c_str());
+        TH2 *position = (TH2*)list->FindObject(histname.c_str());
+        if(!position) {
+          position = new TH2F(histname.c_str(),histname.c_str(),628,0,6.28,314,0,3.14);
+          list->Add(position);
+        }
+        double theta = hit.GetInteractionPosition(0).Theta();
+        double phi   = hit.GetInteractionPosition(0).Phi();
+        if(phi<0)
+          phi = TMath::TwoPi()+phi;
+        position->Fill(phi,theta);
       }
-      double theta = hit.GetInteractionPosition(0).Theta();
-      double phi   = hit.GetInteractionPosition(0).Phi();
-      if(phi<0)
-        phi = TMath::TwoPi()+phi;
-      position->Fill(phi,theta);
     }
     //}
     histname = Form("GretinaPosition");

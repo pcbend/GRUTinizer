@@ -26,6 +26,10 @@ TCompiledHistograms::TCompiledHistograms(std::string input_lib)
   library = std::make_shared<DynamicLibrary>(this->libname.c_str(), true);
   // Casting required to keep gcc from complaining.
   *(void_alias*)(&func) = library->GetSymbol("MakeHistograms");
+
+  std::cout << "library: " << library
+            << "\tfunc: " << func << std::endl;
+  std::cout << "libname: " << input_lib << std::endl;
   last_modified = get_timestamp();
   last_checked = time(NULL);
 }
@@ -54,6 +58,7 @@ bool TCompiledHistograms::file_exists() {
 }
 
 void TCompiledHistograms::Write() {
+  objects.Sort();
   objects.Write();
   TPreserveGDirectory preserve;
   gDirectory->mkdir("variables")->cd();

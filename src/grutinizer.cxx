@@ -11,6 +11,7 @@
 #include "TEnv.h"
 #include "TPluginManager.h"
 #include "TPython.h"
+#include "TThread.h"
 
 #include "TGRUTint.h"
 //#include "TROOT_Shim.h"
@@ -65,6 +66,11 @@ int main(int argc, char **argv) {
   LoadGRUTEnv();
   SetGRUTPluginHandlers();
   //ReplaceCleanups();
+
+  // This turns on both the Cint Mutex and gROOT Mutex,
+  // with-out it, you are taking thread into your own hands
+  // with-it, you can use TThread::Lock/UnLock around possible hazards.
+  TThread::Initialize();
 
   //SetDisplay();
   TGRUTint *input = 0;
@@ -189,4 +195,3 @@ static STRUCT_UTMP *SearchEntry(int n, const char *tty) {
 }
 
 */
-

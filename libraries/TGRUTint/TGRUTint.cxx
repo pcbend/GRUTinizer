@@ -66,13 +66,8 @@ TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions
 
 TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t noLogo,const char *appClassName)
   :TRint(appClassName, &argc, argv, options, numOptions,noLogo),
-   fIsTabComplete(false) {
+   fIsTabComplete(false), main_thread_id(std::this_thread::get_id()) {
    //fCommandServer(NULL), fGuiTimer(NULL), fCommandTimer(NULL),  fIsTabComplete(false) {
-
-  // This turns on both the Cint Mutex and gROOT Mutex,
-  // with-out it, you are taking thread into your own hands
-  // with-it, you can use TThread::Lock/UnLock around possible hazards.
-  TThread::Initialize();
 
   fGRUTEnv = gEnv;
   GetSignalHandler()->Remove();
@@ -196,20 +191,6 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
   return str;
 }
 
-void *GUI_Loop() {
-  std::string   script_filename = Form("%s/util/grut-view.py",getenv("GRUTSYS"));
-  std::ifstream script(script_filename);
-  std::string   script_text((std::istreambuf_iterator<char>(script)),
-                            std::istreambuf_iterator<char>());
-  TPython::Exec(script_text.c_str());
-
-  while(true){
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    TPython::Exec("update()");
-
-  }
-}
-
 void TGRUTint::ApplyOptions() {
   TGRUTOptions* opt = TGRUTOptions::Get();
 
@@ -218,9 +199,17 @@ void TGRUTint::ApplyOptions() {
   }
 
   if(opt->StartGUI()){
-    TThread *gui_thread = new TThread("gui_thread",(TThread::VoidRtnFunc_t)GUI_Loop);
-    gui_thread->Run();
+    // TThread *gui_thread = new TThread("gui_thread",(TThread::VoidRtnFunc_t)GUI_Loop);
+    // gui_thread->Run();
 
+    std::string   script_filename = Form("%s/util/grut-view.py",getenv("GRUTSYS"));
+    std::ifstream script(script_filename);
+    std::string   script_text((std::istreambuf_iterator<char>(script)),
+                              std::istreambuf_iterator<char>());
+    TPython::Exec(script_text.c_str());
+
+    TTimer* gui_timer = new TTimer("TPython::Exec(\"update()\");", 10, true);
+    gui_timer->TurnOn();
   }
 
   //if I am passed any calibrations, lets load those.
@@ -253,7 +242,13 @@ void TGRUTint::ApplyOptions() {
       woop->Connect(uoop1);
       //woop->Connect(uoop2);
 
+      std::string histoutfile = "hist" + get_run_number(opt->RawInputFiles().at(x)) + ".root";
+      // if(opt->OutputFile().length()) {
+      //   histoutfile = opt->OutputFile();
+      // }
+
       THistogramLoop *hoop = THistogramLoop::Get("5_hist_loop");
+      hoop->SetOutputFilename(histoutfile);
       woop->AttachHistogramLoop(hoop);
       hoop->Resume();
       woop->Resume();
@@ -389,27 +384,57 @@ void TGRUTint::ApplyOptions() {
 //}
 
 
-TFile* TGRUTint::OpenRootFile(const std::string& filename, TChain *chain){
-  if(!file_exists(filename.c_str())){
-    std::cerr << "File \"" << filename << "\" does not exist" << std::endl;
-    return NULL;
-  }
+TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
+  TString sopt(opt);
+  sopt.ToLower();
 
-  // const char* command = Form("TFile *_file%i = TObjectManager::Get(\"%s\",\"read\")",
-  //       		      fRootFilesOpened, filename.c_str());
-  const char* command = Form("TFile *_file%i = new TFile(\"%s\",\"read\")",
-                             fRootFilesOpened, filename.c_str());
-  ProcessLine(command);
-  TFile *file = (TFile*)gROOT->GetListOfFiles()->FindObject(filename.c_str());
-  if(file){
-    std::cout << "\tfile " << BLUE << file->GetName() << RESET_COLOR <<  " opened as " << BLUE <<  "_file" << fRootFilesOpened << RESET_COLOR <<  std::endl;
-    if(file->FindObjectAny("EventTree")) {
-      if(!fChain)
-        fChain = new TChain("EventTree");
-      fChain->Add(file->GetName());
+  bool is_online = sopt.Contains("online");
+  sopt.ReplaceAll("online","");
+
+  TFile* file = NULL;
+  if(sopt.Contains("recreate") ||
+     sopt.Contains("new")) {
+    file = new TFile(filename.c_str(), "RECREATE");
+    if(file){
+      const char* command = Form("TFile* _file%i = (TFile*)%luL",
+                                 fRootFilesOpened,
+                                 (unsigned long)file);
+      ProcessLine(command);
+      fRootFilesOpened++;
+    } else {
+      std::cout << "Could not create " << filename << std::endl;
+    }
+  } else {
+    file = new TFile(filename.c_str(), opt);
+    if(file){
+      const char* command = Form("TFile* _%s%i = (TFile*)%luL",
+                                 is_online ? "online" : "file",
+                                 fRootFilesOpened,
+                                 (unsigned long)file);
+      ProcessLine(command);
+      std::cout << "\tfile " << BLUE << file->GetName() << RESET_COLOR
+                <<  " opened as " << BLUE <<  "_file" << fRootFilesOpened << RESET_COLOR <<  std::endl;
+
+      // if(file->FindObjectAny("EventTree")) {
+      //   if(!fChain)
+      //     fChain = new TChain("EventTree");
+      //   fChain->Add(file->GetName());
+      // }
+      fRootFilesOpened++;
+    } else {
+      std::cout << "Could not open " << filename << std::endl;
     }
   }
-  fRootFilesOpened++;
+
+
+  if(is_online){
+    file->SetOption("online");
+  }
+
+  if(file && TGRUTOptions::Get()->StartGUI()){
+    TPython::Bind(file,"tdir");
+    ProcessLine("TPython::Exec(\"window.AddDirectory(tdir)\");");
+  }
   return file;
 }
 
@@ -494,7 +519,8 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   // Any diagnostic print statements should be done after this if statement.
   sync = false;
   if(fIsTabComplete){
-    return TRint::ProcessLine(line, sync, error);
+    long res = TRint::ProcessLine(line, sync, error);
+    return res;
   }
   TString sline(line);
   if(!sline.Length()){
@@ -502,19 +528,22 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   }
   //sline.ReplaceAll("TCanvas","GCanvas");
 
+  if(std::this_thread::get_id() != main_thread_id){
+    return DelayedProcessLine(line);
+  }
+
   if(sline.Contains("for") ||
      sline.Contains("while") ||
      sline.Contains("if") ||
      sline.Contains("{") ||
      sline.Contains("TPython")){
-     //printf("\n\nLINE:   %s\n",sline.Data()); fflush(stdout);
-     auto res = TRint::ProcessLine(sline.Data(), sync, error);
-     //printf("DONE:   %s\n\n",sline.Data()); fflush(stdout);
-     return res;
+    auto res = TRint::ProcessLine(sline.Data(), sync, error);
+    return res;
   }
 
   if(!sline.CompareTo("clear")) {
-    return TRint::ProcessLine(".! clear");
+    long result = TRint::ProcessLine(".! clear");
+    return result;
   }
 
   Ssiz_t index;
@@ -535,25 +564,6 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   //fNewChild = NULL;
   long result =  TRint::ProcessLine(sline.Data(),sync,error);
 
-  //if(!fNewChild){
-  //  return result;
-  //}
-/*
-  if((index = sline.Index("Project",TString::kIgnoreCase))    != kNPOS   ||
-     (index = sline.Index("Projection",TString::kIgnoreCase)) != kNPOS   ||
-     (index = sline.Index("Profile",TString::kIgnoreCase))    != kNPOS   ||
-     (index = sline.Index("Draw",TString::kIgnoreCase))       != kNPOS ) {
-
-    TString newline = ReverseObjectSearch(sline);
-    TObject *parent = gROOT->FindObject(newline.Data());
-
-    if(parent){
-      gManager->AddRelationship(parent, fNewChild);
-    }
-  }
-
-  fNewChild = NULL;
-*/
   return result;
 }
 
@@ -636,53 +646,62 @@ void TGRUTint::OpenFileDialog() {
 }
 */
 
-TObject* TGRUTint::DelayedProcessLine(std::string message){
-  std::lock_guard<std::mutex> any_command_lock(fCommandWaitingMutex);
 
-  {
-    std::lock_guard<std::mutex> lock(fCommandListMutex);
-    fLinesToProcess.push(message);
+//   These variables are to be accessed only from DelayedProcessLine
+// and DelayedProcessLine_Action, nowhere else.
+//   These are used to pass information between the two functions.
+// DelayedProcessLine_Action() should ONLY be called from a TTimer running
+// on the main thread.  DelayedProcessLine may ONLY be called
+// from inside ProcessLine().
+namespace {
+  std::mutex g__CommandListMutex;
+  std::mutex g__ResultListMutex;
+  std::mutex g__CommandWaitingMutex;
+  std::condition_variable g__NewResult;
+
+  std::string g__LineToProcess;
+  bool g__ProcessingNeeded;
+
+  Long_t g__CommandResult;
+  bool g__CommandFinished;
+}
+
+Long_t TGRUTint::DelayedProcessLine(std::string command){
+  std::lock_guard<std::mutex> any_command_lock(g__CommandWaitingMutex);
+
+  g__LineToProcess = command;
+  g__CommandFinished = false;
+  g__ProcessingNeeded = true;
+  TTimer::SingleShot(0,"TGRUTint",this,"DelayedProcessLine_Action()");
+
+  std::unique_lock<std::mutex> lock(g__ResultListMutex);
+  while(!g__CommandFinished){
+    g__NewResult.wait(lock);
   }
 
-  TTimer::SingleShot(0,"TGRUTint",this,"DelayedProcessLine_ProcessItem()");
-
-  std::unique_lock<std::mutex> lock(fResultListMutex);
-  while(fCommandResults.empty()){
-    fNewResult.wait(lock);
-  }
-
-  TObject* result = fCommandResults.front();
-  fCommandResults.pop();
-  return result;
+  return g__CommandResult;
 }
 
 
-void TGRUTint::DelayedProcessLine_ProcessItem(){
+void TGRUTint::DelayedProcessLine_Action(){
   std::string message;
   {
-    std::lock_guard<std::mutex> lock(fCommandListMutex);
-    if(fLinesToProcess.empty()){
+    std::lock_guard<std::mutex> lock(g__CommandListMutex);
+    if(!g__ProcessingNeeded){
       return;
     }
-    message = fLinesToProcess.front();
-    fLinesToProcess.pop();
+    message = g__LineToProcess;
   }
 
-  std::cout << "Received remote command \"" << message << "\"" << std::endl;
-  //TThread::Lock();
-  std::cout << "tthread is locked" << std::endl;
-  this->ProcessLine(message.c_str());
-  std::cout << "After this->ProcessLine()" << std::endl;
+  Long_t result = this->ProcessLine(message.c_str());
   Getlinem(EGetLineMode::kInit,((TRint*)gApplication)->GetPrompt());
-  std::cout << "After Getlinem()" << std::endl;
-  //TThread::UnLock();
 
   {
-    std::lock_guard<std::mutex> lock(fResultListMutex);
-    fCommandResults.push(0);
-    //fCommandResults.push(gResponse);
-    //gResponse = NULL;
+    std::lock_guard<std::mutex> lock(g__ResultListMutex);
+    g__CommandResult = result;
+    g__CommandFinished = true;
+    g__ProcessingNeeded = false;
   }
 
-  fNewResult.notify_one();
+  g__NewResult.notify_one();
 }

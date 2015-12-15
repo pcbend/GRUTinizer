@@ -8,6 +8,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <memory>
+#include <thread>
 #endif
 
 #include <TSystem.h>
@@ -42,18 +43,12 @@ class TGRUTint : public TRint {
     //TObject* ObjectAppended(TObject* obj);
 
     Int_t TabCompletionHook(char* buf, int* pLoc, std::ostream& out);
-    TFile* OpenRootFile(const std::string& filename,TChain *chain=0);
+    TFile* OpenRootFile(const std::string& filename, Option_t* opt="");
     TRawFileIn* OpenRawFile(const std::string& filename);
 
 public:
-  TObject* DelayedProcessLine(std::string message);
-  //GUI interface commands;
-  //void OpenFileDialog();
-  //void DefaultFunction();
-
-  void DelayedProcessLine_ProcessItem();
-
   //void HandleFile(const std::string& filename);
+  void DelayedProcessLine_Action();
 
 
  protected:
@@ -63,17 +58,14 @@ public:
 
 
 private:
-#ifndef __CINT__
- std::mutex fCommandListMutex;
- std::mutex fResultListMutex;
- std::mutex fCommandWaitingMutex;
- std::condition_variable fNewResult;
-#endif
+  Long_t DelayedProcessLine(std::string message);
+
   //TTimer* fGuiTimer;
 
   //TTimer* fCommandTimer;
-  std::queue<std::string> fLinesToProcess;
-  std::queue<TObject*> fCommandResults;
+#ifndef __CINT__
+  std::thread::id main_thread_id;
+#endif
 
   int fRootFilesOpened;
   int fRawFilesOpened;
