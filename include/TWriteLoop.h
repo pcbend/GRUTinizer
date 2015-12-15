@@ -1,7 +1,10 @@
 #ifndef _TWRITELOOP_H_
 #define _TWRITELOOP_H_
 
+#ifndef __CINT__
 #include <atomic>
+#endif
+
 #include <map>
 #include <vector>
 
@@ -44,6 +47,7 @@ protected:
 private:
   TWriteLoop(std::string name, std::string output_file);
 
+#ifndef __CINT__
   void HandleEvent(TUnpackedEvent* event);
   void LearningPhase(TUnpackedEvent* event);
   void EndLearningPhase();
@@ -55,7 +59,7 @@ private:
   std::mutex input_queue_mutex;
   std::vector<TUnpackingLoop*> input_queues;
   TTree* event_tree;
-  //TTree* scaler_tree;
+
   std::atomic_int event_tree_size;
 
   std::map<TClass*, TDetector**> det_map;
@@ -63,6 +67,9 @@ private:
   std::atomic_int learning_phase_size;
   std::atomic_bool in_learning_phase;
   int learning_phase_length;
+#endif
+
+  ClassDef(TWriteLoop, 0);
 };
 
 

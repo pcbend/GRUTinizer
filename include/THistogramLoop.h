@@ -59,6 +59,8 @@ private:
   TDirectory* previous_dir;
   std::string output_filename;
   bool stopsent;
+
+  ClassDef(THistogramLoop,0);
 };
 
 #endif /* _THISTOGRAMLOOP_H_ */

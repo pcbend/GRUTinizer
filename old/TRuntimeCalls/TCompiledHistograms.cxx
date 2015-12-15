@@ -35,7 +35,7 @@ TCompiledHistograms::TCompiledHistograms(std::string libname)
 void TCompiledHistograms::ClearHistograms() {
   std::lock_guard<std::mutex> lock(mutex);
 
-  TIter next(&objects);
+  TIter next(GetObjects());
   TObject* obj;
   while((obj = next())){
     if(obj->InheritsFrom(TH1::Class())){
@@ -56,7 +56,7 @@ bool TCompiledHistograms::file_exists() {
 }
 
 void TCompiledHistograms::Write() {
-  objects.Write();
+  GetObjects()->Write();
   TPreserveGDirectory preserve;
   gDirectory->mkdir("variables")->cd();
   variables.Write();
@@ -98,7 +98,7 @@ void TCompiledHistograms::Fill(TUnpackedEvent& detectors) {
   TPreserveGDirectory preserve;
   default_directory->cd();
 
-  TRuntimeObjects obj(detectors, &objects, &variables);
+  TRuntimeObjects obj(detectors, GetObjects(), &variables);
   func(obj);
 }
 

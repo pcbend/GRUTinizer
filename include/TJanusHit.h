@@ -7,34 +7,41 @@ class TJanusHit : public TDetectorHit {
 public:
   TJanusHit() { }
 
+  int GetDetnum() const;
+
   void Clear(Option_t* opt = "");
   void Copy(TObject& obj) const;
 
-  void SetAnalogChannel(int chan) { fChannel = chan; }
-  void SetOverflowBit(bool bit)   { fOverflowBit = bit; }
-  void SetUnderflowBit(bool bit)  { fUnderflowBit = bit; }
-  void SetEntryType(char type)    { fEntryType = type; }
-  void SetTimestamp(long ts)      { fTimestamp = ts; }
-  void SetCharge(int chg)         { fCharge = chg; }
+  void SetADCOverflowBit(bool bit)   { fEnergyOverflowBit = bit; }
+  void SetADCUnderflowBit(bool bit)  { fEnergyUnderflowBit = bit; }
+  bool GetADCOverflowBit()  const { return fEnergyOverflowBit; }
+  bool GetADCUnderflowBit() const { return fEnergyUnderflowBit;}
 
-  virtual Int_t Charge() const { return fCharge;  }
-  int GetAnalogChannel() const { return fChannel; }
-  bool GetOverflowBit()  const { return fOverflowBit; }
-  bool GetUnderflowBit() const { return fUnderflowBit;}
-  char GetEntryType() const  { return fEntryType; }
-  long GetTimestamp() const { return fTimestamp; }
+  void SetTDCOverflowBit(bool bit)   { fTimeOverflowBit = bit; }
+  void SetTDCUnderflowBit(bool bit)  { fTimeUnderflowBit = bit; }
+  bool GetTDCOverflowBit()  const { return fTimeOverflowBit; }
+  bool GetTDCUnderflowBit() const { return fTimeUnderflowBit;}
 
-  bool IsValid() const { return fEntryType == 0; } //CAEN_ADC::EntryType::Event
+  TDetectorHit& GetBackHit() { return back_hit; }
+
+  int GetFrontChannel() const;
+  int GetBackChannel() const;
+
+  int GetRing() const;
+  int GetSector() const;
+  TVector3 GetPosition() const;
 
 private:
-  long  fTimestamp;
-  short fEntryType;
-  int   fChannel;
-  int   fCharge;
-  bool  fOverflowBit;
-  bool  fUnderflowBit;
+	 // Energy
+  bool  fEnergyOverflowBit;
+  bool  fEnergyUnderflowBit;
+	 // Time
+  bool  fTimeOverflowBit;
+  bool  fTimeUnderflowBit;
 
-  ClassDef(TJanusHit,2);
+  TDetectorHit back_hit;
+
+  ClassDef(TJanusHit,4);
 };
 
 #endif /* _TJANUSDETECTORHIT_H_ */

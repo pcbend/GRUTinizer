@@ -20,13 +20,15 @@
 #include <TVirtualPad.h>
 
 #include "GRootGuiFactory.h"
-//#include "ProgramPath.h"
-//#include "TDetectorEnv.h"
+
+#include "TChannel.h"
+#include "TDetectorEnv.h"
+
 #include "TGRUTOptions.h"
 #include "TRawSource.h"
-//#include "TGRUTLoop.h"
+
 #include "TGRUTUtilities.h"
-//#include "TObjectManager.h"
+
 #include "TChannel.h"
 
 #include "TS800.h"
@@ -37,7 +39,7 @@
 #include "TWriteLoop.h"
 #include "THistogramLoop.h"
 
-//#include "TOnlineTree.h"
+#include "TSega.h"
 
 //extern "C" G__value G__getitem(const char* item);
 //#include "FastAllocString.h"
@@ -117,12 +119,6 @@ void TGRUTint::Init() {
   // gSystem->Unlink("/var/tmp/mytemp.root");
 
 
-  if(TGRUTOptions::Get()->MakeBackupFile()){
-    //TObjectManager::Get("GRUT_Manager", "GRUT Manager");
-  }
-
-
-
   std::string grutpath = getenv("GRUTSYS");
   gInterpreter->AddIncludePath(Form("%s/include",grutpath.c_str()));
   //gSystem->AddIncludePath(Form("-I%s/include",grutpath.c_str()));
@@ -167,6 +163,7 @@ void TGRUTint::LoadDetectorClasses() {
 
 }
 
+
 /*********************************/
 
 bool TGRUTInterruptHandler::Notify() {
@@ -198,6 +195,11 @@ void TGRUTint::ApplyOptions() {
      LoadGRootGraphics();
   }
 
+  TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
+
+
+  TSega::LoadDetectorPositions();
+
   if(opt->StartGUI()){
     // TThread *gui_thread = new TThread("gui_thread",(TThread::VoidRtnFunc_t)GUI_Loop);
     // gui_thread->Run();
@@ -214,9 +216,9 @@ void TGRUTint::ApplyOptions() {
 
   //if I am passed any calibrations, lets load those.
   if(opt->CalInputFiles().size()) {
-    for(int x=0;x<opt->CalInputFiles().size();x++)
+    for(int x=0;x<opt->CalInputFiles().size();x++) {
       TChannel::ReadCalFile(opt->CalInputFiles().at(x).c_str());
-      //printf("I was passed calfile %s\n",opt->CalInputFiles().at(x).c_str());
+    }
   }
   TDataLoop *loop = 0;
   //next most important thing, if given a raw file && told NOT to not sort!
@@ -283,12 +285,11 @@ void TGRUTint::ApplyOptions() {
     if(loop) {
       while(loop->IsRunning()) {
         std::cout << "\r" << loop->Status() << std::flush;
+        gSystem->ProcessEvents();
         std::this_thread::sleep_for(std::chrono::seconds(1));
       }
-    //TGRUTLoop::Get()->Status();
-    //std::cout << "Waiting for join" << std::endl;
-    //TGRUTLoop::Get()->Join();
     }
+    std::cout << std::endl;
     this->Terminate();
   }
 
@@ -602,14 +603,6 @@ void TGRUTint::Terminate(Int_t status){
   //if(TGRUTOptions::Get()->StartGUI()){
   //  TPython::Exec("on_close()");
   //}
-
-  //TGRUTLoop::Get()->Stop();
-  //TDataLoop::DeleteInstance();
-
-  // TIter iter(TObjectManager::GetListOfManagers());
-  // while(TObjectManager *om = (TObjectManager*)iter.Next()) {
-  //   om->SaveAndClose();
-  // }
 
   //Be polite when you leave.
   printf(DMAGENTA "\nbye,bye\t" DCYAN "%s" RESET_COLOR  "\n",getlogin());

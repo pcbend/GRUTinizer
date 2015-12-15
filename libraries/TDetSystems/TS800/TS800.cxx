@@ -191,7 +191,6 @@ float TS800::GetAFP() const{
 }
 
 float TS800::GetBFP() const{
-
   float BFP = TMath::ATan((GetCrdc(1).GetNonDispersiveY()-GetCrdc(0).GetNonDispersiveY())/1073.0);
   return BFP;
 

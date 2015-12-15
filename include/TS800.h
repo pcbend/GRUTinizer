@@ -34,8 +34,6 @@ public:
   Float_t GetBta()         { return fBta; }
   Float_t GetDta()         { return fDta; }
 
-
-
   virtual void Copy(TObject& obj)        const;
   //virtual void Print(Option_t *opt = "") const;
   virtual void Clear(Option_t* opt = "");
@@ -93,14 +91,12 @@ public:
   TIonChamber  ion;
   TCrdc        crdc[2];
   //THodoscope   hodo[32];
-
   //TMultiHitTof multi_tof;
 
   Float_t fAta;
   Float_t fYta;
   Float_t fBta;
   Float_t fDta;
-
 
   Long_t fEventCounter;
 

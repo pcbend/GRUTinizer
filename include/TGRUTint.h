@@ -56,7 +56,6 @@ public:
    void SplashPopNWait(bool flag);
    void CreateDataLoop();
 
-
 private:
   Long_t DelayedProcessLine(std::string message);
 

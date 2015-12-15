@@ -54,6 +54,9 @@ public:
 
   unsigned int GetTimeLow()        const { return header->time_low;                                    }
   unsigned int GetTimeHigh()       const { return (header->time_high_cfd & LOWER16BITMASK);            }
+  unsigned long GetTimestamp()     const {
+    return (((unsigned long)GetTimeHigh())<<32) + GetTimeLow();
+  }
   int GetCFDFailBit()              const { return (header->time_high_cfd & BIT31MASK)     >> 31;       }
   int GetCFDTime()                 const { return (header->time_high_cfd & BIT30TO16MASK) >> 16;       }
 

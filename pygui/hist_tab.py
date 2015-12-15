@@ -129,14 +129,14 @@ class HistTab(object):
 
     def _PeriodicHistogramCheck(self):
         self.CheckOnlineHists()
-        self.main.window.after(5000, self._PeriodicHistogramCheck)
+        self.main.window.after(1000, self._PeriodicHistogramCheck)
 
     def CheckOnlineHists(self):
         for tdir in self.active_dirs:
             if tdir.GetList():
                 self.Insert(tdir.GetList(),
                             objname=tdir.GetName(), icon=self.main.icons['tfile'])
-            elif tdir.GetListOfKeys():
+            if tdir.GetListOfKeys():
                 self.Insert(tdir.GetListOfKeys(),
                             objname=tdir.GetName(), icon=self.main.icons['tfile'])
 

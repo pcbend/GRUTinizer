@@ -7,6 +7,7 @@
 #include "TDirectory.h"
 
 #include "StoppableThread.h"
+#include "TGRUTTypes.h"
 #include "ThreadsafeQueue.h"
 #include "TRawEvent.h"
 #include "TRawEventSource.h"
@@ -74,6 +75,9 @@ public:
   /// Sets the input ring.
   void SetInputRing(std::string ringname);
 
+  /// Sets the expected file type
+  void SetFiletype(kFileType file_type);
+
   bool IsFinished();
 
 private:
@@ -88,7 +92,7 @@ private:
   void SetupOutputFile();
   void SetupHistogramLoop();
   void SetupOutputLoop();
-  TRawEventSource* OpenSingleFile(const std::string& filename);
+  TRawEventSource* OpenSingleFile(const std::string& filename, bool is_ring=false);
 
   bool is_initialized;
 
@@ -116,6 +120,7 @@ private:
   std::vector<std::string> input_raw_files;
   std::vector<std::string> input_root_files;
   std::string input_ring;
+  kFileType fFileType;
 
   std::string histogram_library;
   std::string output_root_file;

@@ -49,6 +49,7 @@ bool TBuildingLoop::Iteration(){
   TRawEvent event;
 
   int error = input_source->Pop(event);///input_queue.Pop(event);
+  bool input_running = input_source->IsRunning();
   if(error<0) {
     // Stop if the parent has stopped and the queue is empty.
     return input_source->IsRunning();
