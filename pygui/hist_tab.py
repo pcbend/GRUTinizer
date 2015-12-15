@@ -48,16 +48,18 @@ class HistTab(object):
             self.hist_lookup[key].Write()
 
     def _load_compiled_histograms(self, filename):
-        pipeline = ROOT.GetPipeline(0)
-        if outfile:
-            pipeline.SetHistogramLibrary(filename)
+        print 'load compiled histograms called.'
+        #pipeline = ROOT.GetPipeline(0)
+        #if outfile:
+        #    pipeline.SetHistogramLibrary(filename)
 
     def _compiled_histogram_filename(self):
-        pipeline = ROOT.GetPipeline(0)
-        if pipeline:
-            return pipeline.GetLibraryName()
-        else:
-            return ''
+        print ' _compiled_histogram_filename  called.\n'
+        #pipeline = ROOT.GetPipeline(0)
+        #if pipeline:
+        #    return pipeline.GetLibraryName()
+        #else:
+        return ''
 
     def Insert(self,obj,parent=''):
         if not obj:

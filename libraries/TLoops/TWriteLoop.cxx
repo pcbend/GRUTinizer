@@ -1,6 +1,9 @@
 #include "TWriteLoop.h"
 
 #include "TFile.h"
+#include "TThread.h"
+
+#include "THistogramLoop.h"
 
 #include <chrono>
 #include <thread>
@@ -26,8 +29,10 @@ TWriteLoop* TWriteLoop::Get(std::string name, std::string output_filename){
 TWriteLoop::TWriteLoop(std::string name, std::string output_filename)
   : StoppableThread(name),
     in_learning_phase(true), learning_phase_length(1000),
-    event_tree_size(0), learning_phase_size(0) {
+    event_tree_size(0), learning_phase_size(0),
+    hist_loop(0) {
   //TPreserveGDirectory preserve;
+
   output_file = new TFile(output_filename.c_str(),"RECREATE");
   event_tree = new TTree("EventTree","EventTree");
   //scaler_tree = new TTree("ScalerTree","ScalerTree");
@@ -39,7 +44,7 @@ TWriteLoop::~TWriteLoop() {
     EndLearningPhase();
   }
   //std::cout << __PRETTY_FUNCTION__ << 1 << std::endl;
-  
+
   for(auto& elem : det_map){
     //delete *elem.second;
     //delete elem.second;
@@ -83,7 +88,8 @@ bool TWriteLoop::Iteration() {
   if(!handled_event){
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   }
-
+  if(!living_parent && hist_loop)
+    hist_loop->SendStop();
   return living_parent || (input_queues.size()==0);
 }
 
@@ -110,11 +116,16 @@ void TWriteLoop::LearningPhase(TUnpackedEvent* event) {
   for(auto det : event->GetDetectors()) {
     TClass* cls = det->IsA();
     if(!det_map.count(cls)){
+      TThread::Lock();
+      std::cout << "LearningPhase has locked" << std::endl;
       TDetector** det = new TDetector*;
       *det = (TDetector*)cls->New();
+      std::cout << "Made detector" << std::endl;
       det_map[cls] = det;
       // TODO: Place this mutex here
       event_tree->Branch(cls->GetName(), cls->GetName(), det);
+      TThread::UnLock();
+      std::cout << "LearningPhase has unlocked" << std::endl;
     }
   }
   learning_queue.push_back(event);
@@ -144,5 +155,8 @@ void TWriteLoop::WriteEvent(TUnpackedEvent* event) {
 
   // Fill
   event_tree->Fill();
-  delete event;
+  if(hist_loop)
+    hist_loop->Push(event);
+  else
+    delete event;
 }

@@ -44,17 +44,17 @@ class TGRUTint : public TRint {
     Int_t TabCompletionHook(char* buf, int* pLoc, std::ostream& out);
     TFile* OpenRootFile(const std::string& filename,TChain *chain=0);
     TRawFileIn* OpenRawFile(const std::string& filename);
-/*
+
 public:
-  //TObject* DelayedProcessLine(std::string message);
+  TObject* DelayedProcessLine(std::string message);
   //GUI interface commands;
   //void OpenFileDialog();
   //void DefaultFunction();
 
-  //void DelayedProcessLine_ProcessItem();
+  void DelayedProcessLine_ProcessItem();
 
   //void HandleFile(const std::string& filename);
-*/
+
 
  protected:
    void RunMacroFile(const std::string& filename);
@@ -63,17 +63,17 @@ public:
 
 
 private:
-//#ifndef __CINT__
-//  std::mutex fCommandListMutex;
-//  std::mutex fResultListMutex;
-//  std::mutex fCommandWaitingMutex;
-//  std::condition_variable fNewResult;
-//#endif
+#ifndef __CINT__
+ std::mutex fCommandListMutex;
+ std::mutex fResultListMutex;
+ std::mutex fCommandWaitingMutex;
+ std::condition_variable fNewResult;
+#endif
   //TTimer* fGuiTimer;
 
   //TTimer* fCommandTimer;
-  //std::queue<std::string> fLinesToProcess;
-  //std::queue<TObject*> fCommandResults;
+  std::queue<std::string> fLinesToProcess;
+  std::queue<TObject*> fCommandResults;
 
   int fRootFilesOpened;
   int fRawFilesOpened;
@@ -93,7 +93,7 @@ private:
     TList *GetListOfRawFiles() { return &fOpenedRawFiles; }
 
   private:
-    TList fOpenedRawFiles; 
+    TList fOpenedRawFiles;
 
 
 

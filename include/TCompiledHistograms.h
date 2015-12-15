@@ -8,10 +8,15 @@
 #include <string>
 
 #include "TObject.h"
+#include "TList.h"
 
 #include "DynamicLibrary.h"
 #include "TDetector.h"
 #include "TRuntimeObjects.h"
+
+#include "TUnpackedEvent.h"
+//#include "THistogramLoop.h"
+
 
 class TCompiledHistograms : public TObject {
 public:
@@ -34,8 +39,10 @@ public:
   void ClearHistograms();
 
   TList* GetObjects(){ return &objects; }
+  TList* GetGates(){   return &gates;   }
 
   void Write();
+
 
 private:
   void swap_lib(TCompiledHistograms& other);
@@ -54,6 +61,7 @@ private:
   int check_every;
 
   TList objects;
+  TList gates;
   TList variables;
 
   TDirectory* default_directory;

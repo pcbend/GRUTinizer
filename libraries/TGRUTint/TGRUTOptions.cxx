@@ -40,6 +40,7 @@ void TGRUTOptions::Clear(Option_t* opt) {
   fHelp = false;
   fShowLogo = true;
   fSortRaw = true;
+  fIsOnline = false;
 
   fShouldExit = false;
 }

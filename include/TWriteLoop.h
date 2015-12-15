@@ -14,6 +14,8 @@
 #include "ThreadsafeQueue.h"
 #include "TUnpackedEvent.h"
 
+class THistogramLoop;
+
 class TWriteLoop : public StoppableThread {
 public:
   static TWriteLoop* Get(std::string name="", std::string output_filename="");
@@ -34,6 +36,8 @@ public:
   size_t GetItemsCurrent() { return learning_queue.size();      }
   size_t GetRate()         { return 0; }
 
+  bool AttachHistogramLoop(THistogramLoop *loop) {hist_loop = loop; return loop; }
+
 protected:
   bool Iteration();
 
@@ -45,6 +49,7 @@ private:
   void EndLearningPhase();
   void WriteEvent(TUnpackedEvent* event);
 
+  THistogramLoop *hist_loop;
   TFile* output_file;
 
   std::mutex input_queue_mutex;

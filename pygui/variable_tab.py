@@ -49,9 +49,9 @@ class VariableTab(object):
         self.treeview.bind("<Double-1>",self.VariableSelection)
 
     def SetReplaceVariable(self, name, value):
-        pipeline = ROOT.GetPipeline(0)
-        if pipeline:
-            pipeline.SetReplaceVariable(name, value)
+        #pipeline = ROOT.GetPipeline(0)
+        #if pipeline:
+        #    pipeline.SetReplaceVariable(name, value)
 
         self.variables[name] = value
         if name in self.treeview.get_children():
@@ -60,9 +60,9 @@ class VariableTab(object):
             self.treeview.insert('','end',name, text=name, values=(str(value),))
 
     def DeleteVariable(self, name):
-        pipeline = ROOT.GetPipeline(0)
-        if pipeline:
-            pipeline.RemoveVariable(name, value)
+        #pipeline = ROOT.GetPipeline(0)
+        #if pipeline:
+        #    pipeline.RemoveVariable(name, value)
 
         self.variables.pop(name, None)
         self.treeview.delete(name)
@@ -92,14 +92,14 @@ class VariableTab(object):
         self.var_value.set(str(self.variables[name]))
 
     def _dump_to_tfile(self):
-        pipeline = ROOT.GetPipeline(0)
-        if not pipeline:
-            return
+        #pipeline = ROOT.GetPipeline(0)
+        #if not pipeline:
+        #    return
 
         tdir = ROOT.gDirectory.mkdir('variables')
-        with PreserveGDir(tdir):
-            for obj in pipeline.GetVariables():
-                obj.Write()
+        #with PreserveGDir(tdir):
+        #    for obj in pipeline.GetVariables():
+        #        obj.Write()
 
     def _variable_patterns(self):
         return self.variables

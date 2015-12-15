@@ -15,6 +15,10 @@
 #include <TTree.h>
 #include <TUnixSystem.h>
 
+#include <TThread.h>
+#include <TMethodCall.h>
+#include <TVirtualPad.h>
+
 #include "GRootGuiFactory.h"
 //#include "ProgramPath.h"
 //#include "TDetectorEnv.h"
@@ -31,6 +35,7 @@
 #include "TBuildingLoop.h"
 #include "TUnpackingLoop.h"
 #include "TWriteLoop.h"
+#include "THistogramLoop.h"
 
 //#include "TOnlineTree.h"
 
@@ -40,6 +45,8 @@
 
 //extern void PopupLogo(bool);
 //extern void WaitLogo();
+
+
 
 ClassImp(TGRUTint)
 
@@ -61,6 +68,11 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
   :TRint(appClassName, &argc, argv, options, numOptions,noLogo),
    fIsTabComplete(false) {
    //fCommandServer(NULL), fGuiTimer(NULL), fCommandTimer(NULL),  fIsTabComplete(false) {
+
+  // This turns on both the Cint Mutex and gROOT Mutex,
+  // with-out it, you are taking thread into your own hands
+  // with-it, you can use TThread::Lock/UnLock around possible hazards.
+  TThread::Initialize();
 
   fGRUTEnv = gEnv;
   GetSignalHandler()->Remove();
@@ -145,12 +157,18 @@ void TGRUTint::SplashPopNWait(bool flag) {
 
 void TGRUTint::LoadDetectorClasses() {
   TS800 s800;
-  gROOT->LoadClass("TGretina");
-  gROOT->LoadClass("TS800");
-  //gROOT->LoadClass("TPhosWall",false);
 
-  gROOT->LoadClass("TSega");
-  gROOT->LoadClass("TJanus");
+  if(!gROOT->LoadClass("TGretina") ||
+     !gROOT->LoadClass("TGretinaHit") ||
+     !gROOT->LoadClass("std::vector<TGretinaHit>") ||
+     !gROOT->LoadClass("TS800") ||
+
+     !gROOT->LoadClass("TSega") ||
+     !gROOT->LoadClass("TJanus")
+    //gROOT->LoadClass("TPhosWall",false);
+  ){
+    std::cout << "Could not load all GRUT classes" << std::endl;
+  }
 
 }
 
@@ -168,6 +186,30 @@ bool TGRUTInterruptHandler::Notify() {
   return true;
 }
 
+// Copied from http://stackoverflow.com/a/24315631
+std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
+  size_t start_pos = 0;
+  while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+    str.replace(start_pos, from.length(), to);
+    start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+  }
+  return str;
+}
+
+void *GUI_Loop() {
+  std::string   script_filename = Form("%s/util/grut-view.py",getenv("GRUTSYS"));
+  std::ifstream script(script_filename);
+  std::string   script_text((std::istreambuf_iterator<char>(script)),
+                            std::istreambuf_iterator<char>());
+  TPython::Exec(script_text.c_str());
+
+  while(true){
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    TPython::Exec("update()");
+
+  }
+}
+
 void TGRUTint::ApplyOptions() {
   TGRUTOptions* opt = TGRUTOptions::Get();
 
@@ -176,22 +218,10 @@ void TGRUTint::ApplyOptions() {
   }
 
   if(opt->StartGUI()){
-    //std::string script_filename = program_path() + "/../util/grut-view.py";
-    std::string   script_filename = Form("%s/util/grut-view.py",getenv("GRUTSYS"));
-    std::ifstream script(script_filename);
-    std::string   script_text((std::istreambuf_iterator<char>(script)),
-                               std::istreambuf_iterator<char>());
-    TPython::Exec(script_text.c_str());
+    TThread *gui_thread = new TThread("gui_thread",(TThread::VoidRtnFunc_t)GUI_Loop);
+    gui_thread->Run();
 
-    for(auto& filename : opt->RootInputFiles()){
-      //TPython::Exec(Form("window.LoadRootFile(\"%s\")",filename.c_str()));
-      //OpenRootFile(filename); // Is this needed/sane?
-    }
-    TTimer *fGuiTimer = new TTimer("TPython::Exec(\"update()\");",10);
-    fGuiTimer->TurnOn();
   }
-
-
 
   //if I am passed any calibrations, lets load those.
   if(opt->CalInputFiles().size()) {
@@ -222,6 +252,10 @@ void TGRUTint::ApplyOptions() {
       TWriteLoop* woop = TWriteLoop::Get("4_write_loop", rootoutfile);
       woop->Connect(uoop1);
       //woop->Connect(uoop2);
+
+      THistogramLoop *hoop = THistogramLoop::Get("5_hist_loop");
+      woop->AttachHistogramLoop(hoop);
+      hoop->Resume();
       woop->Resume();
     }
       //printf("I was passed rawfile %s\n",opt->RawInputFiles().at(x).c_str());
@@ -261,7 +295,7 @@ void TGRUTint::ApplyOptions() {
     //TGRUTLoop::Get()->Join();
     }
     this->Terminate();
-  } 
+  }
 
 
 
@@ -458,6 +492,7 @@ Int_t TGRUTint::TabCompletionHook(char* buf, int* pLoc, std::ostream& out){
 Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   // If you print while fIsTabComplete is true, you will break tab complete.
   // Any diagnostic print statements should be done after this if statement.
+  sync = false;
   if(fIsTabComplete){
     return TRint::ProcessLine(line, sync, error);
   }
@@ -472,7 +507,10 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
      sline.Contains("if") ||
      sline.Contains("{") ||
      sline.Contains("TPython")){
-     return TRint::ProcessLine(sline.Data(), sync, error);
+     //printf("\n\nLINE:   %s\n",sline.Data()); fflush(stdout);
+     auto res = TRint::ProcessLine(sline.Data(), sync, error);
+     //printf("DONE:   %s\n\n",sline.Data()); fflush(stdout);
+     return res;
   }
 
   if(!sline.CompareTo("clear")) {
@@ -597,7 +635,7 @@ void TGRUTint::OpenFileDialog() {
   }
 }
 */
-/*
+
 TObject* TGRUTint::DelayedProcessLine(std::string message){
   std::lock_guard<std::mutex> any_command_lock(fCommandWaitingMutex);
 
@@ -617,8 +655,8 @@ TObject* TGRUTint::DelayedProcessLine(std::string message){
   fCommandResults.pop();
   return result;
 }
-*/
-/*
+
+
 void TGRUTint::DelayedProcessLine_ProcessItem(){
   std::string message;
   {
@@ -631,15 +669,20 @@ void TGRUTint::DelayedProcessLine_ProcessItem(){
   }
 
   std::cout << "Received remote command \"" << message << "\"" << std::endl;
+  //TThread::Lock();
+  std::cout << "tthread is locked" << std::endl;
   this->ProcessLine(message.c_str());
+  std::cout << "After this->ProcessLine()" << std::endl;
   Getlinem(EGetLineMode::kInit,((TRint*)gApplication)->GetPrompt());
+  std::cout << "After Getlinem()" << std::endl;
+  //TThread::UnLock();
 
   {
     std::lock_guard<std::mutex> lock(fResultListMutex);
-    fCommandResults.push(gResponse);
-    gResponse = NULL;
+    fCommandResults.push(0);
+    //fCommandResults.push(gResponse);
+    //gResponse = NULL;
   }
 
   fNewResult.notify_one();
 }
-*/

@@ -1,5 +1,3 @@
-#!/usr/bin/env grut-python-exec
-
 import gc
 import os
 import sys
@@ -12,7 +10,7 @@ import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 warnings.filterwarnings(action='ignore',category=RuntimeWarning,
                         message='creating converter.*')
-sys.argv = sys.argv[1:] # ROOT appends "python" to the beginning of sys.argv
+sys.argv = sys.argv[1:] # ROOT appends 'python' to the beginning of sys.argv
 sys.argv.append('grut-view.py')
 
 sys.path.append(os.environ['GRUTSYS'])
@@ -35,4 +33,5 @@ def on_close():
     window = None
     gc.collect()
 
+window = None
 window = MainWindow()
