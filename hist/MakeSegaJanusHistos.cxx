@@ -91,6 +91,13 @@ void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega) {
     obj.FillHistogram("sega_energy_summary",
                       16, 1, 17, hit.GetDetnum(),
                       8000, 0, 4000, hit.GetEnergy());
+    obj.FillHistogram("sega_numsegments",
+                      16, 1, 17, hit.GetDetnum(),
+                      33, 0, 33, hit.GetNumSegments());
+
+    obj.FillHistogram(Form("sega_det%d_numsegments_ts", hit.GetDetnum()),
+                      36000, 0, 3600e9, hit.Timestamp(),
+                      33, 0, 33, hit.GetNumSegments());
 
     for(int segi=0; segi<hit.GetNumSegments(); segi++){
       TSegaSegmentHit& seg = hit.GetSegment(segi);

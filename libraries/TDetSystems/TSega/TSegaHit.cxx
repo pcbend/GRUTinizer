@@ -95,6 +95,10 @@ void TSegaHit::SetTrace(unsigned int trace_length, const unsigned short* trace) 
   }
 }
 
+bool TSegaHit::HasCore() const {
+  return fCharge != -1;
+}
+
 int TSegaHit::GetDetnum() const {
   TChannel* chan = TChannel::GetChannel(fAddress);
   if(chan){
@@ -119,11 +123,11 @@ int TSegaHit::GetChannel() const {
 }
 
 TSegaSegmentHit& TSegaHit::MakeSegmentByAddress(unsigned int address){
-  for(auto& segment : fSegments){
-    if(segment.Address() == address){
-      return segment;
-    }
-  }
+  // for(auto& segment : fSegments){
+  //   if(segment.Address() == address){
+  //     return segment;
+  //   }
+  // }
 
   fSegments.emplace_back();
   TSegaSegmentHit& output = fSegments.back();

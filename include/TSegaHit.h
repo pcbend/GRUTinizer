@@ -20,6 +20,8 @@ public:
   int GetDetnum() const;
   int GetMainSegnum() const;
 
+  bool HasCore() const;
+
   unsigned int GetNumSegments() const { return fSegments.size(); }
   TSegaSegmentHit& GetSegment(int i) { return fSegments.at(i); }
 
