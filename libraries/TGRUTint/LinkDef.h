@@ -10,6 +10,8 @@
 #pragma link C++ enum kDetectorSystems;
 #pragma link C++ enum kFileType;
 
+#pragma link C++ global gChain;
+
 //#pragma link C++ class std::vector<Short_t>+;
 #pragma link C++ class TGRUTOptions+;
 #pragma link C++ class TGRUTInterruptHandler+;

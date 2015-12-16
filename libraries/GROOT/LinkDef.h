@@ -1,4 +1,4 @@
-// GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GCanvas.h GPeak.h GValue.h
+// GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GRootBrowser.h GCanvas.h GPeak.h GValue.h
 
 
 #ifdef __CINT__
@@ -31,14 +31,15 @@
 #pragma link C++ function Help;
 #pragma link C++ function Commands;
 
-
-#pragma link C++ global gManager;
-#pragma link C++ global gBaseManager;
+//#pragma link C++ global gManager;
+//#pragma link C++ global gBaseManager;
 
 #pragma link C++ class GValue+;
 #pragma link C++ class GMarker+;
 #pragma link C++ class GCanvas+;
 #pragma link C++ class GRootCanvas+;
+#pragma link C++ class GRootBrowser+;
+#pragma link C++ class GBrowserPlugin+;
 #pragma link C++ class GRootGuiFactory+;
 
 #pragma link C++ class GPeak+;

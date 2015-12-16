@@ -56,8 +56,6 @@ void StoppableThread::StopAll() {
 }
 
 void StoppableThread::StopAllClean() {
-  stop_status_thread();
-
   std::cout << "Stopping each TDataLoop" << std::endl;
   for(auto& elem : fthreadmap){
     TDataLoop* thread = dynamic_cast<TDataLoop*>(elem.second);
@@ -72,6 +70,8 @@ void StoppableThread::StopAllClean() {
     StoppableThread* thread = elem.second;
     thread->Join();
   }
+
+  stop_status_thread();
 
   for(auto& elem : fthreadmap){
     std::cout << "Deleting thread " << elem.first << std::endl;
@@ -196,7 +196,7 @@ void StoppableThread::status_out() {
   outfile << "---------------------------------------------------------------\n"; // 64 -.
   for(auto it = fthreadmap.begin();it!=fthreadmap.end();it++) {
     StoppableThread *thread = it->second;
-    outfile << "- " << thread->Name() << std::string(64-2-thread->Name().length(),' ')   << "-\n";
+    outfile << "- " << thread->Name() << (thread->IsRunning()?"[Live]":"[Stop]") << std::string(64-8-thread->Name().length(),' ')   << "-\n";
     outfile << "- " << std::string(40,' ') << "items_pushed:  " << thread->GetItemsPushed()  << "\n";
     outfile << "- " << std::string(40,' ') << "items_popped:  " << thread->GetItemsPopped()  << "\n";
     outfile << "- " << std::string(40,' ') << "items_current: " << thread->GetItemsCurrent() << "\n";

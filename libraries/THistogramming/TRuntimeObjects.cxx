@@ -19,7 +19,6 @@ void TRuntimeObjects::FillHistogram(std::string name,
     hist->Fill(value);
   } else {
     TH1* newHist = new TH1I(name.c_str(),name.c_str(),bins,low,high);
-    newHist->SetDirectory(directory);
     newHist->Fill(value);
     GetObjects().Add(newHist);
   }
@@ -35,7 +34,6 @@ void TRuntimeObjects::FillHistogram(std::string name,
     TH2* newHist = new TH2I(name.c_str(),name.c_str(),
                             Xbins, Xlow, Xhigh,
                             Ybins, Ylow, Yhigh);
-    newHist->SetDirectory(directory);
     newHist->Fill(Xvalue, Yvalue);
     GetObjects().Add(newHist);
   }
@@ -67,6 +65,7 @@ double TRuntimeObjects::GetVariable(const char* name) {
   if(obj && dynamic_cast<GValue*>(obj)){
     return ((GValue*)obj)->GetValue();
   } else {
-    return std::sqrt(-1);
+    return 0.00;
+    //return std::sqrt(-1);
   }
 }

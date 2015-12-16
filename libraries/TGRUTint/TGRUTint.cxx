@@ -15,14 +15,20 @@
 #include <TTree.h>
 #include <TUnixSystem.h>
 
+#include <TThread.h>
+#include <TMethodCall.h>
+#include <TVirtualPad.h>
+
 #include "GRootGuiFactory.h"
-//#include "ProgramPath.h"
-//#include "TDetectorEnv.h"
+
+#include "TChannel.h"
+#include "TDetectorEnv.h"
+
 #include "TGRUTOptions.h"
 #include "TRawSource.h"
-//#include "TGRUTLoop.h"
+
 #include "TGRUTUtilities.h"
-//#include "TObjectManager.h"
+
 #include "TChannel.h"
 
 #include "TS800.h"
@@ -31,8 +37,10 @@
 #include "TBuildingLoop.h"
 #include "TUnpackingLoop.h"
 #include "TWriteLoop.h"
+#include "TChainLoop.h"
+#include "THistogramLoop.h"
 
-//#include "TOnlineTree.h"
+#include "TSega.h"
 
 //extern "C" G__value G__getitem(const char* item);
 //#include "FastAllocString.h"
@@ -40,6 +48,9 @@
 
 //extern void PopupLogo(bool);
 //extern void WaitLogo();
+
+
+TChain *gChain = NULL;
 
 ClassImp(TGRUTint)
 
@@ -59,7 +70,7 @@ TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions
 
 TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t noLogo,const char *appClassName)
   :TRint(appClassName, &argc, argv, options, numOptions,noLogo),
-   fIsTabComplete(false) {
+   fIsTabComplete(false), main_thread_id(std::this_thread::get_id()) {
    //fCommandServer(NULL), fGuiTimer(NULL), fCommandTimer(NULL),  fIsTabComplete(false) {
 
   fGRUTEnv = gEnv;
@@ -89,31 +100,11 @@ TGRUTint::~TGRUTint() {
 
 
 void TGRUTint::Init() {
-  //TGRUTLoop::CreateDataLoop<TGRUTLoop>();
-  //fChain = new TChain("EventTree");
 
   if(TGRUTOptions::Get()->ShouldExit()){
     Terminate();
     return;
   }
-  //printf("%s called.\n",__PRETTY_FUNCTION__);
-//  TMode3 *mode3 = new TMode3;
-//  mode3->Class();
-
-  // TFile *tempfile = TFile::Open("/var/tmp/mytemp.root","recreate");
-  // TTree *temptree = new TTree("temp","temp");
-  // TMode3 *mode3=0;
-  // temptree->Branch("TMode3","TMode3",&mode3);
-  // temptree->Fill();
-  // temptree->Write();
-  // delete tempfile;
-  // gSystem->Unlink("/var/tmp/mytemp.root");
-
-
-  if(TGRUTOptions::Get()->MakeBackupFile()){
-    //TObjectManager::Get("GRUT_Manager", "GRUT Manager");
-  }
-
 
 
   std::string grutpath = getenv("GRUTSYS");
@@ -145,14 +136,21 @@ void TGRUTint::SplashPopNWait(bool flag) {
 
 void TGRUTint::LoadDetectorClasses() {
   TS800 s800;
-  gROOT->LoadClass("TGretina");
-  gROOT->LoadClass("TS800");
-  //gROOT->LoadClass("TPhosWall",false);
 
-  gROOT->LoadClass("TSega");
-  gROOT->LoadClass("TJanus");
+  if(!gROOT->LoadClass("TGretina") ||
+     !gROOT->LoadClass("TGretinaHit") ||
+     !gROOT->LoadClass("std::vector<TGretinaHit>") ||
+     !gROOT->LoadClass("TS800") ||
+
+     !gROOT->LoadClass("TSega") ||
+     !gROOT->LoadClass("TJanus")
+    //gROOT->LoadClass("TPhosWall",false);
+  ){
+    std::cout << "Could not load all GRUT classes" << std::endl;
+  }
 
 }
+
 
 /*********************************/
 
@@ -168,36 +166,48 @@ bool TGRUTInterruptHandler::Notify() {
   return true;
 }
 
+// Copied from http://stackoverflow.com/a/24315631
+std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
+  size_t start_pos = 0;
+  while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+    str.replace(start_pos, from.length(), to);
+    start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+  }
+  return str;
+}
+
 void TGRUTint::ApplyOptions() {
   TGRUTOptions* opt = TGRUTOptions::Get();
 
   if(!false) { //this can be change to something like, if(!ClassicRoot)
      LoadGRootGraphics();
   }
+  
+  
+  TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
+
+
+  //TSega::LoadDetectorPositions();
 
   if(opt->StartGUI()){
-    //std::string script_filename = program_path() + "/../util/grut-view.py";
+    // TThread *gui_thread = new TThread("gui_thread",(TThread::VoidRtnFunc_t)GUI_Loop);
+    // gui_thread->Run();
+
     std::string   script_filename = Form("%s/util/grut-view.py",getenv("GRUTSYS"));
     std::ifstream script(script_filename);
     std::string   script_text((std::istreambuf_iterator<char>(script)),
-                               std::istreambuf_iterator<char>());
+                              std::istreambuf_iterator<char>());
     TPython::Exec(script_text.c_str());
 
-    for(auto& filename : opt->RootInputFiles()){
-      //TPython::Exec(Form("window.LoadRootFile(\"%s\")",filename.c_str()));
-      //OpenRootFile(filename); // Is this needed/sane?
-    }
-    TTimer *fGuiTimer = new TTimer("TPython::Exec(\"update()\");",10);
-    fGuiTimer->TurnOn();
+    TTimer* gui_timer = new TTimer("TPython::Exec(\"update()\");", 10, true);
+    gui_timer->TurnOn();
   }
-
-
 
   //if I am passed any calibrations, lets load those.
   if(opt->CalInputFiles().size()) {
-    for(int x=0;x<opt->CalInputFiles().size();x++)
+    for(int x=0;x<opt->CalInputFiles().size();x++) {
       TChannel::ReadCalFile(opt->CalInputFiles().at(x).c_str());
-      //printf("I was passed calfile %s\n",opt->CalInputFiles().at(x).c_str());
+    }
   }
   TDataLoop *loop = 0;
   //next most important thing, if given a raw file && told NOT to not sort!
@@ -222,6 +232,17 @@ void TGRUTint::ApplyOptions() {
       TWriteLoop* woop = TWriteLoop::Get("4_write_loop", rootoutfile);
       woop->Connect(uoop1);
       //woop->Connect(uoop2);
+
+      std::string histoutfile = "hist" + get_run_number(opt->RawInputFiles().at(x)) + ".root";
+      // if(opt->OutputFile().length()) {
+      //   histoutfile = opt->OutputFile();
+      // }
+      if(TGRUTOptions::Get()->MakeHistos()){
+        THistogramLoop *hoop = THistogramLoop::Get("5_hist_loop");
+        hoop->SetOutputFilename(histoutfile);
+        woop->AttachHistogramLoop(hoop);
+        hoop->Resume();
+      }
       woop->Resume();
     }
       //printf("I was passed rawfile %s\n",opt->RawInputFiles().at(x).c_str());
@@ -234,14 +255,8 @@ void TGRUTint::ApplyOptions() {
       //printf("I was passed rawfile %s\n",opt->RawInputFiles().at(x).c_str());
   }
 
-  //next, if given a root file and told to sort it.
-  if(opt->RootInputFiles().size() && opt->SortTree()){
-    for(int x=0;x<opt->RootInputFiles().size();x++)
-      printf("I am going to sort this rootfile %s, someday.\n",opt->RootInputFiles().at(x).c_str());
-  }
-
   //next, if given a root file and NOT told to sort it..
-  if(opt->RootInputFiles().size() && !opt->SortTree()){
+  if(opt->RootInputFiles().size()){
     for(int x=0;x<opt->RootInputFiles().size();x++)
       OpenRootFile(opt->RootInputFiles().at(x));
 
@@ -250,18 +265,31 @@ void TGRUTint::ApplyOptions() {
       printf("I am reloading calfile %s!\n",opt->CalInputFiles().at(x).c_str());
   }
 
+
+  //next, if given a root file and told to sort it.
+  if(gChain && opt->SortTree()){
+    printf("Attempting to sort root files.\n");
+    TChainLoop *coop = TChainLoop::Get("",gChain);
+    THistogramLoop *hoop = THistogramLoop::Get("");
+    coop->AttachHistogramLoop(hoop);
+    hoop->Resume();
+    coop->Resume();
+    //for(int x=0;x<opt->RootInputFiles().size();x++)
+    //  printf("I am going to sort this rootfile %s, someday.\n",opt->RootInputFiles().at(x).c_str());
+  }
+
+
   if(opt->ExitAfterSorting()){
     if(loop) {
       while(loop->IsRunning()) {
         std::cout << "\r" << loop->Status() << std::flush;
+        gSystem->ProcessEvents();
         std::this_thread::sleep_for(std::chrono::seconds(1));
       }
-    //TGRUTLoop::Get()->Status();
-    //std::cout << "Waiting for join" << std::endl;
-    //TGRUTLoop::Get()->Join();
     }
+    std::cout << std::endl;
     this->Terminate();
-  } 
+  }
 
 
 
@@ -355,27 +383,57 @@ void TGRUTint::ApplyOptions() {
 //}
 
 
-TFile* TGRUTint::OpenRootFile(const std::string& filename, TChain *chain){
-  if(!file_exists(filename.c_str())){
-    std::cerr << "File \"" << filename << "\" does not exist" << std::endl;
-    return NULL;
-  }
+TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
+  TString sopt(opt);
+  sopt.ToLower();
 
-  // const char* command = Form("TFile *_file%i = TObjectManager::Get(\"%s\",\"read\")",
-  //       		      fRootFilesOpened, filename.c_str());
-  const char* command = Form("TFile *_file%i = new TFile(\"%s\",\"read\")",
-                             fRootFilesOpened, filename.c_str());
-  ProcessLine(command);
-  TFile *file = (TFile*)gROOT->GetListOfFiles()->FindObject(filename.c_str());
-  if(file){
-    std::cout << "\tfile " << BLUE << file->GetName() << RESET_COLOR <<  " opened as " << BLUE <<  "_file" << fRootFilesOpened << RESET_COLOR <<  std::endl;
-    if(file->FindObjectAny("EventTree")) {
-      if(!fChain)
-        fChain = new TChain("EventTree");
-      fChain->Add(file->GetName());
+  bool is_online = sopt.Contains("online");
+  sopt.ReplaceAll("online","");
+
+  TFile* file = NULL;
+  if(sopt.Contains("recreate") ||
+     sopt.Contains("new")) {
+    file = new TFile(filename.c_str(), "RECREATE");
+    if(file){
+      const char* command = Form("TFile* _file%i = (TFile*)%luL",
+                                 fRootFilesOpened,
+                                 (unsigned long)file);
+      ProcessLine(command);
+      fRootFilesOpened++;
+    } else {
+      std::cout << "Could not create " << filename << std::endl;
+    }
+  } else {
+    file = new TFile(filename.c_str(), opt);
+    if(file){
+      const char* command = Form("TFile* _%s%i = (TFile*)%luL",
+                                 is_online ? "online" : "file",
+                                 fRootFilesOpened,
+                                 (unsigned long)file);
+      ProcessLine(command);
+      std::cout << "\tfile " << BLUE << file->GetName() << RESET_COLOR
+                <<  " opened as " << BLUE <<  "_file" << fRootFilesOpened << RESET_COLOR <<  std::endl;
+
+      if(file->FindObjectAny("EventTree")) {
+        if(!gChain)
+          gChain = new TChain("EventTree");
+        gChain->Add(file->GetName());
+      }
+      fRootFilesOpened++;
+    } else {
+      std::cout << "Could not open " << filename << std::endl;
     }
   }
-  fRootFilesOpened++;
+
+
+  if(is_online){
+    file->SetOption("online");
+  }
+
+  if(file && TGRUTOptions::Get()->StartGUI()){
+    TPython::Bind(file,"tdir");
+    ProcessLine("TPython::Exec(\"window.AddDirectory(tdir)\");");
+  }
   return file;
 }
 
@@ -458,64 +516,28 @@ Int_t TGRUTint::TabCompletionHook(char* buf, int* pLoc, std::ostream& out){
 Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   // If you print while fIsTabComplete is true, you will break tab complete.
   // Any diagnostic print statements should be done after this if statement.
+  sync = false;
   if(fIsTabComplete){
-    return TRint::ProcessLine(line, sync, error);
+    long res = TRint::ProcessLine(line, sync, error);
+    return res;
   }
   TString sline(line);
   if(!sline.Length()){
     return 0;
   }
-  //sline.ReplaceAll("TCanvas","GCanvas");
+  sline.ReplaceAll("TCanvas","GCanvas");
 
-  if(sline.Contains("for") ||
-     sline.Contains("while") ||
-     sline.Contains("if") ||
-     sline.Contains("{") ||
-     sline.Contains("TPython")){
-     return TRint::ProcessLine(sline.Data(), sync, error);
+  if(std::this_thread::get_id() != main_thread_id){
+    return DelayedProcessLine(line);
   }
-
+  
   if(!sline.CompareTo("clear")) {
-    return TRint::ProcessLine(".! clear");
+    long result = TRint::ProcessLine(".! clear");
+    return result;
   }
 
-  Ssiz_t index;
-
-  if((index = sline.Index(';')) != kNPOS){
-    TString first = sline(0,index);
-    first = first.Strip(TString::kTrailing);
-    long res = ProcessLine(first.Data(),     sync, error);
-    if(sline.Length() > index){
-      TString second = sline(index+1, sline.Length()-index).Data();
-      second = second.Strip(TString::kLeading);
-      res += ProcessLine(second.Data(), sync, error);
-    }
-    return res;
-  }
-
-
-  //fNewChild = NULL;
   long result =  TRint::ProcessLine(sline.Data(),sync,error);
 
-  //if(!fNewChild){
-  //  return result;
-  //}
-/*
-  if((index = sline.Index("Project",TString::kIgnoreCase))    != kNPOS   ||
-     (index = sline.Index("Projection",TString::kIgnoreCase)) != kNPOS   ||
-     (index = sline.Index("Profile",TString::kIgnoreCase))    != kNPOS   ||
-     (index = sline.Index("Draw",TString::kIgnoreCase))       != kNPOS ) {
-
-    TString newline = ReverseObjectSearch(sline);
-    TObject *parent = gROOT->FindObject(newline.Data());
-
-    if(parent){
-      gManager->AddRelationship(parent, fNewChild);
-    }
-  }
-
-  fNewChild = NULL;
-*/
   return result;
 }
 
@@ -555,14 +577,6 @@ void TGRUTint::Terminate(Int_t status){
   //  TPython::Exec("on_close()");
   //}
 
-  //TGRUTLoop::Get()->Stop();
-  //TDataLoop::DeleteInstance();
-
-  // TIter iter(TObjectManager::GetListOfManagers());
-  // while(TObjectManager *om = (TObjectManager*)iter.Next()) {
-  //   om->SaveAndClose();
-  // }
-
   //Be polite when you leave.
   printf(DMAGENTA "\nbye,bye\t" DCYAN "%s" RESET_COLOR  "\n",getlogin());
 
@@ -597,49 +611,63 @@ void TGRUTint::OpenFileDialog() {
   }
 }
 */
-/*
-TObject* TGRUTint::DelayedProcessLine(std::string message){
-  std::lock_guard<std::mutex> any_command_lock(fCommandWaitingMutex);
 
-  {
-    std::lock_guard<std::mutex> lock(fCommandListMutex);
-    fLinesToProcess.push(message);
-  }
 
-  TTimer::SingleShot(0,"TGRUTint",this,"DelayedProcessLine_ProcessItem()");
+//   These variables are to be accessed only from DelayedProcessLine
+// and DelayedProcessLine_Action, nowhere else.
+//   These are used to pass information between the two functions.
+// DelayedProcessLine_Action() should ONLY be called from a TTimer running
+// on the main thread.  DelayedProcessLine may ONLY be called
+// from inside ProcessLine().
+namespace {
+  std::mutex g__CommandListMutex;
+  std::mutex g__ResultListMutex;
+  std::mutex g__CommandWaitingMutex;
+  std::condition_variable g__NewResult;
 
-  std::unique_lock<std::mutex> lock(fResultListMutex);
-  while(fCommandResults.empty()){
-    fNewResult.wait(lock);
-  }
+  std::string g__LineToProcess;
+  bool g__ProcessingNeeded;
 
-  TObject* result = fCommandResults.front();
-  fCommandResults.pop();
-  return result;
+  Long_t g__CommandResult;
+  bool g__CommandFinished;
 }
-*/
-/*
-void TGRUTint::DelayedProcessLine_ProcessItem(){
+
+Long_t TGRUTint::DelayedProcessLine(std::string command){
+  std::lock_guard<std::mutex> any_command_lock(g__CommandWaitingMutex);
+
+  g__LineToProcess = command;
+  g__CommandFinished = false;
+  g__ProcessingNeeded = true;
+  TTimer::SingleShot(0,"TGRUTint",this,"DelayedProcessLine_Action()");
+
+  std::unique_lock<std::mutex> lock(g__ResultListMutex);
+  while(!g__CommandFinished){
+    g__NewResult.wait(lock);
+  }
+
+  return g__CommandResult;
+}
+
+
+void TGRUTint::DelayedProcessLine_Action(){
   std::string message;
   {
-    std::lock_guard<std::mutex> lock(fCommandListMutex);
-    if(fLinesToProcess.empty()){
+    std::lock_guard<std::mutex> lock(g__CommandListMutex);
+    if(!g__ProcessingNeeded){
       return;
     }
-    message = fLinesToProcess.front();
-    fLinesToProcess.pop();
+    message = g__LineToProcess;
   }
 
-  std::cout << "Received remote command \"" << message << "\"" << std::endl;
-  this->ProcessLine(message.c_str());
+  Long_t result = this->ProcessLine(message.c_str());
   Getlinem(EGetLineMode::kInit,((TRint*)gApplication)->GetPrompt());
 
   {
-    std::lock_guard<std::mutex> lock(fResultListMutex);
-    fCommandResults.push(gResponse);
-    gResponse = NULL;
+    std::lock_guard<std::mutex> lock(g__ResultListMutex);
+    g__CommandResult = result;
+    g__CommandFinished = true;
+    g__ProcessingNeeded = false;
   }
 
-  fNewResult.notify_one();
+  g__NewResult.notify_one();
 }
-*/

@@ -63,7 +63,7 @@ MAIN_O_FILES    := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard src/*.$(SRC_
 EXE_O_FILES     := $(UTIL_O_FILES) $(SANDBOX_O_FILES)
 EXECUTABLES     := $(patsubst %.o,bin/%,$(notdir $(EXE_O_FILES))) bin/grutinizer
 
-HISTOGRAM_SO    := $(patsubst hist/%.$(SRC_SUFFIX),libraries/lib%.so,$(wildcard hist/*.$(SRC_SUFFIX)))
+HISTOGRAM_SO    := $(patsubst histos/%.$(SRC_SUFFIX),libraries/lib%.so,$(wildcard histos/*.$(SRC_SUFFIX)))
 
 ifdef VERBOSE
 run_and_test = @echo $(1) && $(1);
@@ -105,7 +105,7 @@ bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) bin
 bin:
 	@mkdir -p $@
 
-libraries/lib%.so: .build/hist/%.o
+libraries/lib%.so: .build/histos/%.o
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 # Functions for determining the files included in a library.
@@ -149,6 +149,7 @@ clean:
 	@-$(RM) -rf .build
 	@-$(RM) -rf bin
 	@-$(RM) -f $(LIBRARY_OUTPUT)
+	@-$(RM) -f libraries/*.so
 
 cleaner: clean
 	@printf "\nEven more clean up\n\n"

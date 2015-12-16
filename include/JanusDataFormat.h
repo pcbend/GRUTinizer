@@ -9,7 +9,7 @@ struct VMUSB_Header {
   int stack() const { return (data & 0xf000)>>12; }
 } __attribute__((packed));
 
-struct CAEN_ADC{
+struct CAEN_DataPacket{
   uint16_t tail, head;
 
   enum EntryType{ Begin=0x2, Event=0x0, End=0x4, Invalid=0x6 };
@@ -20,7 +20,8 @@ struct CAEN_ADC{
   int header_zeros()     const  { return           (tail & 0xc000)>>13; }
   int num_entries()      const  { return           (tail & 0x3f00)>>8;  }
   int trailing_stuff()   const  { return           (tail & 0x00ff)>>0;  }
-  int channel_num()      const  { return           (head & 0x003f)>>0;  }
+//  int channel_num()      const  { return           (head & 0x003f)>>0;  }
+  int channel_num()      const  { return           (head & 0x001f)>>0;  }
   int adcvalue()         const  { return           (tail & 0x0fff)>>0;  }
   bool overflow()        const  { return            tail & (1<<12);     }
   bool underflow()       const  { return            tail & (1<<13);     }

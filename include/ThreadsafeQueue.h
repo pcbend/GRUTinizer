@@ -21,7 +21,7 @@ class ThreadsafeQueue {
 public:
   ThreadsafeQueue();
   ~ThreadsafeQueue();
-  void Push(T obj);
+  int Push(T obj);
   int Pop(T& output, int millisecond_wait = 1000);
 
   size_t ItemsPushed();
@@ -55,7 +55,7 @@ template<typename T>
 ThreadsafeQueue<T>::~ThreadsafeQueue() { }
 
 template<typename T>
-void ThreadsafeQueue<T>::Push(T obj) {
+int ThreadsafeQueue<T>::Push(T obj) {
   std::unique_lock<std::mutex> lock(mutex);
   if(queue.size() > max_queue_size){
     can_push.wait(lock);
@@ -66,6 +66,7 @@ void ThreadsafeQueue<T>::Push(T obj) {
 
   queue.push(obj);
   can_pop.notify_one();
+  return 1;
 }
 
 template<typename T>

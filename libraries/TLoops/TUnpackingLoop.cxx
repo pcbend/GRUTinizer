@@ -29,12 +29,7 @@ TUnpackingLoop *TUnpackingLoop::Get(std::string name,TBuildingLoop *input) {
 }
 
 TUnpackingLoop::TUnpackingLoop(std::string name,TBuildingLoop *input) :
-  StoppableThread(name),input_source(input),fOutputEvent(NULL) {
-
-  //SetBuildWindow(1000);
-  //event_start = 0;
-  //next_event = new TUnpackedEvent;
-}
+  StoppableThread(name),input_source(input),fOutputEvent(NULL) { }
 
 
 TUnpackingLoop::~TUnpackingLoop(){

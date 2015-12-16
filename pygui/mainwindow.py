@@ -10,7 +10,6 @@ import ttk
 import sys
 
 import ROOT
-ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 from .run_command import run_command
 from .hist_tab import HistTab
@@ -85,18 +84,18 @@ class MainWindow(object):
     def _load_icons(self):
         self.icons = {}
         self.icons['h1_t'] = tk.PhotoImage(
-            file = os.path.join(os.path.dirname(__file__),'resources','h1_t.gif'))
+            file = os.path.join(os.path.dirname(__file__),'../icons','h1_t.gif'))
         self.icons['h2_t'] = tk.PhotoImage(
-            file = os.path.join(os.path.dirname(__file__),'resources','h2_t.gif'))
+            file = os.path.join(os.path.dirname(__file__),'../icons','h2_t.gif'))
         self.icons['folder_t'] = tk.PhotoImage(
-            file = os.path.join(os.path.dirname(__file__),'resources','folder_t.gif'))
+            file = os.path.join(os.path.dirname(__file__),'../icons','folder_t.gif'))
         self.icons['tfile'] = tk.PhotoImage(
-            file = os.path.join(os.path.dirname(__file__),'resources','rootdb_t.gif'))
+            file = os.path.join(os.path.dirname(__file__),'../icons','rootdb_t.gif'))
         self.icons['tcutg'] = tk.PhotoImage(
-            file = os.path.join(os.path.dirname(__file__),'resources','bld_cut.gif'))
+            file = os.path.join(os.path.dirname(__file__),'../icons','bld_cut.gif'))
         self.icons['ttree'] = tk.PhotoImage(
-            file = os.path.join(os.path.dirname(__file__),'resources','ttree_t.gif'))
-        img = tk.PhotoImage(file=os.path.join(os.path.dirname(__file__),'resources','hdb_s.gif'))
+            file = os.path.join(os.path.dirname(__file__),'../icons','ttree_t.gif'))
+        img = tk.PhotoImage(file=os.path.join(os.path.dirname(__file__),'../icons','hdb_s.gif'))
         self.window.tk.call('wm','iconphoto',self.window._w,img)
 
     def _load_default_style(self):
@@ -178,10 +177,10 @@ class MainWindow(object):
 
     def _update_status_bar(self):
         self.status_bar.delete(1.0, tk.END)
-        pipeline = ROOT.GetPipeline(0)
-        if pipeline:
-            self.status_bar.write(pipeline.Status())
-        self.window.after(1000, self._update_status_bar)
+        #pipeline = ROOT.GetPipeline(0)
+        #if pipeline:
+        #    self.status_bar.write(pipeline.Status())
+        #self.window.after(1000, self._update_status_bar)
 
     def _SetOptStat(self):
         stat = ''
@@ -412,10 +411,11 @@ class MainWindow(object):
         update_tcanvases()
 
     def ResetAllHistograms(self):
-        pipeline = ROOT.GetPipeline()
-        if pipeline:
-            pipeline.ClearHistograms()
-            self.RefreshHistograms()
+        print 'does not work right now.'
+        #pipeline = ROOT.GetPipeline()
+        #if pipeline:
+        #    pipeline.ClearHistograms()
+        #    self.RefreshHistograms()
 
     def _draw_single(self,hist,color=1,nselected=1):
         canvas_exists = bool(filter(None,self.canvases))
@@ -463,6 +463,13 @@ class MainWindow(object):
         hist.SetLineColor(color)
         hist.Draw(' '.join(opt))
 
+    def AddDirectory(self, tdir):
+        if tdir:
+            if 'online' in tdir.GetOption():
+                self.hist_tab.AddActiveDirectory(tdir)
+            else:
+                self.hist_tab.Insert(tdir)
+
     def LoadDataFile(self, filename = None):
         if filename is None:
             filename = tkFileDialog.askopenfilename(filetypes=(("GEB File", "*.dat"),
@@ -471,10 +478,10 @@ class MainWindow(object):
 
         if not filename:
             return
-
-        pipeline = ROOT.GetPipeline(0)
-        if pipeline:
-            pipeline.ReplaceRawDataFile(filename)
+        return
+        #pipeline = ROOT.GetPipeline(0)
+        #if pipeline:
+        #    pipeline.ReplaceRawDataFile(filename)
 
     def LoadRootFile(self,filename=None):
         #print "In py LoadRooFile " + filename
@@ -538,5 +545,7 @@ class MainWindow(object):
             canvas.cd(columns*rows)
         canvas.Modified()
         canvas.Update()
+        #ROOT.PyConfig.GUIThreadScheduleOnce+= [ canvas.Update ]
+        #ROOT.PyGUIThread.join(0.1)
 
         self.canvases.append(canvas)

@@ -41,6 +41,7 @@ public:
   bool CommandServer()      const { return fCommandServer; }
   bool ExtractWaves()       const { return fExtractWaves;  }
   bool StartGUI()           const { return fStartGui; }
+  bool MakeHistos()         const { return fMakeHistos; }
 
   bool IsOnline()           const { return fIsOnline; }
 
@@ -91,6 +92,7 @@ private:
   bool fExtractWaves;
   bool fIsOnline;
   bool fStartGui;
+  bool fMakeHistos;
 
   bool fTimeSortInput;
 

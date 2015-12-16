@@ -23,8 +23,8 @@ public:
 
   void BuildFrom(const TRawEvent::GEBBankType1& raw);
 
-  Long_t   GetTimestamp() const { return fTimeStamp; }
-  Double_t GetTime()  const     { return (double)fTimeStamp - (double)fWalkCorrection; }
+  Long_t   GetTimestamp()       const { return fTimeStamp; }
+  Double_t GetTime()            const { return (double)fTimeStamp - (double)fWalkCorrection; }
   Int_t    GetAddress()         const { return fAddress;        }
   Int_t    GetCrystalId()       const { return fCrystalId;      }
   Int_t    GetHoleNumber()      const { return fCrystalId/4-1;  }
@@ -80,8 +80,8 @@ public:
   Int_t   GetFirstIntPoint()             const { return fFirstInteraction;     }
   Int_t   GetSecondIntPoint()            const { return fSecondInteraction;    }
   Int_t   NumberOfInteractions()         const { return fNumberOfInteractions; }
-  Int_t   GetSegmentId(const int &i)     const { if(i>fNumberOfInteractions) return -1; return fSegmentNumber[i]; }
-  Float_t GetSegmentEng(const int &i)    const { return fInteractionEnergy[i]; }
+  Int_t   GetSegmentId(const int &i)     const { return fSegmentNumber.at(i); }
+  Float_t GetSegmentEng(const int &i)    const { return fInteractionEnergy.at(i); }
   TVector3 GetInteractionPosition(int i) const; //{ return fGlobalInteractionPosition[i]; }
   TVector3 GetLocalPosition(int i) const;
   //TVector3 GetCrystalPosition(int i)     const { return TVector3(0,0,1): }

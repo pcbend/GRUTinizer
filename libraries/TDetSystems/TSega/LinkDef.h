@@ -1,4 +1,4 @@
-// DDASDataFormat.h TSega.h TSegaHit.h
+// DDASDataFormat.h TSega.h TSegaHit.h TSegaSegmentHit.h
 
 #ifdef __CINT__
 
@@ -8,7 +8,10 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class TDDASEvent+;
+#pragma link C++ class TSegaSegmentHit+;
+#pragma link C++ class std::vector<TSegaSegmentHit>+;
 #pragma link C++ class TSegaHit+;
+#pragma link C++ class std::vector<TSegaHit>+;
 #pragma link C++ class TSega+;
 
 #endif

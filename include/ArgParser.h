@@ -366,7 +366,7 @@ private:
     while(iarg<argc &&
           (max_args==-1 || output.size() < size_t(max_args))){
       std::string next_arg = argv[iarg++];
-      if(next_arg.at(0) == '-'){
+      if(next_arg.length() && next_arg.at(0) == '-'){
         read_extra = true;
         break;
       } else {

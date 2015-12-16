@@ -53,7 +53,6 @@ class TKeyDict(dict):
     def __getitem__(self, key):
         output = super(TKeyDict,self).__getitem__(key)
         if isinstance(output, ROOT.TKey):
-            print 'Reading key ',output.GetName()
             value = output.ReadObj().Clone()
             value.SetDirectory(0)
             if hasattr(output, 'hist_pattern'):

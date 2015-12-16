@@ -26,46 +26,47 @@ TMode3Hit::~TMode3Hit() {
 void TMode3Hit::BuildFrom(TSmartBuffer buf){
   Clear();
 
-  bool read_waveform = TGRUTOptions::Get()->ExtractWaves();
+  // // DANGER, uncomment and fix
+  // bool read_waveform = TGRUTOptions::Get()->ExtractWaves();
 
-  auto header = (TRawEvent::GEBMode3Head*)buf.GetData();
-  buf.Advance(sizeof(TRawEvent::GEBMode3Head));
+  // auto header = (TRawEvent::GEBMode3Head*)buf.GetData();
+  // buf.Advance(sizeof(TRawEvent::GEBMode3Head));
 
-  board_id = header->board_id;
+  // board_id = header->board_id;
 
-  auto data   = (TRawEvent::GEBMode3Data*)buf.GetData();
-  buf.Advance(sizeof(TRawEvent::GEBMode3Data));
+  // auto data   = (TRawEvent::GEBMode3Data*)buf.GetData();
+  // buf.Advance(sizeof(TRawEvent::GEBMode3Data));
 
-  led = data->GetLed();
-  charge = data->GetEnergy(*header);
-  //SetCharge(data->GetEnergy(*header));
-  SetAddress(GetHole(),GetCrystal(),GetSegmentId());
-  cfd = data->GetCfd();
+  // led = data->GetLed();
+  // charge = data->GetEnergy(*header);
+  // //SetCharge(data->GetEnergy(*header));
+  // SetAddress(GetHole(),GetCrystal(),GetSegmentId());
+  // cfd = data->GetCfd();
 
-  //std::cout << "wavesize:  " << wavesize << std::endl;
-  //buf.Print("all");
-  //std::cout << std::endl;
-  //std::cout << std::endl;
+  // //std::cout << "wavesize:  " << wavesize << std::endl;
+  // //buf.Print("all");
+  // //std::cout << std::endl;
+  // //std::cout << std::endl;
 
-  size_t wave_bytes = header->GetLength()*4 - sizeof(*header) + 4 - sizeof(*data);
-  if(read_waveform & (wavesize<MAXTRACE)){
-    wavesize = wave_bytes/sizeof(short);
-    //wave = (short*)malloc(wave_bytes);
-    //fOwnWave = true;
-    memcpy((char*)wavebuffer, buf.GetData(), wave_bytes);
+  // size_t wave_bytes = header->GetLength()*4 - sizeof(*header) + 4 - sizeof(*data);
+  // if(read_waveform & (wavesize<MAXTRACE)){
+  //   wavesize = wave_bytes/sizeof(short);
+  //   //wave = (short*)malloc(wave_bytes);
+  //   //fOwnWave = true;
+  //   memcpy((char*)wavebuffer, buf.GetData(), wave_bytes);
 
-    for(int i=0; i<wavesize; i+=2){
-      short tmp      = TRawEvent::SwapShort(wavebuffer[i+1]);
-      wavebuffer[i+1] = TRawEvent::SwapShort(wavebuffer[i]);
-      wavebuffer[i]   = tmp;
-    }
-    wave = &wavebuffer[0];
-  } else {
-    wave = NULL;
-    wavesize = 0;
-  }
+  //   for(int i=0; i<wavesize; i+=2){
+  //     short tmp      = TRawEvent::SwapShort(wavebuffer[i+1]);
+  //     wavebuffer[i+1] = TRawEvent::SwapShort(wavebuffer[i]);
+  //     wavebuffer[i]   = tmp;
+  //   }
+  //   wave = &wavebuffer[0];
+  // } else {
+  //   wave = NULL;
+  //   wavesize = 0;
+  // }
 
-  buf.Advance(wave_bytes);
+  // buf.Advance(wave_bytes);
 }
 
 

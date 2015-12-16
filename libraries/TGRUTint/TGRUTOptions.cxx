@@ -40,6 +40,8 @@ void TGRUTOptions::Clear(Option_t* opt) {
   fHelp = false;
   fShowLogo = true;
   fSortRaw = true;
+  fIsOnline = false;
+  fMakeHistos = false;
 
   fShouldExit = false;
 }
@@ -71,6 +73,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("l no-logo", &fShowLogo)
     .description("Inhibit the startup logo")
     .default_value(true);
+  parser.option("H histos", &fMakeHistos)
+    .description("attempt to run events through MakeHisto lib.")
+    .default_value(false);
   parser.option("n no-sort", &fSortRaw)
     .description("Load raw data files without sorting")
     .default_value(true);
