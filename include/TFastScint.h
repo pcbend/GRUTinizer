@@ -5,7 +5,8 @@
 
 #include "TDetector.h"
 #include "TFastScintHit.h"
-#include "TNSCLEvent.h"
+
+class TNSCLEvent;
 
 class TFastScint : public TDetector {
 public:
@@ -41,8 +42,8 @@ private:
 
   int Build_From(TNSCLEvent &event,bool Zero_Suppress = false);
 
-  TClonesArray* fs_hits; //->
-  
+  //TClonesArray* fs_hits; //->
+  std::vector<TFastScintHit> fs_hits;
 
   int qdc_TS;
   int tdc_TS;

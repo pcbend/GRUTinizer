@@ -44,7 +44,7 @@ incdir=$GRUTSYS/include
 #utildir=$GRUTSYS/etc
 
 
-grutlibs="-lTGEBDAQ -lTDataLoop -lTGEBDAQ -lTGRUTUtil -lTNSCLDAQ -lTRawFormat -lGROOT -lTStripChart"
+grutlibs="-lTGEBDAQ -lTDataLoop -lTGEBDAQ -lTGRUTUtil -lTNSCLDAQ -lTRawFormat -lGROOT -lTStripChart -lTRuntimeCalls"
 detlibs="-lTSega -lTDetector  -lTGretina -lTJanus -lTPhosWall -lTS800 -lTFastScint"
 grutmore="-lTGRUTint -lTDataLoop"
 

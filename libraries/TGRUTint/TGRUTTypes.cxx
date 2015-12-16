@@ -9,5 +9,6 @@ std::map<std::string, kDetectorSystems> detector_system_map{
   {"Janus",           kDetectorSystems::JANUS},
   {"Caesar",          kDetectorSystems::CAESAR},
   {"Phoswall",        kDetectorSystems::PHOSWALL},
-  {"S800",            kDetectorSystems::S800}
+  {"S800",            kDetectorSystems::S800},
+  {"FastScint",       kDetectorSystems::FASTSCINT}
 };

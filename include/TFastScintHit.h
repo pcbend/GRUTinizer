@@ -5,7 +5,9 @@
 
 class TFastScintHit : public TDetectorHit {
 public:
-  TFastScintHit() { }
+  TFastScintHit();
+  TFastScintHit(const TDetectorHit&);
+
 
   void Clear(Option_t* opt = "");
   void Copy(TObject& obj) const;
@@ -14,17 +16,19 @@ public:
   void SetChannel(int chan)  { fChannel = chan; }
   void SetTime(int time)     { fTime = time;    }
   void SetTimestamp(long ts) { fTimestamp = ts; }
+  void SetEnergy();
 
   virtual int Charge() const { return fCharge;    }
   int  GetChannel()    const { return fChannel;   }
   int  GetTime()       const { return fTime;      }
   long GetTimestamp()  const { return fTimestamp; }
-
+  float GetEnergy()    const { return fEnergy;    }
 private:
   long  fTimestamp;
   int   fChannel;
   int   fTime;
   int   fCharge;
+  float fEnergy;
 
   ClassDef(TFastScintHit,22)
 };

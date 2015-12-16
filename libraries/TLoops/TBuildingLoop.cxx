@@ -57,7 +57,6 @@ bool TBuildingLoop::Iteration(){
 
 
   CheckBuildWindow(&event);
-
   next_event.push_back(event);
 
   return true;

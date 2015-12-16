@@ -9,6 +9,7 @@
 #include "TS800.h"
 #include "TS800Scaler.h"
 #include "TSega.h"
+#include "TFastScint.h"
 
 TUnpackedEvent::TUnpackedEvent() { }
 
@@ -52,6 +53,10 @@ void TUnpackedEvent::AddRawData(const TRawEvent& event, kDetectorSystems detecto
 
   case kDetectorSystems::JANUS:
     GetDetector<TJanus>(true)->AddRawData(event);
+    break;
+
+  case kDetectorSystems::FASTSCINT:
+    GetDetector<TFastScint>(true)->AddRawData(event);
     break;
 
     // Not implemented yet.

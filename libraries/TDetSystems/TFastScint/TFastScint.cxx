@@ -9,28 +9,31 @@
 int TFastScint::errors;
 
 TFastScint::TFastScint() {
-  fs_hits = new TClonesArray("TFastScintHit");
-  Clear();
+  //fs_hits = new TClonesArray("TFastScintHit");
+  //Clear();
 }
 
 TFastScint::~TFastScint(){
-  delete fs_hits;
+  //delete fs_hits;
 }
 
 void TFastScint::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 
   TFastScint& fs = (TFastScint&)obj;
-  fs_hits->Copy(*fs.fs_hits);
+  //fs_hits->Copy(*fs.fs_hits);
+  fs.fs_hits = fs_hits;
   fs.raw_data.clear();
 }
 
 void TFastScint::Clear(Option_t* opt){
   TDetector::Clear(opt);
 
-  tdc_TS = -1;
-  qdc_TS = -1;
-  fs_hits->Clear(opt);
+  //tdc_trigger = -1;
+  //qdc_channels = -1;
+  //tdc_channels = -1;
+  //fs_hits->Clear(opt);
+  fs_hits.clear();
 }
 
 int TFastScint::BuildHits(){
@@ -43,16 +46,17 @@ int TFastScint::BuildHits(){
 }
 
 void TFastScint::InsertHit(const TDetectorHit& hit){
-  TFastScintHit* new_hit = (TFastScintHit*)fs_hits->ConstructedAt(Size());
-  hit.Copy(*new_hit);
+  //TFastScintHit* new_hit = (TFastScintHit*)fs_hits->ConstructedAt(Size());
+  //hit.Copy(*new_hit);
+  fs_hits.push_back((TFastScintHit)hit);
 }
 
 int TFastScint::Size(){
-  return fs_hits->GetEntries();
+  return fs_hits.size(); //->GetEntries();
 }
 
 TFastScintHit* TFastScint::GetLaBrHit(int i){
-  return (TFastScintHit*)fs_hits->At(i);
+  return &fs_hits.at(i);
 }
 
 int TFastScint::GetDetNumberIn_fs_hits(Int_t det){
@@ -66,13 +70,13 @@ int TFastScint::GetDetNumberIn_fs_hits(Int_t det){
 }
 
 TDetectorHit& TFastScint::GetHit(int i){
-  return *(TFastScintHit*)fs_hits->At(i);
+  return fs_hits.at(i);
 }
 
 // This is where the unpacking happens:
 int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
-
   bool DEBUG = false;
+
 
   bool isQ = false;  
   bool isT = false;
@@ -92,7 +96,7 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
   // NOTE -> buffer_size is 2*PayloadSize.
   buffer_size = *((UShort_t*)(data));
   data+=2;
-
+  
   if(DEBUG){
     event.Print("all");
     std::cout << " Payload Size : " << PayloadSize << std::endl;
@@ -112,7 +116,7 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	isQ = false; isT = true;
       }
       else std::cout << " *** Error -- Not QDC or TDC *** " << std::endl;
-    }
+    }// end if is header
     else if(Mword->isData()){ // Data
       if(isQ){ // QDC:
 	// NOTE -> we do it this way bc QDC should always come first!!!!
@@ -122,26 +126,30 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	hit.SetTime(-1);
 	if(Mq->isOOR()) hit.SetCharge(5000);
 	else            hit.SetCharge(Mq->Charge());	
-	
+
+	hit.SetEnergy();
+
 	if(Zero_Suppress){
 	  if(Mq->Charge()>0){
 	    InsertHit(hit);
 	  }
 	}
-	else
+	else{
 	  InsertHit(hit);
-	 
+	}
+
 	if(DEBUG){
 	  std::cout << " QDC Q : " << std::hex << Mq->Charge() << std::endl;
 	  std::cout << " QDC ch: " << std::dec << Mq->Chan() << std::endl;
 	  std::cout << " QDC Ov: " << Mq->isOOR() << std::endl;
 	}
-      }
+      } // end if isQ
       else if(isT){ // TDC
 	const TRawEvent::M_TDC_Data* Mt = (TRawEvent::M_TDC_Data*)Mword;
 	
 	detNumber = -1;
 	detNumber = GetDetNumberIn_fs_hits(Int_t(Mt->Chan()));
+
 	
 	if(detNumber!=-1){
 	  TFastScintHit *qdc_hit = GetLaBrHit(detNumber);
@@ -162,6 +170,7 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	  TFastScintHit tdc_hit;
 	  tdc_hit.SetTime(Mt->Time());
 	  tdc_hit.SetCharge(-1);
+          tdc_hit.SetEnergy();
 	  
 	  if(Mt->isTrig())  tdc_hit.SetChannel(-10);
 	  else   	    tdc_hit.SetChannel(Mt->Chan());
@@ -180,51 +189,22 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	    std::cout << " TDC Tr: " << Mt->isTrig() << std::endl;
 	  }
 	}
-      }	
+      } // end elif isT	
       else{ // If not QDC or TDC 
 	std::cout << " *** Not TDC or QDC **** " << std::endl;
       }
-    }
+    }// end elif is data
     else if(Mword->isETS()){
       if(DEBUG)
 	std::cout << " ETS " << std::endl;
-    }
+    }//end elif ets
     else if(Mword->isFILL()){
       if(DEBUG)
 	std::cout << " Filler " << std::endl;
-    }
+    }// end elif isfill
     else if(Mword->isEOE()){
-      // Here we want to set the timestamp.
-      const TRawEvent::Mesy_EOE* Meoe = (TRawEvent::Mesy_EOE*)Mword;
-
-      if(isQ){
-	SetQDC_TimeStamp(Meoe->TS());
-	
-	if(DEBUG){
-	  std::cout << " QDC TS : " << std::hex << Meoe->TS() << std::endl;
-	  std::dec;
-	}
-      }
-      else if (isT){
-	SetTDC_TimeStamp(Meoe->TS());
-	
-	if(DEBUG){
-	  std::cout << " TDC TS : " << std::hex << Meoe->TS() << std::endl;
-	  std::dec;
-	}
-      }
-      else
-	std::cout << " *** Error -- Timestamp not for TDC or QDC *** " << std::endl;
-      
       if(DEBUG) std::cout << " EOE " << std::endl;
-    }
-    else if(Mword->isALLF()){
-      if(DEBUG) std::cout << " All F " << std::endl;
-    }
-  }
-
-  // Sort array:
-  //TFastScintHit *hit_sort = 
-  
+    }// end elif eoe    
+  }// end for
   return 0;
 }
