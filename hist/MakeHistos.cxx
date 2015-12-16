@@ -15,102 +15,55 @@
 
 #include <TH1.h>
 #include <TH2.h>
+#include <TMath.h>
+#include "TRandom.h"
 
 #include "TObject.h"
-#include "TGretina.h"
-#include "TBank29.h"
+#include "TFastScint.h"
 
-#define Q1 15
-#define Q2 7
-#define Q3 8
-#define Q4 16
-#define Q5 9
-#define Q6 14
-#define Q7 17
-#define Q8 6
-
-std::map<int,int> HoleQMap;
-std::map<int,std::string> LayerMap;
-
-void InitMap() {
-  HoleQMap[Q1] = 1;
-  HoleQMap[Q2] = 2;
-  HoleQMap[Q3] = 3;
-  HoleQMap[Q4] = 4;
-  HoleQMap[Q5] = 5;
-  HoleQMap[Q6] = 6;
-  HoleQMap[Q7] = 7;
-  HoleQMap[Q8] = 8;
-
-  LayerMap[0] = "alpha";
-  LayerMap[1] = "beta";
-  LayerMap[2] = "gamma";
-  LayerMap[3] = "delta";
-  LayerMap[4] = "epsilon";
-  LayerMap[5] = "phi";
-
+TH1 *GetHistogram(TList *list, std::string histname,int xbins,double xlow,double xhigh) {
+  //TList *list = &(obj.GetObjects());
+  TH1   *hist = (TH1*)list->FindObject(histname.c_str());
+  if(!hist) {
+    hist= new TH1I(histname.c_str(),histname.c_str(),xbins,xlow,xhigh);
+    list->Add(hist);
+  }
+  return hist;
 }
 
-#define INTEGRATION 128.0
+TH2 *GetMatrix(TList *list, std::string histname,int xbins, double xlow,double xhigh,
+                                                 int ybins, double ylow,double yhigh) {
+  //TList *list = &(obj.GetObjects());
+  TH2   *mat  = (TH2*)list->FindObject(histname.c_str());
+  if(!mat) {
+    mat = new TH2I(histname.c_str(),histname.c_str(),xbins,xlow,xhigh,
+                                                     ybins,ylow,yhigh);
+    list->Add(mat);
+  }
+  return mat;
+}
 
 
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
-  //printf("I am Here 1\n"); fflush(stdout);
-  InitMap();
-  TGretina *gretina = 0;
-  TBank29  *bank29  = 0;
+  TFastScint *fast    = 0;
   TIter iter(&obj.GetDetectors());
   while(TObject *object = iter.Next()) {
-    if(object->InheritsFrom(TGretina::Class()))
-        gretina = (TGretina*)object;
-    if(object->InheritsFrom(TBank29::Class()))
-        bank29 = (TBank29*)object;
+    if(object->InheritsFrom(TFastScint::Class()))
+        fast = (TFastScint*)object;
   }
 
-  TList *list = &(obj.GetObjects());
-  int numobj = list->GetSize();  
-
-  if(bank29) {
-    for(int x=0;x<bank29->Size();x++) {
-      TMode3Hit &hit = (TMode3Hit&)bank29->GetHit(x);
-      std::string histname = Form("bank29_%i",hit.GetChannel()); 
-      TH1 *hist = (TH1*)list->FindObject(histname.c_str()); 
-      if(!hist) {
-        hist= new TH1F(histname.c_str(),histname.c_str(),16000,0,64000);
-        list->Add(hist);
-      }
-      //printf("%i\t\t%i\n",hit.Charge(),hit.Charge()/INTEGRATION);
-      //std::cout << "In makehistos "  << hit.Charge() << "\t\t" << hit.GetChannel() << std::endl;
-      //hist->Fill(hit.Charge()/INTEGRATION);
-      hist->Fill(hit.Charge());
-    }
-  }
-
-  if(!gretina)
+  if(!fast)
     return;
 
-  for(int y=0;y<gretina->Size();y++) {
-    //printf("I am Here %i\n",2+y); fflush(stdout);
-    TGretinaHit hit = gretina->GetGretinaHit(y);
-
-    std::string histname = Form("GretinaSummaryX%02i",hit.GetCrystalId());
-    TH2 *hist = (TH2*)list->FindObject(histname.c_str());
-    if(!hist) {
-      hist = new TH2F(histname.c_str(),histname.c_str(),40,0,40,2000,0,4000);
-      list->Add(hist);
-    }
-    hist->Fill(36,hit.GetCoreCharge(0)/INTEGRATION);
-    hist->Fill(37,hit.GetCoreCharge(1)/INTEGRATION);
-    hist->Fill(38,hit.GetCoreCharge(2)/INTEGRATION);
-    hist->Fill(39,hit.GetCoreCharge(3)/INTEGRATION);
-    for(int z=0;z<hit.NumberOfInteractions();z++) {
-      int layer  = hit.GetSegmentId(z)%6;
-      hist->Fill(hit.GetSegmentId(z),hit.GetSegmentEng(z));
-    }
+  TList *list = &(obj.GetObjects());
+  int numobj = list->GetSize();
+ 
+  for(int i=0;i<fast->Size();i++) {
+    TFastScintHit *hit = fast->GetLaBrHit(i);
+    TH2 *chan_eng = GetMatrix(list,"ChannelCharge",8000,0,64000,20,0,20);
+    chan_eng->Fill(hit->Charge(),hit->GetChannel());
   }
   if(numobj!=list->GetSize())
     list->Sort();
-
-
 }
