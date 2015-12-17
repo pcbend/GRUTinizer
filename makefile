@@ -58,9 +58,8 @@ LINKFLAGS := $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX) $(CFLAGS)
 ROOT_LIBFLAGS := $(shell root-config --cflags)
 
 UTIL_O_FILES    := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard util/*.$(SRC_SUFFIX)))
-SANDBOX_O_FILES := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard sandbox/*.$(SRC_SUFFIX)))
 MAIN_O_FILES    := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard src/*.$(SRC_SUFFIX)))
-EXE_O_FILES     := $(UTIL_O_FILES) $(SANDBOX_O_FILES)
+EXE_O_FILES     := $(UTIL_O_FILES)
 EXECUTABLES     := $(patsubst %.o,bin/%,$(notdir $(EXE_O_FILES))) bin/grutinizer
 
 HISTOGRAM_SO    := $(patsubst histos/%.$(SRC_SUFFIX),libraries/lib%.so,$(wildcard histos/*.$(SRC_SUFFIX)))
@@ -95,9 +94,6 @@ bin/grutinizer-config: util/grutinizer-config | bin
 
 bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT) bin
 	$(call run_and_test,$(CPP) $^ -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
-
-bin/%: .build/sandbox/%.o | $(LIBRARY_OUTPUT) bin
-	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) bin
 	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
