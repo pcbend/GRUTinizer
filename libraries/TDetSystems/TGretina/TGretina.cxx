@@ -1,3 +1,7 @@
+#include <fstream>
+#include <string>
+#include <sstream>
+
 #include "TGretina.h"
 
 #include "TGEBEvent.h"
@@ -61,6 +65,7 @@ void TGretina::SetCRMAT() {
     /* Attempt to read the next line. */
     st = fgets(str, 256, fp);
   }
+  SetSegmentCRMAT();
   fCRMATSet = true;
   //printf("Read %i rotation matrix coefficients.\n", nn);
   /* Done! */
@@ -69,12 +74,14 @@ void TGretina::SetCRMAT() {
 void TGretina::SetSegmentCRMAT() {
   if(fCRMATSet)
     return;
-  FILE *infile;
+  //FILE *infile;
   int NUMSEG = 36;
   std::string temp = getenv("GRUTSYS");
-  temp.append("/libraries/TDetSystems/TGretina/crmat.dat");
-  infile = fopen(temp.c_str(),"r");
-  if(!infile) {
+  temp.append("/libraries/TDetSystems/TGretina/crmat_segpos.dat");
+  //infile = fopen(temp.c_str(),"r");
+  std::ifstream infile;
+  infile.open(temp.c_str());
+  if(!infile.is_open()) {
     return;
   }
   // notice: In file type-A is first, then 
@@ -82,10 +89,34 @@ void TGretina::SetSegmentCRMAT() {
   //         det_ids in the data stream we
   //         define type=0 for type-B not
   //         type-A.
+  //
+  //printf("filename: %s\n",temp.c_str());
+  std::string line;
+  int type = 0;
+  int seg  = 0;
+  while(getline(infile,line)) {
+    if(seg==NUMSEG) {
+      seg  = 0;
+      type = 1;
+    }
+    //printf("%s\n",line.c_str());
+    std::stringstream ss(line);
+    int segread;
+    double x,y,z;
+    ss >> segread >> x >> y >> z;
+    if((seg+1)!=segread) {
+      fprintf(stderr,"%s: seg[%i] read but seg[%i] expected.\n",__PRETTY_FUNCTION__,segread,seg+1);
+    }
+    m_segpos[(type+1)%2][seg][0] = x;
+    m_segpos[(type+1)%2][seg][1] = y;
+    m_segpos[(type+1)%2][seg][2] = z;
+    seg++;
+  }
+  /*
   for(int type=0;type<2;type++) {
     for(int seg=0;seg<NUMSEG;seg++) {
       int rtval,segread;
-      rtval=fscanf(infile, "%d %lf %lf %lf",
+      rtval=fscanf(infile, "%d %lf %lf %lf",  ///CHANGE ME TO A SS!!
                    &segread,
                    m_segpos[(type+1)%2][seg][0],
                    m_segpos[(type+1)%2][seg][1],
@@ -99,7 +130,9 @@ void TGretina::SetSegmentCRMAT() {
       }
     }
   }
-  fclose(infile);
+  */
+  infile.close();
+  //fclose(infile);
 }
 
 
@@ -110,6 +143,21 @@ TVector3 TGretina::GetSegmentPosition(int cry_id,int segment) {
   float z = m_segpos[cry_id%2][segment][2];
   return CrystalToGlobal(cry_id,x,y,z);
 }
+
+TVector3 TGretina::GetCrystalPosition(int cry_id) {
+  SetCRMAT();
+  TVector3 v;
+  v.SetXYZ(0.0,0.0,0.0);
+  for(int i=0;i<6;i++) {
+    TVector3 a = GetSegmentPosition(cry_id,i);
+    v.SetXYZ(v.X()+a.X(),v.Y()+a.Y(),v.Z()+a.Z());
+  }
+  v.SetXYZ(v.X()/6.0,v.Y()/6.0,v.Z()/6.0);
+  return v;      
+}
+
+
+
 
 void TGretina::Copy(TObject& obj) const {
   TDetector::Copy(obj);

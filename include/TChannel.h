@@ -84,9 +84,9 @@ public:
   const char* GetCollectedCharge() const { return fMnemonic.collectedcharge.c_str(); }
 
   std::vector<double> GetEnergyCoeff()    const { return energy_coeff; }
-  void                AddEnergyCoeff(double &tmp)    { energy_coeff.push_back(tmp); }
+  void                AddEnergyCoeff(double  tmp)    { energy_coeff.push_back(tmp); }
   std::vector<double> GetEfficiencyCoeff() const { return efficiency_coeff; }
-  void                AddEfficiencyCoeff(double &tmp) { efficiency_coeff.push_back(tmp); }
+  void                AddEfficiencyCoeff(double  tmp) { efficiency_coeff.push_back(tmp); }
 
   void DestroyEnergyCoeff()    { energy_coeff.clear(); }
   void DestroyEfficiencyCoeff() { efficiency_coeff.clear(); }

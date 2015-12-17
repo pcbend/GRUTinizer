@@ -39,7 +39,9 @@ TChainLoop::TChainLoop(std::string name, TChain *chain)
     SetupChain();
 }
 
-TChainLoop::~TChainLoop() { }
+TChainLoop::~TChainLoop() {
+
+}
 
 int TChainLoop::SetupChain() {
   if(!input_chain)
@@ -64,6 +66,8 @@ int TChainLoop::SetupChain() {
 
 bool TChainLoop::Iteration() {
   if(fEntriesRead >= fEntriesTotal){
+    if(hist_loop)
+      hist_loop->SendStop();
     return false;
   }
 

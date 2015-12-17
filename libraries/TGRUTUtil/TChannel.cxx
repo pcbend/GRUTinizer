@@ -47,15 +47,15 @@ void TChannel::Print(Option_t *opt) const {
 
 std::string TChannel::PrintToString(Option_t *opt) const {
   std::string output;
-  output.append("%s:  {\n",GetName());
-  output.append("Address: \t0x%08x\n",address);
-  output.append("Number:  \t%i\n",number);
-  output.append("Info:    \t%s\n",info.c_str());
-  output.append("EnergyCoeff:  ");
-  for(auto &i : energy_coeff) { output.append("\t%.04f",i); }
+  output.append(Form("%s:  {\n",GetName()));
+  output.append(Form("Address: \t0x%08x\n",address));
+  output.append(Form("Number:  \t%i\n",number));
+  output.append(Form("Info:    \t%s\n",info.c_str()));
+  output.append(Form("EnergyCoeff:  "));
+  for(auto &i : energy_coeff) { output.append(Form("\t%.04f",i)); }
   output.append("\n");
   output.append("EfficienyCoeff:");
-  for(auto &i : efficiency_coeff) { output.append("\t%.04f",i); }
+  for(auto &i : efficiency_coeff) { output.append(Form("\t%.04f",i)); }
   output.append("\n}\n-----------------------------------\n");
   return output;
 }

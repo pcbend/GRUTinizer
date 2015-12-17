@@ -9,6 +9,9 @@
 
 #include "TUnpackedEvent.h"
 
+class TH1;
+class TH2;
+
 /// Object passed to the online histograms.
 /**
    For each event, an instance of this type will be passed to the custom histogrammer.
@@ -33,9 +36,12 @@ public:
   TList& GetObjects();
   TList& GetVariables();
 
-  void FillHistogram(std::string name,
+  TH1* FillHistogram(std::string name,
                      int bins, double low, double high, double value);
-  void FillHistogram(std::string name,
+  TH2* FillHistogram(std::string name,
+                     int Xbins, double Xlow, double Xhigh, double Xvalue,
+                     int Ybins, double Ylow, double Yhigh, double Yvalue);
+  TH2* FillHistogramSym(std::string name,
                      int Xbins, double Xlow, double Xhigh, double Xvalue,
                      int Ybins, double Ylow, double Yhigh, double Yvalue);
 

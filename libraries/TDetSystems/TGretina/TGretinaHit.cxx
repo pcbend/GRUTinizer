@@ -3,6 +3,8 @@
 #include <cmath>
 #include <set>
 
+#include <TRandom.h>
+
 #include "TGretina.h"
 
 struct interaction_point {
@@ -48,6 +50,21 @@ void TGretinaHit::Copy(TObject &rhs) const {
   //}
 }
 
+Float_t TGretinaHit::GetCoreEnergy(int i) const {
+  float charge = (float)GetCoreCharge(i) + gRandom->Uniform();
+  TChannel *channel = TChannel::GetChannel(GetAddress()+i);
+  if(!channel)
+    return charge;
+  return channel->CalEnergy(charge);
+}
+
+const char *TGretinaHit::GetName() const {
+  std::string name = "";
+  TChannel *channel = TChannel::GetChannel(GetAddress());
+  if(!channel)
+    return name.c_str();
+  return channel->GetName();
+}
 
 void TGretinaHit::BuildFrom(const TRawEvent::GEBBankType1& raw){
   //SetAddress(kDetectorSystems::GRETINA, 1, raw.crystal_id);

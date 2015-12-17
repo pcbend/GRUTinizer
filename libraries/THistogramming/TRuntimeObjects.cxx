@@ -12,32 +12,46 @@ TRuntimeObjects::TRuntimeObjects(TUnpackedEvent& detectors, TList* objects, TLis
                                  TDirectory* directory)
   : detectors(detectors), objects(objects), variables(variables), directory(directory) { }
 
-void TRuntimeObjects::FillHistogram(std::string name,
+TH1* TRuntimeObjects::FillHistogram(std::string name,
                                     int bins, double low, double high, double value){
   TH1* hist = (TH1*) GetObjects().FindObject(name.c_str());
-  if(hist){
-    hist->Fill(value);
-  } else {
-    TH1* newHist = new TH1I(name.c_str(),name.c_str(),bins,low,high);
-    newHist->Fill(value);
-    GetObjects().Add(newHist);
+  if(!hist){
+    hist = new TH1I(name.c_str(),name.c_str(),bins,low,high);
+    GetObjects().Add(hist);
   }
+  hist->Fill(value);
+  return hist;
 }
 
-void TRuntimeObjects::FillHistogram(std::string name,
+TH2* TRuntimeObjects::FillHistogram(std::string name,
                                     int Xbins, double Xlow, double Xhigh, double Xvalue,
                                     int Ybins, double Ylow, double Yhigh, double Yvalue){
   TH2* hist = (TH2*) GetObjects().FindObject(name.c_str());
-  if(hist){
-    hist->Fill(Xvalue, Yvalue);
-  } else {
-    TH2* newHist = new TH2I(name.c_str(),name.c_str(),
+  if(!hist){
+    hist = new TH2I(name.c_str(),name.c_str(),
                             Xbins, Xlow, Xhigh,
                             Ybins, Ylow, Yhigh);
-    newHist->Fill(Xvalue, Yvalue);
-    GetObjects().Add(newHist);
+    GetObjects().Add(hist);
   }
+  hist->Fill(Xvalue, Yvalue);
+  return hist;
 }
+
+TH2* TRuntimeObjects::FillHistogramSym(std::string name,
+                                    int Xbins, double Xlow, double Xhigh, double Xvalue,
+                                    int Ybins, double Ylow, double Yhigh, double Yvalue){
+  TH2* hist = (TH2*) GetObjects().FindObject(name.c_str());
+  if(!hist){
+    hist = new TH2I(name.c_str(),name.c_str(),
+                            Xbins, Xlow, Xhigh,
+                            Ybins, Ylow, Yhigh);
+    GetObjects().Add(hist);
+  }
+  hist->Fill(Xvalue, Yvalue);
+  hist->Fill(Yvalue, Xvalue);
+  return hist;
+}
+
 
 TList& TRuntimeObjects::GetObjects() {
   return *objects;
