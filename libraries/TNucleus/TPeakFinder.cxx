@@ -53,7 +53,7 @@ Bool_t TPeakFinder::PeaksForFit(){
   std::string totalString,nameString,eat;
   ifstream inFile;
   Double_t enHolder = 0.0;
-  totalString = program_path()+"/../libraries/SourceData/";
+  totalString = std::string(getenv("GRUTSYS"))+"/../libraries/SourceData/";
   ssFile1 << this->GetNucleus()->GetName();
   ssFile1 << "_FitLines.sou";
   ssFile1 >> nameString;
