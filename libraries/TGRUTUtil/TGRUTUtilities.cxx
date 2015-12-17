@@ -4,54 +4,35 @@
 #include <iostream>
 #include <fstream>
 
-#include <TString.h>
-#include <TRegexp.h>
-#include <TPRegexp.h>
+#include "TObjArray.h"
+#include "TObjString.h"
+#include "TPRegexp.h"
+#include "TString.h"
 
 
 bool file_exists(const char *filename){
   //std::ifstream(filename);
-  struct stat buffer;  
+  struct stat buffer;
   return (stat(filename,&buffer)==0);
 }
 
 std::string get_run_number(std::string input) {
+  TPRegexp re(
+    "(" // Begin capturing group.  This will hold the final return value
+       "([0-9]+-)?" //One or more digits, followed by a dash.  This section may not be present.
+       "[0-9]+" //Followed by one or more digits
+    ")" // End capturing group.
+    "[^0-9]*$" // With no other digits before the end of the filename
+  );
+  TObjArray* matches = re.MatchS(input.c_str());
 
-  TPRegexp pnumber("([0-9]+-)?[0-9]+");
-
-  TRegexp number("[0-9]");
-  TString sinput = input.c_str();
-  int i=0;
-  std::string toreturn ="";
-  
-  while(true) {
-    int result = sinput.Index(number,i);
-    if(result == -1) {
-      if(i==0)
-        i=-1;
-      break;
-    }
-    i = result+1;
+  std::string output;
+  if(matches->GetEntriesFast() >= 2){
+    // Return a std::vector<std::string> ?
+    // No, that would be too simple, too type-safe, and too memory-safe for ROOT.
+    output = ((TObjString*)matches->At(1))->GetString();
   }
-  i-=1;
-  //std::cout << "Input string: \"" << input << "\"" << std::endl;
-  //std::cout << "Found last numeral at " << i << std::endl;
-  //std::cout << "Last numeral is '" << sinput[i] << "'" << std::endl;
-  if(i==-1)
-    return toreturn;
-  int end = i;
-  for(i=end; i>0; i--){
-    if(sinput.Index(pnumber,i) != i){
-      i++;
-      break;
-    }
-  }
-  //std::cout << "Found run number start at " << i << std::endl;
-  int begin = i;
-  return input.substr(begin, end-begin+1);
-  
+  delete matches;
 
-  
+  return output;
 }
-
-
