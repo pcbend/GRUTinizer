@@ -110,6 +110,21 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .description("Show this help message");
 
 
+  // Look for any arguments ending with .info, pass to parser.
+  for(int i=0; i<argc; i++){
+    std::string filename = argv[i];
+    if(DetermineFileType(filename) == kFileType::CONFIG_FILE){
+      try{
+        parser.parse_file(filename);
+      } catch (ParseError& e){
+        std::cerr << "ERROR: " << e.what() << "\n"
+                  << parser << std::endl;
+        fShouldExit = true;
+      }
+    }
+  }
+
+  // Look at the command line.
   try{
     parser.parse(argc, argv);
   } catch (ParseError& e){
@@ -118,6 +133,7 @@ void TGRUTOptions::Load(int argc, char** argv) {
     fShouldExit = true;
   }
 
+  // Print help if requested.
   if(fHelp){
     std::cout << parser << std::endl;
     fShouldExit = true;
@@ -152,7 +168,6 @@ void TGRUTOptions::Load(int argc, char** argv) {
   for(auto& file : input_files){
     FileAutoDetect(file);
   }
-
 }
 
 kFileType TGRUTOptions::DetermineFileType(const std::string& filename) const{
@@ -183,6 +198,8 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename) const{
     return kFileType::GUI_HIST_FILE;
   } else if (ext == "so") {
     return kFileType::COMPILED_HISTOGRAMS;
+  } else if (ext == "info") {
+    return kFileType::CONFIG_FILE;
   } else {
     return kFileType::UNKNOWN_FILETYPE;
   }
@@ -193,7 +210,6 @@ bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
     case kFileType::NSCL_EVT:
     case kFileType::GRETINA_MODE2:
     case kFileType::GRETINA_MODE3:
-      //std::cout << get_run_number(filename) << std::endl;
       input_raw_files.push_back(filename);
       return true;
 
@@ -220,6 +236,9 @@ bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
     case kFileType::COMPILED_HISTOGRAMS:
       compiled_histogram_file = filename;
       return true;
+
+    case kFileType::CONFIG_FILE:
+      return false;
 
     case kFileType::UNKNOWN_FILETYPE:
       printf("\tDiscarding unknown file: %s\n",filename.c_str());

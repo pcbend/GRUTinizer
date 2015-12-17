@@ -1,6 +1,7 @@
 #ifndef _ARGPARSER_H_
 #define _ARGPARSER_H_
 
+#include <fstream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -11,14 +12,19 @@ struct ParseError : public std::runtime_error{
   ParseError(const std::string& msg) : std::runtime_error(msg) { }
 };
 
+//// Because gcc-4.7 does not fully implement C++11
 // struct ParseError : public std::runtime_error{
 //   using std::runtime_error::runtime_error;
 // };
 
+
+/** Base class used to parse an individual item.
+    Most methods are implemented in the templated ArgParseConfig<T>
+ */
 class ArgParseItem{
 public:
   ArgParseItem() : present_(false) { }
-  virtual ~ArgParseItem(){ }
+  virtual ~ArgParseItem() { }
   virtual bool matches(const std::string& flag) const = 0;
   virtual void parse_item(const std::vector<std::string>& arguments) = 0;
   virtual int num_arguments() const = 0;
@@ -27,17 +33,20 @@ public:
   bool is_present() const {return present_;}
   virtual std::string flag_name() const = 0;
 
-  void parse(const std::string& name, const std::vector<std::string>& arguments){
-    if((num_arguments()==-1 && arguments.size()==0) ||
-       (num_arguments()!=-1 && arguments.size() != size_t(num_arguments()))){
-      std::stringstream ss;
-      if(num_arguments()==-1){
-        ss << "Flag \"" << name << "\" expected at least one argument";
-      } else {
-        ss << "Flag \"" << name << "\" expected " << num_arguments()
-           << " argument(s) and received " << arguments.size();
+  void parse(const std::string& name, const std::vector<std::string>& arguments,
+             bool ignore_num_arguments=false){
+    if(!ignore_num_arguments){
+      if((num_arguments()==-1 && arguments.size()==0) ||
+         (num_arguments()!=-1 && arguments.size() != size_t(num_arguments()))){
+        std::stringstream ss;
+        if(num_arguments()==-1){
+          ss << "Flag \"" << name << "\" expected at least one argument";
+        } else {
+          ss << "Flag \"" << name << "\" expected " << num_arguments()
+             << " argument(s) and received " << arguments.size();
+        }
+        throw ParseError(ss.str());
       }
-      throw ParseError(ss.str());
     }
 
     present_ = true;
@@ -57,6 +66,7 @@ public:
     while(!ss.eof()){
       std::string temp;
       ss >> temp;
+      raw_flags.push_back(temp);
       if(temp.length() == 1){
         flags.push_back("-" + temp);
       } else if (temp.length() > 1) {
@@ -152,8 +162,16 @@ public:
   }
 
 protected:
+  /// A description for display on the terminal.
   std::string desc;
+
+  /// The literal flag that is searched for, including leading dashes.
   std::vector<std::string> flags;
+
+  /// The flags without the leading dashes.
+  std::vector<std::string> raw_flags;
+
+  /// Whether the flag must be supplied.
   bool required_;
 };
 
@@ -195,8 +213,13 @@ public:
     return *this;
   }
 
-  virtual void parse_item(const std::vector<std::string>& /*arguments*/){
-    *output_location = !stored_default_value;
+  virtual void parse_item(const std::vector<std::string>& arguments){
+    if(arguments.size() == 0){
+      *output_location = !stored_default_value;
+    } else {
+      std::stringstream ss(arguments[0]);
+      ss >> *output_location;
+    }
   }
 
   virtual int num_arguments() const { return 0; }
@@ -262,11 +285,54 @@ public:
       }
     }
 
-    for(auto val : values){
+    for(auto& val : values){
       if(val->is_required() && !val->is_present()){
         std::stringstream ss;
         ss << "Required argument \"" << val->flag_name() << "\" is not present";
         throw ParseError(ss.str());
+      }
+    }
+  }
+
+  void parse_file(std::string& filename) {
+    std::ifstream infile(filename);
+
+    std::string line;
+    while(std::getline(infile, line)){
+      size_t colon = line.find(":");
+      bool has_colon = (colon != std::string::npos);
+
+      std::string flag;
+      std::string remainder;
+      if(has_colon){
+        flag = line.substr(0,colon);
+        std::stringstream(flag) >> flag; //Strip out whitespace
+        if(flag.length()==1){
+          flag = "-" + flag;
+        } else {
+          flag = "--" + flag;
+        }
+        remainder = line.substr(colon+1, line.length());
+      } else {
+        flag = "";
+        remainder = line;
+      }
+
+      std::vector<std::string> args;
+      std::stringstream ss(remainder);
+      std::string arg;
+      while(ss >> arg){
+        args.push_back(arg);
+      }
+
+      if(has_colon){
+        ArgParseItem& item = get_item(flag);
+        item.parse(flag, args, true);
+      } else {
+        for(auto& arg : args){
+          ArgParseItem& item = get_item(arg);
+          item.parse(arg, std::vector<std::string>{arg});
+        }
       }
     }
   }
