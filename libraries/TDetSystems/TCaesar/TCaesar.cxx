@@ -63,23 +63,27 @@ void TCaesar::Build_Single_Read(TSmartBuffer buf){
       data += fera_header->size * 2; // Size is inclusive number of 16-bit values.
       continue;
     }
+    const char* fera_end = data + fera_header->size*2;
     data += sizeof(TRawEvent::CAESARFeraHeader);
+    
 
-    TRawEvent::CAESARFera* fera = (TRawEvent::CAESARFera*)data;
-    int nchan = fera->number_chans();
-    if(nchan==0){
-      nchan = 16;
-    }
-
-    for(int i=0; i<nchan; i++){
-      if(fera_header->tag == FERA_ENERGY_ID){
-	SetCharge(fera->vsn(), fera->items[i].channel(), fera->items[i].value());
-      } else { //FERA_TIME_ID
-	SetTime(fera->vsn(), fera->items[i].channel(), fera->items[i].value());
+    while(data < fera_end){
+      TRawEvent::CAESARFera* fera = (TRawEvent::CAESARFera*)data;
+      int nchan = fera->number_chans();
+      if(nchan==0){
+	nchan = 16;
       }
-    }
 
-    data += fera_header->size * 2 - sizeof(TRawEvent::CAESARFeraHeader); // Size is inclusive number of 16-bit values.
+      for(int i=0; i<nchan; i++){
+	if(fera_header->tag == FERA_ENERGY_ID){
+	  SetCharge(fera->vsn(), fera->items[i].channel(), fera->items[i].value());
+	} else { //FERA_TIME_ID
+	  SetTime(fera->vsn(), fera->items[i].channel(), fera->items[i].value());
+	}
+      }
+
+      data += 2*fera->number_chans() + 2;
+    }
   }
 }
 

@@ -105,7 +105,7 @@ typedef struct {
 typedef struct {
   Short_t header;
   Short_t number_chans() { return  ((header & 0x7800)>>11); }
-  Short_t vsn()          { return   (header & 0x00ff); }
+  Short_t vsn()          { return   (header & 0x00ff)-1; }
   CAESARFeraItem items[16];
 
 }__attribute__((__packed__)) CAESARFera;

@@ -21,7 +21,12 @@ public:
   void SetChannel(int channel)	{ fChannel = channel;	}
   void SetCharge(int charge)	{ fCharge = charge;	}
   void SetTime(int time)	{ fTime = time;		}
-  
+
+  int GetFullChannel() const {
+    return GetVSN()*16 + GetChannel();
+  }
+
+  bool IsValid() const { return fCharge!=-1 && fTime!=-1; }
 
   //TVector3 GetPosition() const;
 
