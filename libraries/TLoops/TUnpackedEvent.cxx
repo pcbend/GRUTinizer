@@ -3,6 +3,7 @@
 #include "TClass.h"
 
 #include "TBank29.h"
+#include "TCaesar.h"
 #include "TGretina.h"
 #include "TJanus.h"
 #include "TMode3.h"
@@ -59,8 +60,11 @@ void TUnpackedEvent::AddRawData(const TRawEvent& event, kDetectorSystems detecto
     GetDetector<TFastScint>(true)->AddRawData(event);
     break;
 
-    // Not implemented yet.
   case kDetectorSystems::CAESAR:
+    GetDetector<TCaesar>(true)->AddRawData(event);
+    break;
+    
+    // Not implemented yet.
   case kDetectorSystems::PHOSWALL:
     break;
   }

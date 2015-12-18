@@ -1,4 +1,4 @@
-// TJanus.h TJanusHit.h
+// TCaesar.h TCaesarHit.h
 
 #ifdef __CINT__
 
@@ -7,8 +7,8 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class TJanusHit+;
-#pragma link C++ class std::vector<TJanusHit>+;
-#pragma link C++ class TJanus+;
+#pragma link C++ class TCaesarHit+;
+#pragma link C++ class std::vector<TCaesarHit>+;
+#pragma link C++ class TCaesar+;
 
 #endif
