@@ -17,7 +17,6 @@ enum kDetectorSystems {
   JANUS = 65,
   FASTSCINT =4,
 
-
   CAESAR = 80,
 
   PHOSWALL = 17

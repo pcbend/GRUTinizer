@@ -83,10 +83,32 @@ struct M_TDC_Data{
 
 
 
+typedef struct {
+  Int_t   totalsize;
+  Short_t moresize;
+  Short_t tag;
+  Short_t version;
+  Short_t ulm;
+}__attribute__((__packed__)) CAESARHeader;
 
+typedef struct {
+  Short_t size; // Inclusive number of 16-bit values
+  Short_t tag;
+}__attribute__((__packed__)) CAESARFeraHeader;
 
+typedef struct {
+  Short_t data;
+  Short_t channel()  { return  ((data & 0x7800)>>11); }
+  Short_t value()    { return   (data & 0x07ff); }
+}__attribute__((__packed__)) CAESARFeraItem;
 
+typedef struct {
+  Short_t header;
+  Short_t number_chans() { return  ((header & 0x7800)>>11); }
+  Short_t vsn()          { return   (header & 0x00ff); }
+  CAESARFeraItem items[16];
 
+}__attribute__((__packed__)) CAESARFera;
 
 
 
