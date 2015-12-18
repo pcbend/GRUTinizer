@@ -71,8 +71,6 @@ void StoppableThread::StopAllClean() {
     thread->Join();
   }
 
-  stop_status_thread();
-
   for(auto& elem : fthreadmap){
     std::cout << "Deleting thread " << elem.first << std::endl;
     StoppableThread* thread = elem.second;

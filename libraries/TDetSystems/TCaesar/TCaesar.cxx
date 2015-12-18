@@ -5,7 +5,9 @@
 #define FERA_TIME_ID   0x2301
 #define FERA_ENERGY_ID 0x2302
 
-TCaesar::TCaesar() { }
+TCaesar::TCaesar() {
+  Clear();
+}
 
 TCaesar::~TCaesar(){ }
 
@@ -68,7 +70,7 @@ void TCaesar::Build_Single_Read(TSmartBuffer buf){
     if(nchan==0){
       nchan = 16;
     }
-    
+
     for(int i=0; i<nchan; i++){
       if(fera_header->tag == FERA_ENERGY_ID){
 	SetCharge(fera->vsn(), fera->items[i].channel(), fera->items[i].value());
@@ -76,7 +78,7 @@ void TCaesar::Build_Single_Read(TSmartBuffer buf){
 	SetTime(fera->vsn(), fera->items[i].channel(), fera->items[i].value());
       }
     }
-    
+
     data += fera_header->size * 2 - sizeof(TRawEvent::CAESARFeraHeader); // Size is inclusive number of 16-bit values.
   }
 }
