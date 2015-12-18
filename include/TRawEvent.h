@@ -34,6 +34,8 @@ public:
   const char *GetBody() const;
   TSmartBuffer& GetBuffer(){ return fBody; }
 
+  const char* GetPayload() const;
+
   void SetData(TSmartBuffer body);
 
   bool IsGoodSize() const;

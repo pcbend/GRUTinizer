@@ -117,15 +117,17 @@ void TWriteLoop::LearningPhase(TUnpackedEvent* event) {
     TClass* cls = det->IsA();
     if(!det_map.count(cls)){
       TThread::Lock();
-      std::cout << "LearningPhase has locked" << std::endl;
       TDetector** det = new TDetector*;
       *det = (TDetector*)cls->New();
-      std::cout << "Made detector" << std::endl;
+      std::cout << "\r";
+      for(int i=0; i<30; i++){
+	std::cout << " ";
+      }
+      std::cout << "\rAdded \"" << cls->GetName() << "\" branch" << std::endl;
       det_map[cls] = det;
       // TODO: Place this mutex here
       event_tree->Branch(cls->GetName(), cls->GetName(), det);
       TThread::UnLock();
-      std::cout << "LearningPhase has unlocked" << std::endl;
     }
   }
   learning_queue.push_back(event);

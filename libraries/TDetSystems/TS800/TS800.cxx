@@ -224,16 +224,18 @@ void TS800::Clear(Option_t* opt){
 
 int TS800::BuildHits(){
   for(auto& event : raw_data) { // should only be one..
-    TGEBEvent* geb = (TGEBEvent*)&event;
-    SetTimestamp(geb->GetTimestamp());
+    SetTimestamp(event.GetTimestamp());
+    // TGEBEvent* geb = (TGEBEvent*)&event;
+    // SetTimestamp(geb->GetTimestamp());
     int ptr = 0;
-    const TRawEvent::GEBS800Header *head = ((const TRawEvent::GEBS800Header*)geb->GetPayload());
+    //    const TRawEvent::GEBS800Header *head = ((const TRawEvent::GEBS800Header*)geb->GetPayload());
+    const TRawEvent::GEBS800Header *head = ((const TRawEvent::GEBS800Header*)event.GetPayload());
     ptr += sizeof(TRawEvent::GEBS800Header);
       //  Here, we are now pointing at the size of the next S800 thing.  Inclusive in shorts.
       //  std::string buffer = Form("all0x%04x",*((unsigned short*)(geb->GetPayload()+ptr+2)));
     //printf("head.total_size == %i\n",head->total_size); fflush(stdout);
     //printf("sizeof(TRawEvent::GEBS800Header) == %i \n",sizeof(TRawEvent::GEBS800Header));
-    unsigned short *data = (unsigned short*)(geb->GetPayload()+ptr);
+    unsigned short *data = (unsigned short*)(event.GetPayload()+ptr);
     //printf("\t0x%04x\t0x%04x\t0x%04x\t0x%04x\n",*data,*(data+1),*(data+2),*(data+3));
     //while(ptr<((head->total_size*2)-2)) {
     std::string toprint = "all";

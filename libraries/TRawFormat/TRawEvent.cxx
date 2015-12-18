@@ -115,6 +115,27 @@ Long_t TRawEvent::GetTimestamp() const {
   return 0;
 }
 
+const char* TRawEvent::GetPayload() const {
+  if( fFileType == kFileType::UNKNOWN_FILETYPE) {
+    printf("Unknown filetype: Size = %i\n",GetTotalSize());
+    fflush(stdout);
+    Print("all");
+    //return 0;
+  }
+  assert(fFileType != kFileType::UNKNOWN_FILETYPE);
+
+  switch(fFileType){
+   case NSCL_EVT:
+     return ((TNSCLEvent*)this)->GetPayload();
+
+   case GRETINA_MODE2:
+   case GRETINA_MODE3:
+     return ((TGEBEvent*)this)->GetPayload();
+  };
+
+  return 0;
+}
+
 Int_t TRawEvent::GetTotalSize() const {
   return GetBodySize() + sizeof(RawHeader);
 }

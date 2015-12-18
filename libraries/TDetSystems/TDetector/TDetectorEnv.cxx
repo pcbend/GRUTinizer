@@ -124,15 +124,15 @@ kDetectorSystems TDetectorEnv::DetermineSystem(int source_id) const {
   kDetectorSystems output = kDetectorSystems::UNKNOWN_SYSTEM;
 
   for(auto& system : Get().source_ids){
+    if(output != kDetectorSystems::UNKNOWN_SYSTEM){
+      break;
+    }
+
     for(auto id : system.second){
       if(id == source_id){
         output = system.first;
         break;
       }
-    }
-
-    if(output != kDetectorSystems::UNKNOWN_SYSTEM){
-      break;
     }
   }
 
