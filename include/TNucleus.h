@@ -20,7 +20,7 @@ class TNucleus : public TNamed{
 
  private:
   static const char *grsipath;
-  static std::string massfile; //The massfile to be used, which includes Z, N, atomic symbol, and mass excess
+  static std::string& massfile(); //The massfile to be used, which includes Z, N, atomic symbol, and mass excess
   //static const char *massfile; //The massfile to be used, which includes Z, N, atomic symbol, and mass excess
   //static std::string masspath;
 
@@ -31,7 +31,7 @@ class TNucleus : public TNamed{
   TNucleus(int Z, int N, const char* MassFile = 0);                      // Creates a nucleus with Z, N using mass table (default MassFile = "mass.dat")
 
   virtual ~TNucleus();
-	
+
   //static void SetMassFile(const char *tmp = NULL);// {massfile = tmp;} //Sets the mass file to be used
 
   static const char* SortName(const char *name);
@@ -62,10 +62,10 @@ class TNucleus : public TNamed{
   void AddTransition(TTransition *tran);
   //Bool_t RemoveTransition(Int_t idx);
   TTransition *GetTransition(Int_t idx);
-  
+
   Int_t NTransitions() const { return TransitionList.GetSize();};
-  double GetRadius() const;					
-  int GetZfromSymbol(char*);				
+  double GetRadius() const;
+  int GetZfromSymbol(char*);
 
   TList TransitionList;
   //bool SetSourceData();
@@ -76,7 +76,7 @@ class TNucleus : public TNamed{
 
 
 private:
-  int fA; 						// Number of nucleons (Z + N) 
+  int fA; 						// Number of nucleons (Z + N)
   int fN;						// Number of neutrons (N)
   int fZ;						// Number of protons (Z)
   double fMass;						// Mass (in MeV)
@@ -93,4 +93,3 @@ private:
 
 
 #endif
-

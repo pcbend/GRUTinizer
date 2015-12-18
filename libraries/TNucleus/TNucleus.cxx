@@ -30,7 +30,10 @@ ClassImp(TNucleus);
 static double amu = 931.494043;
 //static double MeV2Kg = 1.77777778e-30;
 
-std::string TNucleus::massfile = std::string(getenv("GRUTSYS")) + "/../libraries/SourceData/mass.dat";
+std::string& TNucleus::massfile(){
+  static std::string output = std::string(getenv("GRUTSYS")) + "/../libraries/SourceData/mass.dat";
+  return output;
+}
 //const char *TNucleus::massfile = mfile.c_str();
 
 
@@ -80,7 +83,7 @@ TNucleus::TNucleus(const char *name){
 	element.append(std::to_string((long long)Number)); element.append(symbol);
 	std::string line;
 	std::ifstream infile;
-	std::string MassFile = massfile;//getenv("GRSISYS");
+	std::string MassFile = massfile();//getenv("GRSISYS");
         //MassFile.append(massfile);
 	infile.open(MassFile.c_str());
         //printf("MassFile.c_str()
@@ -100,7 +103,7 @@ TNucleus::TNucleus(const char *name){
 		}
 	}
 	if(!found) {
-		printf("Warning: Element %s not found in the mass table %s.\n Nucleus not Set!\n",element.c_str(),massfile.c_str());
+		printf("Warning: Element %s not found in the mass table %s.\n Nucleus not Set!\n",element.c_str(),MassFile.c_str());
 		return;
 	}
 	infile.close();
@@ -131,10 +134,8 @@ TNucleus::TNucleus(int charge, int neutrons, const char* MassFile){
 // Creates a nucleus with Z, N using mass table (default MassFile = "mass.dat")
   //SetMassFile();
   if(!MassFile) {
-	  std::string SMassFile = massfile;//getenv("GRSISYS");
-	  //SMassFile.append(massfile);
-	  MassFile = SMassFile.c_str();
-	}
+    MassFile = massfile().c_str();
+  }
   fZ = charge;
   fN = neutrons;
   int i = 0,n,z;
