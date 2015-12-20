@@ -532,9 +532,9 @@ class MainWindow(object):
         if width*height == 0:
             array = self.get_canvas_size()
             array = map(int,array)
-            canvas = ROOT.GCanvas(title,title,0,0,array[0],array[1])
+            canvas = ROOT.GCanvas(title,title,0,0,array[0],array[1],True)
         else:
-            canvas = ROOT.GCanvas(title,title,topx,topy,width,height);
+            canvas = ROOT.GCanvas(title,title,topx,topy,width,height,True)
         canvas.cd()
 
         if columns*rows == 1:

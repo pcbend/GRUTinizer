@@ -20,6 +20,7 @@
 #include <TGraph.h>
 #include <TPolyMarker.h>
 #include <TSpectrum.h>
+#include <TPython.h>
 
 #include <TApplication.h>
 #include <TContextMenu.h>
@@ -89,9 +90,10 @@ GCanvas::GCanvas(const char* name, Int_t ww, Int_t wh, Int_t winid)
 }
 
 
-GCanvas::GCanvas(const char* name, const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh)
+GCanvas::GCanvas(const char* name, const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,bool gui)
         :TCanvas(name,title,wtopx,wtopy,ww,wh) {
    GCanvasInit();
+   fGuiEnabled = gui;
 }
 
 
@@ -106,13 +108,14 @@ void GCanvas::GCanvasInit() {
    // TRootGuiFactory used in the creation of some of the
    // default gui's (canvas,browser,etc).
    //fStatsDisplayed = true;
-   fMarkerMode     = true;
+   fMarkerMode = true;
    control_key = false;
+   fGuiEnabled = false;
    //if(gVirtualX->InheritsFrom("TGX11")) {
    //    printf("\tusing x11-like graphical interface.\n");
    //}
    //this->SetCrosshair(true);
-  SetBit(kNotDeleted,false); //root voodoo.
+   SetBit(kNotDeleted,false); //root voodoo.
 }
 
 void GCanvas::AddMarker(int x,int y,int dim) {
@@ -624,6 +627,12 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       RemoveMarker("all");
       edited = true;
       break;
+    case kKey_p:
+      if(hists.size()<1)
+        break;
+      printf("you hit the p key.\n");
+
+      break;
     case kKey_z: {
         printf("you pressed z!\n");           
         GCanvas *c = (GCanvas*)gPad->GetCanvas();
@@ -651,10 +660,6 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       }
       edited = true;
       break;
-
-
-
-
 
   };
   return edited;

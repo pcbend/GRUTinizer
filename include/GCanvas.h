@@ -33,7 +33,7 @@ class GCanvas : public TCanvas {
       GCanvas(const char* name, const char* title = "", Int_t form = 1);
       GCanvas(const char* name, const char* title, Int_t ww, Int_t wh);
       GCanvas(const char* name, Int_t ww, Int_t wh, Int_t winid);
-      GCanvas(const char* name, const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh);
+      GCanvas(const char* name, const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,bool gui=false);
       virtual ~GCanvas();
 
       //void ProcessEvent(Int_t event,Int_t x,Int_t y,TObject *obj);
@@ -57,6 +57,8 @@ class GCanvas : public TCanvas {
 
       static int lastx;
       static int lasty;
+
+      bool fGuiEnabled;
 
       //bool fStatsDisplayed;
       bool fMarkerMode;

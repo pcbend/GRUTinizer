@@ -526,7 +526,7 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
     return 0;
   }
   sline.ReplaceAll("TCanvas","GCanvas");
-
+  
   if(std::this_thread::get_id() != main_thread_id){
     return DelayedProcessLine(line);
   }

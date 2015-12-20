@@ -54,7 +54,8 @@ time_t TCompiledHistograms::get_timestamp() {
 }
 
 bool TCompiledHistograms::file_exists() {
-  return std::ifstream(libname);
+  std::ifstream infile(libname);
+  return infile.is_open();
 }
 
 void TCompiledHistograms::Write() {

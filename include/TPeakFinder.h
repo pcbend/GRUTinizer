@@ -5,7 +5,9 @@
 #include <string>
 #include <fstream>
 #include <cstdio>
+#ifndef __CINT__
 #include <sstream>
+#endif
 
 #include "TObject.h"
 #include "TList.h"
