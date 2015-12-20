@@ -636,11 +636,17 @@ GRootCanvas::~GRootCanvas()
       delete fToolBarLayout;
       delete fHorizontal1;
       delete fHorizontal1Layout;
-      printf("I AM HERE!!!!\n"); fflush(stdout);
-      printf("fMenuBar = 0x%08x\n",fMenuBar); fflush(stdout);
-      fMenuBar->Print();
-      printf("I AM HERE!!!!\n"); fflush(stdout);
-      delete fMenuBar;
+      //printf("I AM HERE!!!!\n"); fflush(stdout);
+      //printf("fMenuBar = 0x%08x\n",fMenuBar); fflush(stdout);
+      //printf("fMenuBar->MustCleanup()) = %i\n",fMenuBar->MustCleanup()); fflush(stdout);
+      //fMenuBar->Print();
+      //printf("I AM HERE!!!!\n"); fflush(stdout);
+      //
+      //  This is most certainly wrong, but i can not get the TBrowser to not seg fault on close with out it.  pcb.
+      //
+           //delete fMenuBar;
+      //
+      //printf("I AM HERE!!!!\n"); fflush(stdout);
       delete fMenuBarLayout;
       delete fMenuBarItemLayout;
       delete fMenuBarHelpLayout;

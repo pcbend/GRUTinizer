@@ -9,90 +9,106 @@
 #include<TList.h>
 
 class TChannel : public TNamed {
-  public:
-    TChannel();
-    TChannel(const char*);
-    TChannel(const TChannel&);
+public:
+  TChannel();
+  TChannel(const char*);
+  TChannel(const TChannel&);
 
-    virtual ~TChannel(); 
-  
-    void Print(Option_t *opt="") const;
-    std::string PrintToString(Option_t *opt="") const;
-    void Copy(TObject&)       const;
-    void Clear(Option_t *opt ="");
-    //int  Compare(const TObject*) const;
-    static bool AlphaSort(const TChannel&,const TChannel&);
+  virtual ~TChannel();
 
-  private:
-    unsigned int address;
-    int          number;
-    std::string  info;
-    std::vector<double> energy_coeff;
-    std::vector<double> efficiency_coeff;
-    //name and title held by TNamed.
+  void Print(Option_t *opt="") const;
+  std::string PrintToString(Option_t *opt="") const;
+  void Copy(TObject&)       const;
+  void Clear(Option_t *opt ="");
+  //int  Compare(const TObject*) const;
+  static bool AlphaSort(const TChannel&,const TChannel&);
 
-    //static std::vector<std::string> fFileNames;
-    static std::string fChannelData;
+private:
+  unsigned int address;
+  int          number;
+  std::string  info;
+  std::vector<double> energy_coeff;
+  std::vector<double> efficiency_coeff;
+  //name and title held by TNamed.
 
-    void SetEnergyCoeff(std::vector<double> tmp)    { energy_coeff    = tmp; }
-    void SetEfficiencyCoeff(std::vector<double> tmp) { efficiency_coeff = tmp; }
+  //static std::vector<std::string> fFileNames;
+  static std::string fChannelData;
 
-
-  private:
-    static std::map<unsigned int,TChannel*> fChannelMap;
+  void SetEnergyCoeff(std::vector<double> tmp)    { energy_coeff    = tmp; }
+  void SetEfficiencyCoeff(std::vector<double> tmp) { efficiency_coeff = tmp; }
 
 
-  public:
-    static TChannel* GetChannel(unsigned int);
-    static TChannel* FindChannel(std::string);
-    static bool      AddChannel(TChannel*,Option_t *opt="");
-    static bool      RemoveChannel(TChannel&);
-           bool      AppendChannel(TChannel*);
-           bool      ReplaceChannel(TChannel*);
+private:
+  static std::map<unsigned int,TChannel*> fChannelMap;
+  struct MNEMONIC {
+    std::string system;
+    int array_position;
+    std::string arraysubposition;
+    std::string collectedcharge;
+    int segment;
 
-    static int       DeleteAllChannels();  
-    static int       Size() { return fChannelMap.size(); }
+    void Unpack(std::string name);
+    void Clear(Option_t* opt = "");
+  };
+  MNEMONIC fMnemonic;
 
- 
-  public:
-    void SetAddress(unsigned int temp) { address = temp;           }
-    void SetName(const char *temp)     { TNamed::SetNameTitle(temp,temp); }
-    void SetInfo(const char *temp)     { info.assign(temp); }
-    void SetNumber(int temp)           { number = temp;           } 
+public:
+  static TChannel* GetChannel(unsigned int);
+  static TChannel* FindChannel(std::string);
+  static bool      AddChannel(TChannel*,Option_t *opt="");
+  static bool      RemoveChannel(TChannel&);
+  bool      AppendChannel(TChannel*);
+  bool      ReplaceChannel(TChannel*);
 
-    unsigned int GetAddress() const { return address;           }
-    const char*  GetName()    const { return TNamed::GetName(); }
-    const char*  GetInfo()    const { return info.c_str();      }
-    int          GetNumber()  const { return number;            } 
+  static int       DeleteAllChannels();
+  static int       Size() { return fChannelMap.size(); }
 
-    std::vector<double> GetEnergyCoeff()    const { return energy_coeff; } 
-    void                AddEnergyCoeff(double &tmp)    { energy_coeff.push_back(tmp); } 
-    std::vector<double> GetEfficiencyCoeff() const { return efficiency_coeff; } 
-    void                AddEfficiencyCoeff(double &tmp) { efficiency_coeff.push_back(tmp); } 
 
-    void DestroyEnergyCoeff()    { energy_coeff.clear(); }
-    void DestroyEfficiencyCoeff() { efficiency_coeff.clear(); }
+public:
+  void SetAddress(unsigned int temp) { address = temp;           }
+  void SetName(const char *temp)     {
+    TNamed::SetNameTitle(temp,temp);
+    fMnemonic.Unpack(temp);
+  }
+  void SetInfo(const char *temp)     { info.assign(temp); }
+  void SetNumber(int temp)           { number = temp;           }
 
-    void DestroyCalibrations();
+  unsigned int GetAddress() const { return address;           }
+  const char*  GetName()    const { return TNamed::GetName(); }
+  const char*  GetInfo()    const { return info.c_str();      }
+  int          GetNumber()  const { return number;            }
+  int GetArrayPosition() const { return fMnemonic.array_position; }
+  int GetSegment() const { return fMnemonic.segment; }
+  const char* GetSystem() const { return fMnemonic.system.c_str(); }
+  const char* GetArraySubposition() const { return fMnemonic.arraysubposition.c_str(); }
+  const char* GetCollectedCharge() const { return fMnemonic.collectedcharge.c_str(); }
 
-    double CalEnergy(int);
-    double CalEnergy(double);
-   
-    //double CalEfficiency(int);
-    //double CalEfficiency(double) const;
+  std::vector<double> GetEnergyCoeff()    const { return energy_coeff; }
+  void                AddEnergyCoeff(double  tmp)    { energy_coeff.push_back(tmp); }
+  std::vector<double> GetEfficiencyCoeff() const { return efficiency_coeff; }
+  void                AddEfficiencyCoeff(double  tmp) { efficiency_coeff.push_back(tmp); }
 
-  public:
-    static int ReadCalFile(const char* filename="",Option_t *opt="replace");
-    static int WriteCalFile(std::string filename="",Option_t *opt="");
+  void DestroyEnergyCoeff()    { energy_coeff.clear(); }
+  void DestroyEfficiencyCoeff() { efficiency_coeff.clear(); }
 
-  private:
-    static int  ParseInputData(std::string &input,Option_t *opt);
-    static int  WriteToBuffer(Option_t *opt);
-    static void trim(std::string *, const std::string &trimChars=" \f\n\r\t\v");
+  void DestroyCalibrations();
+
+  double CalEnergy(int);
+  double CalEnergy(double);
+
+  //double CalEfficiency(int);
+  //double CalEfficiency(double) const;
+
+public:
+  static int ReadCalFile(const char* filename="",Option_t *opt="replace");
+  static int WriteCalFile(std::string filename="",Option_t *opt="");
+
+private:
+  static int  ParseInputData(std::string &input,Option_t *opt);
+  static int  WriteToBuffer(Option_t *opt);
+  static void trim(std::string *, const std::string &trimChars=" \f\n\r\t\v");
 
   ClassDef(TChannel,1);
 };
 
 #endif
-
-

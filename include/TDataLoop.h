@@ -9,75 +9,47 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <map>
 
-#include "TNamed.h"
+#include <TNamed.h>
 
+#include "StoppableThread.h"
+#include "ThreadsafeQueue.h"
 #include "TRawEvent.h"
 
 class TRawEventSource;
 
-class TDataLoop : public TNamed {
-public:
-  static TDataLoop* Instance();
-  virtual ~TDataLoop();
+class TDataLoop : public StoppableThread  {
+  public:
+    static TDataLoop *Get(std::string name="", TRawEventSource* source=0); 
+    virtual ~TDataLoop();
 
-  void ProcessFile(const char* filename, kFileType file_type = kFileType::UNKNOWN_FILETYPE);
-  void ProcessFile(const std::vector<std::string>& filenames);
-  void ProcessRing(const char* filename);
+    const TRawEventSource& GetSource() const { return *source; }
 
-  void Start();
-  void Pause();
-  void Resume();
-  void Stop();
-  bool IsPaused();
-  void Join();
+    std::string Status();
 
-  virtual bool Initialize() { }
-  virtual void Finalize()   { }
-  virtual int ProcessEvent(TRawEvent& event) { AbstractMethod("ProcessEvent()"); }
+    //protected:
+    bool Iteration();
+    
+    int Pop(TRawEvent &event); 
 
-
-  template<typename T, typename... Params>
-  static void CreateDataLoop(Params&&... params){
-    if(data_loop){
-      return;
-    }
-
-    data_loop = new T(std::forward<Params>(params)...);
-  }
-
-  const TRawEventSource* GetInfile() { return infile; }
-
-protected:
-  TDataLoop();
-  virtual bool CanStart() { return true; }
-
-  TRawEventSource* infile;
-
-#ifndef __CINT__
-  std::thread read_thread;
-  std::atomic_bool running;
-  std::atomic_bool initialized;
-
-  std::atomic_bool paused;
-  std::condition_variable paused_wait;
-  std::mutex pause_mutex;
-#endif
-
-private:
-  static TDataLoop* data_loop;
-
-  void ReadLoop();
-  void Iteration();
-
-  void ProcessSource();
+    size_t GetItemsPushed()  { return output_queue.ItemsPushed(); } 
+    size_t GetItemsPopped()  { return output_queue.ItemsPopped(); } 
+    size_t GetItemsCurrent() { return output_queue.Size();        }
+    size_t GetRate()         { return 0; } 
 
 
-  TDataLoop(const TDataLoop& other) { MayNotUse("TDataLoop()"); }
-  TDataLoop& operator=(const TDataLoop& other) { MayNotUse("TDataLoop::operator="); }
+  private:
+    TDataLoop(std::string name,TRawEventSource* source);
+    //ThreadsafeQueue<TRawEvent>& output_queue,std::string name="");
+    TDataLoop();
+    TDataLoop(const TDataLoop& other);
+    TDataLoop& operator=(const TDataLoop& other);
 
+    ThreadsafeQueue<TRawEvent> output_queue;
+    TRawEventSource* source;
 
-  ClassDef(TDataLoop,0);
+    ClassDef(TDataLoop, 0);
 };
 
 #endif /* _TDATALOOP_H_ */

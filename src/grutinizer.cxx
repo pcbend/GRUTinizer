@@ -1,18 +1,24 @@
 
-#include <Globals.h>
+#include "Globals.h"
 
 #include <cstdio>
 #include <ctime>
 #include <string>
-#include <sys/stat.h>
-#include <sys/socket.h>
-#include <netdb.h>
+//#include <sys/stat.h>
+//#include <sys/socket.h>
+//#include <netdb.h>
 
 #include "TEnv.h"
 #include "TPluginManager.h"
+#include "TPython.h"
+#include "TThread.h"
 
 #include "TGRUTint.h"
 #include "ProgramPath.h"
+//#include "TROOT_Shim.h"
+//#include "LoadGRUTEnv.h"
+
+
 
 #ifdef __APPLE__
 #define HAVE_UTMPX_H
@@ -25,7 +31,7 @@
 #endif
 #endif
 
-
+/*
 #ifdef HAVE_UTMPX_H
 #include <utmpx.h>
 #define STRUCT_UTMP struct utmpx
@@ -33,60 +39,65 @@
 #include <utmp.h>
 #define STRUCT_UTMP struct utmp
 #endif
+*/
+
+//extern void PopupGrutLogo(bool);
 
 
-extern void PopupGrutLogo(bool);
+//static int ReadUtmp();
+//static STRUCT_UTMP *SearchEntry(int, const char*);
+//static STRUCT_UTMP *gUtmpContents;
 
-
-static int ReadUtmp();
-static STRUCT_UTMP *SearchEntry(int, const char*);
-static STRUCT_UTMP *gUtmpContents;
-
-static void SetDisplay();
+//static void SetDisplay();
 void SetGRUTPluginHandlers();
-void LoadGRUTEnv();
+
+
+void LoadGRUTEnv() {
+  // Set the GRUTSYS variable based on the executable path.
+  // If GRUTSYS has already been defined, don't overwrite.
+  setenv("GRUTSYS", (program_path()+"/..").c_str(), 0);
+  std::string grut_path = Form("%s/.grutrc",getenv("GRUTSYS")); // + "/../.grutrc";
+  gEnv->ReadFile(grut_path.c_str(),kEnvChange);
+}
+
 
 
 int main(int argc, char **argv) {
-   //Find the grut environment variable so that we can read in .grutrc
+  //Find the grut environment variable so that we can read in .grutrc
   LoadGRUTEnv();
+  SetGRUTPluginHandlers();
+  //ReplaceCleanups();
 
-   SetDisplay();
-   //SetGRUTPluginHandlers();
-   TGRUTint *input = 0;
+  // This turns on both the Cint Mutex and gROOT Mutex,
+  // with-out it, you are taking thread into your own hands
+  // with-it, you can use TThread::Lock/UnLock around possible hazards.
+  TThread::Initialize();
 
-   //Create an instance of the grut interpreter so that we can run root-like interpretive mode
-   input = TGRUTint::instance(argc,argv);
-   //PopupGrutLogo(true);
+  //SetDisplay();
+  TGRUTint *input = 0;
 
-   //Run the code!
-   input->Run("true");
-   //Be polite when you leave.
-   printf(DMAGENTA "\nbye,bye\t" DCYAN "%s" RESET_COLOR  "\n",getlogin());
+  //Create an instance of the grut interpreter so that we can run root-like interpretive mode
+  input = TGRUTint::instance(argc,argv);
+  //PopupGrutLogo(true);
 
-   if((clock()%60) == 0){
-     printf("DING!");
-     fflush(stdout);
-     gSystem->Sleep(500);
-     printf("\r              \r");
-     fflush(stdout);
-   }
-
-   return 0;
+  //Run the code!
+  //input->Run(true);
+  input->Run(false);
+  return 0;
 }
 
 
 
 void SetGRUTPluginHandlers() {
-   //gPluginMgr->AddHandler("GRootCanvas","grsi","GRootCanvas"
-//   gPluginMgr->AddHandler("TGuiFactory","root","GROOTGuiFactory","Gui","GROOTGuiFactory()");
-//   gPluginMgr->AddHandler("TBrowserImp","GRootBrowser","GRootBrowser",
-//                          "Gui","NewBrowser(TBrowser *,const char *,Int_t,Int_t,UInt_t,UInt_t");
-//   gPluginMgr->AddHandler("TBrowserImp","GRootBrowser","GRootBrowser",
-//                          "Gui","NewBrowser(TBrowser *,const char *,Int_t,Int_t");
+  //gPluginMgr->AddHandler("GRootCanvas","grut","GRootCanvas"
+  gPluginMgr->AddHandler("TGuiFactory","root","GROOTGuiFactory","Gui","GROOTGuiFactory()");
+  gPluginMgr->AddHandler("TBrowserImp","GRootBrowser","GRootBrowser",
+                         "Gui","NewBrowser(TBrowser *,const char *,Int_t,Int_t,UInt_t,UInt_t");
+  gPluginMgr->AddHandler("TBrowserImp","GRootBrowser","GRootBrowser",
+                         "Gui","NewBrowser(TBrowser *,const char *,Int_t,Int_t");
 }
 
-
+/*
 
 static void SetDisplay()  {
   // Set DISPLAY environment variable.
@@ -173,14 +184,6 @@ static int ReadUtmp() {
   return 0;
 }
 
-void LoadGRUTEnv() {
-  // Set the GRUTSYS variable based on the executable path.
-  // If GRUTSYS has already been defined, don't overwrite.
-  setenv("GRUTSYS", (program_path()+"/..").c_str(), 0);
-  std::string grut_path = program_path() + "/../.grutrc";
-  gEnv->ReadFile(grut_path.c_str(),kEnvChange);
-}
-
 static STRUCT_UTMP *SearchEntry(int n, const char *tty) {
   STRUCT_UTMP *ue = gUtmpContents;
 
@@ -191,3 +194,5 @@ static STRUCT_UTMP *SearchEntry(int n, const char *tty) {
    }
    return 0;
 }
+
+*/

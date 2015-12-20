@@ -3,6 +3,9 @@
 
 #include <string>
 
-bool file_exists(const std::string& filename);
+bool file_exists(const char *filename);
+
+std::string get_run_number(std::string input);
+
 
 #endif

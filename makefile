@@ -50,18 +50,19 @@ LIBRARY_OUTPUT := $(patsubst %,libraries/lib%.so,$(LIBRARY_NAMES))
 
 INCLUDES  := $(addprefix -I$(PWD)/,$(INCLUDES))
 CFLAGS    += $(shell root-config --cflags)
-CFLAGS    += -MMD $(INCLUDES)
+CFLAGS    += -MMD -MP $(INCLUDES)
 LINKFLAGS += -Llibraries $(addprefix -l,$(LIBRARY_NAMES)) -Wl,-rpath,\$$ORIGIN/../libraries
-LINKFLAGS += $(shell root-config --glibs) -lSpectrum
+LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lPyROOT
 LINKFLAGS := $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX) $(CFLAGS)
 
 ROOT_LIBFLAGS := $(shell root-config --cflags)
 
 UTIL_O_FILES    := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard util/*.$(SRC_SUFFIX)))
-SANDBOX_O_FILES := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard sandbox/*.$(SRC_SUFFIX)))
 MAIN_O_FILES    := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard src/*.$(SRC_SUFFIX)))
-EXE_O_FILES     := $(UTIL_O_FILES) $(SANDBOX_O_FILES)
+EXE_O_FILES     := $(UTIL_O_FILES)
 EXECUTABLES     := $(patsubst %.o,bin/%,$(notdir $(EXE_O_FILES))) bin/grutinizer
+
+HISTOGRAM_SO    := $(patsubst histos/%.$(SRC_SUFFIX),libraries/lib%.so,$(wildcard histos/*.$(SRC_SUFFIX)))
 
 ifdef VERBOSE
 run_and_test = @echo $(1) && $(1);
@@ -82,24 +83,26 @@ run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  
                 rm -f $(2).log $(2).error
 endif
 
-all: $(EXECUTABLES) $(LIBRARY_OUTPUT)
-	@cp util/grut-config bin/ 
+all: $(EXECUTABLES) $(LIBRARY_OUTPUT) bin/grutinizer-config $(HISTOGRAM_SO)
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
 
 docs:
 	doxygen doxygen.config
 
+bin/grutinizer-config: util/grutinizer-config | bin
+	@ln -sf ../$< $@
+
 bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT) bin
 	$(call run_and_test,$(CPP) $^ -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
-
-bin/%: .build/sandbox/%.o | $(LIBRARY_OUTPUT) bin
-	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) bin
 	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 bin:
 	@mkdir -p $@
+
+libraries/lib%.so: .build/histos/%.o
+	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 # Functions for determining the files included in a library.
 # All src files in the library directory are included.
@@ -138,10 +141,11 @@ $(foreach lib,$(LIBRARY_DIRS),$(eval $(call library_template,$(lib))))
 -include $(shell find .build -name '*.d' 2> /dev/null)
 
 clean:
-	@printf "\nCleaning up\n\n"
+	@printf "\n$(WARN_COLOR)Cleaning up$(NO_COLOR)\n\n"
 	@-$(RM) -rf .build
 	@-$(RM) -rf bin
 	@-$(RM) -f $(LIBRARY_OUTPUT)
+	@-$(RM) -f libraries/*.so
 
 cleaner: clean
 	@printf "\nEven more clean up\n\n"

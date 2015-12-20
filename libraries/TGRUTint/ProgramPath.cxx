@@ -1,6 +1,5 @@
 #include "ProgramPath.h"
 
-
 #ifdef __linux__
 
 #include <unistd.h>

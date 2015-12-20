@@ -13,6 +13,109 @@
 #define MAX_INTPTS 16
 #define MAX_PWID   256
 #define MAX_LABRID 16
+#define MQDC_ID 10
+#define MTDC_ID 20
+
+// General Mesytec Stuff:
+struct Mesy_Word{
+  // This is 2x16 bits = 32 bits.  The MQDC talks in 32 bit words.
+  UShort_t tail;
+  UShort_t nose;
+
+  bool isHeader() const { return((nose&0xff00)==0x4000); }
+  bool isData()   const { return((nose&0xffc0)==0x0400); } // for QDC 0x0020 should also be 0.  Left out for easy use.
+  bool isETS()    const { return((nose&0xffff)==0x0480); }
+  bool isFILL()   const { return(((nose&0xffff)==0) && ((tail&0xffff)==0)); }
+  bool isALLF()   const { return(((nose&0xffff)==0xffff) && ((tail&0xffff)==0xffff)); }
+  bool isEOE()    const { return(((nose&0xc000)==0xc000) && !(isALLF())); }
+}__attribute__((__packed__));
+
+struct Mesy_Header{
+  UShort_t tail;
+  UShort_t nose;
+
+  UShort_t format()   const { return ((tail&0x8000)>>15); }
+  UShort_t size()     const { return tail&0x0fff; }
+  UShort_t id()       const { return nose&0x00ff; }
+  UShort_t res()      const { return (tail&0x7000)>>12; }
+  bool isQDC()        const { return(id()==MQDC_ID); }
+  bool isTDC()        const { return(id()==MTDC_ID); }
+}__attribute__((__packed__));
+
+struct Mesy_ETS{
+  UShort_t tail;
+  UShort_t nose;
+
+  UShort_t ETS()    const { return tail&0xffff; }
+}__attribute__((__packed__));
+
+struct Mesy_FILL{
+  UShort_t tail;
+  UShort_t nose;
+}__attribute__((__packed__));
+
+struct Mesy_EOE{
+  UInt_t data;
+
+  Int_t TS()     const { return data&0x3fffffff; }
+}__attribute__((__packed__));
+
+// Mesytec QDC:
+struct M_QDC_Data{
+  UShort_t tail;
+  UShort_t nose;
+
+  UShort_t Chan()   const { return nose&0x001f; }
+  UShort_t Charge() const { return tail&0x0fff; }
+  UShort_t isOOR()  const { return (tail&0x4000)>>14; }
+}__attribute__((__packed__));
+
+// Mesytec TDC:
+struct M_TDC_Data{
+  UShort_t tail;
+  UShort_t nose;
+
+  bool isTrig() const { return((nose&0x0020)>>5); }
+  UShort_t Chan()   const { return nose&0x001f; }
+  UShort_t Time()   const { return tail&0xffff; }
+}__attribute__((__packed__));
+
+
+
+
+typedef struct {
+  Int_t   totalsize;
+  Short_t moresize;
+  Short_t tag;
+  Short_t version;
+  Short_t ulm;
+}__attribute__((__packed__)) CAESARHeader;
+
+typedef struct {
+  Short_t size; // Inclusive number of 16-bit values
+  Short_t tag;
+}__attribute__((__packed__)) CAESARFeraHeader;
+
+typedef struct {
+  Short_t data;
+  Short_t channel()  { return  ((data & 0x7800)>>11); }
+  Short_t value()    { return   (data & 0x07ff); }
+}__attribute__((__packed__)) CAESARFeraItem;
+
+typedef struct {
+  Short_t header;
+  Short_t number_chans() { return  ((header & 0x7800)>>11); }
+  Short_t vsn()          { return   (header & 0x00ff)-1; }
+  CAESARFeraItem items[16];
+
+}__attribute__((__packed__)) CAESARFera;
+
+
+
+
+
+
+
 
 
 typedef struct { // HPGe Segment Hit Type 1;
@@ -82,12 +185,74 @@ struct GEBMode3Data {
   UShort_t cfd_pt2_low;
   Long_t GetLed() const;
   Long_t GetCfd() const;
-  Int_t  GetEnergy(const GEBMode3Head&) const;
+  Int_t  GetEnergy(GEBMode3Head&) const;
 }__attribute__((__packed__));
 
 friend std::ostream& operator<<(std::ostream& os, const GEBMode3Data &data);
 static void SwapMode3Data(GEBMode3Data &data);
 
+struct GEBS800Header {
+  Int_t    total_size;
+  UShort_t total_size2;
+  UShort_t S800_packet;
+  UShort_t S800_packet_size;
+  UShort_t S800_version;
+  UShort_t S800_timestamp_packet;
+  ULong_t  S800_timestamp;
+  UShort_t S800_eventnumber_packet_size;
+  UShort_t S800_eventnumber_packet;
+  UShort_t S800_eventnumber_low;
+  UShort_t S800_eventnumber_middle;
+  UShort_t S800_eventnumber_high;
+  Long_t GetEventNumber() const {
+     long temp = (long)S800_eventnumber_low;
+     temp     += ((long)S800_eventnumber_middle) << 16;
+     temp     += ((long)S800_eventnumber_high)   << 32;
+     return temp;
+  }
+
+} __attribute__((__packed__));
+
+friend std::ostream& operator<<(std::ostream& os, const GEBS800Header &head);
+
+static Int_t GetS800Channel(UShort_t input) { return (input>>12);    }
+static Int_t GetS800Value(UShort_t input)   { return (input&0x0fff); }
+
+
+struct S800TriggerPacket {
+  UShort_t trgger_pattern;
+  UShort_t channel_time[4];
+  UShort_t channel_time_number;
+} __attribute__((__packed__));
+
+friend std::ostream& operator<<(std::ostream& os, const S800TriggerPacket &pack);
+
+struct S800TOFPacket {
+  UShort_t value[4];
+  UShort_t number;
+} __attribute__((__packed__));
+
+friend std::ostream& operator<<(std::ostream& os, const S800TOFPacket &tof);
+
+struct S800SCINTPacket {
+  UShort_t value[2][4];
+  UShort_t number;
+} __attribute__((__packed__));
+
+// https://wikihost.nscl.msu.edu/S800Doc/doku.php?id=s800_version_0x0006
+
+struct S800FPICPacket {
+  UShort_t number;
+  UShort_t subid;
+  UShort_t value[16];
+} __attribute__((__packed__));
+
+struct S800FPCRDCPacket {
+  UShort_t id;
+  UShort_t number;
+  UShort_t subid;
+  /// not finished.
+} __attribute__((__packed__));
 
 typedef struct {
    Short_t pix_id;  //int16_t

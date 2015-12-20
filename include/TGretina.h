@@ -20,26 +20,30 @@ public:
   virtual void Clear(Option_t *opt = "");
 
   virtual void          InsertHit(const TDetectorHit& hit);
-  virtual TDetectorHit& GetHit(const int &i)            { return *(TGretinaHit*)gretina_hits->At(i); }
-  virtual int           Size()                          { return gretina_hits->GetEntries(); }
+  virtual TDetectorHit& GetHit(const int &i)            { return gretina_hits.at(i); }
 
-  const TGretinaHit& GetGretinaHit(int i) { return *(TGretinaHit*)gretina_hits->At(i); }
-  TGretinaHit& GetAddbackHit(int i) { return *(TGretinaHit*)addback_hits->At(i); }
-  void PrintHit(int i){ gretina_hits->At(i)->Print(); }
+  const TGretinaHit& GetGretinaHit(int i) { return gretina_hits.at(i); }
+  //const TGretinaHit& GetAddbackHit(int i) { return *(TGretinaHit*)addback_hits.at(i); }
+  void PrintHit(int i){ gretina_hits.at(i).Print(); }
 
   static TVector3 CrystalToGlobal(int cryId,
                                   Float_t localX=0,Float_t localY=0,Float_t localZ=0);
+  static TVector3 GetSegmentPosition(int cryid,int segment); //return the position of the segemnt in the lab system
+  static TVector3 GetCrystalPosition(int cryid); //return the position of the crysal in the lab system
 
 private:
   virtual int BuildHits();
-  void BuildAddbackHits();
+  //void BuildAddbackHits();
 
-  TClonesArray* gretina_hits;//("TGretinaHit");
-  TClonesArray* addback_hits;//("TGretinaHit");
+  std::vector<TGretinaHit> gretina_hits;
+  //TClonesArray* addback_hits;//("TGretinaHit");
 
   static Float_t crmat[32][4][4][4];
+  static Float_t m_segpos[2][36][3];
   static void SetCRMAT();
+  static void SetSegmentCRMAT();
   static bool fCRMATSet;
+
 
   ClassDef(TGretina,3);
 };

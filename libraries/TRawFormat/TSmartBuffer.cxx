@@ -5,44 +5,36 @@
 
 #include <algorithm>
 #include <iostream>
-//#include <mutex>
 
 TSmartBuffer::TSmartBuffer()
   : fAllocatedLocation(NULL), fData(NULL), fSize(0),
-    fReferenceCount(NULL), fReferenceMutex(NULL) { }
+    fReferenceCount(NULL) { }
 
 TSmartBuffer::TSmartBuffer(char* buffer, size_t size)
   : fAllocatedLocation(buffer), fData(buffer), fSize(size) {
-  fReferenceCount = new int(1);
-  fReferenceMutex = new std::mutex;
+  fReferenceCount = new std::atomic_int(1);
 }
 
 TSmartBuffer::~TSmartBuffer() {
   // This buffer didn't point to anything, so no need to clean anything up.
-  if(!fReferenceMutex){
+  if(!fReferenceCount){
     return;
   }
 
-  std::unique_lock<std::mutex> lock(*fReferenceMutex);
   (*fReferenceCount)--;
 
   if(*fReferenceCount==0){
-
     free(fAllocatedLocation);
     delete fReferenceCount;
-    lock.unlock();
-    delete fReferenceMutex;
   }
 }
 
 TSmartBuffer::TSmartBuffer(const TSmartBuffer& other)
   : fAllocatedLocation(other.fAllocatedLocation), fData(other.fData),
-    fSize(other.fSize), fReferenceCount(other.fReferenceCount),
-    fReferenceMutex(other.fReferenceMutex) {
+    fSize(other.fSize), fReferenceCount(other.fReferenceCount) {
 
 
-  if(fReferenceMutex){
-    std::unique_lock<std::mutex> lock(*fReferenceMutex);
+  if(fReferenceCount){
     (*fReferenceCount)++;
   }
 }
@@ -67,7 +59,6 @@ void TSmartBuffer::swap(TSmartBuffer& other){
   std::swap(fData, other.fData);
   std::swap(fSize, other.fSize);
   std::swap(fReferenceCount, other.fReferenceCount);
-  std::swap(fReferenceMutex, other.fReferenceMutex);
 }
 
 void TSmartBuffer::SetBuffer(char* buffer, size_t size){
@@ -98,22 +89,31 @@ void TSmartBuffer::Advance(size_t dist) {
 void TSmartBuffer::Print(Option_t* opt) const {
   TString options(opt);
   TRegexp regexp("0x[0-9a-f][0-9a-f][0-9a-f][0-9a-f]");
+  //TRegexp regexp2("0x[0-9a-f][0-9a-f][0-9a-f][0-9a-f]");
   if(!options.Contains("bodyonly")) {
     std::cout << "TSmartBuffer allocated at " << (void*)fAllocatedLocation << ", "
               << "currently pointed at " << (void*)fData << ", "
               << "with a size of " << fSize << "bytes."
               << std::endl;
   }
-  if(fReferenceMutex){
-    std::unique_lock<std::mutex> lock(*fReferenceMutex);
+  if(fReferenceCount){
     std::cout << "There are " << *fReferenceCount << " TSmartBuffers sharing this C-buffer"
               << std::endl;
 
     // Full hexdump of the buffer contents
-    TString highlight_string = options(regexp);
-    unsigned short highlight = 0;
-    if(highlight_string.Length()) {
-      highlight = strtol(highlight_string.Data(),0,0);
+    //TString highlight_string = options(regexp);
+    std::vector<TString> highlight_strings;
+    while(options.Contains(regexp)) {
+      highlight_strings.push_back(options(regexp));
+      options.ReplaceAll(highlight_strings.back(),"");
+    }
+    //unsigned short highlight = 0;
+    std::vector<unsigned short> highlight;
+    if(highlight_strings.size()) { //Length()) {
+      //highlight = strtol(highlight_string.Data(),0,0);
+      for(int j=0;j<highlight_strings.size();j++) {
+        highlight.push_back(strtol(highlight_strings.at(j).Data(),0,0));
+      }
     }
     if(options.Contains("all")){
       printf("\t");
@@ -123,9 +123,16 @@ void TSmartBuffer::Print(Option_t* opt) const {
           printf("\n\t");
         }
         unsigned int value = *(unsigned short*)(GetData()+x);
-        if(highlight>0 && highlight==value) {printf(DRED);}
+        //if(highlight>0 && highlight==value) {printf(DRED);}
+        bool found = false;
+        for(int j=0;j<highlight.size();j++) {
+          if(highlight.at(j) == value)
+            found = true;
+        }
+        if(found) {printf(DRED);}
         printf("0x%04x  ",value);
-        if(highlight>0 && highlight==value) {printf(RESET_COLOR);}
+        if(found) {printf(RESET_COLOR);}
+        //if(highlight>0 && highlight==value) {printf(RESET_COLOR);}
 
       }
       if(GetSize()%2 == 1){

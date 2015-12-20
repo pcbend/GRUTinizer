@@ -3,13 +3,19 @@
 #include <TRawEvent.h>
 #include <iostream>
 
+#include <TClass.h>
+
 ClassImp(TDetector)
 
-TDetector::TDetector() { }
+TDetector::TDetector() {
+  Class()->CanIgnoreTObjectStreamer();
+  Clear();
+}
 
 TDetector::TDetector(const char* name,const char* title) {
+  Clear();
   TNamed::SetNameTitle(name,title);
-
+  Class()->CanIgnoreTObjectStreamer();
 }
 
 TDetector::~TDetector() { }
@@ -18,6 +24,7 @@ void TDetector::Clear(Option_t *opt) {
   TNamed::Clear(opt);
   fTimestamp = -1;
   raw_data.clear();
+  fSize = 0;
 }
 
 void TDetector::Print(Option_t *opt) const { }
@@ -27,6 +34,7 @@ void TDetector::Copy(TObject& obj) const {
 
   TDetector& det = (TDetector&)obj;
   det.fTimestamp = fTimestamp;
+  det.fSize = fSize;
 }
 
 int TDetector::Compare(const TObject& obj) const {

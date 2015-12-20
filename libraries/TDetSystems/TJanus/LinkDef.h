@@ -7,7 +7,8 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class TJanus+;
 #pragma link C++ class TJanusHit+;
+#pragma link C++ class std::vector<TJanusHit>+;
+#pragma link C++ class TJanus+;
 
 #endif

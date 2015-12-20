@@ -1,4 +1,4 @@
-
+#include "TRawEvent.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -6,8 +6,10 @@
 #include <string.h>
 #include <assert.h>
 
-#include "TRawEvent.h"
 #include "TString.h"
+
+#include "TGEBEvent.h"
+#include "TNSCLEvent.h"
 
 ClassImp(TRawEvent)
 
@@ -15,6 +17,7 @@ TRawEvent::TRawEvent() {
   fEventHeader.datum1      = -1;
   fEventHeader.datum2      =  0;
   fFileType = kFileType::UNKNOWN_FILETYPE;
+  fTimestamp = -1;
 }
 
 void TRawEvent::Copy(TObject &rhs) const {
@@ -22,6 +25,7 @@ void TRawEvent::Copy(TObject &rhs) const {
   ((TRawEvent&)rhs).fEventHeader = fEventHeader;
   ((TRawEvent&)rhs).fBody        = fBody;
   ((TRawEvent&)rhs).fFileType    = fFileType;
+  ((TRawEvent&)rhs).fTimestamp    = fTimestamp;
 }
 
 TRawEvent::TRawEvent(const TRawEvent &rhs) {
@@ -37,7 +41,9 @@ Int_t TRawEvent::Compare(const TObject &rhs) const { }
 TRawEvent &TRawEvent::operator=(const TRawEvent &rhs) {
   if(&rhs!=this)
     Clear();
-  rhs.Copy(*this);
+  fEventHeader = rhs.fEventHeader;
+  fBody        = rhs.fBody;
+  fFileType    = rhs.fFileType;
   return *this;
 }
 
@@ -80,6 +86,52 @@ Int_t TRawEvent::GetBodySize() const {
   default:
     return 0;
   }
+
+  return 0;
+}
+
+Long_t TRawEvent::GetTimestamp() const {
+  if(fTimestamp != -1){
+    return fTimestamp;
+  }
+
+  if( fFileType == kFileType::UNKNOWN_FILETYPE) {
+    printf("Unknown filetype: Size = %i\n",GetTotalSize());
+    fflush(stdout);
+    Print("all");
+    //return 0;
+  }
+  assert(fFileType != kFileType::UNKNOWN_FILETYPE);
+
+  switch(fFileType){
+   case NSCL_EVT:
+     return ((TNSCLEvent*)this)->GetTimestamp();
+
+   case GRETINA_MODE2:
+   case GRETINA_MODE3:
+     return ((TGEBEvent*)this)->GetTimestamp();
+  };
+
+  return 0;
+}
+
+const char* TRawEvent::GetPayload() const {
+  if( fFileType == kFileType::UNKNOWN_FILETYPE) {
+    printf("Unknown filetype: Size = %i\n",GetTotalSize());
+    fflush(stdout);
+    Print("all");
+    //return 0;
+  }
+  assert(fFileType != kFileType::UNKNOWN_FILETYPE);
+
+  switch(fFileType){
+   case NSCL_EVT:
+     return ((TNSCLEvent*)this)->GetPayload();
+
+   case GRETINA_MODE2:
+   case GRETINA_MODE3:
+     return ((TGEBEvent*)this)->GetPayload();
+  };
 
   return 0;
 }

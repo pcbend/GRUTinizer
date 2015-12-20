@@ -1,21 +1,31 @@
+#include <fstream>
+#include <string>
+#include <sstream>
+
 #include "TGretina.h"
 
 #include "TGEBEvent.h"
 
 TGretina::TGretina(){
-  gretina_hits = new TClonesArray("TGretinaHit");
-  addback_hits = new TClonesArray("TGretinaHit");
+  //gretina_hits = new TClonesArray("TGretinaHit");
+  //addback_hits = new TClonesArray("TGretinaHit");
+  Clear();
 }
 
 TGretina::~TGretina() {
-  gretina_hits->Delete();
-  addback_hits->Delete();
+  //delete gretina_hits;
+  //addback_hits->Delete();
 }
 
 Float_t TGretina::crmat[32][4][4][4];
-bool    TGretina:: fCRMATSet = false;
+Float_t TGretina::m_segpos[2][36][3];
+bool    TGretina::fCRMATSet = false;
 
 void TGretina::SetCRMAT() {
+  if(fCRMATSet){
+    return;
+  }
+
   FILE *fp;
   std::string temp = getenv("GRUTSYS");
   temp.append("/libraries/TDetSystems/TGretina/crmat.dat");
@@ -55,31 +65,122 @@ void TGretina::SetCRMAT() {
     /* Attempt to read the next line. */
     st = fgets(str, 256, fp);
   }
+  SetSegmentCRMAT();
   fCRMATSet = true;
   //printf("Read %i rotation matrix coefficients.\n", nn);
   /* Done! */
 }
 
+void TGretina::SetSegmentCRMAT() {
+  if(fCRMATSet)
+    return;
+  //FILE *infile;
+  int NUMSEG = 36;
+  std::string temp = getenv("GRUTSYS");
+  temp.append("/libraries/TDetSystems/TGretina/crmat_segpos.dat");
+  //infile = fopen(temp.c_str(),"r");
+  std::ifstream infile;
+  infile.open(temp.c_str());
+  if(!infile.is_open()) {
+    return;
+  }
+  // notice: In file type-A is first, then 
+  //         type-B but as type-B are even
+  //         det_ids in the data stream we
+  //         define type=0 for type-B not
+  //         type-A.
+  //
+  //printf("filename: %s\n",temp.c_str());
+  std::string line;
+  int type = 0;
+  int seg  = 0;
+  while(getline(infile,line)) {
+    if(seg==NUMSEG) {
+      seg  = 0;
+      type = 1;
+    }
+    //printf("%s\n",line.c_str());
+    std::stringstream ss(line);
+    int segread;
+    double x,y,z;
+    ss >> segread >> x >> y >> z;
+    if((seg+1)!=segread) {
+      fprintf(stderr,"%s: seg[%i] read but seg[%i] expected.\n",__PRETTY_FUNCTION__,segread,seg+1);
+    }
+    m_segpos[(type+1)%2][seg][0] = x;
+    m_segpos[(type+1)%2][seg][1] = y;
+    m_segpos[(type+1)%2][seg][2] = z;
+    seg++;
+  }
+  /*
+  for(int type=0;type<2;type++) {
+    for(int seg=0;seg<NUMSEG;seg++) {
+      int rtval,segread;
+      rtval=fscanf(infile, "%d %lf %lf %lf",  ///CHANGE ME TO A SS!!
+                   &segread,
+                   m_segpos[(type+1)%2][seg][0],
+                   m_segpos[(type+1)%2][seg][1],
+                   m_segpos[(type+1)%2][seg][2]);
+      if((seg+1)!=segread) {
+        fprintf(stderr,"%s: seg[%i] read but seg[%i] expected.\n",__PRETTY_FUNCTION__,segread,seg+1);
+      }
+      if(rtval==EOF) {
+        fprintf(stderr,"%s: unexpected EOF.\n",__PRETTY_FUNCTION__);
+        break;
+      }
+    }
+  }
+  */
+  infile.close();
+  //fclose(infile);
+}
+
+
+TVector3 TGretina::GetSegmentPosition(int cry_id,int segment) {
+  SetCRMAT();
+  float x = m_segpos[cry_id%2][segment][0];
+  float y = m_segpos[cry_id%2][segment][1];
+  float z = m_segpos[cry_id%2][segment][2];
+  return CrystalToGlobal(cry_id,x,y,z);
+}
+
+TVector3 TGretina::GetCrystalPosition(int cry_id) {
+  SetCRMAT();
+  TVector3 v;
+  v.SetXYZ(0.0,0.0,0.0);
+  for(int i=0;i<6;i++) {
+    TVector3 a = GetSegmentPosition(cry_id,i);
+    v.SetXYZ(v.X()+a.X(),v.Y()+a.Y(),v.Z()+a.Z());
+  }
+  v.SetXYZ(v.X()/6.0,v.Y()/6.0,v.Z()/6.0);
+  return v;      
+}
+
+
+
+
 void TGretina::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 
   TGretina& gretina = (TGretina&)obj;
-  gretina_hits->Copy(*gretina.gretina_hits);
-  addback_hits->Copy(*gretina.addback_hits);
+  gretina.gretina_hits = gretina_hits; // gretina_hits->Copy(*gretina.gretina_hits);
+  //addback_hits->Copy(*gretina.addback_hits);
   gretina.raw_data.clear();
 }
 
 void TGretina::InsertHit(const TDetectorHit& hit){
-  TGretinaHit* new_hit = (TGretinaHit*)gretina_hits->ConstructedAt(Size());
-  hit.Copy(*new_hit);
+  //TGretinaHit* new_hit = (TGretinaHit*)gretina_hits->ConstructedAt(Size());
+  //hit.Copy(*new_hit);
+  gretina_hits.emplace_back((TGretinaHit&)hit);
+  fSize++;
 }
 
 int TGretina::BuildHits(){
   //printf("%s\n",__PRETTY_FUNCTION__);
   for(auto& event : raw_data){
-    TGEBEvent geb(event);
-    SetTimestamp(geb.GetTimestamp());
-    const TRawEvent::GEBBankType1* raw = (const TRawEvent::GEBBankType1*)geb.GetPayloadBuffer().GetData();
+    TGEBEvent* geb = (TGEBEvent*)&event;
+    SetTimestamp(geb->GetTimestamp());
+    const TRawEvent::GEBBankType1* raw = (const TRawEvent::GEBBankType1*)geb->GetPayloadBuffer().GetData();
     TGretinaHit hit;
     hit.BuildFrom(*raw);
     InsertHit(hit);
@@ -87,14 +188,15 @@ int TGretina::BuildHits(){
   //gretina_hits->At(0)->Print();
   raw_data.clear();
 
-  BuildAddbackHits();
+  //BuildAddbackHits();
 
   //gretina_hits->At(0)->Print();
-
   return Size();
 }
 
 TVector3 TGretina::CrystalToGlobal(int cryId,Float_t x,Float_t y,Float_t z) {
+  SetCRMAT();
+
   Int_t detectorPosition = cryId/4 - 1;
   Int_t crystalNumber    = cryId%4;
 
@@ -115,9 +217,11 @@ TVector3 TGretina::CrystalToGlobal(int cryId,Float_t x,Float_t y,Float_t z) {
                 (crmat[detectorPosition][crystalNumber][2][1] * y) +
                 (crmat[detectorPosition][crystalNumber][2][2] * z) +
                 (crmat[detectorPosition][crystalNumber][2][3]) );
+
   return TVector3(xl, yl, zl);
 }
 
+/*
 void TGretina::BuildAddbackHits(){
   if(Size()==0)
     return;
@@ -150,12 +254,13 @@ void TGretina::BuildAddbackHits(){
     }
   }
 }
+*/
 
 void TGretina::Print(Option_t *opt) const { }
 
 void TGretina::Clear(Option_t *opt) {
   TDetector::Clear(opt);
-  gretina_hits->Clear(opt);//("TGretinaHit");
-  addback_hits->Clear(opt);//("TGretinaHit");
+  gretina_hits.clear(); //("TGretinaHit");
+  //addback_hits->Clear(opt);//("TGretinaHit");
   raw_data.clear();
 }

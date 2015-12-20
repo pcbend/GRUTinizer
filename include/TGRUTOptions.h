@@ -20,9 +20,11 @@ public:
   const std::vector<std::string>& RootInputFiles()  { return input_root_files;  }
   const std::vector<std::string>& CalInputFiles()   { return input_cal_files;   }
   const std::vector<std::string>& MacroInputFiles() { return input_macro_files; }
-  const std::string DetectorEnvironment()           { return detector_environment; }
-  const std::string OutputFile()                    { return output_file; }
+  const std::vector<std::string>& GuiSaveSetFiles() { return input_gui_hist_files; }
+  const std::string& DetectorEnvironment()          { return detector_environment; }
+  const std::string& OutputFile()                   { return output_file; }
   std::string InputRing() { return input_ring; }
+  std::string CompiledHistogramFile() { return compiled_histogram_file; }
 
   int CommandPort() { return fCommandPort; }
 
@@ -34,16 +36,28 @@ public:
   bool ShowedHelp()         const { return fHelp; }
   bool ShowLogo()           const { return fShowLogo; }
   bool SortRaw()            const { return fSortRaw; }
+  bool SortTree()           const { return fSortTree; }
   bool IgnoreMode3()        const { return fIgnoreMode3; }
   bool CommandServer()      const { return fCommandServer; }
   bool ExtractWaves()       const { return fExtractWaves;  }
+  bool StartGUI()           const { return fStartGui; }
+  bool MakeHistos()         const { return fMakeHistos; }
+
+  bool IsOnline()           const { return fIsOnline; }
+
+  bool TimeSortInput()      const { return fTimeSortInput; }
 
   bool ShouldExitImmediately() const { return fShouldExit; }
   bool MakeBackupFile() const { return fMakeBackupFile; }
 
-  kFileType   DetermineFileType(const std::string& filename);
+  kFileType   DefaultFileType() const { return fDefaultFileType; }
+  kFileType   DetermineFileType(const std::string& filename) const;
+
   std::string GenerateOutputFilename(const std::string& filename);
   std::string GenerateOutputFilename(const std::vector<std::string>& filename);
+
+
+  bool SetStartGUI(bool flag=true) { fStartGui=flag; }
 
 private:
   TGRUTOptions(int argc, char** argv);
@@ -54,24 +68,33 @@ private:
   std::vector<std::string> input_root_files;
   std::vector<std::string> input_cal_files;
   std::vector<std::string> input_macro_files;
+  std::vector<std::string> input_gui_hist_files;
   std::string input_ring;
 
   std::string output_file;
 
   std::string detector_environment;
+  std::string compiled_histogram_file;
 
   std::vector<std::string> options_file;
 
   int fCommandPort;
 
+  kFileType fDefaultFileType;
   bool fExitAfterSorting;
   bool fHelp;
   bool fShowLogo;
   bool fSortRaw;
+  bool fSortTree;
   bool fIgnoreErrors;
   bool fIgnoreMode3;
   bool fCommandServer;
   bool fExtractWaves;
+  bool fIsOnline;
+  bool fStartGui;
+  bool fMakeHistos;
+
+  bool fTimeSortInput;
 
   bool fShouldExit;
   bool fMakeBackupFile;

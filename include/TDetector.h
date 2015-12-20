@@ -27,7 +27,8 @@ public:
   int Build();
   virtual void InsertHit(const TDetectorHit&) { AbstractMethod("InsertHit()"); }
   virtual TDetectorHit& GetHit(int i)         { AbstractMethod("GetHit()"); }
-  virtual int  Size() const                   { AbstractMethod("Size()"); }
+
+  int  Size() const { return fSize; }
 
 
   Long_t Timestamp() const { return fTimestamp; }
@@ -38,10 +39,12 @@ protected:
   std::vector<TRawEvent> raw_data; //!
   #endif
 
+  int fSize;
+  Long_t   fTimestamp;
+
 private:
   virtual int  BuildHits()                  { AbstractMethod("BuildHits()"); }
 
-  Long_t   fTimestamp;
 
   ClassDef(TDetector,1)
 };

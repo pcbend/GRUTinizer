@@ -71,7 +71,7 @@ class GCanvas : public TCanvas {
       //void ClearBGMarkers();
       //void OrderBGMarkers();
 
-      std::vector<TH1*> Find1DHists();
+      std::vector<TH1*> FindHists(int dim=1);
       std::vector<TH1*> FindAllHists();
 
    public:
@@ -106,6 +106,10 @@ class GCanvas : public TCanvas {
    private:
       Window_t fCanvasWindowID;
       TRootCanvas *fRootCanvas;
+
+      bool control_key;
+
+      bool toggle_control() { control_key = !control_key;}
 
    ClassDef(GCanvas,2);
 };

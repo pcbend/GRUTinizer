@@ -18,3 +18,5 @@ htmldoc
 bin
 .build
 .nfs*
+*.pyc
+.grut_thread

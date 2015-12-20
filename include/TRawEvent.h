@@ -34,7 +34,9 @@ public:
   const char *GetBody() const;
   TSmartBuffer& GetBuffer(){ return fBody; }
 
-   void SetData(TSmartBuffer body);
+  const char* GetPayload() const;
+
+  void SetData(TSmartBuffer body);
 
   bool IsGoodSize() const;
   void SetFileType(kFileType type) { fFileType = type; }
@@ -43,13 +45,16 @@ public:
   Int_t  GetEventType() const;
   Int_t  GetTotalSize() const;
   Int_t  GetBodySize()  const;
+  Long_t GetTimestamp() const;
+
+  void SetFragmentTimestamp(long timestamp) { fTimestamp = timestamp; }
 
 protected:
   RawHeader fEventHeader;
   kFileType fFileType;
+  long fTimestamp;
   TSmartBuffer fBody;
-public:
-  virtual bool FillCondition() {printf("%s",__PRETTY_FUNCTION__); return true;} //!
+
 
   ClassDef(TRawEvent,0)
 };

@@ -9,9 +9,10 @@
 #include <TText.h>
 #include <TLatex.h>
 #include <TH1.h>
+#include <TH2.h>
 #include <TGraphErrors.h>
 #include <Buttons.h>
-#include <KeySymbols.h> 
+#include <KeySymbols.h>
 #include <TVirtualX.h>
 #include <TROOT.h>
 #include <TFrame.h>
@@ -24,9 +25,7 @@
 #include <TContextMenu.h>
 
 //#include "GROOTGuiFactory.h"
-//#include "GRootGlobals.h"
-
-#include "TObjectManager.h"
+#include "GRootCommands.h"
 
 #include <iostream>
 #include <fstream>
@@ -66,24 +65,24 @@ int GCanvas::lastx = 0;
 int GCanvas::lasty = 0;
 
 GCanvas::GCanvas(Bool_t build)
-        :TCanvas(build)  {  
+        :TCanvas(build)  {
    GCanvasInit();
 }
 
 GCanvas::GCanvas(const char* name, const char* title, Int_t form)
-        :TCanvas(name,title,form) { 
+        :TCanvas(name,title,form) {
    GCanvasInit();
 
 }
 
 GCanvas::GCanvas(const char* name, const char* title, Int_t ww, Int_t wh)
-        :TCanvas(name,title,ww,wh) { 
+        :TCanvas(name,title,ww,wh) {
    GCanvasInit();
 
 }
 
 GCanvas::GCanvas(const char* name, Int_t ww, Int_t wh, Int_t winid)
-        :TCanvas(name,ww,wh,winid) { 
+        :TCanvas(name,ww,wh,winid) {
   // this constructor is used to create an embedded canvas
   // I see no reason for us to support this here.  pcb.
   GCanvasInit();
@@ -91,29 +90,29 @@ GCanvas::GCanvas(const char* name, Int_t ww, Int_t wh, Int_t winid)
 
 
 GCanvas::GCanvas(const char* name, const char* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh)
-        :TCanvas(name,title,wtopx,wtopy,ww,wh) { 
+        :TCanvas(name,title,wtopx,wtopy,ww,wh) {
    GCanvasInit();
 }
 
 
 GCanvas::~GCanvas() {
-   //TCanvas::~TCanvas();           
+  //TCanvas::~TCanvas();
 }
 
 void GCanvas::GCanvasInit() {
-   printf("GCanvasInit called.\n");
    // ok, to interact with the default TGWindow
-   // stuff from the root gui we need our own GRootCanvas.  
+   // stuff from the root gui we need our own GRootCanvas.
    // We make this using GROOTGuiFactory, which replaces the
-   // TRootGuiFactory used in the creation of some of the 
-   // default gui's (canvas,browser,etc).  
+   // TRootGuiFactory used in the creation of some of the
+   // default gui's (canvas,browser,etc).
    //fStatsDisplayed = true;
-   fMarkerMode     = false;
-
+   fMarkerMode     = true;
+   control_key = false;
    //if(gVirtualX->InheritsFrom("TGX11")) {
    //    printf("\tusing x11-like graphical interface.\n");
    //}
    //this->SetCrosshair(true);
+  SetBit(kNotDeleted,false); //root voodoo.
 }
 
 void GCanvas::AddMarker(int x,int y,int dim) {
@@ -137,7 +136,7 @@ void GCanvas::AddMarker(int x,int y,int dim) {
   }
   if(fMarkers.size()>MAXNUMBEROFMARKERS) {
     delete fMarkers.at(0);
-    fMarkers.erase(fMarkers.begin()); 
+    fMarkers.erase(fMarkers.begin());
     //fMarkers.insert(fMarkers.begin(),mark);
   } //else {
     fMarkers.push_back(mark);
@@ -164,7 +163,7 @@ void GCanvas::RemoveMarker(Option_t* opt) {
   }
 }
 
-void GCanvas::OrderMarkers() { 
+void GCanvas::OrderMarkers() {
   std::sort(fMarkers.begin(),fMarkers.end());
   return;
 }
@@ -174,7 +173,7 @@ void GCanvas::OrderMarkers() {
 //  fBG_Markers.push_back(bg_mark);
 //}
 
-GCanvas *GCanvas::MakeDefCanvas() { 
+GCanvas *GCanvas::MakeDefCanvas() {
   // Static function to build a default canvas.
 
   const char *defcanvas = gROOT->GetDefCanvasName();
@@ -202,7 +201,7 @@ GCanvas *GCanvas::MakeDefCanvas() {
 //   printf("\ty:     \t0x%i\n",y);
 //}
 
-//void GCanvas::ExecuteEvent(Int_t event,Int_t x,Int_t y) { 
+//void GCanvas::ExecuteEvent(Int_t event,Int_t x,Int_t y) {
 //  printf("exc event called.\n");
 //}
 
@@ -211,8 +210,11 @@ void GCanvas::HandleInput(Int_t event,Int_t x,Int_t y) {
   //If the below switch breaks. You need to upgrade your version of ROOT
   //Version 5.34.24 works. //older version should work now too pcb (8/2015)
   bool used = false;
+  //printf("event = 0x%08x\n",event);
   switch(event) {
-    case 0x00000001:
+    case 0x00000001: //single click
+    case 0x0000003d: //double click
+    case 0x00000007: //shift-click
       used = HandleMousePress(event,x,y);
       break;
   };
@@ -229,20 +231,26 @@ void GCanvas::Draw(Option_t *opt) {
 }
 
 
-std::vector<TH1*> GCanvas::Find1DHists() {
+std::vector<TH1*> GCanvas::FindHists(int dim) {
   std::vector<TH1*> tempvec;
   TH1 *hist = 0;
   TIter iter(gPad->GetListOfPrimitives());
   while(TObject *obj = iter.Next()) {
-    if( obj->InheritsFrom(TH1::Class()) ) {  
+    if( obj->InheritsFrom(TH1::Class()) ) {
       TH1* hist = (TH1*)obj;
-      if(hist->GetDimension()==1){
-        tempvec.push_back(hist); 
+      if(hist->GetDimension()==dim){
+        tempvec.push_back(hist);
       }
     }
   }
   return tempvec;
 }
+
+
+
+
+
+
 
 std::vector<TH1*> GCanvas::FindAllHists() {
   std::vector<TH1*> tempvec;
@@ -250,7 +258,7 @@ std::vector<TH1*> GCanvas::FindAllHists() {
   TIter iter(gPad->GetListOfPrimitives());
   while(TObject *obj = iter.Next()) {
      if( obj->InheritsFrom("TH1"))
-        tempvec.push_back((TH1*)obj); 
+        tempvec.push_back((TH1*)obj);
   }
   return tempvec;
 }
@@ -258,8 +266,8 @@ std::vector<TH1*> GCanvas::FindAllHists() {
 bool GCanvas::HandleArrowKeyPress(Event_t *event,UInt_t *keysym) {
 
   bool edited = false;
-  
-  std::vector<TH1*> hists = Find1DHists();
+
+  std::vector<TH1*> hists = FindHists();
   if(hists.size()>0){
     edited = Process1DArrowKeyPress(event,keysym);
   }
@@ -283,10 +291,15 @@ bool GCanvas::HandleKeyboardPress(Event_t *event,UInt_t *keysym) {
   //         ge = (TGraphErrors*)obj;
   //   }
   //}
-  std::vector<TH1*> hists = Find1DHists();
-  if(hists.size()>0){  
+  std::vector<TH1*> hists = FindHists();
+  if(hists.size()>0){
     edited = Process1DKeyboardPress(event,keysym);
   }
+  hists = FindHists(2);
+  if(hists.size()>0){
+    edited = Process2DKeyboardPress(event,keysym);
+  }
+
 
   //if(ge){
   //  switch(*keysym) {
@@ -315,16 +328,23 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
   TH1 *hist = 0;
   bool edited = false;
   while(TObject *obj = iter.Next()) {
-     if( obj->InheritsFrom("TH1") &&
-        !obj->InheritsFrom("TH2") &&  
-        !obj->InheritsFrom("TH3") ) {  
-        hist = (TH1*)obj; 
-     }
+     if(obj->InheritsFrom(TH1::Class()))
+        hist = (TH1*)obj;
   }
   if(!hist)
      return false;
+  if(event == 0x00000007) {
+    GCanvas *g = new GCanvas();
+    TString options;
+    if(hist->GetDimension()==2)
+      options.Append("colz");
+    hist->DrawCopy(options.Data());
+    return true;
+  }
 
   bool used = false;
+  if(hist->GetDimension()!=1)
+    return used;
 
   if(!strcmp(GetSelected()->GetName(),"TFrame") && fMarkerMode) {
     //((TFrame*)GetSelected())->SetBit(TBox::kCannotMove);
@@ -345,14 +365,14 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
 }
 
 
-TF1 *GCanvas::GetLastFit() { 
+TF1 *GCanvas::GetLastFit() {
   TH1 *hist = 0;
   TIter iter(gPad->GetListOfPrimitives());
   while(TObject *obj = iter.Next()) {
      if( obj->InheritsFrom("TH1") &&
-        !obj->InheritsFrom("TH2") &&  
-        !obj->InheritsFrom("TH3") ) {  
-        hist = (TH1*)obj; 
+        !obj->InheritsFrom("TH2") &&
+        !obj->InheritsFrom("TH3") ) {
+        hist = (TH1*)obj;
      }
   }
   if(!hist)
@@ -364,19 +384,19 @@ TF1 *GCanvas::GetLastFit() {
      //    tmpfit = (TF1*)(hist->GetListOfFunctions()->Before(tmpfit));
      //    tmpname = tmpfit->GetName();
      //}
-     return tmpfit; 
+     return tmpfit;
   }
   return 0;
 }
 
 
-bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) { 
+bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
   bool edited = false;
-  std::vector<TH1*> hists = Find1DHists();
+  std::vector<TH1*> hists = FindHists();
 
   int first = hists.at(0)->GetXaxis()->GetFirst();
   int last = hists.at(0)->GetXaxis()->GetLast();
- 
+
   int min = std::min(first,0);
   int max = std::max(last,hists.at(0)->GetXaxis()->GetNbins()+1);
 
@@ -394,7 +414,7 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
 	  first = min+1;
 	  last  = min + (xdiff) + 1;
 	} else {
-	  first = first-(xdiff/2); 
+	  first = first-(xdiff/2);
 	  last  = last -(xdiff/2);
 	}
       }
@@ -408,38 +428,45 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
     {
       if(mdiff>xdiff) {
 	if(last== (max-1)) {
-	  // 
+	  //
 	}else if((last+(xdiff/2))>max) {
-	  first = max - 1 - (xdiff); 
+	  first = max - 1 - (xdiff);
 	  last  = max - 1;
 	} else {
-	  last  = last +(xdiff/2); 
-	  first = first+(xdiff/2); 
+	  last  = last +(xdiff/2);
+	  first = first+(xdiff/2);
 	}
       }
       for(int i=0;i<hists.size();i++)
 	hists.at(i)->GetXaxis()->SetRange(first,last);
-      
+
       edited = true;
     }
     break;
 
   case kMyArrowUp: {
-    TH1* temph = gManager->GetNext1D(hists.at(0), false);
-    if(temph) {
-      temph->GetXaxis()->SetRange(first,last);
-      temph->Draw();
-      edited = true;
-    }
+    // //printf("Up.\n");
+    // //printf("start: 0x%08x\n",hists.at(0));
+    // TH1* temph = (TH1*)gManager->FindObjectAny(hists.at(0)->GetName());
+    // temph = gManager->GetNext1D(temph, false);
+    // //printf("next:  0x%08x\n",temph);
+    // if(temph) {
+    //   temph->GetXaxis()->SetRange(first,last);
+    //   temph->Draw();
+    //   edited = true;
+    // }
   }
     break;
   case kMyArrowDown: {
-    TH1* temph = gManager->GetNext1D(hists.at(0), true);
-    if(temph) {
-      temph->GetXaxis()->SetRange(first,last);
-      temph->Draw();
-      edited = true;
-    }
+    // //printf("Down.\n");
+    // //TH1* temph = gManager->GetNext1D(hists.at(0), true);
+    // TH1* temph = (TH1*)gManager->FindObjectAny(hists.at(0)->GetName());
+    // temph = gManager->GetNext1D(temph, false);
+    // if(temph) {
+    //   temph->GetXaxis()->SetRange(first,last);
+    //   temph->Draw();
+    //   edited = true;
+    // }
   }
     break;
   default:
@@ -450,17 +477,23 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
 }
 
 bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
+
+  //printf("keysym:   0x%08x\n",*keysym);
+
   bool edited = false;
-  std::vector<TH1*> hists = Find1DHists();
+  std::vector<TH1*> hists = FindHists();
   if(hists.size()<1)
-    return edited; 
+    return edited;
 
   switch(*keysym) {
+    case kKey_Control:
+      toggle_control();
+      break;
     case kKey_e:
        if(GetNMarkers()<2)
           break;
        {
-       if(fMarkers.at(fMarkers.size()-1)->localx < fMarkers.at(fMarkers.size()-2)->localx) 
+       if(fMarkers.at(fMarkers.size()-1)->localx < fMarkers.at(fMarkers.size()-2)->localx)
           for(int i=0;i<hists.size();i++)
             hists.at(i)->GetXaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-1)->localx,fMarkers.at(fMarkers.size()-2)->localx);
        else
@@ -471,17 +504,56 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
        RemoveMarker("all");
        break;
     case kKey_E:
+       //this->GetListOfPrimitives()->Print();
        GetContextMenu()->Action(hists.back()->GetXaxis(),hists.back()->GetXaxis()->Class()->GetMethodAny("SetRangeUser"));
-       for(int i=0;i<hists.size()-1;i++)
-          hists.at(i)->GetXaxis()->SetRangeUser(hists.back()->GetXaxis()->GetFirst(),hists.back()->GetXaxis()->GetLast());
+       {
+          double x1 = hists.back()->GetXaxis()->GetBinCenter(hists.back()->GetXaxis()->GetFirst());
+          double x2 = hists.back()->GetXaxis()->GetBinCenter(hists.back()->GetXaxis()->GetLast());
+          TIter iter(this->GetListOfPrimitives());
+          while(TObject *obj = iter.Next()) {
+            if(obj->InheritsFrom(TPad::Class())) {
+              TPad *pad = (TPad*)obj;
+              TIter iter2(pad->GetListOfPrimitives());
+              while(TObject *obj2=iter2.Next()) {
+                if(obj2->InheritsFrom(TH1::Class())) {
+                  TH1* hist = (TH1*)obj2;
+                  hist->GetXaxis()->SetRangeUser(x1,x2);
+                  pad->Modified();
+                  pad->Update();
+                }
+              }
+            }
+          }
+
+       //for(int i=0;i<hists.size()-1;i++)   // this doesn't work, set range needs values not bins.   pcb.
+       //   hists.at(i)->GetXaxis()->SetRangeUser(hists.back()->GetXaxis()->GetFirst(),hists.back()->GetXaxis()->GetLast());
+
+       }
        edited = true;
        break;
-    //case kKey_g:
-    //   edited = GausFit();
-    //   break;
+    case kKey_f:
+       if(!hists.empty() && GetNMarkers()>1) {
+         //printf("x low = %.1f\t\txhigh = %.1f\n",fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
+         edited = PhotoPeakFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
+       }
+       break;
+  case kKey_g:
+    edited = GausFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
+    break;
     //case kKey_G:
     //   edited = GausBGFit();
     //   break;
+    case kKey_i:
+       if(!hists.empty() && GetNMarkers()>1) {
+         double xlow  = (fMarkers.at(fMarkers.size()-2)->localx);
+         double xhigh = (fMarkers.back()->localx);
+         if(xlow>xhigh)
+           std::swap(xlow,xhigh);
+         double sum = hists.back()->Integral(hists.back()->GetXaxis()->FindBin(xlow),
+                                             hists.back()->GetXaxis()->FindBin(xhigh));
+         printf( BLUE "\n\tSum [%.01f : %.01f] = %.01f" RESET_COLOR  "\n",xlow,xhigh,sum);
+       }
+       break;
     //case kKey_l:
     //   for(int i=0;i<hists.size();i++) {
     //      hists.at(i)->GetYaxis()->UnZoom();
@@ -502,42 +574,93 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       break;
     case kKey_M:
       SetMarkerMode(false);
-    case kKey_n: 
+    case kKey_n:
       RemoveMarker("all");
       for(int i=0;i<hists.size();i++)
         hists.at(i)->GetListOfFunctions()->Delete();
+      RemovePeaks(hists.data(),hists.size());
       edited = true;
-      break; 
+      break;
     case kKey_o:
       for(int i=0;i<hists.size();i++)
         hists.at(i)->GetXaxis()->UnZoom();
       RemoveMarker("all");
-      edited = true;    
+      edited = true;
+      break;
+    case kKey_s:
+      edited = ShowPeaks(hists.data(),hists.size());
       break;
     case kKey_F10:{
-      }    
+      }
       break;
 
   };
   return edited;
 }
 
-bool GCanvas::Process1DMousePress(Int_t event,Int_t x,Int_t y)      { 
+bool GCanvas::Process1DMousePress(Int_t event,Int_t x,Int_t y)      {
   bool edited = false;
   return edited;
 }
 
-bool GCanvas::Process2DArrowKeyPress(Event_t *event,UInt_t *keysym) { 
+bool GCanvas::Process2DArrowKeyPress(Event_t *event,UInt_t *keysym) {
   bool edited = false;
   return edited;
 }
 
-bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) { 
+bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
   bool edited = false;
+  //printf("2d hist key pressed.\n");
+  std::vector<TH1*> hists = FindHists(2);
+  if(hists.size()<1)
+    return edited;
+  switch(*keysym) {
+    case kKey_o:
+      for(int i=0;i<hists.size();i++) {
+        TH2* h = (TH2*)hists.at(i);
+        h->GetXaxis()->UnZoom();
+        h->GetYaxis()->UnZoom();
+      }
+      RemoveMarker("all");
+      edited = true;
+      break;
+    case kKey_z: {
+        printf("you pressed z!\n");           
+        GCanvas *c = (GCanvas*)gPad->GetCanvas();
+        TIter iter(c->GetListOfPrimitives());
+        while(TObject *obj = iter.Next()) {
+          if(!obj->InheritsFrom(TCanvas::Class()))
+            continue;
+          TCanvas *c = ((TCanvas*)obj);
+          if(!c->GetLogz())
+            c->SetLogz(1);
+        }
+      }
+      edited = true;
+      break;
+    case kKey_Z: {
+        GCanvas *c = (GCanvas*)gPad->GetCanvas();
+        TIter iter(c->GetListOfPrimitives());
+        while(TObject *obj = iter.Next()) {
+          if(!obj->InheritsFrom(TCanvas::Class()))
+            continue;
+          TCanvas *c = ((TCanvas*)obj);
+          if(c->GetLogz())
+            c->SetLogz(0);
+        }
+      }
+      edited = true;
+      break;
+
+
+
+
+
+  };
   return edited;
 }
 
-bool GCanvas::Process2DMousePress(Int_t event,Int_t x,Int_t y)      { 
+bool GCanvas::Process2DMousePress(Int_t event,Int_t x,Int_t y)      {
   bool edited = false;
   return edited;
 }
@@ -557,9 +680,9 @@ bool GCanvas::GausFit(GMarker *m1,GMarker *m2) {
   bool edited = false;
   while(TObject *obj = iter.Next()) {
      if( obj->InheritsFrom("TH1") &&
-        !obj->InheritsFrom("TH2") &&  
-        !obj->InheritsFrom("TH3") ) {  
-        hist = (TH1*)obj; 
+        !obj->InheritsFrom("TH2") &&
+        !obj->InheritsFrom("TH3") ) {
+        hist = (TH1*)obj;
      }
   }
   if(!hist)
@@ -567,12 +690,12 @@ bool GCanvas::GausFit(GMarker *m1,GMarker *m2) {
   if(!m1 || !m2) {
     if(GetNMarkers()<2) {
        return false;
-    } else { 
+    } else {
        m1 = fMarkers.at(fMarkers.size()-1);
        m2 = fMarkers.at(fMarkers.size()-2);
     }
   }
-  
+
   TF1 *gausfit = hist->GetFunction("gausfit");
   if(gausfit)
      gausfit->Delete();
@@ -582,11 +705,11 @@ bool GCanvas::GausFit(GMarker *m1,GMarker *m2) {
   if(m1->localx < m2->localx) {
     x[0]=m1->localx; x[1]=m2->localx;
     binx[0]=m1->x;   binx[1]=m2->x;
-    y[0]=hist->GetBinContent(m1->x); y[1]=hist->GetBinContent(m2->x); 
+    y[0]=hist->GetBinContent(m1->x); y[1]=hist->GetBinContent(m2->x);
   } else {
     x[1]=m1->localx; x[0]=m2->localx;
     binx[1]=m1->x;   binx[0]=m2->x;
-    y[1]=hist->GetBinContent(m1->x); y[0]=hist->GetBinContent(m2->x); 
+    y[1]=hist->GetBinContent(m1->x); y[0]=hist->GetBinContent(m2->x);
   }
   //printf("x[0] = %.02f   x[1] = %.02f\n",x[0],x[1]);
   gausfit = new TF1("gausfit","gaus",x[0],x[1]);
@@ -594,20 +717,20 @@ bool GCanvas::GausFit(GMarker *m1,GMarker *m2) {
 //  hist->Fit(gfit,"QR+");
 
   ///gausfit->SetParameters(y[0],0,gfit->GetParameter(0),gfit->GetParameter(1),gfit->GetParameter(2));
-  
+
 //  gfit->Delete();
   //hist->GetFunction("gaus")->Delete();
 
   hist->Fit(gausfit,"QR+");
-  
+
   double param[3];
   double error[3];
-   
+
   gausfit->GetParameters(param);
   error[0] = gausfit->GetParError(0);
   error[1] = gausfit->GetParError(1);
   error[2] = gausfit->GetParError(2);
-  
+
   printf("\nIntegral from % 4.01f to % 4.01f: %f\n",x[0],x[1],gausfit->Integral(x[0],x[1])/hist->GetBinWidth(1));
   printf("Centroid:  % 4.02f  +/- %.02f\n",param[1],error[1]);
   printf("FWHM:      % 4.02f  +/- %.02f\n",param[2]*2.35,error[2]*2.35);
@@ -617,7 +740,7 @@ bool GCanvas::GausFit(GMarker *m1,GMarker *m2) {
   printf("Area:      % 4.02f  +/- %.02f\n",
          integral,int_err);
   return true;
-  
+
 }
 
 bool GCanvas::PeakFit(GMarker *m1,GMarker *m2) {
@@ -626,9 +749,9 @@ bool GCanvas::PeakFit(GMarker *m1,GMarker *m2) {
   bool edited = false;
   while(TObject *obj = iter.Next()) {
      if( obj->InheritsFrom("TH1") &&
-        !obj->InheritsFrom("TH2") &&  
-        !obj->InheritsFrom("TH3") ) {  
-        hist = (TH1*)obj; 
+        !obj->InheritsFrom("TH2") &&
+        !obj->InheritsFrom("TH3") ) {
+        hist = (TH1*)obj;
      }
   }
   if(!hist)
@@ -636,12 +759,12 @@ bool GCanvas::PeakFit(GMarker *m1,GMarker *m2) {
   if(!m1 || !m2) {
     if(GetNMarkers()<2) {
        return false;
-    } else { 
+    } else {
        m1 = fMarkers.at(fMarkers.size()-1);
        m2 = fMarkers.at(fMarkers.size()-2);
     }
   }
-  
+
  // TPeak *mypeak = (TPeak*)(hist->GetFunction("peak"));
  // if(mypeak)
   //   mypeak->Delete();
@@ -651,11 +774,11 @@ bool GCanvas::PeakFit(GMarker *m1,GMarker *m2) {
   if(m1->localx < m2->localx) {
     x[0]=m1->localx; x[1]=m2->localx;
     binx[0]=m1->x;   binx[1]=m2->x;
-    y[0]=hist->GetBinContent(m1->x); y[1]=hist->GetBinContent(m2->x); 
+    y[0]=hist->GetBinContent(m1->x); y[1]=hist->GetBinContent(m2->x);
   } else {
     x[1]=m1->localx; x[0]=m2->localx;
     binx[1]=m1->x;   binx[0]=m2->x;
-    y[1]=hist->GetBinContent(m1->x); y[0]=hist->GetBinContent(m2->x); 
+    y[1]=hist->GetBinContent(m1->x); y[0]=hist->GetBinContent(m2->x);
   }
   //printf("x[0] = %.02f   x[1] = %.02f\n",x[0],x[1]);
   TPeak* mypeak = new TPeak((x[0]+x[1])/2.0,x[0],x[1]);
@@ -663,7 +786,7 @@ bool GCanvas::PeakFit(GMarker *m1,GMarker *m2) {
 //  hist->Fit(gfit,"QR+");
 
   ///gausfit->SetParameters(y[0],0,gfit->GetParameter(0),gfit->GetParameter(1),gfit->GetParameter(2));
-  
+
 //  gfit->Delete();
   //hist->GetFunction("gaus")->Delete();
 
@@ -673,15 +796,15 @@ bool GCanvas::PeakFit(GMarker *m1,GMarker *m2) {
   TPeak *peakfit = (TPeak*)(hist->GetListOfFunctions()->Last());
 //  mypeak->Background()->Draw("SAME");
 
-//  
+//
 //  double param[3];
 //  double error[3];
-//   
+//
 //  gausfit->GetParameters(param);
 //  error[0] = gausfit->GetParError(0);
 //  error[1] = gausfit->GetParError(1);
 //  error[2] = gausfit->GetParError(2);
-//  
+//
 //  printf("\nIntegral from % 4.01f to % 4.01f: %f\n",x[0],x[1],gausfit->Integral(x[0],x[1])/hist->GetBinWidth(1));
 //  printf("Centroid:  % 4.02f  +/- %.02f\n",param[1],error[1]);
 //  printf("FWHM:      % 4.02f  +/- %.02f\n",param[2]*2.35,error[2]*2.35);
@@ -691,7 +814,7 @@ bool GCanvas::PeakFit(GMarker *m1,GMarker *m2) {
 //  printf("Area:      % 4.02f  +/- %.02f\n",
 //         integral,int_err);
   return true;
-  
+
 }
 
 
@@ -701,9 +824,9 @@ bool GCanvas::PeakFitQ(GMarker *m1,GMarker *m2) {
   bool edited = false;
   while(TObject *obj = iter.Next()) {
      if( obj->InheritsFrom("TH1") &&
-        !obj->InheritsFrom("TH2") &&  
-        !obj->InheritsFrom("TH3") ) {  
-        hist = (TH1*)obj; 
+        !obj->InheritsFrom("TH2") &&
+        !obj->InheritsFrom("TH3") ) {
+        hist = (TH1*)obj;
      }
   }
   if(!hist)
@@ -711,23 +834,23 @@ bool GCanvas::PeakFitQ(GMarker *m1,GMarker *m2) {
   if(!m1 || !m2) {
     if(GetNMarkers()<2) {
        return false;
-    } else { 
+    } else {
        m1 = fMarkers.at(fMarkers.size()-1);
        m2 = fMarkers.at(fMarkers.size()-2);
     }
   }
-  
+
   int binx[2];
   double x[2];
   double y[2];
   if(m1->localx < m2->localx) {
     x[0]=m1->localx; x[1]=m2->localx;
     binx[0]=m1->x;   binx[1]=m2->x;
-    y[0]=hist->GetBinContent(m1->x); y[1]=hist->GetBinContent(m2->x); 
+    y[0]=hist->GetBinContent(m1->x); y[1]=hist->GetBinContent(m2->x);
   } else {
     x[1]=m1->localx; x[0]=m2->localx;
     binx[1]=m1->x;   binx[0]=m2->x;
-    y[1]=hist->GetBinContent(m1->x); y[0]=hist->GetBinContent(m2->x); 
+    y[1]=hist->GetBinContent(m1->x); y[0]=hist->GetBinContent(m2->x);
   }
   //printf("x[0] = %.02f   x[1] = %.02f\n",x[0],x[1]);
   TPeak * mypeak = new TPeak((x[0]+x[1])/2.0,x[0],x[1]);
@@ -739,7 +862,7 @@ bool GCanvas::PeakFitQ(GMarker *m1,GMarker *m2) {
 //  hist->Fit(gfit,"QR+");
 
   ///gausfit->SetParameters(y[0],0,gfit->GetParameter(0),gfit->GetParameter(1),gfit->GetParameter(2));
-  
+
 //  gfit->Delete();
   //hist->GetFunction("gaus")->Delete();
 
@@ -754,9 +877,9 @@ bool GCanvas::PeakFitQ(GMarker *m1,GMarker *m2) {
   }
 //  mypeak->Background()->Draw("SAME");
   mypeak->Print();
-*/  
-     
-/* 
+*/
+
+/*
   double param[10];
   double error[10];
   peakfit->GetParameters(param);
@@ -770,7 +893,7 @@ bool GCanvas::PeakFitQ(GMarker *m1,GMarker *m2) {
   error[4] = peakfit->GetParError(7);
   error[4] = peakfit->GetParError(8);
   error[4] = peakfit->GetParError(9);
-  
+
   printf("\nIntegral from % 4.01f to % 4.01f: %f\n",x[0],x[1],peakfit->Integral(x[0],x[1])/hist->GetBinWidth(1));
   printf("Centroid:  % 4.02f  +/- %.02f\n",param[1],error[1]);
   printf("FWHM:      % 4.02f  +/- %.02f\n",fabs(param[2]*2.35),error[2]*2.35);
@@ -779,22 +902,22 @@ bool GCanvas::PeakFitQ(GMarker *m1,GMarker *m2) {
  //                                        ((error[4]/param[4])*(error[4]/param[4])));
  // printf("Area:      % 4.02f  +/- %.02f\n",
  //        integral - (bg->Integral(x[0],x[1])/hist->GetBinWidth(1)),int_err);
- */ 
+ */
 //  return true;
-  
+
 //}
 
 /*
 void GCanvas::SetBackGroundSubtractionType() {
   // used to set the background subtraction type
-  // used for the p command. Current configurations 
+  // used for the p command. Current configurations
   // are:
   //
   // 0.  No background subtraction.
   // 1.  Fraction of the total projection. setting a bg level estimates the fraction.
   // 2.  From marker #3         -> make a subtract gate the same width as the project gate.
   // 3.  From marker #3 & #4    -> make a suntract gate from maker 3 and 4 the same total widthe as the project gate. Odd numebrs default to marker #4.
-  // 4.  Between marker #3 & #4 -> make a subtract gate between marker 3 and 4. 
+  // 4.  Between marker #3 & #4 -> make a subtract gate between marker 3 and 4.
   // 5.  Use marker #1 & #2     -> use the 'b' key to create a subtract projection.  Projection is not drawn but last projection made will be subtracted
   //                               in the next projection.
   //
@@ -828,9 +951,9 @@ void GCanvas::SetBackGroundSubtractionType() {
 }
 
 bool GCanvas::SetBackGround(GMarker *m1,GMarker *m2,GMarker *m3,GMarker *m4) {
-  ClearBGMarkers();  //removes all BG markers... 
+  ClearBGMarkers();  //removes all BG markers...
   bool edited = false;
-  switch(fBGSubtraction_type) {   
+  switch(fBGSubtraction_type) {
     case 0:
       printf(RED "\nBackground Subtraction type not set, no Background subtraction will be performed.\n" RESET_COLOR );
       break;
@@ -886,23 +1009,23 @@ bool GCanvas::SetBackGround(GMarker *m1,GMarker *m2,GMarker *m3,GMarker *m4) {
 
 bool GCanvas::SetBGGate(GMarker *m1, GMarker *m2, GMarker *m3, GMarker *m4) {
   ClearBGMarkers();
-  switch(fBGSubtraction_type) {   
+  switch(fBGSubtraction_type) {
     case 2:
       if(!m1 || !m2 || !m3)
          return false;
       else {
         AddBGMarker(m3);
-        
+
         GMarker *mark = new GMarker(*m3);
         mark->x = m3->x + (abs(m1->x - m2->x)+1);
         mark->localx = gPad->AbsPixeltoX(mark->x);
         AddBGMarker(mark);
-        
+
         mark = fBG_Markers.at(0);
         mark->linex = new TLine(mark->localx,GetUymin(),mark->localx,GetUymax());
         mark->linex->SetLineColor(kBlue);
         mark->linex->Draw();
-        
+
         mark = fBG_Markers.at(1);
         mark->linex = new TLine(mark->localx,GetUymin(),mark->localx,GetUymax());
         mark->linex->SetLineColor(kBlue);
@@ -920,7 +1043,7 @@ bool GCanvas::SetBGGate(GMarker *m1, GMarker *m2, GMarker *m3, GMarker *m4) {
         GMarker *mark = new GMarker(*m3);
         if((abs(m1->x - m2->x)%2) != 0)
           mark->x = m3->x + ((abs(m1->x - m2->x)+1)/2 + 1 );
-        else 
+        else
           mark->x = m3->x + (abs(m1->x - m2->x)/2 + 1);
         mark->localx = gPad->AbsPixeltoX(mark->x);
         AddBGMarker(mark);
@@ -936,7 +1059,7 @@ bool GCanvas::SetBGGate(GMarker *m1, GMarker *m2, GMarker *m3, GMarker *m4) {
            mark->linex = new TLine(mark->localx,GetUymin(),mark->localx,GetUymax());
            mark->linex->SetLineColor(kBlue);
            mark->linex->Draw();
-        } 
+        }
         RemoveMarker(); // remove marker #4 so the project will work...
         RemoveMarker(); // remove marker #3 so the project will work...
      }
@@ -952,10 +1075,10 @@ bool GCanvas::SetBGGate(GMarker *m1, GMarker *m2, GMarker *m3, GMarker *m4) {
          mark->linex = new TLine(mark->localx,GetUymin(),mark->localx,GetUymax());
          mark->linex->SetLineColor(kBlue);
          mark->linex->Draw();
-       } 
+       }
        RemoveMarker(); // remove marker #4 so the project will work...
        RemoveMarker(); // remove marker #3 so the project will work...
-     }  
+     }
      return true;
      default:
         return false;
@@ -964,7 +1087,7 @@ bool GCanvas::SetBGGate(GMarker *m1, GMarker *m2, GMarker *m3, GMarker *m4) {
 
 bool GCanvas::SetConstantBG() {
   bool edited = false;
-  std::vector<TH1*> hists = Find1DHists();
+  std::vector<TH1*> hists = FindHists();
   if(hists.size()<1)
      return edited;
   if(GetNBG_Markers()<1)
@@ -991,12 +1114,12 @@ bool GCanvas::SetConstantBG() {
 }
 
 TH1 *GCanvas::GetBackGroundHist(GMarker *addlow,GMarker *addhigh) {
-  std::vector<TH1*> hists = Find1DHists();
+  std::vector<TH1*> hists = FindHists();
   if(hists.size()<1)
      return 0;
   TH1 *hist = hists.at(0);
 
-  switch(fBGSubtraction_type) {   
+  switch(fBGSubtraction_type) {
     case 0:
       //printf(RED "\nBackground Subtraction type not set, no Background subtraction will be performed.\n" RESET_COLOR );
       return 0;
@@ -1026,7 +1149,7 @@ TH1 *GCanvas::GetBackGroundHist(GMarker *addlow,GMarker *addhigh) {
       if(!mobj || !mobj->GetParent() || !mobj->GetParent()->InheritsFrom("TH2"))
          return temp_bg;
       int bin0,bin1;
-      if(!strcmp(mobj->GetOption(),"ProjY")) { 
+      if(!strcmp(mobj->GetOption(),"ProjY")) {
         bin1 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(fBG_Markers.size()-1)->localx);
         bin0 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(fBG_Markers.size()-2)->localx);
         temp_bg = ((TH2*)mobj->GetParent())->ProjectionX(Form("%s_bg",hist->GetName()),bin0,bin1);
@@ -1049,7 +1172,7 @@ TH1 *GCanvas::GetBackGroundHist(GMarker *addlow,GMarker *addhigh) {
       if(!mobj || !mobj->GetParent() || !mobj->GetParent()->InheritsFrom("TH2"))
          return temp_bg;
       int bin0,bin1;
-      if(!strcmp(mobj->GetOption(),"ProjY")) { 
+      if(!strcmp(mobj->GetOption(),"ProjY")) {
         bin1 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(0)->localx);
         bin0 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(1)->localx);
         temp_bg = ((TH2*)mobj->GetParent())->ProjectionX(Form("%s_bg",hist->GetName()),bin0,bin1);
@@ -1079,7 +1202,7 @@ TH1 *GCanvas::GetBackGroundHist(GMarker *addlow,GMarker *addhigh) {
       if(!mobj || !mobj->GetParent() || !mobj->GetParent()->InheritsFrom("TH2"))
          return temp_bg;
       int bin0,bin1;
-      if(!strcmp(mobj->GetOption(),"ProjY")) { 
+      if(!strcmp(mobj->GetOption(),"ProjY")) {
         bin1 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(0)->localx);
         bin0 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(1)->localx);
         temp_bg = ((TH2*)mobj->GetParent())->ProjectionX(Form("%s_bg",hist->GetName()),bin0,bin1);
@@ -1095,7 +1218,7 @@ TH1 *GCanvas::GetBackGroundHist(GMarker *addlow,GMarker *addhigh) {
     case 5:
       printf(RED "\nWork in progress, check back soon; no Background subtraction will be performed.\n" RESET_COLOR );
       break;
-      
+
   };
   return 0;
 }

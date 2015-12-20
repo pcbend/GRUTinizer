@@ -4,8 +4,6 @@
 #include "TDetector.h"
 #include "TSegaHit.h"
 
-class TClonesArray;
-
 class TSega : public TDetector {
 public:
   TSega();
@@ -14,17 +12,29 @@ public:
   void Copy(TObject& obj) const;
 
   virtual void Clear(Option_t* opt = "");
-  virtual void InsertHit(const TDetectorHit&);
   virtual TSegaHit& GetSegaHit(int i);
   virtual TDetectorHit& GetHit(int i);
-  virtual int Size();
+
+  static TVector3 GetSegmentPosition(int detnum, int segnum);
+  static TVector3 CrystalToGlobal(int detnum, TVector3 crystal_pos);
+  static void LoadDetectorPositions();
 
 private:
+  TSegaHit& GetOrMakeHit(int detnum);
+
   virtual int BuildHits();
 
-  TClonesArray* sega_hits; //->
+  std::vector<TSegaHit> sega_hits;
 
-  ClassDef(TSega,1);
+  struct Transformation {
+    TVector3 origin;
+    TVector3 x;
+    TVector3 y;
+    TVector3 z;
+  };
+  static std::map<int,Transformation> detector_positions;
+
+  ClassDef(TSega,2);
 };
 
 #endif /* _TSEGA_H_ */
