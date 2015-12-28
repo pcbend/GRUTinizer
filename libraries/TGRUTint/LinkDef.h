@@ -1,4 +1,4 @@
-// TGRUTint.h TGRUTOptions.h TGRUTTypes.h 
+// TGRUTint.h TGRUTOptions.h TGRUTTypes.h
 
 #ifdef __CINT__
 
@@ -12,19 +12,8 @@
 
 #pragma link C++ global gChain;
 
-//#pragma link C++ class std::vector<Short_t>+;
 #pragma link C++ class TGRUTOptions+;
 #pragma link C++ class TGRUTInterruptHandler+;
-//#pragma link C++ class TDetectorEnv+;
 #pragma link C++ class TGRUTint+;
-//#pragma link C++ class TGRUTServer+;
-//#pragma link C++ class THashList_ThreadSafe+;
-
-//#pragma link C++ class GValue+;
-
-//#pragma link C++ global gResponse;
-
-//#pragma link C++ function GetNPipelines;
-//#pragma link C++ function GetPipeline;
 
 #endif

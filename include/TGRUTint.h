@@ -11,18 +11,15 @@
 #include <thread>
 #endif
 
-#include <TSystem.h>
-#include <TSysEvtHandler.h>
-#include <TRint.h>
-#include <TEnv.h>
-#include <TChain.h>
-#include <TList.h>
-
-//#include "TGRUTServer.h"
+#include "TChain.h"
+#include "TEnv.h"
+#include "TList.h"
+#include "TRint.h"
+#include "TSysEvtHandler.h"
+#include "TSystem.h"
 
 class TRawFileIn;
 
-//extern TObject* gResponse;
 extern TChain *gChain;
 
 class TGRUTint : public TRint {
@@ -48,7 +45,6 @@ class TGRUTint : public TRint {
     TRawFileIn* OpenRawFile(const std::string& filename);
 
 public:
-  //void HandleFile(const std::string& filename);
   void DelayedProcessLine_Action();
 
 
@@ -61,8 +57,6 @@ private:
   Long_t DelayedProcessLine(std::string message);
 
   //TTimer* fGuiTimer;
-
-  //TTimer* fCommandTimer;
 #ifndef __CINT__
   std::thread::id main_thread_id;
 #endif
@@ -70,9 +64,7 @@ private:
   int fRootFilesOpened;
   int fRawFilesOpened;
 
-  //TObject* fNewChild;
   bool fIsTabComplete;
-  //TGRUTServer *fCommandServer;
 
   TChain* fChain;
 
@@ -81,13 +73,11 @@ private:
   void LoadGRootGraphics();
   void LoadDetectorClasses();
 
-  public:
-    TList *GetListOfRawFiles() { return &fOpenedRawFiles; }
+public:
+  TList *GetListOfRawFiles() { return &fOpenedRawFiles; }
 
-  private:
-    TList fOpenedRawFiles;
-
-
+private:
+  TList fOpenedRawFiles;
 
   ClassDef(TGRUTint,0);
 };

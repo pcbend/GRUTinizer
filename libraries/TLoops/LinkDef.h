@@ -15,8 +15,4 @@
 #pragma link C++ class TWriteLoop+;
 #pragma link C++ class TChainLoop+;
 
-
-//#pragma link C++ class TUnpackLoop+;
-//#pragma link C++ class TPipeline+;
-
 #endif
