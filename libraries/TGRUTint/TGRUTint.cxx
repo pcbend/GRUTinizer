@@ -42,8 +42,6 @@
 #include "TChainLoop.h"
 #include "THistogramLoop.h"
 
-#include "TSega.h"
-
 //extern "C" G__value G__getitem(const char* item);
 //#include "FastAllocString.h"
 //char* G__valuemonitor(G__value buf, G__FastAllocString& temp);
@@ -188,8 +186,6 @@ void TGRUTint::ApplyOptions() {
 
   TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
 
-
-  //TSega::LoadDetectorPositions();
 
   if(opt->StartGUI()){
     // TThread *gui_thread = new TThread("gui_thread",(TThread::VoidRtnFunc_t)GUI_Loop);

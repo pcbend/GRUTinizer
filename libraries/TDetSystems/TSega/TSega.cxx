@@ -123,6 +123,8 @@ TVector3 TSega::GetSegmentPosition(int detnum, int segnum) {
 }
 
 TVector3 TSega::CrystalToGlobal(int detnum, TVector3 crystal_pos) {
+  LoadDetectorPositions();
+
   static int lines_displayed = 0;
   if(!detector_positions.count(detnum)){
     if(lines_displayed < 1000) {
@@ -140,14 +142,20 @@ TVector3 TSega::CrystalToGlobal(int detnum, TVector3 crystal_pos) {
 }
 
 void TSega::LoadDetectorPositions() {
+  static bool loaded = false;
+  if(loaded){
+    return;
+  }
+  loaded = true;
+
   std::string filename = std::string(getenv("GRUTSYS")) + "/../config/SeGA_rotations.txt";
 
   //Read the locations from file.
   std::ifstream infile(filename);
 
   if(!infile){
-    //std::cout << "SeGA rotation matrix file \"" << filename << "\""
-    //          << " does not exist, skipping" << std::endl;
+    std::cout << "SeGA rotation matrix file \"" << filename << "\""
+             << " does not exist, skipping" << std::endl;
     return;
   }
 

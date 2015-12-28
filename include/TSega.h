@@ -19,10 +19,10 @@ public:
 
   static TVector3 GetSegmentPosition(int detnum, int segnum);
   static TVector3 CrystalToGlobal(int detnum, TVector3 crystal_pos);
-  static void LoadDetectorPositions();
 
 private:
   virtual int BuildHits();
+  static void LoadDetectorPositions();
 
   std::vector<TSegaHit> sega_hits;
 
