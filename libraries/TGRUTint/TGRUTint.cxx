@@ -1,9 +1,11 @@
 #include "Globals.h"
 #include "TGRUTint.h"
 
+#include <algorithm>
 #include <fstream>
 #include <string>
-#include <algorithm>
+
+#include <pwd.h>
 
 #include <Getline.h>
 #include <TClass.h>
@@ -578,7 +580,9 @@ void TGRUTint::Terminate(Int_t status){
   //}
 
   //Be polite when you leave.
-  printf(DMAGENTA "\nbye,bye\t" DCYAN "%s" RESET_COLOR  "\n",getlogin());
+  //printf(DMAGENTA "\nbye,bye\t" DCYAN "%s" RESET_COLOR  "\n",getlogin());
+  printf(DMAGENTA "\nbye,bye\t" DCYAN "%s" RESET_COLOR  "\n",
+         getpwuid(getuid())->pw_name);
 
   if((clock()%60) == 0){
     printf("DING!");
