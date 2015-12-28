@@ -21,12 +21,13 @@ public:
   virtual void InsertHit(const TDetectorHit& hit);
 
 
-  int  Size() const    { return phoswall_hits->GetEntries(); }
+  int  Size() const    { return phoswall_hits.size(); }
 
-  Int_t GetLargestNumber()            const { return fLargestHit;                          }
-  TPhosWallHit &GetLargetHit()        const { return GetPhosWallHit(GetLargestNumber());   }
-  TPhosWallHit &GetPhosWallHit(int i) const { return *(TPhosWallHit*)phoswall_hits->At(i); }
-  TDetectorHit &GetHit(int i)               { return *(TDetectorHit*)phoswall_hits->At(i); }
+  Int_t GetLargestNumber()                  const { return fLargestHit; }
+  TPhosWallHit& GetLargetHit()                    { return GetPhosWallHit(GetLargestNumber()); }
+        TPhosWallHit& GetPhosWallHit(int i)       { return phoswall_hits.at(i); }
+  const TPhosWallHit& GetPhosWallHit(int i) const { return phoswall_hits.at(i); }
+  TDetectorHit& GetHit(int i)                     { return phoswall_hits.at(i); }
 
   //void Draw(Option_t *opt="");
   //void DrawXY(Option_t *opt="");
@@ -46,7 +47,7 @@ private:
   Short_t  fLargestHit;
   Int_t    fNumberOfHits;
 
-  TClonesArray *phoswall_hits;  //->
+  std::vector<TPhosWallHit> phoswall_hits;
 
   static TVector3 *fWallPositions[257];
   static bool      fPositionsSet;

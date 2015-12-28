@@ -8,22 +8,19 @@ TVector3* TPhosWall::fWallPositions[257] = {NULL};
 bool TPhosWall::fPositionsSet = false;
 
 TPhosWall::TPhosWall() {
-  phoswall_hits = new TClonesArray("TPhosWallHit");
   if(!fPositionsSet)
     SetWallPositions();
 }
 
-TPhosWall::~TPhosWall() {
-  phoswall_hits->Delete();
-}
+TPhosWall::~TPhosWall() { }
 
 
 void TPhosWall::Copy(TObject &rhs) const {
   TDetector::Copy(rhs);
 
   TPhosWall det = (TPhosWall&)rhs;
-  phoswall_hits->Copy(*det.phoswall_hits);
 
+  det.phoswall_hits = phoswall_hits;
   det.fTimeStamp    = fTimeStamp;
   det.fLargestHit   = fLargestHit;
   det.fNumberOfHits = fNumberOfHits;
@@ -32,7 +29,8 @@ void TPhosWall::Copy(TObject &rhs) const {
 
 void TPhosWall::Clear(Option_t *opt) {
   TDetector::Clear(opt);
-  phoswall_hits->Clear(opt);
+
+  phoswall_hits.clear();
 
   fTimeStamp    = -1;
   fLargestHit   = -1;
@@ -57,6 +55,7 @@ int TPhosWall::BuildHits() {
   for(size_t i=0;i<raw_data.size();i++) {
     TGEBEvent &geb = (TGEBEvent&)raw_data.at(i);
     fTimeStamp = geb.GetTimestamp();
+    fLargestHit = 0;
     for(int j=0;j<geb.GetBodySize(); j+=sizeof(TRawEvent::PWHit)) {
       TPhosWallHit hit((TRawEvent::PWHit*)(geb.GetPayload() + j));
       InsertHit(hit);
@@ -67,8 +66,7 @@ int TPhosWall::BuildHits() {
 }
 
 void TPhosWall::InsertHit(const TDetectorHit &hit) {
-  TPhosWallHit *newhit = (TPhosWallHit*)phoswall_hits->ConstructedAt(Size());
-  hit.Copy(*newhit);
+  phoswall_hits.push_back((TPhosWallHit&)hit);
 }
 
 
