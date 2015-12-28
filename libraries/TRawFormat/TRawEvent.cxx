@@ -28,7 +28,8 @@ void TRawEvent::Copy(TObject &rhs) const {
   ((TRawEvent&)rhs).fTimestamp    = fTimestamp;
 }
 
-TRawEvent::TRawEvent(const TRawEvent &rhs) {
+TRawEvent::TRawEvent(const TRawEvent &rhs)
+  : TObject(rhs) {
   rhs.Copy(*this);
 }
 
@@ -36,7 +37,7 @@ TRawEvent::~TRawEvent() {
   Clear();
 }
 
-Int_t TRawEvent::Compare(const TObject &rhs) const { }
+Int_t TRawEvent::Compare(const TObject &rhs) const { return 0; }
 
 TRawEvent &TRawEvent::operator=(const TRawEvent &rhs) {
   if(&rhs!=this)
@@ -69,6 +70,8 @@ Int_t TRawEvent::GetEventType() const {
   case GRETINA_MODE3:
     return ((GEBHeader*)(&fEventHeader))->type();
 
+  default:
+    ;
   }
 
   return 0;
@@ -110,7 +113,10 @@ Long_t TRawEvent::GetTimestamp() const {
    case GRETINA_MODE2:
    case GRETINA_MODE3:
      return ((TGEBEvent*)this)->GetTimestamp();
-  };
+
+   default:
+     ;
+  }
 
   return 0;
 }
@@ -131,7 +137,10 @@ const char* TRawEvent::GetPayload() const {
    case GRETINA_MODE2:
    case GRETINA_MODE3:
      return ((TGEBEvent*)this)->GetPayload();
-  };
+
+   default:
+     ;
+  }
 
   return 0;
 }

@@ -78,41 +78,40 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
   bool DEBUG = false;
 
 
-  bool isQ = false;  
+  bool isQ = false;
   bool isT = false;
 
   Int_t words_processed = 0;
-  UShort_t buffer_size = 0;
   Int_t detNumber = -1;
 
   // Payload size in 32 bit words.
   Int_t PayloadSize = event.GetPayloadSize()/4.0;
-  
+
   if(PayloadSize == 1)
     return 1;
-  
+
   const char* data = event.GetPayload();
-  
+
   // NOTE -> buffer_size is 2*PayloadSize.
-  buffer_size = *((UShort_t*)(data));
+  // UShort_t buffer_size = *((UShort_t*)(data));
   data+=2;
-  
+
   if(DEBUG){
     event.Print("all");
     std::cout << " Payload Size : " << PayloadSize << std::endl;
   }
-  
+
 
   for(Int_t i = 0; i <PayloadSize; i++ ){
     const TRawEvent::Mesy_Word* Mword = (TRawEvent::Mesy_Word*)data;
     data+=sizeof(TRawEvent::Mesy_Word); words_processed++;
-    
+
     if(Mword->isHeader()){ // Header
       const TRawEvent::Mesy_Header* Mhead = (TRawEvent::Mesy_Header*)Mword;
-      if(Mhead->isQDC()){ 
+      if(Mhead->isQDC()){
 	isQ = true; isT = false;
       }
-      else if(Mhead->isTDC()){ 
+      else if(Mhead->isTDC()){
 	isQ = false; isT = true;
       }
       else std::cout << " *** Error -- Not QDC or TDC *** " << std::endl;
@@ -125,7 +124,7 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	hit.SetChannel(Mq->Chan());
 	hit.SetTime(-1);
 	if(Mq->isOOR()) hit.SetCharge(5000);
-	else            hit.SetCharge(Mq->Charge());	
+	else            hit.SetCharge(Mq->Charge());
 
 	hit.SetEnergy();
 
@@ -146,16 +145,16 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
       } // end if isQ
       else if(isT){ // TDC
 	const TRawEvent::M_TDC_Data* Mt = (TRawEvent::M_TDC_Data*)Mword;
-	
+
 	detNumber = -1;
 	detNumber = GetDetNumberIn_fs_hits(Int_t(Mt->Chan()));
 
-	
+
 	if(detNumber!=-1){
 	  TFastScintHit *qdc_hit = GetLaBrHit(detNumber);
 	  if(qdc_hit->GetChannel()==Mt->Chan()){
 	    qdc_hit->SetTime(Mt->Time());
-	    
+
 	    if(DEBUG){
 	      std::cout << " TDC ch         : " << Mt->Chan() << std::endl;
 	      std::cout << " TDC for QDC ch : " << qdc_hit->GetChannel() << std::endl;
@@ -166,15 +165,15 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	    std::cout << " *** Found a Channel but it didnt match ?? *** " << std::endl;
 	  }
 	}
-	else{ // No Matching QDC 
+	else{ // No Matching QDC
 	  TFastScintHit tdc_hit;
 	  tdc_hit.SetTime(Mt->Time());
 	  tdc_hit.SetCharge(-1);
           tdc_hit.SetEnergy();
-	  
+
 	  if(Mt->isTrig())  tdc_hit.SetChannel(-10);
 	  else   	    tdc_hit.SetChannel(Mt->Chan());
-	    
+
 	  if(Zero_Suppress){
 	    if(Mt->Time()>0){
 	      InsertHit(tdc_hit);
@@ -182,15 +181,15 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	  }
 	  else
 	    InsertHit(tdc_hit);
-	  
+
 	  if(DEBUG){
 	    std::cout << " TDC t : " << std::hex << Mt->Time() << std::endl;
 	    std::cout << " TDC ch: " << std::dec << Mt->Chan() << std::endl;
 	    std::cout << " TDC Tr: " << Mt->isTrig() << std::endl;
 	  }
 	}
-      } // end elif isT	
-      else{ // If not QDC or TDC 
+      } // end elif isT
+      else{ // If not QDC or TDC
 	std::cout << " *** Not TDC or QDC **** " << std::endl;
       }
     }// end elif is data
@@ -204,7 +203,7 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
     }// end elif isfill
     else if(Mword->isEOE()){
       if(DEBUG) std::cout << " EOE " << std::endl;
-    }// end elif eoe    
+    }// end elif eoe
   }// end for
   return 0;
 }

@@ -20,7 +20,7 @@ public:
   virtual void Clear(Option_t *opt = "");
 
   virtual void          InsertHit(const TDetectorHit& hit);
-  virtual TDetectorHit& GetHit(const int &i)            { return mode3_hits.at(i); }
+  virtual TDetectorHit& GetHit(int i)            { return mode3_hits.at(i); }
 
   const TMode3Hit& GetMode3Hit(int i) { return mode3_hits.at(i); }
   void PrintHit(int i){ mode3_hits.at(i).Print(); }

@@ -144,7 +144,6 @@ TVector3 TGretinaHit::GetLocalPosition(int i) const {
 double TGretinaHit::GetDoppler_dB(double beta, const TVector3 *vec,double Dta){
   if(Size()<1)
     return 0.0;
-  bool madevec = false;
   if(vec==0) {
     vec = &BeamUnitVec;
   }

@@ -12,6 +12,7 @@ public:
   void Copy(TObject& obj) const;
 
   virtual void Clear(Option_t* opt = "");
+  virtual void InsertHit(const TDetectorHit&);
 
   virtual TJanusHit&    GetJanusHit(int i);
   virtual TDetectorHit& GetHit(int i);

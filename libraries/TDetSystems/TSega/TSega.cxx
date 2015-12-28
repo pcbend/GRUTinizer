@@ -35,10 +35,6 @@ TDetectorHit& TSega::GetHit(int i){
   return sega_hits.at(i);
 }
 
-TSegaHit& GetOrMakeHit(int detnum) {
-
-}
-
 int TSega::BuildHits() {
   for(auto& event : raw_data){
     TNSCLEvent& nscl = (TNSCLEvent&)event;
@@ -96,6 +92,8 @@ int TSega::BuildHits() {
       seg.SetTrace(ddas.GetTraceLength(), ddas.trace);
     }
   }
+
+  return Size();
 }
 
 TVector3 TSega::GetSegmentPosition(int detnum, int segnum) {
@@ -178,4 +176,9 @@ void TSega::LoadDetectorPositions() {
       detector_positions[detnum].z = vec;
     }
   }
+}
+
+void TSega::InsertHit(const TDetectorHit& hit) {
+  sega_hits.emplace_back((TSegaHit&)hit);
+  fSize++;
 }

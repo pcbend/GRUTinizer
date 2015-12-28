@@ -194,7 +194,7 @@ GCanvas *GCanvas::MakeDefCanvas() {
   //printf("GCanvas::MakeDefCanvas"," created default GCanvas with name %s",cdef);
   delete [] cdef;
   return c;
-};
+}
 
 //void GCanvas::ProcessEvent(Int_t event,Int_t x,Int_t y,TObject *obj) {
 //   printf("{GCanvas} ProcessEvent:\n");
@@ -236,7 +236,6 @@ void GCanvas::Draw(Option_t *opt) {
 
 std::vector<TH1*> GCanvas::FindHists(int dim) {
   std::vector<TH1*> tempvec;
-  TH1 *hist = 0;
   TIter iter(gPad->GetListOfPrimitives());
   while(TObject *obj = iter.Next()) {
     if( obj->InheritsFrom(TH1::Class()) ) {
@@ -257,7 +256,6 @@ std::vector<TH1*> GCanvas::FindHists(int dim) {
 
 std::vector<TH1*> GCanvas::FindAllHists() {
   std::vector<TH1*> tempvec;
-  TH1 *hist = 0;
   TIter iter(gPad->GetListOfPrimitives());
   while(TObject *obj = iter.Next()) {
      if( obj->InheritsFrom("TH1"))
@@ -329,7 +327,6 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
 
   TIter iter(gPad->GetListOfPrimitives());
   TH1 *hist = 0;
-  bool edited = false;
   while(TObject *obj = iter.Next()) {
      if(obj->InheritsFrom(TH1::Class()))
         hist = (TH1*)obj;
@@ -337,7 +334,7 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
   if(!hist)
      return false;
   if(event == 0x00000007) {
-    GCanvas *g = new GCanvas();
+    new GCanvas();
     TString options;
     if(hist->GetDimension()==2)
       options.Append("colz");
@@ -421,7 +418,7 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
 	  last  = last -(xdiff/2);
 	}
       }
-      for(int i=0;i<hists.size();i++)
+      for(unsigned int i=0;i<hists.size();i++)
 	hists.at(i)->GetXaxis()->SetRange(first,last);
 
       edited = true;
@@ -440,7 +437,7 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
 	  first = first+(xdiff/2);
 	}
       }
-      for(int i=0;i<hists.size();i++)
+      for(unsigned int i=0;i<hists.size();i++)
 	hists.at(i)->GetXaxis()->SetRange(first,last);
 
       edited = true;
@@ -497,10 +494,10 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
           break;
        {
        if(fMarkers.at(fMarkers.size()-1)->localx < fMarkers.at(fMarkers.size()-2)->localx)
-          for(int i=0;i<hists.size();i++)
+          for(unsigned int i=0;i<hists.size();i++)
             hists.at(i)->GetXaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-1)->localx,fMarkers.at(fMarkers.size()-2)->localx);
        else
-          for(int i=0;i<hists.size();i++)
+          for(unsigned int i=0;i<hists.size();i++)
             hists.at(i)->GetXaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-2)->localx,fMarkers.at(fMarkers.size()-1)->localx);
        }
        edited = true;
@@ -579,13 +576,13 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       SetMarkerMode(false);
     case kKey_n:
       RemoveMarker("all");
-      for(int i=0;i<hists.size();i++)
+      for(unsigned int i=0;i<hists.size();i++)
         hists.at(i)->GetListOfFunctions()->Delete();
       RemovePeaks(hists.data(),hists.size());
       edited = true;
       break;
     case kKey_o:
-      for(int i=0;i<hists.size();i++)
+      for(unsigned int i=0;i<hists.size();i++)
         hists.at(i)->GetXaxis()->UnZoom();
       RemoveMarker("all");
       edited = true;
@@ -619,7 +616,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
     return edited;
   switch(*keysym) {
     case kKey_o:
-      for(int i=0;i<hists.size();i++) {
+      for(unsigned int i=0;i<hists.size();i++) {
         TH2* h = (TH2*)hists.at(i);
         h->GetXaxis()->UnZoom();
         h->GetYaxis()->UnZoom();
@@ -634,7 +631,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
 
       break;
     case kKey_z: {
-        printf("you pressed z!\n");           
+        printf("you pressed z!\n");
         GCanvas *c = (GCanvas*)gPad->GetCanvas();
         TIter iter(c->GetListOfPrimitives());
         while(TObject *obj = iter.Next()) {

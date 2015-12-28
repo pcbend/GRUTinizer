@@ -12,8 +12,8 @@ public:
   TOrderedRawFile(TRawEventSource* unordered);
   ~TOrderedRawFile();
 
-  void SetDepth(int depth) { this->depth = depth; }
-  int GetDepth() { return depth; }
+  void SetDepth(size_t depth) { this->depth = depth; }
+  size_t GetDepth() const { return depth; }
 
   virtual std::string SourceDescription() const { return unordered->SourceDescription(); }
   virtual std::string Status()            const { return unordered->Status(); }
@@ -25,7 +25,7 @@ private:
 
   TRawEventSource* unordered;
 
-  int depth;
+  size_t depth;
   long oldest_timestamp,newest_timestamp;
   bool finished;
 

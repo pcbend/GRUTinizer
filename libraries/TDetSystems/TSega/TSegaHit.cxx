@@ -59,12 +59,12 @@ void TSegaHit::DrawTrace(int segnum) {
   hist.SetStats(false);
 
   if(segnum==0){
-    hist.SetTitle(Form("SeGA Detector %d at %d ns", GetDetnum(), Timestamp()));
+    hist.SetTitle(Form("SeGA Detector %d at %ld ns", GetDetnum(), Timestamp()));
     hist.GetXaxis()->SetTitle("Time (ns)");
     hist.GetYaxis()->SetTitle("ADC units");
   }
 
-  for(int i=0; i<trace->size(); i++) {
+  for(size_t i=0; i<trace->size(); i++) {
     hist.SetBinContent(i+1,(*trace)[i]);
   }
   hist.DrawCopy();

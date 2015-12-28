@@ -14,7 +14,7 @@
 
 //#include "TMode3.h"
 
-ClassImp(TBuildingLoop);
+ClassImp(TBuildingLoop)
 
 TBuildingLoop *TBuildingLoop::Get(std::string name,TDataLoop *input) {
   if(name.length()==0 && input) {
@@ -49,7 +49,6 @@ bool TBuildingLoop::Iteration(){
   TRawEvent event;
 
   int error = input_source->Pop(event);///input_queue.Pop(event);
-  bool input_running = input_source->IsRunning();
   if(error<0) {
     // Stop if the parent has stopped and the queue is empty.
     return input_source->IsRunning();

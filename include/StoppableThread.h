@@ -63,7 +63,7 @@ protected:
 
 private:
   StoppableThread(const StoppableThread& other) { }
-  StoppableThread& operator=(const StoppableThread& other) { }
+  StoppableThread& operator=(const StoppableThread& other) { return *this; }
 
   std::string fname;
 

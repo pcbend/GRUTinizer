@@ -25,7 +25,7 @@ public:
 
   //void PrintHit(int i){ gretina_hits->At(i)->Print(); }
 
-  Long_t GetTimestamp() { Timestamp(); }
+  Long_t GetTimestamp() { return Timestamp(); }
     //if(Size()>0) return ((TMode3Hit&)GetHit(0)).GetTimestamp(); else return -1; }
 
 private:

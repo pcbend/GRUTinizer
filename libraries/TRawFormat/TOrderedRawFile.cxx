@@ -4,7 +4,7 @@
 #include <iostream>
 #include <utility>
 
-ClassImp(TOrderedRawFile);
+ClassImp(TOrderedRawFile)
 
 TOrderedRawFile::TOrderedRawFile(TRawEventSource* unordered)
   : unordered(unordered),

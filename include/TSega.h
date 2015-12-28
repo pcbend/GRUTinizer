@@ -13,6 +13,8 @@ public:
 
   virtual void Clear(Option_t* opt = "");
   virtual TSegaHit& GetSegaHit(int i);
+
+  virtual void InsertHit(const TDetectorHit&);
   virtual TDetectorHit& GetHit(int i);
 
   static TVector3 GetSegmentPosition(int detnum, int segnum);
@@ -20,8 +22,6 @@ public:
   static void LoadDetectorPositions();
 
 private:
-  TSegaHit& GetOrMakeHit(int detnum);
-
   virtual int BuildHits();
 
   std::vector<TSegaHit> sega_hits;

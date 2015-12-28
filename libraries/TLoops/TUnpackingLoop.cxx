@@ -16,7 +16,7 @@
 
 //#include "TMode3.h"
 
-ClassImp(TUnpackingLoop);
+ClassImp(TUnpackingLoop)
 
 TUnpackingLoop *TUnpackingLoop::Get(std::string name,TBuildingLoop *input) {
   if(name.length()==0 && input) {
@@ -50,7 +50,7 @@ bool TUnpackingLoop::Iteration(){
   }
 
   fOutputEvent = new TUnpackedEvent;
-  for(int i=0;i<event.size();i++) {
+  for(unsigned int i=0;i<event.size();i++) {
     TRawEvent& raw_event = event[i];
     switch(raw_event.GetFileType()){
       case kFileType::NSCL_EVT:
@@ -66,6 +66,9 @@ bool TUnpackingLoop::Iteration(){
         TGEBEvent geb_event(raw_event);
         HandleGEBData(geb_event);
       }
+        break;
+
+      default:
         break;
     }
   }
@@ -123,7 +126,7 @@ void TUnpackingLoop::HandleGEBMode3(TGEBEvent& event, kDetectorSystems system){
   TGEBMode3Event built(event);
   for(unsigned int i=0; i<built.NumFragments(); i++){
     TGEBEvent& fragment = built.GetFragment(i);
-    fOutputEvent->AddRawData(event, system);
+    fOutputEvent->AddRawData(fragment, system);
   }
 }
 

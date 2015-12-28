@@ -38,7 +38,7 @@ public:
   void popd();
 
   int Push(TUnpackedEvent *event);
-  int SendStop(bool flag=true) { stopsent = flag; }
+  void SendStop(bool flag=true) { stopsent = flag; }
 
 protected:
   bool Iteration();

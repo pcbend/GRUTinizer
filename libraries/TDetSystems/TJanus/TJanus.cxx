@@ -226,3 +226,8 @@ TVector3 TJanus::GetPosition(int detnum, int ring_num, int sector_num){
 
   return position;
 }
+
+void TJanus::InsertHit(const TDetectorHit& hit) {
+  janus_hits.emplace_back((TJanusHit&)hit);
+  fSize++;
+}

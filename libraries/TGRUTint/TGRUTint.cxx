@@ -70,7 +70,7 @@ TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions
 
 TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t noLogo,const char *appClassName)
   :TRint(appClassName, &argc, argv, options, numOptions,noLogo),
-   fIsTabComplete(false), main_thread_id(std::this_thread::get_id()) {
+   main_thread_id(std::this_thread::get_id()), fIsTabComplete(false) {
    //fCommandServer(NULL), fGuiTimer(NULL), fCommandTimer(NULL),  fIsTabComplete(false) {
 
   fGRUTEnv = gEnv;
@@ -182,8 +182,8 @@ void TGRUTint::ApplyOptions() {
   if(!false) { //this can be change to something like, if(!ClassicRoot)
      LoadGRootGraphics();
   }
-  
-  
+
+
   TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
 
 
@@ -205,14 +205,14 @@ void TGRUTint::ApplyOptions() {
 
   //if I am passed any calibrations, lets load those.
   if(opt->CalInputFiles().size()) {
-    for(int x=0;x<opt->CalInputFiles().size();x++) {
+    for(unsigned int x=0;x<opt->CalInputFiles().size();x++) {
       TChannel::ReadCalFile(opt->CalInputFiles().at(x).c_str());
     }
   }
   TDataLoop *loop = 0;
   //next most important thing, if given a raw file && told NOT to not sort!
   if(opt->RawInputFiles().size() && opt->SortRaw()) {
-    for(int x=0;x<opt->RawInputFiles().size();x++) {
+    for(unsigned int x=0;x<opt->RawInputFiles().size();x++) {
       loop = TDataLoop::Get("1_input_loop",new TRawFileIn(opt->RawInputFiles().at(x).c_str()));
       loop->Resume();
       TBuildingLoop *boop = TBuildingLoop::Get("2_build_loop",loop);
@@ -250,18 +250,18 @@ void TGRUTint::ApplyOptions() {
 
   //ok now, if told not to sort open any raw files as _data# (rootish like??)
   if(opt->RawInputFiles().size() && !opt->SortRaw()) {
-    for(int x=0;x<opt->RawInputFiles().size();x++)
+    for(unsigned int x=0;x<opt->RawInputFiles().size();x++)
       OpenRawFile(opt->RawInputFiles().at(x));
       //printf("I was passed rawfile %s\n",opt->RawInputFiles().at(x).c_str());
   }
 
   //next, if given a root file and NOT told to sort it..
   if(opt->RootInputFiles().size()){
-    for(int x=0;x<opt->RootInputFiles().size();x++)
+    for(unsigned int x=0;x<opt->RootInputFiles().size();x++)
       OpenRootFile(opt->RootInputFiles().at(x));
 
     //now that my root file has been open, I may need to re-apply any passed in calfiles.
-    for(int x=0;x<opt->CalInputFiles().size();x++)
+    for(unsigned int x=0;x<opt->CalInputFiles().size();x++)
       printf("I am reloading calfile %s!\n",opt->CalInputFiles().at(x).c_str());
   }
 
@@ -526,11 +526,11 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
     return 0;
   }
   sline.ReplaceAll("TCanvas","GCanvas");
-  
+
   if(std::this_thread::get_id() != main_thread_id){
     return DelayedProcessLine(line);
   }
-  
+
   if(!sline.CompareTo("clear")) {
     long result = TRint::ProcessLine(".! clear");
     return result;

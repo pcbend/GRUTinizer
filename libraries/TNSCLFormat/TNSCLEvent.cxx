@@ -106,7 +106,7 @@ Int_t TNSCLScaler::IsIncremental(){
 }
 
 Int_t TNSCLScaler::GetScalerValue(size_t scaler_num){
-  assert(scaler_num < GetScalerCount());
+  assert(scaler_num < size_t(GetScalerCount()));
 
   return *(Int_t*)(GetPayload() + 24 + 4*scaler_num);
 }

@@ -30,7 +30,8 @@ TSmartBuffer::~TSmartBuffer() {
 }
 
 TSmartBuffer::TSmartBuffer(const TSmartBuffer& other)
-  : fAllocatedLocation(other.fAllocatedLocation), fData(other.fData),
+  : TObject(other),
+    fAllocatedLocation(other.fAllocatedLocation), fData(other.fData),
     fSize(other.fSize), fReferenceCount(other.fReferenceCount) {
 
 
@@ -111,13 +112,13 @@ void TSmartBuffer::Print(Option_t* opt) const {
     std::vector<unsigned short> highlight;
     if(highlight_strings.size()) { //Length()) {
       //highlight = strtol(highlight_string.Data(),0,0);
-      for(int j=0;j<highlight_strings.size();j++) {
+      for(unsigned int j=0;j<highlight_strings.size();j++) {
         highlight.push_back(strtol(highlight_strings.at(j).Data(),0,0));
       }
     }
     if(options.Contains("all")){
       printf("\t");
-      for(int x=0; x<GetSize()-1; x+=2) {
+      for(unsigned int x=0; x<GetSize()-1; x+=2) {
         if((x%16 == 0) &&
            (x!=GetSize())){
           printf("\n\t");
@@ -125,7 +126,7 @@ void TSmartBuffer::Print(Option_t* opt) const {
         unsigned int value = *(unsigned short*)(GetData()+x);
         //if(highlight>0 && highlight==value) {printf(DRED);}
         bool found = false;
-        for(int j=0;j<highlight.size();j++) {
+        for(unsigned int j=0;j<highlight.size();j++) {
           if(highlight.at(j) == value)
             found = true;
         }
@@ -136,7 +137,7 @@ void TSmartBuffer::Print(Option_t* opt) const {
 
       }
       if(GetSize()%2 == 1){
-        printf("0x02x ", *(unsigned char*)(GetData()+GetSize()-1));
+        printf("0x%02x ", *(unsigned char*)(GetData()+GetSize()-1));
       }
 
       printf("\n--------------------------\n");

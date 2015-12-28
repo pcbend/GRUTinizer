@@ -241,6 +241,7 @@ bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
       return false;
 
     case kFileType::UNKNOWN_FILETYPE:
+    default:
       printf("\tDiscarding unknown file: %s\n",filename.c_str());
       return false;
   }

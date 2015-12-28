@@ -48,7 +48,8 @@ GPeak::GPeak()
   background.SetLineColor(kBlack);
 }
 
-GPeak::GPeak(const GPeak &peak) {
+GPeak::GPeak(const GPeak &peak)
+  : TF1(peak) {
   peak.Copy(*this);
 }
 
@@ -95,7 +96,6 @@ bool GPeak::InitParams(TH1 *fithist){
   Int_t bin = fithist->GetXaxis()->FindBin(GetParameter("centroid"));
   Int_t binlow = fithist->GetXaxis()->FindBin(xlow);
   Int_t binhigh = fithist->GetXaxis()->FindBin(xhigh);
-  Double_t binWidth = fithist->GetBinWidth(bin);
 
   double largestx=0.0;
   double largesty=0.0;
@@ -110,9 +110,9 @@ bool GPeak::InitParams(TH1 *fithist){
   //printf("largest y = %.1f\n",largesty);
 
   TF1::SetParLimits(1,xlow,xhigh);
-  TF1::SetParLimits(2,0.1,xhigh-xlow); 
+  TF1::SetParLimits(2,0.1,xhigh-xlow);
   TF1::SetParLimits(3,0.000,10);
-  TF1::SetParLimits(4,0,100); // 
+  TF1::SetParLimits(4,0,100); //
   //Step size is allow to vary to anything. If it goes below 0, the code will fix it to 0
   TF1::SetParLimits(6,0.0,fithist->GetBinContent(bin)*1.4);
   //this->SetParLimits(9,xlow,xhigh);
@@ -217,7 +217,9 @@ void GPeak::Print(Option_t *opt) const {
   printf("Name: %s \n", this->GetName());
   printf("Centroid:  %1f +/- %1f \n", this->GetParameter("centroid"),this->GetParError(GetParNumber("centroid")));
   printf("Area:      %1f +/- %1f \n", farea, fd_area);
-  printf("FWHM:      %1f +/- %1f \n", this->GetParameter("sigma")*2,35,this->GetParError(GetParNumber("sigma")*2.35));
+  printf("FWHM:      %1f +/- %1f \n",
+         this->GetParameter("sigma")*2.35,
+         this->GetParError(GetParNumber("sigma"))*2.35);
   printf("Chi^2/NDF: %1f\n",fchi2/fNdf);
   if(options.Contains("+")){
     TF1::Print(opt);

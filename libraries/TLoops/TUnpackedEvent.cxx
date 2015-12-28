@@ -63,9 +63,12 @@ void TUnpackedEvent::AddRawData(const TRawEvent& event, kDetectorSystems detecto
   case kDetectorSystems::CAESAR:
     GetDetector<TCaesar>(true)->AddRawData(event);
     break;
-    
+
     // Not implemented yet.
   case kDetectorSystems::PHOSWALL:
+    break;
+
+  default:
     break;
   }
 }

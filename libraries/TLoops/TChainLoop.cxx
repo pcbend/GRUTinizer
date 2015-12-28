@@ -26,7 +26,7 @@ TChainLoop* TChainLoop::Get(std::string name,TChain *chain){
       return 0;
     } else if(!chain) {
       chain = gChain;
-    } 
+    }
     thread = new TChainLoop(name,chain);
   }
   return dynamic_cast<TChainLoop*>(thread);
@@ -34,8 +34,8 @@ TChainLoop* TChainLoop::Get(std::string name,TChain *chain){
 
 TChainLoop::TChainLoop(std::string name, TChain *chain)
   : StoppableThread(name),
-    input_chain(chain),fEntriesRead(0),hist_loop(0) {
-    fEntriesTotal = chain->GetEntries();
+    fEntriesRead(0), fEntriesTotal(chain->GetEntries()),
+    input_chain(chain), hist_loop(0) {
     SetupChain();
 }
 
@@ -49,9 +49,9 @@ int TChainLoop::SetupChain() {
   TObjArray *array = input_chain->GetListOfBranches();
   for(int x=0;x<array->GetSize();x++) {
     TBranch *b = (TBranch*)array->At(x);
-    if(b) { 
+    if(b) {
       TClass *c = TClass::GetClass(b->GetName());
-      if(c) { 
+      if(c) {
         printf("Found  %s!\n",b->GetName());
         TDetector** det = new TDetector*;
 	*det = NULL;
@@ -124,7 +124,7 @@ bool TChainLoop::Iteration() {
   }
   if(!living_parent && hist_loop)
     hist_loop->SendStop();
-  
+
   return living_parent || (input_queues.size()==0);
   */
   return true;
@@ -197,4 +197,3 @@ void TChainLoop::ChainEvent(TUnpackedEvent* event) {
     delete event;
 }
 */
-

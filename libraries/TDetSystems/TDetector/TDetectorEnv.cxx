@@ -52,12 +52,12 @@ Int_t TDetectorEnv::ReadFile(const std::string& filename) {
     return -2;
   }
 
-  char buffer[length+1];
+  std::vector<char> buffer(length+1);
   infile.seekg(0,std::ios::beg);
-  infile.read(buffer,length);
+  infile.read(buffer.data(),length);
   buffer[length] = '\0';
 
-  ParseInputData(buffer);
+  ParseInputData(buffer.data());
   return 1;
 }
 
@@ -72,7 +72,7 @@ Int_t TDetectorEnv::ParseInputData(const char *inputdata) {
   //Parse the cal file. This is useful because if the cal file contains something that
   //the parser does not recognize, it just skips it!
   while (std::getline(infile, line)) {
-    int comment = line.find("//");
+    size_t comment = line.find("//");
     if (comment != std::string::npos) {
       line = line.substr(0, comment);
     }
@@ -88,7 +88,7 @@ Int_t TDetectorEnv::ParseInputData(const char *inputdata) {
     if (!line.length())
       continue;
 
-    int colon = line.find(":");
+    size_t colon = line.find(":");
 
     if(colon  == std::string::npos)
       continue;
@@ -111,6 +111,8 @@ Int_t TDetectorEnv::ParseInputData(const char *inputdata) {
       id_list.push_back(value);
     }
   }
+
+  return 0;
 }
 
 // TODO: Implement this.

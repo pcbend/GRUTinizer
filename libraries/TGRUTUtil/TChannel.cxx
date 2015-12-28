@@ -25,7 +25,8 @@ TChannel::TChannel(const char *name) {
    SetName(name);
 }
 
-TChannel::TChannel(const TChannel& rhs) {
+TChannel::TChannel(const TChannel& rhs)
+  : TNamed(rhs) {
   rhs.Copy(*this);
 }
 
@@ -156,6 +157,7 @@ bool TChannel::AppendChannel(TChannel *oldchan) {
 
 bool TChannel::ReplaceChannel(TChannel *oldchan)  {
   this->Copy(*oldchan);
+  return true;
 }
 
 bool TChannel::RemoveChannel(TChannel &chan) {
@@ -167,12 +169,12 @@ bool TChannel::RemoveChannel(TChannel &chan) {
 }
 
 int TChannel::DeleteAllChannels()  {
-  int count;
+  int count = 0;
   for(auto &iter : fChannelMap) {
     if(iter.second)
-       delete iter.second;
-     iter.second = 0;
-     count++;
+      delete iter.second;
+    iter.second = 0;
+    count++;
   }
   fChannelMap.clear();
   return count;
@@ -198,7 +200,7 @@ void TChannel::DestroyCalibrations() {
   DestroyEnergyCoeff();
   DestroyEfficiencyCoeff();
   return;
-};
+}
 
 double TChannel::CalEnergy(int charge) {
   if(charge==0)
@@ -240,10 +242,10 @@ int TChannel::ReadCalFile(const char* filename,Option_t *opt) {
   }
 
   std::string sbuffer;
-  char buffer[(int)length];
+  std::vector<char> buffer(length);
   infile.seekg(0,std::ios::beg);
-  infile.read(buffer,(int)length);
-  sbuffer.assign(buffer);
+  infile.read(buffer.data(),(int)length);
+  sbuffer.assign(buffer.data());
 
   int channels_found = ParseInputData(sbuffer,opt);
   if(channels_found) {
@@ -299,6 +301,7 @@ int TChannel::WriteToBuffer(Option_t *opt) {
     fChannelData.append(iter.PrintToString());
     fChannelData.append("\n");
   }
+  return 0;
 }
 
 
@@ -309,7 +312,6 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
   int linenumber = 0;
   int newchannels = 0;
 
-  bool creatednewchannel = false;
   bool brace_open = false;
   std::string name;
 
@@ -400,7 +402,7 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
   if(!strcmp(opt,"debug"))
      printf("parsed %i lines,\n",linenumber);
   return newchannels;
-};
+}
 
 
 void TChannel::Streamer(TBuffer &R__b) {

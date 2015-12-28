@@ -7,9 +7,6 @@ class TSequentialRawFile : public TRawEventSource {
 public:
   TSequentialRawFile();
   ~TSequentialRawFile();
-  // TODO, can I disable thse somehow without annoying ROOT?
-  TSequentialRawFile(const TSequentialRawFile& other) { }
-  TSequentialRawFile& operator=(const TSequentialRawFile& other) { }
 
   void Add(TRawEventSource* infile);
 
@@ -20,9 +17,13 @@ public:
 
 
 private:
+  // TODO, can I disable thse somehow without annoying ROOT?
+  TSequentialRawFile(const TSequentialRawFile& other) { }
+  TSequentialRawFile& operator=(const TSequentialRawFile& other) { return *this; }
+
   virtual int GetEvent(TRawEvent& event);
 
-  int active_source;
+  size_t active_source;
   std::vector<TRawEventSource*> sources;
 
   ClassDef(TSequentialRawFile, 0);

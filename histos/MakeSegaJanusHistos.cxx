@@ -99,7 +99,7 @@ void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega) {
                       36000, 0, 3600e9, hit.Timestamp(),
                       33, 0, 33, hit.GetNumSegments());
 
-    for(int segi=0; segi<hit.GetNumSegments(); segi++){
+    for(unsigned int segi=0; segi<hit.GetNumSegments(); segi++){
       TSegaSegmentHit& seg = hit.GetSegment(segi);
       obj.FillHistogram(Form("sega_det%d_segsummary", hit.GetDetnum()),
                         32, 0, 32, seg.GetSegnum(),

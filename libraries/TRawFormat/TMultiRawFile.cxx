@@ -85,7 +85,7 @@ std::string TMultiRawFile::Status() const{
 
   std::stringstream ss;
   if(!fIsFirstStatus){
-    for(auto& file : fFileList){
+    for(unsigned int i = 0; i<fFileList.size(); i++) {
       ss << CURSOR_UP;
     }
   }

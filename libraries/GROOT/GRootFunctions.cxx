@@ -2,7 +2,7 @@
 #include "GRootFunctions.h"
 
 
-NamespaceImp(GRootFunctions);
+NamespaceImp(GRootFunctions)
 
 
 #define PI TMATH::Pi()
@@ -24,10 +24,10 @@ Double_t GRootFunctions::StepFunction(Double_t *dim, Double_t *par) {
   //  -par[5]: size of step in step function.
 
   Double_t x       = dim[0];
-  Double_t height  = par[0];
+  //Double_t height  = par[0];
   Double_t cent    = par[1];
   Double_t sigma   = par[2];
-  Double_t R       = par[4];
+  //Double_t R       = par[4];
   Double_t step    = par[5];
 
   //return TMath::Abs(step)*height/100.0*TMath::Erfc((x-cent)/(TMath::Sqrt(2.0)*sigma));
@@ -107,5 +107,5 @@ Double_t GRootFunctions::Efficiency(Double_t *dim, Double_t *par){
     return pow(10.0,(p0+p1*TMath::Log10(x)+p2*std::pow(TMath::Log10(x),2.0)+p3/(std::pow(x,2.0))));
   else
     return 0;
-	    
+
 }

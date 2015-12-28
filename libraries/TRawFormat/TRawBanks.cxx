@@ -5,7 +5,7 @@ std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBInteractionPoint 
    return os << "HPGeSegment[" << std::setw(3) << fSeg.seg << "]\t("
              << std::setprecision(2)  << fSeg.x << ", " << fSeg.y << ", " << fSeg.z << ")\t"
              << fSeg.seg_ener << " / " << fSeg.e << std::setprecision(ss) << std::endl;
-};
+}
 
 
 
@@ -37,7 +37,7 @@ std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBBankType1 &bank) 
       os << "\t" << bank.intpts[x];
    os << "************************" << std::endl;
    return os;
-};
+}
 
 UShort_t TRawEvent:: SwapShort(UShort_t datum) {
   UShort_t temp = 0;
@@ -165,7 +165,7 @@ std::ostream& operator<<(std::ostream& os,const TRawEvent::PWHit &hit) {
              << std::setw(8) << hit.data_b
              << std::setw(8) << hit.data_c
              << std::setw(8) << hit.time   << std::endl;
-};
+}
 
 
 std::ostream& operator<<(std::ostream& os,const TRawEvent::PWBank &bank) {
@@ -175,13 +175,13 @@ std::ostream& operator<<(std::ostream& os,const TRawEvent::PWBank &bank) {
       os << bank.hit[x];
    os << "*****************************" << std::endl;
    return os;
-};
+}
 
 
 std::ostream& operator<<(std::ostream& os,const TRawEvent::LaBrSeg &hit) {
    return os << "LaBrHit[" << std::setw(2)  << hit.chan_id <<"]\t"   //  PW Bank @ " << std::hex << &head << std::dec      << std::endl
              << std::setw(8) << hit.value << std::endl;
-};
+}
 
 
 std::ostream& operator<<(std::ostream& os,const TRawEvent::LaBrBank &bank) {
@@ -196,7 +196,7 @@ std::ostream& operator<<(std::ostream& os,const TRawEvent::LaBrBank &bank) {
       os << "\t" << bank.energy_hit[x];
    os << "*****************************" << std::endl;
    return os;
-};
+}
 
 std::ostream& operator<<(std::ostream& os, const TRawEvent::RawHeader &head) {
   return os << "\tdatum1      = " << std::setw(8) << head.datum1 << std::endl

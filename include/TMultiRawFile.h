@@ -38,7 +38,7 @@ public:
 
 private:
   TMultiRawFile(const TMultiRawFile& other) { }
-  TMultiRawFile& operator=(const TMultiRawFile& other) { }
+  TMultiRawFile& operator=(const TMultiRawFile& other) { return *this; }
 
   std::set<TRawEventSource*> fFileList; // This list does not get modified frequently
   std::set<FileEvent> fFileEvents; // This list is modified frequently

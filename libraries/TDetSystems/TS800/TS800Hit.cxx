@@ -11,19 +11,19 @@ TTrigger::TTrigger() {
 TTrigger::~TTrigger() {
 }
 
-void TTrigger::Copy(TObject &obj) const { 
+void TTrigger::Copy(TObject &obj) const {
   TDetectorHit::Copy(obj);
   TTrigger &trig =(TTrigger&)obj;
   trig.fregistr  = fregistr;
-  trig.fs800source      = fs800source;     
+  trig.fs800source      = fs800source;
   trig.fexternalsource1 = fexternalsource1;
   trig.fexternalsource2 = fexternalsource2;
   trig.fsecondarysource = fsecondarysource;
 }
 
-void TTrigger::Clear(Option_t *opt) { 
+void TTrigger::Clear(Option_t *opt) {
   fregistr         = -1;
-  fs800source      = -1;     
+  fs800source      = -1;
   fexternalsource1 = -1;
   fexternalsource2 = -1;
   fsecondarysource = -1;
@@ -38,18 +38,18 @@ TTof::TTof() {
 TTof::~TTof() {
 }
 
-void TTof::Copy(TObject &obj) const { 
+void TTof::Copy(TObject &obj) const {
   TDetectorHit::Copy(obj);
   TTof &tof_ =(TTof&)obj;
   tof_.frf      = frf;
   tof_.fobj     = fobj;
   tof_.fxfp     = fxfp;
   tof_.fsi      = fsi;
-  tof_.ftac_obj = ftac_obj; 
+  tof_.ftac_obj = ftac_obj;
   tof_.ftac_xfp = ftac_xfp;
 }
 
-void TTof::Clear(Option_t *opt) { 
+void TTof::Clear(Option_t *opt) {
    frf      = -1;
    fobj     = -1;
    fxfp     = -1;
@@ -69,7 +69,7 @@ TScintillator::TScintillator() {
 TScintillator::~TScintillator() {
 }
 
-void TScintillator::Copy(TObject &obj) const { 
+void TScintillator::Copy(TObject &obj) const {
   TDetectorHit::Copy(obj);
   TScintillator &scinti =(TScintillator&)obj;
   scinti.fID            = fID;
@@ -80,7 +80,7 @@ void TScintillator::Copy(TObject &obj) const {
 
 }
 
-void TScintillator::Clear(Option_t *opt) { 
+void TScintillator::Clear(Option_t *opt) {
   fID        = -1;
   fdE_up     = -1;
   fdE_down   = -1;
@@ -108,7 +108,7 @@ void TIonChamber::Set(int ch, int data){
 float TIonChamber::GetdE(){
   float temp =0.0;
   //if(fdE==-1.0) {
-    for(int x=0;x<fData.size();x++) {   //std::vector<int>::iterator it=fData.begin();it!=fData.end();it++) {
+    for(unsigned int x=0;x<fData.size();x++) {   //std::vector<int>::iterator it=fData.begin();it!=fData.end();it++) {
       //if(fdE==-1.0)
       //  fdE=0.0;
       temp+=fData.at(x); //it->first;
@@ -118,10 +118,10 @@ float TIonChamber::GetdE(){
   }
   if(temp>0)
     temp = temp/((float)fData.size());
-  return temp;                   
+  return temp;
 }
 
-void TIonChamber::Copy(TObject &obj) const { 
+void TIonChamber::Copy(TObject &obj) const {
   TDetectorHit::Copy(obj);
   TIonChamber &ic =(TIonChamber&)obj;
   ic.fChan = fChan;
@@ -129,7 +129,7 @@ void TIonChamber::Copy(TObject &obj) const {
 
 }
 
-void TIonChamber::Clear(Option_t *opt) { 
+void TIonChamber::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
   //fdE = -1;
   fChan.clear();
@@ -141,68 +141,64 @@ void TIonChamber::Print(Option_t *opt) const { }
 /******* End of TIonChamber.  Beginning of TWhatever **********/
 
 
-TCrdc::TCrdc() { 
+TCrdc::TCrdc() {
   Clear();
 }
 
-TCrdc::~TCrdc() { 
+TCrdc::~TCrdc() {
 }
 
 float TCrdc::GetPad(){
   int temp = 0;
   int place =0;
-  float WeightedSumNum = 0;
-  float WeightedSumDen = 0;
   if(!data.size())
     return -1.0;
-  
+
   temp = data.at(0);
-  for(int i = 0; i < data.size(); i++){
+  for(unsigned int i = 0; i < data.size(); i++){
     /* std::cout << " ------ " << std::endl;
     std::cout << " Data    : " << data.at(i) << " at " << i << std::endl;
     std::cout << " Sample  : " << sample.at(i) << " at " << i << std::endl;
     std::cout << " Channel : " << channel.at(i) << " at " << i << std::endl;
     */
-    
+
     /*if(data.at(i)>0){
       WeightedSumNum += float(data.at(i))*float(channel.at(i));
       WeightedSumDen += float(channel.at(i));
-      
+
     }*/
 
     if(data.at(i)>temp) {
-    temp = data.at(i);
-    place = i;
+      temp = data.at(i);
+      place = i;
     }
   }
-  
+
   //for(int j = 0; j < 6; j++){
-    
+
   //}
-  
+
   //return float(WeightedSumNum/WeightedSumDen)+gRandom->Uniform();
   return (float)(channel.at(place))+gRandom->Uniform();
-  
+
 }
 
 void TCrdc::DrawChannels(Option_t *opt) const {
-  GCanvas *c = 0;
   if(!gPad)
-    c = new GCanvas();
+    new GCanvas();
   else {
     //gPad->Clear();
-    //c = (GCanvas*)gPad->GetCanvas();
+    //GCanvas* c = (GCanvas*)gPad->GetCanvas();
     //c->Clear();
   }
-  
+
   std::vector<TH1I> hits;
-  512;
-  int currentchannel = -1;
+  //int currentchannel = -1;
   //TH2I *currenthist = 0;
   TH2I hist(Form("crdc_%i",fId),Form("crdc_%i",fId),224,0,224,128,0,128);
   for(int x=0;x<Size();x++) {
     //if(channel.at(x)!=currentchannel) {
-      
+
       //TH1I hist(Form("channel_%02i",channel.at(x)),Form("channel_%02i",channel.at(x)),512,0,512);
       //hits.push_back(hist);
       //currentchannel = channel.at(x);
@@ -228,11 +224,11 @@ void TCrdc::DrawHit(Option_t *opt) const {
     //gPad->Clear();
     c = (GCanvas*)gPad->GetCanvas();
     c->Clear();
-  } 
+  }
   TH1I *mat = new TH1I("hit_pattern","hit_pattern",256,0,256);
   int currentchannel = -1;
   int currentx = -1;
-  int currenty = -1;
+  //int currenty = -1;
   int datasum =0;
   for(int x=0;x<Size();x++) {
     if(channel.at(x)!=currentchannel) {
@@ -241,10 +237,10 @@ void TCrdc::DrawHit(Option_t *opt) const {
        datasum = 0;
        currentchannel = channel.at(x);
        currentx = channel.at(x);
-       currenty = channel.at(x)%16;
-    } 
+       //currenty = channel.at(x)%16;
+    }
     datasum+=data.at(x);
-    
+
   }
   if(currentchannel!=-1)
     mat->Fill(currentx,datasum);
@@ -257,7 +253,7 @@ void TCrdc::DrawHit(Option_t *opt) const {
 }
 
 
-int TCrdc::GetWidth() { 
+int TCrdc::GetWidth() {
   if(Size()<2)
     return 0;
   return sample.back()-sample.front()+1;
@@ -279,17 +275,17 @@ void TCrdc::Copy(TObject &obj) const {
 
 }
 
-void TCrdc::Clear(Option_t *opt) { 
+void TCrdc::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
   fId   = -1;
   anode = -1;
   time  = -1;
   channel.clear();
-  sample.clear();  
-  data.clear();    
-} 
+  sample.clear();
+  data.clear();
+}
 
-void TCrdc::Print(Option_t *opt) const { } 
+void TCrdc::Print(Option_t *opt) const { }
 
 
 
@@ -301,10 +297,10 @@ void TCrdc::Print(Option_t *opt) const { }
 
 TCrdcPad::TCrdcPad()  { Clear(); }
 
-TCrdcPad::TCrdcPad(int chan)  { 
-  fChannel = chan;  
+TCrdcPad::TCrdcPad(int chan)  {
+  fChannel = chan;
   fNumSamples =0;
-  Clear(); 
+  Clear();
   for(int x=0;x<MAXCRDC;x++)  {
     fSample[x] = 0;
     fValue[x]  = 0;
@@ -329,9 +325,9 @@ void TCrdcPad::Clear(Option_t *opt) {
     fValue[x]  = 0;
   }
   fNumSamples =0;
-}  
+}
 
-void TCrdcPad::Print(Option_t *opt) const { 
+void TCrdcPad::Print(Option_t *opt) const {
   printf("I print.\n");
 }
 
@@ -360,10 +356,10 @@ TMTof::TMTof(const TMTof &mtof) {
 
 void TMTof::Copy(TObject &obj) const {
   TDetectorHit::Copy(obj);
-  
+
   TMTof &mtof = ((TMTof&)obj);
 
-  mtof.fE1Up      = fE1Up;     
+  mtof.fE1Up      = fE1Up;
   mtof.fE1Down    = fE1Down;
   mtof.fXfp       = fXfp;
   mtof.fObj       = fObj;
@@ -377,25 +373,16 @@ void TMTof::Copy(TObject &obj) const {
 
 void TMTof::Clear(Option_t *opt) {
 
-  fE1Up.clear();     
-  fE1Down.clear();   
-  fXfp.clear();       
-  fObj.clear();      
+  fE1Up.clear();
+  fE1Down.clear();
+  fXfp.clear();
+  fObj.clear();
   //fGalotte.clear();
   fCrdc1Anode.clear();
   fCrdc2Anode.clear();
-  fRf.clear();       
+  fRf.clear();
   fHodoscope.clear();
   fRef.clear();
 }
 
 void TMTof::Print(Option_t *opt) const {    }
-
-
-
-
-
-
-
-
-

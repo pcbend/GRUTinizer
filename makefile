@@ -7,8 +7,7 @@ PLATFORM:=$(PLATFORM)
 # EDIT THIS SECTION
 
 INCLUDES   = include
-CFLAGS     = -g -std=c++11 -O3
-#-Wall -Wextra -pedantic -Wno-unused-parameter
+CFLAGS     = -g -std=c++11 -O3 -Wall -Wextra -pedantic -Wno-unused-parameter
 LINKFLAGS_PREFIX  =
 LINKFLAGS_SUFFIX  = -L/opt/X11/lib -lX11 -lXpm -std=c++11
 SRC_SUFFIX = cxx

@@ -34,17 +34,17 @@ public:
   Float_t  GetCoreEnergy(int i) const; // { return fCoreCharge[i];  }
   virtual Int_t Charge()        const { return fCoreCharge[3];  }
 
-  const char *GetName() const;  
+  const char *GetName() const;
 
 
 
   void  Print(Option_t *opt="") const;
   void  Clear(Option_t *opt="");
-  const Int_t Size()  { return fNumberOfInteractions; }//fSegmentNumber.size(); }
+  Int_t Size() const { return fNumberOfInteractions; }//fSegmentNumber.size(); }
 
-  double GetX() { return GetPosition().X(); }
-  double GetY() { return GetPosition().Y(); }
-  double GetZ() { return GetPosition().Z(); }
+  double GetX() const { return GetPosition().X(); }
+  double GetY() const { return GetPosition().Y(); }
+  double GetZ() const { return GetPosition().Z(); }
 
   double GetPhi() {
     double phi = GetPosition().Phi();
@@ -67,7 +67,6 @@ public:
   double GetDoppler(double beta,const TVector3 *vec=0) {
     if(Size()<1)
       return 0.0;
-    bool madevec = false;
     if(vec==0) {
       vec = &BeamUnitVec;
     }

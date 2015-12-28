@@ -65,7 +65,7 @@ void TCaesar::Build_Single_Read(TSmartBuffer buf){
     }
     const char* fera_end = data + fera_header->size*2;
     data += sizeof(TRawEvent::CAESARFeraHeader);
-    
+
 
     while(data < fera_end){
       TRawEvent::CAESARFera* fera = (TRawEvent::CAESARFera*)data;
@@ -115,4 +115,9 @@ void TCaesar::SetCharge(int vsn, int channel, int data) {
 void TCaesar::SetTime(int vsn, int channel, int data) {
   TCaesarHit& hit = GetHit_VSNChannel(vsn, channel);
   hit.SetTime(data);
+}
+
+void TCaesar::InsertHit(const TDetectorHit& hit) {
+  caesar_hits.emplace_back((TCaesarHit&)hit);
+  fSize++;
 }

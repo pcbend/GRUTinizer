@@ -4,7 +4,7 @@
 
 #include "TPhosWall.h"
 
-ClassImp(TPhosWallHit);
+ClassImp(TPhosWallHit)
 
 TPhosWallHit::TPhosWallHit() {
   Clear();

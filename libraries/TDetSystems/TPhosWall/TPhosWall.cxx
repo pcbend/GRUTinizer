@@ -2,7 +2,7 @@
 
 #include "TMath.h"
 
-ClassImp(TPhosWall);
+ClassImp(TPhosWall)
 
 TVector3* TPhosWall::fWallPositions[257] = {NULL};
 bool TPhosWall::fPositionsSet = false;
@@ -54,12 +54,9 @@ void TPhosWall::Print(Option_t *opt) const {
 
 int TPhosWall::BuildHits() {
 
-  int fLargestValue = 0;
-  for(int i=0;i<raw_data.size();i++) {
+  for(size_t i=0;i<raw_data.size();i++) {
     TGEBEvent &geb = (TGEBEvent&)raw_data.at(i);
-    int hitsize = geb.GetBodySize()/sizeof(TRawEvent::PWHit);
     fTimeStamp = geb.GetTimestamp();
-    fLargestHit = 0;
     for(int j=0;j<geb.GetBodySize(); j+=sizeof(TRawEvent::PWHit)) {
       TPhosWallHit hit((TRawEvent::PWHit*)(geb.GetPayload() + j));
       InsertHit(hit);

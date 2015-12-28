@@ -24,8 +24,9 @@ THistogramLoop::THistogramLoop(ThreadsafeQueue<TUnpackedEvent*>& input_queue,
 }
 */
 THistogramLoop::THistogramLoop(std::string name)
-  : StoppableThread(name), stopsent(false),
-    output_file(0), previous_dir(0), output_filename("last.root") {
+  : StoppableThread(name),
+    output_file(0), previous_dir(0), output_filename("last.root"),
+    stopsent(false) {
   std::string libname = getenv("GRUTSYS");
   libname.append("/libraries/libMakeHistos.so");
   LoadLib(libname);
@@ -42,7 +43,7 @@ int THistogramLoop::Push(TUnpackedEvent *event) {
 
 bool THistogramLoop::Iteration() {
   TUnpackedEvent* event = NULL;
-  int error = input_queue.Pop(event);
+  input_queue.Pop(event);
   if(event) {
     if(!output_file){
       OpenFile();

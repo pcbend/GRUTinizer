@@ -20,7 +20,7 @@ public:
   virtual void Clear(Option_t *opt = "");
 
   virtual void          InsertHit(const TDetectorHit& hit);
-  virtual TDetectorHit& GetHit(const int &i)            { return gretina_hits.at(i); }
+  virtual TDetectorHit& GetHit(int i)            { return gretina_hits.at(i); }
 
   const TGretinaHit& GetGretinaHit(int i) { return gretina_hits.at(i); }
   //const TGretinaHit& GetAddbackHit(int i) { return *(TGretinaHit*)addback_hits.at(i); }

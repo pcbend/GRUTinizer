@@ -1,11 +1,10 @@
 #include "DDASDataFormat.h"
 
-ClassImp(TDDASEvent);
+ClassImp(TDDASEvent)
 
 TDDASEvent::TDDASEvent(const TSmartBuffer& buf)
-  : header(NULL), qdc_sum(NULL),
-    energy_sum(NULL), trace(NULL),
-    buf(buf) {
+  : qdc_sum(NULL), energy_sum(NULL), trace(NULL),
+    header(NULL), buf(buf) {
   const char* data = buf.GetData();
 
   header = (DDASHeader*)data;
@@ -39,4 +38,5 @@ bool TDDASEvent::HasEnergySum() const {
 
 std::ostream& operator<<(std::ostream& out, const TDDASEvent& event){
   out << "DDAS Channel: \n";
+  return out;
 }

@@ -154,7 +154,7 @@ void StoppableThread::Print() {
   printf("%i Threads:\n",GetNThreads());
   int counter = 0;
   for(auto it=fthreadmap.begin();it!=fthreadmap.end();it++) {
-    printf("  %i\t%s @ 0x%08x\n",counter,it->first.c_str(),it->second);
+    printf("  %i\t%s @ 0x%08lx\n",counter,it->first.c_str(),(unsigned long)it->second);
     counter++;
   }
 }
@@ -204,4 +204,4 @@ void StoppableThread::status_out() {
   outfile << "---------------------------------------------------------------\n"; // 64 -.
 
 
-};
+}

@@ -3,7 +3,7 @@
 #include "TString.h"
 
 
-ClassImp(TGEBEvent);
+ClassImp(TGEBEvent)
 
 TGEBEvent::TGEBEvent() { }
 
@@ -43,14 +43,13 @@ void TGEBEvent::Print(Option_t *opt) const {
     pass_opt.Append(options);
     TRawEvent::Print(pass_opt.Data());
   }
-};
+}
 
-ClassImp(TGEBMode3Event);
+ClassImp(TGEBMode3Event)
 
 void TGEBMode3Event::BuildFragments(){
   TSmartBuffer buf = fEvent.GetPayloadBuffer();
   TGEBEvent event(fEvent);
-  TRawEvent::GEBMode3Data data;
 
   while(buf.GetSize()){
     // Read the header and body

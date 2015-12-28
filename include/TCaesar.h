@@ -10,6 +10,7 @@ public:
   virtual ~TCaesar();
 
   void Copy(TObject& obj) const;
+  virtual void InsertHit(const TDetectorHit&);
 
   virtual void Clear(Option_t* opt = "");
 
@@ -25,7 +26,7 @@ private:
   void SetCharge(int vsn, int channel, int data);
   void SetTime(int vsn, int channel, int data);
   TCaesarHit& GetHit_VSNChannel(int vsn, int channel);
-  
+
   virtual int  BuildHits();
 
   void Build_Single_Read(TSmartBuffer buf);

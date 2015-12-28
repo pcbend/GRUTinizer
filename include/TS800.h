@@ -23,7 +23,7 @@ public:
   void SetEventCounter(Long_t event) { fEventCounter = event; }
 
   Long_t GetEventCounter() { return fEventCounter;}
-  Long_t GetTimestamp()    { Timestamp(); }
+  Long_t GetTimestamp()    { return Timestamp(); }
 
   TVector3 CRDCTrack();  // not a finished method
   float GetAFP() const;

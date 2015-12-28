@@ -6,7 +6,7 @@
 
 #include "TGRUTOptions.h"
 
-ClassImp(TRawEventSource);
+ClassImp(TRawEventSource)
 
 int TRawEventSource::Read(TRawEvent& event){
   if(fIsFinished){
@@ -102,17 +102,13 @@ double TRawEventSource::GetAverageRate() const {
   return sum/n;
 }
 
-ClassImp(TRawEventByteSource);
+ClassImp(TRawEventByteSource)
 
 TRawEventByteSource::TRawEventByteSource(kFileType file_type)
   : fFileType(file_type), fFileSize(-1),
-    fDefaultBufferSize(8192) {
-  clock.Start();
-}
+    fDefaultBufferSize(8192) { }
 
 std::string TRawEventByteSource::Status() const {
-  double runtime = clock.RealTime();
-  clock.Continue();
   return Form("%s: %s %8.2f MB given %s / %s %8.2f MB total %s  => %s %3.02f MB/s processed %s",
               SourceDescription().c_str(),
               DCYAN, GetBytesGiven()/1e6, RESET_COLOR,

@@ -123,7 +123,6 @@ private:
   int FillBuffer(size_t bytes_requested);
 
   kFileType fFileType;
-  mutable TStopwatch clock;
 
   long fFileSize;
 

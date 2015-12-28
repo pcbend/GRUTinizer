@@ -9,7 +9,8 @@ GValue::GValue(const char *name,double value)
 GValue::GValue(const char *name)
   : TNamed(name,name), fValue(0.00) { }
 
-GValue::GValue(const GValue &val) {
+GValue::GValue(const GValue &val)
+  : TNamed(val) {
   val.Copy(*this);
 }
 

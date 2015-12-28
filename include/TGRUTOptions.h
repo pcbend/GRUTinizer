@@ -57,7 +57,7 @@ public:
   std::string GenerateOutputFilename(const std::vector<std::string>& filename);
 
 
-  bool SetStartGUI(bool flag=true) { fStartGui=flag; }
+  void SetStartGUI(bool flag=true) { fStartGui=flag; }
 
 private:
   TGRUTOptions(int argc, char** argv);

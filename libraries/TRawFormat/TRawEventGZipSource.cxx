@@ -17,7 +17,7 @@ TRawEventGZipSource::~TRawEventGZipSource() {
 
 int TRawEventGZipSource::ReadBytes(char* buf, size_t size){
   int output = gzread(*fGzFile, buf, size);
-  if(output != size){
+  if(size_t(output) != size){
     if(gzeof(*fGzFile)){
       SetLastErrno(-1);
       SetLastError("EOF");

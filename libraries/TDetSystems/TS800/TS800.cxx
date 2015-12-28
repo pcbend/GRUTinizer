@@ -68,8 +68,7 @@ void TS800::Copy(TObject& obj) const {
 
 bool TS800::ReadInvMap(const char* file){
   std::string eat,I,COEF,ORDEXP;
-  int index,order,exp[6];
-  float coeff;
+  int index;
   std::stringstream ssTest;
   int par = 0;
   ifstream inFile;
@@ -147,7 +146,7 @@ void TS800::MapCalc(float *input){
     case 3: current_ = fIML_sec4;  break;
     default: printf(" *** Wrong Param passed to S800::MapCalc!!\n"); return;break;
     }
-    for(int i=0; i<current_.size();i++){
+    for(size_t i=0; i<current_.size();i++){
       if(CalcOrder<current_.at(i).order) break;
       multi = 1;
       //std::cout << " current coef : " << current_.at(i).coef << std::endl;
@@ -239,7 +238,7 @@ int TS800::BuildHits(){
     //printf("\t0x%04x\t0x%04x\t0x%04x\t0x%04x\n",*data,*(data+1),*(data+2),*(data+3));
     //while(ptr<((head->total_size*2)-2)) {
     std::string toprint = "all";
-    int x = 0;
+    size_t x = 0;
     while(x<(head->total_size-sizeof(TRawEvent::GEBS800Header)+16)) {  //total size is inclusive.
       int size             = *(data+x);
       unsigned short *dptr = (data+x+1);
@@ -402,7 +401,7 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
   int x =1;
   int subsize = *(data+x);
   x++;
-  int subtype = *(data+x);
+  //int subtype = *(data+x);
   x++;
 
   //std::cout << " subsize : " << std::hex << subsize << std::endl;
@@ -451,7 +450,7 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
       return true;
   subsize = *(data+x);
   x++;
-  subtype = *(data+x);
+  //subtype = *(data+x);
   x++;
   current_crdc->SetAnode(*(data+x));
   x++;
@@ -554,7 +553,7 @@ bool TS800::HandleIonCPacket(unsigned short* data, int size){
     //std::dec;
     switch(*(data+x++)){
     case 0x5821:
-      for(x; x<sub_size;x++){
+      for(; x<sub_size;x++){
 	unsigned short current = *(data+x);
 	int ch  = (current&0xf000)>>12;
 	int dat = (current&0x0fff);
@@ -568,7 +567,7 @@ bool TS800::HandleIonCPacket(unsigned short* data, int size){
       }
       break;
     case 0x5822: // Old Style
-      for(x; x<sub_size;x++){
+      for(; x<sub_size;x++){
 	unsigned short current = *(data+x);
 	ion.Set((current&0xf000),(current&0x0fff));
 	//std::cout << " Channel : " << std::hex << (current&0xf000) << std::endl;
@@ -873,11 +872,12 @@ float TS800::GetTofE1_TDC(float c1,float c2)  const {
 float TS800::GetTofE1_MTDC(float c1,float c2)   {
 
   std::vector<float> result;
-  if(mtof.fObj.size()<0)
-    std::cout << " In GetTOF MTDC, Size = " << mtof.fObj.size() << std::endl;
-  for(int x=0;x<mtof.fObj.size();x++) {
+  // TODO: This check is always false.  Commented it out, but was there some reason for it?
+  // if(mtof.fObj.size()<0)
+  //   std::cout << " In GetTOF MTDC, Size = " << mtof.fObj.size() << std::endl;
+  for(unsigned int x=0;x<mtof.fObj.size();x++) {
     if(mtof.fObj.at(x)>10200) {
-      for(int y=0;y<mtof.fE1Up.size();y++) {
+      for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
         if((mtof.fE1Up.at(y) <13500) && (mtof.fE1Up.at(y) >12500))
           result.push_back( mtof.fObj.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
       }

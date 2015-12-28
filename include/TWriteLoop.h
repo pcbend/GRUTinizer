@@ -66,7 +66,7 @@ private:
   std::vector<TUnpackedEvent*> learning_queue;
   std::atomic_int learning_phase_size;
   std::atomic_bool in_learning_phase;
-  int learning_phase_length;
+  size_t learning_phase_length;
 #endif
 
   ClassDef(TWriteLoop, 0);
