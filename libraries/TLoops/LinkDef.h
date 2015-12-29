@@ -8,6 +8,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class StoppableThread+;
+#pragma link C++ class std::vector<const StoppableThread*>+;
 
 #pragma link C++ class TDataLoop+;
 #pragma link C++ class TBuildingLoop+;

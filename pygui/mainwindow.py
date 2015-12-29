@@ -17,6 +17,7 @@ from .tcut_tab import TCutTab
 from .variable_tab import VariableTab
 from .util import update_tcanvases
 from .AnsiColorText import AnsiColorText
+from .status_widget import ThreadStatusFrame
 
 class MainWindow(object):
 
@@ -166,6 +167,10 @@ class MainWindow(object):
         notebook.pack(fill=tk.BOTH,expand=True)
 
         self._setup_status_bar(self.window)
+
+        status = ThreadStatusFrame(self.window)
+        status.pack()
+
 
     def _setup_status_bar(self, parent):
         frame = tk.Frame(parent, height=60)

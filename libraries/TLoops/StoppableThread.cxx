@@ -205,3 +205,11 @@ void StoppableThread::status_out() {
 
 
 }
+
+std::vector<const StoppableThread*> StoppableThread::GetAll() {
+  std::vector<const StoppableThread*> output;
+  for(auto& elem : fthreadmap){
+    output.push_back(elem.second);
+  }
+  return output;
+}

@@ -164,7 +164,7 @@ void TGRUTint::ApplyOptions() {
 
 
   if(opt->StartGUI()){
-    std::string   script_filename = Form("%s/util/grut-view.py",getenv("GRUTSYS"));
+    std::string   script_filename = Form("%s/pygui/grut-view.py",getenv("GRUTSYS"));
     std::ifstream script(script_filename);
     std::string   script_text((std::istreambuf_iterator<char>(script)),
                               std::istreambuf_iterator<char>());

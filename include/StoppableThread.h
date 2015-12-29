@@ -19,6 +19,7 @@ public:
 
   StoppableThread(std::string name);
   static StoppableThread *Get(std::string name);
+  static std::vector<const StoppableThread*> GetAll();
   virtual ~StoppableThread();
 
   void Resume();
