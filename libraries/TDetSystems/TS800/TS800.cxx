@@ -1,12 +1,15 @@
 #include "TS800.h"
 
 
+#include <atomic>
 #include <cassert>
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <thread>
 
 #include "TGEBEvent.h"
+#include "TGRUTOptions.h"
 
 std::vector<TS800::S800_InvMapLine> TS800::fIML_sec1;
 std::vector<TS800::S800_InvMapLine> TS800::fIML_sec2;
@@ -16,13 +19,19 @@ short TS800::fMaxOrder;
 float TS800::fBrho;
 int TS800::fMass;
 int TS800::fCharge;
-bool TS800::InvMapFileRead = false;
 
 TS800::TS800() {
   Clear();
+  static std::atomic_bool InvMapFileRead(false);
   if(!InvMapFileRead){
-    ReadInvMap("invmap.inv");
-    InvMapFileRead=true;
+    //   Quick little mutex to make sure that multiple threads
+    // don't try to read the map file at the same time.
+    static std::mutex inv_map_mutex;
+    std::lock_guard<std::mutex> lock(inv_map_mutex);
+    if(!InvMapFileRead){
+      ReadInvMap();
+      InvMapFileRead=true;
+    }
   }
 
   GetCrdc(0).SetXslope(2.54);
@@ -66,13 +75,15 @@ void TS800::Copy(TObject& obj) const {
   }
 }
 
-bool TS800::ReadInvMap(const char* file){
+bool TS800::ReadInvMap(){
+  std::string filename = TGRUTOptions::Get()->S800InverseMapFile();
+
   std::string eat,I,COEF,ORDEXP;
   int index;
   std::stringstream ssTest;
   int par = 0;
   ifstream inFile;
-  inFile.open(file);
+  inFile.open(filename);
   getline(inFile,eat);
   //std::cout << eat << std::endl;
   sscanf(eat.c_str(), "S800 inverse map - Brho=%g - M=%d - Q=%d", &fBrho, &fMass, &fCharge);
@@ -81,15 +92,15 @@ bool TS800::ReadInvMap(const char* file){
   getline(inFile,eat);
 
   if(I!="I" && COEF!="COEFFICIENT"){
-    //std::cout << " *** Bad S800 Inv Map File Format!!! " << std::endl;
-    //std::cout << " *** Inv Map File Not Read !!! " << std::endl;
+    std::cout << " *** Bad S800 Inv Map File Format!!! " << std::endl;
+    std::cout << " *** Inv Map File Not Read !!! " << std::endl;
     return false;
   }
 
   while(!(inFile.eof())){
 
     if(ssTest.fail() == true){
-      std::cout << " *** sstream Failed while reading file : " << file << std::endl;
+      std::cout << " *** sstream Failed while reading file : " << filename << std::endl;
       std::cout << " *** File not loaded!! " << std::endl;
       return false;
     }

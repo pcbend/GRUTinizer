@@ -33,8 +33,6 @@
 
 #include "TChannel.h"
 
-#include "TS800.h"
-
 #include "TDataLoop.h"
 #include "TBuildingLoop.h"
 #include "TUnpackingLoop.h"
@@ -111,8 +109,6 @@ void TGRUTint::SplashPopNWait(bool flag) {
 }
 
 void TGRUTint::LoadDetectorClasses() {
-  TS800 s800;
-
   if(!gROOT->LoadClass("TGretina") ||
      !gROOT->LoadClass("TGretinaHit") ||
      !gROOT->LoadClass("std::vector<TGretinaHit>") ||

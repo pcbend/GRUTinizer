@@ -52,9 +52,9 @@ public:
   float GetTofE1_TDC(float c1=0.00,float c2=0.00) const;
   float GetTofE1_MTDC(float c1=0.00,float c2=0.00);
 
- private:
+private:
 
-  bool ReadInvMap(const char* file);
+  bool ReadInvMap();
   virtual int  BuildHits();
 
   bool HandleTrigPacket(unsigned short*,int);     //!
@@ -64,7 +64,6 @@ public:
   bool HandleCRDCPacket(unsigned short*,int);     //!
   bool HandleMTDCPacket(unsigned short*,int);     //!
 
-  static bool InvMapFileRead;
   struct S800_InvMapLine {
     float coef;
     int order,exp[6];

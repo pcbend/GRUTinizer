@@ -52,6 +52,7 @@ void TGRUTOptions::Load(int argc, char** argv) {
   Clear();
   detector_environment = std::string(getenv("GRUTSYS")) + "/config/DetectorEnvironment.env";
   compiled_histogram_file = gEnv->GetValue("GRUT.HistLib","");
+  s800_inverse_map_file = "invmap.inv";
   //output_file = "temp.root";
 
   ArgParser parser;
@@ -200,6 +201,8 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename) const{
     return kFileType::COMPILED_HISTOGRAMS;
   } else if (ext == "info") {
     return kFileType::CONFIG_FILE;
+  } else if (ext == "inv") {
+    return kFileType::S800_INVMAP;
   } else {
     return kFileType::UNKNOWN_FILETYPE;
   }
@@ -235,6 +238,10 @@ bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
 
     case kFileType::COMPILED_HISTOGRAMS:
       compiled_histogram_file = filename;
+      return true;
+
+    case kFileType::S800_INVMAP:
+      s800_inverse_map_file = filename;
       return true;
 
     case kFileType::CONFIG_FILE:
