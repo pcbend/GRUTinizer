@@ -554,21 +554,26 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
          printf( BLUE "\n\tSum [%.01f : %.01f] = %.01f" RESET_COLOR  "\n",xlow,xhigh,sum);
        }
        break;
-    //case kKey_l:
-    //   for(int i=0;i<hists.size();i++) {
-    //      hists.at(i)->GetYaxis()->UnZoom();
-    //   }
-    //   SetLogy(0);
-    //   edited = true;
-    //   break;
-    //case kKey_L:
-    //   for(int i=0;i<hists.size();i++) {
-    //     if(hists.at(i)->GetYaxis()->GetXmin()<0)
-    //        hists.at(i)->GetYaxis()->SetRangeUser(0,hists.at(i)->GetYaxis()->GetXmax());
-    //   }
-    //   SetLogy(1);
-    //   edited = true;
-    //   break;
+
+    case kKey_l:
+      if(GetLogy()){
+        // Show full y range, not restricted to positive values.
+        for(unsigned int i=0;i<hists.size();i++) {
+          hists.at(i)->GetYaxis()->UnZoom();
+        }
+        SetLogy(0);
+      } else {
+        // Only show plot from 0 up when in log scale.
+        for(unsigned int i=0;i<hists.size();i++) {
+          if(hists.at(i)->GetYaxis()->GetXmin()<0) {
+            hists.at(i)->GetYaxis()->SetRangeUser(0,hists.at(i)->GetYaxis()->GetXmax());
+          }
+        }
+        SetLogy(1);
+      }
+      edited = true;
+      break;
+
     case kKey_m:
       SetMarkerMode(true);
       break;
@@ -658,6 +663,24 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       edited = true;
       break;
 
+    case kKey_l:
+      if(GetLogz()){
+        // Show full z range, not restricted to positive values.
+        for(unsigned int i=0;i<hists.size();i++) {
+          hists.at(i)->GetZaxis()->UnZoom();
+        }
+        SetLogz(0);
+      } else {
+        // Only show plot from 0 up when in log scale.
+        for(unsigned int i=0;i<hists.size();i++) {
+          if(hists.at(i)->GetZaxis()->GetXmin()<0) {
+            hists.at(i)->GetZaxis()->SetRangeUser(0,hists.at(i)->GetZaxis()->GetXmax());
+          }
+        }
+        SetLogz(1);
+      }
+      edited = true;
+      break;
   };
   return edited;
 }
