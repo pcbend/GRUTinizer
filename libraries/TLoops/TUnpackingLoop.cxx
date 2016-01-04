@@ -160,8 +160,16 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
     case 8: // Gretina diag. data.
       HandleGEBMode3(event, kDetectorSystems::BANK29);
       break;
+    case 9:
+      //Simulated S800 data,
+      //event.Print("all");
+      break;
     case 10: // S800 scaler data....
       HandleS800Scaler(event);
+      break;
+    case 11:
+      //GEANT4 gretina simulated data.
+      //event.Print("all");
       break;
     case 17: //PWall Mode2 equivlant.
       break;
