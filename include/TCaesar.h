@@ -22,6 +22,8 @@ public:
 
   //static TVector3 GetPosition(int detnum, int ring_num, int sector_num);
 
+  int Size() const { return caesar_hits.size(); }
+
 private:
   void SetCharge(int vsn, int channel, int data);
   void SetTime(int vsn, int channel, int data);
