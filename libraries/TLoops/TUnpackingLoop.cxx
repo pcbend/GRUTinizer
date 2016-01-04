@@ -162,6 +162,7 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
       break;
     case 9:
       //Simulated S800 data,
+      //fOutputEvent->AddRawData(event, kDetectorSystems::S800); THIS DIDNT WORK!!!
       //event.Print("all");
       break;
     case 10: // S800 scaler data....
@@ -169,7 +170,9 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
       break;
     case 11:
       //GEANT4 gretina simulated data.
+      fOutputEvent->AddRawData(event,kDetectorSystems::GRETINA_SIM);
       //event.Print("all");
+      //exit(1);
       break;
     case 17: //PWall Mode2 equivlant.
       break;

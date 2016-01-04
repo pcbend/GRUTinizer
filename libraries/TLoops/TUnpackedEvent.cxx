@@ -5,6 +5,7 @@
 #include "TBank29.h"
 #include "TCaesar.h"
 #include "TGretina.h"
+#include "TGretSim.h"
 #include "TJanus.h"
 #include "TMode3.h"
 #include "TS800.h"
@@ -30,6 +31,10 @@ void TUnpackedEvent::AddRawData(const TRawEvent& event, kDetectorSystems detecto
   switch(detector){
   case kDetectorSystems::GRETINA:
     GetDetector<TGretina>(true)->AddRawData(event);
+    break;
+    
+  case kDetectorSystems::GRETINA_SIM:
+    GetDetector<TGretSim>(true)->AddRawData(event);
     break;
 
   case kDetectorSystems::MODE3:

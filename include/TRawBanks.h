@@ -16,6 +16,23 @@
 #define MQDC_ID 10
 #define MTDC_ID 20
 
+// Simulation
+#define MAX_SIM_GAMMAS 10
+
+struct g4sim_ghead{
+  int type;          /* defined as abcd1234 */
+  int num;           /* # of emitted gammas */
+  int full;          /* is full energy */
+}__attribute__((__packed__));
+
+struct g4sim_eg{
+  float e;
+  float x, y, z;
+  //  float phi, theta; THIS IS REDUNDANT
+  float beta;
+}__attribute__((__packed__));
+
+
 // General Mesytec Stuff:
 struct Mesy_Word{
   // This is 2x16 bits = 32 bits.  The MQDC talks in 32 bit words.
