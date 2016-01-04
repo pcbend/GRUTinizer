@@ -168,7 +168,8 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
     case 29: // Something.
       break;
     default:
-      std::cout << "Dance Party EventType: " << type << std::endl;
+      if(!TGRUTOptions::Get()->IgnoreErrors())
+        std::cout << "Dance Party EventType: " << type << std::endl;
       //dance party.
       break;
   }
