@@ -76,7 +76,7 @@ detnums = {(1,3):1,
            }
 
 for cratenum in range(1,4):
-    for slotnum in range(2,13):
+    for slotnum in range(2,14):
         for channum in range(16):
             address = sega_address(cratenum, slotnum, channum)
             try:

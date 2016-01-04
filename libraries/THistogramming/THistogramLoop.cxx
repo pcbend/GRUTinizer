@@ -3,6 +3,7 @@
 #include "TFile.h"
 
 #include "TGRUTint.h"
+#include "TGRUTOptions.h"
 #include "TPreserveGDirectory.h"
 
 THistogramLoop * THistogramLoop::Get(std::string name) {
@@ -27,9 +28,7 @@ THistogramLoop::THistogramLoop(std::string name)
   : StoppableThread(name),
     output_file(0), previous_dir(0), output_filename("last.root"),
     stopsent(false) {
-  std::string libname = getenv("GRUTSYS");
-  libname.append("/libraries/libMakeHistos.so");
-  LoadLib(libname);
+  LoadLib(TGRUTOptions::Get()->CompiledHistogramFile());
 }
 
 THistogramLoop::~THistogramLoop() {
