@@ -36,13 +36,13 @@ struct g4sim_eg{
   float phi, theta; //THIS IS REDUNDANT
   float beta;
 
-  float GetEn()   const { return e; }
-  float GetX()    const { return x; }
-  float GetY()    const { return y; }
-  float GetZ()    const { return z; }
-  float GetPhi()    const { return phi; }
+  float GetEn()       const { return e; }
+  float GetX()        const { return x; }
+  float GetY()        const { return y; }
+  float GetZ()        const { return z; }
+  float GetPhi()      const { return phi; }
   float GetTheta()    const { return theta; }
-  float GetBeta() const { return beta; }
+  float GetBeta()     const { return beta; }
 
 }__attribute__((__packed__));
 
@@ -53,6 +53,51 @@ struct G4SimPacket {
 }__attribute__((__packed__));
 
 friend std::ostream& operator<<(std::ostream& os, const G4SimPacket &packet);
+
+// -- End of Geant4 Gamma Sim stuff 
+// -- Beginning of Geant4 S800 Sim stuff
+
+struct G4S800 {
+
+  
+  Int_t type;    /* defined abcd1234 for indicating this version */
+  // All of this vvv is zero in the sim. ***************************
+  float crdc1_x;   /* Crdc x/y positions in mm */
+  float crdc1_y;
+  float crdc2_x;
+  float crdc2_y;
+  float ic_sum;    /* ion chamber energy loss         */
+  float tof_xfp;   /* TOF scintillator after A1900    */
+  float tof_obj;   /* TOF scintillator in object box  */
+  float rf;        /* Cyclotron RF for TOF            */ 
+  Int_t trigger; /* Trigger register bit pattern    */
+  /* - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
+  /* from here corrected values extracted from data above */ 
+  /* - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
+  float ic_de;
+  /* TOF values with TOF correction applied (from afp/crdc x) */
+  float tof_xfpe1;
+  float tof_obje1;
+  float tof_rfe1;
+  // All of this ^^^ is zero in the sim. ***************************
+
+
+  /* Trajectory information at target position calculated from 
+     a map and afp/bfp/xfp/yfp. New map and you need to re-calc */
+  float ata; /* dispersive angle        */
+  float bta; /* non-dispersive angle    */
+  float dta; /* dT/T T:kinetic energy   */
+  float yta; /* non-dispersive position */
+
+  Int_t GetType() const { return type; }
+  float GetATA()  const { return ata; }
+  float GetBTA()  const { return bta; }
+  float GetDTA()  const { return dta; }
+  float GetYTA()  const { return yta; }
+}__attribute__((__packed__));
+
+friend std::ostream& operator<<(std::ostream& os, const G4S800 &s800pack);
+
 
 // General Mesytec Stuff:
 struct Mesy_Word{

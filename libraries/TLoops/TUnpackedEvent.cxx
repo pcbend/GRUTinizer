@@ -9,6 +9,7 @@
 #include "TJanus.h"
 #include "TMode3.h"
 #include "TS800.h"
+#include "TS800Sim.h"
 #include "TS800Scaler.h"
 #include "TSega.h"
 #include "TFastScint.h"
@@ -43,6 +44,10 @@ void TUnpackedEvent::AddRawData(const TRawEvent& event, kDetectorSystems detecto
 
   case kDetectorSystems::S800:
     GetDetector<TS800>(true)->AddRawData(event);
+    break;
+
+  case kDetectorSystems::S800_SIM:
+    GetDetector<TS800Sim>(true)->AddRawData(event);
     break;
 
   case kDetectorSystems::S800SCALER:
