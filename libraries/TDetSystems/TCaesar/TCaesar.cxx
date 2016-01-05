@@ -2,8 +2,9 @@
 
 #include "TNSCLEvent.h"
 
-#define FERA_TIME_ID   0x2301
-#define FERA_ENERGY_ID 0x2302
+#define FERA_TIME_ID        0x2301
+#define FERA_ENERGY_ID      0x2302
+#define FERA_TIMESTAMP_ID   0x2303
 
 TCaesar::TCaesar() {
   Clear();
@@ -59,9 +60,11 @@ void TCaesar::Build_Single_Read(TSmartBuffer buf){
 
   while(data < data_end){
     TRawEvent::CAESARFeraHeader* fera_header = (TRawEvent::CAESARFeraHeader*)data;
-    if(fera_header->tag != FERA_ENERGY_ID && fera_header->tag != FERA_TIME_ID){
+    if((fera_header->tag != FERA_ENERGY_ID) && (fera_header->tag != FERA_TIME_ID)){
       data += fera_header->size * 2; // Size is inclusive number of 16-bit values.
-      continue;
+      if(fera_header->tag == FERA_TIMESTAMP_ID)
+        continue;
+      break;  // what we actually need to do is check if the fera is bad and take some action.
     }
     const char* fera_end = data + fera_header->size*2;
     data += sizeof(TRawEvent::CAESARFeraHeader);
