@@ -10,6 +10,7 @@
 
 //  https:://gswg.lbl.gov/tiki-index.php?page=GEB+Headers
 
+#define MAXSIMSIZE 40
 #define MAX_INTPTS 16
 #define MAX_PWID   256
 #define MAX_LABRID 16
@@ -23,15 +24,35 @@ struct g4sim_ghead{
   int type;          /* defined as abcd1234 */
   int num;           /* # of emitted gammas */
   int full;          /* is full energy */
+
+  int GetType() const { return type; }
+  int GetNum()  const { return num; }
+  int GetFull() const { return full; }
 }__attribute__((__packed__));
 
 struct g4sim_eg{
   float e;
   float x, y, z;
-  //  float phi, theta; THIS IS REDUNDANT
+  float phi, theta; //THIS IS REDUNDANT
   float beta;
+
+  float GetEn()   const { return e; }
+  float GetX()    const { return x; }
+  float GetY()    const { return y; }
+  float GetZ()    const { return z; }
+  float GetPhi()    const { return phi; }
+  float GetTheta()    const { return theta; }
+  float GetBeta() const { return beta; }
+
 }__attribute__((__packed__));
 
+
+struct G4SimPacket {
+  g4sim_ghead head;
+  g4sim_eg    data[MAXSIMSIZE];
+}__attribute__((__packed__));
+
+friend std::ostream& operator<<(std::ostream& os, const G4SimPacket &packet);
 
 // General Mesytec Stuff:
 struct Mesy_Word{
