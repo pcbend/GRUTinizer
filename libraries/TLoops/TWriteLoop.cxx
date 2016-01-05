@@ -28,8 +28,7 @@ TWriteLoop* TWriteLoop::Get(std::string name, std::string output_filename){
 
 TWriteLoop::TWriteLoop(std::string name, std::string output_filename)
   : StoppableThread(name),
-    hist_loop(0), event_tree_size(0),
-    in_learning_phase(true), learning_phase_length(1000) {
+    hist_loop(0) {
   //TPreserveGDirectory preserve;
 
   output_file = new TFile(output_filename.c_str(),"RECREATE");
@@ -38,18 +37,9 @@ TWriteLoop::TWriteLoop(std::string name, std::string output_filename)
 }
 
 TWriteLoop::~TWriteLoop() {
-  if(in_learning_phase){
-    EndLearningPhase();
+  for(auto& elem : det_map){
+    delete elem.second;
   }
-
-  // TODO: Test these.  They were commented out for causing segfaults.
-  // I think that the "delete elem.second" line should be present.
-  // The TDetector* itself belongs to the TUnpackedEvent,
-  //    and so the "delete *elem.second" line should not be present.
-  // for(auto& elem : det_map){
-  //   delete *elem.second;
-  //   delete elem.second;
-  // }
 
   event_tree->Write(event_tree->GetName(), TObject::kOverwrite);
   output_file->Close();
@@ -74,7 +64,7 @@ bool TWriteLoop::Iteration() {
     for(auto& queue : input_queues){
       int size = queue->Pop(event,0);
       if(size >= 0) {
-        HandleEvent(event);
+        WriteEvent(event);
         handled_event = true;
         living_parent = true;
       } else if (queue->IsRunning()){
@@ -92,54 +82,50 @@ bool TWriteLoop::Iteration() {
 }
 
 void TWriteLoop::Write() {
-  EndLearningPhase();
   //TPreserveGDirectory preserve;
   output_file->cd();
   event_tree->Write();
 }
 
-void TWriteLoop::HandleEvent(TUnpackedEvent* event) {
-  if(in_learning_phase) {
-    LearningPhase(event);
-    if(learning_queue.size() > learning_phase_length){
-      EndLearningPhase();
-    }
-  } else {
-    WriteEvent(event);
-  }
-}
+void TWriteLoop::AddBranch(TClass* cls){
+  if(!det_map.count(cls)){
+    // This uses the ROOT dictionaries, so we need to lock the threads.
+    TThread::Lock();
 
-void TWriteLoop::LearningPhase(TUnpackedEvent* event) {
-  for(auto det : event->GetDetectors()) {
-    TClass* cls = det->IsA();
-    if(!det_map.count(cls)){
-      TThread::Lock();
-      TDetector** det = new TDetector*;
-      *det = (TDetector*)cls->New();
-      std::cout << "\r";
-      for(int i=0; i<30; i++){
-	std::cout << " ";
-      }
-      std::cout << "\rAdded \"" << cls->GetName() << "\" branch" << std::endl;
-      det_map[cls] = det;
-      // TODO: Place this mutex here
-      event_tree->Branch(cls->GetName(), cls->GetName(), det);
-      TThread::UnLock();
-    }
-  }
-  learning_queue.push_back(event);
-}
+    // Make the TDetector**
+    TDetector** det = new TDetector*;
+    *det = (TDetector*)cls->New();
+    det_map[cls] = det;
 
-void TWriteLoop::EndLearningPhase() {
-  in_learning_phase = false;
-  for(auto event : learning_queue){
-    WriteEvent(event);
+    // Make a new branch.
+    TBranch* new_branch = event_tree->Branch(cls->GetName(), cls->GetName(), det);
+    delete *det;
+    *det = NULL;
+
+    // Fill the new branch up to the point where the tree is filled.
+    // Explanation:
+    //   When TTree::Fill is called, it calls TBranch::Fill for each
+    // branch, then increments the number of entries.  We may be
+    // adding branches after other branches have already been filled.
+    // If the S800 branch has been filled 100 times before the Gretina
+    // branch is created, then the next call to TTree::Fill will fill
+    // entry 101 of S800, but entry 1 of Gretina, rather than entry
+    // 101 of both.
+    //   Therefore, we need to fill the new branch as many times as
+    // TTree::Fill has been called before.
+    for(int i=0; i<event_tree->GetEntries(); i++){
+      new_branch->Fill();
+    }
+
+    std::cout << "\r" << std::string(30,' ')
+              << "\rAdded \"" << cls->GetName() << "\" branch" << std::endl;
+
+    // Unlock after we are done.
+    TThread::UnLock();
   }
-  learning_queue.clear();
 }
 
 void TWriteLoop::WriteEvent(TUnpackedEvent* event) {
-  event_tree_size++;
   // Clear pointers from previous writes.
   for(auto& elem : det_map){
     *elem.second = NULL;
@@ -148,7 +134,13 @@ void TWriteLoop::WriteEvent(TUnpackedEvent* event) {
   // Load current events
   for(auto det : event->GetDetectors()) {
     TClass* cls = det->IsA();
-    *det_map.at(cls) = det;
+    try{
+      *det_map.at(cls) = det;
+    } catch (std::out_of_range& e) {
+      AddBranch(cls);
+      WriteEvent(event);
+      return;
+    }
   }
 
   // Fill
