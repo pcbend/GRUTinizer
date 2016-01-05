@@ -5,9 +5,11 @@
 #include "TBank29.h"
 #include "TCaesar.h"
 #include "TGretina.h"
+#include "TGretSim.h"
 #include "TJanus.h"
 #include "TMode3.h"
 #include "TS800.h"
+#include "TS800Sim.h"
 #include "TS800Scaler.h"
 #include "TSega.h"
 #include "TFastScint.h"
@@ -31,6 +33,10 @@ void TUnpackedEvent::AddRawData(const TRawEvent& event, kDetectorSystems detecto
   case kDetectorSystems::GRETINA:
     GetDetector<TGretina>(true)->AddRawData(event);
     break;
+    
+  case kDetectorSystems::GRETINA_SIM:
+    GetDetector<TGretSim>(true)->AddRawData(event);
+    break;
 
   case kDetectorSystems::MODE3:
     GetDetector<TMode3>(true)->AddRawData(event);
@@ -38,6 +44,10 @@ void TUnpackedEvent::AddRawData(const TRawEvent& event, kDetectorSystems detecto
 
   case kDetectorSystems::S800:
     GetDetector<TS800>(true)->AddRawData(event);
+    break;
+
+  case kDetectorSystems::S800_SIM:
+    GetDetector<TS800Sim>(true)->AddRawData(event);
     break;
 
   case kDetectorSystems::S800SCALER:

@@ -65,7 +65,7 @@ Int_t TRawEvent::GetEventType() const {
   switch(fFileType){
   case NSCL_EVT:
     return ((EVTHeader*)(&fEventHeader))->type();
-
+    
   case GRETINA_MODE2:
   case GRETINA_MODE3:
     return ((GEBHeader*)(&fEventHeader))->type();
