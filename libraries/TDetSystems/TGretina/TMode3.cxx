@@ -29,10 +29,10 @@ void TMode3::InsertHit(const TDetectorHit& hit){
 
 int TMode3::BuildHits(){
   for(auto& event : raw_data){
-    TGEBEvent* geb = (TGEBEvent*)&event;
-    SetTimestamp(geb->GetTimestamp());
+    SetTimestamp(event.GetTimestamp());
     TMode3Hit hit;
-    hit.BuildFrom(geb->GetPayloadBuffer());
+    hit.BuildFrom(event.GetPayloadBuffer());
+    hit.SetTimestamp(event.GetTimestamp());
     InsertHit(hit);
   }
   return Size();
