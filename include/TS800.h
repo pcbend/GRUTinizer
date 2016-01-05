@@ -43,6 +43,8 @@ public:
   TMTof         &GetMTof()         const { return (TMTof&)mtof;        }
   TIonChamber   &GetIonChamber()   const { return (TIonChamber&)ion; }
   TScintillator &GetScint(int x=0) const { return (TScintillator&)scint[x]; }
+  //Added 1/4/2016 for getting trigbit - BAE
+  TTrigger      &GetTrigger()      const { return (TTrigger&)trigger;}
 
   //float GetAFP() const {
   //    return  TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1000.0);

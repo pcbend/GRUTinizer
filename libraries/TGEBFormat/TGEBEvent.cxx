@@ -71,4 +71,13 @@ void TGEBMode3Event::BuildFragments(){
     fragments.push_back(event);
     buf.Advance(body_size);
   }
+
+  // std::cout << "---------------------------------------------------" << std::endl;
+  // fEvent.Print("all");
+  // std::cout << "NumFragments: " << fragments.size() << std::endl;
+  // for(auto& frag : fragments){
+  //   frag.Print("all");
+  // }
+
+  // std::cout << "---------------------------------------------------" << std::endl;
 }

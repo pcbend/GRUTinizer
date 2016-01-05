@@ -28,6 +28,7 @@
 
 #include "TGRUTOptions.h"
 #include "TRawSource.h"
+#include "TSequentialRawFile.h"
 
 #include "TGRUTUtilities.h"
 
@@ -177,41 +178,69 @@ void TGRUTint::ApplyOptions() {
     }
   }
   TDataLoop *loop = 0;
-  //next most important thing, if given a raw file && told NOT to not sort!
-  if(opt->RawInputFiles().size() && opt->SortRaw()) {
-    for(unsigned int x=0;x<opt->RawInputFiles().size();x++) {
-      loop = TDataLoop::Get("1_input_loop",new TRawFileIn(opt->RawInputFiles().at(x).c_str()));
-      loop->Resume();
-      TBuildingLoop *boop = TBuildingLoop::Get("2_build_loop",loop);
-      boop->Resume();
-      TUnpackingLoop *uoop1 = TUnpackingLoop::Get("3_unpack1",boop);
-      uoop1->Resume();
-      //TUnpackingLoop *uoop2 = TUnpackingLoop::Get("unpack2",boop);
-      //uoop2->Resume();
-      // TUnpackingLoop *uoop3 = TUnpackingLoop::Get("unpack3",boop);
-      // uoop3->Resume();
+  //next most important thing, if given a raw file && NOT told to not sort!
+  if((opt->InputRing().length() || opt->RawInputFiles().size())
+     && opt->SortRaw()) {
 
-      std::string rootoutfile = "run" + get_run_number(opt->RawInputFiles().at(x)) + ".root";
-      if(opt->OutputFile().length()) {
-        rootoutfile = opt->OutputFile();
+    // Open a ring, multiple files, or a single file, as requested.
+    TRawEventSource* source = NULL;
+    if(opt->InputRing().length()) {
+      source = new TRawEventRingSource(opt->InputRing(),
+                                       opt->DefaultFileType());
+    } else if(opt->RawInputFiles().size() > 1){
+      TSequentialRawFile* seq_source = new TSequentialRawFile();
+      for(auto& filename : opt->RawInputFiles()){
+        seq_source->Add(new TRawFileIn(filename.c_str()));
       }
-
-      TWriteLoop* woop = TWriteLoop::Get("4_write_loop", rootoutfile);
-      woop->Connect(uoop1);
-      //woop->Connect(uoop2);
-
-      std::string histoutfile = "hist" + get_run_number(opt->RawInputFiles().at(x)) + ".root";
-      // if(opt->OutputFile().length()) {
-      //   histoutfile = opt->OutputFile();
-      // }
-      if(TGRUTOptions::Get()->MakeHistos()){
-        THistogramLoop *hoop = THistogramLoop::Get("5_hist_loop");
-        hoop->SetOutputFilename(histoutfile);
-        woop->AttachHistogramLoop(hoop);
-        hoop->Resume();
-      }
-      woop->Resume();
+      source = seq_source;
+    } else {
+      std::string filename = opt->RawInputFiles().at(0);
+      source = new TRawFileIn(filename.c_str());
     }
+    loop = TDataLoop::Get("1_input_loop",source);
+    loop->Resume();
+
+
+    TBuildingLoop *boop = TBuildingLoop::Get("2_build_loop",loop);
+    boop->Resume();
+    TUnpackingLoop *uoop1 = TUnpackingLoop::Get("3_unpack1",boop);
+    uoop1->Resume();
+    //TUnpackingLoop *uoop2 = TUnpackingLoop::Get("unpack2",boop);
+    //uoop2->Resume();
+    // TUnpackingLoop *uoop3 = TUnpackingLoop::Get("unpack3",boop);
+    // uoop3->Resume();
+
+
+    // Determine output file names
+    std::string rootoutfile = "temp_tree.root";
+    std::string histoutfile = "temp_hist.root";
+    if(opt->RawInputFiles().size() > 0){
+      std::string filename = opt->RawInputFiles()[0];
+      rootoutfile = "run" + get_run_number(filename) + ".root";
+      histoutfile = "hist" + get_run_number(filename) + ".root";
+    } else {
+      rootoutfile = "ring_tree.root";
+      histoutfile = "ring_hist.root";
+    }
+
+    if(opt->OutputFile().length()) {
+      rootoutfile = opt->OutputFile();
+    }
+    if(opt->OutputHistogramFile().length()) {
+      histoutfile = opt->OutputHistogramFile();
+    }
+
+    TWriteLoop* woop = TWriteLoop::Get("4_write_loop", rootoutfile);
+    woop->Connect(uoop1);
+    //woop->Connect(uoop2);
+
+    if(TGRUTOptions::Get()->MakeHistos()){
+      THistogramLoop *hoop = THistogramLoop::Get("5_hist_loop");
+      hoop->SetOutputFilename(histoutfile);
+      woop->AttachHistogramLoop(hoop);
+      hoop->Resume();
+    }
+    woop->Resume();
   }
 
   //ok now, if told not to sort open any raw files as _data# (rootish like??)

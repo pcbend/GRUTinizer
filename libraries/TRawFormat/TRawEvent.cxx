@@ -145,6 +145,30 @@ const char* TRawEvent::GetPayload() const {
   return 0;
 }
 
+TSmartBuffer TRawEvent::GetPayloadBuffer() const {
+  if( fFileType == kFileType::UNKNOWN_FILETYPE) {
+    printf("Unknown filetype: Size = %i\n",GetTotalSize());
+    fflush(stdout);
+    Print("all");
+    //return 0;
+  }
+  assert(fFileType != kFileType::UNKNOWN_FILETYPE);
+
+  switch(fFileType){
+   case NSCL_EVT:
+     return ((TNSCLEvent*)this)->GetPayloadBuffer();
+
+   case GRETINA_MODE2:
+   case GRETINA_MODE3:
+     return ((TGEBEvent*)this)->GetPayloadBuffer();
+
+   default:
+     ;
+  }
+
+  return TSmartBuffer();
+}
+
 Int_t TRawEvent::GetTotalSize() const {
   return GetBodySize() + sizeof(RawHeader);
 }

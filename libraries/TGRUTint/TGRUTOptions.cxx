@@ -52,8 +52,10 @@ void TGRUTOptions::Load(int argc, char** argv) {
   Clear();
   detector_environment = std::string(getenv("GRUTSYS")) + "/config/DetectorEnvironment.env";
   compiled_histogram_file = gEnv->GetValue("GRUT.HistLib","");
+  if(compiled_histogram_file.length() == 0){
+    compiled_histogram_file = std::string(getenv("GRUTSYS")) + "/libraries/libMakeHistos.so";
+  }
   s800_inverse_map_file = "invmap.inv";
-  //output_file = "temp.root";
 
   ArgParser parser;
 
@@ -66,6 +68,8 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .description("Input file(s)");
   parser.option("o output", &output_file)
     .description("Root output file");
+  parser.option("hist-output",&output_histogram_file)
+    .description("Output file for histograms");
   parser.option("3 include-mode3 ", &fIgnoreMode3)
     .description("analyze gretina mode3 data")
     .default_value(true);

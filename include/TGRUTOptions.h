@@ -23,6 +23,7 @@ public:
   const std::vector<std::string>& GuiSaveSetFiles() { return input_gui_hist_files; }
   const std::string& DetectorEnvironment()          { return detector_environment; }
   const std::string& OutputFile()                   { return output_file; }
+  const std::string& OutputHistogramFile()          { return output_histogram_file; }
   const std::string& S800InverseMapFile()           { return s800_inverse_map_file; }
   std::string InputRing() { return input_ring; }
   std::string CompiledHistogramFile() { return compiled_histogram_file; }
@@ -73,6 +74,7 @@ private:
   std::string input_ring;
 
   std::string output_file;
+  std::string output_histogram_file;
 
   std::string detector_environment;
   std::string compiled_histogram_file;
