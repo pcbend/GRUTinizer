@@ -35,6 +35,7 @@ public:
   TSmartBuffer& GetBuffer(){ return fBody; }
 
   const char* GetPayload() const;
+  TSmartBuffer GetPayloadBuffer() const;
 
   void SetData(TSmartBuffer body);
 

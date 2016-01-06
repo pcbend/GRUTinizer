@@ -251,8 +251,12 @@ class MainWindow(object):
                              command=lambda :self._dump_root_file(include_histograms=False))
         filemenu.add_command(label="Dump ROOT Histograms",command=self._dump_root_file)
         filemenu.add_separator()
-        filemenu.add_command(label="Exit",command=ROOT.TGRUTint.instance().Terminate)
+        filemenu.add_command(label="Exit",command=self.Terminate)
         menubar.add_cascade(label="File",menu=filemenu)
+
+    def Terminate(self):
+        self.dummy = ROOT.TTimer('.q',-1)
+        self.dummy.Start(-1, True)
 
     def _PickIcon(self, obj):
         # If this is a TKey, look up the icon for the thing it points to.
