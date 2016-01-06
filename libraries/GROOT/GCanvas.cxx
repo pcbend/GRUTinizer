@@ -27,6 +27,7 @@
 
 //#include "GROOTGuiFactory.h"
 #include "GRootCommands.h"
+#include "GH1D.h"
 
 #include <iostream>
 #include <fstream>
@@ -445,28 +446,42 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
     break;
 
   case kMyArrowUp: {
-    // //printf("Up.\n");
-    // //printf("start: 0x%08x\n",hists.at(0));
-    // TH1* temph = (TH1*)gManager->FindObjectAny(hists.at(0)->GetName());
-    // temph = gManager->GetNext1D(temph, false);
-    // //printf("next:  0x%08x\n",temph);
-    // if(temph) {
-    //   temph->GetXaxis()->SetRange(first,last);
-    //   temph->Draw();
-    //   edited = true;
-    // }
+    GH1D* ghist = NULL;
+    for(auto hist : hists){
+      if(hist->InheritsFrom(GH1D::Class())){
+        ghist = (GH1D*)hist;
+        break;
+      }
+    }
+
+    if(ghist) {
+      TH1* prev = ghist->GetPrevious();
+      if(prev) {
+        prev->GetXaxis()->SetRange(first,last);
+        prev->Draw();
+        edited = true;
+      }
+    }
   }
     break;
+
   case kMyArrowDown: {
-    // //printf("Down.\n");
-    // //TH1* temph = gManager->GetNext1D(hists.at(0), true);
-    // TH1* temph = (TH1*)gManager->FindObjectAny(hists.at(0)->GetName());
-    // temph = gManager->GetNext1D(temph, false);
-    // if(temph) {
-    //   temph->GetXaxis()->SetRange(first,last);
-    //   temph->Draw();
-    //   edited = true;
-    // }
+    GH1D* ghist = NULL;
+    for(auto hist : hists){
+      if(hist->InheritsFrom(GH1D::Class())){
+        ghist = (GH1D*)hist;
+        break;
+      }
+    }
+
+    if(ghist) {
+      TH1* prev = ghist->GetNext();
+      if(prev) {
+        prev->GetXaxis()->SetRange(first,last);
+        prev->Draw();
+        edited = true;
+      }
+    }
   }
     break;
   default:
