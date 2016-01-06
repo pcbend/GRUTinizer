@@ -28,19 +28,12 @@ public:
   std::string InputRing() { return input_ring; }
   std::string CompiledHistogramFile() { return compiled_histogram_file; }
 
-  int CommandPort() { return fCommandPort; }
-
   const std::vector<std::string>& OptionFiles() { return options_file; }
-
-  bool IgnoreErrors() { return fIgnoreErrors; }
 
   bool ExitAfterSorting()   const { return fExitAfterSorting; }
   bool ShowedHelp()         const { return fHelp; }
   bool ShowLogo()           const { return fShowLogo; }
   bool SortRaw()            const { return fSortRaw; }
-  bool SortTree()           const { return fSortTree; }
-  bool IgnoreMode3()        const { return fIgnoreMode3; }
-  bool CommandServer()      const { return fCommandServer; }
   bool ExtractWaves()       const { return fExtractWaves;  }
   bool StartGUI()           const { return fStartGui; }
   bool MakeHistos()         const { return fMakeHistos; }
@@ -48,9 +41,9 @@ public:
   bool IsOnline()           const { return fIsOnline; }
 
   bool TimeSortInput()      const { return fTimeSortInput; }
+  int TimeSortDepth()       const { return fTimeSortDepth; }
 
   bool ShouldExitImmediately() const { return fShouldExit; }
-  bool MakeBackupFile() const { return fMakeBackupFile; }
 
   kFileType   DefaultFileType() const { return fDefaultFileType; }
   kFileType   DetermineFileType(const std::string& filename) const;
@@ -82,26 +75,20 @@ private:
 
   std::vector<std::string> options_file;
 
-  int fCommandPort;
-
   kFileType fDefaultFileType;
   bool fExitAfterSorting;
   bool fHelp;
   bool fShowLogo;
   bool fSortRaw;
-  bool fSortTree;
-  bool fIgnoreErrors;
-  bool fIgnoreMode3;
-  bool fCommandServer;
   bool fExtractWaves;
   bool fIsOnline;
   bool fStartGui;
   bool fMakeHistos;
 
   bool fTimeSortInput;
+  int fTimeSortDepth;
 
   bool fShouldExit;
-  bool fMakeBackupFile;
 
   ClassDef(TGRUTOptions,0);
 };

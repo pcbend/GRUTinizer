@@ -27,6 +27,7 @@
 #include "TDetectorEnv.h"
 
 #include "TGRUTOptions.h"
+#include "TOrderedRawFile.h"
 #include "TRawSource.h"
 #include "TSequentialRawFile.h"
 
@@ -197,6 +198,13 @@ void TGRUTint::ApplyOptions() {
       std::string filename = opt->RawInputFiles().at(0);
       source = new TRawFileIn(filename.c_str());
     }
+
+    if(opt->TimeSortInput()){
+      TOrderedRawFile* ordered_source = new TOrderedRawFile(source);
+      ordered_source->SetDepth(opt->TimeSortDepth());
+      source = ordered_source;
+    }
+
     loop = TDataLoop::Get("1_input_loop",source);
     loop->Resume();
 
@@ -263,7 +271,7 @@ void TGRUTint::ApplyOptions() {
 
 
   //next, if given a root file and told to sort it.
-  if(gChain && opt->SortTree()){
+  if(gChain && opt->MakeHistos()){
     printf("Attempting to sort root files.\n");
     TChainLoop *coop = TChainLoop::Get("",gChain);
     THistogramLoop *hoop = THistogramLoop::Get("");
