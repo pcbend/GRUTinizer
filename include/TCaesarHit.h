@@ -6,6 +6,7 @@
 class TCaesarHit : public TDetectorHit {
 public:
   TCaesarHit() { Clear(); }
+  TCaesarHit(const TCaesarHit&);
 
   //int GetDetnum() const;
 
@@ -14,13 +15,13 @@ public:
 
   int GetVSN() const		{ return fVsn;		}
   int GetChannel() const	{ return fChannel;	}
-  int GetCharge() const		{ return fCharge;	}
-  int GetTime() const		{ return fTime;		}
+  int GetCharge() const		{ return Charge();	}
+  int GetTime() const		{ return Time();		}
 
   void SetVSN(int vsn)		{ fVsn = vsn;		}
   void SetChannel(int channel)	{ fChannel = channel;	}
-  void SetCharge(int charge)	{ fCharge = charge;	}
-  void SetTime(int time)	{ fTime = time;		}
+  //void SetCharge(int charge)	{ fCharge = charge;	}
+  //void SetTime(int time)	{ fTime = time;		}
 
   int GetFullChannel() const {
     return GetVSN()*16 + GetChannel();
@@ -35,10 +36,7 @@ private:
   int fVsn;
   int fChannel;
       	 
-  int fCharge;
-  int fTime;
-
-  ClassDef(TCaesarHit,1);
+  ClassDef(TCaesarHit,2);
 };
 
 #endif /* _TCAESARDETECTORHIT_H_ */
