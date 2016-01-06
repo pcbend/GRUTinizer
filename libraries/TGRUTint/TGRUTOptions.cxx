@@ -34,7 +34,6 @@ void TGRUTOptions::Clear(Option_t* opt) {
 
   fDefaultFileType = kFileType::UNKNOWN_FILETYPE;
 
-  fCommandServer    = true;
   fExtractWaves     = false;
   fExitAfterSorting = false;
   fHelp = false;
@@ -70,9 +69,6 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .description("Root output file");
   parser.option("hist-output",&output_histogram_file)
     .description("Output file for histograms");
-  parser.option("3 include-mode3 ", &fIgnoreMode3)
-    .description("analyze gretina mode3 data")
-    .default_value(true);
   parser.option("r ring",&input_ring)
     .description("Input ring source (host/ringname).  Requires --format to be specified.");
   parser.option("l no-logo", &fShowLogo)
@@ -84,31 +80,20 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("n no-sort", &fSortRaw)
     .description("Load raw data files without sorting")
     .default_value(true);
-  parser.option("s sort", &fSortTree)
-    .description("Try and loop over any loaded root file using libMakeHistos.so")
-    .default_value(false);
   parser.option("t time-sort", &fTimeSortInput)
     .description("Reorder raw events by time");
-  parser.option("port", &fCommandPort)
-    .description("Port on which to listen for commands")
-    .default_value(9090);
+  parser.option("time-sort-depth",&fTimeSortDepth)
+    .description("Number of events to hold when time sorting")
+    .default_value(100000);
   parser.option("f format",&default_file_format)
     .description("File format of raw data.  Allowed options are \"EVT\" and \"GEB\"."
                  "If unspecified, will be guessed from the filename.");
   parser.option("g start-gui",&fStartGui)
     .description("Start the GUI")
     .default_value(false);
-  parser.option("w getwaves",&fExtractWaves)
+  parser.option("w gretina-waves",&fExtractWaves)
     .description("Extract wave forms to data class when available.")
     .default_value(false);
-  parser.option("no-backup",&fMakeBackupFile)
-    .description("Disable the \"last.root\" backup file")
-    .default_value(true);
-  parser.option("server", &fCommandServer)
-    .description("Start program with command server running.")
-    .default_value(false);
-  parser.option("ignore-errors ignore_errors", &fIgnoreErrors)
-    .description("Don't print warning messages.  Use at your own risk.");
   parser.option("q quit", &fExitAfterSorting)
     .description("Run in batch mode");
   parser.option("h help ?", &fHelp)
@@ -166,8 +151,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
     fShouldExit = true;
   }
 
-  if(fExitAfterSorting){
-    fMakeBackupFile = false;
+  if(output_histogram_file.length()>0 &&
+     output_histogram_file != "none") {
+    fMakeHistos = true;
   }
 
   for(auto& file : input_files){

@@ -149,10 +149,7 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
       fOutputEvent->AddRawData(event, kDetectorSystems::GRETINA);
       break;
     case 2: // Gretina Mode3 data.
-      // TODO, move this check somewhere else
-      if(!TGRUTOptions::Get()->IgnoreMode3()) {
-        HandleGEBMode3(event, kDetectorSystems::MODE3);
-      }
+      HandleGEBMode3(event, kDetectorSystems::MODE3);
       break;
     case 5: // S800 Mode2 equvilant.
       fOutputEvent->AddRawData(event, kDetectorSystems::S800);
@@ -180,8 +177,7 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
     case 29: // Something.
       break;
     default:
-      if(!TGRUTOptions::Get()->IgnoreErrors())
-        std::cout << "Dance Party EventType: " << type << std::endl;
+      std::cout << "Dance Party EventType: " << type << std::endl;
       //dance party.
       break;
   }
