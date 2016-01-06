@@ -1,4 +1,4 @@
-// GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GRootBrowser.h GCanvas.h GH2.h  GPeak.h GValue.h
+// GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GRootBrowser.h GCanvas.h GH2I.h  GPeak.h GValue.h
 
 
 #ifdef __CINT__
@@ -42,7 +42,7 @@
 #pragma link C++ class GBrowserPlugin+;
 #pragma link C++ class GRootGuiFactory+;
 
-#pragma link C++ class GH2+;
+#pragma link C++ class GH2I+;
 
 #pragma link C++ class GPeak+;
 //#pragma link C++ class GEfficiency+;
