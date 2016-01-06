@@ -66,26 +66,56 @@ void GH2I::Draw(Option_t *opt) {
   TH2I::Draw(opt);
 }
 
-TH1D* GH2I::ProjectionX(const char* name,
+GH1D* GH2I::ProjectionX(const char* name,
                        int firstybin,
                        int lastybin,
                        Option_t* option) {
-  TH1D* proj = TH2I::ProjectionX(name, firstybin, lastybin, option);
+  std::string actual_title;
+  if(firstybin==0 && lastybin==-1){
+    actual_title = Form("%s_totalx",GetName());
+  } else {
+    actual_title = Form("%s_projx_%d_%d",GetName(),firstybin,lastybin);
+  }
+
+  std::string actual_name = name;
+  if(actual_name == "_px"){
+    actual_name = actual_title;
+  }
+
+  TH1D* proj = TH2I::ProjectionX("temp", firstybin, lastybin, option);
   GH1D* output = new GH1D(*proj);
   proj->Delete();
+  output->SetName(actual_name.c_str());
+  output->SetTitle(actual_title.c_str());
   output->SetParent(this);
+  output->SetProjectionAxis(0);
   fProjections->Add(output);
   return output;
 }
 
-TH1D* GH2I::ProjectionY(const char* name,
+GH1D* GH2I::ProjectionY(const char* name,
                        int firstxbin,
                        int lastxbin,
                        Option_t* option) {
-  TH1D* proj = TH2I::ProjectionY(name, firstxbin, lastxbin, option);
+  std::string actual_title;
+  if(firstxbin==0 && lastxbin==-1){
+    actual_title = Form("%s_totaly",GetName());
+  } else {
+    actual_title = Form("%s_projy_%d_%d",GetName(),firstxbin,lastxbin);
+  }
+
+  std::string actual_name = name;
+  if(actual_name == "_py"){
+    actual_name = actual_title;
+  }
+
+  TH1D* proj = TH2I::ProjectionY("temp", firstxbin, lastxbin, option);
   GH1D* output = new GH1D(*proj);
   proj->Delete();
+  output->SetName(actual_name.c_str());
+  output->SetTitle(actual_title.c_str());
   output->SetParent(this);
+  output->SetProjectionAxis(1);
   fProjections->Add(output);
   return output;
 }

@@ -4,7 +4,8 @@
 
 #include "GH2I.h"
 
-GH1D::GH1D(const TH1D& source) {
+GH1D::GH1D(const TH1D& source)
+  : parent(NULL), projection_axis(-1) {
   source.Copy(*this);
 }
 
@@ -37,6 +38,24 @@ GH1D* GH1D::GetNext() const {
   if(parent && parent->InheritsFrom(GH2I::Class())) {
     GH2I* gpar = (GH2I*)parent;
     return gpar->GetNext(this);
+  } else {
+    return NULL;
+  }
+}
+
+GH1D* GH1D::Project(int bin_low, int bin_high) const {
+  if(bin_low > bin_high){
+    std::swap(bin_low, bin_high);
+  }
+
+  if(parent && parent->InheritsFrom(GH2I::Class()) &&
+     projection_axis!=-1) {
+    GH2I* gpar = (GH2I*)parent;
+    if(projection_axis == 0){
+      return gpar->ProjectionY("_py", bin_low, bin_high);
+    } else {
+      return gpar->ProjectionX("_px", bin_low, bin_high);
+    }
   } else {
     return NULL;
   }

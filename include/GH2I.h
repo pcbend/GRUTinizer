@@ -35,12 +35,12 @@ public:
   virtual void Clear(Option_t *opt="");
   virtual void Print(Option_t *opt="") const;
 
-  TH1D* ProjectionX(const char* name="_px",
+  GH1D* ProjectionX(const char* name="_px",
                     int firstybin = 0,
                     int lastybin = -1,
                     Option_t* option=""); // *MENU*
 
-  TH1D* ProjectionY(const char* name="_py",
+  GH1D* ProjectionY(const char* name="_py",
                     int firstxbin = 0,
                     int lastxbin = -1,
                     Option_t* option=""); // *MENU*

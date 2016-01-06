@@ -5,20 +5,23 @@
 
 class GH1D : public TH1D {
 public:
-  GH1D() : TH1D() { }
+  GH1D() : TH1D(), parent(NULL), projection_axis(-1) { }
   GH1D(const TVectorD& v)
-    : TH1D(v) { }
+    : TH1D(v), parent(NULL), projection_axis(-1) { }
   GH1D(const char* name, const char* title, Int_t nbinsx, const Float_t* xbins)
-    : TH1D(name, title, nbinsx, xbins) { }
+    : TH1D(name, title, nbinsx, xbins), parent(NULL), projection_axis(-1) { }
   GH1D(const char* name, const char* title, Int_t nbinsx, const Double_t* xbins)
-    : TH1D(name, title, nbinsx, xbins) { }
+    : TH1D(name, title, nbinsx, xbins), parent(NULL), projection_axis(-1) { }
   GH1D(const char* name, const char* title, Int_t nbinsx, Double_t xlow, Double_t xup)
-    : TH1D(name, title, nbinsx, xlow, xup) { }
+    : TH1D(name, title, nbinsx, xlow, xup), parent(NULL), projection_axis(-1) { }
 
   GH1D(const TH1D& source);
 
-  TObject* GetParent() { return parent; }
+  TObject* GetParent() const { return parent; }
   void SetParent(TObject* obj) { parent = obj; }
+
+  int GetProjectionAxis() const { return projection_axis; }
+  void SetProjectionAxis(int axis) { projection_axis = axis; }
 
   void Clear(Option_t* opt="");
   void Print(Option_t* opt="") const;
@@ -27,9 +30,12 @@ public:
   GH1D* GetPrevious() const;
   GH1D* GetNext() const;
 
+  GH1D* Project(int bin_low, int bin_high) const;
+
 private:
   // TODO: We'll need a custom streamer here to set the parent correctly.
   TObject* parent;
+  int projection_axis;
 
   ClassDef(GH1D,1)
 };

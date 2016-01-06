@@ -27,6 +27,7 @@
 
 //#include "GROOTGuiFactory.h"
 #include "GRootCommands.h"
+#include "GH2I.h"
 #include "GH1D.h"
 
 #include <iostream>
@@ -59,6 +60,8 @@ void GMarker::Copy(TObject &object) const {
   ((GMarker&)object).localy = localy;
   ((GMarker&)object).linex  = 0;
   ((GMarker&)object).liney  = 0;
+  ((GMarker&)object).binx  = binx;
+  ((GMarker&)object).biny  = biny;
 }
 
 
@@ -120,20 +123,33 @@ void GCanvas::GCanvasInit() {
 }
 
 void GCanvas::AddMarker(int x,int y,int dim) {
+  std::vector<TH1*> hists = FindHists(dim);
+  if(hists.size() < 1){
+    return;
+  }
+  TH1* hist = hists[0];
+
   GMarker *mark = new GMarker();
   mark->x = x;
   mark->y = y;
   if(dim==1) {
     mark->localx = gPad->AbsPixeltoX(x);
-    mark->linex = new TLine(mark->localx,GetUymin(),mark->localx,GetUymax());
+    mark->binx = hist->GetXaxis()->FindBin(mark->localx);
+    double bin_edge = hist->GetXaxis()->GetBinLowEdge(mark->binx);
+    mark->linex = new TLine(bin_edge,GetUymin(),bin_edge,GetUymax());
     mark->linex->SetLineColor(kRed);
     mark->linex->Draw();
   } else if (dim==2) {
     mark->localx = gPad->AbsPixeltoX(x);
     mark->localy = gPad->AbsPixeltoX(y);
-    mark->linex = new TLine(mark->localx,GetUymin(),mark->localx,GetUymax());
+    mark->binx = hist->GetXaxis()->FindBin(mark->localx);
+    mark->biny = hist->GetYaxis()->FindBin(mark->localy);
+    double binx_edge = hist->GetXaxis()->GetBinLowEdge(mark->binx);
+    double biny_edge = hist->GetYaxis()->GetBinLowEdge(mark->biny);
+
+    mark->linex = new TLine(binx_edge,GetUymin(),binx_edge,GetUymax());
     mark->linex->SetLineColor(kRed);
-    mark->liney = new TLine(GetUxmin(),mark->localy,GetUxmax(),mark->localy);
+    mark->liney = new TLine(GetUxmin(),biny_edge,GetUxmax(),biny_edge);
     mark->liney->SetLineColor(kRed);
     mark->linex->Draw();
     mark->liney->Draw();
@@ -339,7 +355,13 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
     TString options;
     if(hist->GetDimension()==2)
       options.Append("colz");
-    hist->DrawCopy(options.Data());
+
+    if(hist->InheritsFrom(GH1D::Class())) {
+      GH1D* ghist = (GH1D*)hist;
+      ghist->GetParent()->Draw("colz");
+    } else {
+      hist->DrawCopy(options.Data());
+    }
     return true;
   }
 
@@ -607,6 +629,28 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       RemoveMarker("all");
       edited = true;
       break;
+
+    case kKey_p: {
+      if(GetNMarkers() < 2){
+        break;
+      }
+      GH1D* ghist = NULL;
+      for(auto hist : hists){
+        if(hist->InheritsFrom(GH1D::Class())){
+          ghist = (GH1D*)hist;
+          break;
+        }
+      }
+
+      if(ghist){
+        GH1D* proj = ghist->Project(fMarkers.at(fMarkers.size()-1)->binx,
+                                    fMarkers.at(fMarkers.size()-2)->binx);
+        proj->Draw();
+        edited=true;
+      }
+    }
+      break;
+
     case kKey_s:
       edited = ShowPeaks(hists.data(),hists.size());
       break;
@@ -650,6 +694,39 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       printf("you hit the p key.\n");
 
       break;
+
+    case kKey_x: {
+      GH2I* ghist = NULL;
+      for(auto hist : hists) {
+        if(hist->InheritsFrom(GH2I::Class())){
+          ghist = (GH2I*)hist;
+          break;
+        }
+      }
+
+      if(ghist){
+        ghist->ProjectionX()->Draw();
+        edited=true;
+      }
+    }
+      break;
+
+    case kKey_y: {
+      GH2I* ghist = NULL;
+      for(auto hist : hists) {
+        if(hist->InheritsFrom(GH2I::Class())){
+          ghist = (GH2I*)hist;
+          break;
+        }
+      }
+
+      if(ghist){
+        ghist->ProjectionY()->Draw();
+        edited=true;
+      }
+    }
+      break;
+
     case kKey_z: {
         printf("you pressed z!\n");
         GCanvas *c = (GCanvas*)gPad->GetCanvas();
