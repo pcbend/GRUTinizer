@@ -159,14 +159,18 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
       break;
     case 9:
       //Simulated S800 data,
+      fOutputEvent->AddRawData(event, kDetectorSystems::S800_SIM);
       //event.Print("all");
+      //std::cout << " In simulated S800 packet" << std::endl;
       break;
     case 10: // S800 scaler data....
       HandleS800Scaler(event);
       break;
     case 11:
       //GEANT4 gretina simulated data.
+      fOutputEvent->AddRawData(event,kDetectorSystems::GRETINA_SIM);
       //event.Print("all");
+      //exit(1);
       break;
     case 17: //PWall Mode2 equivlant.
       break;

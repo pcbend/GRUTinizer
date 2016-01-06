@@ -39,6 +39,34 @@ std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBBankType1 &bank) 
    return os;
 }
 
+std::ostream& operator<<(std::ostream& os, const TRawEvent::G4S800 &s800pack){
+  os << " ATA : " << s800pack.GetATA() << std::endl;
+  os << " BTA : " << s800pack.GetBTA() << std::endl;
+  os << " DTA : " << s800pack.GetDTA() << std::endl;
+  os << " YTA : " << s800pack.GetYTA() << std::endl;
+
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const TRawEvent::G4SimPacket &packet){
+  os << " Type : " << std::hex << packet.head.GetType() << std::endl;
+  os << " Num  : " << packet.head.GetNum() << std::endl;
+  os << " Full : " << packet.head.GetFull() << std::endl;
+  
+  for(int i = 0; i< packet.head.GetNum(); i++){
+      os << " --- Gamma Summary ---" << std::endl;
+      os << " > Gamma En   : " << packet.data[i].GetEn() << std::endl;
+      os << " > Gamma X    : " << packet.data[i].GetX() << std::endl;
+      os << " > Gamma Y    : " << packet.data[i].GetY() << std::endl;
+      os << " > Gamma Z    : " << packet.data[i].GetZ() << std::endl;
+      os << " > Gamma Beta : " << packet.data[i].GetBeta() << std::endl;
+      os << " > Gamma Phi  : " << packet.data[i].GetPhi() << std::endl;
+      os << " > Gamma Theta: " << packet.data[i].GetTheta() << std::endl;
+  }
+  return os;
+}
+
+
 UShort_t TRawEvent:: SwapShort(UShort_t datum) {
   UShort_t temp = 0;
   temp = (datum&0x00ff);
