@@ -93,6 +93,8 @@ class HistTab(object):
             iterable = obj.GetListOfKeys()
             if not iterable:
                 iterable = obj.GetList()
+        elif isinstance(obj, ROOT.GH2I):
+            iterable = obj.GetProjections()
         else:
             iterable = None
 

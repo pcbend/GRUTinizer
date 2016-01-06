@@ -19,6 +19,7 @@ enum kBackgroundSubtraction {
 class GH2I : public TH2I {
 
 public:
+  GH2I() { Init(); }
   GH2I(const TObject&);
   GH2I(const char *name,const char *title,Int_t nbinsx,const Double_t *xbins,Int_t nbinsy, const Double_t *ybins);
   GH2I(const char *name,const char *title,Int_t nbinsx,const Float_t *xbins,Int_t nbinsy, const Float_t *ybins);
@@ -72,6 +73,8 @@ public:
 
   GH1D* GetPrevious(const GH1D* curr) const;
   GH1D* GetNext(const GH1D* curr) const;
+
+  TList* GetProjections() { return fProjections; }
 
 private:
   void Init();

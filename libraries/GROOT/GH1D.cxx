@@ -16,7 +16,7 @@ void GH1D::Clear(Option_t* opt) {
 
 void GH1D::Print(Option_t* opt) const {
   TH1D::Print(opt);
-  std::cout << "\tParent: " << parent << std::endl;
+  std::cout << "\tParent: " << parent.GetObject() << std::endl;
 }
 
 void GH1D::Copy(TObject& obj) const {
@@ -26,8 +26,8 @@ void GH1D::Copy(TObject& obj) const {
 }
 
 GH1D* GH1D::GetPrevious() const {
-  if(parent && parent->InheritsFrom(GH2I::Class())) {
-    GH2I* gpar = (GH2I*)parent;
+  if(parent.GetObject() && parent.GetObject()->InheritsFrom(GH2I::Class())) {
+    GH2I* gpar = (GH2I*)parent.GetObject();
     return gpar->GetPrevious(this);
   } else {
     return NULL;
@@ -35,8 +35,8 @@ GH1D* GH1D::GetPrevious() const {
 }
 
 GH1D* GH1D::GetNext() const {
-  if(parent && parent->InheritsFrom(GH2I::Class())) {
-    GH2I* gpar = (GH2I*)parent;
+  if(parent.GetObject() && parent.GetObject()->InheritsFrom(GH2I::Class())) {
+    GH2I* gpar = (GH2I*)parent.GetObject();
     return gpar->GetNext(this);
   } else {
     return NULL;
@@ -48,9 +48,9 @@ GH1D* GH1D::Project(int bin_low, int bin_high) const {
     std::swap(bin_low, bin_high);
   }
 
-  if(parent && parent->InheritsFrom(GH2I::Class()) &&
+  if(parent.GetObject() && parent.GetObject()->InheritsFrom(GH2I::Class()) &&
      projection_axis!=-1) {
-    GH2I* gpar = (GH2I*)parent;
+    GH2I* gpar = (GH2I*)parent.GetObject();
     if(projection_axis == 0){
       return gpar->ProjectionY("_py", bin_low, bin_high);
     } else {
@@ -71,9 +71,9 @@ GH1D* GH1D::Project_Background(int bin_low, int bin_high,
     std::swap(bg_bin_low, bg_bin_high);
   }
 
-  if(parent && parent->InheritsFrom(GH2I::Class()) &&
+  if(parent.GetObject() && parent.GetObject()->InheritsFrom(GH2I::Class()) &&
      projection_axis!=-1) {
-    GH2I* gpar = (GH2I*)parent;
+    GH2I* gpar = (GH2I*)parent.GetObject();
     if(projection_axis == 0){
       return gpar->ProjectionY_Background(bin_low, bin_high,
                                           bg_bin_low, bg_bin_high,

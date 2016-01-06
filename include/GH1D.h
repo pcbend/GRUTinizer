@@ -2,6 +2,7 @@
 #define GH1D_H
 
 #include "TH1.h"
+#include "TRef.h"
 
 #include "GH2I.h"
 
@@ -19,7 +20,7 @@ public:
 
   GH1D(const TH1D& source);
 
-  TObject* GetParent() const { return parent; }
+  TObject* GetParent() const { return parent.GetObject(); }
   void SetParent(TObject* obj) { parent = obj; }
 
   int GetProjectionAxis() const { return projection_axis; }
@@ -38,8 +39,7 @@ public:
                            kBackgroundSubtraction mode = kRegionBackground) const;
 
 private:
-  // TODO: We'll need a custom streamer here to set the parent correctly.
-  TObject* parent;
+  TRef parent;
   int projection_axis;
 
   ClassDef(GH1D,1)
