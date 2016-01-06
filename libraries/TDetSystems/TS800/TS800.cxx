@@ -233,6 +233,9 @@ void TS800::Clear(Option_t* opt){
 }
 
 int TS800::BuildHits(){
+  if(raw_data.size() != 1){
+    std::cout << "Data buffers: " << raw_data.size() << std::endl;
+  }
   for(auto& event : raw_data) { // should only be one..
     SetTimestamp(event.GetTimestamp());
     // TGEBEvent* geb = (TGEBEvent*)&event;
@@ -335,8 +338,12 @@ int TS800::BuildHits(){
 }
 
 bool TS800::HandleTrigPacket(unsigned short *data,int size) {
-  if(size<1)
+  if(size<1){
+    static int i=0;
+    i++;
+    std::cout << "Encountered " << i << " events with empty trig packet" << std::endl;
     return false;
+  }
 
   trigger.SetRegistr(*data);
   for(int x=1;x<size;x++) {
