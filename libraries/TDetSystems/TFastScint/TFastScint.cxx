@@ -102,7 +102,7 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
   }
 
 
-  for(Int_t i = 0; i <PayloadSize; i++ ){
+  for(Int_t i = 0; i <PayloadSize; i++ ){ 
     const TRawEvent::Mesy_Word* Mword = (TRawEvent::Mesy_Word*)data;
     data+=sizeof(TRawEvent::Mesy_Word); words_processed++;
 

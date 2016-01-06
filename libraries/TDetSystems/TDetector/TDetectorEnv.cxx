@@ -138,8 +138,7 @@ kDetectorSystems TDetectorEnv::DetermineSystem(int source_id) const {
     }
   }
 
-  if(output == kDetectorSystems::UNKNOWN_SYSTEM
-     && !TGRUTOptions::Get()->IgnoreErrors()){
+  if(output == kDetectorSystems::UNKNOWN_SYSTEM){
     //std::cerr << RED << "Unknown sourceid found: " << source_id << RESET_COLOR << std::endl;
   }
 

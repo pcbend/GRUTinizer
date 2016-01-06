@@ -266,6 +266,7 @@ int TS800::BuildHits(){
       switch(*dptr) {
       case 0x5801:  //S800 TriggerPacket.
 	HandleTrigPacket(dptr+1,sizeleft);
+
 	break;
       case 0x5802:  // S800 TOF.
 	//event.Print("all0x5802");
@@ -334,11 +335,11 @@ int TS800::BuildHits(){
 }
 
 bool TS800::HandleTrigPacket(unsigned short *data,int size) {
-  if(size<2)
+  if(size<1)
     return false;
 
   trigger.SetRegistr(*data);
-    for(int x=1;x<size;x++) {
+  for(int x=1;x<size;x++) {
     unsigned short current = *(data+x);
     switch(current&0xf000) {
     case 0x8000:  //S800

@@ -1599,6 +1599,86 @@ SEG10AN32 {
   EnergyCoeff: 0 1
 }
 
+SEG10AN01 {
+  Address: 0x01020d00
+  EnergyCoeff: 0 1
+}
+
+SEG10AN02 {
+  Address: 0x01020d01
+  EnergyCoeff: 0 1
+}
+
+SEG10AN03 {
+  Address: 0x01020d02
+  EnergyCoeff: 0 1
+}
+
+SEG10AN04 {
+  Address: 0x01020d03
+  EnergyCoeff: 0 1
+}
+
+SEG10AN05 {
+  Address: 0x01020d04
+  EnergyCoeff: 0 1
+}
+
+SEG10AN06 {
+  Address: 0x01020d05
+  EnergyCoeff: 0 1
+}
+
+SEG10AN07 {
+  Address: 0x01020d06
+  EnergyCoeff: 0 1
+}
+
+SEG10AN08 {
+  Address: 0x01020d07
+  EnergyCoeff: 0 1
+}
+
+SEG10AN09 {
+  Address: 0x01020d08
+  EnergyCoeff: 0 1
+}
+
+SEG10AN10 {
+  Address: 0x01020d09
+  EnergyCoeff: 0 1
+}
+
+SEG10AN11 {
+  Address: 0x01020d0a
+  EnergyCoeff: 0 1
+}
+
+SEG10AN12 {
+  Address: 0x01020d0b
+  EnergyCoeff: 0 1
+}
+
+SEG10AN13 {
+  Address: 0x01020d0c
+  EnergyCoeff: 0 1
+}
+
+SEG10AN14 {
+  Address: 0x01020d0d
+  EnergyCoeff: 0 1
+}
+
+SEG10AN15 {
+  Address: 0x01020d0e
+  EnergyCoeff: 0 1
+}
+
+SEG10AN16 {
+  Address: 0x01020d0f
+  EnergyCoeff: 0 1
+}
+
 SEG11AN17 {
   Address: 0x01030200
   EnergyCoeff: 0 1
@@ -2476,6 +2556,86 @@ SEG16AN31 {
 
 SEG16AN32 {
   Address: 0x01030c0f
+  EnergyCoeff: 0 1
+}
+
+SEG16AN01 {
+  Address: 0x01030d00
+  EnergyCoeff: 0 1
+}
+
+SEG16AN02 {
+  Address: 0x01030d01
+  EnergyCoeff: 0 1
+}
+
+SEG16AN03 {
+  Address: 0x01030d02
+  EnergyCoeff: 0 1
+}
+
+SEG16AN04 {
+  Address: 0x01030d03
+  EnergyCoeff: 0 1
+}
+
+SEG16AN05 {
+  Address: 0x01030d04
+  EnergyCoeff: 0 1
+}
+
+SEG16AN06 {
+  Address: 0x01030d05
+  EnergyCoeff: 0 1
+}
+
+SEG16AN07 {
+  Address: 0x01030d06
+  EnergyCoeff: 0 1
+}
+
+SEG16AN08 {
+  Address: 0x01030d07
+  EnergyCoeff: 0 1
+}
+
+SEG16AN09 {
+  Address: 0x01030d08
+  EnergyCoeff: 0 1
+}
+
+SEG16AN10 {
+  Address: 0x01030d09
+  EnergyCoeff: 0 1
+}
+
+SEG16AN11 {
+  Address: 0x01030d0a
+  EnergyCoeff: 0 1
+}
+
+SEG16AN12 {
+  Address: 0x01030d0b
+  EnergyCoeff: 0 1
+}
+
+SEG16AN13 {
+  Address: 0x01030d0c
+  EnergyCoeff: 0 1
+}
+
+SEG16AN14 {
+  Address: 0x01030d0d
+  EnergyCoeff: 0 1
+}
+
+SEG16AN15 {
+  Address: 0x01030d0e
+  EnergyCoeff: 0 1
+}
+
+SEG16AN16 {
+  Address: 0x01030d0f
   EnergyCoeff: 0 1
 }
 

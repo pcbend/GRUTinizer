@@ -149,10 +149,7 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
       fOutputEvent->AddRawData(event, kDetectorSystems::GRETINA);
       break;
     case 2: // Gretina Mode3 data.
-      // TODO, move this check somewhere else
-      if(!TGRUTOptions::Get()->IgnoreMode3()) {
-        HandleGEBMode3(event, kDetectorSystems::MODE3);
-      }
+      HandleGEBMode3(event, kDetectorSystems::MODE3);
       break;
     case 5: // S800 Mode2 equvilant.
       fOutputEvent->AddRawData(event, kDetectorSystems::S800);
@@ -162,22 +159,25 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
       break;
     case 9:
       //Simulated S800 data,
+      fOutputEvent->AddRawData(event, kDetectorSystems::S800_SIM);
       //event.Print("all");
+      //std::cout << " In simulated S800 packet" << std::endl;
       break;
     case 10: // S800 scaler data....
       HandleS800Scaler(event);
       break;
     case 11:
       //GEANT4 gretina simulated data.
+      fOutputEvent->AddRawData(event,kDetectorSystems::GRETINA_SIM);
       //event.Print("all");
+      //exit(1);
       break;
     case 17: //PWall Mode2 equivlant.
       break;
     case 29: // Something.
       break;
     default:
-      if(!TGRUTOptions::Get()->IgnoreErrors())
-        std::cout << "Dance Party EventType: " << type << std::endl;
+      std::cout << "Dance Party EventType: " << type << std::endl;
       //dance party.
       break;
   }

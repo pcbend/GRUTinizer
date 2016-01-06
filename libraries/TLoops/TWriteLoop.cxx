@@ -51,7 +51,7 @@ TWriteLoop::~TWriteLoop() {
   //   delete elem.second;
   // }
 
-  event_tree->Write();
+  event_tree->Write(event_tree->GetName(), TObject::kOverwrite);
   output_file->Close();
   output_file->Delete();
 }
