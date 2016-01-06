@@ -9,11 +9,24 @@
 #include "TH1.h"
 #include "TLine.h"
 
+#include "GH2I.h"
+
 class GMarker : public TObject{
 public:
   GMarker():x(-1),y(-1),localx(0.0),localy(0.0),linex(0),liney(0) { }
   GMarker(const GMarker &m) : TObject(m) { ((GMarker&)m).Copy(*this); }
   virtual ~GMarker() { if(linex) linex->Delete(); if(liney) liney->Delete(); }
+  void Draw(Option_t* opt="") { if(linex) linex->Draw(opt); if(liney) liney->Draw(opt); }
+
+  void SetColor(Color_t color) {
+    if(linex){
+      linex->SetLineColor(color);
+    }
+    if(liney){
+      liney->SetLineColor(color);
+    }
+  }
+
   // Pixel space
   int x,y;
   // Coordinate space (SetRangeUser() units)
@@ -65,9 +78,14 @@ private:
   //bool fStatsDisplayed;
   bool fMarkerMode;
   std::vector<GMarker*> fMarkers;
+  std::vector<GMarker*> fBackgroundMarkers;
+  kBackgroundSubtraction fBackgroundMode;
   void AddMarker(int,int,int dim=1);
   void RemoveMarker(Option_t *opt="");
   void OrderMarkers();
+  void RedrawMarkers();
+  bool SetBackgroundMarkers();
+  bool CycleBackgroundSubtraction();
 
   //std::vector<GMarker*> fBG_Markers;
   //void AddBGMarker(GMarker *mark);

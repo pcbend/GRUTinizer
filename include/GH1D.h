@@ -3,6 +3,8 @@
 
 #include "TH1.h"
 
+#include "GH2I.h"
+
 class GH1D : public TH1D {
 public:
   GH1D() : TH1D(), parent(NULL), projection_axis(-1) { }
@@ -31,6 +33,9 @@ public:
   GH1D* GetNext() const;
 
   GH1D* Project(int bin_low, int bin_high) const;
+  GH1D* Project_Background(int bin_low, int bin_high,
+                           int bg_bin_low, int bg_bin_high,
+                           kBackgroundSubtraction mode = kRegionBackground) const;
 
 private:
   // TODO: We'll need a custom streamer here to set the parent correctly.

@@ -60,3 +60,30 @@ GH1D* GH1D::Project(int bin_low, int bin_high) const {
     return NULL;
   }
 }
+
+GH1D* GH1D::Project_Background(int bin_low, int bin_high,
+                               int bg_bin_low, int bg_bin_high,
+                               kBackgroundSubtraction mode) const {
+  if(bin_low > bin_high){
+    std::swap(bin_low, bin_high);
+  }
+  if(bg_bin_low > bg_bin_high){
+    std::swap(bg_bin_low, bg_bin_high);
+  }
+
+  if(parent && parent->InheritsFrom(GH2I::Class()) &&
+     projection_axis!=-1) {
+    GH2I* gpar = (GH2I*)parent;
+    if(projection_axis == 0){
+      return gpar->ProjectionY_Background(bin_low, bin_high,
+                                          bg_bin_low, bg_bin_high,
+                                          mode);
+    } else {
+      return gpar->ProjectionX_Background(bin_low, bin_high,
+                                          bg_bin_low, bg_bin_high,
+                                          mode);
+    }
+  } else {
+    return NULL;
+  }
+}

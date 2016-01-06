@@ -10,6 +10,12 @@
 
 class GH1D;
 
+enum kBackgroundSubtraction {
+  kNoBackground,
+  kRegionBackground,
+  kScaledTotalProjection
+};
+
 class GH2I : public TH2I {
 
 public:
@@ -35,15 +41,34 @@ public:
   virtual void Clear(Option_t *opt="");
   virtual void Print(Option_t *opt="") const;
 
+  GH1D* Projection_Background(int axis=0,
+                              int firstbin = 0,
+                              int lastbin = -1,
+                              int firstbackground_bin = 0,
+                              int lastbackground_bin = -1,
+                              kBackgroundSubtraction mode = kRegionBackground);
+
   GH1D* ProjectionX(const char* name="_px",
-                    int firstybin = 0,
-                    int lastybin = -1,
+                    int firstbin = 0,
+                    int lastbin = -1,
                     Option_t* option=""); // *MENU*
 
+  GH1D* ProjectionX_Background(int firstbin = 0,
+                               int lastbin = -1,
+                               int firstbackground_bin = 0,
+                               int lastbackground_bin = -1,
+                               kBackgroundSubtraction mode = kRegionBackground); // *MENU*
+
   GH1D* ProjectionY(const char* name="_py",
-                    int firstxbin = 0,
-                    int lastxbin = -1,
+                    int firstbin = 0,
+                    int lastbin = -1,
                     Option_t* option=""); // *MENU*
+
+  GH1D* ProjectionY_Background(int firstbin = 0,
+                               int lastbin = -1,
+                               int firstbackground_bin = 0,
+                               int lastbackground_bin = -1,
+                               kBackgroundSubtraction mode = kRegionBackground); // *MENU*
 
   GH1D* GetPrevious(const GH1D* curr) const;
   GH1D* GetNext(const GH1D* curr) const;
@@ -51,6 +76,7 @@ public:
 private:
   void Init();
   TList *fProjections;
+
 
   ClassDef(GH2I,1)
 };
