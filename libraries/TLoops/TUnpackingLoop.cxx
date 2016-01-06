@@ -74,8 +74,11 @@ bool TUnpackingLoop::Iteration(){
   }
 
   fOutputEvent->Build();
-  output_queue.Push(fOutputEvent);
-  fOutputEvent = NULL;
+
+  if(fOutputEvent->GetDetectors().size() != 0){
+    output_queue.Push(fOutputEvent);
+    fOutputEvent = NULL;
+  }
   return true;
 }
 
@@ -131,7 +134,10 @@ void TUnpackingLoop::HandleGEBMode3(TGEBEvent& event, kDetectorSystems system){
 }
 
 void TUnpackingLoop::HandleNSCLPeriodicScalers(TNSCLEvent& event){
-  // TODO: Bring this in.
+  TUnpackedEvent* scaler_event = new TUnpackedEvent;
+  scaler_event->AddRawData(event, kDetectorSystems::S800SCALER);
+  scaler_event->Build();
+  output_queue.Push(scaler_event);
 }
 
 void TUnpackingLoop::HandleS800Scaler(TGEBEvent& event){

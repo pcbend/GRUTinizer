@@ -4,6 +4,7 @@
 #include "TThread.h"
 
 #include "THistogramLoop.h"
+#include "TS800.h"
 
 #include <chrono>
 #include <thread>
@@ -146,7 +147,7 @@ void TWriteLoop::WriteEvent(TUnpackedEvent* event) {
   }
 
   // Load current events
-  for(auto det : event->GetDetectors()) {
+  for(auto det : event->GetDetectors()) {    
     TClass* cls = det->IsA();
     *det_map.at(cls) = det;
   }

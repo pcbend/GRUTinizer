@@ -210,6 +210,7 @@ void TGRUTint::ApplyOptions() {
 
 
     TBuildingLoop *boop = TBuildingLoop::Get("2_build_loop",loop);
+    boop->SetBuildWindow(opt->BuildWindow());
     boop->Resume();
     TUnpackingLoop *uoop1 = TUnpackingLoop::Get("3_unpack1",boop);
     uoop1->Resume();
