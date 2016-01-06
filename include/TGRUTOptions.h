@@ -30,6 +30,8 @@ public:
 
   const std::vector<std::string>& OptionFiles() { return options_file; }
 
+  int BuildWindow() const { return fBuildWindow; }
+
   bool ExitAfterSorting()   const { return fExitAfterSorting; }
   bool ShowedHelp()         const { return fHelp; }
   bool ShowLogo()           const { return fShowLogo; }
@@ -87,6 +89,8 @@ private:
 
   bool fTimeSortInput;
   int fTimeSortDepth;
+
+  int fBuildWindow;
 
   bool fShouldExit;
 

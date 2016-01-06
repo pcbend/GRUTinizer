@@ -85,6 +85,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("time-sort-depth",&fTimeSortDepth)
     .description("Number of events to hold when time sorting")
     .default_value(100000);
+  parser.option("build-window", &fBuildWindow)
+    .description("Build window, timestamp units")
+    .default_value(1000);
   parser.option("f format",&default_file_format)
     .description("File format of raw data.  Allowed options are \"EVT\" and \"GEB\"."
                  "If unspecified, will be guessed from the filename.");
