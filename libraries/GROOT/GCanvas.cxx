@@ -27,6 +27,8 @@
 
 //#include "GROOTGuiFactory.h"
 #include "GRootCommands.h"
+#include "GH2I.h"
+#include "GH1D.h"
 
 #include <iostream>
 #include <fstream>
@@ -58,6 +60,8 @@ void GMarker::Copy(TObject &object) const {
   ((GMarker&)object).localy = localy;
   ((GMarker&)object).linex  = 0;
   ((GMarker&)object).liney  = 0;
+  ((GMarker&)object).binx  = binx;
+  ((GMarker&)object).biny  = biny;
 }
 
 
@@ -111,6 +115,7 @@ void GCanvas::GCanvasInit() {
    fMarkerMode = true;
    control_key = false;
    fGuiEnabled = false;
+   fBackgroundMode = kNoBackground;
    //if(gVirtualX->InheritsFrom("TGX11")) {
    //    printf("\tusing x11-like graphical interface.\n");
    //}
@@ -119,23 +124,35 @@ void GCanvas::GCanvasInit() {
 }
 
 void GCanvas::AddMarker(int x,int y,int dim) {
+  std::vector<TH1*> hists = FindHists(dim);
+  if(hists.size() < 1){
+    return;
+  }
+  TH1* hist = hists[0];
+
   GMarker *mark = new GMarker();
   mark->x = x;
   mark->y = y;
   if(dim==1) {
     mark->localx = gPad->AbsPixeltoX(x);
-    mark->linex = new TLine(mark->localx,GetUymin(),mark->localx,GetUymax());
-    mark->linex->SetLineColor(kRed);
-    mark->linex->Draw();
+    mark->binx = hist->GetXaxis()->FindBin(mark->localx);
+    double bin_edge = hist->GetXaxis()->GetBinLowEdge(mark->binx);
+    mark->linex = new TLine(bin_edge,GetUymin(),bin_edge,GetUymax());
+    mark->SetColor(kRed);
+    mark->Draw();
   } else if (dim==2) {
     mark->localx = gPad->AbsPixeltoX(x);
     mark->localy = gPad->AbsPixeltoX(y);
-    mark->linex = new TLine(mark->localx,GetUymin(),mark->localx,GetUymax());
-    mark->linex->SetLineColor(kRed);
-    mark->liney = new TLine(GetUxmin(),mark->localy,GetUxmax(),mark->localy);
-    mark->liney->SetLineColor(kRed);
-    mark->linex->Draw();
-    mark->liney->Draw();
+    mark->binx = hist->GetXaxis()->FindBin(mark->localx);
+    mark->biny = hist->GetYaxis()->FindBin(mark->localy);
+    double binx_edge = hist->GetXaxis()->GetBinLowEdge(mark->binx);
+    double biny_edge = hist->GetYaxis()->GetBinLowEdge(mark->biny);
+
+    mark->linex = new TLine(binx_edge,GetUymin(),binx_edge,GetUymax());
+    mark->liney = new TLine(GetUxmin(),biny_edge,GetUxmax(),biny_edge);
+
+    mark->SetColor(kRed);
+    mark->Draw();
   }
   if(fMarkers.size()>MAXNUMBEROFMARKERS) {
     delete fMarkers.at(0);
@@ -169,6 +186,90 @@ void GCanvas::RemoveMarker(Option_t* opt) {
 void GCanvas::OrderMarkers() {
   std::sort(fMarkers.begin(),fMarkers.end());
   return;
+}
+
+void GCanvas::RedrawMarkers() {
+  gPad->Update();
+  for(auto marker : fMarkers){
+    if(marker->linex){
+      marker->linex->SetY1(GetUymin());
+      marker->linex->SetY2(GetUymax());
+    }
+    if(marker->liney){
+      marker->liney->SetX1(GetUxmin());
+      marker->liney->SetX2(GetUxmax());
+    }
+    marker->Draw();
+  }
+
+  for(auto marker : fBackgroundMarkers){
+    if(marker->linex){
+      marker->linex->SetY1(GetUymin());
+      marker->linex->SetY2(GetUymax());
+    }
+    if(marker->liney){
+      marker->liney->SetX1(GetUxmin());
+      marker->liney->SetX2(GetUxmax());
+    }
+    marker->Draw();
+  }
+}
+
+bool GCanvas::SetBackgroundMarkers() {
+  if(GetNMarkers() < 2){
+    return false;
+  }
+
+  // Delete previous background, if any.
+  for(auto marker : fBackgroundMarkers){
+    delete marker;
+  }
+  fBackgroundMarkers.clear();
+
+  // Push last two markers into the background.
+  fBackgroundMarkers.push_back(fMarkers.back());
+  fMarkers.pop_back();
+  fBackgroundMarkers.push_back(fMarkers.back());
+  fMarkers.pop_back();
+
+  // Change background marker color.
+  for(auto marker : fBackgroundMarkers){
+    marker->SetColor(kBlue);
+  }
+
+  fBackgroundMode = kRegionBackground;
+
+  return true;
+}
+
+bool GCanvas::CycleBackgroundSubtraction() {
+  if(fBackgroundMarkers.size() < 2){
+    return false;
+  }
+
+  Color_t color = 0;
+
+  switch(fBackgroundMode){
+  case kNoBackground:
+    fBackgroundMode = kRegionBackground;
+    color = kBlue;
+    break;
+
+  case kRegionBackground:
+    fBackgroundMode = kScaledTotalProjection;
+    color = kGreen;
+    break;
+  case kScaledTotalProjection:
+    fBackgroundMode = kNoBackground;
+    color = 0;
+    break;
+  }
+
+  for(auto marker : fBackgroundMarkers){
+    marker->SetColor(color);
+  }
+
+  return true;
 }
 
 //void GCanvas::AddBGMarker(GMarker *mark) {
@@ -298,7 +399,7 @@ bool GCanvas::HandleKeyboardPress(Event_t *event,UInt_t *keysym) {
   }
   hists = FindHists(2);
   if(hists.size()>0){
-    edited = Process2DKeyboardPress(event,keysym);
+    edited = Process2DKeyboardPress(event,keysym) || edited;
   }
 
 
@@ -311,8 +412,8 @@ bool GCanvas::HandleKeyboardPress(Event_t *event,UInt_t *keysym) {
   //}
 
   if(edited) {
-     gPad->Modified();
-     gPad->Update();
+    gPad->Modified();
+    gPad->Update();
   }
   return true;
 }
@@ -338,7 +439,13 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
     TString options;
     if(hist->GetDimension()==2)
       options.Append("colz");
-    hist->DrawCopy(options.Data());
+
+    if(hist->InheritsFrom(GH1D::Class())) {
+      GH1D* ghist = (GH1D*)hist;
+      ghist->GetParent()->Draw("colz");
+    } else {
+      hist->DrawCopy(options.Data());
+    }
     return true;
   }
 
@@ -445,28 +552,44 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
     break;
 
   case kMyArrowUp: {
-    // //printf("Up.\n");
-    // //printf("start: 0x%08x\n",hists.at(0));
-    // TH1* temph = (TH1*)gManager->FindObjectAny(hists.at(0)->GetName());
-    // temph = gManager->GetNext1D(temph, false);
-    // //printf("next:  0x%08x\n",temph);
-    // if(temph) {
-    //   temph->GetXaxis()->SetRange(first,last);
-    //   temph->Draw();
-    //   edited = true;
-    // }
+    GH1D* ghist = NULL;
+    for(auto hist : hists){
+      if(hist->InheritsFrom(GH1D::Class())){
+        ghist = (GH1D*)hist;
+        break;
+      }
+    }
+
+    if(ghist) {
+      TH1* prev = ghist->GetPrevious();
+      if(prev) {
+        prev->GetXaxis()->SetRange(first,last);
+        prev->Draw();
+        RedrawMarkers();
+        edited = true;
+      }
+    }
   }
     break;
+
   case kMyArrowDown: {
-    // //printf("Down.\n");
-    // //TH1* temph = gManager->GetNext1D(hists.at(0), true);
-    // TH1* temph = (TH1*)gManager->FindObjectAny(hists.at(0)->GetName());
-    // temph = gManager->GetNext1D(temph, false);
-    // if(temph) {
-    //   temph->GetXaxis()->SetRange(first,last);
-    //   temph->Draw();
-    //   edited = true;
-    // }
+    GH1D* ghist = NULL;
+    for(auto hist : hists){
+      if(hist->InheritsFrom(GH1D::Class())){
+        ghist = (GH1D*)hist;
+        break;
+      }
+    }
+
+    if(ghist) {
+      TH1* prev = ghist->GetNext();
+      if(prev) {
+        prev->GetXaxis()->SetRange(first,last);
+        prev->Draw();
+        RedrawMarkers();
+        edited = true;
+      }
+    }
   }
     break;
   default:
@@ -489,6 +612,15 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
     case kKey_Control:
       toggle_control();
       break;
+
+    case kKey_b:
+      edited = SetBackgroundMarkers();
+      break;
+
+    case kKey_B:
+      edited = CycleBackgroundSubtraction();
+      break;
+
     case kKey_e:
        if(GetNMarkers()<2)
           break;
@@ -571,6 +703,8 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
         }
         SetLogy(1);
       }
+      // TODO: Make this work, instead of disappearing the markers in log mode.
+      //RedrawMarkers();
       edited = true;
       break;
 
@@ -592,6 +726,56 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       RemoveMarker("all");
       edited = true;
       break;
+
+    case kKey_p: {
+      if(GetNMarkers() < 2){
+        break;
+      }
+      GH1D* ghist = NULL;
+      for(auto hist : hists){
+        if(hist->InheritsFrom(GH1D::Class())){
+          ghist = (GH1D*)hist;
+          break;
+        }
+      }
+
+      if(ghist){
+        GH1D* proj = NULL;
+        if(fBackgroundMarkers.size()>=2 &&
+           fBackgroundMode!=kNoBackground){
+          proj = ghist->Project_Background(fMarkers.at(fMarkers.size()-1)->binx,
+                                           fMarkers.at(fMarkers.size()-2)->binx,
+                                           fBackgroundMarkers[0]->binx,
+                                           fBackgroundMarkers[1]->binx,
+                                           fBackgroundMode);
+        } else {
+          proj = ghist->Project(fMarkers.at(fMarkers.size()-1)->binx,
+                                fMarkers.at(fMarkers.size()-2)->binx);
+        }
+        if(proj){
+          proj->Draw();
+          edited=true;
+        }
+      }
+    }
+      break;
+
+    case kKey_P: {
+      GH1D* ghist = NULL;
+      for(auto hist : hists){
+        if(hist->InheritsFrom(GH1D::Class())){
+          ghist = (GH1D*)hist;
+          break;
+        }
+      }
+
+      if(ghist){
+        ghist->GetParent()->Draw();
+        edited=true;
+      }
+    }
+      break;
+
     case kKey_s:
       edited = ShowPeaks(hists.data(),hists.size());
       break;
@@ -635,6 +819,39 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       printf("you hit the p key.\n");
 
       break;
+
+    case kKey_x: {
+      GH2I* ghist = NULL;
+      for(auto hist : hists) {
+        if(hist->InheritsFrom(GH2I::Class())){
+          ghist = (GH2I*)hist;
+          break;
+        }
+      }
+
+      if(ghist){
+        ghist->ProjectionX()->Draw();
+        edited=true;
+      }
+    }
+      break;
+
+    case kKey_y: {
+      GH2I* ghist = NULL;
+      for(auto hist : hists) {
+        if(hist->InheritsFrom(GH2I::Class())){
+          ghist = (GH2I*)hist;
+          break;
+        }
+      }
+
+      if(ghist){
+        ghist->ProjectionY()->Draw();
+        edited=true;
+      }
+    }
+      break;
+
     case kKey_z: {
         printf("you pressed z!\n");
         GCanvas *c = (GCanvas*)gPad->GetCanvas();

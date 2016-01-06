@@ -295,9 +295,9 @@ void TGRUTint::ApplyOptions() {
   }
 
 
-  // for(auto& filename : opt->MacroInputFiles()){
-  //   RunMacroFile(filename);
-  // }
+  for(auto& filename : opt->MacroInputFiles()){
+    RunMacroFile(filename);
+  }
 }
 
 TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
@@ -386,13 +386,13 @@ TRawFileIn *TGRUTint::OpenRawFile(const std::string& filename) {
 
 
 void TGRUTint::RunMacroFile(const std::string& filename){
-//  if(!file_exists(filename)){
-//    std::cerr << "File \"" << filename << "\" does not exist" << std::endl;
-//    return;
-//  }
+  if(!file_exists(filename.c_str())){
+    std::cerr << "File \"" << filename << "\" does not exist" << std::endl;
+    return;
+  }
 
-//  const char* command = Form(".x %s", filename.c_str());
-//  ProcessLine(command);
+  const char* command = Form(".x %s", filename.c_str());
+  ProcessLine(command);
 }
 
 Int_t TGRUTint::TabCompletionHook(char* buf, int* pLoc, std::ostream& out){
