@@ -19,14 +19,14 @@ public:
   virtual void  Clear(Option_t *opt = "" );
   virtual void  Print(Option_t *opt = "" ) const;
 
-  Int_t  Address()   const { return fAddress; }
+  Int_t  Address()   const      { return fAddress; }
   virtual Int_t  Charge() const { return fCharge;  }
-  Int_t  Time() const { return fTime; }
-  long   Timestamp() const { return fTimestamp; }
+  Int_t  Time() const           { return fTime; }
+  long   Timestamp() const      { return fTimestamp; }
 
-  void SetAddress(unsigned int address) { fAddress = address; }
-  void SetCharge(unsigned int charge) { fCharge = charge;  }
-  void SetTime(unsigned int time) { fTime = time; }
+  void SetAddress(int address)      { fAddress = address; }
+  void SetCharge(int charge)        { fCharge = charge;  }
+  void SetTime(int time)            { fTime = time; }
   void SetTimestamp(long timestamp) { fTimestamp = timestamp; }
 
   double GetEnergy() const;
