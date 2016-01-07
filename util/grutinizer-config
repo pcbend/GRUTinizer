@@ -43,9 +43,9 @@ libdir=$GRUTSYS/libraries
 incdir=$GRUTSYS/include
 #utildir=$GRUTSYS/etc
 
-grutlibs="-lTDataLoop  -lTGRUTUtil -lTRawFormat -lGROOT -lTNSCLFormat -lTGEBFormat -lTGRUTUtil"
-detlibs="-lTSega -lTDetector  -lTGretina -lTJanus -lTPhosWall -lTS800 -lTFastScint"
-grutmore="-lTGRUTint -lTLoops -lTHistogramming"
+grutlibs="-lTGRUTUtil -lTRawFormat -lGROOT -lTNSCLFormat -lTGEBFormat -lTGRUTUtil"
+detlibs="-lTSega -lTDetector  -lTGretina -lTJanus -lTPhosWall -lTS800 -lTFastScint -lTCaesar -lTS800Sim -lTGretSim"
+grutmore="-lTGRUTint -lTLoops -lTHistogramming "
 
 cflags="-std=c++0x -I$incdir"
 
