@@ -21,7 +21,7 @@ void TPhosWall::Copy(TObject &rhs) const {
   TPhosWall det = (TPhosWall&)rhs;
 
   det.phoswall_hits = phoswall_hits;
-  det.fTimeStamp    = fTimeStamp;
+  det.fTimestamp    = fTimestamp;
   det.fLargestHit   = fLargestHit;
   det.fNumberOfHits = fNumberOfHits;
 
@@ -32,14 +32,14 @@ void TPhosWall::Clear(Option_t *opt) {
 
   phoswall_hits.clear();
 
-  fTimeStamp    = -1;
+  fTimestamp    = -1;
   fLargestHit   = -1;
   fNumberOfHits = -1;
 
 }
 
 void TPhosWall::Print(Option_t *opt) const {
-  std::cout << "TPhosWall:  "  << fTimeStamp << "    " <<  fLargestHit << std::endl;
+  std::cout << "TPhosWall:  "  << fTimestamp << "    " <<  fLargestHit << std::endl;
   std::cout << "             A       B       C     Time"  << std::endl;
   for(int i = 0; i<Size(); i++) {
     if(i==fLargestHit)
@@ -54,10 +54,11 @@ int TPhosWall::BuildHits() {
 
   for(size_t i=0;i<raw_data.size();i++) {
     TGEBEvent &geb = (TGEBEvent&)raw_data.at(i);
-    fTimeStamp = geb.GetTimestamp();
+    fTimestamp = geb.GetTimestamp();
     fLargestHit = 0;
     for(int j=0;j<(geb.GetBodySize()-8); j+=sizeof(TRawEvent::PWHit)) {
       TPhosWallHit hit((TRawEvent::PWHit*)(geb.GetPayload() + j));
+      hit.SetTimestamp(geb.GetTimestamp());
       InsertHit(hit);
       if(hit.Pixel()>255)
         geb.Print("all");

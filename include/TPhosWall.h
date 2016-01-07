@@ -38,12 +38,9 @@ public:
 
   static TVector3 GetWallPosition(int pixelnumber,double delta=5.0);
 
-  Long_t GetTimeStamp() const { return fTimeStamp; }
-
 private:
   virtual int BuildHits();
 
-  Long_t   fTimeStamp;
   Short_t  fLargestHit;
   Int_t    fNumberOfHits;
 

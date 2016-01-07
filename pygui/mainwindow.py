@@ -261,19 +261,21 @@ class MainWindow(object):
     def _PickIcon(self, obj):
         # If this is a TKey, look up the icon for the thing it points to.
         if isinstance(obj, ROOT.TKey):
-            obj = ROOT.TClass(obj.GetClassName())
+            cls = ROOT.TClass(obj.GetClassName())
+        else:
+            cls = obj.IsA()
 
-        if isinstance(obj, ROOT.TH2):
+        if cls.InheritsFrom(ROOT.TH2.Class()):
             return self.icons['h2_t']
-        elif isinstance(obj, ROOT.TH1):
+        elif cls.InheritsFrom(ROOT.TH1.Class()):
             return self.icons['h1_t']
-        elif isinstance(obj, ROOT.TFile):
+        elif cls.InheritsFrom(ROOT.TFile.Class()):
             return self.icons['tfile']
-        elif isinstance(obj, ROOT.TDirectory):
+        elif cls.InheritsFrom(ROOT.TDirectory.Class()):
             return self.icons['folder_t']
-        elif isinstance(obj, ROOT.TList):
+        elif cls.InheritsFrom(ROOT.TList.Class()):
             return self.icons['folder_t']
-        elif isinstance(obj, ROOT.TTree):
+        elif cls.InheritsFrom(ROOT.TTree.Class()):
             return self.icons['ttree']
         else:
             return ''
