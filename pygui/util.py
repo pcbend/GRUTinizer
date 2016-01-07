@@ -53,12 +53,12 @@ class TKeyDict(dict):
     def __getitem__(self, key):
         output = super(TKeyDict,self).__getitem__(key)
         if isinstance(output, ROOT.TKey):
-            value = output.ReadObj().Clone()
-            value.SetDirectory(0)
-            if hasattr(output, 'hist_pattern'):
-                value.hist_pattern = output.hist_pattern
-            self[key] = value
-            output = value
+            output = output.ReadObj()
+            if (isinstance(output, ROOT.TH2) and
+                not isinstance(output, ROOT.GH2I)):
+                output = ROOT.GH2I(output)
+            self[key] = output
+
         return output
 
     def is_tkey(self, key):

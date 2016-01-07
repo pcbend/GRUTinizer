@@ -383,7 +383,6 @@ bool GCanvas::HandleArrowKeyPress(Event_t *event,UInt_t *keysym) {
 
 
 bool GCanvas::HandleKeyboardPress(Event_t *event,UInt_t *keysym) {
-
   //printf("keysym = %i\n",*keysym);
   TIter iter(gPad->GetListOfPrimitives());
   //TGraphErrors * ge = 0;
@@ -393,13 +392,13 @@ bool GCanvas::HandleKeyboardPress(Event_t *event,UInt_t *keysym) {
   //         ge = (TGraphErrors*)obj;
   //   }
   //}
-  std::vector<TH1*> hists = FindHists();
+  std::vector<TH1*> hists = FindHists(1);
   if(hists.size()>0){
     edited = Process1DKeyboardPress(event,keysym);
   }
   hists = FindHists(2);
-  if(hists.size()>0){
-    edited = Process2DKeyboardPress(event,keysym) || edited;
+  if(hists.size()>0 && !edited){
+    edited = Process2DKeyboardPress(event,keysym);
   }
 
 
@@ -818,6 +817,22 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
         break;
       printf("you hit the p key.\n");
 
+      break;
+
+    case kKey_P: {
+      GH2I* ghist = NULL;
+      for(auto hist : hists){
+        if(hist->InheritsFrom(GH2I::Class())){
+          ghist = (GH2I*)hist;
+          break;
+        }
+      }
+
+      if(ghist && ghist->GetProjections()->GetSize()){
+        ghist->GetProjections()->At(0)->Draw();
+        edited=true;
+      }
+    }
       break;
 
     case kKey_x: {

@@ -39,10 +39,9 @@ GH2I::GH2I(const char *name,const char *title,Int_t nbinsx, Double_t xlow, Doubl
 }
 
 GH2I::GH2I(const TObject &obj) {
+  Init();
   if(obj.InheritsFrom(TH2::Class())){
     obj.Copy(*this);
-  } else {
-    Init();
   }
 }
 
@@ -111,6 +110,7 @@ GH1D* GH2I::Projection_Background(int axis,
   output->SetTitle(title.c_str());
   output->SetParent(this);
   output->SetProjectionAxis(axis);
+  output->SetDirectory(0);
   fProjections->Add(output);
   return output;
 }
@@ -139,6 +139,7 @@ GH1D* GH2I::ProjectionX(const char* name,
   output->SetTitle(title.c_str());
   output->SetParent(this);
   output->SetProjectionAxis(0);
+  output->SetDirectory(0);
   fProjections->Add(output);
   return output;
 }
@@ -177,6 +178,7 @@ GH1D* GH2I::ProjectionY(const char* name,
   output->SetTitle(title.c_str());
   output->SetParent(this);
   output->SetProjectionAxis(1);
+  output->SetDirectory(0);
   fProjections->Add(output);
   return output;
 }
