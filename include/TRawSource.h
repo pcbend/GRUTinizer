@@ -53,7 +53,6 @@ public:
                  possibly the end of file.
    */
   int Read(TRawEvent& event);
-
   int Read(TRawEvent* event);
 
   virtual std::string SourceDescription() const = 0;
@@ -228,7 +227,7 @@ private:
 
 
 
-class TRawFile : public TRawEventSource,public TNamed {
+class TRawFile : public TRawEventSource { //,public TNamed {
 public:
   TRawFile(const char* filename, kFileType file_type = kFileType::UNKNOWN_FILETYPE);
   ~TRawFile();
@@ -248,12 +247,24 @@ public:
   virtual std::string GetLastError() const {
     return wrapped->GetLastError();
   }
+  
+  void SetNameTitle(const char *name,const char *title) {
+    fname.assign(name);
+    ftitle.assign(title);
+  }
+  void SetName(const char *name) { fname.assign(name);};
+  void SetTitle(const char *title) { ftitle.assign(title);};
 
+  const char *GetName() { return fname.c_str(); }
+  const char *GetTitle() { return ftitle.c_str(); }
 
 private:
   virtual int GetEvent(TRawEvent& event) {
     return wrapped->Read(event);
   }
+
+  std::string fname;
+  std::string ftitle;
 
   TRawEventSource* wrapped;
   ClassDef(TRawFile,1)
