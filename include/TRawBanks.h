@@ -180,18 +180,19 @@ typedef struct {
 }__attribute__((__packed__)) CAESARFeraHeader;
 
 typedef struct {
+  Short_t header;
+  Short_t number_chans() { return  ((header & 0x7800)>>11); }
+  Short_t vsn()          { return   (header & 0x00ff)-1; }
+//  CAESARFeraItem items[16];
+
+}__attribute__((__packed__)) CAESARFera;
+
+
+typedef struct {
   Short_t data;
   Short_t channel()  { return  ((data & 0x7800)>>11); }
   Short_t value()    { return   (data & 0x07ff); }
 }__attribute__((__packed__)) CAESARFeraItem;
-
-typedef struct {
-  Short_t header;
-  Short_t number_chans() { return  ((header & 0x7800)>>11); }
-  Short_t vsn()          { return   (header & 0x00ff)-1; }
-  CAESARFeraItem items[16];
-
-}__attribute__((__packed__)) CAESARFera;
 
 
 
