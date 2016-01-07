@@ -73,7 +73,7 @@ bool TUnpackingLoop::Iteration(){
     }
   }
 
-  fOutputEvent->Build();
+    fOutputEvent->Build();
 
   if(fOutputEvent->GetDetectors().size() != 0){
     output_queue.Push(fOutputEvent);
@@ -179,6 +179,7 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
       //exit(1);
       break;
     case 17: //PWall Mode2 equivlant.
+      fOutputEvent->AddRawData(event, kDetectorSystems::PHOSWALL);
       break;
     case 29: // Something.
       break;

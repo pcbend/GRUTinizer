@@ -49,7 +49,7 @@ private:
 
   std::vector<TPhosWallHit> phoswall_hits;
 
-  static TVector3 *fWallPositions[257];
+  static std::vector<TVector3> fWallPositions;
   static bool      fPositionsSet;
   static void      SetWallPositions();
 

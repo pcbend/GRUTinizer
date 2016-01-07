@@ -75,11 +75,11 @@ bool TWriteLoop::Iteration() {
     for(auto& queue : input_queues){
       int size = queue->Pop(event,0);
       if(size >= 0) {
-        HandleEvent(event);
-        handled_event = true;
-        living_parent = true;
+	HandleEvent(event);
+	handled_event = true;
+	living_parent = true;
       } else if (queue->IsRunning()){
-        living_parent = true;
+	living_parent = true;
       }
     }
   }
@@ -89,6 +89,7 @@ bool TWriteLoop::Iteration() {
   }
   if(!living_parent && hist_loop)
     hist_loop->SendStop();
+
   return living_parent || (input_queues.size()==0);
 }
 
@@ -149,7 +150,11 @@ void TWriteLoop::WriteEvent(TUnpackedEvent* event) {
   // Load current events
   for(auto det : event->GetDetectors()) {    
     TClass* cls = det->IsA();
-    *det_map.at(cls) = det;
+    try{
+      *det_map.at(cls) = det;
+    } catch (std::out_of_range& e){
+      std::cout << "Class missing from learning phase: " << cls->GetName() ", skipping" << std::endl;
+    }
   }
 
   // Fill
