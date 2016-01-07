@@ -5,6 +5,9 @@
 #define FERA_TIME_ID        0x2301
 #define FERA_ENERGY_ID      0x2302
 #define FERA_TIMESTAMP_ID   0x2303
+#define FERA_ERROR_ID       0x23ff
+
+#define DEBUG_BRANDON 0
 
 TCaesar::TCaesar() {
   Clear();
@@ -47,6 +50,13 @@ TDetectorHit& TCaesar::GetHit(int i){
 void TCaesar::Build_Single_Read(TSmartBuffer buf){
   const char* data = buf.GetData();
   const char* data_end = data + buf.GetSize();
+
+  if (DEBUG_BRANDON){
+    std::cout << "\n\n" << std::endl;
+    buf.Print("all");
+  }
+  
+
   TRawEvent::CAESARHeader* header = (TRawEvent::CAESARHeader*)data;
   data += sizeof(TRawEvent::CAESARHeader);
 
@@ -59,33 +69,66 @@ void TCaesar::Build_Single_Read(TSmartBuffer buf){
   }
 
   while(data < data_end){
+    //fera_header contains the size & tag of the current packet 
     TRawEvent::CAESARFeraHeader* fera_header = (TRawEvent::CAESARFeraHeader*)data;
+    
+    
     if((fera_header->tag != FERA_ENERGY_ID) && (fera_header->tag != FERA_TIME_ID)){
       data += fera_header->size * 2; // Size is inclusive number of 16-bit values.
-      if(fera_header->tag == FERA_TIMESTAMP_ID)
+      if(fera_header->tag == FERA_TIMESTAMP_ID){
         continue;
-      break;  // what we actually need to do is check if the fera is bad and take some action.
+      }
+      else if (fera_header->tag == FERA_ERROR_ID){
+        break; // what we actually need to do is check if the fera is bad and take some action.
+      }
+      else {
+        std::cout << "Unknown fera pkt tag" << (std::hex) << fera_header->tag << std::endl;
+        break; 
+      }
     }
     const char* fera_end = data + fera_header->size*2;
     data += sizeof(TRawEvent::CAESARFeraHeader);
 
+    if (DEBUG_BRANDON){
+      std::cout << "fera_header->size = 0x" << (std::hex) << fera_header->size << std::endl;
+      std::cout << "fera_header->tag = 0x" << (std::hex) << fera_header->tag << std::endl;
+    }
 
     while(data < fera_end){
+      //This should contain all the data until the end of the fera
       TRawEvent::CAESARFera* fera = (TRawEvent::CAESARFera*)data;
+      data += sizeof(TRawEvent::CAESARFera);
       int nchan = fera->number_chans();
       if(nchan==0){
 	nchan = 16;
       }
 
-      for(int i=0; i<nchan; i++){
-	if(fera_header->tag == FERA_ENERGY_ID){
-	  SetCharge(fera->vsn(), fera->items[i].channel(), fera->items[i].value());
-	} else { //FERA_TIME_ID
-	  SetTime(fera->vsn(), fera->items[i].channel(), fera->items[i].value());
-	}
+      //Now we have the first header and know the VSN and number of channels
+      //We need to start grabbing CAESARFeraItems now
+      if (DEBUG_BRANDON){
+        std::cout << "fera->header = 0x" << (std::hex) << fera->header << std::endl;
+        std::cout << "fera->number_chans() = " << (std::dec) << fera->number_chans() << std::endl;
+        std::cout << "fera->vsn() = " <<  (std::dec) << fera->vsn() << std::endl;
       }
+      for(int i=0; i<nchan; i++){
+        TRawEvent::CAESARFeraItem *item = (TRawEvent::CAESARFeraItem*)data;
+        if (DEBUG_BRANDON){
+          std::cout << "item->data = 0x"    << (std::hex)     << item->data    << std::endl;
+          std::cout << "item->channel() = " << (std::dec) << item->channel() << std::endl;
+          std::cout << "item->value() = "   << (std::dec) << item->value()   << std::endl;
+        }
 
-      data += 2*fera->number_chans() + 2;
+	if(fera_header->tag == FERA_ENERGY_ID){
+	  SetCharge(fera->vsn(), item->channel(), item->value());
+	} else { //FERA_TIME_ID
+	  SetTime(fera->vsn(), item->channel(), item->value());
+	}
+        data += sizeof(TRawEvent::CAESARFeraItem);//just read in a single CAESARFeraItem
+      }
+      //data += 2*fera->number_chans() + 2;
+    }
+    if (DEBUG_BRANDON){
+      std::cout << "\n\n" << std::endl;
     }
   }
 }
