@@ -250,20 +250,29 @@ bool GCanvas::CycleBackgroundSubtraction() {
   Color_t color = 0;
 
   switch(fBackgroundMode){
-  case kNoBackground:
-    fBackgroundMode = kRegionBackground;
-    color = kBlue;
-    break;
-
-  case kRegionBackground:
-    fBackgroundMode = kScaledTotalProjection;
-    color = kGreen;
-    break;
-  case kScaledTotalProjection:
-    fBackgroundMode = kNoBackground;
-    color = 0;
-    break;
-  }
+    case kNoBackground:
+      fBackgroundMode = kRegionBackground;
+      printf("hello??\n");
+      Prompt();
+      color = kBlue;
+      break;
+    case kRegionBackground:
+      fBackgroundMode = kTotalFraction;
+      color = kGreen;
+      break;
+    case kTotalFraction:
+      fBackgroundMode = kMatchedLowerMarker;
+      color = kOrange;
+      break;
+    case kMatchedLowerMarker:
+      fBackgroundMode = kSplitTwoMarker;
+      color = kMagenta;
+      break;
+    case kSplitTwoMarker:
+      fBackgroundMode = kNoBackground;
+      color = 0;
+      break;
+  };
 
   for(auto marker : fBackgroundMarkers){
     marker->SetColor(color);
@@ -442,6 +451,13 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
     if(hist->InheritsFrom(GH1D::Class())) {
       GH1D* ghist = (GH1D*)hist;
       ghist->GetParent()->Draw("colz");
+    } else if(hist->InheritsFrom(TH2::Class())) {
+      if(!hist->InheritsFrom(GH2I::Class())) {
+        GH2I *ghist = new GH2I(*((TH2*)hist));
+        ghist->Draw();
+      } else {
+        hist->DrawCopy(options.Data());
+      }
     } else {
       hist->DrawCopy(options.Data());
     }

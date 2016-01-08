@@ -19,6 +19,8 @@ std::string MergeStrings(const std::vector<std::string>& strings, char split='\n
 
 //bool PeakFit(TH1*,Double_t,Double_t,Option_t *opt="");
 
+void Prompt();
+
 void Help();
 void Commands();
 

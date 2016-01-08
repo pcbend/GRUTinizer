@@ -13,7 +13,9 @@ class GH1D;
 enum kBackgroundSubtraction {
   kNoBackground,
   kRegionBackground,
-  kScaledTotalProjection
+  kMatchedLowerMarker,
+  kSplitTwoMarker,
+  kTotalFraction
 };
 
 class GH2I : public TH2I {
