@@ -12,9 +12,11 @@ public:
   void Copy(TObject& obj) const;
   virtual void InsertHit(const TDetectorHit&);
 
+  virtual void Print(Option_t* opt="") const; 
   virtual void Clear(Option_t* opt = "");
 
-  virtual TCaesarHit&    GetCaesarHit(int i);
+  virtual TCaesarHit&   GetCaesarHit(int i);
+  virtual const TCaesarHit& GetCaesarHit(int i) const;
   virtual TDetectorHit& GetHit(int i);
 
   int GetULM() const { return fUlm; }

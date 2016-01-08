@@ -21,3 +21,10 @@ void TCaesarHit::Clear(Option_t* opt) {
   fChannel = -1;
 }
 
+void TCaesarHit::Print(Option_t *opt) const {
+  printf("Det[%03i]\tCharge: %i\n",GetDetectorNumber(),Charge());
+}
+
+
+
+

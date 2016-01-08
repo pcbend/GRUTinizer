@@ -190,6 +190,7 @@ void TRawEvent::Print(Option_t *opt) const {
   TString options(opt);
   if(!options.Contains("bodyonly"))
     std::cout << fEventHeader;
+  std::cout << "Timestamp: " << GetTimestamp() << std::endl;
   fBody.Print(options.Data());
   // printf("\t");
   // for(int x=0; x<GetBodySize(); x+=2) {
