@@ -11,6 +11,7 @@ public:
   //int GetDetnum() const;
 
   void Clear(Option_t* opt = "");
+  void Print(Option_t* opt = "") const;
   void Copy(TObject& obj) const;
 
   int GetVSN() const		{ return fVsn;		}
@@ -23,6 +24,7 @@ public:
   //void SetCharge(int charge)	{ fCharge = charge;	}
   //void SetTime(int time)	{ fTime = time;		}
 
+  int GetDetectorNumber() const { return GetFullChannel(); }
   int GetFullChannel() const {
     return GetVSN()*16 + GetChannel();
   }
