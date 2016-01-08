@@ -69,7 +69,13 @@ bool TBuildingLoop::Iteration(){
 
 bool TBuildingLoop::CheckBuildWindow(TRawEvent *event) {
   long timestamp = event->GetTimestamp();
-  if(timestamp > event_start + build_window) {
+
+  if(timestamp == -1){
+    return false;
+  }
+  
+  if(timestamp > event_start + build_window ||
+     timestamp < event_start - build_window) {
     //next_event->Build();
     output_queue.Push(next_event);
     next_event.clear(); // = new TUnpackedEvent;

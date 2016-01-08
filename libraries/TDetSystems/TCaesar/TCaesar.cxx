@@ -7,7 +7,7 @@
 #define FERA_TIMESTAMP_ID   0x2303
 #define FERA_ERROR_ID       0x23ff
 
-#define DEBUG_BRANDON 1
+#define DEBUG_BRANDON 0
 
 TCaesar::TCaesar() {
   Clear();
