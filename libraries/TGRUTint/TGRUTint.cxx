@@ -29,7 +29,7 @@
 #include "TGRUTOptions.h"
 #include "TOrderedRawFile.h"
 #include "TRawSource.h"
-#include "TSequentialRawFile.h"
+#include "TMultiRawFile.h"
 
 #include "TGRUTUtilities.h"
 
@@ -189,11 +189,11 @@ void TGRUTint::ApplyOptions() {
       source = new TRawEventRingSource(opt->InputRing(),
                                        opt->DefaultFileType());
     } else if(opt->RawInputFiles().size() > 1){
-      TSequentialRawFile* seq_source = new TSequentialRawFile();
+      TMultiRawFile* multi_source = new TMultiRawFile();
       for(auto& filename : opt->RawInputFiles()){
-        seq_source->Add(new TRawFileIn(filename.c_str()));
+        multi_source->AddFile(new TRawFileIn(filename.c_str()));
       }
-      source = seq_source;
+      source = multi_source;
     } else {
       std::string filename = opt->RawInputFiles().at(0);
       source = new TRawFileIn(filename.c_str());

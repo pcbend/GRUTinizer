@@ -50,8 +50,14 @@ bool TBuildingLoop::Iteration(){
 
   int error = input_source->Pop(event);///input_queue.Pop(event);
   if(error<0) {
-    // Stop if the parent has stopped and the queue is empty.
-    return input_source->IsRunning();
+    if(input_source->IsRunning()){
+      // Wait for the source to give more data.
+      return true;
+    } else {
+      // Source is dead, push the last event and stop.
+      output_queue.Push(next_event);
+      return false;
+    }
   }
 
 

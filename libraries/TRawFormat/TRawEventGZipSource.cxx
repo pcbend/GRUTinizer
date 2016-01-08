@@ -3,7 +3,6 @@
 
 TRawEventGZipSource::TRawEventGZipSource(const std::string& filename, kFileType file_type)
   : TRawEventByteSource(file_type), fFilename(filename) {
-  printf("I am here.\n");
   fFile = fopen(filename.c_str(),"rb");
   fGzFile = new gzFile;
   *fGzFile = gzdopen(fileno(fFile),"rb");

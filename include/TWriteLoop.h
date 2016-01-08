@@ -27,16 +27,11 @@ public:
 
   void Connect(TUnpackingLoop* input_queue);
 
-  void SetLearningPhaseLength(int length) { learning_phase_length = length; }
-  int GetLearningPhaseLength(int length) const { return learning_phase_length; }
-
   void Write();
-
-  bool InLearningPhase() { return in_learning_phase; }
 
   size_t GetItemsPushed()  { return event_tree->GetEntries();   }
   size_t GetItemsPopped()  { return 0; }
-  size_t GetItemsCurrent() { return learning_queue.size();      }
+  size_t GetItemsCurrent() { return 0;      }
   size_t GetRate()         { return 0; }
 
   bool AttachHistogramLoop(THistogramLoop *loop) {hist_loop = loop; return loop; }
@@ -46,11 +41,9 @@ protected:
 
 private:
   TWriteLoop(std::string name, std::string output_file);
+  void AddBranch(TClass* cls);
 
 #ifndef __CINT__
-  void HandleEvent(TUnpackedEvent* event);
-  void LearningPhase(TUnpackedEvent* event);
-  void EndLearningPhase();
   void WriteEvent(TUnpackedEvent* event);
 
   THistogramLoop *hist_loop;
@@ -60,13 +53,7 @@ private:
   std::vector<TUnpackingLoop*> input_queues;
   TTree* event_tree;
 
-  std::atomic_int event_tree_size;
-
   std::map<TClass*, TDetector**> det_map;
-  std::vector<TUnpackedEvent*> learning_queue;
-  std::atomic_int learning_phase_size;
-  std::atomic_bool in_learning_phase;
-  size_t learning_phase_length;
 #endif
 
   ClassDef(TWriteLoop, 0);

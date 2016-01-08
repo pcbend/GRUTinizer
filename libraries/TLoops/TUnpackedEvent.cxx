@@ -8,6 +8,7 @@
 #include "TGretSim.h"
 #include "TJanus.h"
 #include "TMode3.h"
+#include "TPhosWall.h"
 #include "TS800.h"
 #include "TS800Sim.h"
 #include "TS800Scaler.h"
@@ -74,9 +75,9 @@ void TUnpackedEvent::AddRawData(const TRawEvent& event, kDetectorSystems detecto
     GetDetector<TCaesar>(true)->AddRawData(event);
     break;
 
-  //   // Not implemented yet.
-  // case kDetectorSystems::PHOSWALL:
-  //   break;
+  case kDetectorSystems::PHOSWALL:
+    GetDetector<TPhosWall>(true)->AddRawData(event);
+    break;
 
   default:
     break;

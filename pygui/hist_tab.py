@@ -34,11 +34,16 @@ class HistTab(object):
         self.active_dirs.append(tdir)
 
     def OnHistClick(self,event):
-        objects = [self.hist_lookup[i] for i in event.widget.selection()]
-        histograms = [h for h in objects if isinstance(h, ROOT.TH1)]
+        objects = {name:self.hist_lookup[name]
+                   for name in event.widget.selection()}
+        histograms = {name:h for name,h in objects.items()
+                      if isinstance(h, ROOT.TH1)}
 
         color = 1;
-        for obj in histograms:
+        for name,obj in histograms.items():
+            if isinstance(obj, ROOT.GH2I):
+                self._refresh(name, obj)
+
             self.main._draw_single(obj,color,len(histograms))
             if self.main.plotlocation.get()=='Overlay':
                 color+=1
@@ -65,6 +70,26 @@ class HistTab(object):
         #else:
         return ''
 
+    def _refresh(self, name, obj):
+        parent = self._find_parent(name)
+        if parent is not None:
+            self.Insert(obj, parent)
+
+    def _find_parent(self, name, base=''):
+        children = self.treeview.get_children(base)
+        if name in children:
+            # Found it, done
+            return base
+        elif children:
+            # Search in the children
+            for child in children:
+                parent = self._find_parent(name, child)
+                if parent:
+                    return parent
+        else:
+            # Not here.
+            return None
+
     def Insert(self,obj,parent='',objname=None,icon=None):
         if not obj:
             return
@@ -77,7 +102,8 @@ class HistTab(object):
             obj = obj.ReadObj()
 
         if (isinstance(obj, ROOT.TTree) or
-            isinstance(obj, ROOT.TCutG)):
+            isinstance(obj, ROOT.TCutG) or
+            isinstance(obj, ROOT.TProcessID)):
             return
 
         if parent:
@@ -93,6 +119,8 @@ class HistTab(object):
             iterable = obj.GetListOfKeys()
             if not iterable:
                 iterable = obj.GetList()
+        elif isinstance(obj, ROOT.GH2I):
+            iterable = obj.GetProjections()
         else:
             iterable = None
 

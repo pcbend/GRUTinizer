@@ -38,18 +38,15 @@ public:
 
   static TVector3 GetWallPosition(int pixelnumber,double delta=5.0);
 
-  Long_t GetTimeStamp() const { return fTimeStamp; }
-
 private:
   virtual int BuildHits();
 
-  Long_t   fTimeStamp;
   Short_t  fLargestHit;
   Int_t    fNumberOfHits;
 
   std::vector<TPhosWallHit> phoswall_hits;
 
-  static TVector3 *fWallPositions[257];
+  static std::vector<TVector3> fWallPositions;
   static bool      fPositionsSet;
   static void      SetWallPositions();
 
