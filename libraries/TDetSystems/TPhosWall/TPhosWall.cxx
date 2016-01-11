@@ -307,24 +307,27 @@ void TPhosWall::Draw(Option_t *opt) {
   return;
 }
 
-void TPhosWall::DrawPID(Option_t *gate,Option_t *opt,ULong_t nentries,TChain *chain) {
+void TPhosWall::DrawPID(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) {
   if(!chain)
     chain = gChain;
   if(!chain || !chain->GetBranch("TPhosWall"))
     return;
-  //printf("chain = %s\n",chain->GetName());
+  //printf("chain = %s\t%lu\t%lu\n",chain->GetName(),chain->GetEntries(),nentries);
   if(!gPad || !gPad->IsEditable())  {
     gROOT->MakeDefCanvas();
   } else {
     gPad->GetCanvas()->Clear();
   }
-  std::string name = Form("phoswall_pid_%s",opt);
-  TH2I *h = new TH2I(name.c_str(),name.c_str(),2048,0,8192,2048,0,8192);  
+  std::string name = Form("%s_PID",Class()->GetName()); //_%s",opt);
+  //const char *name = "phoswall_pid";
+  GH2I *h = new GH2I(name.c_str(),name.c_str(),2048,0,8192,2048,0,8192);  
   chain->Project(name.c_str(),"phoswall_hits.C():phoswall_hits.B()",gate,"",nentries);
+  //chain->Draw("phoswall_hits.C():phoswall_hits.B()>>h","","colz",10000); //nentries);
   h->GetXaxis()->SetTitle("Largest B");
   h->GetYaxis()->SetTitle("Largest C");
   h->Draw("colz");
-
+  //TCanvas *C1 = new TCanvas("C1");
+  //chain->Draw("phoswall_hits.C():phoswall_hits.B()","","colz",10000);
 }
 
 TVector3 TPhosWall::GetKinVector(Double_t E_ejec,Double_t E_beam,const char *beam,const char *recoil, const char *ejec) {
@@ -395,7 +398,10 @@ int TPhosWall::SaveGates(const char *filename) {
   std::string fname = filename;
   if(!fname.length())
     fname.assign("phoswall_gates.root");
-  TFile *f = new TFile(fname.c_str(),"recreate");
+  TFile *f = new TFile(fname.c_str(),"update");
+
+  f->mkdir("TPhosWall");
+  f->cd("TPhosWall");
   gates.Sort();
   gates.Write();
   f->Close();

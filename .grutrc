@@ -21,6 +21,7 @@ Canvas.ResizeOpaque: false
 Canvas.ShowEventStatus: true
 Canvas.ShowToolBar: true
 Canvas.UseScreenFactor: true
+Canvas.ShowGuideLines: false
 
 
 Gui.IconPath:      $(GRUTSYS)/icons:$(ROOTSYS)/icons

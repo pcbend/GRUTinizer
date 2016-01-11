@@ -38,7 +38,7 @@ public:
   TDetectorHit& GetHit(int i)                     { return phoswall_hits.at(i); }
 
   void Draw(Option_t *opt="");
-  static void DrawPID(Option_t *gate="",Option_t *opt="BC",ULong_t entries=kMaxULong,TChain *chain=0); 
+  static void DrawPID(Option_t *gate="",Option_t *opt="BC",Long_t entries=kMaxLong,TChain *chain=0); 
 
   TVector3 GetHitPosition() 
     { if(fLargestHit>-1) return GetWallPosition(Pixel(fLargestHit)); else return TVector3(sqrt(-1),sqrt(-1),sqrt(-1)); }
