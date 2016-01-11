@@ -9,6 +9,7 @@
 #define MAXPIXEL 256
 
 class TNucleus;
+class TCutG;
 
 class TPhosWall : public TDetector {
 
@@ -53,6 +54,15 @@ public:
 
   static TVector3 GetWallPosition(int pixelnumber,double delta=5.0);
 
+
+  static void   AddGate(TCutG* cut)   { gates.Add((TObject*)cut); }
+  static int    LoadGates(const char* filename);
+  static int    SaveGates(const char* filename="");
+  static TList *GetGates()            { return &gates;  }
+         int    IsInside(Option_t *opt = "BC") const; 
+  static const char* GetGateName(int i) { return gates.At(i)->GetName(); }
+
+
 private:
   virtual int BuildHits();
 
@@ -65,6 +75,8 @@ private:
   static bool      fPositionsSet;
   static void      SetWallPositions();
 
+  static TList gates; //!
+  
   ClassDef(TPhosWall,3);
 };
 

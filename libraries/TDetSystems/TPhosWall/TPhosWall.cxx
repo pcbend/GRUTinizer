@@ -1,6 +1,10 @@
 #include "TPhosWall.h"
 
+#include "TFile.h"
+#include "TKey.h"
+
 #include "TH2.h"
+#include "TCutG.h"
 #include "GCanvas.h"
 #include "TMath.h"
 #include "TStyle.h"
@@ -10,6 +14,8 @@
 #include "GRootCommands.h"
 
 ClassImp(TPhosWall)
+
+TList TPhosWall::gates;
 
 std::vector<TVector3> TPhosWall::fWallPositions(257);
 bool TPhosWall::fPositionsSet = false;
@@ -46,7 +52,14 @@ void TPhosWall::Clear(Option_t *opt) {
 }
 
 void TPhosWall::Print(Option_t *opt) const {
+  TString option(opt);
   std::cout << "TPhosWall:  "  << fTimestamp << "    " <<  fLargestHit << std::endl;
+  if(option.Contains("all")) {
+    printf("\tcurrently holding %i gates:\n",gates.GetSize());
+    for(int i=0;i<gates.GetSize();i++) {
+      printf("\t\t%s\n",GetGateName(i));
+    }
+  }
   std::cout << "             A       B       C     Time"  << std::endl;
   for(int i = 0; i<Size(); i++) {
     if(i==fLargestHit)
@@ -307,7 +320,9 @@ void TPhosWall::DrawPID(Option_t *gate,Option_t *opt,ULong_t nentries,TChain *ch
   }
   std::string name = Form("phoswall_pid_%s",opt);
   TH2I *h = new TH2I(name.c_str(),name.c_str(),2048,0,8192,2048,0,8192);  
-  chain->Project(name.c_str(),"phoswall_hits.B():phoswall_hits.C()",gate,"",nentries);
+  chain->Project(name.c_str(),"phoswall_hits.C():phoswall_hits.B()",gate,"",nentries);
+  h->GetXaxis()->SetTitle("Largest B");
+  h->GetYaxis()->SetTitle("Largest C");
   h->Draw("colz");
 
 }
@@ -339,6 +354,55 @@ TVector3 TPhosWall::GetKinVector(Double_t E_ejec,Double_t E_beam,TNucleus &beam,
   return v;
 }
 
+int TPhosWall::IsInside(Option_t *opt) const {
+  if(!gates.GetSize() || !Size()) 
+    return 0;
+  TIter iter(&gates);
+  int counter =1;
+  while(TCutG* cut = (TCutG*)iter.Next()) {
+    if(cut->IsInside(B(fLargestHit),C(fLargestHit)))
+      return counter;
+    counter++;
+  }
+  return 0;
+}
+
+int TPhosWall::LoadGates(const char *filename) {
+  TDirectory *current = gDirectory;
+  TFile *f = new TFile(filename);
+  int found=0;
+  if(f->IsOpen()) {
+    TIter iter(f->GetListOfKeys());
+    while(TKey *key = (TKey*)iter.Next()) {
+      if(!strncmp("TCutG",key->GetClassName(),5)) {
+        gates.Add((TCutG*)key->ReadObj());
+        found++;
+      }
+    }
+  }
+  f->Close();
+  f->Delete();
+  current->cd();
+  return found;
+}
+
+int TPhosWall::SaveGates(const char *filename) {
+  if(!gates.GetSize()) {
+    printf("%s, currently no gates to save.\n",__PRETTY_FUNCTION__);
+    return 0;
+  }
+  TDirectory *current = gDirectory;
+  std::string fname = filename;
+  if(!fname.length())
+    fname.assign("phoswall_gates.root");
+  TFile *f = new TFile(fname.c_str(),"recreate");
+  gates.Sort();
+  gates.Write();
+  f->Close();
+  f->Delete();
+  current->cd();
+  return gates.GetSize();
+}
 
 /*
 void TPhosWall::DrawXY(Option_t *opt) {

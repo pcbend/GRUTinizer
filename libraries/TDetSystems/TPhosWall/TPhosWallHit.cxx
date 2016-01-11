@@ -2,7 +2,10 @@
 
 #include <iostream>
 
+#include "TCutG.h"
 #include "TPhosWall.h"
+
+
 
 ClassImp(TPhosWallHit)
 
@@ -45,6 +48,21 @@ void TPhosWallHit::Clear(Option_t *opt) {
   fTime     = -1;
   fPosition.SetXYZ(0,0,1);
 }
+
+
+int TPhosWallHit::IsInside(Option_t *opt) const {
+  TIter iter(TPhosWall::GetGates());  //&gates);
+  int counter =1;
+  while(TCutG* cut = (TCutG*)iter.Next()) {
+    if(cut->IsInside(B(),C()))
+      return counter;
+    counter++;
+  }
+  return 0;
+}
+
+
+
 
 void TPhosWallHit::Print(Option_t *opt) const {
   std::cout << "PhosWall Hit[" << fPixel   << "] "
