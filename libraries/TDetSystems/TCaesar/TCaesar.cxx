@@ -31,11 +31,26 @@ void TCaesar::Clear(Option_t* opt){
 }
 
 int TCaesar::BuildHits(){
+  //if(raw_data.size()!=1) 
+    //printf("\nCaesar event size = %i\n",raw_data.size());
+
   for(auto& event : raw_data){
     TNSCLEvent& nscl = (TNSCLEvent&)event;
     SetTimestamp(nscl.GetTimestamp());
     Build_Single_Read(nscl.GetPayloadBuffer());
+//  Print();
+//  event.Print("all");
+//  printf("********************************\n");
+//  printf("********************************\n");
+//  printf("********************************\n");
+//  printf("********************************\n");
+//  printf("********************************\n");
   }
+  //if(caesar_hits.size()<1) {
+  //  raw_data.at(0).Print("all"); 
+  //  printf("\nCaesar hits size = %i\n",caesar_hits.size());
+  //  Print();
+  //}
   return caesar_hits.size();
 }
 
@@ -43,8 +58,22 @@ TCaesarHit& TCaesar::GetCaesarHit(int i){
   return caesar_hits.at(i);
 }
 
+const TCaesarHit& TCaesar::GetCaesarHit(int i) const{
+  return caesar_hits.at(i);
+}
+
 TDetectorHit& TCaesar::GetHit(int i){
   return caesar_hits.at(i);
+}
+
+void TCaesar::Print(Option_t *opt) const {
+  printf("Casear event @ %lu\n",Timestamp());
+  printf("Number of Hits: %i\n",Size());
+  for(int i=0;i<Size();i++) {
+    printf("\t"); 
+    GetCaesarHit(i).Print();
+  }
+  printf("---------------------------------------\n");
 }
 
 void TCaesar::Build_Single_Read(TSmartBuffer buf){
@@ -52,7 +81,7 @@ void TCaesar::Build_Single_Read(TSmartBuffer buf){
   const char* data_end = data + buf.GetSize();
 
   if (DEBUG_BRANDON){
-    std::cout << "\n\n" << std::endl;
+    std::cout << "--------------------------------------------------\n\n" << std::endl;
     buf.Print("all");
   }
   
@@ -94,6 +123,11 @@ void TCaesar::Build_Single_Read(TSmartBuffer buf){
       std::cout << "fera_header->tag = 0x" << (std::hex) << fera_header->tag << std::endl;
     }
 
+
+    //printf("fera end:  0x%04x\n",*((unsigned short*)fera_end));
+    //buf.Print("all");
+
+
     while(data < fera_end){
       //This should contain all the data until the end of the fera
       TRawEvent::CAESARFera* fera = (TRawEvent::CAESARFera*)data;
@@ -128,7 +162,7 @@ void TCaesar::Build_Single_Read(TSmartBuffer buf){
       //data += 2*fera->number_chans() + 2;
     }
     if (DEBUG_BRANDON){
-      std::cout << "\n\n" << std::endl;
+      std::cout << "--------------------------------------------------\n\n" << std::endl;
     }
   }
 }
