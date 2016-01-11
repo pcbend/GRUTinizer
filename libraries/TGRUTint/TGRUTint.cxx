@@ -50,7 +50,7 @@
 //extern void WaitLogo();
 
 
-TChain *gChain = NULL;
+//TChain *gChain = NULL;
 
 ClassImp(TGRUTint)
 

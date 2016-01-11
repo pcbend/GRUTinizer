@@ -24,6 +24,7 @@
 #include <GPeak.h>
 //#include <GRootObjectManager.h>
 
+TChain *gChain = NULL;
 
 void Help()     { printf("This is helpful information.\n"); }
 

@@ -2,11 +2,14 @@
 #define GROOTCOMMANDS__H
 
 #include <string>
+#include <TChain.h>
 class TTree;
 class TH1;
 class GMarker;
 
 #include "TDirectory.h"
+
+extern TChain *gChain;
 
 int  LabelPeaks(TH1*,double,double,Option_t *opt="");
 bool ShowPeaks(TH1**,unsigned int);

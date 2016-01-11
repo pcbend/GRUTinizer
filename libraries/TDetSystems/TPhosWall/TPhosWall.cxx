@@ -1,6 +1,13 @@
 #include "TPhosWall.h"
 
+#include "TH2.h"
+#include "GCanvas.h"
 #include "TMath.h"
+#include "TStyle.h"
+#include "TPaveStats.h"
+
+#include "TNucleus.h"
+#include "GRootCommands.h"
 
 ClassImp(TPhosWall)
 
@@ -237,3 +244,120 @@ TVector3 TPhosWall::GetWallPosition(int pixelnumber, double delta){
 
 //    return position;
 // }
+//
+//
+
+
+void TPhosWall::Draw(Option_t *opt) {
+  TH2I hitpat[4];
+  //std::string exef;
+  //std::string exex = ".x "; 
+  //if(strlen(opt)!=0) {
+  //  exef.append(opt);
+  //  exex.append(opt);
+  //  exex.append(".C");
+  //}
+  for(int x=0;x<4;x++) {
+    hitpat[x] = hitpat[x] = TH2I(Form("hit%i",x),Form("Pixels %03i - %03i",x*64,x*64+63),8,0,8,8,0,8);
+    hitpat[x].GetXaxis()->SetNdivisions(8);
+    hitpat[x].GetYaxis()->SetNdivisions(8);
+    hitpat[x].SetStats(false);
+  }
+  for(int x=0;x<Size();x++) {
+    int hist = Pixel(x)/64;
+    int row  = (Pixel(x)-(hist*64))%8;
+    int col  = (Pixel(x)-(hist*64))/8;
+    hitpat[hist].Fill(row,col,B(x)); 
+    printf("\t\tPixel[%03i | %02i]  r[%02i] c[%02i]    %i\n",Pixel(x),Pixel(x)-hist*64,row,col,B(x));
+  }
+  if(!gPad || !gPad->IsEditable())  {
+    gROOT->MakeDefCanvas();
+  } else {
+    gPad->GetCanvas()->Clear();
+  }
+  TVirtualPad *mother = gPad;
+  mother->Divide(2,2);
+  mother->cd(1); hitpat[0].DrawCopy("colz");
+  gPad->SetGrid();
+  ///if(exef.size()) gPad->AddExec(exef.c_str(),exex.c_str());
+  mother->cd(2); hitpat[1].DrawCopy("colz");
+  gPad->SetGrid();
+  //if(exef.size()) gPad->AddExec(exef.c_str(),exex.c_str());
+  mother->cd(4); hitpat[2].DrawCopy("colz");
+  gPad->SetGrid();
+  //if(exef.size()) gPad->AddExec(exef.c_str(),exex.c_str());
+  mother->cd(3); hitpat[3].DrawCopy("colz");
+  gPad->SetGrid();
+  //if(exef.size()) gPad->AddExec(exef.c_str(),exex.c_str());
+  gPad->Modified();
+  gPad->Update();
+  return;
+}
+
+void TPhosWall::DrawPID(Option_t *gate,Option_t *opt,ULong_t nentries,TChain *chain) {
+  if(!chain)
+    chain = gChain;
+  if(!chain || !chain->GetBranch("TPhosWall"))
+    return;
+  //printf("chain = %s\n",chain->GetName());
+  if(!gPad || !gPad->IsEditable())  {
+    gROOT->MakeDefCanvas();
+  } else {
+    gPad->GetCanvas()->Clear();
+  }
+  std::string name = Form("phoswall_pid_%s",opt);
+  TH2I *h = new TH2I(name.c_str(),name.c_str(),2048,0,8192,2048,0,8192);  
+  chain->Project(name.c_str(),"phoswall_hits.B():phoswall_hits.C()",gate,"",nentries);
+  h->Draw("colz");
+
+}
+
+TVector3 TPhosWall::GetKinVector(Double_t E_ejec,Double_t E_beam,const char *beam,const char *recoil, const char *ejec) {
+  TNucleus nbeam(beam);
+  TNucleus nejec(ejec);
+  TNucleus nrecoil(recoil);
+  return GetKinVector(E_beam,E_ejec,nbeam,nrecoil,nejec);
+}
+
+TVector3 TPhosWall::GetKinVector(Double_t E_ejec,Double_t E_beam,TNucleus &beam,TNucleus &recoil, TNucleus &ejec) {
+  
+  double v_beam = sqrt(2*E_beam/beam.GetMass());
+  double p_beam = beam.GetMass()*v_beam;
+  
+  double v_ejec = sqrt(2*E_ejec/ejec.GetMass());
+  double p_ejec = ejec.GetMass()*v_ejec;
+
+  double p_recoil     = sqrt(pow(p_beam-p_ejec*GetHitPosition().CosTheta(),2) + pow(p_ejec*TMath::Sin(GetHitPosition().Theta()),2));
+  double theta_recoil = TMath::ASin((p_ejec/p_recoil)*TMath::Sin(GetHitPosition().Theta()));
+  double phi_recoil   = GetHitPosition().Phi();
+  if(phi_recoil<TMath::Pi()) 
+    phi_recoil += TMath::Pi();
+  else if(phi_recoil > TMath::Pi())
+    phi_recoil -= TMath::Pi();
+  TVector3 v;
+  v.SetMagThetaPhi(1,theta_recoil,phi_recoil);
+  return v;
+}
+
+
+/*
+void TPhosWall::DrawXY(Option_t *opt) {
+  TH2I hitpattern("hitpattern","PWFragmet XY Hit Pattern",
+                   116,-58,58,116,-58,58);
+  for(int i=0;i<fNumberOfHits;i++) {
+     TVector3 vec = GetWallPosition(Pixel(i));
+     hitpattern.Fill(vec.X(),
+                     vec.Y(),
+                     A(i));
+  }
+  if(gPad || !gPad->IsEditable())
+    gROOT->MakeDefCanvas();
+  hitpattern.DrawCopy("colz");
+  gPad->SetGrid();
+  gPad->Modified();
+  gPad->Update();
+  return;
+}
+*/
+
+
