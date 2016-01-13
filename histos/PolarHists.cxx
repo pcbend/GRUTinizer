@@ -115,6 +115,11 @@ void MakeHistograms(TRuntimeObjects& obj) {
     position = TGretina::GetCrystalPosition(hit.GetCrystalId());
     obj.FillHistogram(histname,314,0,3.14,position.Theta(),
                               4000,0,4000,hit.GetCoreEnergy());
+
+    histname = "Gretina_Theta_byDecomp";
+    position = hit.GetPosition();
+    obj.FillHistogram(histname,314,0,3.14,position.Theta(),
+                              4000,0,4000,hit.GetCoreEnergy());
     
     histname = "GretinaOverview";
     obj.FillHistogram(histname,4000,0,4000,hit.GetCoreEnergy(),

@@ -481,6 +481,8 @@ class MainWindow(object):
             else:
                 self.hist_tab.Insert(tdir)
 
+            self.tcut_tab.AddDirectory(tdir)
+
     def LoadDataFile(self, filename = None):
         if filename is None:
             filename = tkFileDialog.askopenfilename(filetypes=(("GEB File", "*.dat"),

@@ -24,6 +24,7 @@ public:
   
   virtual Int_t Charge() const { return B(); }
 
+  Int_t IsInside(Option_t *opt="") const;
 
 private:
   Short_t  fACharge;

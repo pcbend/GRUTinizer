@@ -16,6 +16,7 @@ class TCutTab(object):
         self._setup_GUI(frame)
 
         self.cuts = {}
+        self.detector_classes = {}
 
         #frame.after_idle(self._repeatedly_check)
 
@@ -77,22 +78,43 @@ class TCutTab(object):
 
         return cutg
 
+    def AddDirectory(self, tdir):
+        gchain = ROOT.gChain
+        if not gchain:
+            return
+        
+        for branch in gchain.GetListOfBranches():
+            cls_name = branch.GetName()
+            cls = getattr(ROOT, cls_name)
+            if cls_name not in self.detector_classes:
+                top = self.tree.insert('','end',
+                                       cls_name, text=cls_name)
+                self.tree.insert(top,'end',
+                                 '{}/Draw PID'.format(cls_name),
+                                 text='Draw PID')
+                self.detector_classes[cls_name] = cls
+
     def AddFile(self, tfile):
         for key in tfile.GetListOfKeys():
             if key.GetClassName()=='TCutG':
                 self.AddCut(key.ReadObj())
 
-    def AddCut(self, cut):
+    def AddCut(self, cut, det_type = None):
         name = cut.GetName()
+        full_name = '{}/{}'.format(det_type,name) if det_type is not None else name
         cut.SetLineColor(ROOT.kRed)
         cut.SetLineWidth(3)
-        self.cuts[name] = cut
-        self.tree.insert('', 'end', name, text=name, values='2D Cut',
+        self.cuts[full_name] = cut
+
+        if det_type is None:
+            parent = ''
+        else:
+            parent = det_type
+            self.detector_classes[det_type].AddGate(cut)
+            
+        self.tree.insert(parent, 'end', full_name, text=name, values='2D Cut',
                          image = self.main.icons['tcutg'])
 
-        #pipeline = ROOT.GetPipeline(0)
-        #if pipeline:
-        #    pipeline.GetDirectory().GetList().Add(cut)
         if ROOT.gPad:
             ROOT.gPad.Modified()
             ROOT.gPad.Update()
@@ -106,9 +128,17 @@ class TCutTab(object):
             return
 
         ROOT.gROOT.GetListOfSpecials().Remove(cutg)
+        
         cutg.SetName(self._increment_name())
+        for prim in ROOT.gPad.GetListOfPrimitives():
+            if isinstance(prim, ROOT.TH2):
+                title = prim.GetName()
+                det_type = title[:title.index('_')]
+                break
+        else:
+            det_type = None
 
-        self.AddCut(cutg)
+        self.AddCut(cutg, det_type)
 
     def DeleteCut(self):
         cutg = self._check_for_tcut()
@@ -116,13 +146,6 @@ class TCutTab(object):
             return
 
         cutg.Delete()
-
-        #ROOT.gROOT.GetListOfSpecials().Remove(cutg)
-        #name = self.next_name.get()
-        #cutg.SetName(name)
-        #self._increment_name()
-
-        #self.AddCut(cutg)
 
     def CopyCut(self):
         cuts = self.tree.selection()
@@ -167,12 +190,22 @@ class TCutTab(object):
         self.tree.column('type', width=50, anchor='e')
         self.tree.heading('type', text='Type')
         self.tree.pack(fill=tk.BOTH,expand=True)
-        self.tree.bind("<Double-1>",self.GateSelection)
+        self.tree.bind("<Double-1>",self.TreeView_OnDoubleClick)
 
-    def GateSelection(self, event):
-        gate_name = event.widget.selection()[0]
-        tcut = self.cuts[gate_name]
+    def _draw_cut(self,cut):
         tcut.Draw('same')
         if ROOT.gPad:
             ROOT.gPad.Modified()
             ROOT.gPad.Update()
+
+    def TreeView_OnDoubleClick(self, event):
+        selection = event.widget.selection()[0]
+        if selection in self.cuts:
+            self._draw_cut(self.cuts[selection])
+        else:
+            if selection.endswith('Draw PID'):
+                cls_name = selection[:selection.index('/')]
+                try:
+                    self.detector_classes[cls_name].DrawPID('','',1000)
+                except AttributeError:
+                    print 'You did not implement {}::DrawPID.\nPlease do so.'.format(cls_name)

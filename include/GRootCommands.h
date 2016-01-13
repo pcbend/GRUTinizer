@@ -2,11 +2,14 @@
 #define GROOTCOMMANDS__H
 
 #include <string>
+#include <TChain.h>
 class TTree;
 class TH1;
 class GMarker;
 
 #include "TDirectory.h"
+
+extern TChain *gChain;
 
 int  LabelPeaks(TH1*,double,double,Option_t *opt="");
 bool ShowPeaks(TH1**,unsigned int);
@@ -19,7 +22,12 @@ std::string MergeStrings(const std::vector<std::string>& strings, char split='\n
 
 //bool PeakFit(TH1*,Double_t,Double_t,Option_t *opt="");
 
+//
+//  Below are in the interpretur commands. (added to the linkdef!)
+//  
+
 void Help();
 void Commands();
+TH1 *GrabHist(int i=1); //return the histogram from the current canvas, pad i.
 
 #endif

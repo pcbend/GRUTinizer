@@ -50,6 +50,19 @@ GH2I::~GH2I() {
 }
 
 
+void GH2I::Copy(TObject &obj) const {
+  ((GH2I&)obj).Init();
+  TH2::Copy(obj);
+  fProjections->Copy(*(((GH2I&)obj).fProjections));
+}
+
+TObject *GH2I::Clone(const char *newname) const {
+  std::string name = newname;
+  if(!name.length())
+    name = Form("%s_clone",GetName());
+  return TH2::Clone(name.c_str());
+}
+
 void GH2I::Init() {
   fProjections = new TList();
 }
