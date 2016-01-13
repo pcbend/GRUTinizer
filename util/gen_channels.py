@@ -85,9 +85,11 @@ for cratenum in range(1,4):
                 continue
 
             if cratenum==1:
-                channum = (16 if slotnum%2==1 else 0) + channum + 1
-            else:
+                # In crate 1, A1 (channum==1) is on slots 3,5,...
                 channum = (0 if slotnum%2==1 else 16) + channum + 1
+            else:
+                # In crate 2 and 3, A1 (channum==1) is in slots 2,4,...
+                channum = (0 if slotnum%2==0 else 16) + channum + 1
 
             name = sega_name(detnum, channum)
             f.write(channel_format.format(name=name, address=address))

@@ -135,18 +135,20 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   std::vector<unsigned int> good_fronts;
   for(auto& elem : front_hits){
     TJanusHit& hit = elem.second;
-    if(hit.Time() > 200 && hit.Time() < 3900){
+    // DANGER, uncomment this when not using LaBr
+    //if(hit.Time() > 200 && hit.Time() < 3900){
       good_fronts.push_back(elem.first);
-    }
+      //}
   }
 
   // Find all backs with a reasonable TDC value
   std::vector<unsigned int> good_backs;
   for(auto& elem : back_hits){
     TJanusHit& hit = elem.second;
-    if(hit.Time() > 200 && hit.Time() < 3900){
+    // DANGER, uncomment this when not using LaBr
+    //if(hit.Time() > 200 && hit.Time() < 3900){
       good_backs.push_back(elem.first);
-    }
+      //}
   }
 
   if(good_fronts.size()==1 && good_backs.size()==1){

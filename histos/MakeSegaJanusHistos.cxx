@@ -57,7 +57,7 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanus* janus) {
                       128, 0, 128, hit.GetFrontChannel());
     obj.FillHistogram("channel_energy",
                       128, 0, 128, hit.GetFrontChannel(),
-                      4096, 0, 4096, hit.Charge());
+                      4100, -4, 4096, hit.Charge());
     obj.FillHistogram("channel_time",
                       128, 0, 128, hit.GetFrontChannel(),
                       4096, 0, 4096, hit.Time());
@@ -95,14 +95,14 @@ void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega) {
                       16, 1, 17, hit.GetDetnum(),
                       33, 0, 33, hit.GetNumSegments());
 
-    obj.FillHistogram(Form("sega_det%d_numsegments_ts", hit.GetDetnum()),
-                      36000, 0, 3600e9, hit.Timestamp(),
-                      33, 0, 33, hit.GetNumSegments());
+    // obj.FillHistogram(Form("sega_det%d_numsegments_ts", hit.GetDetnum()),
+    //                   36000, 0, 3600e9, hit.Timestamp(),
+    //                   33, 0, 33, hit.GetNumSegments());
 
     for(unsigned int segi=0; segi<hit.GetNumSegments(); segi++){
       TSegaSegmentHit& seg = hit.GetSegment(segi);
-      obj.FillHistogram(Form("sega_det%d_segsummary", hit.GetDetnum()),
-                        32, 0, 32, seg.GetSegnum(),
+      obj.FillHistogram(Form("sega_det%02d_segsummary", hit.GetDetnum()),
+                        1, 0, 33, seg.GetSegnum(),
                         32768, 0, 32768, seg.Charge());
     }
 

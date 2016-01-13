@@ -40,7 +40,7 @@ class HistTab(object):
                       if isinstance(h, ROOT.TH1)}
 
         color = 1;
-        for name,obj in histograms.items():
+        for name,obj in sorted(histograms.items()):
             if isinstance(obj, ROOT.GH2I):
                 self._refresh(name, obj)
 

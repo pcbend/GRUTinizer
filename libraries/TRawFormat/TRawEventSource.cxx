@@ -167,6 +167,16 @@ int TRawEventByteSource::GetEvent(TRawEvent& rawevent) {
 }
 
 int TRawEventByteSource::FillBuffer(size_t bytes_requested) {
+  // //std::cout << "UNBUFFERED READ" << std::endl;
+  // char* buf = (char*)malloc(bytes_requested);
+  // size_t bytes_read = ReadBytes(buf, bytes_requested);
+  // fCurrentBuffer = TSmartBuffer(buf, bytes_requested);
+  // if(bytes_read != bytes_requested){
+  //   return -2;
+  // } else {
+  //   return bytes_read;
+  // }
+
   if(fCurrentBuffer.GetSize() >= bytes_requested){
     return bytes_requested;
   }
