@@ -43,16 +43,15 @@ private:
   TWriteLoop(std::string name, std::string output_file);
   void AddBranch(TClass* cls);
 
+  //ThreadsafeQueue<TUnpackedEvent*> input_queue;
+
 #ifndef __CINT__
   void WriteEvent(TUnpackedEvent* event);
-
   THistogramLoop *hist_loop;
   TFile* output_file;
-
   std::mutex input_queue_mutex;
   std::vector<TUnpackingLoop*> input_queues;
   TTree* event_tree;
-
   std::map<TClass*, TDetector**> det_map;
 #endif
 

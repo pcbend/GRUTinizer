@@ -272,7 +272,7 @@ void TGRUTint::ApplyOptions() {
 
 
   //next, if given a root file and told to sort it.
-  if(gChain && opt->MakeHistos()){
+  if(gChain && (opt->MakeHistos() || opt->SortRoot()) ){
     printf("Attempting to sort root files.\n");
     TChainLoop *coop = TChainLoop::Get("",gChain);
     THistogramLoop *hoop = THistogramLoop::Get("");

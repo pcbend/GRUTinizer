@@ -41,6 +41,9 @@ public:
 
   virtual void Clear(Option_t *opt="");
   virtual void Print(Option_t *opt="") const;
+  virtual void Copy(TObject&) const;
+  virtual TObject *Clone(const char *newname="") const;
+
 
   GH1D* Projection_Background(int axis=0,
                               int firstbin = 0,

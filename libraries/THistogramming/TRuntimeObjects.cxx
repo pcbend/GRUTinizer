@@ -6,6 +6,9 @@
 #include "TH1.h"
 #include "TH2.h"
 
+#include "GH1D.h"
+#include "GH2I.h"
+
 #include "GValue.h"
 
 TRuntimeObjects::TRuntimeObjects(TUnpackedEvent& detectors, TList* objects, TList* variables,
@@ -28,7 +31,7 @@ TH2* TRuntimeObjects::FillHistogram(std::string name,
                                     int Ybins, double Ylow, double Yhigh, double Yvalue){
   TH2* hist = (TH2*) GetObjects().FindObject(name.c_str());
   if(!hist){
-    hist = new TH2I(name.c_str(),name.c_str(),
+    hist = new GH2I(name.c_str(),name.c_str(),
                             Xbins, Xlow, Xhigh,
                             Ybins, Ylow, Yhigh);
     GetObjects().Add(hist);
@@ -42,7 +45,7 @@ TH2* TRuntimeObjects::FillHistogramSym(std::string name,
                                     int Ybins, double Ylow, double Yhigh, double Yvalue){
   TH2* hist = (TH2*) GetObjects().FindObject(name.c_str());
   if(!hist){
-    hist = new TH2I(name.c_str(),name.c_str(),
+    hist = new GH2I(name.c_str(),name.c_str(),
                             Xbins, Xlow, Xhigh,
                             Ybins, Ylow, Yhigh);
     GetObjects().Add(hist);

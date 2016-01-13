@@ -36,6 +36,7 @@ public:
   bool ShowedHelp()         const { return fHelp; }
   bool ShowLogo()           const { return fShowLogo; }
   bool SortRaw()            const { return fSortRaw; }
+  bool SortRoot()           const { return fSortRoot; }
   bool ExtractWaves()       const { return fExtractWaves;  }
   bool StartGUI()           const { return fStartGui; }
   bool MakeHistos()         const { return fMakeHistos; }
@@ -82,6 +83,7 @@ private:
   bool fHelp;
   bool fShowLogo;
   bool fSortRaw;
+  bool fSortRoot;
   bool fExtractWaves;
   bool fIsOnline;
   bool fStartGui;

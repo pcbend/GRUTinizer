@@ -86,7 +86,7 @@ class TCutTab(object):
         for branch in gchain.GetListOfBranches():
             cls_name = branch.GetName()
             cls = getattr(ROOT, cls_name)
-            if cls not in self.detector_classes:
+            if cls_name not in self.detector_classes:
                 top = self.tree.insert('','end',
                                        cls_name, text=cls_name)
                 self.tree.insert(top,'end',

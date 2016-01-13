@@ -845,7 +845,11 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       }
 
       if(ghist){
-        ghist->ProjectionX()->Draw();
+        TH1 *phist = ghist->ProjectionX();//->Draw();
+        if(phist) {
+          new GCanvas();
+          phist->Draw();
+        }
         edited=true;
       }
     }
@@ -861,7 +865,14 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       }
 
       if(ghist){
-        ghist->ProjectionY()->Draw();
+        //printf("ghist = 0x%08x\n",ghist);
+        TH1 *phist = ghist->ProjectionY();//->Draw();
+        //printf("phist = 0x%08x\n",phist);
+        //printf("phist->GetName() = %s\n",phist->GetName());
+        if(phist) {
+          new GCanvas();
+          phist->Draw();
+        }
         edited=true;
       }
     }

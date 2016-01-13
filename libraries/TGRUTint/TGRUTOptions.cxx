@@ -36,10 +36,11 @@ void TGRUTOptions::Clear(Option_t* opt) {
 
   fExtractWaves     = false;
   fExitAfterSorting = false;
-  fHelp = false;
-  fShowLogo = true;
-  fSortRaw = true;
-  fIsOnline = false;
+  fHelp       = false;
+  fShowLogo   = true;
+  fSortRaw    = true;
+  fSortRoot   = false;
+  fIsOnline   = false;
   fMakeHistos = false;
 
   fShouldExit = false;
@@ -80,6 +81,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("n no-sort", &fSortRaw)
     .description("Load raw data files without sorting")
     .default_value(true);
+  parser.option("s sort", &fSortRoot)
+    .description("Attempt to loop through root files.")
+    .default_value(false);
   parser.option("t time-sort", &fTimeSortInput)
     .description("Reorder raw events by time");
   parser.option("time-sort-depth",&fTimeSortDepth)

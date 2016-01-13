@@ -27,6 +27,19 @@ void TSega::Clear(Option_t* opt){
   sega_hits.clear();
 }
 
+void TSega::Draw(Option_t *opt) {
+  //if(!gPad || !gPad->IsEditable())  {
+  //  gROOT->MakeDefCanvas();
+  //} else {
+  //  gPad->GetCanvas()->Clear();
+  //}
+  
+  
+  
+
+
+}
+
 TSegaHit& TSega::GetSegaHit(int i){
   return sega_hits.at(i);
 }

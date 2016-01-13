@@ -21,6 +21,7 @@
 #include <TObjArray.h>
 #include <TH1.h>
 
+#include <GCanvas.h>
 #include <GPeak.h>
 //#include <GRootObjectManager.h>
 
@@ -194,3 +195,29 @@ std::string MergeStrings(const std::vector<std::string>& strings, char split) {
   }
   return ss.str();
 }
+
+
+TH1 *GrabHist(int i)  {
+  //return the histogram from the current canvas, pad i.
+  TH1 *hist = 0;
+  if(!gPad)
+    return hist;
+  TIter iter(gPad->GetListOfPrimitives());
+  while(TObject *obj = iter.Next()) {
+    if(obj->InheritsFrom(TH1::Class())) {
+      hist = (TH1*)obj;
+      break;
+    }
+  }
+  return hist;
+}
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
