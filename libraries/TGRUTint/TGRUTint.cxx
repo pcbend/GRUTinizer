@@ -168,6 +168,13 @@ void TGRUTint::ApplyOptions() {
                               std::istreambuf_iterator<char>());
     TPython::Exec(script_text.c_str());
 
+    std::string default_gui_config = gEnv->GetValue("GRUT.GuiSetup","");
+    if(default_gui_config.length() &&
+       !opt->GuiSaveSetFiles().size()){
+      TPython::Exec(Form("window.LoadGuiFile(\"%s\")",default_gui_config.c_str()));
+    }
+		    
+
     TTimer* gui_timer = new TTimer("TPython::Exec(\"update()\");", 10, true);
     gui_timer->TurnOn();
   }
