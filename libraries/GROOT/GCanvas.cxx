@@ -137,7 +137,8 @@ void GCanvas::AddMarker(int x,int y,int dim) {
     mark->localx = gPad->AbsPixeltoX(x);
     mark->binx = hist->GetXaxis()->FindBin(mark->localx);
     double bin_edge = hist->GetXaxis()->GetBinLowEdge(mark->binx);
-    mark->linex = new TLine(bin_edge,GetUymin(),bin_edge,GetUymax());
+    mark->linex = new TLine(bin_edge,hist->GetMinimum(),
+                            bin_edge,hist->GetMaximum());
     mark->SetColor(kRed);
     mark->Draw();
   } else if (dim==2) {
@@ -148,8 +149,10 @@ void GCanvas::AddMarker(int x,int y,int dim) {
     double binx_edge = hist->GetXaxis()->GetBinLowEdge(mark->binx);
     double biny_edge = hist->GetYaxis()->GetBinLowEdge(mark->biny);
 
-    mark->linex = new TLine(binx_edge,GetUymin(),binx_edge,GetUymax());
-    mark->liney = new TLine(GetUxmin(),biny_edge,GetUxmax(),biny_edge);
+    mark->linex = new TLine(binx_edge,hist->GetYaxis()->GetXmin(),
+                            binx_edge,hist->GetYaxis()->GetXmax());
+    mark->liney = new TLine(hist->GetXaxis()->GetXmin(),biny_edge,
+                            hist->GetXaxis()->GetXmax(),biny_edge);
 
     mark->SetColor(kRed);
     mark->Draw();
@@ -740,16 +743,26 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
 
       if(ghist){
         GH1D* proj = NULL;
+        int binlow = fMarkers.at(fMarkers.size()-1)->binx;
+        int binhigh = fMarkers.at(fMarkers.size()-2)->binx;
+        if(binlow > binhigh){
+          std::swap(binlow, binhigh);
+        }
         if(fBackgroundMarkers.size()>=2 &&
            fBackgroundMode!=kNoBackground){
-          proj = ghist->Project_Background(fMarkers.at(fMarkers.size()-1)->binx,
-                                           fMarkers.at(fMarkers.size()-2)->binx,
-                                           fBackgroundMarkers[0]->binx,
-                                           fBackgroundMarkers[1]->binx,
+          int bg_binlow = fBackgroundMarkers[0]->binx;
+          int bg_binhigh = fBackgroundMarkers[1]->binx;
+          if(bg_binlow > bg_binhigh){
+            std::swap(bg_binlow, bg_binhigh);
+          }
+          // Using binhigh-1 instead of binhigh,
+          //  because the ProjectionX/Y functions from ROOT use inclusive bin numbers,
+          //  rather than exclusive.
+          proj = ghist->Project_Background(binlow, binhigh-1,
+                                           bg_binlow, bg_binhigh-1,
                                            fBackgroundMode);
         } else {
-          proj = ghist->Project(fMarkers.at(fMarkers.size()-1)->binx,
-                                fMarkers.at(fMarkers.size()-2)->binx);
+          proj = ghist->Project(binlow, binhigh-1);
         }
         if(proj){
           proj->Draw();
