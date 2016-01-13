@@ -15,9 +15,12 @@ public:
   virtual void Print(Option_t* opt="") const; 
   virtual void Clear(Option_t* opt = "");
 
+  virtual TDetectorHit& GetHit(int i);
+  //Is there any reason the below are virtual? There is no GetCaesarHit in other
+  //classes.
   virtual TCaesarHit&   GetCaesarHit(int i);
   virtual const TCaesarHit& GetCaesarHit(int i) const;
-  virtual TDetectorHit& GetHit(int i);
+  virtual std::vector<TCaesarHit> GetCaesarHits() const  { return caesar_hits; };
 
   int GetULM() const { return fUlm; }
   void SetULM(int ulm) { fUlm = ulm; }

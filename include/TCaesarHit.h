@@ -24,8 +24,9 @@ public:
   //void SetCharge(int charge)	{ fCharge = charge;	}
   //void SetTime(int time)	{ fTime = time;		}
 
-  int GetDetectorNumber() const { return GetFullChannel(); }
-  int GetFullChannel() const {
+  //Detector number is not ordered in any reasonable way. This is just
+  //all the detectors.
+  int GetDetectorNumber() const { 
     return GetVSN()*16 + GetChannel();
   }
 
