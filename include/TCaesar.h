@@ -65,8 +65,8 @@ private:
   void Build_Single_Read(TSmartBuffer buf);
 
   int fUlm;
-  std::string vsn_file_name = std::string(getenv("GRUTSYS")) + "/config/VSNMap.dat";
-  std::string det_pos_file_name = std::string(getenv("GRUTSYS")) + "/config/CaesarPos.dat";
+  std::string vsn_file_name = std::string(getenv("GRUTSYS")) + "/config/caesar/VSNMap.dat";
+  std::string det_pos_file_name = std::string(getenv("GRUTSYS")) + "/config/caesarCaesarPos.dat";
   std::vector<TCaesarHit> caesar_hits;
 
   ClassDef(TCaesar,1);
