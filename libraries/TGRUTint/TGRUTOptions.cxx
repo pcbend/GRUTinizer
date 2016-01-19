@@ -26,6 +26,7 @@ void TGRUTOptions::Clear(Option_t* opt) {
   input_raw_files.clear();
   input_root_files.clear();
   input_cal_files.clear();
+  input_val_files.clear();
   input_macro_files.clear();
 
   input_ring = "";
@@ -200,6 +201,8 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename) const{
     return kFileType::CONFIG_FILE;
   } else if (ext == "inv") {
     return kFileType::S800_INVMAP;
+  } else if (ext == "val"){
+      return kFileType::GVALUE;
   } else {
     return kFileType::UNKNOWN_FILETYPE;
   }
@@ -240,10 +243,11 @@ bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
     case kFileType::S800_INVMAP:
       s800_inverse_map_file = filename;
       return true;
-
+    case kFileType::GVALUE:
+      input_val_files.push_back(filename);
+      return true;
     case kFileType::CONFIG_FILE:
       return false;
-
     case kFileType::UNKNOWN_FILETYPE:
     default:
       printf("\tDiscarding unknown file: %s\n",filename.c_str());

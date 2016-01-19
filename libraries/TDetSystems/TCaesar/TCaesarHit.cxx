@@ -13,7 +13,10 @@ void TCaesarHit::Copy(TObject& obj) const {
 
   hit.fVsn = fVsn;
   hit.fChannel = fChannel;
+  hit.fDet = fDet;
+  hit.fRing = fRing;
 }
+
 
 void TCaesarHit::Clear(Option_t* opt) {
   TDetectorHit::Clear(opt);
