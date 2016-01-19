@@ -107,7 +107,7 @@ bool TChannel::AlphaSort(const TChannel &chana,const TChannel &chanb) {
 
 TChannel* TChannel::GetChannel(unsigned int add)   {
   TChannel *chan = 0;
-  if(add=0xffffffff)
+  if(add==0xffffffff)
     return fDefaultChannel;
   if(fChannelMap.count(add)==1) {
     chan = fChannelMap.at(add);
