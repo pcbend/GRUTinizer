@@ -9,6 +9,7 @@
 
 //std::string GValue::fValueData
 //std::map<unsigned int, GValue*> GValue::fValueMap;
+GValue *GValue::fDefaultValue = new GValue("GValue",sqrt(-1));
 std::map<std::string,GValue*> GValue::fValueVector;
 
 GValue::GValue()
@@ -30,13 +31,19 @@ void GValue::Copy(TObject &obj) const {
   ((GValue&)obj).fValue = fValue;
 }
 
+double GValue::Value(std::string name) {
+  if(!fValueVector.count(name))
+    return sqrt(-1);
+  return fValueVector.at(name)->GetValue();
+}
 
 
 GValue* GValue::FindValue(std::string name){
   GValue* value = 0;
+  if(!name.length()) 
+    return GetDefaultValue();
   if(fValueVector.count(name))
     value = fValueVector[name];
-    
   return value;
 
 }
@@ -81,6 +88,56 @@ bool GValue::AddValue(GValue* value,Option_t *opt) {
   return true;
 }
 
+
+std::string GValue::PrintToString() const {
+
+  std::string buffer;
+  buffer.append(GetName());
+  buffer.append("\t{\n");
+  buffer.append("value:\t");
+  buffer.append(Form("%f\n",fValue));
+  buffer.append("}\n");
+  return buffer;
+}
+
+void GValue::Print(Option_t *opt) const {
+  std::cout << PrintToString() << std::endl;
+}
+
+int GValue::WriteValFile(std::string filename,Option_t *opt) {
+  std::map<std::string,GValue*>::iterator it;
+  //std::string filebuffer;
+  if(filename.length()) {
+    std::ofstream outfile;
+    outfile.open(filename.c_str());
+    if(!outfile.is_open())
+      return -1;
+    for(it = fValueVector.begin();it!=fValueVector.end();it++) {
+      outfile << it->second->PrintToString();
+      outfile << "\n\n";
+    }
+  } else {
+    for(it = fValueVector.begin();it!=fValueVector.end();it++) {
+      std::cout << it->second->PrintToString() << "\n\n";
+    }
+  }
+  return fValueVector.size();
+}
+
+std::string GValue::WriteToBuffer(Option_t *opt) {
+  std::string buffer="";
+  if(!GValue::Size())
+    return buffer;
+  std::map<std::string,GValue*>::iterator it;
+  for(it = fValueVector.begin();it!=fValueVector.end();it++) {
+    buffer.append(it->second->PrintToString());
+    buffer.append("\n");
+  }
+  return buffer;
+}
+
+
+
 int GValue::ReadValFile(const char* filename,Option_t *opt) {
   std::string infilename = filename;
   if(infilename.length()==0)
@@ -119,7 +176,7 @@ int GValue::ReadValFile(const char* filename,Option_t *opt) {
 //  Value : 
 //  Info  : 
 //}
-int GValue::ParseInputData(std::string &input,Option_t *opt) {
+int GValue::ParseInputData(std::string input,Option_t *opt) {
   std::istringstream infile(input);
   GValue *value = 0;
   std::string line;
@@ -213,4 +270,23 @@ void GValue::trim(std::string * line, const std::string & trimChars) {
     *line = line->substr(0, found + 1);
   return;
 }
+
+
+void GValue::Streamer(TBuffer &R__b) {
+  this->SetBit(kCanDelete);
+  UInt_t R__s, R__c;
+  if(R__b.IsReading()) {
+     Version_t R__v = R__b.ReadVersion(&R__s,&R__c);
+     TNamed::Streamer(R__b);
+     if(R__v>1) { }
+     { TString R__str; R__str.Streamer(R__b); ParseInputData(R__str.Data()); }
+     R__b.CheckByteCount(R__s,R__c,GValue::IsA());
+  } else {
+     R__c = R__b.WriteVersion(GValue::IsA(),true);
+     TNamed::Streamer(R__b);
+     { TString R__str = GValue::WriteToBuffer(); R__str.Streamer(R__b);}
+     R__b.SetByteCount(R__c,true);
+  }
+}
+
 

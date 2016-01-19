@@ -12,6 +12,7 @@ class TChannel : public TNamed {
 public:
   TChannel();
   TChannel(const char*);
+  TChannel(const char*,unsigned int);
   TChannel(const TChannel&);
 
   virtual ~TChannel();
@@ -54,6 +55,7 @@ private:
 
 public:
   static TChannel* GetChannel(unsigned int);
+  static TChannel* Get(unsigned int=0xffffffff);
   static TChannel* FindChannel(std::string);
   static bool      AddChannel(TChannel*,Option_t *opt="");
   static bool      RemoveChannel(TChannel&);
@@ -63,6 +65,8 @@ public:
   static int       DeleteAllChannels();
   static int       Size() { return fChannelMap.size(); }
 
+
+  static TChannel *fDefaultChannel;
 
 public:
   void SetAddress(unsigned int temp) { address = temp;           }

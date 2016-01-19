@@ -35,7 +35,7 @@
 //#pragma link C++ global gManager;
 //#pragma link C++ global gBaseManager;
 
-#pragma link C++ class GValue+;
+#pragma link C++ class GValue-;
 #pragma link C++ class GMarker+;
 #pragma link C++ class GCanvas+;
 #pragma link C++ class GRootCanvas+;

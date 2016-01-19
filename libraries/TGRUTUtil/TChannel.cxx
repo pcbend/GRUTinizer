@@ -9,7 +9,9 @@
 #include <fstream>
 #include <sstream>
 
+
 std::map<unsigned int,TChannel*> TChannel::fChannelMap;
+TChannel *TChannel::fDefaultChannel = new TChannel("TChannel",0xffffffff);
 std::string TChannel::fChannelData;
 
 ClassImp(TChannel)
@@ -23,6 +25,12 @@ TChannel::TChannel() {
 TChannel::TChannel(const char *name) {
    Clear();
    SetName(name);
+}
+
+TChannel::TChannel(const char *name,unsigned int address) {
+   Clear();
+   SetName(name);
+   SetAddress(address);
 }
 
 TChannel::TChannel(const TChannel& rhs)
@@ -99,11 +107,19 @@ bool TChannel::AlphaSort(const TChannel &chana,const TChannel &chanb) {
 
 TChannel* TChannel::GetChannel(unsigned int add)   {
   TChannel *chan = 0;
+  if(add=0xffffffff)
+    return fDefaultChannel;
   if(fChannelMap.count(add)==1) {
     chan = fChannelMap.at(add);
   }
   return chan;
 }
+
+TChannel* TChannel::Get(unsigned int add)   {
+  return GetChannel(add);
+}
+
+
 
 TChannel* TChannel::FindChannel(std::string name)   {
   TChannel *chan = 0;
