@@ -32,6 +32,7 @@
 #include "TRawSource.h"
 #include "TMultiRawFile.h"
 
+#include "GrutNotifier.h"
 #include "TGRUTUtilities.h"
 
 
@@ -180,7 +181,7 @@ void TGRUTint::ApplyOptions() {
   }
   if(opt->ValInputFiles().size()) {
     for(unsigned int x=0;x<opt->ValInputFiles().size();x++) {
-      GValue::ReadCalFile(opt->ValInputFiles().at(x).c_str());
+      GValue::ReadValFile(opt->ValInputFiles().at(x).c_str());
     }
   }
 
@@ -349,6 +350,7 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
       if(file->FindObjectAny("EventTree")) {
         if(!gChain) {
           gChain = new TChain("EventTree");
+          gChain->SetNotify(GrutNotifier::Get());
         }
         gChain->Add(file->GetName());
       }

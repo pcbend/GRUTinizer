@@ -9,7 +9,7 @@
 
 //std::string GValue::fValueData
 //std::map<unsigned int, GValue*> GValue::fValueMap;
-std::vector<GValue*> GValue::fValueVector;
+std::map<std::string,GValue*> GValue::fValueVector;
 
 GValue::GValue()
   : fValue(0.00) { }
@@ -30,17 +30,15 @@ void GValue::Copy(TObject &obj) const {
   ((GValue&)obj).fValue = fValue;
 }
 
+
+
 GValue* GValue::FindValue(std::string name){
   GValue* value = 0;
-  if(name.length()==0)
-     return value;
-  for(auto &iter : fValueVector) {
-     value = iter;
-     if(!name.compare(value->GetName()))
-        break;
-     value = 0;
-  }
+  if(fValueVector.count(name))
+    value = fValueVector[name];
+    
   return value;
+
 }
 
 bool GValue::AppendValue(GValue *oldvalue) {
@@ -78,12 +76,12 @@ bool GValue::AddValue(GValue* value,Option_t *opt) {
      delete value;
      value = 0;
   } else {
-    fValueVector.push_back(value);
+    fValueVector[temp_string] = value;   //.push_back(value);
   }
   return true;
 }
 
-int GValue::ReadCalFile(const char* filename,Option_t *opt) {
+int GValue::ReadValFile(const char* filename,Option_t *opt) {
   std::string infilename = filename;
   if(infilename.length()==0)
      return -1;

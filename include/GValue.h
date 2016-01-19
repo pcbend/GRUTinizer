@@ -17,9 +17,8 @@ public:
   void SetValue(double value) { fValue = value; }
   void SetInfo(const char *temp) { info.assign(temp); }
 
-  virtual void Copy(TObject &obj) const;
 
-  static int ReadCalFile(const char *filename="",Option_t *opt="replace");
+  static int ReadValFile(const char *filename="",Option_t *opt="replace");
 
   //Search fValueVector for GValue with name given by string
   static GValue* FindValue(std::string);
@@ -30,11 +29,17 @@ public:
   bool AppendValue(GValue*);
   bool ReplaceValue(GValue*);
 
+  //virtual void Clear(Option_t *opt="");
+  //virtual void Print(Option_t *opt="") const;
+  virtual void Copy(TObject &obj) const;
+  //virtual bool Notify();
+
+  int Size() const { return fValueVector.size(); }
 
 private:
   double fValue;
   std::string info;
-  static std::vector<GValue*> fValueVector;
+  static std::map<std::string,GValue*> fValueVector;
   static int  ParseInputData(std::string &input,Option_t *opt);
   static void trim(std::string *, const std::string &trimChars=" \f\n\r\t\v");
 
