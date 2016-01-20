@@ -24,6 +24,7 @@
 #include "GRootGuiFactory.h"
 
 #include "TChannel.h"
+#include "GValue.h"
 #include "TDetectorEnv.h"
 
 #include "TGRUTOptions.h"
@@ -31,9 +32,9 @@
 #include "TRawSource.h"
 #include "TMultiRawFile.h"
 
+#include "GrutNotifier.h"
 #include "TGRUTUtilities.h"
 
-#include "TChannel.h"
 
 #include "TDataLoop.h"
 #include "TBuildingLoop.h"
@@ -185,6 +186,12 @@ void TGRUTint::ApplyOptions() {
       TChannel::ReadCalFile(opt->CalInputFiles().at(x).c_str());
     }
   }
+  if(opt->ValInputFiles().size()) {
+    for(unsigned int x=0;x<opt->ValInputFiles().size();x++) {
+      GValue::ReadValFile(opt->ValInputFiles().at(x).c_str());
+    }
+  }
+
   TDataLoop *loop = 0;
   //next most important thing, if given a raw file && NOT told to not sort!
   if((opt->InputRing().length() || opt->RawInputFiles().size())
@@ -350,6 +357,7 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
       if(file->FindObjectAny("EventTree")) {
         if(!gChain) {
           gChain = new TChain("EventTree");
+          gChain->SetNotify(GrutNotifier::Get());
         }
         gChain->Add(file->GetName());
       }
