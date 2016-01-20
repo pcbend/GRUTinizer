@@ -26,6 +26,7 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanus* janus);
 void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega);
 void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus);
 void MakeTimestampDiffs(TRuntimeObjects& obj, TSega* sega, TJanus* janus);
+void MakeLaBrCoincPlots(TRuntimeObjects& obj, TSega* sega, TJanus* janus);
 
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
@@ -40,6 +41,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
   }
   if(sega && janus){
     MakeCoincidenceHistograms(obj, sega, janus);
+    MakeLaBrCoincPlots(obj, sega, janus);
   }
 
   MakeTimestampDiffs(obj, sega, janus);
@@ -193,6 +195,34 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus)
       obj.FillHistogram("channel_energy_any_coinc_missing4",
                         128, 0, 128, hit.GetBackChannel(),
                         4096, 0, 4096, hit.GetBackHit().Charge());
+    }
+  }
+}
+
+void MakeLaBrCoincPlots(TRuntimeObjects& obj, TSega* sega, TJanus* janus) {
+  bool has_labr_1332 = false;
+  for(int i=0; i<janus->Size(); i++){
+    TJanusHit& hit = janus->GetJanusHit(i);
+    obj.FillHistogram("labr_energy",
+                      8000, 0, 4000, hit.GetEnergy());
+    if(hit.GetFrontChannel() == 26 &&
+       hit.GetEnergy() > 1310 &&
+       hit.GetEnergy() < 1350){
+      obj.FillHistogram("labr_energy_gated",
+                        8000, 0, 4000, hit.GetEnergy());
+      has_labr_1332 = true;
+      break;
+    }
+  }
+
+  if(has_labr_1332){
+    for(int i=0; i<sega->Size(); i++){
+      TSegaHit& hit = sega->GetSegaHit(i);
+      obj.FillHistogram("sega_energy_labr1332coinc",
+                        8000, 0, 4000, hit.GetEnergy());
+      obj.FillHistogram("sega_energy_summary_labr1332coinc",
+                        16, 1, 17, hit.GetDetnum(),
+                        8000, 0, 4000, hit.GetEnergy());
     }
   }
 }

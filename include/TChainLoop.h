@@ -35,6 +35,8 @@ public:
 
   bool AttachHistogramLoop(THistogramLoop *loop) {hist_loop = loop; return loop; }
 
+  virtual std::string Status();
+
 protected:
   bool Iteration();
 
