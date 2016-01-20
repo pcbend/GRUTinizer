@@ -22,6 +22,8 @@
 #include "TSega.h"
 #include "TJanus.h"
 
+#define BETA 0.01
+
 void MakeJanusHistograms(TRuntimeObjects& obj, TJanus* janus);
 void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega);
 void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus);
@@ -177,21 +179,41 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus)
       TVector3 JanusPos = hit.GetPosition();
       double CT_sj = SegaPos.Dot(JanusPos);
 
-      obj.FillHistogram(Form("senergy_sjtheta_ring%i",hit.GetRing()),
+      obj.FillHistogram(Form("senergy_sjtheta_ring%02i",hit.GetRing()),
 			280,-70,70, CT_sj,
 			8000,0,4000,s_hit.GetEnergy());
+
+       
+      obj.FillHistogram(Form("dopper_with_ring%02i_gate",hit.GetRing()),
+			//280,-70,70, s_hit.GetPosition().Angle(hit.GetPosition())*TMath::RadToDeg(),
+			180,0,180, hit.GetPosition().Theta()*TMath::RadToDeg(),
+			8000,0,4000,s_hit.GetDoppler(BETA,hit.GetPosition())); //Energy());
+
+
+
       // ---- ^^ End JAB ^^ ----
     }
 
     // ---- Added by JAB 1/20/16 ----
 
-    obj.FillHistogram(Form("janus_angle_v_energy_det%i",hit.GetDetnum()),
+    obj.FillHistogram(Form("janus_theta_v_energy_det%02i",hit.GetDetnum()),
 		      180,0,180,hit.GetPosition().Theta()*TMath::RadToDeg(),
 		      4096,0,4096,hit.Charge());
 
-    obj.FillHistogram(Form("janus_ring_v_energy_det%i",hit.GetDetnum()),
+    obj.FillHistogram(Form("janus_ring_v_energy_det%02i",hit.GetDetnum()),
 		      30,0,30,hit.GetRing(),
 		      4096,0,4096,hit.Charge());
+
+    obj.FillHistogram(Form("janus_phi_v_energy_det%02i",hit.GetDetnum()),
+		      360,-180,180,hit.GetPosition().Phi()*TMath::RadToDeg(),
+		      4096,0,4096,hit.Charge());
+
+    obj.FillHistogram(Form("janus_secotr_v_energy_det%02i",hit.GetDetnum()),
+		      64,0,64,hit.GetSector(),
+		      4096,0,4096,hit.Charge());
+
+
+
 
     // ---- ^^ End JAB ^^ ----
 

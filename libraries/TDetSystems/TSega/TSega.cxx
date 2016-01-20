@@ -33,9 +33,9 @@ void TSega::Draw(Option_t *opt) {
   //} else {
   //  gPad->GetCanvas()->Clear();
   //}
-  
-  
-  
+
+
+
 
 
 }
@@ -161,7 +161,8 @@ void TSega::LoadDetectorPositions() {
   }
   loaded = true;
 
-  std::string filename = std::string(getenv("GRUTSYS")) + "/../config/SeGA_rotations.txt";
+  //std::string filename = std::string(getenv("GRUTSYS")) + "/../config/SeGA_rotations.txt";
+  std::string filename = std::string(getenv("GRUTSYS")) + "/config/SeGA_rotations.txt";
 
   //Read the locations from file.
   std::ifstream infile(filename);
