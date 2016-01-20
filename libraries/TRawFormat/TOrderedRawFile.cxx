@@ -24,6 +24,11 @@ int TOrderedRawFile::GetEvent(TRawEvent& event) {
   event = event_queue.begin()->second;
   event_queue.erase(event_queue.begin());
 
+  // If timestamp == -1 (usually scalers), pass it through automatically.
+  if(curr_timestamp == -1){
+    return event.GetTotalSize();
+  }
+
   if(oldest_timestamp != -1 && newest_timestamp != -1 &&
      curr_timestamp < newest_timestamp){
     std::cerr << "Sorting failed, insufficient depth "
