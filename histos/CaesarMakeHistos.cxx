@@ -64,7 +64,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
   double MCRDCX_COEF = obj.GetVariable("MCRDCX_COEF");
   double AFP_COEF = obj.GetVariable("AFP_COEF");
   double CRDCX_COEF = obj.GetVariable("CRDCX_COEF");
-  //double BETA = obj.GetVariable(BETA);
+////double BETA = obj.GetVariable(BETA);
   double E1_TDC_low = obj.GetVariable("E1_TDC_low");
   double E1_TDC_high = obj.GetVariable("E1_TDC_high");
 
