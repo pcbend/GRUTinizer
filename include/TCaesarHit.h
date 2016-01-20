@@ -17,26 +17,36 @@ public:
   int GetVSN() const		{ return fVsn;		}
   int GetChannel() const	{ return fChannel;	}
   int GetCharge() const		{ return Charge();	}
-  int GetTime() const		{ return Time();		}
+  int GetTime() const		{ return Time();        }
+  int GetDetectorNumber() const { return fDet;          }
+  int GetRingNumber() const     { return fRing;         }
+  double *GetPos()              { return pos;        }  
+  double  GetX()      const     { return pos[0];     }
+  double  GetY()      const     { return pos[1];     }
+  double  GetZ()      const     { return pos[2];     }
+
 
   void SetVSN(int vsn)		{ fVsn = vsn;		}
   void SetChannel(int channel)	{ fChannel = channel;	}
-  //void SetCharge(int charge)	{ fCharge = charge;	}
-  //void SetTime(int time)	{ fTime = time;		}
+  void SetDet(int det)          { fDet = det;           }
+  void SetRing(int ring)        { fRing = ring;         }
+  void SetPos(double x, double y, double z){ pos[0] = x; 
+                                             pos[1] = y; 
+                                             pos[2] = z; }
 
-  int GetDetectorNumber() const { return GetFullChannel(); }
-  int GetFullChannel() const {
-    return GetVSN()*16 + GetChannel();
-  }
+  //Detector number is not ordered in any reasonable way. This is just
+  //all the detectors.
 
-  bool IsValid() const { return fCharge!=-1 && fTime!=-1; }
+  bool IsValid() const { return (fCharge!=-1 && fTime!=-1); }
 
-  //TVector3 GetPosition() const;
 
 private:
 	 
   int fVsn;
   int fChannel;
+  int fDet;
+  int fRing;
+  double pos[3];
       	 
   ClassDef(TCaesarHit,2);
 };

@@ -73,8 +73,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
       TCaesarHit hit = caesar->GetCaesarHit(y);
       std::string histname;
 
-      TH2 *caesar_det_charge = GetMatrix(list,"DetectorCharge",200,0,200,5000,0,5000);
-      caesar_det_charge->Fill(hit.GetFullChannel(),hit.GetCharge());
+      TH2 *caesar_det_charge = GetMatrix(list,"DetectorCharge",200,0,200,2500,0,2500);
+      caesar_det_charge->Fill(hit.GetDetectorNumber(),hit.GetCharge());
      }
   }
 
@@ -90,11 +90,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
     mtdc_vs_afp->Fill(s800->GetTofE1_MTDC(MAFP_COEF,MCRDCX_COEF),s800->GetAFP());
     TH2 *tdc_vs_afp= GetMatrix(list,"TDC_vs_AFP",2000,-2000,00,600,-0.1,0.1);
     tdc_vs_afp->Fill(s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),s800->GetAFP());
-
-
-
-
-
 
     double delta_t = s800->GetScint().GetTimeUp()-s800->GetTof().GetOBJ();
 
@@ -122,33 +117,22 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     TH1 *ion_sum = GetHistogram(list,"Ion Chamber Sum",8000,0,64000);
     ion_sum->Fill(s800->GetIonChamber().Charge());
+
+    TH1 *trig_bit = GetHistogram(list, "TrigBit", 10,0,10);
+    int freg = s800->GetTrigger().GetRegistr();
+    if (freg != 1 && freg != 2 && freg != 3){
+      trig_bit->Fill(9); //Just a random channel to fill for nonsense input
+    }
+    else{
+      if (freg&1){
+        trig_bit->Fill(0);
+      }
+      if (freg&2){
+        trig_bit->Fill(1);
+      }
+    }
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   if(numobj!=list->GetSize())
     list->Sort();
-
-
 }
