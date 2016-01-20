@@ -24,6 +24,13 @@ public:
 
   unsigned int GetNumSegments() const { return fSegments.size(); }
   TSegaSegmentHit& GetSegment(int i) { return fSegments.at(i); }
+  unsigned long GetSegmentTimestamp() {
+    if(fSegments.size()){
+      return fSegments[0].Timestamp();
+    } else {
+      return -1;
+    }
+  }
 
   std::vector<unsigned short>* GetTrace(int segnum=0);
 

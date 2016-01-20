@@ -1,67 +1,67 @@
 
 SEG01AP00 {
   Address: 0x01010200
-  EnergyCoeff: 2.005 0.127
+  EnergyCoeff: 0.667 0.127115
 }
 
 SEG02AP00 {
   Address: 0x01010201
-  EnergyCoeff: 2.516 0.087
+  EnergyCoeff: 1.059 0.086538
 }
 
 SEG03AP00 {
   Address: 0x01010202
-  EnergyCoeff: 1.569 0.125
+  EnergyCoeff: 0.086 0.125720
 }
 
 SEG04AP00 {
   Address: 0x01010203
-  EnergyCoeff: 2.149 0.133
+  EnergyCoeff: 0.287 0.133474
 }
 
 SEG05AP00 {
   Address: 0x01010204
-  EnergyCoeff: 1.778 0.118
+  EnergyCoeff: -0.563 0.117727
 }
 
 SEG06AP00 {
   Address: 0x01010205
-  EnergyCoeff: 2.596 0.129
+  EnergyCoeff: -0.940 0.129074
 }
 
 SEG07AP00 {
   Address: 0x01010206
-  EnergyCoeff: 3.943 0.125
+  EnergyCoeff: 2.586 0.125360
 }
 
 SEG08AP00 {
   Address: 0x01010207
-  EnergyCoeff: 2.044 0.132
+  EnergyCoeff: 1.605 0.136708
 }
 
 SEG09AP00 {
   Address: 0x01010208
-  EnergyCoeff: 1.749 0.132
+  EnergyCoeff: -0.356 0.132533
 }
 
 SEG10AP00 {
   Address: 0x01010209
-  EnergyCoeff: 6.174 0.124
+  EnergyCoeff: 0.264 0.124745
 }
 
 SEG11AP00 {
   Address: 0x0101020a
-  EnergyCoeff: 1.653 0.132
+  EnergyCoeff: -0.642 0.132343
 }
 
 SEG12AP00 {
   Address: 0x0101020b
-  EnergyCoeff: 1.326 0.132
+  EnergyCoeff: 0.479 0.130466
 }
 
 SEG13AP00 {
   Address: 0x0101020c
-  EnergyCoeff: 1.915 0.131
+  EnergyCoeff: 0.179 0.130874
 }
 
 SEG14AP00 {
@@ -71,13 +71,28 @@ SEG14AP00 {
 
 SEG15AP00 {
   Address: 0x0101020e
-  EnergyCoeff: 0.076 0.136
+  EnergyCoeff: 0.879 0.136149
 }
 
 SEG16AP00 {
   Address: 0x0101020f
-  EnergyCoeff: 2.284 0.128
+  EnergyCoeff: 1.613 0.127596
 }
+
+// // The RF signal
+// SEG99AP00 {
+//   Address: 0x01030e00
+// }
+//
+// // Crate 3, Slot 14, Channel 6, dummy
+// SEG17AP00 {
+//   Address: 0x01030e06
+// }
+//
+// // Crate 3, Slot 14, Channel 9, dummy
+// SEG18AP00 {
+//   Address: 0x01030e09
+// }
 
 SEG01AN01 {
   Address: 0x01010300
@@ -2764,37 +2779,37 @@ DEL00FN00 {
   EnergyCoeff: 0 1
 }
 
-DEL00FN00 {
+DEL00FN01 {
   Address: 0x02040519
   EnergyCoeff: 0 1
 }
 
-DEL00FN00 {
+DEL00FN02 {
   Address: 0x0204051a
-  EnergyCoeff: 0 1
+  EnergyCoeff: -83.868 0.457287
 }
 
-DEL00FN00 {
+DEL00FN03 {
   Address: 0x0204051b
   EnergyCoeff: 0 1
 }
 
-DEL00FN00 {
+DEL00FN04 {
   Address: 0x0204051c
   EnergyCoeff: 0 1
 }
 
-DEL00FN00 {
+DEL00FN05 {
   Address: 0x0204051d
   EnergyCoeff: 0 1
 }
 
-DEL00FN00 {
+DEL00FN06 {
   Address: 0x0204051e
   EnergyCoeff: 0 1
 }
 
-DEL00FN00 {
+DEL00FN07 {
   Address: 0x0204051f
   EnergyCoeff: 0 1
 }
@@ -3084,37 +3099,37 @@ DEL01FN00 {
   EnergyCoeff: 0 1
 }
 
-DEL01FN00 {
+DEL01FN01 {
   Address: 0x02040719
   EnergyCoeff: 0 1
 }
 
-DEL01FN00 {
+DEL01FN02 {
   Address: 0x0204071a
   EnergyCoeff: 0 1
 }
 
-DEL01FN00 {
+DEL01FN03 {
   Address: 0x0204071b
   EnergyCoeff: 0 1
 }
 
-DEL01FN00 {
+DEL01FN04 {
   Address: 0x0204071c
   EnergyCoeff: 0 1
 }
 
-DEL01FN00 {
+DEL01FN05 {
   Address: 0x0204071d
   EnergyCoeff: 0 1
 }
 
-DEL01FN00 {
+DEL01FN06 {
   Address: 0x0204071e
   EnergyCoeff: 0 1
 }
 
-DEL01FN00 {
+DEL01FN07 {
   Address: 0x0204071f
   EnergyCoeff: 0 1
 }

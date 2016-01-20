@@ -86,10 +86,10 @@ void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega) {
     obj.FillHistogram("sega_energy",
                       8000, 0, 4000, hit.GetEnergy());
     obj.FillHistogram("sega_charge_summary",
-                      16, 1, 17, hit.GetDetnum(),
+                      18, 1, 19, hit.GetDetnum(),
                       32768, 0, 32768, hit.Charge());
     obj.FillHistogram("sega_energy_summary",
-                      16, 1, 17, hit.GetDetnum(),
+                      18, 1, 19, hit.GetDetnum(),
                       8000, 0, 4000, hit.GetEnergy());
     obj.FillHistogram("sega_numsegments",
                       16, 1, 17, hit.GetDetnum(),
@@ -157,6 +157,15 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus)
       obj.FillHistogram("channel_energy_60keV_coinc",
                         128, 0, 128, hit.GetBackChannel(),
                         4096, 0, 4096, hit.GetBackHit().Charge());
+    }
+
+    if(hit.GetFrontChannel()==87){
+      for(int j=0; j<sega->Size(); j++){
+        TSegaHit& s_hit = sega->GetSegaHit(j);
+        obj.FillHistogram("senergy_jcharge_innermost_ring",
+                          4096, 0, 4096, hit.Charge(),
+                          8000, 0, 4000, s_hit.GetEnergy());
+      }
     }
 
 

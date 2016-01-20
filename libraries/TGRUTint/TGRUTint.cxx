@@ -200,6 +200,7 @@ void TGRUTint::ApplyOptions() {
     }
 
     if(opt->TimeSortInput()){
+      std::cout << "\n\nI am time sorted\n\n" << std::endl;
       TOrderedRawFile* ordered_source = new TOrderedRawFile(source);
       ordered_source->SetDepth(opt->TimeSortDepth());
       source = ordered_source;

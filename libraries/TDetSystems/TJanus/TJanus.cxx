@@ -136,9 +136,9 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   for(auto& elem : front_hits){
     TJanusHit& hit = elem.second;
     // DANGER, uncomment this when not using LaBr
-    //if(hit.Time() > 200 && hit.Time() < 3900){
+    if(hit.Time() > 200 && hit.Time() < 3900){
       good_fronts.push_back(elem.first);
-      //}
+    }
   }
 
   // Find all backs with a reasonable TDC value
@@ -146,9 +146,9 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   for(auto& elem : back_hits){
     TJanusHit& hit = elem.second;
     // DANGER, uncomment this when not using LaBr
-    //if(hit.Time() > 200 && hit.Time() < 3900){
+    if(hit.Time() > 200 && hit.Time() < 3900){
       good_backs.push_back(elem.first);
-      //}
+    }
   }
 
   if(good_fronts.size()==1 && good_backs.size()==1){
@@ -164,6 +164,7 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
     hit.GetBackHit().SetCharge(back.Charge());
     hit.GetBackHit().SetTime(back.Time());
     hit.GetBackHit().SetTimestamp(back.Timestamp());
+
   } else {
     static bool message_displayed = false;
     if(!message_displayed){
