@@ -161,15 +161,39 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus)
                         4096, 0, 4096, hit.GetBackHit().Charge());
     }
 
-    if(hit.GetFrontChannel()==87){
-      for(int j=0; j<sega->Size(); j++){
-        TSegaHit& s_hit = sega->GetSegaHit(j);
+    
+
+    
+    for(int j=0; j<sega->Size(); j++){
+      TSegaHit& s_hit = sega->GetSegaHit(j);
+      if(hit.GetFrontChannel()==87){
         obj.FillHistogram("senergy_jcharge_innermost_ring",
                           4096, 0, 4096, hit.Charge(),
                           8000, 0, 4000, s_hit.GetEnergy());
       }
+
+      // ---- Added by JAB 1/20/16 ----
+      TVector3 SegaPos = s_hit.GetPosition();
+      TVector3 JanusPos = hit.GetPosition();
+      double CT_sj = SegaPos.Dot(JanusPos);
+      
+      obj.FillHistogram(Form("senergy_sjtheta_ring%i",hit.GetRing()),
+			180,0,180, CT_sj,
+			8000,0,4000,s_hit.GetEnergy());
+      // ---- ^^ End JAB ^^ ----
     }
 
+    // ---- Added by JAB 1/20/16 ----
+    
+    obj.FillHistogram(Form("janus_angle_v_energy_det%i",hit.GetDetnum()),
+		      180,0,180,hit.GetPosition().Theta(),
+		      4096,0,4096,hit.Charge());
+
+    obj.FillHistogram(Form("janus_ring_v_energy_det%i",hit.GetDetnum()),
+		      20,0,20,hit.GetRing(),
+		      4096,0,4096,hit.Charge());
+
+    // ---- ^^ End JAB ^^ ----
 
     obj.FillHistogram("channel_energy_any_coinc",
                       128, 0, 128, hit.GetFrontChannel(),
