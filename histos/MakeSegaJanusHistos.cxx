@@ -22,6 +22,8 @@
 #include "TSega.h"
 #include "TJanus.h"
 
+#define BETA 0.01
+
 void MakeJanusHistograms(TRuntimeObjects& obj, TJanus* janus);
 void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega);
 void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus);
@@ -161,15 +163,59 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus)
                         4096, 0, 4096, hit.GetBackHit().Charge());
     }
 
-    if(hit.GetFrontChannel()==87){
-      for(int j=0; j<sega->Size(); j++){
-        TSegaHit& s_hit = sega->GetSegaHit(j);
+
+
+
+    for(int j=0; j<sega->Size(); j++){
+      TSegaHit& s_hit = sega->GetSegaHit(j);
+      if(hit.GetFrontChannel()==87){
         obj.FillHistogram("senergy_jcharge_innermost_ring",
                           4096, 0, 4096, hit.Charge(),
                           8000, 0, 4000, s_hit.GetEnergy());
       }
+
+      // ---- Added by JAB 1/20/16 ----
+      TVector3 SegaPos = s_hit.GetPosition();
+      TVector3 JanusPos = hit.GetPosition();
+      double CT_sj = SegaPos.Dot(JanusPos);
+
+      obj.FillHistogram(Form("senergy_sjtheta_ring%02i",hit.GetRing()),
+			280,-70,70, CT_sj,
+			8000,0,4000,s_hit.GetEnergy());
+
+       
+      obj.FillHistogram(Form("dopper_with_ring%02i_gate",hit.GetRing()),
+			//280,-70,70, s_hit.GetPosition().Angle(hit.GetPosition())*TMath::RadToDeg(),
+			180,0,180, hit.GetPosition().Theta()*TMath::RadToDeg(),
+			8000,0,4000,s_hit.GetDoppler(BETA,hit.GetPosition())); //Energy());
+
+
+
+      // ---- ^^ End JAB ^^ ----
     }
 
+    // ---- Added by JAB 1/20/16 ----
+
+    obj.FillHistogram(Form("janus_theta_v_energy_det%02i",hit.GetDetnum()),
+		      180,0,180,hit.GetPosition().Theta()*TMath::RadToDeg(),
+		      4096,0,4096,hit.Charge());
+
+    obj.FillHistogram(Form("janus_ring_v_energy_det%02i",hit.GetDetnum()),
+		      30,0,30,hit.GetRing(),
+		      4096,0,4096,hit.Charge());
+
+    obj.FillHistogram(Form("janus_phi_v_energy_det%02i",hit.GetDetnum()),
+		      360,-180,180,hit.GetPosition().Phi()*TMath::RadToDeg(),
+		      4096,0,4096,hit.Charge());
+
+    obj.FillHistogram(Form("janus_secotr_v_energy_det%02i",hit.GetDetnum()),
+		      64,0,64,hit.GetSector(),
+		      4096,0,4096,hit.Charge());
+
+
+
+
+    // ---- ^^ End JAB ^^ ----
 
     obj.FillHistogram("channel_energy_any_coinc",
                       128, 0, 128, hit.GetFrontChannel(),
