@@ -3,6 +3,8 @@
 #include "TFile.h"
 #include "TThread.h"
 
+#include "GValue.h"
+#include "TChannel.h"
 #include "THistogramLoop.h"
 #include "TS800.h"
 
@@ -43,6 +45,11 @@ TWriteLoop::~TWriteLoop() {
   }
 
   event_tree->Write(event_tree->GetName(), TObject::kOverwrite);
+  if(GValue::Size())
+    GValue::Get()->Write();
+  if(TChannel::Size())
+    TChannel::Get()->Write();
+
   output_file->Close();
   output_file->Delete();
 }

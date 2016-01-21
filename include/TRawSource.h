@@ -34,7 +34,7 @@ inline size_t FindFileSize(const char* fname) {
 
 
 
-class TRawEventSource  {
+class TRawEventSource : public TObject  {
 public:
   TRawEventSource()
     : fBytesGiven(0), fLastErrno(0), fIsFinished(0) { }
@@ -247,7 +247,7 @@ public:
   virtual std::string GetLastError() const {
     return wrapped->GetLastError();
   }
-  
+
   void SetNameTitle(const char *name,const char *title) {
     fname.assign(name);
     ftitle.assign(title);

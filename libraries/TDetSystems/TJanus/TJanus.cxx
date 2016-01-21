@@ -135,6 +135,7 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   std::vector<unsigned int> good_fronts;
   for(auto& elem : front_hits){
     TJanusHit& hit = elem.second;
+    // DANGER, uncomment this when not using LaBr
     if(hit.Time() > 200 && hit.Time() < 3900){
       good_fronts.push_back(elem.first);
     }
@@ -144,6 +145,7 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   std::vector<unsigned int> good_backs;
   for(auto& elem : back_hits){
     TJanusHit& hit = elem.second;
+    // DANGER, uncomment this when not using LaBr
     if(hit.Time() > 200 && hit.Time() < 3900){
       good_backs.push_back(elem.first);
     }
@@ -162,6 +164,7 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
     hit.GetBackHit().SetCharge(back.Charge());
     hit.GetBackHit().SetTime(back.Time());
     hit.GetBackHit().SetTimestamp(back.Timestamp());
+
   } else {
     static bool message_displayed = false;
     if(!message_displayed){

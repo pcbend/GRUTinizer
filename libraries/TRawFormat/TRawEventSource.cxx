@@ -133,10 +133,15 @@ int TRawEventByteSource::GetEvent(TRawEvent& rawevent) {
   rawevent.SetFileType(fFileType);
 
   int bytes_read_header = FillBuffer(sizeof(TRawEvent::RawHeader));
+  // If not enough was read, check the errno.
+  // If it is 0, we may still receive more data. (e.g. reading from ring)
+  // If it is nonzero, we are done. (e.g. end of file)
   if(bytes_read_header == 0) {
-    return 0;
-  } else if(GetLastErrno()){
-    return -1;
+    if(GetLastErrno()){
+      return -1;
+    } else {
+      return 0;
+    }
   }
 
   memcpy(rawevent.GetRawHeader(), fCurrentBuffer.GetData(), sizeof(TRawEvent::RawHeader));
@@ -162,6 +167,16 @@ int TRawEventByteSource::GetEvent(TRawEvent& rawevent) {
 }
 
 int TRawEventByteSource::FillBuffer(size_t bytes_requested) {
+  // //std::cout << "UNBUFFERED READ" << std::endl;
+  // char* buf = (char*)malloc(bytes_requested);
+  // size_t bytes_read = ReadBytes(buf, bytes_requested);
+  // fCurrentBuffer = TSmartBuffer(buf, bytes_requested);
+  // if(bytes_read != bytes_requested){
+  //   return -2;
+  // } else {
+  //   return bytes_read;
+  // }
+
   if(fCurrentBuffer.GetSize() >= bytes_requested){
     return bytes_requested;
   }

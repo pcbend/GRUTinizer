@@ -9,9 +9,31 @@
 
 #define DEBUG_BRANDON 0
 
+
+int  const TCaesar::det_per_ring[] = {10,14,24,24,24, 24, 24, 24, 14, 10};
+char const TCaesar::ring_names[] = {'a','b','c','d','e','f','g','h', 'i','j'};
+
+int TCaesar::vsnchn_ring_map_energy[MAX_VSN][MAX_CHN] = {{0}};
+int TCaesar::vsnchn_ring_map_time[MAX_VSN][MAX_CHN] = {{0}};
+int TCaesar::vsnchn_det_map_energy[MAX_VSN][MAX_CHN] = {{0}};
+int TCaesar::vsnchn_det_map_time[MAX_VSN][MAX_CHN] = {{0}};
+double TCaesar::detector_positions[N_RINGS][MAX_DETS][3] = {{{0.0,0.0,0.0}}};
+
+bool TCaesar::filled_map = false;
+bool TCaesar::filled_det_pos = false;
 TCaesar::TCaesar() {
+  if (!filled_map){
+    ReadVSNMap(vsn_file_name);
+    filled_map = true;
+  }
+  if (!filled_det_pos){
+    ReadDetectorPositions(det_pos_file_name);
+    filled_det_pos = true;
+  }
   Clear();
 }
+
+
 
 TCaesar::~TCaesar(){ }
 
@@ -183,6 +205,8 @@ TCaesarHit& TCaesar::GetHit_VSNChannel(int vsn, int channel){
   output.SetAddress( (37<<24) +
 		     (vsn<<16) +
 		     (channel) );
+  output.SetDet(vsnchn_det_map_energy[vsn][channel] );
+  output.SetRing(vsnchn_ring_map_energy[vsn][channel]);
   return output;
 }
 
@@ -201,3 +225,124 @@ void TCaesar::InsertHit(const TDetectorHit& hit) {
   caesar_hits.emplace_back((TCaesarHit&)hit);
   fSize++;
 }
+
+void TCaesar::ReadDetectorPositions(std::string in_file_name){
+  std::ifstream input_file;
+  input_file.open(in_file_name.c_str());
+  std::string line;
+
+  char ring_name;
+  char pos_name; 
+  int det_id;
+  int ring_id;
+  int pos_id;
+  double pos;
+
+  while(std::getline(input_file,line)){
+    sscanf(line.c_str(), "Caesar.Ring.%c.pos_%c.%d:\t %lf", &ring_name, &pos_name, &det_id, &pos); 
+    det_id = det_id-1; //want det_id to start from 0
+    ring_id = ring_name - 'a';//forces ring_id to start from 0
+    pos_id = pos_name - 'x';//want pos_name to start from 0 at x
+    this->detector_positions[ring_id][det_id][pos_id] = pos;
+  }
+}
+
+void TCaesar::ReadVSNMap(std::string in_file_name){
+  //Note that in the VSN mapping file, VSN is referenced from 1 while the channel
+  //is referenced from 0.
+  
+  std::cout << "Mapping detectors <-> FERA modules"<< std::endl;
+  
+  for(int vsn=0; vsn<MAX_VSN; vsn++){
+    for(int chn=0; chn<MAX_CHN; chn++){
+      vsnchn_ring_map_energy[vsn][chn] = -1;
+      vsnchn_det_map_energy [vsn][chn] = -1;
+      vsnchn_ring_map_time[vsn][chn] = -1;
+      vsnchn_det_map_time [vsn][chn] = -1;
+    }
+  }
+
+  TEnv *map = new TEnv(in_file_name.c_str()); 
+  for(int ring=0; ring < N_RINGS; ring++){
+    for(int det=1; det <= det_per_ring[ring]; det++){
+      //cout << Form("Fera.Ring.%c.chn_en.%d",ring_names[ring],det) << "\t";
+      //cout << map->GetValue(Form("Fera.Ring.%c.chn_en.%d",ring_names[ring],det),-1) << endl;
+      
+      int vsn_e = map->GetValue(Form("Fera.Ring.%c.vsn_en.%d",ring_names[ring],det),-1);
+      int vsn_t = map->GetValue(Form("Fera.Ring.%c.vsn_ti.%d",ring_names[ring],det),-1);
+      int chn_e = map->GetValue(Form("Fera.Ring.%c.chn_en.%d",ring_names[ring],det),-1);
+      int chn_t = map->GetValue(Form("Fera.Ring.%c.chn_ti.%d",ring_names[ring],det),-1);
+      
+      
+      if((vsn_e != vsn_t) || (chn_e != chn_t))
+        std::cout << "  >>>>> WARNING: ring " << ring_names[ring] << " det "  << det << " has not equal mapping for time AND energy" << std::endl;
+      
+      vsn_e--;//forces vsn_e to be referennced from 0
+      if(vsn_e>-1 && chn_e>-1){
+        if(vsn_e < MAX_VSN &&  chn_e< MAX_CHN){
+          if(vsnchn_ring_map_energy[vsn_e][chn_e] == -1 || vsnchn_det_map_energy [vsn_e][chn_e] == -1){ // was not yet set
+            vsnchn_ring_map_energy[vsn_e][chn_e] = ring;
+            vsnchn_det_map_energy [vsn_e][chn_e] = det-1;//det runs now from 0
+          }
+          else{
+            std::cout << "  >>>>> Error of mapping detectors to VSN/CHN for energy!!!" << std::endl
+                 << "Ring " << ring_names[ring] << " "
+                 << "Det " << det << " "
+                 << "is assigned to VSN " << vsn_e+1 << " Chn " << chn_e
+                 << std::endl
+                 << "but this combination is already occupied by "
+                 << ring_names[vsnchn_ring_map_energy[vsn_e][chn_e]]
+                 << " Det " << vsnchn_det_map_energy [vsn_e][chn_e]
+                 << std::endl
+                 << "  >>>>> THIS DETECTOR IS OMITTED"
+                 << std::endl;
+          }
+        }// < max vsn/ch
+        else{
+          std::cout << "  >>>>> Error of mapping detectors to VSN/CHN for energy!!!" << std::endl
+               << "Ring " << ring_names[ring] 
+               << "Det " << det
+               << "is assigned to VSN " << vsn_e+1 << " Chn " << chn_e
+               << " exceeds limits VSN/chn of " << MAX_VSN << "/" 
+               << MAX_CHN << std::endl;
+
+        }
+      }//read a value
+      
+     vsn_t--;
+      if(vsn_t>-1 && chn_t>-1){
+        if(vsn_t < MAX_VSN &&  chn_t< MAX_CHN){
+          if(vsnchn_ring_map_time[vsn_t][chn_t] == -1 || vsnchn_det_map_time [vsn_t][chn_t] == -1){ // was not yet set
+            vsnchn_ring_map_time[vsn_t][chn_t] = ring;
+            vsnchn_det_map_time [vsn_t][chn_t] = det-1;//det runs now from 0
+          }
+          else{
+            std::cout << "  >>>>> Error of mapping detectors to VSN/CHN for energy!!!" << std::endl
+                 << "Ring " << ring_names[ring] << " "
+                 << "Det " << det << " "
+                 << "is assigned to VSN " << vsn_t+1 << " Chn " << chn_t
+                 << std::endl
+                 << "but this combination is already occupied by "
+                 << ring_names[vsnchn_ring_map_time[vsn_t][chn_t]]
+                 << " Det " << vsnchn_det_map_time [vsn_t][chn_t]
+                 << std::endl
+                 << "  >>>>> THIS DETECTOR IS OMITTED"
+                 << std::endl;
+          }
+        }// < max vsn/ch
+        else{
+          std::cout << "  >>>>> Error of mapping detectors to VSN/CHN for energy!!!" << std::endl
+               << "Ring " << ring_names[ring] 
+               << "Det " << det
+               << "is assigned to VSN " << vsn_t+1 << " Chn " << chn_t
+               << " exceeds limits VSN/chn of " << MAX_VSN << "/" 
+               << MAX_CHN << std::endl;
+
+        }
+      }//read a value
+      
+    }//det
+  }//rings
+  return;
+}
+

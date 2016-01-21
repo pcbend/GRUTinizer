@@ -1,67 +1,67 @@
 
 SEG01AP00 {
   Address: 0x01010200
-  EnergyCoeff: 2.005 0.127
+  EnergyCoeff: 0.667 0.127115
 }
 
 SEG02AP00 {
   Address: 0x01010201
-  EnergyCoeff: 2.516 0.087
+  EnergyCoeff: 1.059 0.086538
 }
 
 SEG03AP00 {
   Address: 0x01010202
-  EnergyCoeff: 1.569 0.125
+  EnergyCoeff: 0.086 0.125720
 }
 
 SEG04AP00 {
   Address: 0x01010203
-  EnergyCoeff: 2.149 0.133
+  EnergyCoeff: 0.287 0.133474
 }
 
 SEG05AP00 {
   Address: 0x01010204
-  EnergyCoeff: 1.778 0.118
+  EnergyCoeff: -0.563 0.117727
 }
 
 SEG06AP00 {
   Address: 0x01010205
-  EnergyCoeff: 2.596 0.129
+  EnergyCoeff: -0.940 0.129074
 }
 
 SEG07AP00 {
   Address: 0x01010206
-  EnergyCoeff: 3.943 0.125
+  EnergyCoeff: 2.586 0.125360
 }
 
 SEG08AP00 {
   Address: 0x01010207
-  EnergyCoeff: 2.044 0.132
+  EnergyCoeff: 1.605 0.136708
 }
 
 SEG09AP00 {
   Address: 0x01010208
-  EnergyCoeff: 1.749 0.132
+  EnergyCoeff: -0.356 0.132533
 }
 
 SEG10AP00 {
   Address: 0x01010209
-  EnergyCoeff: 6.174 0.124
+  EnergyCoeff: 0.264 0.124745
 }
 
 SEG11AP00 {
   Address: 0x0101020a
-  EnergyCoeff: 1.653 0.132
+  EnergyCoeff: -0.642 0.132343
 }
 
 SEG12AP00 {
   Address: 0x0101020b
-  EnergyCoeff: 1.326 0.132
+  EnergyCoeff: 0.479 0.130466
 }
 
 SEG13AP00 {
   Address: 0x0101020c
-  EnergyCoeff: 1.915 0.131
+  EnergyCoeff: 0.179 0.130874
 }
 
 SEG14AP00 {
@@ -71,2570 +71,2585 @@ SEG14AP00 {
 
 SEG15AP00 {
   Address: 0x0101020e
-  EnergyCoeff: 0.076 0.136
+  EnergyCoeff: 0.879 0.136149
 }
 
 SEG16AP00 {
   Address: 0x0101020f
-  EnergyCoeff: 2.284 0.128
+  EnergyCoeff: 1.613 0.127596
 }
 
-SEG01AN17 {
+// // The RF signal
+// SEG99AP00 {
+//   Address: 0x01030e00
+// }
+//
+// // Crate 3, Slot 14, Channel 6, dummy
+// SEG17AP00 {
+//   Address: 0x01030e06
+// }
+//
+// // Crate 3, Slot 14, Channel 9, dummy
+// SEG18AP00 {
+//   Address: 0x01030e09
+// }
+
+SEG01AN01 {
   Address: 0x01010300
   EnergyCoeff: 0 1
 }
 
-SEG01AN18 {
+SEG01AN02 {
   Address: 0x01010301
   EnergyCoeff: 0 1
 }
 
-SEG01AN19 {
+SEG01AN03 {
   Address: 0x01010302
   EnergyCoeff: 0 1
 }
 
-SEG01AN20 {
+SEG01AN04 {
   Address: 0x01010303
   EnergyCoeff: 0 1
 }
 
-SEG01AN21 {
+SEG01AN05 {
   Address: 0x01010304
   EnergyCoeff: 0 1
 }
 
-SEG01AN22 {
+SEG01AN06 {
   Address: 0x01010305
   EnergyCoeff: 0 1
 }
 
-SEG01AN23 {
+SEG01AN07 {
   Address: 0x01010306
   EnergyCoeff: 0 1
 }
 
-SEG01AN24 {
+SEG01AN08 {
   Address: 0x01010307
   EnergyCoeff: 0 1
 }
 
-SEG01AN25 {
+SEG01AN09 {
   Address: 0x01010308
   EnergyCoeff: 0 1
 }
 
-SEG01AN26 {
+SEG01AN10 {
   Address: 0x01010309
   EnergyCoeff: 0 1
 }
 
-SEG01AN27 {
+SEG01AN11 {
   Address: 0x0101030a
   EnergyCoeff: 0 1
 }
 
-SEG01AN28 {
+SEG01AN12 {
   Address: 0x0101030b
   EnergyCoeff: 0 1
 }
 
-SEG01AN29 {
+SEG01AN13 {
   Address: 0x0101030c
   EnergyCoeff: 0 1
 }
 
-SEG01AN30 {
+SEG01AN14 {
   Address: 0x0101030d
   EnergyCoeff: 0 1
 }
 
-SEG01AN31 {
+SEG01AN15 {
   Address: 0x0101030e
   EnergyCoeff: 0 1
 }
 
-SEG01AN32 {
+SEG01AN16 {
   Address: 0x0101030f
   EnergyCoeff: 0 1
 }
 
-SEG01AN01 {
+SEG01AN17 {
   Address: 0x01010400
   EnergyCoeff: 0 1
 }
 
-SEG01AN02 {
+SEG01AN18 {
   Address: 0x01010401
   EnergyCoeff: 0 1
 }
 
-SEG01AN03 {
+SEG01AN19 {
   Address: 0x01010402
   EnergyCoeff: 0 1
 }
 
-SEG01AN04 {
+SEG01AN20 {
   Address: 0x01010403
   EnergyCoeff: 0 1
 }
 
-SEG01AN05 {
+SEG01AN21 {
   Address: 0x01010404
   EnergyCoeff: 0 1
 }
 
-SEG01AN06 {
+SEG01AN22 {
   Address: 0x01010405
   EnergyCoeff: 0 1
 }
 
-SEG01AN07 {
+SEG01AN23 {
   Address: 0x01010406
   EnergyCoeff: 0 1
 }
 
-SEG01AN08 {
+SEG01AN24 {
   Address: 0x01010407
   EnergyCoeff: 0 1
 }
 
-SEG01AN09 {
+SEG01AN25 {
   Address: 0x01010408
   EnergyCoeff: 0 1
 }
 
-SEG01AN10 {
+SEG01AN26 {
   Address: 0x01010409
   EnergyCoeff: 0 1
 }
 
-SEG01AN11 {
+SEG01AN27 {
   Address: 0x0101040a
   EnergyCoeff: 0 1
 }
 
-SEG01AN12 {
+SEG01AN28 {
   Address: 0x0101040b
   EnergyCoeff: 0 1
 }
 
-SEG01AN13 {
+SEG01AN29 {
   Address: 0x0101040c
   EnergyCoeff: 0 1
 }
 
-SEG01AN14 {
+SEG01AN30 {
   Address: 0x0101040d
   EnergyCoeff: 0 1
 }
 
-SEG01AN15 {
+SEG01AN31 {
   Address: 0x0101040e
   EnergyCoeff: 0 1
 }
 
-SEG01AN16 {
+SEG01AN32 {
   Address: 0x0101040f
   EnergyCoeff: 0 1
 }
 
-SEG02AN17 {
+SEG02AN01 {
   Address: 0x01010500
   EnergyCoeff: 0 1
 }
 
-SEG02AN18 {
+SEG02AN02 {
   Address: 0x01010501
   EnergyCoeff: 0 1
 }
 
-SEG02AN19 {
+SEG02AN03 {
   Address: 0x01010502
   EnergyCoeff: 0 1
 }
 
-SEG02AN20 {
+SEG02AN04 {
   Address: 0x01010503
   EnergyCoeff: 0 1
 }
 
-SEG02AN21 {
+SEG02AN05 {
   Address: 0x01010504
   EnergyCoeff: 0 1
 }
 
-SEG02AN22 {
+SEG02AN06 {
   Address: 0x01010505
   EnergyCoeff: 0 1
 }
 
-SEG02AN23 {
+SEG02AN07 {
   Address: 0x01010506
   EnergyCoeff: 0 1
 }
 
-SEG02AN24 {
+SEG02AN08 {
   Address: 0x01010507
   EnergyCoeff: 0 1
 }
 
-SEG02AN25 {
+SEG02AN09 {
   Address: 0x01010508
   EnergyCoeff: 0 1
 }
 
-SEG02AN26 {
+SEG02AN10 {
   Address: 0x01010509
   EnergyCoeff: 0 1
 }
 
-SEG02AN27 {
+SEG02AN11 {
   Address: 0x0101050a
   EnergyCoeff: 0 1
 }
 
-SEG02AN28 {
+SEG02AN12 {
   Address: 0x0101050b
   EnergyCoeff: 0 1
 }
 
-SEG02AN29 {
+SEG02AN13 {
   Address: 0x0101050c
   EnergyCoeff: 0 1
 }
 
-SEG02AN30 {
+SEG02AN14 {
   Address: 0x0101050d
   EnergyCoeff: 0 1
 }
 
-SEG02AN31 {
+SEG02AN15 {
   Address: 0x0101050e
   EnergyCoeff: 0 1
 }
 
-SEG02AN32 {
+SEG02AN16 {
   Address: 0x0101050f
   EnergyCoeff: 0 1
 }
 
-SEG02AN01 {
+SEG02AN17 {
   Address: 0x01010600
   EnergyCoeff: 0 1
 }
 
-SEG02AN02 {
+SEG02AN18 {
   Address: 0x01010601
   EnergyCoeff: 0 1
 }
 
-SEG02AN03 {
+SEG02AN19 {
   Address: 0x01010602
   EnergyCoeff: 0 1
 }
 
-SEG02AN04 {
+SEG02AN20 {
   Address: 0x01010603
   EnergyCoeff: 0 1
 }
 
-SEG02AN05 {
+SEG02AN21 {
   Address: 0x01010604
   EnergyCoeff: 0 1
 }
 
-SEG02AN06 {
+SEG02AN22 {
   Address: 0x01010605
   EnergyCoeff: 0 1
 }
 
-SEG02AN07 {
+SEG02AN23 {
   Address: 0x01010606
   EnergyCoeff: 0 1
 }
 
-SEG02AN08 {
+SEG02AN24 {
   Address: 0x01010607
   EnergyCoeff: 0 1
 }
 
-SEG02AN09 {
+SEG02AN25 {
   Address: 0x01010608
   EnergyCoeff: 0 1
 }
 
-SEG02AN10 {
+SEG02AN26 {
   Address: 0x01010609
   EnergyCoeff: 0 1
 }
 
-SEG02AN11 {
+SEG02AN27 {
   Address: 0x0101060a
   EnergyCoeff: 0 1
 }
 
-SEG02AN12 {
+SEG02AN28 {
   Address: 0x0101060b
   EnergyCoeff: 0 1
 }
 
-SEG02AN13 {
+SEG02AN29 {
   Address: 0x0101060c
   EnergyCoeff: 0 1
 }
 
-SEG02AN14 {
+SEG02AN30 {
   Address: 0x0101060d
   EnergyCoeff: 0 1
 }
 
-SEG02AN15 {
+SEG02AN31 {
   Address: 0x0101060e
   EnergyCoeff: 0 1
 }
 
-SEG02AN16 {
+SEG02AN32 {
   Address: 0x0101060f
   EnergyCoeff: 0 1
 }
 
-SEG03AN17 {
+SEG03AN01 {
   Address: 0x01010700
   EnergyCoeff: 0 1
 }
 
-SEG03AN18 {
+SEG03AN02 {
   Address: 0x01010701
   EnergyCoeff: 0 1
 }
 
-SEG03AN19 {
+SEG03AN03 {
   Address: 0x01010702
   EnergyCoeff: 0 1
 }
 
-SEG03AN20 {
+SEG03AN04 {
   Address: 0x01010703
   EnergyCoeff: 0 1
 }
 
-SEG03AN21 {
+SEG03AN05 {
   Address: 0x01010704
   EnergyCoeff: 0 1
 }
 
-SEG03AN22 {
+SEG03AN06 {
   Address: 0x01010705
   EnergyCoeff: 0 1
 }
 
-SEG03AN23 {
+SEG03AN07 {
   Address: 0x01010706
   EnergyCoeff: 0 1
 }
 
-SEG03AN24 {
+SEG03AN08 {
   Address: 0x01010707
   EnergyCoeff: 0 1
 }
 
-SEG03AN25 {
+SEG03AN09 {
   Address: 0x01010708
   EnergyCoeff: 0 1
 }
 
-SEG03AN26 {
+SEG03AN10 {
   Address: 0x01010709
   EnergyCoeff: 0 1
 }
 
-SEG03AN27 {
+SEG03AN11 {
   Address: 0x0101070a
   EnergyCoeff: 0 1
 }
 
-SEG03AN28 {
+SEG03AN12 {
   Address: 0x0101070b
   EnergyCoeff: 0 1
 }
 
-SEG03AN29 {
+SEG03AN13 {
   Address: 0x0101070c
   EnergyCoeff: 0 1
 }
 
-SEG03AN30 {
+SEG03AN14 {
   Address: 0x0101070d
   EnergyCoeff: 0 1
 }
 
-SEG03AN31 {
+SEG03AN15 {
   Address: 0x0101070e
   EnergyCoeff: 0 1
 }
 
-SEG03AN32 {
+SEG03AN16 {
   Address: 0x0101070f
   EnergyCoeff: 0 1
 }
 
-SEG03AN01 {
+SEG03AN17 {
   Address: 0x01010800
   EnergyCoeff: 0 1
 }
 
-SEG03AN02 {
+SEG03AN18 {
   Address: 0x01010801
   EnergyCoeff: 0 1
 }
 
-SEG03AN03 {
+SEG03AN19 {
   Address: 0x01010802
   EnergyCoeff: 0 1
 }
 
-SEG03AN04 {
+SEG03AN20 {
   Address: 0x01010803
   EnergyCoeff: 0 1
 }
 
-SEG03AN05 {
+SEG03AN21 {
   Address: 0x01010804
   EnergyCoeff: 0 1
 }
 
-SEG03AN06 {
+SEG03AN22 {
   Address: 0x01010805
   EnergyCoeff: 0 1
 }
 
-SEG03AN07 {
+SEG03AN23 {
   Address: 0x01010806
   EnergyCoeff: 0 1
 }
 
-SEG03AN08 {
+SEG03AN24 {
   Address: 0x01010807
   EnergyCoeff: 0 1
 }
 
-SEG03AN09 {
+SEG03AN25 {
   Address: 0x01010808
   EnergyCoeff: 0 1
 }
 
-SEG03AN10 {
+SEG03AN26 {
   Address: 0x01010809
   EnergyCoeff: 0 1
 }
 
-SEG03AN11 {
+SEG03AN27 {
   Address: 0x0101080a
   EnergyCoeff: 0 1
 }
 
-SEG03AN12 {
+SEG03AN28 {
   Address: 0x0101080b
   EnergyCoeff: 0 1
 }
 
-SEG03AN13 {
+SEG03AN29 {
   Address: 0x0101080c
   EnergyCoeff: 0 1
 }
 
-SEG03AN14 {
+SEG03AN30 {
   Address: 0x0101080d
   EnergyCoeff: 0 1
 }
 
-SEG03AN15 {
+SEG03AN31 {
   Address: 0x0101080e
   EnergyCoeff: 0 1
 }
 
-SEG03AN16 {
+SEG03AN32 {
   Address: 0x0101080f
   EnergyCoeff: 0 1
 }
 
-SEG04AN17 {
+SEG04AN01 {
   Address: 0x01010900
   EnergyCoeff: 0 1
 }
 
-SEG04AN18 {
+SEG04AN02 {
   Address: 0x01010901
   EnergyCoeff: 0 1
 }
 
-SEG04AN19 {
+SEG04AN03 {
   Address: 0x01010902
   EnergyCoeff: 0 1
 }
 
-SEG04AN20 {
+SEG04AN04 {
   Address: 0x01010903
   EnergyCoeff: 0 1
 }
 
-SEG04AN21 {
+SEG04AN05 {
   Address: 0x01010904
   EnergyCoeff: 0 1
 }
 
-SEG04AN22 {
+SEG04AN06 {
   Address: 0x01010905
   EnergyCoeff: 0 1
 }
 
-SEG04AN23 {
+SEG04AN07 {
   Address: 0x01010906
   EnergyCoeff: 0 1
 }
 
-SEG04AN24 {
+SEG04AN08 {
   Address: 0x01010907
   EnergyCoeff: 0 1
 }
 
-SEG04AN25 {
+SEG04AN09 {
   Address: 0x01010908
   EnergyCoeff: 0 1
 }
 
-SEG04AN26 {
+SEG04AN10 {
   Address: 0x01010909
   EnergyCoeff: 0 1
 }
 
-SEG04AN27 {
+SEG04AN11 {
   Address: 0x0101090a
   EnergyCoeff: 0 1
 }
 
-SEG04AN28 {
+SEG04AN12 {
   Address: 0x0101090b
   EnergyCoeff: 0 1
 }
 
-SEG04AN29 {
+SEG04AN13 {
   Address: 0x0101090c
   EnergyCoeff: 0 1
 }
 
-SEG04AN30 {
+SEG04AN14 {
   Address: 0x0101090d
   EnergyCoeff: 0 1
 }
 
-SEG04AN31 {
+SEG04AN15 {
   Address: 0x0101090e
   EnergyCoeff: 0 1
 }
 
-SEG04AN32 {
+SEG04AN16 {
   Address: 0x0101090f
   EnergyCoeff: 0 1
 }
 
-SEG04AN01 {
+SEG04AN17 {
   Address: 0x01010a00
   EnergyCoeff: 0 1
 }
 
-SEG04AN02 {
+SEG04AN18 {
   Address: 0x01010a01
   EnergyCoeff: 0 1
 }
 
-SEG04AN03 {
+SEG04AN19 {
   Address: 0x01010a02
   EnergyCoeff: 0 1
 }
 
-SEG04AN04 {
+SEG04AN20 {
   Address: 0x01010a03
   EnergyCoeff: 0 1
 }
 
-SEG04AN05 {
+SEG04AN21 {
   Address: 0x01010a04
   EnergyCoeff: 0 1
 }
 
-SEG04AN06 {
+SEG04AN22 {
   Address: 0x01010a05
   EnergyCoeff: 0 1
 }
 
-SEG04AN07 {
+SEG04AN23 {
   Address: 0x01010a06
   EnergyCoeff: 0 1
 }
 
-SEG04AN08 {
+SEG04AN24 {
   Address: 0x01010a07
   EnergyCoeff: 0 1
 }
 
-SEG04AN09 {
+SEG04AN25 {
   Address: 0x01010a08
   EnergyCoeff: 0 1
 }
 
-SEG04AN10 {
+SEG04AN26 {
   Address: 0x01010a09
   EnergyCoeff: 0 1
 }
 
-SEG04AN11 {
+SEG04AN27 {
   Address: 0x01010a0a
   EnergyCoeff: 0 1
 }
 
-SEG04AN12 {
+SEG04AN28 {
   Address: 0x01010a0b
   EnergyCoeff: 0 1
 }
 
-SEG04AN13 {
+SEG04AN29 {
   Address: 0x01010a0c
   EnergyCoeff: 0 1
 }
 
-SEG04AN14 {
+SEG04AN30 {
   Address: 0x01010a0d
   EnergyCoeff: 0 1
 }
 
-SEG04AN15 {
+SEG04AN31 {
   Address: 0x01010a0e
   EnergyCoeff: 0 1
 }
 
-SEG04AN16 {
+SEG04AN32 {
   Address: 0x01010a0f
   EnergyCoeff: 0 1
 }
 
-SEG05AN17 {
+SEG05AN01 {
   Address: 0x01020200
   EnergyCoeff: 0 1
 }
 
-SEG05AN18 {
+SEG05AN02 {
   Address: 0x01020201
   EnergyCoeff: 0 1
 }
 
-SEG05AN19 {
+SEG05AN03 {
   Address: 0x01020202
   EnergyCoeff: 0 1
 }
 
-SEG05AN20 {
+SEG05AN04 {
   Address: 0x01020203
   EnergyCoeff: 0 1
 }
 
-SEG05AN21 {
+SEG05AN05 {
   Address: 0x01020204
   EnergyCoeff: 0 1
 }
 
-SEG05AN22 {
+SEG05AN06 {
   Address: 0x01020205
   EnergyCoeff: 0 1
 }
 
-SEG05AN23 {
+SEG05AN07 {
   Address: 0x01020206
   EnergyCoeff: 0 1
 }
 
-SEG05AN24 {
+SEG05AN08 {
   Address: 0x01020207
   EnergyCoeff: 0 1
 }
 
-SEG05AN25 {
+SEG05AN09 {
   Address: 0x01020208
   EnergyCoeff: 0 1
 }
 
-SEG05AN26 {
+SEG05AN10 {
   Address: 0x01020209
   EnergyCoeff: 0 1
 }
 
-SEG05AN27 {
+SEG05AN11 {
   Address: 0x0102020a
   EnergyCoeff: 0 1
 }
 
-SEG05AN28 {
+SEG05AN12 {
   Address: 0x0102020b
   EnergyCoeff: 0 1
 }
 
-SEG05AN29 {
+SEG05AN13 {
   Address: 0x0102020c
   EnergyCoeff: 0 1
 }
 
-SEG05AN30 {
+SEG05AN14 {
   Address: 0x0102020d
   EnergyCoeff: 0 1
 }
 
-SEG05AN31 {
+SEG05AN15 {
   Address: 0x0102020e
   EnergyCoeff: 0 1
 }
 
-SEG05AN32 {
+SEG05AN16 {
   Address: 0x0102020f
   EnergyCoeff: 0 1
 }
 
-SEG05AN01 {
+SEG05AN17 {
   Address: 0x01020300
   EnergyCoeff: 0 1
 }
 
-SEG05AN02 {
+SEG05AN18 {
   Address: 0x01020301
   EnergyCoeff: 0 1
 }
 
-SEG05AN03 {
+SEG05AN19 {
   Address: 0x01020302
   EnergyCoeff: 0 1
 }
 
-SEG05AN04 {
+SEG05AN20 {
   Address: 0x01020303
   EnergyCoeff: 0 1
 }
 
-SEG05AN05 {
+SEG05AN21 {
   Address: 0x01020304
   EnergyCoeff: 0 1
 }
 
-SEG05AN06 {
+SEG05AN22 {
   Address: 0x01020305
   EnergyCoeff: 0 1
 }
 
-SEG05AN07 {
+SEG05AN23 {
   Address: 0x01020306
   EnergyCoeff: 0 1
 }
 
-SEG05AN08 {
+SEG05AN24 {
   Address: 0x01020307
   EnergyCoeff: 0 1
 }
 
-SEG05AN09 {
+SEG05AN25 {
   Address: 0x01020308
   EnergyCoeff: 0 1
 }
 
-SEG05AN10 {
+SEG05AN26 {
   Address: 0x01020309
   EnergyCoeff: 0 1
 }
 
-SEG05AN11 {
+SEG05AN27 {
   Address: 0x0102030a
   EnergyCoeff: 0 1
 }
 
-SEG05AN12 {
+SEG05AN28 {
   Address: 0x0102030b
   EnergyCoeff: 0 1
 }
 
-SEG05AN13 {
+SEG05AN29 {
   Address: 0x0102030c
   EnergyCoeff: 0 1
 }
 
-SEG05AN14 {
+SEG05AN30 {
   Address: 0x0102030d
   EnergyCoeff: 0 1
 }
 
-SEG05AN15 {
+SEG05AN31 {
   Address: 0x0102030e
   EnergyCoeff: 0 1
 }
 
-SEG05AN16 {
+SEG05AN32 {
   Address: 0x0102030f
   EnergyCoeff: 0 1
 }
 
-SEG06AN17 {
+SEG06AN01 {
   Address: 0x01020400
   EnergyCoeff: 0 1
 }
 
-SEG06AN18 {
+SEG06AN02 {
   Address: 0x01020401
   EnergyCoeff: 0 1
 }
 
-SEG06AN19 {
+SEG06AN03 {
   Address: 0x01020402
   EnergyCoeff: 0 1
 }
 
-SEG06AN20 {
+SEG06AN04 {
   Address: 0x01020403
   EnergyCoeff: 0 1
 }
 
-SEG06AN21 {
+SEG06AN05 {
   Address: 0x01020404
   EnergyCoeff: 0 1
 }
 
-SEG06AN22 {
+SEG06AN06 {
   Address: 0x01020405
   EnergyCoeff: 0 1
 }
 
-SEG06AN23 {
+SEG06AN07 {
   Address: 0x01020406
   EnergyCoeff: 0 1
 }
 
-SEG06AN24 {
+SEG06AN08 {
   Address: 0x01020407
   EnergyCoeff: 0 1
 }
 
-SEG06AN25 {
+SEG06AN09 {
   Address: 0x01020408
   EnergyCoeff: 0 1
 }
 
-SEG06AN26 {
+SEG06AN10 {
   Address: 0x01020409
   EnergyCoeff: 0 1
 }
 
-SEG06AN27 {
+SEG06AN11 {
   Address: 0x0102040a
   EnergyCoeff: 0 1
 }
 
-SEG06AN28 {
+SEG06AN12 {
   Address: 0x0102040b
   EnergyCoeff: 0 1
 }
 
-SEG06AN29 {
+SEG06AN13 {
   Address: 0x0102040c
   EnergyCoeff: 0 1
 }
 
-SEG06AN30 {
+SEG06AN14 {
   Address: 0x0102040d
   EnergyCoeff: 0 1
 }
 
-SEG06AN31 {
+SEG06AN15 {
   Address: 0x0102040e
   EnergyCoeff: 0 1
 }
 
-SEG06AN32 {
+SEG06AN16 {
   Address: 0x0102040f
   EnergyCoeff: 0 1
 }
 
-SEG06AN01 {
+SEG06AN17 {
   Address: 0x01020500
   EnergyCoeff: 0 1
 }
 
-SEG06AN02 {
+SEG06AN18 {
   Address: 0x01020501
   EnergyCoeff: 0 1
 }
 
-SEG06AN03 {
+SEG06AN19 {
   Address: 0x01020502
   EnergyCoeff: 0 1
 }
 
-SEG06AN04 {
+SEG06AN20 {
   Address: 0x01020503
   EnergyCoeff: 0 1
 }
 
-SEG06AN05 {
+SEG06AN21 {
   Address: 0x01020504
   EnergyCoeff: 0 1
 }
 
-SEG06AN06 {
+SEG06AN22 {
   Address: 0x01020505
   EnergyCoeff: 0 1
 }
 
-SEG06AN07 {
+SEG06AN23 {
   Address: 0x01020506
   EnergyCoeff: 0 1
 }
 
-SEG06AN08 {
+SEG06AN24 {
   Address: 0x01020507
   EnergyCoeff: 0 1
 }
 
-SEG06AN09 {
+SEG06AN25 {
   Address: 0x01020508
   EnergyCoeff: 0 1
 }
 
-SEG06AN10 {
+SEG06AN26 {
   Address: 0x01020509
   EnergyCoeff: 0 1
 }
 
-SEG06AN11 {
+SEG06AN27 {
   Address: 0x0102050a
   EnergyCoeff: 0 1
 }
 
-SEG06AN12 {
+SEG06AN28 {
   Address: 0x0102050b
   EnergyCoeff: 0 1
 }
 
-SEG06AN13 {
+SEG06AN29 {
   Address: 0x0102050c
   EnergyCoeff: 0 1
 }
 
-SEG06AN14 {
+SEG06AN30 {
   Address: 0x0102050d
   EnergyCoeff: 0 1
 }
 
-SEG06AN15 {
+SEG06AN31 {
   Address: 0x0102050e
   EnergyCoeff: 0 1
 }
 
-SEG06AN16 {
+SEG06AN32 {
   Address: 0x0102050f
   EnergyCoeff: 0 1
 }
 
-SEG07AN17 {
+SEG07AN01 {
   Address: 0x01020600
   EnergyCoeff: 0 1
 }
 
-SEG07AN18 {
+SEG07AN02 {
   Address: 0x01020601
   EnergyCoeff: 0 1
 }
 
-SEG07AN19 {
+SEG07AN03 {
   Address: 0x01020602
   EnergyCoeff: 0 1
 }
 
-SEG07AN20 {
+SEG07AN04 {
   Address: 0x01020603
   EnergyCoeff: 0 1
 }
 
-SEG07AN21 {
+SEG07AN05 {
   Address: 0x01020604
   EnergyCoeff: 0 1
 }
 
-SEG07AN22 {
+SEG07AN06 {
   Address: 0x01020605
   EnergyCoeff: 0 1
 }
 
-SEG07AN23 {
+SEG07AN07 {
   Address: 0x01020606
   EnergyCoeff: 0 1
 }
 
-SEG07AN24 {
+SEG07AN08 {
   Address: 0x01020607
   EnergyCoeff: 0 1
 }
 
-SEG07AN25 {
+SEG07AN09 {
   Address: 0x01020608
   EnergyCoeff: 0 1
 }
 
-SEG07AN26 {
+SEG07AN10 {
   Address: 0x01020609
   EnergyCoeff: 0 1
 }
 
-SEG07AN27 {
+SEG07AN11 {
   Address: 0x0102060a
   EnergyCoeff: 0 1
 }
 
-SEG07AN28 {
+SEG07AN12 {
   Address: 0x0102060b
   EnergyCoeff: 0 1
 }
 
-SEG07AN29 {
+SEG07AN13 {
   Address: 0x0102060c
   EnergyCoeff: 0 1
 }
 
-SEG07AN30 {
+SEG07AN14 {
   Address: 0x0102060d
   EnergyCoeff: 0 1
 }
 
-SEG07AN31 {
+SEG07AN15 {
   Address: 0x0102060e
   EnergyCoeff: 0 1
 }
 
-SEG07AN32 {
+SEG07AN16 {
   Address: 0x0102060f
   EnergyCoeff: 0 1
 }
 
-SEG07AN01 {
+SEG07AN17 {
   Address: 0x01020700
   EnergyCoeff: 0 1
 }
 
-SEG07AN02 {
+SEG07AN18 {
   Address: 0x01020701
   EnergyCoeff: 0 1
 }
 
-SEG07AN03 {
+SEG07AN19 {
   Address: 0x01020702
   EnergyCoeff: 0 1
 }
 
-SEG07AN04 {
+SEG07AN20 {
   Address: 0x01020703
   EnergyCoeff: 0 1
 }
 
-SEG07AN05 {
+SEG07AN21 {
   Address: 0x01020704
   EnergyCoeff: 0 1
 }
 
-SEG07AN06 {
+SEG07AN22 {
   Address: 0x01020705
   EnergyCoeff: 0 1
 }
 
-SEG07AN07 {
+SEG07AN23 {
   Address: 0x01020706
   EnergyCoeff: 0 1
 }
 
-SEG07AN08 {
+SEG07AN24 {
   Address: 0x01020707
   EnergyCoeff: 0 1
 }
 
-SEG07AN09 {
+SEG07AN25 {
   Address: 0x01020708
   EnergyCoeff: 0 1
 }
 
-SEG07AN10 {
+SEG07AN26 {
   Address: 0x01020709
   EnergyCoeff: 0 1
 }
 
-SEG07AN11 {
+SEG07AN27 {
   Address: 0x0102070a
   EnergyCoeff: 0 1
 }
 
-SEG07AN12 {
+SEG07AN28 {
   Address: 0x0102070b
   EnergyCoeff: 0 1
 }
 
-SEG07AN13 {
+SEG07AN29 {
   Address: 0x0102070c
   EnergyCoeff: 0 1
 }
 
-SEG07AN14 {
+SEG07AN30 {
   Address: 0x0102070d
   EnergyCoeff: 0 1
 }
 
-SEG07AN15 {
+SEG07AN31 {
   Address: 0x0102070e
   EnergyCoeff: 0 1
 }
 
-SEG07AN16 {
+SEG07AN32 {
   Address: 0x0102070f
   EnergyCoeff: 0 1
 }
 
-SEG08AN17 {
+SEG08AN01 {
   Address: 0x01020800
   EnergyCoeff: 0 1
 }
 
-SEG08AN18 {
+SEG08AN02 {
   Address: 0x01020801
   EnergyCoeff: 0 1
 }
 
-SEG08AN19 {
+SEG08AN03 {
   Address: 0x01020802
   EnergyCoeff: 0 1
 }
 
-SEG08AN20 {
+SEG08AN04 {
   Address: 0x01020803
   EnergyCoeff: 0 1
 }
 
-SEG08AN21 {
+SEG08AN05 {
   Address: 0x01020804
   EnergyCoeff: 0 1
 }
 
-SEG08AN22 {
+SEG08AN06 {
   Address: 0x01020805
   EnergyCoeff: 0 1
 }
 
-SEG08AN23 {
+SEG08AN07 {
   Address: 0x01020806
   EnergyCoeff: 0 1
 }
 
-SEG08AN24 {
+SEG08AN08 {
   Address: 0x01020807
   EnergyCoeff: 0 1
 }
 
-SEG08AN25 {
+SEG08AN09 {
   Address: 0x01020808
   EnergyCoeff: 0 1
 }
 
-SEG08AN26 {
+SEG08AN10 {
   Address: 0x01020809
   EnergyCoeff: 0 1
 }
 
-SEG08AN27 {
+SEG08AN11 {
   Address: 0x0102080a
   EnergyCoeff: 0 1
 }
 
-SEG08AN28 {
+SEG08AN12 {
   Address: 0x0102080b
   EnergyCoeff: 0 1
 }
 
-SEG08AN29 {
+SEG08AN13 {
   Address: 0x0102080c
   EnergyCoeff: 0 1
 }
 
-SEG08AN30 {
+SEG08AN14 {
   Address: 0x0102080d
   EnergyCoeff: 0 1
 }
 
-SEG08AN31 {
+SEG08AN15 {
   Address: 0x0102080e
   EnergyCoeff: 0 1
 }
 
-SEG08AN32 {
+SEG08AN16 {
   Address: 0x0102080f
   EnergyCoeff: 0 1
 }
 
-SEG08AN01 {
+SEG08AN17 {
   Address: 0x01020900
   EnergyCoeff: 0 1
 }
 
-SEG08AN02 {
+SEG08AN18 {
   Address: 0x01020901
   EnergyCoeff: 0 1
 }
 
-SEG08AN03 {
+SEG08AN19 {
   Address: 0x01020902
   EnergyCoeff: 0 1
 }
 
-SEG08AN04 {
+SEG08AN20 {
   Address: 0x01020903
   EnergyCoeff: 0 1
 }
 
-SEG08AN05 {
+SEG08AN21 {
   Address: 0x01020904
   EnergyCoeff: 0 1
 }
 
-SEG08AN06 {
+SEG08AN22 {
   Address: 0x01020905
   EnergyCoeff: 0 1
 }
 
-SEG08AN07 {
+SEG08AN23 {
   Address: 0x01020906
   EnergyCoeff: 0 1
 }
 
-SEG08AN08 {
+SEG08AN24 {
   Address: 0x01020907
   EnergyCoeff: 0 1
 }
 
-SEG08AN09 {
+SEG08AN25 {
   Address: 0x01020908
   EnergyCoeff: 0 1
 }
 
-SEG08AN10 {
+SEG08AN26 {
   Address: 0x01020909
   EnergyCoeff: 0 1
 }
 
-SEG08AN11 {
+SEG08AN27 {
   Address: 0x0102090a
   EnergyCoeff: 0 1
 }
 
-SEG08AN12 {
+SEG08AN28 {
   Address: 0x0102090b
   EnergyCoeff: 0 1
 }
 
-SEG08AN13 {
+SEG08AN29 {
   Address: 0x0102090c
   EnergyCoeff: 0 1
 }
 
-SEG08AN14 {
+SEG08AN30 {
   Address: 0x0102090d
   EnergyCoeff: 0 1
 }
 
-SEG08AN15 {
+SEG08AN31 {
   Address: 0x0102090e
   EnergyCoeff: 0 1
 }
 
-SEG08AN16 {
+SEG08AN32 {
   Address: 0x0102090f
   EnergyCoeff: 0 1
 }
 
-SEG09AN17 {
+SEG09AN01 {
   Address: 0x01020a00
   EnergyCoeff: 0 1
 }
 
-SEG09AN18 {
+SEG09AN02 {
   Address: 0x01020a01
   EnergyCoeff: 0 1
 }
 
-SEG09AN19 {
+SEG09AN03 {
   Address: 0x01020a02
   EnergyCoeff: 0 1
 }
 
-SEG09AN20 {
+SEG09AN04 {
   Address: 0x01020a03
   EnergyCoeff: 0 1
 }
 
-SEG09AN21 {
+SEG09AN05 {
   Address: 0x01020a04
   EnergyCoeff: 0 1
 }
 
-SEG09AN22 {
+SEG09AN06 {
   Address: 0x01020a05
   EnergyCoeff: 0 1
 }
 
-SEG09AN23 {
+SEG09AN07 {
   Address: 0x01020a06
   EnergyCoeff: 0 1
 }
 
-SEG09AN24 {
+SEG09AN08 {
   Address: 0x01020a07
   EnergyCoeff: 0 1
 }
 
-SEG09AN25 {
+SEG09AN09 {
   Address: 0x01020a08
   EnergyCoeff: 0 1
 }
 
-SEG09AN26 {
+SEG09AN10 {
   Address: 0x01020a09
   EnergyCoeff: 0 1
 }
 
-SEG09AN27 {
+SEG09AN11 {
   Address: 0x01020a0a
   EnergyCoeff: 0 1
 }
 
-SEG09AN28 {
+SEG09AN12 {
   Address: 0x01020a0b
   EnergyCoeff: 0 1
 }
 
-SEG09AN29 {
+SEG09AN13 {
   Address: 0x01020a0c
   EnergyCoeff: 0 1
 }
 
-SEG09AN30 {
+SEG09AN14 {
   Address: 0x01020a0d
   EnergyCoeff: 0 1
 }
 
-SEG09AN31 {
+SEG09AN15 {
   Address: 0x01020a0e
   EnergyCoeff: 0 1
 }
 
-SEG09AN32 {
+SEG09AN16 {
   Address: 0x01020a0f
   EnergyCoeff: 0 1
 }
 
-SEG09AN01 {
+SEG09AN17 {
   Address: 0x01020b00
   EnergyCoeff: 0 1
 }
 
-SEG09AN02 {
+SEG09AN18 {
   Address: 0x01020b01
   EnergyCoeff: 0 1
 }
 
-SEG09AN03 {
+SEG09AN19 {
   Address: 0x01020b02
   EnergyCoeff: 0 1
 }
 
-SEG09AN04 {
+SEG09AN20 {
   Address: 0x01020b03
   EnergyCoeff: 0 1
 }
 
-SEG09AN05 {
+SEG09AN21 {
   Address: 0x01020b04
   EnergyCoeff: 0 1
 }
 
-SEG09AN06 {
+SEG09AN22 {
   Address: 0x01020b05
   EnergyCoeff: 0 1
 }
 
-SEG09AN07 {
+SEG09AN23 {
   Address: 0x01020b06
   EnergyCoeff: 0 1
 }
 
-SEG09AN08 {
+SEG09AN24 {
   Address: 0x01020b07
   EnergyCoeff: 0 1
 }
 
-SEG09AN09 {
+SEG09AN25 {
   Address: 0x01020b08
   EnergyCoeff: 0 1
 }
 
-SEG09AN10 {
+SEG09AN26 {
   Address: 0x01020b09
   EnergyCoeff: 0 1
 }
 
-SEG09AN11 {
+SEG09AN27 {
   Address: 0x01020b0a
   EnergyCoeff: 0 1
 }
 
-SEG09AN12 {
+SEG09AN28 {
   Address: 0x01020b0b
   EnergyCoeff: 0 1
 }
 
-SEG09AN13 {
+SEG09AN29 {
   Address: 0x01020b0c
   EnergyCoeff: 0 1
 }
 
-SEG09AN14 {
+SEG09AN30 {
   Address: 0x01020b0d
   EnergyCoeff: 0 1
 }
 
-SEG09AN15 {
+SEG09AN31 {
   Address: 0x01020b0e
   EnergyCoeff: 0 1
 }
 
-SEG09AN16 {
+SEG09AN32 {
   Address: 0x01020b0f
   EnergyCoeff: 0 1
 }
 
-SEG10AN17 {
+SEG10AN01 {
   Address: 0x01020c00
   EnergyCoeff: 0 1
 }
 
-SEG10AN18 {
+SEG10AN02 {
   Address: 0x01020c01
   EnergyCoeff: 0 1
 }
 
-SEG10AN19 {
+SEG10AN03 {
   Address: 0x01020c02
   EnergyCoeff: 0 1
 }
 
-SEG10AN20 {
+SEG10AN04 {
   Address: 0x01020c03
   EnergyCoeff: 0 1
 }
 
-SEG10AN21 {
+SEG10AN05 {
   Address: 0x01020c04
   EnergyCoeff: 0 1
 }
 
-SEG10AN22 {
+SEG10AN06 {
   Address: 0x01020c05
   EnergyCoeff: 0 1
 }
 
-SEG10AN23 {
+SEG10AN07 {
   Address: 0x01020c06
   EnergyCoeff: 0 1
 }
 
-SEG10AN24 {
+SEG10AN08 {
   Address: 0x01020c07
   EnergyCoeff: 0 1
 }
 
-SEG10AN25 {
+SEG10AN09 {
   Address: 0x01020c08
   EnergyCoeff: 0 1
 }
 
-SEG10AN26 {
+SEG10AN10 {
   Address: 0x01020c09
   EnergyCoeff: 0 1
 }
 
-SEG10AN27 {
+SEG10AN11 {
   Address: 0x01020c0a
   EnergyCoeff: 0 1
 }
 
-SEG10AN28 {
+SEG10AN12 {
   Address: 0x01020c0b
   EnergyCoeff: 0 1
 }
 
-SEG10AN29 {
+SEG10AN13 {
   Address: 0x01020c0c
   EnergyCoeff: 0 1
 }
 
-SEG10AN30 {
+SEG10AN14 {
   Address: 0x01020c0d
   EnergyCoeff: 0 1
 }
 
-SEG10AN31 {
+SEG10AN15 {
   Address: 0x01020c0e
   EnergyCoeff: 0 1
 }
 
-SEG10AN32 {
+SEG10AN16 {
   Address: 0x01020c0f
   EnergyCoeff: 0 1
 }
 
-SEG10AN01 {
+SEG10AN17 {
   Address: 0x01020d00
   EnergyCoeff: 0 1
 }
 
-SEG10AN02 {
+SEG10AN18 {
   Address: 0x01020d01
   EnergyCoeff: 0 1
 }
 
-SEG10AN03 {
+SEG10AN19 {
   Address: 0x01020d02
   EnergyCoeff: 0 1
 }
 
-SEG10AN04 {
+SEG10AN20 {
   Address: 0x01020d03
   EnergyCoeff: 0 1
 }
 
-SEG10AN05 {
+SEG10AN21 {
   Address: 0x01020d04
   EnergyCoeff: 0 1
 }
 
-SEG10AN06 {
+SEG10AN22 {
   Address: 0x01020d05
   EnergyCoeff: 0 1
 }
 
-SEG10AN07 {
+SEG10AN23 {
   Address: 0x01020d06
   EnergyCoeff: 0 1
 }
 
-SEG10AN08 {
+SEG10AN24 {
   Address: 0x01020d07
   EnergyCoeff: 0 1
 }
 
-SEG10AN09 {
+SEG10AN25 {
   Address: 0x01020d08
   EnergyCoeff: 0 1
 }
 
-SEG10AN10 {
+SEG10AN26 {
   Address: 0x01020d09
   EnergyCoeff: 0 1
 }
 
-SEG10AN11 {
+SEG10AN27 {
   Address: 0x01020d0a
   EnergyCoeff: 0 1
 }
 
-SEG10AN12 {
+SEG10AN28 {
   Address: 0x01020d0b
   EnergyCoeff: 0 1
 }
 
-SEG10AN13 {
+SEG10AN29 {
   Address: 0x01020d0c
   EnergyCoeff: 0 1
 }
 
-SEG10AN14 {
+SEG10AN30 {
   Address: 0x01020d0d
   EnergyCoeff: 0 1
 }
 
-SEG10AN15 {
+SEG10AN31 {
   Address: 0x01020d0e
   EnergyCoeff: 0 1
 }
 
-SEG10AN16 {
+SEG10AN32 {
   Address: 0x01020d0f
   EnergyCoeff: 0 1
 }
 
-SEG11AN17 {
+SEG11AN01 {
   Address: 0x01030200
   EnergyCoeff: 0 1
 }
 
-SEG11AN18 {
+SEG11AN02 {
   Address: 0x01030201
   EnergyCoeff: 0 1
 }
 
-SEG11AN19 {
+SEG11AN03 {
   Address: 0x01030202
   EnergyCoeff: 0 1
 }
 
-SEG11AN20 {
+SEG11AN04 {
   Address: 0x01030203
   EnergyCoeff: 0 1
 }
 
-SEG11AN21 {
+SEG11AN05 {
   Address: 0x01030204
   EnergyCoeff: 0 1
 }
 
-SEG11AN22 {
+SEG11AN06 {
   Address: 0x01030205
   EnergyCoeff: 0 1
 }
 
-SEG11AN23 {
+SEG11AN07 {
   Address: 0x01030206
   EnergyCoeff: 0 1
 }
 
-SEG11AN24 {
+SEG11AN08 {
   Address: 0x01030207
   EnergyCoeff: 0 1
 }
 
-SEG11AN25 {
+SEG11AN09 {
   Address: 0x01030208
   EnergyCoeff: 0 1
 }
 
-SEG11AN26 {
+SEG11AN10 {
   Address: 0x01030209
   EnergyCoeff: 0 1
 }
 
-SEG11AN27 {
+SEG11AN11 {
   Address: 0x0103020a
   EnergyCoeff: 0 1
 }
 
-SEG11AN28 {
+SEG11AN12 {
   Address: 0x0103020b
   EnergyCoeff: 0 1
 }
 
-SEG11AN29 {
+SEG11AN13 {
   Address: 0x0103020c
   EnergyCoeff: 0 1
 }
 
-SEG11AN30 {
+SEG11AN14 {
   Address: 0x0103020d
   EnergyCoeff: 0 1
 }
 
-SEG11AN31 {
+SEG11AN15 {
   Address: 0x0103020e
   EnergyCoeff: 0 1
 }
 
-SEG11AN32 {
+SEG11AN16 {
   Address: 0x0103020f
   EnergyCoeff: 0 1
 }
 
-SEG11AN01 {
+SEG11AN17 {
   Address: 0x01030300
   EnergyCoeff: 0 1
 }
 
-SEG11AN02 {
+SEG11AN18 {
   Address: 0x01030301
   EnergyCoeff: 0 1
 }
 
-SEG11AN03 {
+SEG11AN19 {
   Address: 0x01030302
   EnergyCoeff: 0 1
 }
 
-SEG11AN04 {
+SEG11AN20 {
   Address: 0x01030303
   EnergyCoeff: 0 1
 }
 
-SEG11AN05 {
+SEG11AN21 {
   Address: 0x01030304
   EnergyCoeff: 0 1
 }
 
-SEG11AN06 {
+SEG11AN22 {
   Address: 0x01030305
   EnergyCoeff: 0 1
 }
 
-SEG11AN07 {
+SEG11AN23 {
   Address: 0x01030306
   EnergyCoeff: 0 1
 }
 
-SEG11AN08 {
+SEG11AN24 {
   Address: 0x01030307
   EnergyCoeff: 0 1
 }
 
-SEG11AN09 {
+SEG11AN25 {
   Address: 0x01030308
   EnergyCoeff: 0 1
 }
 
-SEG11AN10 {
+SEG11AN26 {
   Address: 0x01030309
   EnergyCoeff: 0 1
 }
 
-SEG11AN11 {
+SEG11AN27 {
   Address: 0x0103030a
   EnergyCoeff: 0 1
 }
 
-SEG11AN12 {
+SEG11AN28 {
   Address: 0x0103030b
   EnergyCoeff: 0 1
 }
 
-SEG11AN13 {
+SEG11AN29 {
   Address: 0x0103030c
   EnergyCoeff: 0 1
 }
 
-SEG11AN14 {
+SEG11AN30 {
   Address: 0x0103030d
   EnergyCoeff: 0 1
 }
 
-SEG11AN15 {
+SEG11AN31 {
   Address: 0x0103030e
   EnergyCoeff: 0 1
 }
 
-SEG11AN16 {
+SEG11AN32 {
   Address: 0x0103030f
   EnergyCoeff: 0 1
 }
 
-SEG12AN17 {
+SEG12AN01 {
   Address: 0x01030400
   EnergyCoeff: 0 1
 }
 
-SEG12AN18 {
+SEG12AN02 {
   Address: 0x01030401
   EnergyCoeff: 0 1
 }
 
-SEG12AN19 {
+SEG12AN03 {
   Address: 0x01030402
   EnergyCoeff: 0 1
 }
 
-SEG12AN20 {
+SEG12AN04 {
   Address: 0x01030403
   EnergyCoeff: 0 1
 }
 
-SEG12AN21 {
+SEG12AN05 {
   Address: 0x01030404
   EnergyCoeff: 0 1
 }
 
-SEG12AN22 {
+SEG12AN06 {
   Address: 0x01030405
   EnergyCoeff: 0 1
 }
 
-SEG12AN23 {
+SEG12AN07 {
   Address: 0x01030406
   EnergyCoeff: 0 1
 }
 
-SEG12AN24 {
+SEG12AN08 {
   Address: 0x01030407
   EnergyCoeff: 0 1
 }
 
-SEG12AN25 {
+SEG12AN09 {
   Address: 0x01030408
   EnergyCoeff: 0 1
 }
 
-SEG12AN26 {
+SEG12AN10 {
   Address: 0x01030409
   EnergyCoeff: 0 1
 }
 
-SEG12AN27 {
+SEG12AN11 {
   Address: 0x0103040a
   EnergyCoeff: 0 1
 }
 
-SEG12AN28 {
+SEG12AN12 {
   Address: 0x0103040b
   EnergyCoeff: 0 1
 }
 
-SEG12AN29 {
+SEG12AN13 {
   Address: 0x0103040c
   EnergyCoeff: 0 1
 }
 
-SEG12AN30 {
+SEG12AN14 {
   Address: 0x0103040d
   EnergyCoeff: 0 1
 }
 
-SEG12AN31 {
+SEG12AN15 {
   Address: 0x0103040e
   EnergyCoeff: 0 1
 }
 
-SEG12AN32 {
+SEG12AN16 {
   Address: 0x0103040f
   EnergyCoeff: 0 1
 }
 
-SEG12AN01 {
+SEG12AN17 {
   Address: 0x01030500
   EnergyCoeff: 0 1
 }
 
-SEG12AN02 {
+SEG12AN18 {
   Address: 0x01030501
   EnergyCoeff: 0 1
 }
 
-SEG12AN03 {
+SEG12AN19 {
   Address: 0x01030502
   EnergyCoeff: 0 1
 }
 
-SEG12AN04 {
+SEG12AN20 {
   Address: 0x01030503
   EnergyCoeff: 0 1
 }
 
-SEG12AN05 {
+SEG12AN21 {
   Address: 0x01030504
   EnergyCoeff: 0 1
 }
 
-SEG12AN06 {
+SEG12AN22 {
   Address: 0x01030505
   EnergyCoeff: 0 1
 }
 
-SEG12AN07 {
+SEG12AN23 {
   Address: 0x01030506
   EnergyCoeff: 0 1
 }
 
-SEG12AN08 {
+SEG12AN24 {
   Address: 0x01030507
   EnergyCoeff: 0 1
 }
 
-SEG12AN09 {
+SEG12AN25 {
   Address: 0x01030508
   EnergyCoeff: 0 1
 }
 
-SEG12AN10 {
+SEG12AN26 {
   Address: 0x01030509
   EnergyCoeff: 0 1
 }
 
-SEG12AN11 {
+SEG12AN27 {
   Address: 0x0103050a
   EnergyCoeff: 0 1
 }
 
-SEG12AN12 {
+SEG12AN28 {
   Address: 0x0103050b
   EnergyCoeff: 0 1
 }
 
-SEG12AN13 {
+SEG12AN29 {
   Address: 0x0103050c
   EnergyCoeff: 0 1
 }
 
-SEG12AN14 {
+SEG12AN30 {
   Address: 0x0103050d
   EnergyCoeff: 0 1
 }
 
-SEG12AN15 {
+SEG12AN31 {
   Address: 0x0103050e
   EnergyCoeff: 0 1
 }
 
-SEG12AN16 {
+SEG12AN32 {
   Address: 0x0103050f
   EnergyCoeff: 0 1
 }
 
-SEG13AN17 {
+SEG13AN01 {
   Address: 0x01030600
   EnergyCoeff: 0 1
 }
 
-SEG13AN18 {
+SEG13AN02 {
   Address: 0x01030601
   EnergyCoeff: 0 1
 }
 
-SEG13AN19 {
+SEG13AN03 {
   Address: 0x01030602
   EnergyCoeff: 0 1
 }
 
-SEG13AN20 {
+SEG13AN04 {
   Address: 0x01030603
   EnergyCoeff: 0 1
 }
 
-SEG13AN21 {
+SEG13AN05 {
   Address: 0x01030604
   EnergyCoeff: 0 1
 }
 
-SEG13AN22 {
+SEG13AN06 {
   Address: 0x01030605
   EnergyCoeff: 0 1
 }
 
-SEG13AN23 {
+SEG13AN07 {
   Address: 0x01030606
   EnergyCoeff: 0 1
 }
 
-SEG13AN24 {
+SEG13AN08 {
   Address: 0x01030607
   EnergyCoeff: 0 1
 }
 
-SEG13AN25 {
+SEG13AN09 {
   Address: 0x01030608
   EnergyCoeff: 0 1
 }
 
-SEG13AN26 {
+SEG13AN10 {
   Address: 0x01030609
   EnergyCoeff: 0 1
 }
 
-SEG13AN27 {
+SEG13AN11 {
   Address: 0x0103060a
   EnergyCoeff: 0 1
 }
 
-SEG13AN28 {
+SEG13AN12 {
   Address: 0x0103060b
   EnergyCoeff: 0 1
 }
 
-SEG13AN29 {
+SEG13AN13 {
   Address: 0x0103060c
   EnergyCoeff: 0 1
 }
 
-SEG13AN30 {
+SEG13AN14 {
   Address: 0x0103060d
   EnergyCoeff: 0 1
 }
 
-SEG13AN31 {
+SEG13AN15 {
   Address: 0x0103060e
   EnergyCoeff: 0 1
 }
 
-SEG13AN32 {
+SEG13AN16 {
   Address: 0x0103060f
   EnergyCoeff: 0 1
 }
 
-SEG13AN01 {
+SEG13AN17 {
   Address: 0x01030700
   EnergyCoeff: 0 1
 }
 
-SEG13AN02 {
+SEG13AN18 {
   Address: 0x01030701
   EnergyCoeff: 0 1
 }
 
-SEG13AN03 {
+SEG13AN19 {
   Address: 0x01030702
   EnergyCoeff: 0 1
 }
 
-SEG13AN04 {
+SEG13AN20 {
   Address: 0x01030703
   EnergyCoeff: 0 1
 }
 
-SEG13AN05 {
+SEG13AN21 {
   Address: 0x01030704
   EnergyCoeff: 0 1
 }
 
-SEG13AN06 {
+SEG13AN22 {
   Address: 0x01030705
   EnergyCoeff: 0 1
 }
 
-SEG13AN07 {
+SEG13AN23 {
   Address: 0x01030706
   EnergyCoeff: 0 1
 }
 
-SEG13AN08 {
+SEG13AN24 {
   Address: 0x01030707
   EnergyCoeff: 0 1
 }
 
-SEG13AN09 {
+SEG13AN25 {
   Address: 0x01030708
   EnergyCoeff: 0 1
 }
 
-SEG13AN10 {
+SEG13AN26 {
   Address: 0x01030709
   EnergyCoeff: 0 1
 }
 
-SEG13AN11 {
+SEG13AN27 {
   Address: 0x0103070a
   EnergyCoeff: 0 1
 }
 
-SEG13AN12 {
+SEG13AN28 {
   Address: 0x0103070b
   EnergyCoeff: 0 1
 }
 
-SEG13AN13 {
+SEG13AN29 {
   Address: 0x0103070c
   EnergyCoeff: 0 1
 }
 
-SEG13AN14 {
+SEG13AN30 {
   Address: 0x0103070d
   EnergyCoeff: 0 1
 }
 
-SEG13AN15 {
+SEG13AN31 {
   Address: 0x0103070e
   EnergyCoeff: 0 1
 }
 
-SEG13AN16 {
+SEG13AN32 {
   Address: 0x0103070f
   EnergyCoeff: 0 1
 }
 
-SEG14AN17 {
+SEG14AN01 {
   Address: 0x01030800
   EnergyCoeff: 0 1
 }
 
-SEG14AN18 {
+SEG14AN02 {
   Address: 0x01030801
   EnergyCoeff: 0 1
 }
 
-SEG14AN19 {
+SEG14AN03 {
   Address: 0x01030802
   EnergyCoeff: 0 1
 }
 
-SEG14AN20 {
+SEG14AN04 {
   Address: 0x01030803
   EnergyCoeff: 0 1
 }
 
-SEG14AN21 {
+SEG14AN05 {
   Address: 0x01030804
   EnergyCoeff: 0 1
 }
 
-SEG14AN22 {
+SEG14AN06 {
   Address: 0x01030805
   EnergyCoeff: 0 1
 }
 
-SEG14AN23 {
+SEG14AN07 {
   Address: 0x01030806
   EnergyCoeff: 0 1
 }
 
-SEG14AN24 {
+SEG14AN08 {
   Address: 0x01030807
   EnergyCoeff: 0 1
 }
 
-SEG14AN25 {
+SEG14AN09 {
   Address: 0x01030808
   EnergyCoeff: 0 1
 }
 
-SEG14AN26 {
+SEG14AN10 {
   Address: 0x01030809
   EnergyCoeff: 0 1
 }
 
-SEG14AN27 {
+SEG14AN11 {
   Address: 0x0103080a
   EnergyCoeff: 0 1
 }
 
-SEG14AN28 {
+SEG14AN12 {
   Address: 0x0103080b
   EnergyCoeff: 0 1
 }
 
-SEG14AN29 {
+SEG14AN13 {
   Address: 0x0103080c
   EnergyCoeff: 0 1
 }
 
-SEG14AN30 {
+SEG14AN14 {
   Address: 0x0103080d
   EnergyCoeff: 0 1
 }
 
-SEG14AN31 {
+SEG14AN15 {
   Address: 0x0103080e
   EnergyCoeff: 0 1
 }
 
-SEG14AN32 {
+SEG14AN16 {
   Address: 0x0103080f
   EnergyCoeff: 0 1
 }
 
-SEG14AN01 {
+SEG14AN17 {
   Address: 0x01030900
   EnergyCoeff: 0 1
 }
 
-SEG14AN02 {
+SEG14AN18 {
   Address: 0x01030901
   EnergyCoeff: 0 1
 }
 
-SEG14AN03 {
+SEG14AN19 {
   Address: 0x01030902
   EnergyCoeff: 0 1
 }
 
-SEG14AN04 {
+SEG14AN20 {
   Address: 0x01030903
   EnergyCoeff: 0 1
 }
 
-SEG14AN05 {
+SEG14AN21 {
   Address: 0x01030904
   EnergyCoeff: 0 1
 }
 
-SEG14AN06 {
+SEG14AN22 {
   Address: 0x01030905
   EnergyCoeff: 0 1
 }
 
-SEG14AN07 {
+SEG14AN23 {
   Address: 0x01030906
   EnergyCoeff: 0 1
 }
 
-SEG14AN08 {
+SEG14AN24 {
   Address: 0x01030907
   EnergyCoeff: 0 1
 }
 
-SEG14AN09 {
+SEG14AN25 {
   Address: 0x01030908
   EnergyCoeff: 0 1
 }
 
-SEG14AN10 {
+SEG14AN26 {
   Address: 0x01030909
   EnergyCoeff: 0 1
 }
 
-SEG14AN11 {
+SEG14AN27 {
   Address: 0x0103090a
   EnergyCoeff: 0 1
 }
 
-SEG14AN12 {
+SEG14AN28 {
   Address: 0x0103090b
   EnergyCoeff: 0 1
 }
 
-SEG14AN13 {
+SEG14AN29 {
   Address: 0x0103090c
   EnergyCoeff: 0 1
 }
 
-SEG14AN14 {
+SEG14AN30 {
   Address: 0x0103090d
   EnergyCoeff: 0 1
 }
 
-SEG14AN15 {
+SEG14AN31 {
   Address: 0x0103090e
   EnergyCoeff: 0 1
 }
 
-SEG14AN16 {
+SEG14AN32 {
   Address: 0x0103090f
   EnergyCoeff: 0 1
 }
 
-SEG15AN17 {
+SEG15AN01 {
   Address: 0x01030a00
   EnergyCoeff: 0 1
 }
 
-SEG15AN18 {
+SEG15AN02 {
   Address: 0x01030a01
   EnergyCoeff: 0 1
 }
 
-SEG15AN19 {
+SEG15AN03 {
   Address: 0x01030a02
   EnergyCoeff: 0 1
 }
 
-SEG15AN20 {
+SEG15AN04 {
   Address: 0x01030a03
   EnergyCoeff: 0 1
 }
 
-SEG15AN21 {
+SEG15AN05 {
   Address: 0x01030a04
   EnergyCoeff: 0 1
 }
 
-SEG15AN22 {
+SEG15AN06 {
   Address: 0x01030a05
   EnergyCoeff: 0 1
 }
 
-SEG15AN23 {
+SEG15AN07 {
   Address: 0x01030a06
   EnergyCoeff: 0 1
 }
 
-SEG15AN24 {
+SEG15AN08 {
   Address: 0x01030a07
   EnergyCoeff: 0 1
 }
 
-SEG15AN25 {
+SEG15AN09 {
   Address: 0x01030a08
   EnergyCoeff: 0 1
 }
 
-SEG15AN26 {
+SEG15AN10 {
   Address: 0x01030a09
   EnergyCoeff: 0 1
 }
 
-SEG15AN27 {
+SEG15AN11 {
   Address: 0x01030a0a
   EnergyCoeff: 0 1
 }
 
-SEG15AN28 {
+SEG15AN12 {
   Address: 0x01030a0b
   EnergyCoeff: 0 1
 }
 
-SEG15AN29 {
+SEG15AN13 {
   Address: 0x01030a0c
   EnergyCoeff: 0 1
 }
 
-SEG15AN30 {
+SEG15AN14 {
   Address: 0x01030a0d
   EnergyCoeff: 0 1
 }
 
-SEG15AN31 {
+SEG15AN15 {
   Address: 0x01030a0e
   EnergyCoeff: 0 1
 }
 
-SEG15AN32 {
+SEG15AN16 {
   Address: 0x01030a0f
   EnergyCoeff: 0 1
 }
 
-SEG15AN01 {
+SEG15AN17 {
   Address: 0x01030b00
   EnergyCoeff: 0 1
 }
 
-SEG15AN02 {
+SEG15AN18 {
   Address: 0x01030b01
   EnergyCoeff: 0 1
 }
 
-SEG15AN03 {
+SEG15AN19 {
   Address: 0x01030b02
   EnergyCoeff: 0 1
 }
 
-SEG15AN04 {
+SEG15AN20 {
   Address: 0x01030b03
   EnergyCoeff: 0 1
 }
 
-SEG15AN05 {
+SEG15AN21 {
   Address: 0x01030b04
   EnergyCoeff: 0 1
 }
 
-SEG15AN06 {
+SEG15AN22 {
   Address: 0x01030b05
   EnergyCoeff: 0 1
 }
 
-SEG15AN07 {
+SEG15AN23 {
   Address: 0x01030b06
   EnergyCoeff: 0 1
 }
 
-SEG15AN08 {
+SEG15AN24 {
   Address: 0x01030b07
   EnergyCoeff: 0 1
 }
 
-SEG15AN09 {
+SEG15AN25 {
   Address: 0x01030b08
   EnergyCoeff: 0 1
 }
 
-SEG15AN10 {
+SEG15AN26 {
   Address: 0x01030b09
   EnergyCoeff: 0 1
 }
 
-SEG15AN11 {
+SEG15AN27 {
   Address: 0x01030b0a
   EnergyCoeff: 0 1
 }
 
-SEG15AN12 {
+SEG15AN28 {
   Address: 0x01030b0b
   EnergyCoeff: 0 1
 }
 
-SEG15AN13 {
+SEG15AN29 {
   Address: 0x01030b0c
   EnergyCoeff: 0 1
 }
 
-SEG15AN14 {
+SEG15AN30 {
   Address: 0x01030b0d
   EnergyCoeff: 0 1
 }
 
-SEG15AN15 {
+SEG15AN31 {
   Address: 0x01030b0e
   EnergyCoeff: 0 1
 }
 
-SEG15AN16 {
+SEG15AN32 {
   Address: 0x01030b0f
   EnergyCoeff: 0 1
 }
 
-SEG16AN17 {
+SEG16AN01 {
   Address: 0x01030c00
   EnergyCoeff: 0 1
 }
 
-SEG16AN18 {
+SEG16AN02 {
   Address: 0x01030c01
   EnergyCoeff: 0 1
 }
 
-SEG16AN19 {
+SEG16AN03 {
   Address: 0x01030c02
   EnergyCoeff: 0 1
 }
 
-SEG16AN20 {
+SEG16AN04 {
   Address: 0x01030c03
   EnergyCoeff: 0 1
 }
 
-SEG16AN21 {
+SEG16AN05 {
   Address: 0x01030c04
   EnergyCoeff: 0 1
 }
 
-SEG16AN22 {
+SEG16AN06 {
   Address: 0x01030c05
   EnergyCoeff: 0 1
 }
 
-SEG16AN23 {
+SEG16AN07 {
   Address: 0x01030c06
   EnergyCoeff: 0 1
 }
 
-SEG16AN24 {
+SEG16AN08 {
   Address: 0x01030c07
   EnergyCoeff: 0 1
 }
 
-SEG16AN25 {
+SEG16AN09 {
   Address: 0x01030c08
   EnergyCoeff: 0 1
 }
 
-SEG16AN26 {
+SEG16AN10 {
   Address: 0x01030c09
   EnergyCoeff: 0 1
 }
 
-SEG16AN27 {
+SEG16AN11 {
   Address: 0x01030c0a
   EnergyCoeff: 0 1
 }
 
-SEG16AN28 {
+SEG16AN12 {
   Address: 0x01030c0b
   EnergyCoeff: 0 1
 }
 
-SEG16AN29 {
+SEG16AN13 {
   Address: 0x01030c0c
   EnergyCoeff: 0 1
 }
 
-SEG16AN30 {
+SEG16AN14 {
   Address: 0x01030c0d
   EnergyCoeff: 0 1
 }
 
-SEG16AN31 {
+SEG16AN15 {
   Address: 0x01030c0e
   EnergyCoeff: 0 1
 }
 
-SEG16AN32 {
+SEG16AN16 {
   Address: 0x01030c0f
   EnergyCoeff: 0 1
 }
 
-SEG16AN01 {
+SEG16AN17 {
   Address: 0x01030d00
   EnergyCoeff: 0 1
 }
 
-SEG16AN02 {
+SEG16AN18 {
   Address: 0x01030d01
   EnergyCoeff: 0 1
 }
 
-SEG16AN03 {
+SEG16AN19 {
   Address: 0x01030d02
   EnergyCoeff: 0 1
 }
 
-SEG16AN04 {
+SEG16AN20 {
   Address: 0x01030d03
   EnergyCoeff: 0 1
 }
 
-SEG16AN05 {
+SEG16AN21 {
   Address: 0x01030d04
   EnergyCoeff: 0 1
 }
 
-SEG16AN06 {
+SEG16AN22 {
   Address: 0x01030d05
   EnergyCoeff: 0 1
 }
 
-SEG16AN07 {
+SEG16AN23 {
   Address: 0x01030d06
   EnergyCoeff: 0 1
 }
 
-SEG16AN08 {
+SEG16AN24 {
   Address: 0x01030d07
   EnergyCoeff: 0 1
 }
 
-SEG16AN09 {
+SEG16AN25 {
   Address: 0x01030d08
   EnergyCoeff: 0 1
 }
 
-SEG16AN10 {
+SEG16AN26 {
   Address: 0x01030d09
   EnergyCoeff: 0 1
 }
 
-SEG16AN11 {
+SEG16AN27 {
   Address: 0x01030d0a
   EnergyCoeff: 0 1
 }
 
-SEG16AN12 {
+SEG16AN28 {
   Address: 0x01030d0b
   EnergyCoeff: 0 1
 }
 
-SEG16AN13 {
+SEG16AN29 {
   Address: 0x01030d0c
   EnergyCoeff: 0 1
 }
 
-SEG16AN14 {
+SEG16AN30 {
   Address: 0x01030d0d
   EnergyCoeff: 0 1
 }
 
-SEG16AN15 {
+SEG16AN31 {
   Address: 0x01030d0e
   EnergyCoeff: 0 1
 }
 
-SEG16AN16 {
+SEG16AN32 {
   Address: 0x01030d0f
   EnergyCoeff: 0 1
 }
@@ -2764,37 +2779,37 @@ DEL00FN00 {
   EnergyCoeff: 0 1
 }
 
-DEL00FN00 {
+DEL00FN01 {
   Address: 0x02040519
   EnergyCoeff: 0 1
 }
 
-DEL00FN00 {
+DEL00FN02 {
   Address: 0x0204051a
-  EnergyCoeff: 0 1
+  EnergyCoeff: -83.868 0.457287
 }
 
-DEL00FN00 {
+DEL00FN03 {
   Address: 0x0204051b
   EnergyCoeff: 0 1
 }
 
-DEL00FN00 {
+DEL00FN04 {
   Address: 0x0204051c
   EnergyCoeff: 0 1
 }
 
-DEL00FN00 {
+DEL00FN05 {
   Address: 0x0204051d
   EnergyCoeff: 0 1
 }
 
-DEL00FN00 {
+DEL00FN06 {
   Address: 0x0204051e
   EnergyCoeff: 0 1
 }
 
-DEL00FN00 {
+DEL00FN07 {
   Address: 0x0204051f
   EnergyCoeff: 0 1
 }
@@ -3084,37 +3099,37 @@ DEL01FN00 {
   EnergyCoeff: 0 1
 }
 
-DEL01FN00 {
+DEL01FN01 {
   Address: 0x02040719
   EnergyCoeff: 0 1
 }
 
-DEL01FN00 {
+DEL01FN02 {
   Address: 0x0204071a
   EnergyCoeff: 0 1
 }
 
-DEL01FN00 {
+DEL01FN03 {
   Address: 0x0204071b
   EnergyCoeff: 0 1
 }
 
-DEL01FN00 {
+DEL01FN04 {
   Address: 0x0204071c
   EnergyCoeff: 0 1
 }
 
-DEL01FN00 {
+DEL01FN05 {
   Address: 0x0204071d
   EnergyCoeff: 0 1
 }
 
-DEL01FN00 {
+DEL01FN06 {
   Address: 0x0204071e
   EnergyCoeff: 0 1
 }
 
-DEL01FN00 {
+DEL01FN07 {
   Address: 0x0204071f
   EnergyCoeff: 0 1
 }

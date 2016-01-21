@@ -3,6 +3,7 @@ Unix.*.Root.MacroPath: .:$(GRUTSYS)/util:$(ROOTSYS)/macros
 
 #default MakeHistos library
 GRUT.HistLib: $(GRUTSYS)/libraries/libMakeHistos.so
+#GRUT.HistLib: $(GRUTSYS)/libraries/libMakeSegaJanusHistos.so
 GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
 
 #files to load at log in:
@@ -21,9 +22,10 @@ Canvas.ResizeOpaque: false
 Canvas.ShowEventStatus: true
 Canvas.ShowToolBar: true
 Canvas.UseScreenFactor: true
+Canvas.ShowGuideLines: false
 
 
 Gui.IconPath:      $(GRUTSYS)/icons:$(ROOTSYS)/icons
 #$(ROOTSYS)/etc/root.mimes
-Gui.MimeTypeFile:  $(GRUTSYS)/.grut.mimes 
+Gui.MimeTypeFile:  $(GRUTSYS)/.grut.mimes
 

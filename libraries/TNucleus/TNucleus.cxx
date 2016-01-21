@@ -31,7 +31,7 @@ static double amu = 931.494043;
 //static double MeV2Kg = 1.77777778e-30;
 
 std::string& TNucleus::massfile(){
-  static std::string output = std::string(getenv("GRUTSYS")) + "/../libraries/SourceData/mass.dat";
+  static std::string output = std::string(getenv("GRUTSYS")) + "/libraries/SourceData/mass.dat";
   return output;
 }
 //const char *TNucleus::massfile = mfile.c_str();
@@ -405,7 +405,7 @@ bool TNucleus::LoadTransitionFile(){
   std::stringstream ss1,ssName;
   std::string fileName1,fileName2,NucName,eat;
   Double_t En,EnUn,Ints,IntsUn;
-  fileName1 =   std::string(getenv("GRUTSYS")) + "/../libraries/SourceData/";
+  fileName1 =   std::string(getenv("GRUTSYS")) + "/libraries/SourceData/";
   ss1 << this->GetSymbol();  ssName << this->GetSymbol();
   ss1 << this->GetA();       ssName << this->GetA();
   ssName >> NucName;
@@ -419,8 +419,8 @@ bool TNucleus::LoadTransitionFile(){
   transFile.open(fileName1.c_str());
 
   if(!transFile){
-    std::cout << " *** ERROR : File - " << fileName1
-	      << " does not exist!!! Not Loading!! " << std::endl;
+    //std::cout << " *** ERROR : File - " << fileName1
+    //	      << " does not exist!!! Not Loading!! " << std::endl;
     return false;
   }
 
@@ -433,7 +433,7 @@ bool TNucleus::LoadTransitionFile(){
 
   transFile.close();
   std::cout << " File        : " << fileName2 <<  std::endl
-	    << " Opened from : " << "../libraries/SourceData/" << std::endl;
+	    << " Opened from : " << "libraries/SourceData/" << std::endl;
   return true;
 
 }
