@@ -63,6 +63,9 @@ int TChainLoop::SetupChain() {
   return 0;
 }
 
+std::string TChainLoop::Status() {
+  return Form("Event: %ld / %ld", fEntriesRead, fEntriesTotal);
+}
 
 bool TChainLoop::Iteration() {
   if(fEntriesRead >= fEntriesTotal){
