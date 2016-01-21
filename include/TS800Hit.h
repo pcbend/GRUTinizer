@@ -8,6 +8,7 @@
 #include <TDetectorHit.h>
 #include <TMath.h>
 #include "TRandom.h"
+#include "GValue.h"
 
 #define MAXCRDC 513
 //#define CRDC_XSlope 2.54
@@ -134,10 +135,10 @@ class TCrdc : public TDetectorHit {
     void SetAnode(short an) {anode = an; }
     void SetTime(short ti)  {time = ti;  }
 
-    void SetXslope (float xm)  { fCRDCXslope = xm; }
-    void SetYslope (float ym)  { fCRDCYslope = ym; }
-    void SetXoffset (float xo) { fCRDCXoff = xo;   }
-    void SetYoffset (float yo) { fCRDCYoff = yo;   }
+//  void SetXslope (float xm)  { fCRDCXslope = xm; }
+//  void SetYslope (float ym)  { fCRDCYslope = ym; }
+//  void SetXoffset (float xo) { fCRDCXoff = xo;   }
+//  void SetYoffset (float yo) { fCRDCYoff = yo;   }
 
 
     void AddPoint(int chan,int samp,int dat) { channel.push_back(chan);
@@ -149,12 +150,12 @@ class TCrdc : public TDetectorHit {
 
     int GetWidth();
 
-    float GetDispersiveX()      { if(GetPad()==-1) return sqrt(-1); return (GetPad()*fCRDCXslope+fCRDCXoff); }
-    float GetNonDispersiveY()   { if(GetPad()==-1) return sqrt(-1); return (GetTimeRand()*fCRDCYslope+fCRDCYoff); }
-    float GetXslope ()  { return fCRDCXslope; }
-    float GetYslope ()  { return fCRDCYslope; }
-    float GetXoffset () { return fCRDCXoff;   }
-    float GetYoffset () { return fCRDCYoff;   }
+    float GetDispersiveX();     
+    float GetNonDispersiveY();  
+//  float GetXslope ()  { return fCRDCXslope; }
+//  float GetYslope ()  { return fCRDCYslope; }
+//  float GetXoffset () { return fCRDCXoff;   }
+//  float GetYoffset () { return fCRDCYoff;   }
 
 
 
@@ -174,10 +175,10 @@ class TCrdc : public TDetectorHit {
     std::vector<int> sample;
     std::vector<int> data;
 
-    float fCRDCXslope; //!
-    float fCRDCYslope; //!
-    float fCRDCXoff;   //!
-    float fCRDCYoff;   //!
+//  float fCRDCXslope; //!
+//  float fCRDCYslope; //!
+//  float fCRDCXoff;   //!
+//  float fCRDCYoff;   //!
 
     unsigned short anode;
     unsigned short time;
@@ -229,6 +230,7 @@ class TIonChamber : public TDetectorHit {
     int GetData(int i)    const { if(i>=Size()) return sqrt(-1); return fData.at(i); }
     int Size() const { return fChan.size(); }
     float GetdE();
+    float GetdECorr(TCrdc*);
 
 
     virtual void Copy(TObject&) const;
