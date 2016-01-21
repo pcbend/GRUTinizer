@@ -10,6 +10,14 @@
 
 #include "TGEBEvent.h"
 #include "TGRUTOptions.h"
+#include "GH2I.h"
+#include "GRootCommands.h"
+#include "GCanvas.h"
+
+#include "TChain.h"
+#include "TPad.h"
+#include "TROOT.h"
+
 
 std::vector<TS800::S800_InvMapLine> TS800::fIML_sec1;
 std::vector<TS800::S800_InvMapLine> TS800::fIML_sec2;
@@ -34,21 +42,20 @@ TS800::TS800() {
     }
   }
 
-  GetCrdc(0).SetXslope(2.54);
-  GetCrdc(0).SetYslope(-0.1074866936);
-  GetCrdc(0).SetXoffset(-281.94);
-  GetCrdc(0).SetYoffset(95.9966);
-  //GetCrdc(0).SetYoffset(129.1513428524);
+//GetCrdc(0).SetXslope(2.54);
+//GetCrdc(0).SetYslope(-0.1074866936);
+//GetCrdc(0).SetXoffset(-281.94);
+//GetCrdc(0).SetYoffset(95.9966);
+//GetCrdc(0).SetYoffset(129.1513428524);
 
-  GetCrdc(1).SetXslope(2.54);
-  GetCrdc(1).SetYslope(0.1110700359);
-  GetCrdc(1).SetXoffset(-281.94);
-  GetCrdc(1).SetYoffset(-122.8);
-  //GetCrdc(1).SetYoffset(-131.4070990297);
+//GetCrdc(1).SetXslope(2.54);
+//GetCrdc(1).SetYslope(0.1110700359);
+//GetCrdc(1).SetXoffset(-281.94);
+//GetCrdc(1).SetYoffset(-122.8);
+//GetCrdc(1).SetYoffset(-131.4070990297);
 
-
-  //  std::cout << " Slopes and offsets are SET" << std::endl;
-  //std::cout << " For Example : " <<     GetCrdc(0).GetYslope() << std::endl;
+//  std::cout << " Slopes and offsets are SET" << std::endl;
+//std::cout << " For Example : " <<     GetCrdc(0).GetYslope() << std::endl;
 }
 
 TS800::~TS800(){
@@ -874,10 +881,6 @@ TDetectorHit& TS800::GetHit(int i){
   return *hit;
 }
 
-
-
-
-
 float TS800::GetTofE1_TAC(float c1,float c2)  const {
   return GetTof().GetTacOBJ() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
 }
@@ -907,3 +910,57 @@ float TS800::GetTofE1_MTDC(float c1,float c2)   {
   return -1.0;
   //return GetTof().GetOBJ() - GetScint().GetTimeUp() - c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
 }
+
+float TS800::GetCorrTOF_OBJTAC() const {
+  double afp_cor = GValue::Value("OBJTAC_TOF_CORR_AFP");
+  double xfp_cor = GValue::Value("OBJTAC_TOF_CORR_XFP");
+//std::cout << "TOF OBJTAC AFP COR" << afp_cor << std::endl;
+//std::cout << "TOF OBJTAC xfp COR" << xfp_cor << std::endl;
+  return GetTofE1_TAC(afp_cor,xfp_cor);
+}
+float TS800::GetCorrTOF_OBJ() const {
+  double afp_cor = GValue::Value("OBJ_TOF_CORR_AFP");
+  double xfp_cor = GValue::Value("OBJ_TOF_CORR_XFP");
+  return GetTofE1_TDC(afp_cor,xfp_cor);
+}
+
+//float TS800::GetCorrTOF_XFP(){
+//  double afp_cor = GValue::Value("XFP_TOF_CORR_AFP");
+//  double xfp_cor = GValue::Value("XFP_TOF_CORR_XFP");
+//  return GetTofE1_(afp_cor,xfp_cor);
+//}
+
+//float TS800::GetCorrTOF_XFPTAC(){
+//  double afp_cor = GValue::Value("XFPTAC_TOF_CORR_AFP");
+//double xfp_cor = GValue::Value("XFPTAC_TOF_CORR_XFP");
+//return GetTofE1_TAC(afp_cor,xfp_cor);
+//}
+//
+//
+
+
+
+void TS800::DrawPID(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) {
+  if(!chain)
+    chain = gChain;
+  if(!chain || !chain->GetBranch("TS800"))
+    return;
+  if(!gPad || !gPad->IsEditable()) {
+    gROOT->MakeDefCanvas();
+  } else {
+    gPad->GetCanvas()->Clear();
+  }
+  
+  std::string name = Form("%s_PID",Class()->GetName()); //_%s",opt);
+  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
+  if(!h)
+    h = new GH2I(name.c_str(),name.c_str(),2048,0,2048,4000,0,8192);
+  chain->Project(name.c_str(),"GetIonChamber()->GetdE():GetCorrTOF_OBJTAC()","","colz",nentries);
+  h->GetXaxis()->SetTitle("Corrected TOF (objtac)");  
+  h->GetYaxis()->SetTitle("Ion Chamber Energy loss (arb. units)");  
+  h->Draw("colz");
+
+}
+
+
+

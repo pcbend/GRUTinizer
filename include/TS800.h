@@ -6,8 +6,11 @@
 #include <vector>
 #include "TDetector.h"
 
+#include "GValue.h"
 #include "TS800Hit.h"
 //class TTrigger;
+
+class TChain;
 
 class TS800 : public TDetector {
 public:
@@ -50,9 +53,15 @@ public:
   //    return  TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1000.0);
   //}
 
+  //Note c1 is the AFP correction and c2 is the XFP correction
   float GetTofE1_TAC(float c1=0.00,float c2=0.00) const;
   float GetTofE1_TDC(float c1=0.00,float c2=0.00) const;
   float GetTofE1_MTDC(float c1=0.00,float c2=0.00);
+
+  float GetCorrTOF_OBJTAC() const;
+  float GetCorrTOF_OBJ() const;
+//float GetCorrTOF_XFPTAC();
+//float GetCorrTOF_XFP();
 
 private:
 
@@ -100,6 +109,10 @@ private:
   Float_t fDta;
 
   Long_t fEventCounter;
+
+
+  public:
+    static void DrawPID(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
 
 
   ClassDef(TS800,1);

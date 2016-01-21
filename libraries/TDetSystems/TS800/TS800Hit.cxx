@@ -108,7 +108,7 @@ void TIonChamber::Set(int ch, int data){
 float TIonChamber::GetdE(){
   float temp =0.0;
   //if(fdE==-1.0) {
-    for(unsigned int x=0;x<fData.size();x++) {   //std::vector<int>::iterator it=fData.begin();it!=fData.end();it++) {
+  for(unsigned int x=0;x<fData.size();x++) {   //std::vector<int>::iterator it=fData.begin();it!=fData.end();it++) {
       //if(fdE==-1.0)
       //  fdE=0.0;
       temp+=fData.at(x); //it->first;
@@ -119,6 +119,22 @@ float TIonChamber::GetdE(){
   if(temp>0)
     temp = temp/((float)fData.size());
   return temp;
+}
+
+//Calculate energy loss in Ion Chamber corrected
+//for particle track
+float TIonChamber::GetdECorr(TCrdc *crdc){
+  float sum = GetdE();
+  float x   = crdc->GetDispersiveX();
+  float y   = crdc->GetNonDispersiveY();
+
+  float xtilt  = GValue::Value("IC_DE_XTILT");
+  float ytilt  = GValue::Value("IC_DE_YTILT");
+  float x0tilt = GValue::Value("IC_DE_X0TILT");
+
+  sum += sum * ytilt * y;
+  sum *= exp(xtilt*(x0tilt-x));
+  return sum;
 }
 
 void TIonChamber::Copy(TObject &obj) const {
@@ -268,11 +284,10 @@ void TCrdc::Copy(TObject &obj) const {
   c.data     = data;
   c.anode    = anode;
   c.time     = time;
-  c.fCRDCXslope = fCRDCXslope;
-  c.fCRDCYslope = fCRDCYslope;
-  c.fCRDCXoff = fCRDCXoff;
-  c.fCRDCYoff = fCRDCYoff;
-
+//c.fCRDCXslope = fCRDCXslope;
+//c.fCRDCYslope = fCRDCYslope;
+//c.fCRDCXoff = fCRDCXoff;
+//c.fCRDCYoff = fCRDCYoff;
 }
 
 void TCrdc::Clear(Option_t *opt) {
@@ -285,15 +300,43 @@ void TCrdc::Clear(Option_t *opt) {
   data.clear();
 }
 
+
+float TCrdc::GetDispersiveX() {
+  if (GetPad() ==-1){
+    return sqrt(-1);
+  }
+
+  float x_slope = sqrt(-1);
+  float x_offset = sqrt(-1);
+  if(fId==0) {
+    x_slope = GValue::Value("CRDC1_X_SLOPE");
+    x_offset = GValue::Value("CRDC1_X_OFFSET");
+  } else if(fId==1) {
+    x_slope = GValue::Value("CRDC2_X_SLOPE");
+    x_offset = GValue::Value("CRDC2_X_OFFSET");
+  } 
+  
+  return (GetPad()*x_slope+x_offset);
+}
+
+
+float TCrdc::GetNonDispersiveY(){
+  if (GetPad() ==-1){
+    return sqrt(-1);
+  }
+  float y_slope = sqrt(-1);
+  float y_offset = sqrt(-1);
+  if(fId==0) {
+    y_slope = GValue::Value("CRDC1_Y_SLOPE");
+    y_offset = GValue::Value("CRDC1_Y_OFFSET");
+  } else if(fId==1) {
+    y_slope = GValue::Value("CRDC2_Y_SLOPE");
+    y_offset = GValue::Value("CRDC2_Y_OFFSET");
+  }
+  return (GetTimeRand()*y_slope+y_offset);
+}
+
 void TCrdc::Print(Option_t *opt) const { }
-
-
-
-
-
-
-
-
 
 TCrdcPad::TCrdcPad()  { Clear(); }
 
