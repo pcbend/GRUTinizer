@@ -73,6 +73,11 @@ int TSega::BuildHits() {
                   << " you should probably stop the program." << std::endl;
       }
       lines_displayed++;
+
+      sega_hits.emplace_back();
+      TSegaHit* hit = &sega_hits.back();
+      hit->SetAddress(address);
+      hit->SetTimestamp(nscl.GetTimestamp());
       continue;
     }
 
