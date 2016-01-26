@@ -163,6 +163,18 @@ void TGRUTint::ApplyOptions() {
   TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
 
 
+  //if I am passed any calibrations, lets load those.
+  if(opt->CalInputFiles().size()) {
+    for(unsigned int x=0;x<opt->CalInputFiles().size();x++) {
+      TChannel::ReadCalFile(opt->CalInputFiles().at(x).c_str());
+    }
+  }
+  if(opt->ValInputFiles().size()) {
+    for(unsigned int x=0;x<opt->ValInputFiles().size();x++) {
+      GValue::ReadValFile(opt->ValInputFiles().at(x).c_str());
+    }
+  }
+
   if(opt->StartGUI()){
     std::string   script_filename = Form("%s/pygui/grut-view.py",getenv("GRUTSYS"));
     std::ifstream script(script_filename);
@@ -179,19 +191,6 @@ void TGRUTint::ApplyOptions() {
 
     TTimer* gui_timer = new TTimer("TPython::Exec(\"update()\");", 10, true);
     gui_timer->TurnOn();
-  }
-
-
-  //if I am passed any calibrations, lets load those.
-  if(opt->CalInputFiles().size()) {
-    for(unsigned int x=0;x<opt->CalInputFiles().size();x++) {
-      TChannel::ReadCalFile(opt->CalInputFiles().at(x).c_str());
-    }
-  }
-  if(opt->ValInputFiles().size()) {
-    for(unsigned int x=0;x<opt->ValInputFiles().size();x++) {
-      GValue::ReadValFile(opt->ValInputFiles().at(x).c_str());
-    }
   }
 
   TDataLoop *loop = 0;

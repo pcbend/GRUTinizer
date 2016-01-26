@@ -14,6 +14,7 @@ class VariableTab(object):
         self.main = main
         self._setup_GUI(frame)
         self.variables = {}
+        self.OnUpdateAll_Click()
 
     def _setup_GUI(self, frame):
         self.frame = frame
@@ -39,6 +40,8 @@ class VariableTab(object):
                   command=self.OnSetReplaceVariable_Click).pack(side=tk.LEFT)
         tk.Button(frame, text='Delete',
                   command=self.OnDeleteVariable_Click).pack(side=tk.LEFT)
+        tk.Button(frame, text='Update',
+                  command=self.OnUpdateAll_Click).pack(side=tk.LEFT)
         frame.pack(fill=tk.X,expand=False)
 
     def _MakeTreeView(self, parent):
@@ -48,22 +51,24 @@ class VariableTab(object):
         self.treeview.pack(fill=tk.BOTH,expand=True)
         self.treeview.bind("<Double-1>",self.VariableSelection)
 
-    def SetReplaceVariable(self, name, value):
-        #pipeline = ROOT.GetPipeline(0)
-        #if pipeline:
-        #    pipeline.SetReplaceVariable(name, value)
+    def OnUpdateAll_Click(self, *args):
+        t = ROOT.GValue.AllValues()
+        for val in t:
+            self.SetReplaceVariable(val.GetName(), val.GetValue(),
+                                    update_cpp = False)
 
+    def SetReplaceVariable(self, name, value, update_cpp = True):
         self.variables[name] = value
         if name in self.treeview.get_children():
             self.treeview.item(name, values=(str(value),))
         else:
             self.treeview.insert('','end',name, text=name, values=(str(value),))
 
-    def DeleteVariable(self, name):
-        #pipeline = ROOT.GetPipeline(0)
-        #if pipeline:
-        #    pipeline.RemoveVariable(name, value)
+        if update_cpp:
+            ROOT.GValue.SetReplaceValue(name, value)
 
+
+    def DeleteVariable(self, name):
         self.variables.pop(name, None)
         self.treeview.delete(name)
 

@@ -1,8 +1,10 @@
 #ifndef TGRUTVARIABLE_H
 #define TGRUTVARIABLE_H
 
-#include "TNamed.h"
 #include <map>
+
+#include "TList.h"
+#include "TNamed.h"
 
 class GValue : public TNamed {
 public:
@@ -12,7 +14,7 @@ public:
   GValue(const GValue &val);
 
   double GetValue() { return fValue; }
-  const char *GetInfo()   const { return info.c_str(); } 
+  const char *GetInfo()   const { return info.c_str(); }
 
   void SetValue(double value) { fValue = value; }
   void SetInfo(const char *temp) { info.assign(temp); }
@@ -21,11 +23,20 @@ public:
   static int ReadValFile(const char *filename="",Option_t *opt="replace");
   static int WriteValFile(std::string filename="",Option_t *opt="");
 
-  //Search fValueVector for GValue with name given by string
   static GValue* GetDefaultValue() { return fDefaultValue; }
+  //Search fValueVector for GValue with name given by string
   static GValue* FindValue(std::string="");
+  static void SetReplaceValue(std::string name, double value);
   static GValue* Get(std::string name="") { return FindValue(name); }
   static double Value(std::string);
+  static TList* AllValues() {
+    TList* output = new TList;
+    output->SetOwner(false);
+    for(auto& item : fValueVector){
+      output->Add(item.second);
+    }
+    return output;
+  }
 
 
   //Add value into static vector fValueVector

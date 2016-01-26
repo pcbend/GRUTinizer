@@ -1,30 +1,21 @@
-
-
 #include "TRuntimeObjects.h"
-
-
 
 #include <iostream>
 #include <map>
 
-
-
 #include <cstdio>
-
-
 
 #include <TH1.h>
 #include <TH2.h>
 #include <TMath.h>
 #include "TRandom.h"
 
-
-
 #include "TObject.h"
 #include "TCaesar.h"
 #include "TS800.h"
 
-#define BETA .37
+#include "TChannel.h"
+#include "GValue.h"
 
 TH1 *GetHistogram(TList *list, std::string histname,int xbins,double xlow,double xhigh) {
   //TList *list = &(obj.GetObjects());

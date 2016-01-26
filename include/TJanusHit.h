@@ -29,7 +29,7 @@ public:
 
   int GetRing() const;
   int GetSector() const;
-  TVector3 GetPosition() const;
+  TVector3 GetPosition(bool apply_array_offset = true) const;
 
 private:
 	 // Energy

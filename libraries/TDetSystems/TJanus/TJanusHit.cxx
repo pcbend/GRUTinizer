@@ -63,6 +63,12 @@ int TJanusHit::GetSector() const {
   }
 }
 
-TVector3 TJanusHit::GetPosition() const {
-  return TJanus::GetPosition(GetDetnum(), GetRing(), GetSector());
+TVector3 TJanusHit::GetPosition(bool apply_array_offset) const {
+  TVector3 output = TJanus::GetPosition(GetDetnum(), GetRing(), GetSector());
+  if(apply_array_offset) {
+    output += TVector3(GValue::Value("Janus_X_offset"),
+                       GValue::Value("Janus_Y_offset"),
+                       GValue::Value("Janus_Z_offset"));
+  }
+  return output;
 }

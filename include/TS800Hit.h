@@ -10,6 +10,8 @@
 #include "TRandom.h"
 #include "GValue.h"
 
+class TF1;
+
 #define MAXCRDC 513
 //#define CRDC_XSlope 2.54
 //#define CRDC_XOffset -281.94
@@ -128,12 +130,15 @@ class TCrdc : public TDetectorHit {
     short GetTime()  { return time;  }
     float GetTimeRand()  { return ((float)(time)+gRandom->Uniform());  }
 
-    int  Size()        const { return sample.size(); }
+    int  Size()        const { return channel.size(); }
     int  GetNSamples() const { return sample.size(); }
 
     void SetId(short id)    { fId = id;  }
     void SetAnode(short an) {anode = an; }
     void SetTime(short ti)  {time = ti;  }
+
+
+    int  Address(int i) const { return TDetectorHit::Address() + channel.at(i); }
 
 //  void SetXslope (float xm)  { fCRDCXslope = xm; }
 //  void SetYslope (float ym)  { fCRDCYslope = ym; }
@@ -144,13 +149,13 @@ class TCrdc : public TDetectorHit {
     void AddPoint(int chan,int samp,int dat) { channel.push_back(chan);
                                                sample.push_back(samp);
                                                data.push_back(dat);    }
-    int GetChannel(int i)    { if(i>=Size()) return -1; return channel.at(i);    }
-    int GetSample(int i)     { if(i>=Size()) return -1; return sample.at(i);     }
-    int GetData(int i)       { if(i>=Size()) return -1; return data.at(i);       }
+    int GetChannel(int i) const    { if(i>=Size()) return -1; return channel.at(i);    }
+    int GetSample(int i)  const    { if(i>=Size()) return -1; return sample.at(i);     }
+    int GetData(int i)    const    { if(i>=Size()) return -1; return data.at(i);       }
 
     int GetWidth();
 
-    float GetDispersiveX();     
+    float GetDispersiveX() const;     
     float GetNonDispersiveY();  
 //  float GetXslope ()  { return fCRDCXslope; }
 //  float GetYslope ()  { return fCRDCYslope; }
@@ -159,13 +164,13 @@ class TCrdc : public TDetectorHit {
 
 
 
-    float GetPad();
+    int GetMaxPad() const;
 
     virtual void Copy(TObject&) const;
     virtual void Print(Option_t *opt="") const;
     virtual void Clear(Option_t *opt="");
 
-    virtual void DrawChannels(Option_t *opt="") const;
+    virtual void DrawChannels(Option_t *opt="",bool calibrate=true) const;
     virtual void DrawHit(Option_t *opt="") const;
 
   private:
@@ -182,6 +187,9 @@ class TCrdc : public TDetectorHit {
 
     unsigned short anode;
     unsigned short time;
+
+    static TF1 *fgaus;
+
 
   ClassDef(TCrdc,1)
 };
@@ -226,12 +234,14 @@ class TIonChamber : public TDetectorHit {
 
     void Set(int ch, int data); // { fChan.push_back(ch); fData.push_back(data); }
 
-    int GetChannel(int i) const { if(i>=Size()) return sqrt(-1); return fChan.at(i); }
-    int GetData(int i)    const { if(i>=Size()) return sqrt(-1); return fData.at(i); }
+    int GetChannel(int i) const { if(i>=Size()) return -1; return fChan.at(i); }
+    int GetData(int i)    const { if(i>=Size()) return -1; return fData.at(i); }
     int Size() const { return fChan.size(); }
     float GetdE();
+    float GetSum();
     float GetdECorr(TCrdc*);
 
+    int  Address(int i) const { return TDetectorHit::Address() + GetChannel(i); }
 
     virtual void Copy(TObject&) const;
     virtual void Print(Option_t *opt="") const;
@@ -415,7 +425,7 @@ class TCrdcPad : public TDetectorHit {
 
     }
     //int  GetPoint(int sample)           { if(fTrace.count(sample)) return fTrace.at(sample); else return 0; }
-    short GetChannel()                  { return fChannel; }
+    short GetChannel() const              { return fChannel; }
 
     virtual void Clear(Option_t *opt="");
     virtual void Print(Option_t *opt="") const;

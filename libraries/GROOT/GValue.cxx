@@ -37,6 +37,14 @@ double GValue::Value(std::string name) {
   return fValueVector.at(name)->GetValue();
 }
 
+void GValue::SetReplaceValue(std::string name, double value) {
+  GValue* gvalue = FindValue(name);
+  if(!gvalue) {
+    gvalue = new GValue(name.c_str());
+    AddValue(gvalue);
+  }
+  gvalue->SetValue(value);
+}
 
 GValue* GValue::FindValue(std::string name){
   GValue* value = 0;

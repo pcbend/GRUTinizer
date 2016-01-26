@@ -31,6 +31,7 @@ void Help()     { printf("This is helpful information.\n"); }
 
 void Commands() { printf("this is a list of useful commands.\n");}
 
+void Prompt() { Getlinem(EGetLineMode::kInit,((TRint*)gApplication)->GetPrompt()); }
 
 int LabelPeaks(TH1 *hist,double sigma,double thresh,Option_t *opt) {
   TSpectrum::StaticSearch(hist,sigma,"Qnodraw",thresh);
