@@ -48,8 +48,6 @@ enum MyArrowPress{
   kMyArrowDown  = 0x1015
 };
 
-#define MAXNUMBEROFMARKERS 4
-
 ClassImp(GMarker)
 
 void GMarker::Copy(TObject &object) const {
@@ -143,7 +141,7 @@ void GCanvas::AddMarker(int x,int y,int dim) {
     mark->Draw();
   } else if (dim==2) {
     mark->localx = gPad->AbsPixeltoX(x);
-    mark->localy = gPad->AbsPixeltoX(y);
+    mark->localy = gPad->AbsPixeltoY(y);
     mark->binx = hist->GetXaxis()->FindBin(mark->localx);
     mark->biny = hist->GetYaxis()->FindBin(mark->localy);
     double binx_edge = hist->GetXaxis()->GetBinLowEdge(mark->binx);
@@ -157,14 +155,15 @@ void GCanvas::AddMarker(int x,int y,int dim) {
     mark->SetColor(kRed);
     mark->Draw();
   }
-  if(fMarkers.size()>MAXNUMBEROFMARKERS) {
+
+  unsigned int max_number_of_markers = (dim==1) ? 4 : 2;
+
+  fMarkers.push_back(mark);
+
+  if(fMarkers.size() > max_number_of_markers) {
     delete fMarkers.at(0);
     fMarkers.erase(fMarkers.begin());
-    //fMarkers.insert(fMarkers.begin(),mark);
-  } //else {
-    fMarkers.push_back(mark);
-  //}
-  //printf("MarkerAdded %i | %i",x,y);
+  }
   return;
 }
 
@@ -468,17 +467,12 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
   }
 
   bool used = false;
-  if(hist->GetDimension()!=1)
+  if(hist->GetDimension() > 2) {
     return used;
+  }
 
-  if(!strcmp(GetSelected()->GetName(),"TFrame") && fMarkerMode) {
-    //((TFrame*)GetSelected())->SetBit(TBox::kCannotMove);
-    //if(GetNMarkers()==4)
-    //   RemoveMarker();
-    AddMarker(x,y);
-    //int px = gPad->AbsPixeltoX(x);
-    //TLine *line = new TLine(px,GetUymin(),px,GetUymax());
-    //line->Draw();
+  if(fMarkerMode && GetSelected()->InheritsFrom(TH1::Class())) {
+    AddMarker(x,y,hist->GetDimension());
     used = true;
   }
 
