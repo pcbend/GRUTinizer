@@ -59,21 +59,32 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanus* janus) {
 
     obj.FillHistogram("channel",
                       128, 0, 128, hit.GetFrontChannel());
-    obj.FillHistogram("channel_energy",
+    obj.FillHistogram("channel_charge",
                       128, 0, 128, hit.GetFrontChannel(),
                       4100, -4, 4096, hit.Charge());
+    obj.FillHistogram("channel_energy",
+                      128, 0, 128, hit.GetFrontChannel(),
+                      4000, 0, 400e3, hit.GetEnergy());
     obj.FillHistogram("channel_time",
                       128, 0, 128, hit.GetFrontChannel(),
                       4096, 0, 4096, hit.Time());
 
     obj.FillHistogram("channel",
                       128, 0, 128, hit.GetBackChannel());
-    obj.FillHistogram("channel_energy",
+    obj.FillHistogram("channel_charge",
                       128, 0, 128, hit.GetBackChannel(),
                       4096, 0, 4096, hit.GetBackHit().Charge());
+    obj.FillHistogram("channel_energy",
+                      128, 0, 128, hit.GetBackChannel(),
+                      4000, 0, 400e3, hit.GetBackHit().GetEnergy());
     obj.FillHistogram("channel_time",
                       128, 0, 128, hit.GetBackChannel(),
                       4096, 0, 4096, hit.GetBackHit().Time());
+
+    obj.FillHistogram(Form("janus%d_xy", hit.GetDetnum()),
+                      100,-3,3,hit.GetPosition().X(),
+                      100,-3,3,hit.GetPosition().Y());
+
   }
 }
 
@@ -108,6 +119,12 @@ void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega) {
       obj.FillHistogram(Form("sega_det%02d_segsummary", hit.GetDetnum()),
                         32, 1, 33, seg.GetSegnum(),
                         32768, 0, 32768, seg.Charge());
+      obj.FillHistogram(Form("sega_energy_det%02d_segsummary", hit.GetDetnum()),
+                        32, 1, 33, seg.GetSegnum(),
+                        32768, 0, 32768, seg.GetEnergy());
+      obj.FillHistogram("sega_allseg_summary",
+                        32*16, 1, 32*16 + 1, 32*(hit.GetDetnum()-1) + seg.GetSegnum(),
+                        32768, 0, 32768, seg.Charge());
     }
 
     if(hit.GetCrate()==1){
@@ -128,8 +145,8 @@ void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega) {
 
 void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus) {
   bool has_60keV = false;
-  bool coinc_missing3 = false;
-  bool coinc_missing4 = false;
+  // bool coinc_missing3 = false;
+  // bool coinc_missing4 = false;
   for(int i=0; i<sega->Size(); i++){
     TSegaHit& hit = sega->GetSegaHit(i);
     if(hit.GetEnergy()>55 && hit.GetEnergy()<65){
@@ -138,19 +155,22 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus)
                         16, 1, 17, hit.GetDetnum());
     }
 
-    if(hit.GetDetnum()!=15 &&
-       hit.GetDetnum()!=8  &&
-       hit.GetDetnum()!=7  &&
-       hit.GetDetnum()!=12){
-      coinc_missing4 = true;
-    }
+    // if(hit.GetDetnum()!=15 &&
+    //    hit.GetDetnum()!=8  &&
+    //    hit.GetDetnum()!=7  &&
+    //    hit.GetDetnum()!=12){
+    //   coinc_missing4 = true;
+    // }
 
-    if(hit.GetDetnum()!=15 &&
-       hit.GetDetnum()!=8  &&
-       hit.GetDetnum()!=7){
-      coinc_missing3 = true;
-    }
+    // if(hit.GetDetnum()!=15 &&
+    //    hit.GetDetnum()!=8  &&
+    //    hit.GetDetnum()!=7){
+    //   coinc_missing3 = true;
+    // }
   }
+
+  obj.FillHistogram("sega_janus_tdiff",
+                    1000, -5000, 5000, sega->Timestamp() - janus->Timestamp());
 
   for(int i=0; i<janus->Size(); i++){
     TJanusHit& hit = janus->GetJanusHit(i);
@@ -183,7 +203,7 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus)
 			280,-70,70, CT_sj,
 			8000,0,4000,s_hit.GetEnergy());
 
-       
+
       obj.FillHistogram(Form("dopper_with_ring%02i_gate",hit.GetRing()),
 			//280,-70,70, s_hit.GetPosition().Angle(hit.GetPosition())*TMath::RadToDeg(),
 			180,0,180, hit.GetPosition().Theta()*TMath::RadToDeg(),
@@ -225,23 +245,23 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus)
                       4096, 0, 4096, hit.GetBackHit().Charge());
 
 
-    if(coinc_missing3){
-      obj.FillHistogram("channel_energy_any_coinc_missing3",
-                        128, 0, 128, hit.GetFrontChannel(),
-                        4096, 0, 4096, hit.Charge());
-      obj.FillHistogram("channel_energy_any_coinc_missing3",
-                        128, 0, 128, hit.GetBackChannel(),
-                        4096, 0, 4096, hit.GetBackHit().Charge());
-    }
+    // if(coinc_missing3){
+    //   obj.FillHistogram("channel_energy_any_coinc_missing3",
+    //                     128, 0, 128, hit.GetFrontChannel(),
+    //                     4096, 0, 4096, hit.Charge());
+    //   obj.FillHistogram("channel_energy_any_coinc_missing3",
+    //                     128, 0, 128, hit.GetBackChannel(),
+    //                     4096, 0, 4096, hit.GetBackHit().Charge());
+    // }
 
-    if(coinc_missing4){
-      obj.FillHistogram("channel_energy_any_coinc_missing4",
-                        128, 0, 128, hit.GetFrontChannel(),
-                        4096, 0, 4096, hit.Charge());
-      obj.FillHistogram("channel_energy_any_coinc_missing4",
-                        128, 0, 128, hit.GetBackChannel(),
-                        4096, 0, 4096, hit.GetBackHit().Charge());
-    }
+    // if(coinc_missing4){
+    //   obj.FillHistogram("channel_energy_any_coinc_missing4",
+    //                     128, 0, 128, hit.GetFrontChannel(),
+    //                     4096, 0, 4096, hit.Charge());
+    //   obj.FillHistogram("channel_energy_any_coinc_missing4",
+    //                     128, 0, 128, hit.GetBackChannel(),
+    //                     4096, 0, 4096, hit.GetBackHit().Charge());
+    // }
   }
 }
 

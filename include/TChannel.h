@@ -35,6 +35,7 @@ private:
   //static std::vector<std::string> fFileNames;
   static std::string fChannelData;
 
+public:
   void SetEnergyCoeff(std::vector<double> tmp)    { energy_coeff    = tmp; }
   void SetEfficiencyCoeff(std::vector<double> tmp) { efficiency_coeff = tmp; }
 

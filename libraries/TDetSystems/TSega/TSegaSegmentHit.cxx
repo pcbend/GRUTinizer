@@ -39,6 +39,8 @@ int TSegaSegmentHit::GetDetnum() const {
   if(chan){
     return chan->GetArrayPosition();
   } else {
+    std::cout << "Unknown address: " << std::hex << fAddress << std::dec
+              << std::endl;
     return -1;
   }
 }

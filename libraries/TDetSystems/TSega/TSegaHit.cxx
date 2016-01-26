@@ -102,13 +102,23 @@ bool TSegaHit::HasCore() const {
 
 int TSegaHit::GetDetnum() const {
   TChannel* chan = TChannel::GetChannel(fAddress);
-  if(chan){
-    return chan->GetArrayPosition();
+  int output = -1;
+  if(chan && fAddress!=-1){
+    output = chan->GetArrayPosition();
   } else if(fSegments.size()) {
-    return fSegments[0].GetDetnum();
+    output = fSegments[0].GetDetnum();
   } else {
-    return -1;
+    std::cout << "Unknown address: " << std::hex << fAddress << std::dec
+              << std::endl;
+    output = -1;
   }
+
+  if(output == -1 && chan){
+    std::cout << "Chan with det=-1: " << chan->GetName() << std::endl;
+    std::cout << "address: " << fAddress << std::endl;
+  }
+
+  return output;
 }
 
 int TSegaHit::GetCrate() const {
