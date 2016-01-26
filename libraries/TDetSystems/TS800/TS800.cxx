@@ -962,11 +962,10 @@ void TS800::DrawPID(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) 
   GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
   if(!h)
     h = new GH2I(name.c_str(),name.c_str(),2048,0,2048,4000,0,8192);
-  chain->Project(name.c_str(),"GetIonChamber()->GetdE():GetCorrTOF_OBJTAC()","","colz",nentries);
+  chain->Project(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJTAC()","","colz",nentries);
   h->GetXaxis()->SetTitle("Corrected TOF (objtac)");  
   h->GetYaxis()->SetTitle("Ion Chamber Energy loss (arb. units)");  
   h->Draw("colz");
-
 }
 
 
