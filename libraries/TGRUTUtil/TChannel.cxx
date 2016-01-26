@@ -61,10 +61,10 @@ std::string TChannel::PrintToString(Option_t *opt) const {
   output.append(Form("Number:  \t%i\n",number));
   output.append(Form("Info:    \t%s\n",info.c_str()));
   output.append(Form("EnergyCoeff:  "));
-  for(auto &i : energy_coeff) { output.append(Form("\t%.04f",i)); }
+  for(auto &i : energy_coeff) { output.append(Form("\t%.06f",i)); }
   output.append("\n");
   output.append("EfficienyCoeff:");
-  for(auto &i : efficiency_coeff) { output.append(Form("\t%.04f",i)); }
+  for(auto &i : efficiency_coeff) { output.append(Form("\t%.06f",i)); }
   output.append("\n}\n-----------------------------------\n");
   return output;
 }
@@ -404,13 +404,17 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
         } else if((type.compare("ENERGYCOEFF")==0) ||
                   (type.compare("ENGCOEFF")==0)) {
           channel->DestroyEnergyCoeff();
-          double value;
-          while(ss>>value) { channel->AddEnergyCoeff(value); }
+          std::string text;
+          while(ss >> text) {
+            channel->AddEnergyCoeff(std::atof(text.c_str()));
+          }
         } else if((type.compare("EFFICIENCEYCOEFF")==0) ||
                   (type.compare("EFFCOEFF")==0)) {
           channel->DestroyEfficiencyCoeff();
-          double value;
-          while(ss>>value) { channel->AddEfficiencyCoeff(value); }
+          std::string text;
+          while(ss >> text) {
+            channel->AddEfficiencyCoeff(std::atof(text.c_str()));
+          }
         }
       }
     }
