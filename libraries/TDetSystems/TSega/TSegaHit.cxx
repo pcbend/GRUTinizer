@@ -159,8 +159,14 @@ int TSegaHit::GetMainSegnum() const {
   return output;
 }
 
-TVector3 TSegaHit::GetPosition() const {
-  return TSega::GetSegmentPosition(GetDetnum(), GetMainSegnum());
+TVector3 TSegaHit::GetPosition(bool apply_array_offset) const {
+  TVector3 array_pos = TSega::GetSegmentPosition(GetDetnum(), GetMainSegnum());
+  if(apply_array_offset){
+    array_pos += TVector3(GValue::Value("Sega_X_offset"),
+                          GValue::Value("Sega_Y_offset"),
+                          GValue::Value("Sega_Z_offset"));
+  }
+  return array_pos;
 }
 
 Int_t TSegaHit::Charge() const {

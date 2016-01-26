@@ -190,11 +190,6 @@ float TCrdc::GetPad(){
     }
   }
 
-  //for(int j = 0; j < 6; j++){
-
-  //}
-
-  //return float(WeightedSumNum/WeightedSumDen)+gRandom->Uniform();
   return (float)(channel.at(place))+gRandom->Uniform();
 
 }

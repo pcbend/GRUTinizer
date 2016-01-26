@@ -1,4 +1,4 @@
-// GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GRootBrowser.h GCanvas.h GH2I.h  GPeak.h GValue.h GH1D.h GrutNotifier.h 
+// GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GRootBrowser.h GCanvas.h GH2I.h  GPeak.h GValue.h GH1D.h GrutNotifier.h
 
 
 #ifdef __CINT__
@@ -36,6 +36,8 @@
 //#pragma link C++ global gBaseManager;
 
 #pragma link C++ class GValue-;
+#pragma link C++ class std::map<std::string,GValue*>+;
+#pragma link C++ class std::pair<std::string,GValue*>+;
 #pragma link C++ class GMarker+;
 #pragma link C++ class GCanvas+;
 #pragma link C++ class GRootCanvas+;

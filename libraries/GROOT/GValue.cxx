@@ -1,6 +1,6 @@
 #include "GValue.h"
 
-#include <iostream> 
+#include <iostream>
 #include <vector>
 #include <algorithm>
 #include <utility>
@@ -37,10 +37,18 @@ double GValue::Value(std::string name) {
   return fValueVector.at(name)->GetValue();
 }
 
+void GValue::SetReplaceValue(std::string name, double value) {
+  GValue* gvalue = FindValue(name);
+  if(!gvalue) {
+    gvalue = new GValue(name.c_str());
+    AddValue(gvalue);
+  }
+  gvalue->SetValue(value);
+}
 
 GValue* GValue::FindValue(std::string name){
   GValue* value = 0;
-  if(!name.length()) 
+  if(!name.length())
     return GetDefaultValue();
   if(fValueVector.count(name))
     value = fValueVector[name];
@@ -69,7 +77,7 @@ bool GValue::AddValue(GValue* value,Option_t *opt) {
   TString option(opt);
 
   std::string temp_string = value->GetName();
-  
+
   if(GValue::FindValue(value->GetName())) {
      if(option.Contains("overwrite",TString::kIgnoreCase)) {
        GValue *oldvalue = FindValue(value->GetName());
@@ -172,9 +180,9 @@ int GValue::ReadValFile(const char* filename,Option_t *opt) {
 
 //Parses input file. Should be in the form:
 //NAME {
-//  Name : 
-//  Value : 
-//  Info  : 
+//  Name :
+//  Value :
+//  Info  :
 //}
 int GValue::ParseInputData(std::string input,Option_t *opt) {
   std::istringstream infile(input);
@@ -249,7 +257,7 @@ int GValue::ParseInputData(std::string input,Option_t *opt) {
           value->SetValue(num);
         } else if(type.compare("INFO")==0) {
           value->SetInfo(line.c_str());
-        }       
+        }
       }
     }
   }
@@ -288,5 +296,3 @@ void GValue::Streamer(TBuffer &R__b) {
      R__b.SetByteCount(R__c,true);
   }
 }
-
-

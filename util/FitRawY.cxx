@@ -338,6 +338,7 @@ int function(const char *filename) {
   masterallcore->Write();
   masterall->Write();
   out->Close();
+  return 0;
 }
 
 #ifndef __CINT__

@@ -21,8 +21,6 @@ from pygui.mainwindow import MainWindow
 
 ident = threading.current_thread().ident
 
-
-
 def update():
     try:
         if (threading.current_thread().ident == ident and
