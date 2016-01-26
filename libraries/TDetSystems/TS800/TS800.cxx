@@ -424,6 +424,7 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
   std::dec;
   */
 
+
   int x =1;
   int subsize = *(data+x);
   x++;
@@ -432,6 +433,7 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
 
   //std::cout << " subsize : " << std::hex << subsize << std::endl;
   //std::cout << " subtype : " << std::hex << subtype << std::endl;
+  current_crdc->SetAddress((0x58<<24) + (1<<16) + (current_crdc->GetId() <<8) + 0);
 
   std::map<int,std::map<int,int> > pad;
   //for(;x<subsize;x+=2) {
@@ -448,6 +450,8 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
     int connector_number = (word2&(0x0c00)) >> 10;
     int databits         = (word2&(0x03ff));
     int real_channel = (connector_number << 6) + channel_number;
+
+
 
     /*std::cout << " sample Number    : " << std::dec << sample_number << std::endl;
     std::cout << " channel Number   : " << std::dec << channel_number << std::endl;
@@ -469,7 +473,7 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
       current_crdc->AddPoint(it1->first,it2->first,it2->second);
     }
   }
-
+  //printf("\nchannel.size() = %i\n\n\n",current_crdc->Size());
   //printf("\t0x%08x\t%i\n",currentcrdc,currentcrdc->
 
   if(x>=size)
@@ -572,6 +576,9 @@ bool TS800::HandleIonCPacket(unsigned short* data, int size){
   //  std::cout << "-------------------------------------" << std::endl;
   //std::cout << "   In Handle Ion Chamber Packet " << std::endl;
   int x = 0;
+
+  ion.SetAddress((0x58<<24) + (0<<16) + (0<<8) + 0);
+
   while(x<size){
     int sub_size = (*(data+x)&(0xffff)); x++;
     //std::cout << " Sub packet size : " << sub_size << std::endl;
