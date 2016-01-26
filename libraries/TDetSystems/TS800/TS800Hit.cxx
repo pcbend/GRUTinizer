@@ -3,6 +3,9 @@
 #include "TRandom.h"
 #include "GCanvas.h"
 #include "TH2.h"
+#include "TGraph.h"
+#include "TF1.h"
+#include "TVirtualFitter.h"
 
 TTrigger::TTrigger() {
   Clear();
@@ -164,9 +167,12 @@ TCrdc::TCrdc() {
 TCrdc::~TCrdc() {
 }
 
-float TCrdc::GetPad(){
-  int temp = 0;
-  int place =0;
+TF1 *TCrdc::fgaus = new TF1("fgaus","gaus");
+
+
+int TCrdc::GetMaxPad() const {
+  double temp = 0;
+  int    place =0;
   if(!data.size())
     return -1.0;
 
@@ -184,17 +190,23 @@ float TCrdc::GetPad(){
 
     }*/
 
-    if(data.at(i)>temp) {
-      temp = data.at(i);
+    TChannel *c = TChannel::GetChannel(Address(i));
+    double cal_data;
+    if(c)
+      cal_data = c->CalEnergy(data.at(i)) - c->GetNumber();
+    else
+      cal_data = data.at(i);
+
+    if(cal_data>temp) {
+      temp = cal_data;
       place = i;
     }
   }
 
   return (float)(channel.at(place))+gRandom->Uniform();
-
 }
 
-void TCrdc::DrawChannels(Option_t *opt) const {
+void TCrdc::DrawChannels(Option_t *opt,bool calibrate) const {
   if(!gPad)
     new GCanvas();
   else {
@@ -207,14 +219,29 @@ void TCrdc::DrawChannels(Option_t *opt) const {
   //int currentchannel = -1;
   //TH2I *currenthist = 0;
   TH2I hist(Form("crdc_%i",fId),Form("crdc_%i",fId),224,0,224,128,0,128);
-  for(int x=0;x<Size();x++) {
+  for(int x=0;x<this->Size();x++) {
     //if(channel.at(x)!=currentchannel) {
 
       //TH1I hist(Form("channel_%02i",channel.at(x)),Form("channel_%02i",channel.at(x)),512,0,512);
       //hits.push_back(hist);
       //currentchannel = channel.at(x);
       //currenthist = &(hits.back());
-      hist.Fill(channel.at(x),sample.at(x),data.at(x));
+      double cal_data;
+      //printf("channel.size() = %i \t ",channel.size());
+      //printf("address = %08x \t ",Address(x));
+      //printf("channel = %i \t ",channel.at(x));
+      //printf("x = %i  ",x);
+      TChannel *c = TChannel::GetChannel(Address(x));
+      if(c && calibrate) {
+        cal_data = c->CalEnergy(data.at(x)) - c->GetNumber();
+        printf("cal_data[%03i]  = %f\n",channel.at(x),cal_data);
+      } else {
+        if(!c)
+          printf("failed to find TChannel for 0x%08x\n",Address(x));
+        cal_data = data.at(x);
+        //printf("cal_data[%03i]  = %f\n",channel.at(x),cal_data);
+      }
+      hist.Fill(channel.at(x),sample.at(x),cal_data);
     //}
     //hist.Fill(sample.at(x),data.at(x));
   }
@@ -223,6 +250,8 @@ void TCrdc::DrawChannels(Option_t *opt) const {
   //  c->cd(x+1);
   //  hits.at(x).DrawCopy();
   //}
+  //printf("GetMaxPad()     = %i\n",GetMaxPad());
+  //printf("GetDipersiveX() = %.02f\n",GetDispersiveX());
   hist.DrawCopy("colz");
   return;
 }
@@ -295,9 +324,9 @@ void TCrdc::Clear(Option_t *opt) {
   data.clear();
 }
 
-
-float TCrdc::GetDispersiveX() {
-  if (GetPad() ==-1){
+/*
+float TCrdc::GetDispersiveX() const{
+  if (GetMaxPad() ==-1){
     return sqrt(-1);
   }
 
@@ -309,14 +338,82 @@ float TCrdc::GetDispersiveX() {
   } else if(fId==1) {
     x_slope = GValue::Value("CRDC2_X_SLOPE");
     x_offset = GValue::Value("CRDC2_X_OFFSET");
-  } 
-  
-  return (GetPad()*x_slope+x_offset);
+  }
+
+  std::map<int,int> datamap;
+  int mpad = GetMaxPad();
+  for(int i=0;i<Size();i++) {
+    if((channel.at(i) <( mpad-10)) || (channel.at(i)>(mpad+10)))
+      continue;
+    datamap[channel.at(i)] += GetData(i);
+  }
+
+
+  int i=0;
+  std::map<int,int>::iterator it;
+  TGraph g(datamap.size());
+  for(it=datamap.begin();it!=datamap.end();it++) {
+    g.SetPoint(i++,it->first,it->second);
+  }
+  TVirtualFitter::SetMaxIterations(10);
+  g.Fit(fgaus,"qgoff"); //  "gaus","q","goff");
+  TVirtualFitter::SetMaxIterations(5000);
+  //new GCanvas;
+  //g->Draw("AC");
+  //new GCanvas;
+  //printf("fgaus->GetParameter(1) = %.02f\n",fgaus->GetParameter(1));
+  //return (GetMaxPad()*x_slope+x_offset);
+  double pad = fgaus->GetParameter(1);
+  //fgaus->Reset();
+  return (pad*x_slope+x_offset);
+}
+*/
+
+float TCrdc::GetDispersiveX() const{
+  if (GetMaxPad() ==-1){
+    return sqrt(-1);
+  }
+
+  float x_slope = sqrt(-1);
+  float x_offset = sqrt(-1);
+  if(fId==0) {
+    x_slope = GValue::Value("CRDC1_X_SLOPE");
+    x_offset = GValue::Value("CRDC1_X_OFFSET");
+  } else if(fId==1) {
+    x_slope = GValue::Value("CRDC2_X_SLOPE");
+    x_offset = GValue::Value("CRDC2_X_OFFSET");
+  }
+
+  //std::map<int,int> datamap;
+  int mpad = GetMaxPad();
+  //double datasum = 0;
+  //double chansum = 0;
+  TH1I h("h","h",255,0,255);
+  for(int i=0;i<Size();i++) {
+    if((channel.at(i) <( mpad-10)) || (channel.at(i)>(mpad+10)))
+      continue;
+    h.Fill(channel.at(i),GetData(i));
+    //datamap[channel.at(i)] += GetData(i);
+    //datasum += GetData(i);
+  }
+
+ /*
+  std::map<int,int>::iterator it;
+  double wchansum = 0.0;
+  for(it=datamap.begin();it!=datamap.end();it++) {
+    chansum += it->first;
+    wchansum += it->first*(it->second/datasum);
+  }
+  return ((wchansum/chansum)*x_slope+x_offset);
+*/
+  return (h.GetMean(1)*x_slope+x_offset);
+  //return (h.GetRMS(1)*x_slope+x_offset);
 }
 
 
-float TCrdc::GetNonDispersiveY(){
-  if (GetPad() ==-1){
+
+float TCrdc::GetNonDispersiveY() {
+  if (GetMaxPad() ==-1){
     return sqrt(-1);
   }
   float y_slope = sqrt(-1);

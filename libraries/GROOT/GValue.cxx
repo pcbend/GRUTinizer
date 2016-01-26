@@ -253,8 +253,7 @@ int GValue::ParseInputData(std::string input,Option_t *opt) {
         if(type.compare("NAME")==0) {
           value->SetName(line.c_str());
         } else if(type.compare("VALUE")==0) {
-          double num; ss>>num;
-          value->SetValue(num);
+          value->SetValue(std::atof(line.c_str()));
         } else if(type.compare("INFO")==0) {
           value->SetInfo(line.c_str());
         }
