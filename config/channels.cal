@@ -2656,122 +2656,122 @@ SEG16AN32 {
 
 JAN00FN24 {
   Address: 0x02040500
-  EnergyCoeff: 0 1
+  EnergyCoeff: -127.643 34.489
 }
 
 JAN00FN23 {
   Address: 0x02040501
-  EnergyCoeff: 0 1
+  EnergyCoeff: -236.199 32.2927
 }
 
 JAN00FN22 {
   Address: 0x02040502
-  EnergyCoeff: 0 1
+  EnergyCoeff: -1080 36.000
 }
 
 JAN00FN21 {
   Address: 0x02040503
-  EnergyCoeff: 0 1
+  EnergyCoeff: 340.742 30.975
 }
 
 JAN00FN20 {
   Address: 0x02040504
-  EnergyCoeff: 0 1
+  EnergyCoeff: -914.318 36.512
 }
 
 JAN00FN19 {
   Address: 0x02040505
-  EnergyCoeff: 0 1
+  EnergyCoeff: -902.543 30.864
 }
 
 JAN00FN18 {
   Address: 0x02040506
-  EnergyCoeff: 0 1
+  EnergyCoeff: -971.627 36.325
 }
 
 JAN00FN17 {
   Address: 0x02040507
-  EnergyCoeff: 0 1
+  EnergyCoeff: -284.668 32.811
 }
 
 JAN00FN16 {
   Address: 0x02040508
-  EnergyCoeff: 0 1
+  EnergyCoeff: -887.5 35.492
 }
 
 JAN00FN15 {
   Address: 0x02040509
-  EnergyCoeff: 0 1
+  EnergyCoeff: -801.229 32.883
 }
 
 JAN00FN14 {
   Address: 0x0204050a
-  EnergyCoeff: 0 1
+  EnergyCoeff: -63.750 36.266
 }
 
 JAN00FN13 {
   Address: 0x0204050b
-  EnergyCoeff: 0 1
+  EnergyCoeff: -55.714 32.912
 }
 
 JAN00FN12 {
   Address: 0x0204050c
-  EnergyCoeff: 0 1
+  EnergyCoeff: -1152.464 35.964
 }
 
 JAN00FN11 {
   Address: 0x0204050d
-  EnergyCoeff: 0 1
+  EnergyCoeff: -378.560 32.865
 }
 
 JAN00FN10 {
   Address: 0x0204050e
-  EnergyCoeff: 0 1
+  EnergyCoeff: -1139.104 35.730
 }
 
 JAN00FN09 {
   Address: 0x0204050f
-  EnergyCoeff: 0 1
+  EnergyCoeff: -490.551 30.3011
 }
 
 JAN00FN08 {
   Address: 0x02040510
-  EnergyCoeff: 0 1
+  EnergyCoeff: -814.986 36.305
 }
 
 JAN00FN07 {
   Address: 0x02040511
-  EnergyCoeff: 0 1
+  EnergyCoeff: -1496.868 33.101
 }
 
 JAN00FN06 {
   Address: 0x02040512
-  EnergyCoeff: 0 1
+  EnergyCoeff: -1821.922 36.616
 }
 
 JAN00FN05 {
   Address: 0x02040513
-  EnergyCoeff: 0 1
+  EnergyCoeff: -765.786 31.584
 }
 
 JAN00FN04 {
   Address: 0x02040514
-  EnergyCoeff: 0 1
+  EnergyCoeff: -1686.755 36.907
 }
 
 JAN00FN03 {
   Address: 0x02040515
-  EnergyCoeff: 0 1
+  EnergyCoeff: -563.404 31.674
 }
 
 JAN00FN02 {
   Address: 0x02040516
-  EnergyCoeff: 0 1
+  EnergyCoeff: -1258.038 37.6366
 }
 
 JAN00FN01 {
   Address: 0x02040517
-  EnergyCoeff: 0 1
+  EnergyCoeff: -486.768 32.2443
 }
 
 DEL00FN00 {
@@ -2816,72 +2816,72 @@ DEL00FN07 {
 
 JAN00BN10 {
   Address: 0x02040600
-  EnergyCoeff: 0 1
+  EnergyCoeff: -55.7 49.7
 }
 
 JAN00BN11 {
   Address: 0x02040601
-  EnergyCoeff: 0 1
+  EnergyCoeff: -3000 54
 }
 
 JAN00BN12 {
   Address: 0x02040602
-  EnergyCoeff: 0 1
+  EnergyCoeff: -1650 54
 }
 
 JAN00BN13 {
   Address: 0x02040603
-  EnergyCoeff: 0 1
+  EnergyCoeff: -2623 53.5
 }
 
 JAN00BN14 {
   Address: 0x02040604
-  EnergyCoeff: 0 1
+  EnergyCoeff: -1259 58.8
 }
 
 JAN00BN15 {
   Address: 0x02040605
-  EnergyCoeff: 0 1
+  EnergyCoeff: -1171 49.8
 }
 
 JAN00BN16 {
   Address: 0x02040606
-  EnergyCoeff: 0 1
+  EnergyCoeff: -1409 58.7
 }
 
 JAN00BN17 {
   Address: 0x02040607
-  EnergyCoeff: 0 1
+  EnergyCoeff: -1660 54.6
 }
 
 JAN00BN18 {
   Address: 0x02040608
-  EnergyCoeff: 0 1
+  EnergyCoeff: -3963 58.8
 }
 
 JAN00BN19 {
   Address: 0x02040609
-  EnergyCoeff: 0 1
+  EnergyCoeff: -945 54.0
 }
 
 JAN00BN20 {
   Address: 0x0204060a
-  EnergyCoeff: 0 1
+  EnergyCoeff: -2936.6 58.7
 }
 
 JAN00BN21 {
   Address: 0x0204060b
-  EnergyCoeff: 0 1
+  EnergyCoeff: -425 49.8
 }
 
 JAN00BN22 {
   Address: 0x0204060c
-  EnergyCoeff: 0 1
+  EnergyCoeff: -2838 53.56
 }
 
 JAN00BN23 {
   Address: 0x0204060d
-  EnergyCoeff: 0 1
+  EnergyCoeff: -2055 58
 }
 
 JAN00BN24 {

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash 
+#!/usr/bin/env bash
 
 readlink=readlink
 if [ `uname` = "AIX" ]; then
@@ -37,6 +37,11 @@ if [ "$?" -ne "0" ]; then
   fullpath1=$fullpath
 fi
 
+#   If GRUTSYS is not defined, assume it is one directory above
+# the location of the script.
+if [ -z "$GRUTSYS" ]; then
+    GRUTSYS="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"/..
+fi
 
 bindir=$GRUTSYS/bin
 libdir=$GRUTSYS/libraries
@@ -67,7 +72,7 @@ alllibsout=no
 rootout=no
 
 while test $# -gt 0; do
-  case "$1" in 
+  case "$1" in
   -*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
   *)    optarg= ;;
   esac
@@ -120,7 +125,7 @@ while test $# -gt 0; do
         continue
       fi
       rootout="yes"
-      out="$out `root-config --cflags --glibs` -lPhysics -lSpectrum -lPyROOT" 
+      out="$out `root-config --cflags --glibs` -lPhysics -lSpectrum -lPyROOT"
       ;;
     --help)
       ### Print a helpful message...
@@ -141,8 +146,7 @@ while test $# -gt 0; do
       exit 1
       ;;
    esac
-   shift 
+   shift
 done
 
 echo $out
-

@@ -424,11 +424,7 @@ class MainWindow(object):
         update_tcanvases()
 
     def ResetAllHistograms(self):
-        print 'does not work right now.'
-        #pipeline = ROOT.GetPipeline()
-        #if pipeline:
-        #    pipeline.ClearHistograms()
-        #    self.RefreshHistograms()
+        ROOT.TGRUTint.instance().ResetAllHistograms()
 
     def _draw_single(self,hist,color=1,nselected=1):
         canvas_exists = bool(filter(None,self.canvases))
