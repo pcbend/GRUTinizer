@@ -47,6 +47,7 @@ GH2I::GH2I(const TObject &obj) {
 
 GH2I::~GH2I() {
   fProjections->Delete();
+  fSummaryProjections->Delete();
 }
 
 
@@ -54,6 +55,7 @@ void GH2I::Copy(TObject &obj) const {
   ((GH2I&)obj).Init();
   TH2::Copy(obj);
   fProjections->Copy(*(((GH2I&)obj).fProjections));
+  fSummaryProjections->Copy(*(((GH2I&)obj).fSummaryProjections));
 }
 
 TObject *GH2I::Clone(const char *newname) const {
@@ -65,11 +67,19 @@ TObject *GH2I::Clone(const char *newname) const {
 
 void GH2I::Init() {
   fProjections = new TList();
+  fSummaryProjections = new TList();
+  fIsSummary = false;
+  fSummaryDirection = kXDirection;
 }
 
 
 void GH2I::Clear(Option_t *opt) {
+  TString sopt(opt);
+  if(!sopt.Contains("projonly")){
+    TH2I::Clear(opt);
+  }
   fProjections->Clear();
+  fSummaryProjections->Clear();
 }
 
 void GH2I::Print(Option_t *opt) const { }
@@ -153,7 +163,12 @@ GH1D* GH2I::ProjectionX(const char* name,
   output->SetParent(this);
   output->SetProjectionAxis(0);
   output->SetDirectory(0);
-  fProjections->Add(output);
+
+  if(fIsSummary){
+    fSummaryProjections->Add(output);
+  } else {
+    fProjections->Add(output);
+  }
   return output;
 }
 
@@ -192,7 +207,12 @@ GH1D* GH2I::ProjectionY(const char* name,
   output->SetParent(this);
   output->SetProjectionAxis(1);
   output->SetDirectory(0);
-  fProjections->Add(output);
+
+  if(fIsSummary){
+    fSummaryProjections->Add(output);
+  } else {
+    fProjections->Add(output);
+  }
   return output;
 }
 
@@ -206,7 +226,11 @@ GH1D* GH2I::ProjectionY_Background(int firstbin,
                                mode);
 }
 
-GH1D* GH2I::GetPrevious(const GH1D* curr) const {
+GH1D* GH2I::GetPrevious(const GH1D* curr) {
+  if(fIsSummary){
+    return GetPrevSummary(curr);
+  }
+
   TObjLink* link = fProjections->FirstLink();
   while(link){
     if(link->GetObject() == curr){
@@ -225,7 +249,11 @@ GH1D* GH2I::GetPrevious(const GH1D* curr) const {
   }
 }
 
-GH1D* GH2I::GetNext(const GH1D* curr) const {
+GH1D* GH2I::GetNext(const GH1D* curr) {
+  if(fIsSummary){
+    return GetNextSummary(curr);
+  }
+
   TObjLink* link = fProjections->FirstLink();
   while(link){
     if(link->GetObject() == curr){
@@ -242,4 +270,61 @@ GH1D* GH2I::GetNext(const GH1D* curr) const {
   } else {
     return (GH1D*)fProjections->First();
   }
+}
+
+GH1D* GH2I::GetNextSummary(const GH1D* curr) {
+  std::string name = curr->GetName();
+  size_t underscore_pos = name.rfind('_');
+  int binnum = std::atoi(name.c_str() + underscore_pos + 1);
+  binnum++;
+
+  int max_binnum;
+  if(fSummaryDirection == kXDirection){
+    max_binnum = GetXaxis()->GetNbins();
+  } else {
+    max_binnum = GetYaxis()->GetNbins();
+  }
+
+  if(binnum > max_binnum){
+    binnum = 1;
+  }
+
+  return SummaryProject(binnum);
+}
+
+GH1D* GH2I::GetPrevSummary(const GH1D* curr) {
+  std::string name = curr->GetName();
+  size_t underscore_pos = name.rfind('_');
+  int binnum = std::atoi(name.c_str() + underscore_pos + 1);
+  binnum--;
+
+  int max_binnum;
+  if(fSummaryDirection == kXDirection){
+    max_binnum = GetXaxis()->GetNbins();
+  } else {
+    max_binnum = GetYaxis()->GetNbins();
+  }
+
+  if(binnum <= 0){
+    binnum = max_binnum;
+  }
+
+  return SummaryProject(binnum);
+}
+
+GH1D* GH2I::SummaryProject(int binnum) {
+  std::string hist_name = Form("%s_%d",GetName(),binnum);
+  TObject* obj = fSummaryProjections->FindObject(hist_name.c_str());
+  if(obj) {
+    return (GH1D*)obj;
+  }
+
+  switch(fSummaryDirection) {
+    case kXDirection:
+      return ProjectionY(hist_name.c_str(), binnum, binnum);
+    case kYDirection:
+      return ProjectionX(hist_name.c_str(), binnum, binnum);
+  }
+
+  return NULL;
 }

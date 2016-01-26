@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+import itertools
 import Tkinter as tk
 import ttk
 
@@ -121,7 +122,8 @@ class HistTab(object):
             if not iterable:
                 iterable = obj.GetList()
         elif isinstance(obj, ROOT.GH2I):
-            iterable = obj.GetProjections()
+            iterable = itertools.chain(obj.GetProjections(),
+                                       obj.GetSummaryProjections())
         else:
             iterable = None
 

@@ -471,7 +471,8 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
     return used;
   }
 
-  if(fMarkerMode && GetSelected()->InheritsFrom(TH1::Class())) {
+  if(fMarkerMode && (GetSelected()->InheritsFrom(TH1::Class()) ||
+                     GetSelected()->InheritsFrom(TFrame::Class()))) {
     AddMarker(x,y,hist->GetDimension());
     used = true;
   }
@@ -878,6 +879,28 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
     }
       break;
 
+    case kKey_X: {
+      GH2I* ghist = NULL;
+      for(auto hist : hists) {
+        if(hist->InheritsFrom(GH2I::Class())){
+          ghist = (GH2I*)hist;
+          break;
+        }
+      }
+
+      if(ghist){
+        ghist->SetSummary(true);
+        ghist->SetSummaryDirection(kYDirection);
+        TH1* phist = ghist->SummaryProject(1);
+        if(phist) {
+          new GCanvas();
+          phist->Draw();
+        }
+        edited = true;
+      }
+    }
+      break;
+
     case kKey_y: {
       GH2I* ghist = NULL;
       for(auto hist : hists) {
@@ -900,6 +923,29 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       }
     }
       break;
+
+    case kKey_Y: {
+      GH2I* ghist = NULL;
+      for(auto hist : hists) {
+        if(hist->InheritsFrom(GH2I::Class())){
+          ghist = (GH2I*)hist;
+          break;
+        }
+      }
+
+      if(ghist){
+        ghist->SetSummary(true);
+        ghist->SetSummaryDirection(kXDirection);
+        TH1* phist = ghist->SummaryProject(1);
+        if(phist) {
+          new GCanvas();
+          phist->Draw();
+        }
+        edited = true;
+      }
+    }
+      break;
+
 
     case kKey_z: {
         printf("you pressed z!\n");
