@@ -34,7 +34,7 @@
 
 #include "GrutNotifier.h"
 #include "TGRUTUtilities.h"
-
+#include "GRootCommands.h"
 
 #include "TDataLoop.h"
 #include "TBuildingLoop.h"
@@ -176,21 +176,18 @@ void TGRUTint::ApplyOptions() {
   }
 
   if(opt->StartGUI()){
+    StartGUI();
+    /*
     std::string   script_filename = Form("%s/pygui/grut-view.py",getenv("GRUTSYS"));
     std::ifstream script(script_filename);
     std::string   script_text((std::istreambuf_iterator<char>(script)),
                               std::istreambuf_iterator<char>());
     TPython::Exec(script_text.c_str());
 
-    /*std::string default_gui_config = gEnv->GetValue("GRUT.GuiSetup","");
-    if(default_gui_config.length() &&
-       !opt->GuiSaveSetFiles().size()){
-      TPython::Exec(Form("window.LoadGuiFile(\"%s\")",default_gui_config.c_str()));
-    }*/
-
 
     TTimer* gui_timer = new TTimer("TPython::Exec(\"update()\");", 10, true);
     gui_timer->TurnOn();
+    */
   }
 
   TDataLoop *loop = 0;

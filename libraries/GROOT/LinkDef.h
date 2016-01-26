@@ -31,6 +31,7 @@
 #pragma link C++ function Help;
 #pragma link C++ function Commands;
 #pragma link C++ function GrabHist;
+#pragma link C++ function StartGUI();
 
 //#pragma link C++ global gManager;
 //#pragma link C++ global gBaseManager;

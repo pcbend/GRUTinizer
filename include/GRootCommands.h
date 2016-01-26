@@ -30,6 +30,7 @@ std::string MergeStrings(const std::vector<std::string>& strings, char split='\n
 void Prompt();
 void Help();
 void Commands();
+void StartGUI();
 TH1 *GrabHist(int i=1); //return the histogram from the current canvas, pad i.
 
 #endif
