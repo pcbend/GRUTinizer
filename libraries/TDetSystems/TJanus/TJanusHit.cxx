@@ -1,5 +1,6 @@
 #include "TJanusHit.h"
 
+#include "GValue.h"
 #include "TJanus.h"
 
 void TJanusHit::Copy(TObject& obj) const {

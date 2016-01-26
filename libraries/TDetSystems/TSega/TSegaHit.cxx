@@ -6,6 +6,7 @@
 #include "TString.h"
 
 #include "GCanvas.h"
+#include "GValue.h"
 #include "TSega.h"
 
 
