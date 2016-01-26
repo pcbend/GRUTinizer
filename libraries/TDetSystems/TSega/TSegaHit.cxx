@@ -108,14 +108,14 @@ int TSegaHit::GetDetnum() const {
   } else if(fSegments.size()) {
     output = fSegments[0].GetDetnum();
   } else {
-    std::cout << "Unknown address: " << std::hex << fAddress << std::dec
-              << std::endl;
+    // std::cout << "Unknown address: " << std::hex << fAddress << std::dec
+    //           << std::endl;
     output = -1;
   }
 
   if(output == -1 && chan){
-    std::cout << "Chan with det=-1: " << chan->GetName() << std::endl;
-    std::cout << "address: " << fAddress << std::endl;
+    // std::cout << "Chan with det=-1: " << chan->GetName() << std::endl;
+    // std::cout << "address: " << fAddress << std::endl;
   }
 
   return output;
