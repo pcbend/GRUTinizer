@@ -31,7 +31,8 @@ class HistTab(object):
         self.treeview.bind("<Double-1>", self.OnHistClick)
 
     def AddActiveDirectory(self, tdir):
-        self.active_dirs.append(tdir)
+        if tdir.GetName() not in [d.GetName() for d in self.active_dirs]:
+            self.active_dirs.append(tdir)
 
     def OnHistClick(self,event):
         objects = {name:self.hist_lookup[name]
