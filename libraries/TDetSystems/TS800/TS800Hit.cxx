@@ -108,20 +108,69 @@ void TIonChamber::Set(int ch, int data){
   fData.push_back(data);
 }
 
-float TIonChamber::GetdE(){
+float TIonChamber::GetSum(){
   float temp =0.0;
   //if(fdE==-1.0) {
-  for(unsigned int x=0;x<fData.size();x++) {   //std::vector<int>::iterator it=fData.begin();it!=fData.end();it++) {
-      //if(fdE==-1.0)
-      //  fdE=0.0;
-      temp+=fData.at(x); //it->first;
-    //}
-    //if(fdE!=-1.0)
-     // fdE = fdE/((float)fData.size());
+  
+  for(unsigned int x=0;x<fData.size();x++) {   
+      TChannel *c = TChannel::GetChannel(Address(x));
+      if (c){
+        temp += c->CalEnergy(fData.at(x));
+      }
+      else{
+        temp += fData.at(x);
+      }
   }
   if(temp>0)
     temp = temp/((float)fData.size());
   return temp;
+}
+
+//FROM GRROOT
+//bool Calibration::BuildIonChamber(GIonChamber* in, TRACK* track, IC* out){
+//  out->Clear();
+//  out->SetCal(ICCal(in));
+//  double sum = ICSum(out->GetCal());
+//  double IC_corg = 1;
+//  double IC_coro = 0;
+//  if(fIC_cor[0]!=NULL)
+//    IC_corg = fIC_cor[0]->GetBinContent(fevent/10000+1);
+//  if(fIC_cor[1]!=NULL)
+//    IC_coro = fIC_cor[1]->GetBinContent(fevent/10000+1);
+//  sum *= IC_corg;
+//  sum += IC_coro;
+//  out->SetSum(sum);
+//  out->SetDE(ICDE(sum,track));
+//  if(!isnan(sum) && sum>fSett->ICThresh()){
+//    fichctr++;
+//    return true;
+//  }
+//  return false;
+//}
+//Float_t Calibration::ICDE(Float_t sum, TRACK* track){
+//  Float_t x = track->GetXFP();
+//  Float_t y = track->GetYFP();
+//  if(!isnan(sum) && !isnan(track->GetAFP())){
+//    if(!isnan(y))
+//      sum += sum*fSett->dE_ytilt()*y;
+//    if(!isnan(x) && x < fSett->dE_x0tilt())
+//      sum *= exp(fSett->dE_xtilt()* (fSett->dE_x0tilt() -x) );
+//    fs800valid = 0;
+//    return sum * fde_slope + fde_offset;
+//  } else {
+//    return sqrt(-1.0);
+//  }
+//}
+
+//We already have ICSum, it's our current getdE() unction. We need to somehow get the 
+//track from the crdc into this function, and figure out what IC_corg is.
+
+//TODO: We need to change this function to correct the sum for each event
+//      based on the track through the CRDCs
+
+float TIonChamber::GetdE(){
+  std::cout << "GetdE() NOT IMPLEMENTED! Just returning GetSum()" << std::endl;
+  return GetSum();
 }
 
 //Calculate energy loss in Ion Chamber corrected
