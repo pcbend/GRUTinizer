@@ -29,6 +29,7 @@ private:
   int          number;
   std::string  info;
   std::vector<double> energy_coeff;
+  std::vector<double> time_coeff;
   std::vector<double> efficiency_coeff;
   //name and title held by TNamed.
 
@@ -36,6 +37,7 @@ private:
   static std::string fChannelData;
 
   void SetEnergyCoeff(std::vector<double> tmp)    { energy_coeff    = tmp; }
+  void SetTimeCoeff(std::vector<double> tmp)    { time_coeff    = tmp; }
   void SetEfficiencyCoeff(std::vector<double> tmp) { efficiency_coeff = tmp; }
 
 
@@ -89,16 +91,21 @@ public:
 
   std::vector<double> GetEnergyCoeff()    const { return energy_coeff; }
   void                AddEnergyCoeff(double  tmp)    { energy_coeff.push_back(tmp); }
+  std::vector<double> GetTimeCoeff()    const { return time_coeff; }
+  void                AddTimeCoeff(double  tmp)    { time_coeff.push_back(tmp); }
   std::vector<double> GetEfficiencyCoeff() const { return efficiency_coeff; }
   void                AddEfficiencyCoeff(double  tmp) { efficiency_coeff.push_back(tmp); }
 
   void DestroyEnergyCoeff()    { energy_coeff.clear(); }
+  void DestroyTimeCoeff()    { time_coeff.clear(); }
   void DestroyEfficiencyCoeff() { efficiency_coeff.clear(); }
 
   void DestroyCalibrations();
 
   double CalEnergy(int);
   double CalEnergy(double);
+  double CalTime(int);
+  double CalTime(double);
 
   //double CalEfficiency(int);
   //double CalEfficiency(double) const;

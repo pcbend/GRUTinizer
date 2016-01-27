@@ -48,7 +48,11 @@ void TChannel::Print(Option_t *opt) const {
   printf("EnergyCoeff:  ");
   for(auto &i : energy_coeff) { printf("\t%.04f",i); }
   printf("\n");
+  printf("TimeCoeff: ");
+  for(auto &i : time_coeff) { printf("\t%.04f",i); }
+  printf("\n");
   printf("EfficienyCoeff:");
+
   for(auto &i : efficiency_coeff) { printf("\t%.04f",i); }
   printf("\n}\n-----------------------------------\n");
   return;
@@ -75,6 +79,7 @@ void TChannel::Copy(TObject &rhs) const {
   ((TChannel&)rhs).number  = number;
   ((TChannel&)rhs).info    = info;
   ((TChannel&)rhs).energy_coeff = energy_coeff;
+  ((TChannel&)rhs).time_coeff = time_coeff;
   ((TChannel&)rhs).efficiency_coeff = efficiency_coeff;
   return;
 }
@@ -84,6 +89,7 @@ void TChannel::Clear(Option_t *opt) {
   address         = 0xffffffff;
   number          = -1;
   info.clear();
+  time_coeff.clear();
   energy_coeff.clear();
   efficiency_coeff.clear();
   fMnemonic.Clear();
@@ -236,6 +242,24 @@ double TChannel::CalEnergy(double charge) {
     cal_chg += coef;
   }
   return cal_chg;
+}
+double TChannel::CalTime(int time) {
+  if(time==0)
+    return 0.000;
+  double dtime = (double)time + gRandom->Uniform();
+  return CalEnergy(dtime);
+}
+double TChannel::CalTime(double time) {
+  if(time_coeff.size()==0)
+     return time;
+  double cal_time = 0.000;
+  // Evaluate the polynomial
+  for(int i=time_coeff.size()-1; i>=0; i--){
+    double coef = time_coeff[i];
+    cal_time *= time;
+    cal_time += coef;
+  }
+  return cal_time;
 }
 
 

@@ -44,6 +44,15 @@ double TDetectorHit::GetEnergy() const {
   return chan->CalEnergy(Charge());
 }
 
+double TDetectorHit::GetTime() const {
+  TChannel* chan = TChannel::GetChannel(fAddress);
+  if(!chan){
+    return Time() + gRandom->Uniform();
+  }
+  return chan->CalTime(Time());
+}
+
+
 Int_t TDetectorHit::Compare(const TObject *obj) const {
   const TDetectorHit* other = (const TDetectorHit*)obj;
   if(GetEnergy() < other->GetEnergy()) {
