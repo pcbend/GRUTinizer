@@ -1,0 +1,30 @@
+Unix.*.Root.MacroPath: .:$(GRUTSYS)/util:$(ROOTSYS)/macros
+#Unix.*.Root.DynamicPath:  .:~/rootlibs:$(ROOTSYS)/lib:$/home/tiguser/packages/SharcAnalysis
+
+#default MakeHistos library
+#GRUT.HistLib: $(GRUTSYS)/libraries/libMakeHistos.so
+GRUT.HistLib: $(GRUTSYS)/libraries/libMakeSegaJanusHistos.so
+GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
+
+#files to load at log in:
+Rint.Logon: $(GRUTSYS)/.grut_logon
+Rint.History $(GRUTSYS)/.grut_history
+Rint.HistSize: 1000000
+
+Rint.PromptColor: #CCCC00
+Rint.BracketColor: bold green
+Rint.BadBracketColor: bold red underlined
+Rint.TabComColor: magenta
+
+#default root variables form the grsi enviorment
+Canvas.MoveOpaque: false
+Canvas.ResizeOpaque: false
+Canvas.ShowEventStatus: true
+Canvas.ShowToolBar: true
+Canvas.UseScreenFactor: true
+Canvas.ShowGuideLines: false
+
+
+Gui.IconPath:      $(GRUTSYS)/icons:$(ROOTSYS)/icons
+#$(ROOTSYS)/etc/root.mimes
+Gui.MimeTypeFile:  $(GRUTSYS)/.grut.mimes
