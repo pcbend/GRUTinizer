@@ -48,8 +48,6 @@ enum MyArrowPress{
   kMyArrowDown  = 0x1015
 };
 
-#define MAXNUMBEROFMARKERS 4
-
 ClassImp(GMarker)
 
 void GMarker::Copy(TObject &object) const {
@@ -143,7 +141,7 @@ void GCanvas::AddMarker(int x,int y,int dim) {
     mark->Draw();
   } else if (dim==2) {
     mark->localx = gPad->AbsPixeltoX(x);
-    mark->localy = gPad->AbsPixeltoX(y);
+    mark->localy = gPad->AbsPixeltoY(y);
     mark->binx = hist->GetXaxis()->FindBin(mark->localx);
     mark->biny = hist->GetYaxis()->FindBin(mark->localy);
     double binx_edge = hist->GetXaxis()->GetBinLowEdge(mark->binx);
@@ -157,14 +155,15 @@ void GCanvas::AddMarker(int x,int y,int dim) {
     mark->SetColor(kRed);
     mark->Draw();
   }
-  if(fMarkers.size()>MAXNUMBEROFMARKERS) {
+
+  unsigned int max_number_of_markers = (dim==1) ? 4 : 2;
+
+  fMarkers.push_back(mark);
+
+  if(fMarkers.size() > max_number_of_markers) {
     delete fMarkers.at(0);
     fMarkers.erase(fMarkers.begin());
-    //fMarkers.insert(fMarkers.begin(),mark);
-  } //else {
-    fMarkers.push_back(mark);
-  //}
-  //printf("MarkerAdded %i | %i",x,y);
+  }
   return;
 }
 
@@ -253,20 +252,29 @@ bool GCanvas::CycleBackgroundSubtraction() {
   Color_t color = 0;
 
   switch(fBackgroundMode){
-  case kNoBackground:
-    fBackgroundMode = kRegionBackground;
-    color = kBlue;
-    break;
-
-  case kRegionBackground:
-    fBackgroundMode = kScaledTotalProjection;
-    color = kGreen;
-    break;
-  case kScaledTotalProjection:
-    fBackgroundMode = kNoBackground;
-    color = 0;
-    break;
-  }
+    case kNoBackground:
+      fBackgroundMode = kRegionBackground;
+      printf("hello??\n");
+      Prompt();
+      color = kBlue;
+      break;
+    case kRegionBackground:
+      fBackgroundMode = kTotalFraction;
+      color = kGreen;
+      break;
+    case kTotalFraction:
+      fBackgroundMode = kMatchedLowerMarker;
+      color = kOrange;
+      break;
+    case kMatchedLowerMarker:
+      fBackgroundMode = kSplitTwoMarker;
+      color = kMagenta;
+      break;
+    case kSplitTwoMarker:
+      fBackgroundMode = kNoBackground;
+      color = 0;
+      break;
+  };
 
   for(auto marker : fBackgroundMarkers){
     marker->SetColor(color);
@@ -445,6 +453,13 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
     if(hist->InheritsFrom(GH1D::Class())) {
       GH1D* ghist = (GH1D*)hist;
       ghist->GetParent()->Draw("colz");
+    } else if(hist->InheritsFrom(TH2::Class())) {
+      if(!hist->InheritsFrom(GH2I::Class())) {
+        GH2I *ghist = new GH2I(*((TH2*)hist));
+        ghist->Draw();
+      } else {
+        hist->DrawCopy(options.Data());
+      }
     } else {
       hist->DrawCopy(options.Data());
     }
@@ -452,17 +467,13 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
   }
 
   bool used = false;
-  if(hist->GetDimension()!=1)
+  if(hist->GetDimension() > 2) {
     return used;
+  }
 
-  if(!strcmp(GetSelected()->GetName(),"TFrame") && fMarkerMode) {
-    //((TFrame*)GetSelected())->SetBit(TBox::kCannotMove);
-    //if(GetNMarkers()==4)
-    //   RemoveMarker();
-    AddMarker(x,y);
-    //int px = gPad->AbsPixeltoX(x);
-    //TLine *line = new TLine(px,GetUymin(),px,GetUymax());
-    //line->Draw();
+  if(fMarkerMode && (GetSelected()->InheritsFrom(TH1::Class()) ||
+                     GetSelected()->InheritsFrom(TFrame::Class()))) {
+    AddMarker(x,y,hist->GetDimension());
     used = true;
   }
 
@@ -868,6 +879,28 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
     }
       break;
 
+    case kKey_X: {
+      GH2I* ghist = NULL;
+      for(auto hist : hists) {
+        if(hist->InheritsFrom(GH2I::Class())){
+          ghist = (GH2I*)hist;
+          break;
+        }
+      }
+
+      if(ghist){
+        ghist->SetSummary(true);
+        ghist->SetSummaryDirection(kYDirection);
+        TH1* phist = ghist->SummaryProject(1);
+        if(phist) {
+          new GCanvas();
+          phist->Draw();
+        }
+        edited = true;
+      }
+    }
+      break;
+
     case kKey_y: {
       GH2I* ghist = NULL;
       for(auto hist : hists) {
@@ -890,6 +923,29 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       }
     }
       break;
+
+    case kKey_Y: {
+      GH2I* ghist = NULL;
+      for(auto hist : hists) {
+        if(hist->InheritsFrom(GH2I::Class())){
+          ghist = (GH2I*)hist;
+          break;
+        }
+      }
+
+      if(ghist){
+        ghist->SetSummary(true);
+        ghist->SetSummaryDirection(kXDirection);
+        TH1* phist = ghist->SummaryProject(1);
+        if(phist) {
+          new GCanvas();
+          phist->Draw();
+        }
+        edited = true;
+      }
+    }
+      break;
+
 
     case kKey_z: {
         printf("you pressed z!\n");

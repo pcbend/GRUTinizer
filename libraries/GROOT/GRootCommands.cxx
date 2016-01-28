@@ -4,7 +4,7 @@
 #include <cstdio>
 //#include <string>
 #include <sstream>
-
+#include <fstream>
 
 #include <TRint.h>
 #include <TTree.h>
@@ -20,10 +20,14 @@
 #include <TObject.h>
 #include <TObjArray.h>
 #include <TH1.h>
+#include <TPython.h>
+#include <TTimer.h>
 
 #include <GCanvas.h>
 #include <GPeak.h>
 //#include <GRootObjectManager.h>
+#include <TGRUTOptions.h>
+//#include <TGRUTInt.h>
 
 TChain *gChain = NULL;
 
@@ -31,6 +35,7 @@ void Help()     { printf("This is helpful information.\n"); }
 
 void Commands() { printf("this is a list of useful commands.\n");}
 
+void Prompt() { Getlinem(EGetLineMode::kInit,((TRint*)gApplication)->GetPrompt()); }
 
 int LabelPeaks(TH1 *hist,double sigma,double thresh,Option_t *opt) {
   TSpectrum::StaticSearch(hist,sigma,"Qnodraw",thresh);
@@ -213,8 +218,22 @@ TH1 *GrabHist(int i)  {
 }
   
   
-  
-  
+void StartGUI() { 
+  std::string   script_filename = Form("%s/pygui/grut-view.py",getenv("GRUTSYS"));
+  std::ifstream script(script_filename);
+  std::string   script_text((std::istreambuf_iterator<char>(script)),
+                             std::istreambuf_iterator<char>());
+  TPython::Exec(script_text.c_str());
+
+  TTimer* gui_timer = new TTimer("TPython::Exec(\"update()\");", 10, true);
+  gui_timer->TurnOn();
+
+  TGRUTOptions::Get()->SetStartGUI();
+  for(int i=0;i<gROOT->GetListOfFiles()->GetSize();i++) {
+    TPython::Bind((TFile*)gROOT->GetListOfFiles()->At(i),"tdir");
+    gROOT->ProcessLine("TPython::Exec(\"window.AddDirectory(tdir)\");");
+  }
+} 
   
   
   

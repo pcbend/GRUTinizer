@@ -34,7 +34,7 @@
 
 #include "GrutNotifier.h"
 #include "TGRUTUtilities.h"
-
+#include "GRootCommands.h"
 
 #include "TDataLoop.h"
 #include "TBuildingLoop.h"
@@ -80,6 +80,7 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
   fChain = 0;
   fRootFilesOpened = 0;
   fRawFilesOpened  = 0;
+  fHistogramLoop = 0;
 
 
   SetPrompt("GRizer [%d] ");
@@ -162,24 +163,6 @@ void TGRUTint::ApplyOptions() {
   TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
 
 
-  if(opt->StartGUI()){
-    std::string   script_filename = Form("%s/pygui/grut-view.py",getenv("GRUTSYS"));
-    std::ifstream script(script_filename);
-    std::string   script_text((std::istreambuf_iterator<char>(script)),
-                              std::istreambuf_iterator<char>());
-    TPython::Exec(script_text.c_str());
-
-    /*std::string default_gui_config = gEnv->GetValue("GRUT.GuiSetup","");
-    if(default_gui_config.length() &&
-       !opt->GuiSaveSetFiles().size()){
-      TPython::Exec(Form("window.LoadGuiFile(\"%s\")",default_gui_config.c_str()));
-    }*/
-		    
-
-    TTimer* gui_timer = new TTimer("TPython::Exec(\"update()\");", 10, true);
-    gui_timer->TurnOn();
-  }
-
   //if I am passed any calibrations, lets load those.
   if(opt->CalInputFiles().size()) {
     for(unsigned int x=0;x<opt->CalInputFiles().size();x++) {
@@ -190,6 +173,21 @@ void TGRUTint::ApplyOptions() {
     for(unsigned int x=0;x<opt->ValInputFiles().size();x++) {
       GValue::ReadValFile(opt->ValInputFiles().at(x).c_str());
     }
+  }
+
+  if(opt->StartGUI()){
+    StartGUI();
+    /*
+    std::string   script_filename = Form("%s/pygui/grut-view.py",getenv("GRUTSYS"));
+    std::ifstream script(script_filename);
+    std::string   script_text((std::istreambuf_iterator<char>(script)),
+                              std::istreambuf_iterator<char>());
+    TPython::Exec(script_text.c_str());
+
+
+    TTimer* gui_timer = new TTimer("TPython::Exec(\"update()\");", 10, true);
+    gui_timer->TurnOn();
+    */
   }
 
   TDataLoop *loop = 0;
@@ -259,10 +257,10 @@ void TGRUTint::ApplyOptions() {
     //woop->Connect(uoop2);
 
     if(TGRUTOptions::Get()->MakeHistos()){
-      THistogramLoop *hoop = THistogramLoop::Get("5_hist_loop");
-      hoop->SetOutputFilename(histoutfile);
-      woop->AttachHistogramLoop(hoop);
-      hoop->Resume();
+      fHistogramLoop = THistogramLoop::Get("5_hist_loop");
+      fHistogramLoop->SetOutputFilename(histoutfile);
+      woop->AttachHistogramLoop(fHistogramLoop);
+      fHistogramLoop->Resume();
     }
     woop->Resume();
   }
@@ -279,29 +277,27 @@ void TGRUTint::ApplyOptions() {
     for(unsigned int x=0;x<opt->RootInputFiles().size();x++) {
       OpenRootFile(opt->RootInputFiles().at(x));
     }
-
-    //now that my root file has been open, I may need to re-apply any passed in calfiles.
-    for(unsigned int x=0;x<opt->CalInputFiles().size();x++)
-      printf("I am reloading calfile %s!\n",opt->CalInputFiles().at(x).c_str());
   }
-
 
   //next, if given a root file and told to sort it.
   TChainLoop* coop = NULL;
   if(gChain && (opt->MakeHistos() || opt->SortRoot()) ){
     printf("Attempting to sort root files.\n");
     coop = TChainLoop::Get("1_chain_loop",gChain);
-    THistogramLoop *hoop = THistogramLoop::Get("2_hist_loop");
+    fHistogramLoop = THistogramLoop::Get("2_hist_loop");
     std::string histoutfile = "temp_hist.root";
     if(opt->OutputHistogramFile().length()) {
       histoutfile = opt->OutputHistogramFile();
     }
-    hoop->SetOutputFilename(histoutfile);
-    coop->AttachHistogramLoop(hoop);
-    hoop->Resume();
+    fHistogramLoop->SetOutputFilename(histoutfile);
+    coop->AttachHistogramLoop(fHistogramLoop);
+    fHistogramLoop->Resume();
     coop->Resume();
   }
 
+  for(auto& filename : opt->MacroInputFiles()){
+    RunMacroFile(filename);
+  }
 
   if(opt->ExitAfterSorting()){
     if(loop) {
@@ -323,11 +319,6 @@ void TGRUTint::ApplyOptions() {
     std::cout << std::endl;
 
     this->Terminate();
-  }
-
-
-  for(auto& filename : opt->MacroInputFiles()){
-    RunMacroFile(filename);
   }
 }
 
@@ -378,6 +369,15 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
         }
         gChain->Add(file->GetName());
       }
+
+      if(file->FindObjectAny("TChannel")){
+        file->Get("TChannel");
+      }
+
+      if(file->FindObjectAny("GValue")){
+        file->Get("GValue");
+      }
+
       fRootFilesOpened++;
     } else {
       std::cout << "Could not open " << filename << std::endl;
@@ -425,6 +425,12 @@ void TGRUTint::RunMacroFile(const std::string& filename){
 
   const char* command = Form(".x %s", filename.c_str());
   ProcessLine(command);
+}
+
+void TGRUTint::ResetAllHistograms() {
+  if(fHistogramLoop){
+    fHistogramLoop->ClearHistograms();
+  }
 }
 
 Int_t TGRUTint::TabCompletionHook(char* buf, int* pLoc, std::ostream& out){

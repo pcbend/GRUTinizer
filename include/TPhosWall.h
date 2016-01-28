@@ -1,6 +1,8 @@
 #ifndef TPHOSWALL_H
 #define TPHOSWALL_H
 
+#include <cmath>
+
 #include "TChain.h"
 #include "TDetector.h"
 #include "TGEBEvent.h"

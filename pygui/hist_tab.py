@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+import itertools
 import Tkinter as tk
 import ttk
 
@@ -31,7 +32,8 @@ class HistTab(object):
         self.treeview.bind("<Double-1>", self.OnHistClick)
 
     def AddActiveDirectory(self, tdir):
-        self.active_dirs.append(tdir)
+        if tdir.GetName() not in [d.GetName() for d in self.active_dirs]:
+            self.active_dirs.append(tdir)
 
     def OnHistClick(self,event):
         objects = {name:self.hist_lookup[name]
@@ -120,7 +122,8 @@ class HistTab(object):
             if not iterable:
                 iterable = obj.GetList()
         elif isinstance(obj, ROOT.GH2I):
-            iterable = obj.GetProjections()
+            iterable = itertools.chain(obj.GetProjections(),
+                                       obj.GetSummaryProjections())
         else:
             iterable = None
 

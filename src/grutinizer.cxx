@@ -14,6 +14,7 @@
 #include "TThread.h"
 
 #include "TGRUTint.h"
+#include "TGRUTUtilities.h"
 #include "ProgramPath.h"
 //#include "TROOT_Shim.h"
 //#include "LoadGRUTEnv.h"
@@ -56,8 +57,16 @@ void LoadGRUTEnv() {
   // Set the GRUTSYS variable based on the executable path.
   // If GRUTSYS has already been defined, don't overwrite.
   setenv("GRUTSYS", (program_path()+"/..").c_str(), 0);
-  std::string grut_path = Form("%s/.grutrc",getenv("GRUTSYS")); // + "/../.grutrc";
+
+  // Load $GRUTSYS/.grutrc
+  std::string grut_path = Form("%s/.grutrc",getenv("GRUTSYS"));
   gEnv->ReadFile(grut_path.c_str(),kEnvChange);
+
+  // Load $HOME/.grutrc
+  grut_path = Form("%s/.grutrc",getenv("HOME"));
+  if(file_exists(grut_path.c_str())){
+    gEnv->ReadFile(grut_path.c_str(),kEnvChange);
+  }
 }
 
 

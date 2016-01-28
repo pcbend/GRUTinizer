@@ -36,6 +36,7 @@ private:
   //static std::vector<std::string> fFileNames;
   static std::string fChannelData;
 
+public:
   void SetEnergyCoeff(std::vector<double> tmp)    { energy_coeff    = tmp; }
   void SetTimeCoeff(std::vector<double> tmp)    { time_coeff    = tmp; }
   void SetEfficiencyCoeff(std::vector<double> tmp) { efficiency_coeff = tmp; }
@@ -115,8 +116,8 @@ public:
   static int WriteCalFile(std::string filename="",Option_t *opt="");
 
 private:
-  static int  ParseInputData(std::string &input,Option_t *opt);
-  static int  WriteToBuffer(Option_t *opt);
+  static int  ParseInputData(std::string &input,Option_t *opt="");
+  static int  WriteToBuffer(Option_t *opt="");
   static void trim(std::string *, const std::string &trimChars=" \f\n\r\t\v");
 
   ClassDef(TChannel,1);

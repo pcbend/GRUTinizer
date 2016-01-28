@@ -87,7 +87,9 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
       if(lines_displayed < 1000) {
         std::cout << "Unknown analog (slot, channel): ("
                   << adc_cardnum << ", " << packet->channel_num()
-                  << ")" << std::endl;
+                  << "), address = 0x"
+                  << std::hex << address << std::dec
+                  << std::endl;
       } else if(lines_displayed==1000){
         std::cout << "I'm going to stop telling you that the channel was unknown,"
                   << " you should probably stop the program." << std::endl;

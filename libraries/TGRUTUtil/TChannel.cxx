@@ -451,6 +451,7 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
 
 void TChannel::Streamer(TBuffer &R__b) {
   this->SetBit(kCanDelete);
+  //printf("TChannel Streamer.\n");
   UInt_t R__s, R__c;
   if(R__b.IsReading()) {
      Version_t R__v = R__b.ReadVersion(&R__s,&R__c);
@@ -462,6 +463,7 @@ void TChannel::Streamer(TBuffer &R__b) {
   } else {
      R__c = R__b.WriteVersion(TChannel::IsA(),true);
      TNamed::Streamer(R__b);
+     WriteToBuffer();
      { TString R__str = fChannelData.c_str(); R__str.Streamer(R__b);}
      R__b.SetByteCount(R__c,true);
   }

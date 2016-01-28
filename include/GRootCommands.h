@@ -22,12 +22,15 @@ std::string MergeStrings(const std::vector<std::string>& strings, char split='\n
 
 //bool PeakFit(TH1*,Double_t,Double_t,Option_t *opt="");
 
+
 //
 //  Below are in the interpretur commands. (added to the linkdef!)
 //  
 
+void Prompt();
 void Help();
 void Commands();
+void StartGUI();
 TH1 *GrabHist(int i=1); //return the histogram from the current canvas, pad i.
 
 #endif

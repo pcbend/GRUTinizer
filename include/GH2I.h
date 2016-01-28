@@ -13,7 +13,14 @@ class GH1D;
 enum kBackgroundSubtraction {
   kNoBackground,
   kRegionBackground,
-  kScaledTotalProjection
+  kMatchedLowerMarker,
+  kSplitTwoMarker,
+  kTotalFraction
+};
+
+enum kDirection{
+  kXDirection,
+  kYDirection
 };
 
 class GH2I : public TH2I {
@@ -52,6 +59,8 @@ public:
                               int lastbackground_bin = -1,
                               kBackgroundSubtraction mode = kRegionBackground);
 
+  GH1D* SummaryProject(int binnum);
+
   GH1D* ProjectionX(const char* name="_px",
                     int firstbin = 0,
                     int lastbin = -1,
@@ -74,15 +83,27 @@ public:
                                int lastbackground_bin = -1,
                                kBackgroundSubtraction mode = kRegionBackground); // *MENU*
 
-  GH1D* GetPrevious(const GH1D* curr) const;
-  GH1D* GetNext(const GH1D* curr) const;
+  GH1D* GetPrevious(const GH1D* curr);
+  GH1D* GetPrevSummary(const GH1D* curr);
+  GH1D* GetNext(const GH1D* curr);
+  GH1D* GetNextSummary(const GH1D* curr);
 
   TList* GetProjections() { return fProjections; }
+  TList* GetSummaryProjections() { return fSummaryProjections; }
+
+  void SetSummary(bool is_summary = true) { fIsSummary = is_summary; }
+  bool GetSummmary() const { return fIsSummary; }
+
+  void SetSummaryDirection(kDirection dir) { fSummaryDirection = dir; }
+  kDirection GetSummaryDirection() const { return fSummaryDirection; }
 
 private:
   void Init();
-  TList *fProjections;
+  TList* fProjections;
 
+  TList* fSummaryProjections; //!
+  bool fIsSummary;
+  kDirection fSummaryDirection;
 
   ClassDef(GH2I,1)
 };

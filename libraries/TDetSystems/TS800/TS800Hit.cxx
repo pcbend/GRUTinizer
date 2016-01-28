@@ -243,22 +243,16 @@ int TCrdc::GetMaxPad() const {
     double cal_data;
     if(c)
       cal_data = c->CalEnergy(data.at(i)) - c->GetNumber();
-    else 
+    else
       cal_data = data.at(i);
-      
+
     if(cal_data>temp) {
       temp = cal_data;
       place = i;
     }
   }
 
-  //for(int j = 0; j < 6; j++){
-
-  //}
-
-  //return float(WeightedSumNum/WeightedSumDen)+gRandom->Uniform();
-  return channel.at(place);
-
+  return (float)(channel.at(place))+gRandom->Uniform();
 }
 
 void TCrdc::DrawChannels(Option_t *opt,bool calibrate) const {
@@ -281,20 +275,20 @@ void TCrdc::DrawChannels(Option_t *opt,bool calibrate) const {
       //hits.push_back(hist);
       //currentchannel = channel.at(x);
       //currenthist = &(hits.back());
-      double cal_data; 
-      //printf("channel.size() = %i \t ",channel.size()); 
-      //printf("address = %08x \t ",Address(x)); 
-      //printf("channel = %i \t ",channel.at(x)); 
-      //printf("x = %i  ",x); 
+      double cal_data;
+      //printf("channel.size() = %i \t ",channel.size());
+      //printf("address = %08x \t ",Address(x));
+      //printf("channel = %i \t ",channel.at(x));
+      //printf("x = %i  ",x);
       TChannel *c = TChannel::GetChannel(Address(x));
       if(c && calibrate) {
         cal_data = c->CalEnergy(data.at(x)) - c->GetNumber();
-        printf("cal_data[%03i]  = %f\n",channel.at(x),cal_data); 
+        printf("cal_data[%03i]  = %f\n",channel.at(x),cal_data);
       } else {
-        if(!c) 
+        if(!c)
           printf("failed to find TChannel for 0x%08x\n",Address(x));
         cal_data = data.at(x);
-        //printf("cal_data[%03i]  = %f\n",channel.at(x),cal_data); 
+        //printf("cal_data[%03i]  = %f\n",channel.at(x),cal_data);
       }
       hist.Fill(channel.at(x),sample.at(x),cal_data);
     //}
@@ -393,12 +387,12 @@ float TCrdc::GetDispersiveX() const{
   } else if(fId==1) {
     x_slope = GValue::Value("CRDC2_X_SLOPE");
     x_offset = GValue::Value("CRDC2_X_OFFSET");
-  } 
+  }
 
   std::map<int,int> datamap;
   int mpad = GetMaxPad();
   for(int i=0;i<Size();i++) {
-    if((channel.at(i) <( mpad-10)) || (channel.at(i)>(mpad+10))) 
+    if((channel.at(i) <( mpad-10)) || (channel.at(i)>(mpad+10)))
       continue;
     datamap[channel.at(i)] += GetData(i);
   }
@@ -413,8 +407,8 @@ float TCrdc::GetDispersiveX() const{
   TVirtualFitter::SetMaxIterations(10);
   g.Fit(fgaus,"qgoff"); //  "gaus","q","goff");
   TVirtualFitter::SetMaxIterations(5000);
-  //new GCanvas; 
-  //g->Draw("AC");  
+  //new GCanvas;
+  //g->Draw("AC");
   //new GCanvas;
   //printf("fgaus->GetParameter(1) = %.02f\n",fgaus->GetParameter(1));
   //return (GetMaxPad()*x_slope+x_offset);
@@ -437,35 +431,23 @@ float TCrdc::GetDispersiveX() const{
   } else if(fId==1) {
     x_slope = GValue::Value("CRDC2_X_SLOPE");
     x_offset = GValue::Value("CRDC2_X_OFFSET");
-  } 
+  }
 
   std::map<int,int> datamap;
   int mpad = GetMaxPad();
   double datasum = 0;
-  double chansum = 0;
-  //TH1I *h = new TH1I("h","h",255,0,255);
   for(int i=0;i<Size();i++) {
-    if((channel.at(i) <( mpad-10)) || (channel.at(i)>(mpad+10))) 
+    if((channel.at(i) <( mpad-10)) || (channel.at(i)>(mpad+10)))
       continue;
-    //h->Fill(channel.at(i),GetData(i));
     datamap[channel.at(i)] += GetData(i);
     datasum += GetData(i);
   }
-  
- 
   std::map<int,int>::iterator it;
   double wchansum = 0.0;
   for(it=datamap.begin();it!=datamap.end();it++) {
-    chansum += it->first;   
     wchansum += it->first*(it->second/datasum);
   }
-
-  return ((wchansum/chansum)*x_slope+x_offset);
-
-//  double mean = h->GetMean(1);
-  //delete h;
-//  return (mean*x_slope+x_offset);
-  //return (h.GetRMS(1)*x_slope+x_offset);
+  return (wchansum*x_slope+x_offset);
 }
 
 

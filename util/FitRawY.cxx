@@ -15,11 +15,9 @@
 #include "TPaveText.h"
 #include "TRandom.h"
 
-using namespace std;
-
-
 //#include <map>
 
+using namespace std;
 
 TH2F* master = new TH2F("master","master",
                          200,0,200,8000,0,8000);
@@ -94,11 +92,11 @@ TList *FitRawY(TH1 *hist,bool draw=false,bool is_core=false) { //,TChannel *chan
   TGraphErrors *graph = new TGraphErrors(3);
   graph->SetNameTitle(Form("%s_graph",hist->GetName()),Form("%s_graph",hist->GetName()));
 
- ///////// 
+ /////////
   graph->SetPoint(2,0.0,0.0);
   graph->SetPointError(2,1,0);
- ///////// 
-  
+ /////////
+
   graph->SetPoint(0,yfit.GetParameter(1),898.0);
   graph->SetPointError(0,TMath::Sqrt(yfit.GetParameter(0)),0);
   graph->SetPoint(1,yfit.GetParameter(4),1836.0);
@@ -306,7 +304,7 @@ int function(const char *filename) {
 }
 */
 
-int function(const char *filename) {
+int my_function(const char *filename) {
 
   TFile *file = new TFile(filename);
   TList *outlist = new TList;
@@ -338,12 +336,13 @@ int function(const char *filename) {
   masterallcore->Write();
   masterall->Write();
   out->Close();
+  return 0;
 }
 
 #ifndef __CINT__
 
 int main(int argc, char **argv) {
-  function(argv[1]);
+  my_function(argv[1]);
 }
 
 #endif
