@@ -969,4 +969,46 @@ void TS800::DrawPID(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) 
 }
 
 
+void TS800::DrawAFP(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) {
+  if(!chain)
+    chain = gChain;
+  if(!chain || !chain->GetBranch("TS800"))
+    return;
+  if(!gPad || !gPad->IsEditable()) {
+    gROOT->MakeDefCanvas();
+  } else {
+    gPad->GetCanvas()->Clear();
+  }
+  
+  std::string name = Form("%s_AFP",Class()->GetName()); //_%s",opt);
+  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
+  if(!h)
+    h = new GH2I(name.c_str(),name.c_str(),2048,0,2048,4000,-0.1,0.1);
+  chain->Project(name.c_str(),"GetAFP():GetCorrTOF_OBJTAC()","","colz",nentries);
+  h->GetXaxis()->SetTitle("Corrected TOF (objtac)");  
+  h->GetYaxis()->SetTitle("Corrected AFP (objtac)");  
+  h->Draw("colz");
+}
+
+
+void TS800::DrawDispX(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) {
+  if(!chain)
+    chain = gChain;
+  if(!chain || !chain->GetBranch("TS800"))
+    return;
+  if(!gPad || !gPad->IsEditable()) {
+    gROOT->MakeDefCanvas();
+  } else {
+    gPad->GetCanvas()->Clear();
+  }
+  
+  std::string name = Form("%s_DispX",Class()->GetName()); //_%s",opt);
+  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
+  if(!h)
+    h = new GH2I(name.c_str(),name.c_str(),2048,0,2048,4000,-300,300);
+  chain->Project(name.c_str(),"GetCrdc(0)->GetDispersiveX():GetCorrTOF_OBJTAC()","","colz",nentries);
+  h->GetXaxis()->SetTitle("Corrected TOF (objtac)");  
+  h->GetYaxis()->SetTitle("Dispersive X (objtac)");  
+  h->Draw("colz");
+}
 
