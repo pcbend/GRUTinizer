@@ -4,7 +4,6 @@
 #include <set>
 
 #include <TRandom.h>
-
 #include "TGretina.h"
 
 struct interaction_point {
@@ -274,6 +273,7 @@ void TGretinaHit::AddToSelf(const TGretinaHit& rhs, double& max_energy) {
   fFirstInteraction = 0;
   fSecondInteraction = 1;
 }
+
 
 /*
 TGretinaHit& TGretinaHit::operator+=(const TGretinaHit& rhs) {
