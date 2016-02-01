@@ -1,5 +1,5 @@
-#ifndef _TS800HUNDRED_H_
-#define _TS800HUNDRED_H_
+#ifndef _TSEIGHTHUNDRAD_H_
+#define _TSEIGHTHUNDRAD_H_
 
 #include "TClonesArray.h"
 #include <iostream>
@@ -115,7 +115,6 @@ private:
     static void DrawPID(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
     static void DrawAFP(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
     static void DrawDispX(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
-    static void DrawPID_Tune(Long_t entries=kMaxLong,TChain *chain=0);
 
   ClassDef(TS800,1);
 };

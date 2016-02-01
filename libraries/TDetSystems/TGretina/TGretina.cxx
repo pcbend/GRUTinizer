@@ -3,14 +3,6 @@
 #include <sstream>
 
 #include "TGretina.h"
-#include "GRootCommands.h"
-#include <TPad.h>
-#include <TROOT.h>
-
-#include "GH1D.h"
-#include "GH2I.h"
-#include "TGRUTOptions.h"
-#include "GCanvas.h"
 
 #include "TGEBEvent.h"
 
@@ -164,6 +156,9 @@ TVector3 TGretina::GetCrystalPosition(int cry_id) {
   return v;      
 }
 
+
+
+
 void TGretina::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 
@@ -268,105 +263,4 @@ void TGretina::Clear(Option_t *opt) {
   gretina_hits.clear(); //("TGretinaHit");
   //addback_hits->Clear(opt);//("TGretinaHit");
   raw_data.clear();
-}
-
-
-void TGretina::DrawDopplerGamma(Double_t Beta,Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain){
-  TString OptString = opt;
-  if(!chain)
-    chain = gChain;
-  if(!chain || !chain->GetBranch("TGretina"))
-    return;
-  if(!gPad || !gPad->IsEditable()){
-    gROOT->MakeDefCanvas();
-  }else{
-    gPad->GetCanvas()->Clear();
-  }
-  std::string name  = Form("%s_Gammas",Class()->GetName());
-  std::string title = Form("%s Gamma 1-D",Class()->GetName());
-  GH1D *h = (GH1D*)gROOT->FindObject(name.c_str());
-  if(!h)
-    h = new GH1D(name.c_str(),title.c_str(),4000,0,8000);
-
-
-  chain->Project(name.c_str(),Form("gretina_hits.GetDoppler(%f)",Beta),gate,opt,nentries);
-  h->GetXaxis()->SetTitle("Energy [keV]");
-  h->GetYaxis()->SetTitle("Counts / 2 keV");
-  h->Draw(opt);
-
-}
-
-void TGretina::DrawDopplerBeta(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain){
-  TString OptString = opt;
-  if(!chain)
-    chain = gChain;
-  if(!chain || !chain->GetBranch("TGretina"))
-    return;
-  if(!gPad || !gPad->IsEditable()){
-    gROOT->MakeDefCanvas();
-  }else{
-    gPad->GetCanvas()->Clear();
-  }
-  std::string name  = Form("%s_DopplerBeta",Class()->GetName());
-  std::string title = Form("Gretina Doppler Beta");
-  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
-  if(!h)
-    h = new GH2I(name.c_str(),title.c_str(),2000,0,4000,101,0.2,0.5);
-  double beta = 0.2;
-  for(int i = 0; i < 100; i++){
-    chain->Project(name.c_str(),Form("gretina_hits.GetDoppler(%f):%f",beta,beta),gate,opt,nentries);
-  }
-  h->GetXaxis()->SetTitle("Energy [keV]");
-  h->GetYaxis()->SetTitle("BETA");
-  h->Draw(opt);
-  std::cout << " I DONT WORK YET!!!" << std::endl;
-
-}
-
-void TGretina::DrawEnVsTheta(Double_t Beta,Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain){
-  TString OptString = opt;
-  if(!chain)
-    chain = gChain;
-  if(!chain || !chain->GetBranch("TGretina"))
-    return;
-  if(!gPad || !gPad->IsEditable()){
-    gROOT->MakeDefCanvas();
-  }else{
-    gPad->GetCanvas()->Clear();
-  }
-  std::string name  = Form("%s_En_vs_Theta",Class()->GetName());
-  std::string title = Form("Gretina Energy vs Theta");
-  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
-  if(!h)
-    h = new GH2I(name.c_str(),title.c_str(),4000,0,4000,314,0,3.14);
-
-  chain->Project(name.c_str(),Form("gretina_hits.GetTheta():gretina_hits.GetDoppler(%f)",Beta),gate,opt,nentries);
-  h->GetXaxis()->SetTitle("Theta [radians]");
-  h->GetYaxis()->SetTitle("Energy [keV]");
-  h->Draw(opt);
-
-}
-
-void TGretina::DrawCoreSummary(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain){
-  TString OptString = opt;
-  if(!chain)
-    chain = gChain;
-  if(!chain || !chain->GetBranch("TGretina"))
-    return;
-  if(!gPad || !gPad->IsEditable()){
-    gROOT->MakeDefCanvas();
-  }else{
-    gPad->GetCanvas()->Clear();
-  }
-  std::string name  = Form("%s_Core_Summary",Class()->GetName());
-  std::string title = Form("Gretina Core Summary");
-  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
-  if(!h)
-    h = new GH2I(name.c_str(),title.c_str(),60,20,80,4000,0,4000);
-
-  chain->Project(name.c_str(),"gretina_hits.GetCoreEnergy():gretina_hits.GetCrystalId()",gate,opt,nentries);
-  h->GetXaxis()->SetTitle("Crystal ID");
-  h->GetYaxis()->SetTitle("Energy [arb]");
-  h->Draw(opt);
-
 }

@@ -5,8 +5,6 @@
 #include <Rtypes.h>
 #include <TVector3.h>
 #include <TMath.h>
-#include <TChain.h>
-
 
 #include <cmath>
 
@@ -99,10 +97,6 @@ public:
   void AddToSelf(const TGretinaHit& other, double& max_energy);
 
   //void SetPosition(TVector3 &vec) { fCorePosition = vec; }
-
-
-
-
 
 private:
   void SortHits();

@@ -948,7 +948,6 @@ float TS800::GetCorrTOF_OBJ() const {
 
 
 void TS800::DrawPID(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) {
-  TString OptString = opt;
   if(!chain)
     chain = gChain;
   if(!chain || !chain->GetBranch("TS800"))
@@ -956,15 +955,13 @@ void TS800::DrawPID(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) 
   if(!gPad || !gPad->IsEditable()) {
     gROOT->MakeDefCanvas();
   } else {
-    if(!OptString.Contains("Tune"))
-      gPad->GetCanvas()->Clear();
+    gPad->GetCanvas()->Clear();
   }
   
   std::string name = Form("%s_PID",Class()->GetName()); //_%s",opt);
-  std::string title = Form("%s PID AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJTAC_TOF_CORR_AFP"),GValue::Value("OBJTAC_TOF_CORR_XFP")); //_%s",opt);
   GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
   if(!h)
-    h = new GH2I(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJTAC()",4096,0,2048,4000,0,1800);
+    h = new GH2I(name.c_str(),name.c_str(),2048,0,2048,4000,0,8192);
   chain->Project(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJTAC()","","colz",nentries);
   h->GetXaxis()->SetTitle("Corrected TOF (objtac)");  
   h->GetYaxis()->SetTitle("Ion Chamber Energy loss (arb. units)");  
@@ -973,7 +970,6 @@ void TS800::DrawPID(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) 
 
 
 void TS800::DrawAFP(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) {
-  TString OptString = opt;
   if(!chain)
     chain = gChain;
   if(!chain || !chain->GetBranch("TS800"))
@@ -981,15 +977,13 @@ void TS800::DrawAFP(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) 
   if(!gPad || !gPad->IsEditable()) {
     gROOT->MakeDefCanvas();
   } else {
-    if(!OptString.Contains("Tune"))
-      gPad->GetCanvas()->Clear();
+    gPad->GetCanvas()->Clear();
   }
   
   std::string name = Form("%s_AFP",Class()->GetName()); //_%s",opt);
-  std::string title = Form("%s AFP AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJTAC_TOF_CORR_AFP"),GValue::Value("OBJTAC_TOF_CORR_XFP")); //_%s",opt);
   GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
   if(!h)
-    h = new GH2I(name.c_str(),title.c_str(),2048,0,2048,4000,-0.1,0.1);
+    h = new GH2I(name.c_str(),name.c_str(),2048,0,2048,4000,-0.1,0.1);
   chain->Project(name.c_str(),"GetAFP():GetCorrTOF_OBJTAC()","","colz",nentries);
   h->GetXaxis()->SetTitle("Corrected TOF (objtac)");  
   h->GetYaxis()->SetTitle("Corrected AFP (objtac)");  
@@ -998,9 +992,6 @@ void TS800::DrawAFP(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) 
 
 
 void TS800::DrawDispX(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) {
-  
-  TString OptString = opt;
-
   if(!chain)
     chain = gChain;
   if(!chain || !chain->GetBranch("TS800"))
@@ -1008,41 +999,16 @@ void TS800::DrawDispX(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain
   if(!gPad || !gPad->IsEditable()) {
     gROOT->MakeDefCanvas();
   } else {
-    if(!OptString.Contains("Tune"))
-       gPad->GetCanvas()->Clear();
+    gPad->GetCanvas()->Clear();
   }
   
   std::string name = Form("%s_DispX",Class()->GetName()); //_%s",opt);
-  std::string title = Form("%s DispX AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJTAC_TOF_CORR_AFP"),GValue::Value("OBJTAC_TOF_CORR_XFP")); //_%s",opt);
   GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
   if(!h)
-    h = new GH2I(name.c_str(),title.c_str(),2048,0,2048,4000,-300,300);
+    h = new GH2I(name.c_str(),name.c_str(),2048,0,2048,4000,-300,300);
   chain->Project(name.c_str(),"GetCrdc(0)->GetDispersiveX():GetCorrTOF_OBJTAC()","","colz",nentries);
   h->GetXaxis()->SetTitle("Corrected TOF (objtac)");  
   h->GetYaxis()->SetTitle("Dispersive X (objtac)");  
   h->Draw("colz");
-}
-
-void TS800::DrawPID_Tune(Long_t nentries,TChain *chain){
-  if(!chain) chain=gChain;
-  if(!chain || !chain->GetBranch("TS800")) return;
-  if(!gPad || !gPad->IsEditable()){
-    gROOT->MakeDefCanvas()->Divide(3,1);
-  }
-  else{
-    gPad->GetCanvas()->Clear();
-    gPad->GetCanvas()->Divide(3,1);
-  }
-
-  gPad->GetCanvas()->cd(1);
-  DrawDispX("","Tune",nentries);
-
-  gPad->GetCanvas()->cd(2);
-  DrawAFP("","Tune",nentries);
-  
-  gPad->GetCanvas()->cd(3);
-  DrawPID("","Tune",nentries);
-
-
 }
 
