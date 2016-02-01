@@ -827,6 +827,31 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
   if(hists.size()<1)
     return edited;
   switch(*keysym) {
+    case kKey_e:
+      if(GetNMarkers()<2)
+          break;
+       {
+       if(fMarkers.at(fMarkers.size()-1)->localx < fMarkers.at(fMarkers.size()-2)->localx)
+	 for(unsigned int i=0;i<hists.size();i++){
+	   hists.at(i)->GetXaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-1)->localx,fMarkers.at(fMarkers.size()-2)->localx);
+	   hists.at(i)->GetYaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-1)->localy,fMarkers.at(fMarkers.size()-2)->localy);
+	 }
+       else
+	 for(unsigned int i=0;i<hists.size();i++){
+            hists.at(i)->GetXaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-2)->localx,fMarkers.at(fMarkers.size()-1)->localx);
+            hists.at(i)->GetYaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-2)->localy,fMarkers.at(fMarkers.size()-1)->localy);
+	 }
+       }
+       edited = true;
+       RemoveMarker("all");
+       break;
+    case kKey_n:
+      RemoveMarker("all");
+      for(unsigned int i=0;i<hists.size();i++)
+        hists.at(i)->GetListOfFunctions()->Delete();
+      RemovePeaks(hists.data(),hists.size());
+      edited = true;
+      break;
     case kKey_o:
       for(unsigned int i=0;i<hists.size();i++) {
         TH2* h = (TH2*)hists.at(i);
