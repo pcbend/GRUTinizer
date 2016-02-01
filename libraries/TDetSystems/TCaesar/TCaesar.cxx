@@ -98,6 +98,48 @@ void TCaesar::Print(Option_t *opt) const {
   printf("---------------------------------------\n");
 }
 
+//double getDopplerCorrectedEnergy(double energy, double beta, double cos_angle){
+//  //Calculate E_cm = gamma *(1-beta*cos(angle))E_lab
+//  //gamma = 1/sqrt(1-beta^2)
+//  double gamma = 1.0/TMath::Sqrt(1-beta*beta);
+
+//  return gamma*(1-beta*cos_angle)*energy;
+//}
+//cos_angle = (z[j]-Z_SHIFT)/sqrt(pow((z[j]-Z_SHIFT),2)+x[j]*x[j]+y[j]*y[j]);
+double TCaesar::GetEnergyDC(TCaesarHit hit){
+  double BETA = GValue::Value("BETA");
+  double Z_SHIFT = GValue::Value("TARGET_SHIFT_Z");
+  
+  if (!BETA){
+    std::cout << "No Beta given, can't correct" << std::endl;
+    return sqrt(-1);
+  }
+  if (!Z_SHIFT){
+    std::cout << "Warning no Z-shift applied" << std::endl;
+  }
+  int ring = hit.GetRingNumber();
+  int det = hit.GetDetectorNumber();
+  double x = detector_positions[ring][det][0];
+  double y = detector_positions[ring][det][1];
+  double z = detector_positions[ring][det][2];
+
+  //cos_angle is equal to z/(z^2+x^2+y^2) where x,y,z have to be corrected for shift
+  double cos_angle = (z-Z_SHIFT)/(sqrt(pow((z-Z_SHIFT),2)+x*x+y*y));
+  double gamma = 1.0/(sqrt(1-BETA*BETA));
+
+  return (gamma*(1-BETA*cos_angle)*hit.GetEnergy());
+}
+
+double TCaesar::GetCorrTime(TCaesarHit hit, TS800 *s800){
+  double caesar_time = hit.GetTime();
+  if (!s800){
+    return sqrt(-1);
+  }
+  
+  double tac_obj = s800->GetTof().GetTacOBJ();
+  double s800source = s800->GetTrigger().GetS800Source();
+  return caesar_time - ((s800source + tac_obj)*(0.1/0.25));
+}
 void TCaesar::Build_Single_Read(TSmartBuffer buf){
   const char* data = buf.GetData();
   const char* data_end = data + buf.GetSize();
@@ -227,8 +269,13 @@ void TCaesar::InsertHit(const TDetectorHit& hit) {
 }
 
 void TCaesar::ReadDetectorPositions(std::string in_file_name){
+  std::cout << "Mapping detectors <-> Positions"<< std::endl;
   std::ifstream input_file;
   input_file.open(in_file_name.c_str());
+  if (!input_file){
+    std::cout << "Detector input file: " << in_file_name <<  " doesn't exist!" << std::endl;
+    return;
+  }
   std::string line;
 
   char ring_name;

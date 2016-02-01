@@ -29,6 +29,7 @@ private:
   int          number;
   std::string  info;
   std::vector<double> energy_coeff;
+  std::vector<double> time_coeff;
   std::vector<double> efficiency_coeff;
   //name and title held by TNamed.
 
@@ -37,6 +38,7 @@ private:
 
 public:
   void SetEnergyCoeff(std::vector<double> tmp)    { energy_coeff    = tmp; }
+  void SetTimeCoeff(std::vector<double> tmp)    { time_coeff    = tmp; }
   void SetEfficiencyCoeff(std::vector<double> tmp) { efficiency_coeff = tmp; }
 
 
@@ -90,16 +92,21 @@ public:
 
   std::vector<double> GetEnergyCoeff()    const { return energy_coeff; }
   void                AddEnergyCoeff(double  tmp)    { energy_coeff.push_back(tmp); }
+  std::vector<double> GetTimeCoeff()    const { return time_coeff; }
+  void                AddTimeCoeff(double  tmp)    { time_coeff.push_back(tmp); }
   std::vector<double> GetEfficiencyCoeff() const { return efficiency_coeff; }
   void                AddEfficiencyCoeff(double  tmp) { efficiency_coeff.push_back(tmp); }
 
   void DestroyEnergyCoeff()    { energy_coeff.clear(); }
+  void DestroyTimeCoeff()    { time_coeff.clear(); }
   void DestroyEfficiencyCoeff() { efficiency_coeff.clear(); }
 
   void DestroyCalibrations();
 
   double CalEnergy(int);
   double CalEnergy(double);
+  double CalTime(int);
+  double CalTime(double);
 
   //double CalEfficiency(int);
   //double CalEfficiency(double) const;
@@ -109,8 +116,8 @@ public:
   static int WriteCalFile(std::string filename="",Option_t *opt="");
 
 private:
-  static int  ParseInputData(std::string &input,Option_t *opt);
-  static int  WriteToBuffer(Option_t *opt);
+  static int  ParseInputData(std::string &input,Option_t *opt="");
+  static int  WriteToBuffer(Option_t *opt="");
   static void trim(std::string *, const std::string &trimChars=" \f\n\r\t\v");
 
   ClassDef(TChannel,1);

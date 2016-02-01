@@ -8,6 +8,8 @@
 
 #include "TDetector.h"
 #include "TCaesarHit.h"
+#include "GValue.h"
+#include "TS800.h"
 
 //For easy parsing of vsn map
 #include "TEnv.h" 
@@ -38,9 +40,14 @@ public:
   int GetULM() const { return fUlm; }
   void SetULM(int ulm) { fUlm = ulm; }
 
-  //static TVector3 GetPosition(int detnum, int ring_num, int sector_num);
 
+  
+  //static TVector3 GetPosition(int detnum, int ring_num, int sector_num);
   int Size() const { return caesar_hits.size(); }
+
+  double GetEnergyDC(TCaesarHit hit);
+  double GetCorrTime(TCaesarHit hit, TS800 *s800);
+
   static char const ring_names[]; 
   static int  const det_per_ring[]; 
 
@@ -66,10 +73,10 @@ private:
 
   int fUlm;
   std::string vsn_file_name = std::string(getenv("GRUTSYS")) + "/config/caesar/VSNMap.dat";
-  std::string det_pos_file_name = std::string(getenv("GRUTSYS")) + "/config/caesarCaesarPos.dat";
+  std::string det_pos_file_name = std::string(getenv("GRUTSYS")) + "/config/caesar/CaesarPos.dat";
   std::vector<TCaesarHit> caesar_hits;
 
   ClassDef(TCaesar,1);
 };
 
-#endif /* _TJANUS_H_ */
+#endif /* _TCAESAR_H_ */

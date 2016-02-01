@@ -29,7 +29,8 @@ public:
   void SetTime(int time)            { fTime = time; }
   void SetTimestamp(long timestamp) { fTimestamp = timestamp; }
 
-  double GetEnergy() const;
+  double GetEnergy() const; //applies TChannel ENERGYCOEFF to Charge
+  double GetTime() const;   //applies TChannel TIMECOEFF to Time()
 
   static const TVector3 BeamUnitVec; //!
 

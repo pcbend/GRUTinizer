@@ -28,4 +28,3 @@ Canvas.ShowGuideLines: false
 Gui.IconPath:      $(GRUTSYS)/icons:$(ROOTSYS)/icons
 #$(ROOTSYS)/etc/root.mimes
 Gui.MimeTypeFile:  $(GRUTSYS)/.grut.mimes
-

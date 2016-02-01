@@ -433,30 +433,21 @@ float TCrdc::GetDispersiveX() const{
     x_offset = GValue::Value("CRDC2_X_OFFSET");
   }
 
-  //std::map<int,int> datamap;
+  std::map<int,int> datamap;
   int mpad = GetMaxPad();
-  //double datasum = 0;
-  //double chansum = 0;
-  TH1I h("h","h",255,0,255);
+  double datasum = 0;
   for(int i=0;i<Size();i++) {
     if((channel.at(i) <( mpad-10)) || (channel.at(i)>(mpad+10)))
       continue;
-    h.Fill(channel.at(i),GetData(i));
-    //datamap[channel.at(i)] += GetData(i);
-    //datasum += GetData(i);
+    datamap[channel.at(i)] += GetData(i);
+    datasum += GetData(i);
   }
-
- /*
   std::map<int,int>::iterator it;
   double wchansum = 0.0;
   for(it=datamap.begin();it!=datamap.end();it++) {
-    chansum += it->first;
     wchansum += it->first*(it->second/datasum);
   }
-  return ((wchansum/chansum)*x_slope+x_offset);
-*/
-  return (h.GetMean(1)*x_slope+x_offset);
-  //return (h.GetRMS(1)*x_slope+x_offset);
+  return (wchansum*x_slope+x_offset);
 }
 
 
