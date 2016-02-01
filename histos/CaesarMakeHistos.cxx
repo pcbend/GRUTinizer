@@ -72,17 +72,18 @@ void MakeHistograms(TRuntimeObjects& obj) {
         TH2 *caesar_det_energy_dc = GetMatrix(list,"DetectorEnergyDC",200,0,200,4096,0,4096);
         caesar_det_energy_dc->Fill(det+total_det_in_prev_rings[ring],energy_dc);
 
-        TH2 *caesar_det_time = GetMatrix(list,"DetectorTime",200,0,200,4000,0,4000);
+        TH2 *caesar_det_time = GetMatrix(list,"DetectorTime",200,0,200,3000,0,3000);
         caesar_det_time->Fill(det+total_det_in_prev_rings[ring],time);
-        TH2 *caesar_time_energy = GetMatrix(list,"EnergyNoDC",4000,-2000,2000,4000,0,4000);
+
+        TH2 *caesar_time_energy = GetMatrix(list,"EnergyNoDC",3000,0,3000,4096,0,4096);
         caesar_time_energy->Fill(time, energy);
 
-        TH2 *caesar_time_energyDC = GetMatrix(list,"EnergyDCRawTime",4000,-2000,2000,4000,0,4000);
+        TH2 *caesar_time_energyDC = GetMatrix(list,"EnergyDCRawTime",3000,0,3000,4096,0,4096);
         caesar_time_energyDC->Fill(time, energy_dc);
 
         if (s800){
           double corr_time = caesar->GetCorrTime(hit,s800);
-          TH2 *caesar_corrtime_energyDC = GetMatrix(list,"EnergyDCCorrTime",4000,-2000,2000,4000,0,4000);
+          TH2 *caesar_corrtime_energyDC = GetMatrix(list,"EnergyDCCorrTime",4000,-2000,2000,4096,0,4096);
           caesar_corrtime_energyDC->Fill(corr_time, energy_dc);
         }
       }
@@ -101,21 +102,24 @@ if(s800) {
   double xfp = s800->GetTof().GetXFP();
   double obj = s800->GetTof().GetOBJ();
   //if (s800->GetIonChamber().Size()){
-  TH2 *tac_vs_ic= GetMatrix(list,"PID_TAC",4000,0,4000,4096,0,4096);
+  TH2 *tac_vs_ic= GetMatrix(list,"PID_TAC",4096,0,4096,4096,0,4096);
   tac_vs_ic->Fill(objtac_corr, ic_sum);
-  TH1 *ion_sum = GetHistogram(list,"Ion Chamber Sum",8000,0,64000);
+  TH1 *ion_sum = GetHistogram(list,"Ion Chamber Sum",4096,0,4096);
   ion_sum->Fill(ic_sum);
   //}
 
-  TH2 *tac_vs_afp= GetMatrix(list,"tac_vs_AFP",4000,0,4000,600,-0.1,0.1);
+  TH2 *tac_vs_afp= GetMatrix(list,"tac_vs_AFP",4096,0,4096,600,-0.1,0.1);
   tac_vs_afp->Fill(objtac,afp);
 
-  TH2 *tac_vs_xfp= GetMatrix(list,"tac_vs_xfp",4000,0,4000,600,-300,300);
+  TH2 *tac_vs_xfp= GetMatrix(list,"tac_vs_xfp",4096,0,4096,600,-300,300);
   tac_vs_xfp->Fill(objtac,crdc_1_x);
 
-  TH1 *tacobj = GetHistogram(list,"tacobj",4000,0,4000);
+  TH2 *tacxfp_vs_tacobj = GetMatrix(list,"tacxfp_vs_tacobj",4096,0,4096,4096,0,4096);
+  tacxfp_vs_tacobj->Fill(xfptac,objtac);
+
+  TH1 *tacobj = GetHistogram(list,"tacobj",4096,0,4096);
   tacobj->Fill(objtac);
-  TH1 *tacxfp = GetHistogram(list,"tacxfp",4000,0,4000);
+  TH1 *tacxfp = GetHistogram(list,"tacxfp",4096,0,4096);
   tacxfp->Fill(xfptac);
 
   TH1 *obj_hist = GetHistogram(list,"obj_hist",6000,-3000,3000);
@@ -123,13 +127,13 @@ if(s800) {
   TH1 *xfp_hist = GetHistogram(list,"xfp_hist",6000,-3000,3000);
   xfp_hist->Fill(xfp);
 
-  TH2 *tac_corr_vs_afp= GetMatrix(list,"tac_corr_vs_AFP",4000,0,4000,600,-0.1,0.1);
+  TH2 *tac_corr_vs_afp= GetMatrix(list,"tac_corr_vs_AFP",4096,0,4096,600,-0.1,0.1);
   tac_corr_vs_afp->Fill(objtac_corr,afp);
-  TH1 *tacobj_corr = GetHistogram(list,"tacobj_corr",4000,0,4000);
+  TH1 *tacobj_corr = GetHistogram(list,"tacobj_corr",4096,0,4096);
   tacobj_corr->Fill(objtac_corr);
 
   //if (s800->GetCrdc(0).Size()){
-  TH2 *tac_corr_vs_xfp= GetMatrix(list,"tac_corr_vs_xFP",4000,0,4000,600,-300,300);
+  TH2 *tac_corr_vs_xfp= GetMatrix(list,"tac_corr_vs_xFP",4096,0,4096,600,-300,300);
   tac_corr_vs_xfp->Fill(objtac_corr,crdc_1_x);
   TH1 *crdc1x = GetHistogram(list,"CRDC1_X",600,-300,300);
   crdc1x->Fill(crdc_1_x);
