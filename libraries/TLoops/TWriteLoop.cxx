@@ -44,6 +44,7 @@ TWriteLoop::~TWriteLoop() {
     delete elem.second;
   }
 
+  output_file->cd();
   event_tree->Write(event_tree->GetName(), TObject::kOverwrite);
   if(GValue::Size())
     GValue::Get()->Write();
