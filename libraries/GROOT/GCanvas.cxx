@@ -21,6 +21,7 @@
 #include <TPolyMarker.h>
 #include <TSpectrum.h>
 #include <TPython.h>
+#include <TCutG.h>
 
 #include <TApplication.h>
 #include <TContextMenu.h>
@@ -845,6 +846,42 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
        edited = true;
        RemoveMarker("all");
        break;
+    case kKey_g:
+      if(GetNMarkers()<2)
+          break;
+      {
+       static int cutcounter=0;
+       TCutG *cut = new TCutG(Form("_cut%i",cutcounter++),9);
+       //cut->SetVarX("");
+       //cut->SetVarY("");
+       //
+       double x1 = fMarkers.at(fMarkers.size()-1)->localx;
+       double y1 = fMarkers.at(fMarkers.size()-1)->localy;
+       double x2 = fMarkers.at(fMarkers.size()-2)->localx;
+       double y2 = fMarkers.at(fMarkers.size()-2)->localy;
+       if(x1>x2)
+         std::swap(x1,x2);
+       if(y1>y2)
+         std::swap(y1,y2);
+       double xdist = (x2-x1)/2.0;
+       double ydist = (y2-y1)/2.0;
+       //
+       //
+       cut->SetPoint(0,x1,y1);
+       cut->SetPoint(1,x1,y1+ydist);
+       cut->SetPoint(2,x1,y2);
+       cut->SetPoint(3,x1+xdist,y2);
+       cut->SetPoint(4,x2,y2);
+       cut->SetPoint(5,x2,y2-ydist);
+       cut->SetPoint(6,x2,y1);
+       cut->SetPoint(7,x2-xdist,y1);
+       cut->SetPoint(8,x1,y1);
+       cut->SetLineColor(kBlack);
+       hists.at(0)->GetListOfFunctions()->Add(cut);
+      }
+      edited = true;
+      RemoveMarker("all");
+      break;
     case kKey_n:
       RemoveMarker("all");
       for(unsigned int i=0;i<hists.size();i++)
