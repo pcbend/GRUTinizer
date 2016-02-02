@@ -964,7 +964,7 @@ void TS800::DrawPID(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) 
   std::string title = Form("%s PID AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJTAC_TOF_CORR_AFP"),GValue::Value("OBJTAC_TOF_CORR_XFP")); //_%s",opt);
   GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
   if(!h)
-    h = new GH2I(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJTAC()",4096,0,2048,4000,0,1800);
+    h = new GH2I(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJTAC()",4096,0,4096,4000,0,4000);
   chain->Project(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJTAC()","","colz",nentries);
   h->GetXaxis()->SetTitle("Corrected TOF (objtac)");  
   h->GetYaxis()->SetTitle("Ion Chamber Energy loss (arb. units)");  
