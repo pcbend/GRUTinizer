@@ -27,7 +27,11 @@ std::string get_run_number(std::string input) {
   TObjArray* matches = re.MatchS(input.c_str());
 
   std::string output;
-  if(matches->GetEntriesFast() >= 3){
+  //std::cout << " matches->GetEntriesFast() = " << matches->GetEntriesFast() << std::endl; 
+  //for(int x=0;x<matches->GetEntriesFast();x++) 
+  //  std::cout << x << "\t" << ((TObjString*)matches->At(x))->GetString() << std::endl;
+  
+  if(matches->GetEntriesFast() >= 2){
     // Return a std::vector<std::string> ?
     // No, that would be too simple, too type-safe, and too memory-safe for ROOT.
     output = ((TObjString*)matches->At(1))->GetString();
