@@ -36,6 +36,8 @@
 //#pragma link C++ global gManager;
 //#pragma link C++ global gBaseManager;
 
+#pragma link C++ class GPopup+;
+
 #pragma link C++ class GValue-;
 #pragma link C++ class std::map<std::string,GValue*>+;
 #pragma link C++ class std::pair<std::string,GValue*>+;
