@@ -175,7 +175,11 @@ void GCanvas::RemoveMarker(Option_t* opt) {
     for(auto marker : fMarkers){
       delete marker;
     }
+    for(auto marker : fBackgroundMarkers){
+      delete marker;
+    }
     fMarkers.clear();
+    fBackgroundMarkers.clear();
   } else {
     if(fMarkers.size()<1)
       return;
