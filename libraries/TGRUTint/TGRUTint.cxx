@@ -163,7 +163,18 @@ void TGRUTint::ApplyOptions() {
   TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
 
 
-  //if I am passed any calibrations, lets load those.
+  //next, if given a root file and NOT told to sort it..
+  if(opt->RootInputFiles().size()){
+    for(unsigned int x=0;x<opt->RootInputFiles().size();x++) {
+      OpenRootFile(opt->RootInputFiles().at(x));  
+      // this we creat and populate gChain if able.
+      //   TChannels from the root file will be loaded as file is opened. 
+      //   GValues from the root file will be loaded as file is opened. 
+    }
+  }
+
+  //if I am passed any calibrations, lets load those, this 
+  //will over write any wit the same address previously read in.
   if(opt->CalInputFiles().size()) {
     for(unsigned int x=0;x<opt->CalInputFiles().size();x++) {
       TChannel::ReadCalFile(opt->CalInputFiles().at(x).c_str());
@@ -175,23 +186,8 @@ void TGRUTint::ApplyOptions() {
     }
   }
 
-  if(opt->StartGUI()){
-    StartGUI();
-    /*
-    std::string   script_filename = Form("%s/pygui/grut-view.py",getenv("GRUTSYS"));
-    std::ifstream script(script_filename);
-    std::string   script_text((std::istreambuf_iterator<char>(script)),
-                              std::istreambuf_iterator<char>());
-    TPython::Exec(script_text.c_str());
-
-
-    TTimer* gui_timer = new TTimer("TPython::Exec(\"update()\");", 10, true);
-    gui_timer->TurnOn();
-    */
-  }
-
   TDataLoop *loop = 0;
-  //next most important thing, if given a raw file && NOT told to not sort!
+  //next most important thing, if given a raw file && NOT told to NOT sort!
   if((opt->InputRing().length() || opt->RawInputFiles().size())
      && opt->SortRaw()) {
 
@@ -263,21 +259,13 @@ void TGRUTint::ApplyOptions() {
       fHistogramLoop->Resume();
     }
     woop->Resume();
-  }
-
-  //ok now, if told not to sort open any raw files as _data# (rootish like??)
-  if(opt->RawInputFiles().size() && !opt->SortRaw()) {
+  } else if(opt->RawInputFiles().size() && !opt->SortRaw()) {
+    //ok now, if told not to sort open any raw files as _data# (rootish like??)
     for(unsigned int x=0;x<opt->RawInputFiles().size();x++) {
       OpenRawFile(opt->RawInputFiles().at(x));
     }
   }
 
-  //next, if given a root file and NOT told to sort it..
-  if(opt->RootInputFiles().size()){
-    for(unsigned int x=0;x<opt->RootInputFiles().size();x++) {
-      OpenRootFile(opt->RootInputFiles().at(x));
-    }
-  }
 
   //next, if given a root file and told to sort it.
   TChainLoop* coop = NULL;
@@ -288,6 +276,14 @@ void TGRUTint::ApplyOptions() {
     std::string histoutfile = "temp_hist.root";
     if(opt->OutputHistogramFile().length()) {
       histoutfile = opt->OutputHistogramFile();
+    } else {
+      if(opt->RootInputFiles().size()==1) {
+        histoutfile = "hist" + get_run_number(opt->RootInputFiles().at(0)) + ".root";
+      } else if(opt->RootInputFiles().size()>1){
+        histoutfile = "hist" + get_run_number(opt->RootInputFiles().at(0)) + "-"  
+                             + get_run_number(opt->RootInputFiles().at(opt->RootInputFiles().size()-1))  
+                             + ".root";
+      }
     }
     fHistogramLoop->SetOutputFilename(histoutfile);
     coop->AttachHistogramLoop(fHistogramLoop);
@@ -297,6 +293,10 @@ void TGRUTint::ApplyOptions() {
 
   for(auto& filename : opt->MacroInputFiles()){
     RunMacroFile(filename);
+  }
+  
+  if(opt->StartGUI()){
+    StartGUI();
   }
 
   if(opt->ExitAfterSorting()){

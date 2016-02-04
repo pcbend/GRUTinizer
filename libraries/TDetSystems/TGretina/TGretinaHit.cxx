@@ -52,6 +52,7 @@ void TGretinaHit::Copy(TObject &rhs) const {
 Float_t TGretinaHit::GetCoreEnergy(int i) const {
   float charge = (float)GetCoreCharge(i) + gRandom->Uniform();
   TChannel *channel = TChannel::GetChannel(GetAddress()+i);
+  //printf("GetAddress() + i = 0x%08x\n",GetAddress()+i); 
   if(!channel)
     return charge;
   return channel->CalEnergy(charge);

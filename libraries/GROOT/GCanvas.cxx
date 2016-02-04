@@ -25,6 +25,8 @@
 
 #include <TApplication.h>
 #include <TContextMenu.h>
+#include <TGButton.h>
+
 
 //#include "GROOTGuiFactory.h"
 #include "GRootCommands.h"
@@ -62,6 +64,53 @@ void GMarker::Copy(TObject &object) const {
   ((GMarker&)object).binx  = binx;
   ((GMarker&)object).biny  = biny;
 }
+
+ClassImp(GPopup)
+
+GPopup::GPopup(const TGWindow *p,const TGWindow *m) 
+       : TGTransientFrame(p,m,200,200,kVerticalFrame) {
+  SetCleanup(kDeepCleanup);
+  Connect("CloseWindow()","GPopup",this,"CloseWindow()");
+  DontCallClose();
+  if(!p&&!m) {
+    MakeZombie();
+    return;
+  }
+  TGHorizontalFrame *fHtop = new TGHorizontalFrame(this,200,200);
+
+  fButton1 = new TGTextButton(fHtop,"&ok",1);
+  fButton1->SetCommand("printf(\"you pressed ok.\\n\")");
+  fButton1 = new TGTextButton(fHtop,"&cancel",2);
+  fButton1->SetCommand("printf(\"you pressed cancel.\\n\")");
+
+  fHtop->AddFrame(fButton1,0);//new TGLayoutHints);//(kLHintsCenterX|kLHintsCenterY));
+  fHtop->AddFrame(fButton2,0);//new TGLayoutHints);//(kLHintsCenterX|kLHintsCenterY));
+  AddFrame(fHtop,0);//new TGLayoutHints);//(kLHintsExpandX|kLHintsExpandY));
+
+  SetEditDisabled(kEditDisable);
+  MapSubwindows();
+  TGDimension size = GetDefaultSize();
+  Resize(size);
+  CenterOnParent();
+  MapWindow();
+}
+
+GPopup::~GPopup() {
+  if(IsZombie()) return;
+  //cleanup?
+}
+
+void GPopup::CloseWindow() {
+  DeleteWindow();
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -175,7 +224,11 @@ void GCanvas::RemoveMarker(Option_t* opt) {
     for(auto marker : fMarkers){
       delete marker;
     }
+    for(auto marker : fBackgroundMarkers){
+      delete marker;
+    }
     fMarkers.clear();
+    fBackgroundMarkers.clear();
   } else {
     if(fMarkers.size()<1)
       return;
@@ -415,7 +468,7 @@ bool GCanvas::HandleKeyboardPress(Event_t *event,UInt_t *keysym) {
 
 
   //if(ge){
-  //  switch(*keysym) {
+  //switch(*keysym) {
   //    case kKey_p:
   //      ge->Print();
   //      break;
@@ -528,19 +581,19 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
   case kMyArrowLeft:
     {
       if(mdiff>xdiff) {
-	if(first==(min+1)) {
-	  //
-	}
-	else if((first-(xdiff/2))<min) {
-	  first = min+1;
-	  last  = min + (xdiff) + 1;
-	} else {
-	  first = first-(xdiff/2);
-	  last  = last -(xdiff/2);
-	}
+        if(first==(min+1)) {
+          //
+        }
+        else if((first-(xdiff/2))<min) {
+          first = min+1;
+          last  = min + (xdiff) + 1;
+        } else {
+          first = first-(xdiff/2);
+          last  = last -(xdiff/2);
+        }
       }
       for(unsigned int i=0;i<hists.size();i++)
-	hists.at(i)->GetXaxis()->SetRange(first,last);
+        hists.at(i)->GetXaxis()->SetRange(first,last);
 
       edited = true;
     }
@@ -548,18 +601,18 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
   case kMyArrowRight:
     {
       if(mdiff>xdiff) {
-	if(last== (max-1)) {
-	  //
-	}else if((last+(xdiff/2))>max) {
-	  first = max - 1 - (xdiff);
-	  last  = max - 1;
-	} else {
-	  last  = last +(xdiff/2);
-	  first = first+(xdiff/2);
-	}
+        if(last== (max-1)) {
+          //
+        }else if((last+(xdiff/2))>max) {
+          first = max - 1 - (xdiff);
+          last  = max - 1;
+        } else {
+          last  = last +(xdiff/2);
+          first = first+(xdiff/2);
+        }
       }
       for(unsigned int i=0;i<hists.size();i++)
-	hists.at(i)->GetXaxis()->SetRange(first,last);
+        hists.at(i)->GetXaxis()->SetRange(first,last);
 
       edited = true;
     }
@@ -633,6 +686,14 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
 
     case kKey_B:
       edited = CycleBackgroundSubtraction();
+      break;
+ 
+    case kKey_d:
+      {
+        //new GPopup(gClient->GetDefaultRoot(),gClient->GetDefaultRoot());
+        //new GPopup(0,0);
+            //this);
+      }
       break;
 
     case kKey_e:
