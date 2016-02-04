@@ -68,17 +68,19 @@ void MakeHistograms(TRuntimeObjects& obj) {
   if(caesar) {
     for(int y=0;y<caesar->Size();y++) {
       TCaesarHit hit = caesar->GetCaesarHit(y);
+
+      int det = hit.GetDetectorNumber();
+      int ring = hit.GetRingNumber();
+      double charge = hit.GetCharge();
+      TH2 *caesar_det_charge = GetMatrix(list,"DetectorCharge",200,0,200,2500,0,2500);
+      caesar_det_charge->Fill(det+total_det_in_prev_rings[ring],charge);
+
       if (hit.IsValid()){//only accept hits with both times and energies
         std::string histname;
 
-        int det = hit.GetDetectorNumber();
-        int ring = hit.GetRingNumber();
-        double charge = hit.GetCharge();
         double energy = hit.GetEnergy();
         double energy_dc = caesar->GetEnergyDC(hit);
         double time = hit.GetTime();
-        TH2 *caesar_det_charge = GetMatrix(list,"DetectorCharge",200,0,200,2500,0,2500);
-        caesar_det_charge->Fill(det+total_det_in_prev_rings[ring],charge);
 
         TH2 *caesar_det_energy = GetMatrix(list,"DetectorEnergy",200,0,200,4096,0,4096);
         caesar_det_energy->Fill(det+total_det_in_prev_rings[ring],energy);
@@ -102,16 +104,19 @@ void MakeHistograms(TRuntimeObjects& obj) {
           TH2 *caesar_corrtime_energyDC = GetMatrix(list,"EnergyDCCorrTime",4000,-2000,2000,4096,0,4096);
           caesar_corrtime_energyDC->Fill(corr_time, energy_dc);
           
+          TH2 *caesar_det_corrtime = GetMatrix(list,"DetectorCorrTime",200,0,200,3000,0,3000);
+          caesar_det_corrtime->Fill(det+total_det_in_prev_rings[ring],corr_time);
+
           if (cutg->IsInside(objtac_corr, ic_sum)){
-            if (hit.IsValid()){
-              TH1 *caesar_raw_energy_kr88 = GetHistogram(list,"RawEnergyKr88", 8192,0,8192);
-              caesar_raw_energy_kr88->Fill(charge);
-            }
-            TH1 *caesar_raw_fera_charge_kr88 = GetHistogram(list,"RawChargeKr88", 2048,0,2048);
-            caesar_raw_fera_charge_kr88->Fill(charge);
+            TH1 *caesar_raw_energy_kr88 = GetHistogram(list,"RawEnergyKr88", 8192,0,8192);
+            caesar_raw_energy_kr88->Fill(charge);
+            TH2 *caesar_corrtime_energyDC_kr88 = GetMatrix(list,"EnergyDCCorrTimeKr88",4000,-2000,2000,4096,0,4096);
+            caesar_corrtime_energyDC_kr88->Fill(corr_time, energy_dc);
+            TH2 *caesar_det_energy_dc_kr88 = GetMatrix(list,"DetectorEnergyDCKr88",200,0,200,4096,0,4096);
+            caesar_det_energy_dc_kr88->Fill(det+total_det_in_prev_rings[ring],energy_dc);
           }
-        }
-      }
+        }//s800 exists
+      }//hit has both energy and time
     }
   }
 
