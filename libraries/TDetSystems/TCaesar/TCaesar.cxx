@@ -98,14 +98,7 @@ void TCaesar::Print(Option_t *opt) const {
   printf("---------------------------------------\n");
 }
 
-//double getDopplerCorrectedEnergy(double energy, double beta, double cos_angle){
-//  //Calculate E_cm = gamma *(1-beta*cos(angle))E_lab
-//  //gamma = 1/sqrt(1-beta^2)
-//  double gamma = 1.0/TMath::Sqrt(1-beta*beta);
-
-//  return gamma*(1-beta*cos_angle)*energy;
-//}
-//cos_angle = (z[j]-Z_SHIFT)/sqrt(pow((z[j]-Z_SHIFT),2)+x[j]*x[j]+y[j]*y[j]);
+//Calculate E_cm = gamma *(1-beta*cos(angle))E_lab
 double TCaesar::GetEnergyDC(TCaesarHit hit){
   double BETA = GValue::Value("BETA");
   double Z_SHIFT = GValue::Value("TARGET_SHIFT_Z");

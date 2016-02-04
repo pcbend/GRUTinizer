@@ -49,6 +49,20 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   TList *list = &(obj.GetObjects());
   int numobj = list->GetSize();
+  
+  TCutG *cutg = new TCutG("pid_kr88",8);
+  cutg->SetVarX("GetCorrTOF_OBJTAC()");
+  cutg->SetVarY("GetIonChamber()->GetSum()");
+  cutg->SetTitle("pid_kr88");
+  cutg->SetFillColor(1);
+  cutg->SetPoint(0,1774.82,1816.05);
+  cutg->SetPoint(1,1788,1816.05);
+  cutg->SetPoint(2,1796.15,1599.7);
+  cutg->SetPoint(3,1786.11,1510.61);
+  cutg->SetPoint(4,1775.45,1512.43);
+  cutg->SetPoint(5,1766.04,1614.24);
+  cutg->SetPoint(6,1772.94,1805.14);
+  cutg->SetPoint(7,1774.82,1816.05);
 
   const int total_det_in_prev_rings[N_RINGS] = {0,10,24,48,72,96,120,144,168,182};
   if(caesar) {
@@ -83,83 +97,94 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
         if (s800){
           double corr_time = caesar->GetCorrTime(hit,s800);
+          double objtac_corr = s800->GetCorrTOF_OBJTAC();
+          double ic_sum = s800->GetIonChamber().GetSum();
           TH2 *caesar_corrtime_energyDC = GetMatrix(list,"EnergyDCCorrTime",4000,-2000,2000,4096,0,4096);
           caesar_corrtime_energyDC->Fill(corr_time, energy_dc);
+          
+          if (cutg->IsInside(objtac_corr, ic_sum)){
+            if (hit.IsValid()){
+              TH1 *caesar_raw_energy_kr88 = GetHistogram(list,"RawEnergyKr88", 8192,0,8192);
+              caesar_raw_energy_kr88->Fill(charge);
+            }
+            TH1 *caesar_raw_fera_charge_kr88 = GetHistogram(list,"RawChargeKr88", 2048,0,2048);
+            caesar_raw_fera_charge_kr88->Fill(charge);
+          }
         }
       }
     }
   }
 
-if(s800) {
+  if(s800) {
   
-  double ic_sum = s800->GetIonChamber().GetSum();
-  double objtac_corr = s800->GetCorrTOF_OBJTAC();
-  double objtac = s800->GetTof().GetTacOBJ();
-  double crdc_1_x = s800->GetCrdc(0).GetDispersiveX();
-  double crdc_2_x = s800->GetCrdc(1).GetDispersiveX();
-  double afp = s800->GetAFP();
-  double xfptac = s800->GetTof().GetTacXFP();
-  double xfp = s800->GetTof().GetXFP();
-  double obj = s800->GetTof().GetOBJ();
-  //if (s800->GetIonChamber().Size()){
-  TH2 *tac_vs_ic= GetMatrix(list,"PID_TAC",4096,0,4096,4096,0,4096);
-  tac_vs_ic->Fill(objtac_corr, ic_sum);
-  TH1 *ion_sum = GetHistogram(list,"Ion Chamber Sum",4096,0,4096);
-  ion_sum->Fill(ic_sum);
-  //}
+    double ic_sum = s800->GetIonChamber().GetSum();
+    double objtac_corr = s800->GetCorrTOF_OBJTAC();
+    double objtac = s800->GetTof().GetTacOBJ();
+    double crdc_1_x = s800->GetCrdc(0).GetDispersiveX();
+    double crdc_2_x = s800->GetCrdc(1).GetDispersiveX();
+    double afp = s800->GetAFP();
+    double xfptac = s800->GetTof().GetTacXFP();
+    double xfp = s800->GetTof().GetXFP();
+    double obj = s800->GetTof().GetOBJ();
+    //if (s800->GetIonChamber().Size()){
+    TH2 *tac_vs_ic= GetMatrix(list,"PID_TAC",4096,0,4096,4096,0,4096);
+    tac_vs_ic->Fill(objtac_corr, ic_sum);
+    TH1 *ion_sum = GetHistogram(list,"Ion Chamber Sum",4096,0,4096);
+    ion_sum->Fill(ic_sum);
+    //}
 
-  TH2 *tac_vs_afp= GetMatrix(list,"tac_vs_AFP",4096,0,4096,600,-0.1,0.1);
-  tac_vs_afp->Fill(objtac,afp);
+    TH2 *tac_vs_afp= GetMatrix(list,"tac_vs_AFP",4096,0,4096,600,-0.1,0.1);
+    tac_vs_afp->Fill(objtac,afp);
 
-  TH2 *tac_vs_xfp= GetMatrix(list,"tac_vs_xfp",4096,0,4096,600,-300,300);
-  tac_vs_xfp->Fill(objtac,crdc_1_x);
+    TH2 *tac_vs_xfp= GetMatrix(list,"tac_vs_xfp",4096,0,4096,600,-300,300);
+    tac_vs_xfp->Fill(objtac,crdc_1_x);
 
-  TH2 *tacxfp_vs_tacobj = GetMatrix(list,"tacxfp_vs_tacobj",4096,0,4096,4096,0,4096);
-  tacxfp_vs_tacobj->Fill(xfptac,objtac);
+    TH2 *tacxfp_vs_tacobj = GetMatrix(list,"tacxfp_vs_tacobj",4096,0,4096,4096,0,4096);
+    tacxfp_vs_tacobj->Fill(xfptac,objtac);
 
-  TH1 *tacobj = GetHistogram(list,"tacobj",4096,0,4096);
-  tacobj->Fill(objtac);
-  TH1 *tacxfp = GetHistogram(list,"tacxfp",4096,0,4096);
-  tacxfp->Fill(xfptac);
+    TH1 *tacobj = GetHistogram(list,"tacobj",4096,0,4096);
+    tacobj->Fill(objtac);
+    TH1 *tacxfp = GetHistogram(list,"tacxfp",4096,0,4096);
+    tacxfp->Fill(xfptac);
 
-  TH1 *obj_hist = GetHistogram(list,"obj_hist",6000,-3000,3000);
-  obj_hist->Fill(obj);
-  TH1 *xfp_hist = GetHistogram(list,"xfp_hist",6000,-3000,3000);
-  xfp_hist->Fill(xfp);
+    TH1 *obj_hist = GetHistogram(list,"obj_hist",6000,-3000,3000);
+    obj_hist->Fill(obj);
+    TH1 *xfp_hist = GetHistogram(list,"xfp_hist",6000,-3000,3000);
+    xfp_hist->Fill(xfp);
 
-  TH2 *tac_corr_vs_afp= GetMatrix(list,"tac_corr_vs_AFP",4096,0,4096,600,-0.1,0.1);
-  tac_corr_vs_afp->Fill(objtac_corr,afp);
-  TH1 *tacobj_corr = GetHistogram(list,"tacobj_corr",4096,0,4096);
-  tacobj_corr->Fill(objtac_corr);
+    TH2 *tac_corr_vs_afp= GetMatrix(list,"tac_corr_vs_AFP",4096,0,4096,600,-0.1,0.1);
+    tac_corr_vs_afp->Fill(objtac_corr,afp);
+    TH1 *tacobj_corr = GetHistogram(list,"tacobj_corr",4096,0,4096);
+    tacobj_corr->Fill(objtac_corr);
 
-  //if (s800->GetCrdc(0).Size()){
-  TH2 *tac_corr_vs_xfp= GetMatrix(list,"tac_corr_vs_xFP",4096,0,4096,600,-300,300);
-  tac_corr_vs_xfp->Fill(objtac_corr,crdc_1_x);
-  TH1 *crdc1x = GetHistogram(list,"CRDC1_X",600,-300,300);
-  crdc1x->Fill(crdc_1_x);
-  //}
-
-
-  //if (s800->GetCrdc(1).Size()){
-  TH1 *crdc2x = GetHistogram(list,"CRDC2_X",600,-300,300);
-  crdc2x->Fill(crdc_2_x);
- // }
+    //if (s800->GetCrdc(0).Size()){
+    TH2 *tac_corr_vs_xfp= GetMatrix(list,"tac_corr_vs_xFP",4096,0,4096,600,-300,300);
+    tac_corr_vs_xfp->Fill(objtac_corr,crdc_1_x);
+    TH1 *crdc1x = GetHistogram(list,"CRDC1_X",600,-300,300);
+    crdc1x->Fill(crdc_1_x);
+    //}
 
 
-  TH1 *trig_bit = GetHistogram(list, "TrigBit", 10,0,10);
-  int freg = s800->GetTrigger().GetRegistr();
-  if (freg != 1 && freg != 2 && freg != 3){
-    trig_bit->Fill(9); //Just a random channel to fill for nonsense input
-  }
-  else{
-    if (freg&1){
-      trig_bit->Fill(0);
+    //if (s800->GetCrdc(1).Size()){
+    TH1 *crdc2x = GetHistogram(list,"CRDC2_X",600,-300,300);
+    crdc2x->Fill(crdc_2_x);
+    // }
+
+
+    TH1 *trig_bit = GetHistogram(list, "TrigBit", 10,0,10);
+    int freg = s800->GetTrigger().GetRegistr();
+    if (freg != 1 && freg != 2 && freg != 3){
+      trig_bit->Fill(9); //Just a random channel to fill for nonsense input
     }
-    if (freg&2){
-      trig_bit->Fill(1);
+    else{
+      if (freg&1){
+        trig_bit->Fill(0);
+      }
+      if (freg&2){
+        trig_bit->Fill(1);
+      }
     }
   }
-}
 
   if(numobj!=list->GetSize())
     list->Sort();
