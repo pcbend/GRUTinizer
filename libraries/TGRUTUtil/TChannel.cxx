@@ -67,6 +67,9 @@ std::string TChannel::PrintToString(Option_t *opt) const {
   output.append(Form("EnergyCoeff:  "));
   for(auto &i : energy_coeff) { output.append(Form("\t%.06f",i)); }
   output.append("\n");
+  output.append(Form("TimeCoeff:  "));
+  for(auto &i : time_coeff) { output.append(Form("\t%.06f",i)); }
+  output.append("\n");
   output.append("EfficienyCoeff:");
   for(auto &i : efficiency_coeff) { output.append(Form("\t%.06f",i)); }
   output.append("\n}\n-----------------------------------\n");
@@ -170,6 +173,8 @@ bool TChannel::AppendChannel(TChannel *oldchan) {
      oldchan->SetNumber(this->GetNumber());
   if(strlen(this->GetInfo()))
      oldchan->SetInfo(this->GetInfo());
+  if(this->GetTimeCoeff().size()>0)
+     oldchan->SetTimeCoeff(this->GetTimeCoeff());
   if(this->GetEnergyCoeff().size()>0)
      oldchan->SetEnergyCoeff(this->GetEnergyCoeff());
   if(this->GetEfficiencyCoeff().size()>0)
@@ -221,6 +226,7 @@ void TChannel::trim(std::string * line, const std::string & trimChars) {
 void TChannel::DestroyCalibrations() {
   DestroyEnergyCoeff();
   DestroyEfficiencyCoeff();
+  DestroyTimeCoeff();
   return;
 }
 
@@ -244,14 +250,16 @@ double TChannel::CalEnergy(double charge) {
   return cal_chg;
 }
 double TChannel::CalTime(int time) {
-  if(time==0)
+  if(time==0){
     return 0.000;
+  }
   double dtime = (double)time + gRandom->Uniform();
-  return CalEnergy(dtime);
+  return CalTime(dtime);
 }
 double TChannel::CalTime(double time) {
-  if(time_coeff.size()==0)
+  if(time_coeff.size()==0){
      return time;
+  }
   double cal_time = 0.000;
   // Evaluate the polynomial
   for(int i=time_coeff.size()-1; i>=0; i--){
@@ -432,6 +440,12 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
           while(ss >> text) {
             channel->AddEnergyCoeff(std::atof(text.c_str()));
           }
+        } else if((type.compare("TIMECOEFF")==0)) {
+          channel->DestroyTimeCoeff();
+          std::string text;
+          while(ss >> text) {
+            channel->AddTimeCoeff(std::atof(text.c_str()));
+          } 
         } else if((type.compare("EFFICIENCEYCOEFF")==0) ||
                   (type.compare("EFFCOEFF")==0)) {
           channel->DestroyEfficiencyCoeff();

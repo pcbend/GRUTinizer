@@ -17,7 +17,7 @@ public:
   int GetVSN() const		{ return fVsn;		}
   int GetChannel() const	{ return fChannel;	}
   int GetCharge() const		{ return Charge();	}
-  int GetTime() const		{ return Time();        }
+//  int GetTime() const		{ return Time();        }
   int GetDetectorNumber() const { return fDet;          }
   int GetRingNumber() const     { return fRing;         }
   double *GetPos()              { return pos;        }  

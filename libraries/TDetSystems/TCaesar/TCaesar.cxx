@@ -98,14 +98,7 @@ void TCaesar::Print(Option_t *opt) const {
   printf("---------------------------------------\n");
 }
 
-//double getDopplerCorrectedEnergy(double energy, double beta, double cos_angle){
-//  //Calculate E_cm = gamma *(1-beta*cos(angle))E_lab
-//  //gamma = 1/sqrt(1-beta^2)
-//  double gamma = 1.0/TMath::Sqrt(1-beta*beta);
-
-//  return gamma*(1-beta*cos_angle)*energy;
-//}
-//cos_angle = (z[j]-Z_SHIFT)/sqrt(pow((z[j]-Z_SHIFT),2)+x[j]*x[j]+y[j]*y[j]);
+//Calculate E_cm = gamma *(1-beta*cos(angle))E_lab
 double TCaesar::GetEnergyDC(TCaesarHit hit){
   double BETA = GValue::Value("BETA");
   double Z_SHIFT = GValue::Value("TARGET_SHIFT_Z");
@@ -131,14 +124,13 @@ double TCaesar::GetEnergyDC(TCaesarHit hit){
 }
 
 double TCaesar::GetCorrTime(TCaesarHit hit, TS800 *s800){
-  double caesar_time = hit.GetTime();
-  if (!s800){
+  if (!s800 || !hit.IsValid()){
     return sqrt(-1);
   }
-  
+  double caesar_time = hit.GetTime();
   double tac_obj = s800->GetTof().GetTacOBJ();
   double s800source = s800->GetTrigger().GetS800Source();
-  return caesar_time - ((s800source + tac_obj)*(0.1/0.25));
+  return (caesar_time - ((s800source + tac_obj)*(0.1/0.25)));
 }
 void TCaesar::Build_Single_Read(TSmartBuffer buf){
   const char* data = buf.GetData();
