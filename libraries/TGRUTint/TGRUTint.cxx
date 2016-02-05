@@ -186,6 +186,12 @@ void TGRUTint::ApplyOptions() {
     }
   }
 
+
+  if(opt->StartGUI()){
+    StartGUI();
+  }
+
+
   TDataLoop *loop = 0;
   //next most important thing, if given a raw file && NOT told to NOT sort!
   if((opt->InputRing().length() || opt->RawInputFiles().size())
@@ -295,9 +301,6 @@ void TGRUTint::ApplyOptions() {
     RunMacroFile(filename);
   }
   
-  if(opt->StartGUI()){
-    StartGUI();
-  }
 
   if(opt->ExitAfterSorting()){
     if(loop) {
