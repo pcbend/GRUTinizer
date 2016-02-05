@@ -202,15 +202,20 @@ TVector3 TS800::CRDCTrack(){
 }
 
 float TS800::GetAFP() const{
+  if (GetCrdc(0).GetId() == -1 || GetCrdc(1).GetId() == -1){
+    return sqrt(-1);
+  }
   float AFP = TMath::ATan((GetCrdc(1).GetDispersiveX()-GetCrdc(0).GetDispersiveX())/1073.0);
   return AFP;
 
 }
 
 float TS800::GetBFP() const{
+  if (GetCrdc(0).GetId() == -1 || GetCrdc(1).GetId() == -1){
+    return sqrt(-1);
+  }
   float BFP = TMath::ATan((GetCrdc(1).GetNonDispersiveY()-GetCrdc(0).GetNonDispersiveY())/1073.0);
   return BFP;
-
 }
 
 void TS800::Clear(Option_t* opt){
@@ -889,11 +894,17 @@ TDetectorHit& TS800::GetHit(int i){
 }
 
 float TS800::GetTofE1_TAC(float c1,float c2)  const {
+  if (GetCrdc(0).GetId() == -1) {
+    return sqrt(-1);
+  }
   return GetTof().GetTacOBJ() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
 }
 
 
 float TS800::GetTofE1_TDC(float c1,float c2)  const {
+  if (GetCrdc(0).GetId() == -1) {
+    return sqrt(-1);
+  }
 
   return GetTof().GetOBJ() - GetScint().GetTimeUp() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
 }
