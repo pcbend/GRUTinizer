@@ -124,14 +124,13 @@ double TCaesar::GetEnergyDC(TCaesarHit hit){
 }
 
 double TCaesar::GetCorrTime(TCaesarHit hit, TS800 *s800){
-  double caesar_time = hit.GetTime();
-  if (!s800){
+  if (!s800 || !hit.IsValid()){
     return sqrt(-1);
   }
-  
+  double caesar_time = hit.GetTime();
   double tac_obj = s800->GetTof().GetTacOBJ();
   double s800source = s800->GetTrigger().GetS800Source();
-  return caesar_time - ((s800source + tac_obj)*(0.1/0.25));
+  return (caesar_time - ((s800source + tac_obj)*(0.1/0.25)));
 }
 void TCaesar::Build_Single_Read(TSmartBuffer buf){
   const char* data = buf.GetData();
