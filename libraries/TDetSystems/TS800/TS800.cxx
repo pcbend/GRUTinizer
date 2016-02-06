@@ -909,24 +909,21 @@ float TS800::GetTofE1_TDC(float c1,float c2)  const {
   return GetTof().GetOBJ() - GetScint().GetTimeUp() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
 }
 
-float TS800::GetTofE1_MTDC(float c1,float c2)   {
+float TS800::GetTofE1_MTDC(float c1,float c2,int i) const {
 
   std::vector<float> result;
   // TODO: This check is always false.  Commented it out, but was there some reason for it?
   // if(mtof.fObj.size()<0)
   //   std::cout << " In GetTOF MTDC, Size = " << mtof.fObj.size() << std::endl;
   for(unsigned int x=0;x<mtof.fObj.size();x++) {
-    if(mtof.fObj.at(x)>10200) {
-      for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
-        if((mtof.fE1Up.at(y) <13500) && (mtof.fE1Up.at(y) >12500))
-          result.push_back( mtof.fObj.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
+    for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
+      result.push_back( mtof.fObj.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
       }
     }
-  }
-  if(result.size()==1)
-    return result.at(0);
-  return -1.0;
-  //return GetTof().GetOBJ() - GetScint().GetTimeUp() - c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+
+   if(result.size()>(unsigned int)i)
+     return result.at(i);
+   return sqrt(-1.0);
 }
 
 float TS800::GetCorrTOF_OBJTAC() const {
@@ -940,6 +937,13 @@ float TS800::GetCorrTOF_OBJ() const {
   double afp_cor = GValue::Value("OBJ_TOF_CORR_AFP");
   double xfp_cor = GValue::Value("OBJ_TOF_CORR_XFP");
   return GetTofE1_TDC(afp_cor,xfp_cor);
+}
+
+//std::vector<float> TS800::GetCorrTOF_OBJ_MESY() const {
+float TS800::GetCorrTOF_OBJ_MESY(int i) const {
+  double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+  double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+  return GetTofE1_MTDC(afp_cor,xfp_cor,i);
 }
 
 //float TS800::GetCorrTOF_XFP(){
@@ -1027,7 +1031,8 @@ void TS800::DrawDispX(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain
   std::string title = Form("%s DispX AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJTAC_TOF_CORR_AFP"),GValue::Value("OBJTAC_TOF_CORR_XFP")); //_%s",opt);
   GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
   if(!h)
-    h = new GH2I(name.c_str(),title.c_str(),2048,0,2048,4000,-300,300);
+    h = new GH2I(name.c_str(),title.c_str(),4096,-2047,2048,4000,-300,300);
+  h->SetTitle(title.c_str());
   chain->Project(name.c_str(),"GetCrdc(0)->GetDispersiveX():GetCorrTOF_OBJTAC()","","colz",nentries);
   h->GetXaxis()->SetTitle("Corrected TOF (objtac)");  
   h->GetYaxis()->SetTitle("Dispersive X (objtac)");  
@@ -1053,6 +1058,106 @@ void TS800::DrawPID_Tune(Long_t nentries,TChain *chain){
   
   gPad->GetCanvas()->cd(3);
   DrawPID("","Tune",nentries);
+
+
+}
+
+void TS800::DrawPID_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TChain *chain) {
+  TString OptString = opt;
+  if(!chain)
+    chain = gChain;
+  if(!chain || !chain->GetBranch("TS800"))
+    return;
+  if(!gPad || !gPad->IsEditable()) {
+    gROOT->MakeDefCanvas();
+  } else {
+    if(!OptString.Contains("Tune"))
+      gPad->GetCanvas()->Clear();
+  }
+  
+  std::string name = Form("%s_PID",Class()->GetName()); //_%s",opt);
+  std::string title = Form("%s PID AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJ_MTOF_CORR_AFP"),GValue::Value("OBJ_MTOF_CORR_XFP")); //_%s",opt);
+  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
+  if(!h)
+    h = new GH2I(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJ_MESY()",4096,-4096,4096,4000,-4000,4000);
+  chain->Project(name.c_str(),Form("GetIonChamber()->GetSum():GetCorrTOF_OBJ_MESY(%i)",i),"","colz",nentries);
+  h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");  
+  h->GetYaxis()->SetTitle("Ion Chamber Energy loss (arb. units)");  
+  h->Draw("colz");
+}
+
+
+void TS800::DrawAFP_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TChain *chain) {
+  TString OptString = opt;
+  if(!chain)
+    chain = gChain;
+  if(!chain || !chain->GetBranch("TS800"))
+    return;
+  if(!gPad || !gPad->IsEditable()) {
+    gROOT->MakeDefCanvas();
+  } else {
+    if(!OptString.Contains("Tune"))
+      gPad->GetCanvas()->Clear();
+  }
+  
+  std::string name = Form("%s_AFP",Class()->GetName()); //_%s",opt);
+  std::string title = Form("%s AFP AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJ_MTOF_CORR_AFP"),GValue::Value("OBJ_MTOF_CORR_XFP")); //_%s",opt);
+  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
+  if(!h)
+    h = new GH2I(name.c_str(),title.c_str(),2048,-4096,2048,4000,-0.1,0.1);
+  chain->Project(name.c_str(),Form("GetAFP():GetCorrTOF_OBJ_MESY(%i)",i),"","colz",nentries);
+  h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");  
+  h->GetYaxis()->SetTitle("Corrected AFP (Mesy)");  
+  h->Draw("colz");
+}
+
+
+void TS800::DrawDispX_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TChain *chain) {
+  
+  TString OptString = opt;
+
+  if(!chain)
+    chain = gChain;
+  if(!chain || !chain->GetBranch("TS800"))
+    return;
+  if(!gPad || !gPad->IsEditable()) {
+    gROOT->MakeDefCanvas();
+  } else {
+    if(!OptString.Contains("Tune"))
+       gPad->GetCanvas()->Clear();
+  }
+  
+  std::string name = Form("%s_DispX",Class()->GetName()); //_%s",opt);
+  std::string title = Form("%s DispX AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJ_MTOF_CORR_AFP"),GValue::Value("OBJ_MTOF_CORR_XFP")); //_%s",opt);
+  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
+  if(!h)
+    h = new GH2I(name.c_str(),title.c_str(),4096,-4096,4096,4000,-300,300);
+  h->SetTitle(title.c_str());
+  chain->Project(name.c_str(),Form("GetCrdc(0)->GetDispersiveX():GetCorrTOF_OBJ_MESY(%i)",i),"","colz",nentries);
+  h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");  
+  h->GetYaxis()->SetTitle("Dispersive X (Mesy)");  
+  h->Draw("colz");
+}
+
+void TS800::DrawPID_Mesy_Tune(Long_t nentries,int i,TChain *chain){
+  if(!chain) chain=gChain;
+  if(!chain || !chain->GetBranch("TS800")) return;
+  if(!gPad || !gPad->IsEditable()){
+    gROOT->MakeDefCanvas()->Divide(3,1);
+  }
+  else{
+    gPad->GetCanvas()->Clear();
+    gPad->GetCanvas()->Divide(3,1);
+  }
+
+  gPad->GetCanvas()->cd(1);
+  DrawDispX_Mesy("","Tune",nentries,i);
+
+  gPad->GetCanvas()->cd(2);
+  DrawAFP_Mesy("","Tune",nentries,i);
+  
+  gPad->GetCanvas()->cd(3);
+  DrawPID_Mesy("","Tune",nentries,i);
 
 
 }

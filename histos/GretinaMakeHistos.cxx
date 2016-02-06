@@ -105,8 +105,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
   int numobj = list->GetSize();
 
 
-  double MAFP_COEF = obj.GetVariable("MAFP_COEF");
-  double MCRDCX_COEF = obj.GetVariable("MCRDCX_COEF");
+  //double MAFP_COEF = obj.GetVariable("MAFP_COEF");
+  //double MCRDCX_COEF = obj.GetVariable("MCRDCX_COEF");
   double AFP_COEF = obj.GetVariable("AFP_COEF");
   double CRDCX_COEF = obj.GetVariable("CRDCX_COEF");
   //double BETA = obj.GetVariable("BETA");
@@ -216,14 +216,14 @@ void MakeHistograms(TRuntimeObjects& obj) {
       gw800time->Fill(s800->Timestamp()-hit.GetTime(),hit.GetCoreEnergy());
     
     
-      TH2 *mtdc_vs_dispx = GetMatrix(list,"MTDC_vs_DispX",2000,-5000,5000,600,-300,300);
-      mtdc_vs_dispx->Fill(s800->GetTofE1_MTDC(MAFP_COEF,MCRDCX_COEF),s800->GetCrdc(0).GetDispersiveX());
+      //TH2 *mtdc_vs_dispx = GetMatrix(list,"MTDC_vs_DispX",2000,-5000,5000,600,-300,300);
+      //mtdc_vs_dispx->Fill(s800->GetTofE1_MTDC(MAFP_COEF,MCRDCX_COEF),s800->GetCrdc(0).GetDispersiveX());
       TH2 *tdc_vs_dispx = GetMatrix(list,"TDC_vs_DispX",2000,-2000,00,600,-300,300);
       tdc_vs_dispx->Fill(s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),s800->GetCrdc(0).GetDispersiveX());
 
 
-      TH2 *mtdc_vs_afp= GetMatrix(list,"MTDC_vs_AFP",1000,-5000,5000,600,-0.1,0.1);
-      mtdc_vs_afp->Fill(s800->GetTofE1_MTDC(MAFP_COEF,MCRDCX_COEF),s800->GetAFP());
+      //TH2 *mtdc_vs_afp= GetMatrix(list,"MTDC_vs_AFP",1000,-5000,5000,600,-0.1,0.1);
+      //mtdc_vs_afp->Fill(s800->GetTofE1_MTDC(MAFP_COEF,MCRDCX_COEF),s800->GetAFP());
       TH2 *tdc_vs_afp= GetMatrix(list,"TDC_vs_AFP",2000,-2000,00,600,-0.1,0.1);
       tdc_vs_afp->Fill(s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),s800->GetAFP());
       
@@ -234,8 +234,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
       double delta_t = s800->GetScint().GetTimeUp()-s800->GetTof().GetOBJ();
 
-      TH2 *mtdc_vs_ic= GetMatrix(list,"PID_MTDC",2000,-2000,0,2000,20000,40000);
-      mtdc_vs_ic->Fill(s800->GetTofE1_MTDC(MAFP_COEF,MCRDCX_COEF),s800->GetIonChamber().Charge());
+      //TH2 *mtdc_vs_ic= GetMatrix(list,"PID_MTDC",2000,-2000,0,2000,20000,40000);
+      //mtdc_vs_ic->Fill(s800->GetTofE1_MTDC(MAFP_COEF,MCRDCX_COEF),s800->GetIonChamber().Charge());
       TH2 *tdc_vs_ic= GetMatrix(list,"PID_TDC",2000,-2000,0,2000,10000,40000);
       tdc_vs_ic->Fill(s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),s800->GetIonChamber().Charge());
 
