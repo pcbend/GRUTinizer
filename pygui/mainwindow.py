@@ -483,16 +483,14 @@ class MainWindow(object):
 
     def LoadDataFile(self, filename = None):
         if filename is None:
-            filename = tkFileDialog.askopenfilename(filetypes=(("GEB File", "*.dat"),
-                                                               ("GZip File", "*.gz"),
-                                                               ("NSCL Evt", "*.evt")))
+            filename = tkFileDialog.askopenfilename(filetypes=(("NSCL Evt", "*.evt"),
+                                                               ("GEB File", "*.dat"),
+                                                               ("GZip File", "*.gz")))
 
         if not filename:
             return
-        return
-        #pipeline = ROOT.GetPipeline(0)
-        #if pipeline:
-        #    pipeline.ReplaceRawDataFile(filename)
+
+        ROOT.TGRUTint.instance().LoadRawFile(filename)
 
     def LoadRootFile(self,filename=None):
         #print "In py LoadRooFile " + filename

@@ -16,6 +16,8 @@ class StoppableThread {
 public:
   static void StopAll();
   static void StopAllClean();
+  static bool AnyThreadRunning();
+  static std::string AnyThreadStatus();
 
   StoppableThread(std::string name);
   static StoppableThread *Get(std::string name);
@@ -29,7 +31,7 @@ public:
   bool IsRunning();
   void Join();
 
-  virtual std::string Status() { return ""; }
+  virtual std::string Status();
   std::string Name() const     { return fname; }
 
   //protected:

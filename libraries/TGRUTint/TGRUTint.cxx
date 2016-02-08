@@ -70,7 +70,7 @@ TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions
 
 TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t noLogo,const char *appClassName)
   :TRint(appClassName, &argc, argv, options, numOptions,noLogo),
-   main_thread_id(std::this_thread::get_id()), fIsTabComplete(false) {
+   main_thread_id(std::this_thread::get_id()), fIsTabComplete(false){
 
   fGRUTEnv = gEnv;
   GetSignalHandler()->Remove();
@@ -81,6 +81,7 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
   fRootFilesOpened = 0;
   fRawFilesOpened  = 0;
   fHistogramLoop = 0;
+  fDataLoop = 0;
 
 
   SetPrompt("GRizer [%d] ");
@@ -166,14 +167,14 @@ void TGRUTint::ApplyOptions() {
   //next, if given a root file and NOT told to sort it..
   if(opt->RootInputFiles().size()){
     for(unsigned int x=0;x<opt->RootInputFiles().size();x++) {
-      OpenRootFile(opt->RootInputFiles().at(x));  
+      OpenRootFile(opt->RootInputFiles().at(x));
       // this we creat and populate gChain if able.
-      //   TChannels from the root file will be loaded as file is opened. 
-      //   GValues from the root file will be loaded as file is opened. 
+      //   TChannels from the root file will be loaded as file is opened.
+      //   GValues from the root file will be loaded as file is opened.
     }
   }
 
-  //if I am passed any calibrations, lets load those, this 
+  //if I am passed any calibrations, lets load those, this
   //will over write any wit the same address previously read in.
   if(opt->CalInputFiles().size()) {
     for(unsigned int x=0;x<opt->CalInputFiles().size();x++) {
@@ -191,9 +192,7 @@ void TGRUTint::ApplyOptions() {
     StartGUI();
   }
 
-
-  TDataLoop *loop = 0;
-  //next most important thing, if given a raw file && NOT told to NOT sort!
+  //next most important thing, if given a raw file && NOT told to not sort!
   if((opt->InputRing().length() || opt->RawInputFiles().size())
      && opt->SortRaw()) {
 
@@ -220,11 +219,17 @@ void TGRUTint::ApplyOptions() {
       source = ordered_source;
     }
 
-    loop = TDataLoop::Get("1_input_loop",source);
-    loop->Resume();
+    fDataLoop = TDataLoop::Get("1_input_loop",source);
+    // If we are not exiting automatically, keep the data loop alive
+    //   so that we can open a new file.
+    if(!opt->ExitAfterSorting()){
+      fDataLoop->SetSelfStopping(false);
+    }
+
+    fDataLoop->Resume();
 
 
-    TBuildingLoop *boop = TBuildingLoop::Get("2_build_loop",loop);
+    TBuildingLoop *boop = TBuildingLoop::Get("2_build_loop",fDataLoop);
     boop->SetBuildWindow(opt->BuildWindow());
     boop->Resume();
     TUnpackingLoop *uoop1 = TUnpackingLoop::Get("3_unpack1",boop);
@@ -279,15 +284,16 @@ void TGRUTint::ApplyOptions() {
     printf("Attempting to sort root files.\n");
     coop = TChainLoop::Get("1_chain_loop",gChain);
     fHistogramLoop = THistogramLoop::Get("2_hist_loop");
-    std::string histoutfile = "temp_hist.root";
+    gChain->GetEntry(0);
+    std::string histoutfile = "hist" + get_run_number(gChain->GetCurrentFile()->GetName()) + ".root";
     if(opt->OutputHistogramFile().length()) {
       histoutfile = opt->OutputHistogramFile();
     } else {
       if(opt->RootInputFiles().size()==1) {
         histoutfile = "hist" + get_run_number(opt->RootInputFiles().at(0)) + ".root";
       } else if(opt->RootInputFiles().size()>1){
-        histoutfile = "hist" + get_run_number(opt->RootInputFiles().at(0)) + "-"  
-                             + get_run_number(opt->RootInputFiles().at(opt->RootInputFiles().size()-1))  
+        histoutfile = "hist" + get_run_number(opt->RootInputFiles().at(0)) + "-"
+                             + get_run_number(opt->RootInputFiles().at(opt->RootInputFiles().size()-1))
                              + ".root";
       }
     }
@@ -300,24 +306,19 @@ void TGRUTint::ApplyOptions() {
   for(auto& filename : opt->MacroInputFiles()){
     RunMacroFile(filename);
   }
-  
+
 
   if(opt->ExitAfterSorting()){
-    if(loop) {
-      while(loop->IsRunning()) {
-        std::cout << "\r" << loop->Status() << std::flush;
-        gSystem->ProcessEvents();
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-      }
-    }
-    std::cout << std::endl;
-
-    if(coop) {
-      while(coop->IsRunning()) {
-        std::cout << "\r" << coop->Status() << std::flush;
-        gSystem->ProcessEvents();
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-      }
+    while(StoppableThread::AnyThreadRunning()){
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+      gSystem->ProcessEvents();
+      std::cout << "\r" << StoppableThread::AnyThreadStatus() << std::flush;
+      // if(fDataLoop) {
+      //   std::cout << "\r" << fDataLoop->Status() << std::flush;
+      // }
+      // if(coop){
+      //   std::cout << "\r" << coop->Status() << std::flush;
+      // }
     }
     std::cout << std::endl;
 
@@ -398,6 +399,18 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
     ProcessLine("TPython::Exec(\"window.AddDirectory(tdir)\");");
   }
   return file;
+}
+
+void TGRUTint::LoadRawFile(std::string filename) {
+  if(fDataLoop){
+    TRawEventSource* source = new TRawFileIn(filename.c_str());
+    if(TGRUTOptions::Get()->TimeSortInput()){
+      TOrderedRawFile* ordered_source = new TOrderedRawFile(source);
+      ordered_source->SetDepth(TGRUTOptions::Get()->TimeSortDepth());
+      source = ordered_source;
+    }
+    fDataLoop->ReplaceSource(source);
+  }
 }
 
 TRawFileIn *TGRUTint::OpenRawFile(const std::string& filename) {
