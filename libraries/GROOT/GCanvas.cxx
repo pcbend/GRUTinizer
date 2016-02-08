@@ -27,6 +27,8 @@
 #include <TContextMenu.h>
 #include <TGButton.h>
 
+//#include <TGFileDialog.h>
+#include <GPopup.h>
 
 //#include "GROOTGuiFactory.h"
 #include "GRootCommands.h"
@@ -64,7 +66,7 @@ void GMarker::Copy(TObject &object) const {
   ((GMarker&)object).binx  = binx;
   ((GMarker&)object).biny  = biny;
 }
-
+/*
 ClassImp(GPopup)
 
 GPopup::GPopup(const TGWindow *p,const TGWindow *m) 
@@ -103,7 +105,7 @@ GPopup::~GPopup() {
 void GPopup::CloseWindow() {
   DeleteWindow();
 }
-
+*/
 
 
 
@@ -690,9 +692,15 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
  
     case kKey_d:
       {
-        //new GPopup(gClient->GetDefaultRoot(),gClient->GetDefaultRoot());
+        printf("i am here.\n");
+        new GPopup(gClient->GetDefaultRoot(),gClient->GetDefaultRoot(),500,200);
         //new GPopup(0,0);
             //this);
+        //TGFileInfo fi;
+        //new TGFileDialog(gClient->GetDefaultRoot(),gClient->GetDefaultRoot(),
+        //                 kFDOpen, &fi);
+            
+            
       }
       break;
 
@@ -945,8 +953,8 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       break;
     case kKey_n:
       RemoveMarker("all");
-      for(unsigned int i=0;i<hists.size();i++)
-        hists.at(i)->GetListOfFunctions()->Delete();
+      //for(unsigned int i=0;i<hists.size();i++)
+      //  hists.at(i)->GetListOfFunctions()->Delete();
       RemovePeaks(hists.data(),hists.size());
       edited = true;
       break;
@@ -1070,49 +1078,30 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       break;
 
 
-    case kKey_z: {
-        printf("you pressed z!\n");
-        GCanvas *c = (GCanvas*)gPad->GetCanvas();
-        TIter iter(c->GetListOfPrimitives());
-        while(TObject *obj = iter.Next()) {
-          if(!obj->InheritsFrom(TCanvas::Class()))
-            continue;
-          TCanvas *c = ((TCanvas*)obj);
-          if(!c->GetLogz())
-            c->SetLogz(1);
-        }
-      }
-      edited = true;
-      break;
-    case kKey_Z: {
-        GCanvas *c = (GCanvas*)gPad->GetCanvas();
-        TIter iter(c->GetListOfPrimitives());
-        while(TObject *obj = iter.Next()) {
-          if(!obj->InheritsFrom(TCanvas::Class()))
-            continue;
-          TCanvas *c = ((TCanvas*)obj);
-          if(c->GetLogz())
-            c->SetLogz(0);
-        }
-      }
-      edited = true;
-      break;
+
 
     case kKey_l:
+    case kKey_z:
       if(GetLogz()){
-        // Show full z range, not restricted to positive values.
+        // Show full y range, not restricted to positive values.
         for(unsigned int i=0;i<hists.size();i++) {
-          hists.at(i)->GetZaxis()->UnZoom();
+          hists.at(i)->GetYaxis()->UnZoom();
         }
-        SetLogz(0);
+        TVirtualPad *cpad = gPad;
+        this->cd();
+        gPad->SetLogz(0);
+        cpad->cd();
       } else {
         // Only show plot from 0 up when in log scale.
         for(unsigned int i=0;i<hists.size();i++) {
-          if(hists.at(i)->GetZaxis()->GetXmin()<0) {
-            hists.at(i)->GetZaxis()->SetRangeUser(0,hists.at(i)->GetZaxis()->GetXmax());
+          if(hists.at(i)->GetYaxis()->GetXmin()<0) {
+            hists.at(i)->GetYaxis()->SetRangeUser(0,hists.at(i)->GetYaxis()->GetXmax());
           }
         }
-        SetLogz(1);
+        TVirtualPad *cpad = gPad;
+        this->cd();
+        gPad->SetLogz(1);
+        cpad->cd();
       }
       edited = true;
       break;

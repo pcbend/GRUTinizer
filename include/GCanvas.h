@@ -40,6 +40,7 @@ public:
   ClassDef(GMarker,0)
 };
 
+/*
 class GPopup : public TGTransientFrame  {
   public:
     GPopup(const TGWindow *p=0,const TGWindow *m=0);
@@ -50,7 +51,7 @@ class GPopup : public TGTransientFrame  {
     TGTextButton *fButton1,*fButton2;
   ClassDef(GPopup,0)
 };
-
+*/
 
 class GCanvas : public TCanvas {
 public:

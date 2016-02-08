@@ -54,12 +54,13 @@ public:
   //}
 
   //Note c1 is the AFP correction and c2 is the XFP correction
-  float GetTofE1_TAC(float c1=0.00,float c2=0.00) const;
-  float GetTofE1_TDC(float c1=0.00,float c2=0.00) const;
-  float GetTofE1_MTDC(float c1=0.00,float c2=0.00);
+  float GetTofE1_TAC(float c1=0.00,float c2=0.00)  const;
+  float GetTofE1_TDC(float c1=0.00,float c2=0.00)  const;
+  float GetTofE1_MTDC(float c1=0.00,float c2=0.00,int i=0) const;
 
   float GetCorrTOF_OBJTAC() const;
   float GetCorrTOF_OBJ() const;
+  float GetCorrTOF_OBJ_MESY(int i=0) const;
 //float GetCorrTOF_XFPTAC();
 //float GetCorrTOF_XFP();
 
@@ -116,6 +117,11 @@ private:
     static void DrawAFP(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
     static void DrawDispX(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
     static void DrawPID_Tune(Long_t entries=kMaxLong,TChain *chain=0);
+    
+    static void DrawPID_Mesy(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,int i=0,TChain *chain=0);
+    static void DrawAFP_Mesy(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,int i=0,TChain *chain=0);
+    static void DrawDispX_Mesy(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,int i=0,TChain *chain=0);
+    static void DrawPID_Mesy_Tune(Long_t entries=kMaxLong,int i=0,TChain *chain=0);
 
   ClassDef(TS800,1);
 };
