@@ -894,15 +894,16 @@ TDetectorHit& TS800::GetHit(int i){
 }
 
 float TS800::GetTofE1_TAC(float c1,float c2)  const {
-  if (GetCrdc(0).GetId() == -1) {
+  double tac_obj = GetTof().GetTacOBJ();
+  if (GetCrdc(0).GetId() != 0 || tac_obj == -1) {
     return sqrt(-1);
   }
-  return GetTof().GetTacOBJ() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+  return tac_obj + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
 }
 
 
 float TS800::GetTofE1_TDC(float c1,float c2)  const {
-  if (GetCrdc(0).GetId() == -1) {
+  if (GetCrdc(0).GetId() != 0) {
     return sqrt(-1);
   }
 
