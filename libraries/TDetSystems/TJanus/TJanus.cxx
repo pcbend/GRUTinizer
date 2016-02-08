@@ -58,11 +58,16 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   const VME_Timestamp* vme_timestamp = (VME_Timestamp*)(data + num_packets*sizeof(CAEN_DataPacket));
   long timestamp = vme_timestamp->ts1() * 20;
 
+  // std::cout << "JANUS timestamp at " << timestamp << std::endl;
+
+  //buf.Print("all");
+
   std::map<unsigned int,TJanusHit> front_hits;
   std::map<unsigned int,TJanusHit> back_hits;
   for(int i=0; i<num_packets; i++){
     const CAEN_DataPacket* packet = (CAEN_DataPacket*)data;
     data += sizeof(CAEN_DataPacket);
+
 
     if(!packet->IsValid()){
       continue;
@@ -85,11 +90,11 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
     static int lines_displayed = 0;
     if(!chan){
       if(lines_displayed < 1000) {
-        std::cout << "Unknown analog (slot, channel): ("
-                  << adc_cardnum << ", " << packet->channel_num()
-                  << "), address = 0x"
-                  << std::hex << address << std::dec
-                  << std::endl;
+        // std::cout << "Unknown analog (slot, channel): ("
+        //           << adc_cardnum << ", " << packet->channel_num()
+        //           << "), address = 0x"
+        //           << std::hex << address << std::dec
+        //           << std::endl;
       } else if(lines_displayed==1000){
         std::cout << "I'm going to stop telling you that the channel was unknown,"
                   << " you should probably stop the program." << std::endl;
@@ -119,63 +124,70 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
     }
   }
 
-  // //DANGER, take this out later
-  // for(auto& elem : front_hits){
-  //   TJanusHit& hit = elem.second;
-  //   janus_hits.emplace_back(hit);
-  //   fSize++;
-  // }
-  // for(auto& elem : back_hits){
-  //   TJanusHit& hit = elem.second;
-  //   janus_hits.emplace_back(hit);
-  //   fSize++;
-  // }
-  // return;
-  // //END OF DANGER SECTION
-
-  // Find all fronts with a reasonable TDC value
-  std::vector<unsigned int> good_fronts;
   for(auto& elem : front_hits){
     TJanusHit& hit = elem.second;
-    // DANGER, uncomment this when not using LaBr
-    if(hit.Time() > 200 && hit.Time() < 3900){
-      good_fronts.push_back(elem.first);
+    janus_channels.emplace_back(hit);
+  }
+  for(auto& elem : back_hits){
+    TJanusHit& hit = elem.second;
+    janus_channels.emplace_back(hit);
+  }
+
+  // Find all fronts with a reasonable TDC value
+  int best_front = -1;
+  int max_charge = -1;
+  for(auto& elem : front_hits){
+    TJanusHit& hit = elem.second;
+    // if(hit.Time() > 200 && hit.Time() < 3900 &&
+    //    hit.Charge() > max_charge){
+    if(hit.Charge() > max_charge){
+      best_front = elem.first;
+      max_charge = hit.Charge();
     }
   }
 
   // Find all backs with a reasonable TDC value
-  std::vector<unsigned int> good_backs;
+  int best_back = -1;
+  max_charge = -1;
   for(auto& elem : back_hits){
     TJanusHit& hit = elem.second;
-    // DANGER, uncomment this when not using LaBr
-    if(hit.Time() > 200 && hit.Time() < 3900){
-      good_backs.push_back(elem.first);
+    // if(hit.Time() > 200 && hit.Time() < 3900 &&
+    //    hit.Charge() > max_charge) {
+    if(hit.Charge() > max_charge) {
+      best_back = elem.first;
+      max_charge = hit.Charge();
     }
   }
 
-  if(good_fronts.size()==1 && good_backs.size()==1){
+
+  if(best_front != -1 && best_back != -1){
     //Copy most parameters from the front
-    TJanusHit& front = front_hits[good_fronts[0]];
+    TJanusHit& front = front_hits[best_front];
     janus_hits.emplace_back(front);
     fSize++;
     TJanusHit& hit = janus_hits.back();
 
     //Copy more parameters from the back
-    TJanusHit& back  = back_hits[good_backs[0]];
+    TJanusHit& back  = back_hits[best_back];
     hit.GetBackHit().SetAddress(back.Address());
     hit.GetBackHit().SetCharge(back.Charge());
     hit.GetBackHit().SetTime(back.Time());
     hit.GetBackHit().SetTimestamp(back.Timestamp());
 
-  } else {
-    static bool message_displayed = false;
-    if(!message_displayed){
-      std::cout << "Abnormal JANUS Event: " << good_fronts.size()
-                << ", " << good_backs.size() << std::endl;
-      message_displayed = true;
-    }
-  }
-
+  } //else {
+//   static bool message_displayed = false;
+//   //    if(!message_displayed){
+//     std::cout << "Abnormal JANUS Event: " << good_fronts.size()
+//               << ", " << good_backs.size() << std::endl;
+//     for(auto good_front : good_fronts){
+//       std::cout << "\tRing: " << std::hex << front_hits[good_front].Address() << std::dec<< "\tCharge: " << front_hits[good_front].Charge() << "\tTime: " << front_hits[good_front].Time() << std::dec << std::endl;
+//     }
+//     for(auto good_back : good_backs){
+//       std::cout << "\tSector: " << std::hex << back_hits[good_back].Address() << std::dec << "\tCharge: " << back_hits[good_back].Charge() << "\tTime: " << back_hits[good_back].Time() << std::dec << std::endl;
+//     }
+//     message_displayed = true;
+//     //    }
+// }
 
 
   data += sizeof(VME_Timestamp);
@@ -235,4 +247,14 @@ TVector3 TJanus::GetPosition(int detnum, int ring_num, int sector_num){
 void TJanus::InsertHit(const TDetectorHit& hit) {
   janus_hits.emplace_back((TJanusHit&)hit);
   fSize++;
+}
+
+void TJanus::Print(Option_t *opt) const {
+  printf("TJanus @ %lu\n",Timestamp());
+  printf(" Size: %i\n",Size());
+  for(int i=0;i<Size();i++) {
+    printf("\t"); janus_hits.at(i).Print(); printf("\n");
+  }
+  printf("---------------------------\n");
+
 }
