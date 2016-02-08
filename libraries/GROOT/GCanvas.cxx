@@ -28,7 +28,7 @@
 #include <TGButton.h>
 
 //#include <TGFileDialog.h>
-//#include <GPopup.h>
+#include <GPopup.h>
 
 //#include "GROOTGuiFactory.h"
 #include "GRootCommands.h"
@@ -693,7 +693,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
     case kKey_d:
       {
         printf("i am here.\n");
-        //new GPopup(gClient->GetDefaultRoot(),gClient->GetDefaultRoot(),100,100);
+        new GPopup(gClient->GetDefaultRoot(),gClient->GetDefaultRoot(),500,200);
         //new GPopup(0,0);
             //this);
         //TGFileInfo fi;
