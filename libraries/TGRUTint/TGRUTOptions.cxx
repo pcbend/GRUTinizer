@@ -58,6 +58,22 @@ void TGRUTOptions::Load(int argc, char** argv) {
   }
   s800_inverse_map_file = "invmap.inv";
 
+  // Load default TChannels, if specified.
+  {
+    std::string default_calfile = gEnv->GetValue("GRUT.CalFile","");
+    if(default_calfile.length()){
+      input_cal_files.push_back(default_calfile);
+    }
+  }
+
+  // Load default GValues, if specified.
+  {
+    std::string default_valfile = gEnv->GetValue("GRUT.ValFile","");
+    if(default_valfile.length()){
+      input_val_files.push_back(default_valfile);
+    }
+  }
+
   ArgParser parser;
 
   std::vector<std::string> input_files;

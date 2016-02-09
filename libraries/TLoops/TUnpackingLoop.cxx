@@ -113,9 +113,11 @@ void TUnpackingLoop::HandleNSCLData(TNSCLEvent& event) {
 
 void TUnpackingLoop::HandleBuiltNSCLData(TNSCLEvent& event){
   TNSCLBuiltRingItem built(event);
+  //std::cout << "------------------" << std::endl;
   for(unsigned int i=0; i<built.NumFragments(); i++){
     TNSCLFragment& fragment = built.GetFragment(i);
-    kDetectorSystems detector = TDetectorEnv::Get().DetermineSystem(fragment.GetFragmentSourceID());
+    int source_id = fragment.GetFragmentSourceID();
+    kDetectorSystems detector = TDetectorEnv::Get().DetermineSystem(source_id);
     fOutputEvent->AddRawData(fragment.GetNSCLEvent(), detector);
   }
 }

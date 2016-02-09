@@ -64,6 +64,14 @@ int TJanusHit::GetSector() const {
   }
 }
 
+void TJanusHit::Print(Option_t *opt) const {
+  printf("JanusHit[%03i,%03i]  Ring: %02i  Sector: %02i  Charge: %i   Energy: %.02f\n",
+          GetFrontChannel(),GetBackChannel(),GetRing(),GetSector(),Charge(),GetEnergy());
+ 
+}
+
+
+
 TVector3 TJanusHit::GetPosition(bool apply_array_offset) const {
   TVector3 output = TJanus::GetPosition(GetDetnum(), GetRing(), GetSector());
   if(apply_array_offset) {

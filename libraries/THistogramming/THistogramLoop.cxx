@@ -54,6 +54,7 @@ bool THistogramLoop::Iteration() {
   if(stopsent && input_queue.Size()<1) {
     return false;
   }
+
   return true;
 }
 

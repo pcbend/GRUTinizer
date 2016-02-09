@@ -9,7 +9,7 @@
 
 
 TDataLoop::TDataLoop(std::string name,TRawEventSource* source)
-  : StoppableThread(name), source(source) {
+  : StoppableThread(name), source(source), fSelfStopping(true) {
 }
 
 TDataLoop::~TDataLoop(){
@@ -26,12 +26,21 @@ TDataLoop *TDataLoop::Get(std::string name,TRawEventSource* source) {
   return loop;
 }
 
+void TDataLoop::ReplaceSource(TRawEventSource* new_source) {
+  std::lock_guard<std::mutex> lock(source_mutex);
+  delete source;
+  source = new_source;
+}
 
 bool TDataLoop::Iteration() {
   TRawEvent evt;
-  int bytes_read = source->Read(evt);
+  int bytes_read;
+  {
+    std::lock_guard<std::mutex> lock(source_mutex);
+    bytes_read = source->Read(evt);
+  }
 
-  if(bytes_read < 0){
+  if(bytes_read < 0 && fSelfStopping){
     // Error, and no point in trying again.
     printf("file finished??\n");
     return false;
@@ -40,7 +49,11 @@ bool TDataLoop::Iteration() {
     output_queue.Push(evt);
     return true;
   } else {
-    printf("file finished??\n");
+    static TRawEventSource* source_ptr = NULL;
+    if(source_ptr != source){
+      std::cout << "Finished reading source" << std::endl;
+      source_ptr = source;
+    }
     // Nothing returned this time, but I might get something next time.
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     return true;
