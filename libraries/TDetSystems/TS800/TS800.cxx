@@ -454,7 +454,7 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
     // Remember the header.
     if(current_word & 0x8000) {
       word1 = current_word;
-    } else {
+    } else if (word1 != 0) {
       // Not a header, so it is
       unsigned short word2 = current_word;
       int sample_number    = (word1&(0x7fc0)) >> 6;
