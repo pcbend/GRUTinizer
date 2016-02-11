@@ -133,6 +133,10 @@ class MainWindow(object):
                            command=self.LoadRootFile)
         button.pack(side=tk.LEFT)
 
+        frame.pack(fill=tk.X,expand=False)
+
+        frame = tk.Frame(self.window)
+
         button = tk.Button(frame,
                            text='Refresh',fg="black",bg="goldenrod",
                            command=self.RefreshHistograms)
@@ -146,6 +150,11 @@ class MainWindow(object):
         button = tk.Button(frame,
                            text='Reset All',fg="black",bg="goldenrod",
                            command=self.ResetAllHistograms)
+        button.pack(side=tk.LEFT)
+
+        button = tk.Button(frame,
+                           text='Resort Data',fg="black",bg="goldenrod",
+                           command=self.ResortDataFile)
         button.pack(side=tk.LEFT)
 
         frame.pack(fill=tk.X,expand=False)
@@ -427,6 +436,9 @@ class MainWindow(object):
 
     def ResetAllHistograms(self):
         ROOT.TGRUTint.instance().ResetAllHistograms()
+
+    def ResortDataFile(self):
+        ROOT.TGRUTint.instance().ResortDataFile()
 
     def _draw_single(self,hist,color=1,nselected=1):
         canvas_exists = bool(filter(None,self.canvases))

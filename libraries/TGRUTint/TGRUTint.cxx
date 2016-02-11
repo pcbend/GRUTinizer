@@ -413,6 +413,17 @@ void TGRUTint::LoadRawFile(std::string filename) {
   }
 }
 
+void TGRUTint::ResortDataFile() {
+  StoppableThread::PauseAll();
+  if(fDataLoop){
+    fDataLoop->ResetSource();
+    for(auto thread : StoppableThread::GetAll()){
+      thread->ClearQueue();
+    }
+  }
+  StoppableThread::ResumeAll();
+}
+
 TRawFileIn *TGRUTint::OpenRawFile(const std::string& filename) {
   if(!file_exists(filename.c_str())){
     std::cerr << "File \"" << filename << "\" does not exist" << std::endl;

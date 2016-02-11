@@ -46,6 +46,7 @@ public:
   TFile* OpenRootFile(const std::string& filename, Option_t* opt="");
   TRawFileIn* OpenRawFile(const std::string& filename);
   void ResetAllHistograms();
+  void ResortDataFile();
 
   void LoadRawFile(std::string filename);
 

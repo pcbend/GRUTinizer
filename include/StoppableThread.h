@@ -19,9 +19,12 @@ public:
   static bool AnyThreadRunning();
   static std::string AnyThreadStatus();
 
+  static void PauseAll();
+  static void ResumeAll();
+
   StoppableThread(std::string name);
   static StoppableThread *Get(std::string name);
-  static std::vector<const StoppableThread*> GetAll();
+  static std::vector<StoppableThread*> GetAll();
   virtual ~StoppableThread();
 
   void Resume();
@@ -33,6 +36,8 @@ public:
 
   virtual std::string Status();
   std::string Name() const     { return fname; }
+
+  virtual void ClearQueue() { }
 
   //protected:
   virtual bool Iteration() = 0;

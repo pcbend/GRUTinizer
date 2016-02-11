@@ -74,6 +74,18 @@ std::string StoppableThread::AnyThreadStatus() {
   return "";
 }
 
+void StoppableThread::PauseAll() {
+  for(auto& elem : fthreadmap){
+    elem.second->Pause();
+  }
+}
+
+void StoppableThread::ResumeAll() {
+  for(auto& elem : fthreadmap){
+    elem.second->Resume();
+  }
+}
+
 std::string StoppableThread::Status() {
   std::stringstream ss;
   ss << Name()
@@ -232,8 +244,8 @@ void StoppableThread::status_out() {
 
 }
 
-std::vector<const StoppableThread*> StoppableThread::GetAll() {
-  std::vector<const StoppableThread*> output;
+std::vector<StoppableThread*> StoppableThread::GetAll() {
+  std::vector<StoppableThread*> output;
   for(auto& elem : fthreadmap){
     output.push_back(elem.second);
   }

@@ -26,10 +26,22 @@ TDataLoop *TDataLoop::Get(std::string name,TRawEventSource* source) {
   return loop;
 }
 
+void TDataLoop::ClearQueue() {
+  TRawEvent event;
+  while(output_queue.Size()){
+    output_queue.Pop(event);
+  }
+}
+
 void TDataLoop::ReplaceSource(TRawEventSource* new_source) {
   std::lock_guard<std::mutex> lock(source_mutex);
   delete source;
   source = new_source;
+}
+
+void TDataLoop::ResetSource() {
+  std::lock_guard<std::mutex> lock(source_mutex);
+  source->Reset();
 }
 
 bool TDataLoop::Iteration() {
