@@ -64,14 +64,14 @@ int TSega::BuildHits() {
 
     static int lines_displayed = 0;
     if(!chan){
-      if(lines_displayed < 1000) {
+      if(lines_displayed < 10) {
         std::cout << "Unknown (crate, slot, channel): ("
                   << ddas.GetCrateID() << ", " << ddas.GetSlotID()
                   << ", " << ddas.GetChannelID() << ")" << std::endl;
-      } else if(lines_displayed==1000){
-        std::cout << "I'm going to stop telling you that the channel was unknown,"
-                  << " you should probably stop the program." << std::endl;
-      }
+      }//  else if(lines_displayed==1000){
+      //   std::cout << "I'm going to stop telling you that the channel was unknown,"
+      //             << " you should probably stop the program." << std::endl;
+      // }
       lines_displayed++;
 
       sega_hits.emplace_back();

@@ -49,17 +49,7 @@ public:
   TVector3 GetPosition(bool apply_array_offset = true) const;
   double GetDCEnergy(double beta, TVector3 particle_dir = TVector3(0,0,1)) const;
 
-  double GetDoppler(double beta,const TVector3 &vec=TVector3(0,0,1)) {
-    if(GetNumSegments()<1)
-      return 0.0;
-    //if(vec==0) {
-    //  vec = &BeamUnitVec;
-    //}
-    double tmp = 0.0;
-    double gamma = 1/(sqrt(1-pow(beta,2)));
-    tmp = GetEnergy()*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(vec)));
-    return tmp;
-  }
+  double GetDoppler(double beta,const TVector3& vec = TVector3(0,0,1));
 
 
 private:

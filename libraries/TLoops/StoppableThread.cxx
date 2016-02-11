@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include <TString.h>
 
@@ -53,6 +54,31 @@ void StoppableThread::StopAll() {
   std::cout << "Last status" << std::endl;
   status_out();
   std::cout << "End of function" << std::endl;
+}
+
+bool StoppableThread::AnyThreadRunning() {
+  for(auto& elem : fthreadmap){
+    if(elem.second->IsRunning()){
+      return true;
+    }
+  }
+  return false;
+}
+
+std::string StoppableThread::AnyThreadStatus() {
+  for(auto& elem : fthreadmap){
+    if(elem.second->IsRunning()){
+      return elem.second->Status();
+    }
+  }
+  return "";
+}
+
+std::string StoppableThread::Status() {
+  std::stringstream ss;
+  ss << Name()
+     << ":\t" << std::setw(8) << GetItemsPushed();
+  return ss.str();
 }
 
 void StoppableThread::StopAllClean() {

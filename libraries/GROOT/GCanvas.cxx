@@ -230,6 +230,10 @@ void GCanvas::RemoveMarker(Option_t* opt) {
       delete marker;
     }
     fMarkers.clear();
+
+    for(auto marker : fBackgroundMarkers){
+      delete marker;
+    }
     fBackgroundMarkers.clear();
   } else {
     if(fMarkers.size()<1)

@@ -20,36 +20,46 @@
 class TRawEventSource;
 
 class TDataLoop : public StoppableThread  {
-  public:
-    static TDataLoop *Get(std::string name="", TRawEventSource* source=0); 
-    virtual ~TDataLoop();
+public:
+  static TDataLoop *Get(std::string name="", TRawEventSource* source=0);
+  virtual ~TDataLoop();
 
-    const TRawEventSource& GetSource() const { return *source; }
+  const TRawEventSource& GetSource() const { return *source; }
 
-    std::string Status();
+  std::string Status();
 
-    //protected:
-    bool Iteration();
-    
-    int Pop(TRawEvent &event); 
+  //protected:
+  bool Iteration();
 
-    size_t GetItemsPushed()  { return output_queue.ItemsPushed(); } 
-    size_t GetItemsPopped()  { return output_queue.ItemsPopped(); } 
-    size_t GetItemsCurrent() { return output_queue.Size();        }
-    size_t GetRate()         { return 0; } 
+  int Pop(TRawEvent &event);
 
+  size_t GetItemsPushed()  { return output_queue.ItemsPushed(); }
+  size_t GetItemsPopped()  { return output_queue.ItemsPopped(); }
+  size_t GetItemsCurrent() { return output_queue.Size();        }
+  size_t GetRate()         { return 0; }
 
-  private:
-    TDataLoop(std::string name,TRawEventSource* source);
-    //ThreadsafeQueue<TRawEvent>& output_queue,std::string name="");
-    TDataLoop();
-    TDataLoop(const TDataLoop& other);
-    TDataLoop& operator=(const TDataLoop& other);
+  void ReplaceSource(TRawEventSource* new_source);
 
-    ThreadsafeQueue<TRawEvent> output_queue;
-    TRawEventSource* source;
+  void SetSelfStopping(bool self_stopping) { fSelfStopping = self_stopping; }
+  bool GetSelfStopping() const { return fSelfStopping; }
 
-    ClassDef(TDataLoop, 0);
+private:
+  TDataLoop(std::string name,TRawEventSource* source);
+  //ThreadsafeQueue<TRawEvent>& output_queue,std::string name="");
+  TDataLoop();
+  TDataLoop(const TDataLoop& other);
+  TDataLoop& operator=(const TDataLoop& other);
+
+  ThreadsafeQueue<TRawEvent> output_queue;
+  TRawEventSource* source;
+
+  bool fSelfStopping;
+
+#ifndef __CINT__
+  std::mutex source_mutex;
+#endif
+
+  ClassDef(TDataLoop, 0);
 };
 
 #endif /* _TDATALOOP_H_ */

@@ -19,6 +19,7 @@
 #include "TSystem.h"
 
 class TRawFileIn;
+class TDataLoop;
 class THistogramLoop;
 
 extern TChain *gChain;
@@ -46,6 +47,8 @@ public:
   TRawFileIn* OpenRawFile(const std::string& filename);
   void ResetAllHistograms();
 
+  void LoadRawFile(std::string filename);
+
 public:
   void DelayedProcessLine_Action();
 
@@ -69,6 +72,7 @@ private:
   bool fIsTabComplete;
 
   TChain* fChain;
+  TDataLoop* fDataLoop;
   THistogramLoop* fHistogramLoop;
 
   void Init();

@@ -21,3 +21,7 @@ Sega_Y_offset {
 Sega_Z_offset {
   Value: 0.0
 }
+
+beta {
+  Value: 0.01
+}
