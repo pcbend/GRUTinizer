@@ -13,7 +13,10 @@
 
 TRuntimeObjects::TRuntimeObjects(TUnpackedEvent& detectors, TList* objects, TList* variables,
                                  TDirectory* directory)
-  : detectors(detectors), objects(objects), variables(variables), directory(directory) { }
+  : detectors(detectors), objects(objects), variables(variables), directory(directory) {
+  cuts = new TList;
+}
+
 
 TH1* TRuntimeObjects::FillHistogram(std::string name,
                                     int bins, double low, double high, double value){
@@ -60,12 +63,16 @@ TList& TRuntimeObjects::GetObjects() {
   return *objects;
 }
 
+TList& TRuntimeObjects::GetCuts() {
+  return *cuts;
+}
+
 TList& TRuntimeObjects::GetVariables() {
   return *variables;
 }
 
 TCutG* TRuntimeObjects::GetCut(const std::string& name) {
-  TIter next(objects);
+  TIter next(cuts);
   TObject* obj;
   while((obj = next())){
     TCutG* cut = dynamic_cast<TCutG*>(obj);

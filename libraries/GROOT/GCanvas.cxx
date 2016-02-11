@@ -901,16 +901,18 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       if(GetNMarkers()<2)
           break;
        {
-       if(fMarkers.at(fMarkers.size()-1)->localx < fMarkers.at(fMarkers.size()-2)->localx)
-	 for(unsigned int i=0;i<hists.size();i++){
-	   hists.at(i)->GetXaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-1)->localx,fMarkers.at(fMarkers.size()-2)->localx);
-	   hists.at(i)->GetYaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-1)->localy,fMarkers.at(fMarkers.size()-2)->localy);
-	 }
-       else
-	 for(unsigned int i=0;i<hists.size();i++){
-            hists.at(i)->GetXaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-2)->localx,fMarkers.at(fMarkers.size()-1)->localx);
-            hists.at(i)->GetYaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-2)->localy,fMarkers.at(fMarkers.size()-1)->localy);
-	 }
+       double x1 = fMarkers.at(fMarkers.size()-1)->localx;
+       double y1 = fMarkers.at(fMarkers.size()-1)->localy;
+       double x2 = fMarkers.at(fMarkers.size()-2)->localx;
+       double y2 = fMarkers.at(fMarkers.size()-2)->localy;
+       if(x1>x2)
+         std::swap(x1,x2);
+       if(y1>y2)
+       std::swap(y1,y2);
+       for(unsigned int i=0;i<hists.size();i++){
+         hists.at(i)->GetXaxis()->SetRangeUser(x1,x2);
+         hists.at(i)->GetYaxis()->SetRangeUser(y1,y2);
+       }
        }
        edited = true;
        RemoveMarker("all");
@@ -992,8 +994,10 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
 
     case kKey_x: {
       GH2I* ghist = NULL;
+      printf("here!\n");
       for(auto hist : hists) {
         if(hist->InheritsFrom(GH2I::Class())){
+          printf("and here!\n");
           ghist = (GH2I*)hist;
           break;
         }
