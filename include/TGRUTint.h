@@ -21,6 +21,7 @@
 class TRawFileIn;
 class TDataLoop;
 class THistogramLoop;
+class TCutG;
 
 extern TChain *gChain;
 
@@ -49,6 +50,8 @@ public:
   void ResortDataFile();
 
   void LoadRawFile(std::string filename);
+
+  void LoadTCutG(TCutG* cutg);
 
 public:
   void DelayedProcessLine_Action();

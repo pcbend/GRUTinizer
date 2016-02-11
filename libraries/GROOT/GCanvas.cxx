@@ -41,6 +41,8 @@
 
 #include <TMath.h>
 
+#include "TGRUTint.h"
+
 #ifndef kArrowKeyPress
 #define kArrowKeyPress 25
 #define kArrowKeyRelease 26
@@ -69,7 +71,7 @@ void GMarker::Copy(TObject &object) const {
 /*
 ClassImp(GPopup)
 
-GPopup::GPopup(const TGWindow *p,const TGWindow *m) 
+GPopup::GPopup(const TGWindow *p,const TGWindow *m)
        : TGTransientFrame(p,m,200,200,kVerticalFrame) {
   SetCleanup(kDeepCleanup);
   Connect("CloseWindow()","GPopup",this,"CloseWindow()");
@@ -693,7 +695,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
     case kKey_B:
       edited = CycleBackgroundSubtraction();
       break;
- 
+
     case kKey_d:
       {
         printf("i am here.\n");
@@ -703,8 +705,8 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
         //TGFileInfo fi;
         //new TGFileDialog(gClient->GetDefaultRoot(),gClient->GetDefaultRoot(),
         //                 kFDOpen, &fi);
-            
-            
+
+
       }
       break;
 
@@ -953,6 +955,8 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
        cut->SetPoint(8,x1,y1);
        cut->SetLineColor(kBlack);
        hists.at(0)->GetListOfFunctions()->Add(cut);
+
+       TGRUTint::instance()->LoadTCutG(cut);
       }
       edited = true;
       RemoveMarker("all");

@@ -17,6 +17,7 @@
 #include <TTree.h>
 #include <TUnixSystem.h>
 
+#include <TCutG.h>
 #include <TThread.h>
 #include <TMethodCall.h>
 #include <TVirtualPad.h>
@@ -399,6 +400,13 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
     ProcessLine("TPython::Exec(\"window.AddDirectory(tdir)\");");
   }
   return file;
+}
+
+void TGRUTint::LoadTCutG(TCutG* cutg) {
+  if(TGRUTOptions::Get()->StartGUI()) {
+    TPython::Bind(cutg, "cutg");
+    ProcessLine("TPython::Exec(\"window.LoadCutG(cutg)\");");
+  }
 }
 
 void TGRUTint::LoadRawFile(std::string filename) {
