@@ -12,6 +12,11 @@ TRawEventFileSource::~TRawEventFileSource() {
   fclose(fFile);
 }
 
+void TRawEventFileSource::Reset() {
+  TRawEventByteSource::Reset();
+  fseek(fFile, 0, SEEK_SET);
+}
+
 int TRawEventFileSource::ReadBytes(char* buf, size_t size){
   size_t output = fread(buf, 1, size, fFile);
   if(output != size){

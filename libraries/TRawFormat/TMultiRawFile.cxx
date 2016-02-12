@@ -67,6 +67,14 @@ int TMultiRawFile::GetEvent(TRawEvent& outevent){
   return output.next_event.GetTotalSize();
 }
 
+void TMultiRawFile::Reset() {
+  std::lock_guard<std::mutex> lock(fFileListMutex);
+
+  for(auto& file : fFileList){
+    file->Reset();
+  }
+}
+
 std::string TMultiRawFile::SourceDescription() const{
   std::lock_guard<std::mutex> lock(fFileListMutex);
 

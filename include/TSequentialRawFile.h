@@ -9,6 +9,7 @@ public:
   ~TSequentialRawFile();
 
   void Add(TRawEventSource* infile);
+  virtual void Reset();
 
   virtual std::string SourceDescription() const;
   virtual std::string Status() const;

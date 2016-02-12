@@ -19,6 +19,9 @@ public:
     : TH1D(name, title, nbinsx, xlow, xup), parent(NULL), projection_axis(-1) { }
 
   GH1D(const TH1D& source);
+  //GH1D(const TH1 *source);
+
+  //virtual void SetOption(Option_t* option=" ");
 
   TObject* GetParent() const { return parent.GetObject(); }
   void SetParent(TObject* obj) { parent = obj; }

@@ -82,6 +82,16 @@ bool TUnpackingLoop::Iteration(){
   return true;
 }
 
+void TUnpackingLoop::ClearQueue() {
+  while(output_queue.Size()){
+    TUnpackedEvent* event = NULL;
+    output_queue.Pop(event);
+    if(event){
+      delete event;
+    }
+  }
+}
+
 void TUnpackingLoop::HandleNSCLData(TNSCLEvent& event) {
   switch(event.GetEventType()) {
     case kNSCLEventType::BEGIN_RUN:            // 0x0001
