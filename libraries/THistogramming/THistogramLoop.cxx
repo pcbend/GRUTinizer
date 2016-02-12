@@ -39,6 +39,15 @@ int THistogramLoop::Push(TUnpackedEvent *event) {
   return input_queue.Push(event);
 }
 
+void THistogramLoop::ClearQueue() {
+  while(input_queue.Size()){
+    TUnpackedEvent* event = NULL;
+    input_queue.Pop(event);
+    if(event){
+      delete event;
+    }
+  }
+}
 
 bool THistogramLoop::Iteration() {
   TUnpackedEvent* event = NULL;

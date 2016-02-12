@@ -30,6 +30,13 @@ int TRawEventSource::Read(TRawEvent* event){
   }
 }
 
+void TRawEventSource::Reset() {
+  fIsFinished = false;
+  fLastErrno = 0;
+  fLastError = "";
+  fBytesGiven = 0;
+}
+
 void TRawEventSource::UpdateByteThroughput(int bytes) {
   if(!fBytesPerSecond.size()){
     fBytesPerSecond.push_back(0);
@@ -107,6 +114,11 @@ ClassImp(TRawEventByteSource)
 TRawEventByteSource::TRawEventByteSource(kFileType file_type)
   : fFileType(file_type), fFileSize(-1),
     fDefaultBufferSize(8192) { }
+
+void TRawEventByteSource::Reset() {
+  TRawEventSource::Reset();
+  fCurrentBuffer = TSmartBuffer();
+}
 
 std::string TRawEventByteSource::Status() const {
   return Form("%s: %s %8.2f MB given %s / %s %8.2f MB total %s  => %s %3.02f MB/s processed %s",
@@ -218,6 +230,12 @@ TRawEventPipeSource::TRawEventPipeSource(const std::string& command, kFileType f
 
 TRawEventPipeSource::~TRawEventPipeSource() {
   pclose(fPipe);
+}
+
+void TRawEventPipeSource::Reset() {
+  TRawEventByteSource::Reset();
+  pclose(fPipe);
+  fPipe = popen(fCommand.c_str(),"r");
 }
 
 int TRawEventPipeSource::ReadBytes(char* buf, size_t size){

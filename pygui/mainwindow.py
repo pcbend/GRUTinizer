@@ -133,6 +133,10 @@ class MainWindow(object):
                            command=self.LoadRootFile)
         button.pack(side=tk.LEFT)
 
+        frame.pack(fill=tk.X,expand=False)
+
+        frame = tk.Frame(self.window)
+
         button = tk.Button(frame,
                            text='Refresh',fg="black",bg="goldenrod",
                            command=self.RefreshHistograms)
@@ -146,6 +150,11 @@ class MainWindow(object):
         button = tk.Button(frame,
                            text='Reset All',fg="black",bg="goldenrod",
                            command=self.ResetAllHistograms)
+        button.pack(side=tk.LEFT)
+
+        button = tk.Button(frame,
+                           text='Resort Data',fg="black",bg="goldenrod",
+                           command=self.ResortDataFile)
         button.pack(side=tk.LEFT)
 
         frame.pack(fill=tk.X,expand=False)
@@ -348,6 +357,8 @@ class MainWindow(object):
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="8 x 4",onvalue='8x4',
                                   variable=self.predefinedzones,command=self.set_zones)
+        zonesmenu.add_checkbutton(label="9 x 4",onvalue='9x4',
+                                  variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="12 x 12",onvalue='12x12',
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="13 x 13",onvalue='13x13',
@@ -426,6 +437,9 @@ class MainWindow(object):
     def ResetAllHistograms(self):
         ROOT.TGRUTint.instance().ResetAllHistograms()
 
+    def ResortDataFile(self):
+        ROOT.TGRUTint.instance().ResortDataFile()
+
     def _draw_single(self,hist,color=1,nselected=1):
         canvas_exists = bool(filter(None,self.canvases))
 
@@ -480,6 +494,10 @@ class MainWindow(object):
                 self.hist_tab.Insert(tdir)
 
             self.tcut_tab.AddDirectory(tdir)
+
+    def LoadCutG(self, cutg):
+        if cutg:
+            self.tcut_tab.AddCut(cutg)
 
     def LoadDataFile(self, filename = None):
         if filename is None:

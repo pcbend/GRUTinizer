@@ -14,6 +14,7 @@ public:
 
   void SetDepth(size_t depth) { this->depth = depth; }
   size_t GetDepth() const { return depth; }
+  virtual void Reset() { unordered->Reset(); }
 
   virtual std::string SourceDescription() const { return unordered->SourceDescription(); }
   virtual std::string Status()            const { return unordered->Status(); }

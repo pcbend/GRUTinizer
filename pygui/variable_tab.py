@@ -42,6 +42,8 @@ class VariableTab(object):
                   command=self.OnDeleteVariable_Click).pack(side=tk.LEFT)
         tk.Button(frame, text='Update',
                   command=self.OnUpdateAll_Click).pack(side=tk.LEFT)
+        tk.Button(frame, text='Save',
+                  command=self.OnSave_Click).pack(side=tk.LEFT)
         frame.pack(fill=tk.X,expand=False)
 
     def _MakeTreeView(self, parent):
@@ -56,6 +58,10 @@ class VariableTab(object):
         for val in t:
             self.SetReplaceVariable(val.GetName(), val.GetValue(),
                                     update_cpp = False)
+
+    def OnSave_Click(self, *args):
+        ROOT.GValue.WriteValFile("myvalues.val")
+
 
     def SetReplaceVariable(self, name, value, update_cpp = True):
         self.variables[name] = value

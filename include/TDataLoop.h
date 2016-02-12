@@ -27,6 +27,7 @@ public:
   const TRawEventSource& GetSource() const { return *source; }
 
   std::string Status();
+  virtual void ClearQueue();
 
   //protected:
   bool Iteration();
@@ -39,6 +40,7 @@ public:
   size_t GetRate()         { return 0; }
 
   void ReplaceSource(TRawEventSource* new_source);
+  void ResetSource();
 
   void SetSelfStopping(bool self_stopping) { fSelfStopping = self_stopping; }
   bool GetSelfStopping() const { return fSelfStopping; }

@@ -118,3 +118,18 @@ void TMode3Hit::ClearWave(Option_t *opt) {
   wave = NULL;
   wavesize =  0;
 }
+
+double TMode3Hit::AverageWave(int samples) {
+  //printf("wavesize = %i\n",wavesize);
+  if(wavesize<1)
+    return 0.0;
+  if(samples<0 || samples >wavesize)
+    samples = wavesize;
+  double avg = 0.0;
+  for(int i=0;i<samples;i++) { 
+    //printf("wavebiffer[%i] = %i\n",i,wave[i]);
+    avg += wave[i];
+  }
+  return avg/((double)samples);
+}
+

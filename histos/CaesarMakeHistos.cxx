@@ -16,6 +16,7 @@
 
 #include "TChannel.h"
 #include "GValue.h"
+#include "TCutG.h"
 
 TH1 *GetHistogram(TList *list, std::string histname,int xbins,double xlow,double xhigh) {
   //TList *list = &(obj.GetObjects());
@@ -64,6 +65,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
   pid_kr88->SetPoint(6,1772.94,1805.14);
   pid_kr88->SetPoint(7,1774.82,1816.05);
 
+<<<<<<< HEAD
   TCutG *tcut_kr88 = new TCutG("tcut_kr88",8);
   tcut_kr88->SetVarX("EnergyDCCorrTimeKr88");
   tcut_kr88->SetVarY("");
@@ -78,6 +80,42 @@ void MakeHistograms(TRuntimeObjects& obj) {
   tcut_kr88->SetPoint(5,-1558.92,417.161);
   tcut_kr88->SetPoint(6,-1574.56,314.633);
   tcut_kr88->SetPoint(7,-1566.74,276.185);
+=======
+  TCutG *pid_rb = new TCutG("pid_rb",10);
+  pid_rb->SetVarX("PID_TAC");
+  pid_rb->SetVarY("");
+  pid_rb->SetTitle("Graph");
+  pid_rb->SetFillColor(1);
+  pid_rb->SetLineWidth(3);
+  pid_rb->SetPoint(0,1801.13,1828.56);
+  pid_rb->SetPoint(1,1805.33,1830.83);
+  pid_rb->SetPoint(2,1811.24,1767.31);
+  pid_rb->SetPoint(3,1811.43,1649.34);
+  pid_rb->SetPoint(4,1806.28,1592.63);
+  pid_rb->SetPoint(5,1795.41,1585.82);
+  pid_rb->SetPoint(6,1790.83,1692.44);
+  pid_rb->SetPoint(7,1790.45,1755.96);
+  pid_rb->SetPoint(8,1794.46,1848.97);
+  pid_rb->SetPoint(9,1801.13,1828.56);
+
+   TCutG *pid_br = new TCutG("pid_br",11);
+   pid_br->SetVarX("PID_TAC");
+   pid_br->SetVarY("");
+   pid_br->SetTitle("Graph");
+   pid_br->SetFillColor(1);
+   pid_br->SetLineWidth(3);
+   pid_br->SetPoint(0,1760.13,1649.34);
+   pid_br->SetPoint(1,1756.13,1638);
+   pid_br->SetPoint(2,1751.93,1558.6);
+   pid_br->SetPoint(3,1752.89,1510.96);
+   pid_br->SetPoint(4,1758.61,1447.44);
+   pid_br->SetPoint(5,1768.71,1436.09);
+   pid_br->SetPoint(6,1774.44,1508.69);
+   pid_br->SetPoint(7,1766.81,1631.19);
+   pid_br->SetPoint(8,1761.09,1662.95);
+   pid_br->SetPoint(9,1758.8,1662.95);
+   pid_br->SetPoint(10,1760.13,1649.34);
+>>>>>>> crdc-unpack-test
   const int total_det_in_prev_rings[N_RINGS] = {0,10,24,48,72,96,120,144,168,182};
   if(caesar) {
     for(int y=0;y<caesar->Size();y++) {
@@ -122,6 +160,11 @@ void MakeHistograms(TRuntimeObjects& obj) {
           caesar_det_corrtime->Fill(det+total_det_in_prev_rings[ring],corr_time);
 
           if (pid_kr88->IsInside(objtac_corr, ic_sum)){
+<<<<<<< HEAD
+=======
+            TH1 *caesar_raw_energy_kr88 = GetHistogram(list,"RawEnergyKr88", 8192,0,8192);
+            caesar_raw_energy_kr88->Fill(charge);
+>>>>>>> crdc-unpack-test
             TH2 *caesar_corrtime_energyDC_kr88 = GetMatrix(list,"EnergyDCCorrTimeKr88",4000,-2000,2000,4096,0,4096);
             caesar_corrtime_energyDC_kr88->Fill(corr_time, energy_dc);
             TH1 *caesar_raw_energy_kr88 = GetHistogram(list,"RawEnergyKr88", 8192,0,8192);
@@ -132,6 +175,22 @@ void MakeHistograms(TRuntimeObjects& obj) {
               TH1 *caesar_energydc_kr88 = GetHistogram(list,"DCEnergyKr88", 512,0,8192);
               caesar_energydc_kr88->Fill(energy_dc);
             }
+          }
+          if (pid_rb->IsInside(objtac_corr, ic_sum)){
+            TH1 *caesar_raw_energy_rb = GetHistogram(list,"RawEnergyRb", 8192,0,8192);
+            caesar_raw_energy_rb->Fill(charge);
+            TH2 *caesar_corrtime_energyDC_rb = GetMatrix(list,"EnergyDCCorrTimeRb",4000,-2000,2000,4096,0,4096);
+            caesar_corrtime_energyDC_rb->Fill(corr_time, energy_dc);
+            TH2 *caesar_det_energy_dc_rb = GetMatrix(list,"DetectorEnergyDCRb",200,0,200,4096,0,4096);
+            caesar_det_energy_dc_rb->Fill(det+total_det_in_prev_rings[ring],energy_dc);
+          }
+          if (pid_br->IsInside(objtac_corr, ic_sum)){
+            TH1 *caesar_raw_energy_br = GetHistogram(list,"RawEnergyBr", 8192,0,8192);
+            caesar_raw_energy_br->Fill(charge);
+            TH2 *caesar_corrtime_energyDC_br = GetMatrix(list,"EnergyDCCorrTimeBr",4000,-2000,2000,4096,0,4096);
+            caesar_corrtime_energyDC_br->Fill(corr_time, energy_dc);
+            TH2 *caesar_det_energy_dc_br = GetMatrix(list,"DetectorEnergyDCBr",200,0,200,4096,0,4096);
+            caesar_det_energy_dc_br->Fill(det+total_det_in_prev_rings[ring],energy_dc);
           }
         }//s800 exists
       }//hit has both energy and time

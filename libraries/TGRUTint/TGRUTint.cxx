@@ -17,6 +17,7 @@
 #include <TTree.h>
 #include <TUnixSystem.h>
 
+#include <TCutG.h>
 #include <TThread.h>
 #include <TMethodCall.h>
 #include <TVirtualPad.h>
@@ -401,6 +402,13 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
   return file;
 }
 
+void TGRUTint::LoadTCutG(TCutG* cutg) {
+  if(TGRUTOptions::Get()->StartGUI()) {
+    TPython::Bind(cutg, "cutg");
+    ProcessLine("TPython::Exec(\"window.LoadCutG(cutg)\");");
+  }
+}
+
 void TGRUTint::LoadRawFile(std::string filename) {
   if(fDataLoop){
     TRawEventSource* source = new TRawFileIn(filename.c_str());
@@ -411,6 +419,17 @@ void TGRUTint::LoadRawFile(std::string filename) {
     }
     fDataLoop->ReplaceSource(source);
   }
+}
+
+void TGRUTint::ResortDataFile() {
+  StoppableThread::PauseAll();
+  if(fDataLoop){
+    fDataLoop->ResetSource();
+    for(auto thread : StoppableThread::GetAll()){
+      thread->ClearQueue();
+    }
+  }
+  StoppableThread::ResumeAll();
 }
 
 TRawFileIn *TGRUTint::OpenRawFile(const std::string& filename) {
