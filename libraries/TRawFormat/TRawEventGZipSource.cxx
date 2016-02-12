@@ -14,6 +14,11 @@ TRawEventGZipSource::~TRawEventGZipSource() {
   fclose(fFile);
 }
 
+void TRawEventGZipSource::Reset() {
+  TRawEventByteSource::Reset();
+  gzseek(*fGzFile, 0, SEEK_SET);
+}
+
 int TRawEventGZipSource::ReadBytes(char* buf, size_t size){
   int output = gzread(*fGzFile, buf, size);
   if(size_t(output) != size){

@@ -8,7 +8,7 @@
 #include "TRawEvent.h"
 //#include "TBuildingEvent.h"
 
-#ifndef __CINT__ 
+#ifndef __CINT__
 #include <condition_variable>
 #include <mutex>
 #include <queue>
@@ -30,15 +30,17 @@ class TBuildingLoop : public StoppableThread {
     //protected:
     bool Iteration();
 
-    size_t GetItemsPushed()  { return output_queue.ItemsPushed(); } 
-    size_t GetItemsPopped()  { return output_queue.ItemsPopped(); } 
+    virtual void ClearQueue();
+
+    size_t GetItemsPushed()  { return output_queue.ItemsPushed(); }
+    size_t GetItemsPopped()  { return output_queue.ItemsPopped(); }
     size_t GetItemsCurrent() { return output_queue.Size();        }
-    size_t GetRate()         { return 0; } 
+    size_t GetRate()         { return 0; }
 
     void SetBuildWindow(long clock_ticks) { build_window = clock_ticks; }
 
 
-    int Pop(std::vector<TRawEvent> &event); 
+    int Pop(std::vector<TRawEvent> &event);
 
 
   private:

@@ -65,6 +65,8 @@ public:
   size_t GetBytesGiven() const { return fBytesGiven; }
   double GetAverageRate() const;
 
+  virtual void Reset();
+
 protected:
   void SetLastErrno(int error) { fLastErrno = error; }
   void SetLastError(std::string error) { fLastError = error; }
@@ -105,6 +107,8 @@ public:
   kFileType GetFileType() const { return fFileType; }
   long GetFileSize() const { return fFileSize; }
 
+  virtual void Reset();
+
 protected:
   void SetFileSize(long file_size) { fFileSize = file_size; }
 
@@ -138,6 +142,7 @@ public:
   ~TRawEventPipeSource();
 
   virtual int ReadBytes(char* buf, size_t size);
+  virtual void Reset();
 
   virtual std::string SourceDescription() const;
 private:
@@ -154,6 +159,7 @@ public:
   ~TRawEventGZipSource();
 
   virtual int ReadBytes(char* buf, size_t size);
+  virtual void Reset();
 
   virtual std::string SourceDescription() const;
 private:
@@ -184,6 +190,7 @@ public:
   ~TRawEventFileSource();
 
   virtual int ReadBytes(char* buf, size_t size);
+  virtual void Reset();
 
   virtual std::string SourceDescription() const;
 private:
@@ -214,6 +221,7 @@ public:
   ~TRawEventOnlineFileSource();
 
   virtual int ReadBytes(char* buf, size_t size);
+  virtual void Reset();
 
   virtual std::string SourceDescription() const;
 private:
@@ -246,6 +254,11 @@ public:
 
   virtual std::string GetLastError() const {
     return wrapped->GetLastError();
+  }
+
+  virtual void Reset() {
+    TRawEventSource::Reset();
+    wrapped->Reset();
   }
 
   void SetNameTitle(const char *name,const char *title) {

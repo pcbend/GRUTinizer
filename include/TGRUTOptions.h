@@ -65,6 +65,7 @@ private:
 
   std::vector<std::string> input_raw_files;
   std::vector<std::string> input_root_files;
+  std::vector<std::string> input_cuts_files;
   std::vector<std::string> input_cal_files;
   std::vector<std::string> input_val_files;
   std::vector<std::string> input_macro_files;

@@ -31,6 +31,8 @@ public:
 
   bool IsValid() const { return fIsValid; }
 
+  virtual void Reset();
+
   virtual std::string SourceDescription() const;
   virtual std::string Status() const;
   virtual int GetLastErrno() const;

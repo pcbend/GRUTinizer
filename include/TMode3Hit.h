@@ -21,6 +21,7 @@ class TMode3Hit : public TDetectorHit {
     //virtual void          InsertHit(const TDetectorHit& hit) { return;       }
     //virtual TDetectorHit& GetHit(const int &i=0)             { return hit; }
     //virtual int           Size()                             { return 1;     }
+  double AverageWave(int samples=-1);
 
   void     BuildFrom(TSmartBuffer buf);
 

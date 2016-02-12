@@ -14,6 +14,11 @@ TRawEventOnlineFileSource::~TRawEventOnlineFileSource() {
   fclose(fFile);
 }
 
+void TRawEventOnlineFileSource::Reset() {
+  TRawEventByteSource::Reset();
+  fseek(fFile, 0, SEEK_SET);
+}
+
 int TRawEventOnlineFileSource::ReadBytes(char* buf, size_t size){
   while(true){
     int output = single_read(buf, size);

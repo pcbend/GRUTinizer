@@ -34,6 +34,7 @@ public:
   TCutG* GetCut(const std::string& name);
 
   TList& GetObjects();
+  TList& GetCuts();
   TList& GetVariables();
 
   TH1* FillHistogram(std::string name,
@@ -50,6 +51,7 @@ public:
 private:
   TUnpackedEvent& detectors;
   TList* objects;
+  TList* cuts;
   TList* variables;
   TDirectory* directory;
 
