@@ -65,7 +65,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
   pid_kr88->SetPoint(6,1772.94,1805.14);
   pid_kr88->SetPoint(7,1774.82,1816.05);
 
-<<<<<<< HEAD
   TCutG *tcut_kr88 = new TCutG("tcut_kr88",8);
   tcut_kr88->SetVarX("EnergyDCCorrTimeKr88");
   tcut_kr88->SetVarY("");
@@ -80,7 +79,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
   tcut_kr88->SetPoint(5,-1558.92,417.161);
   tcut_kr88->SetPoint(6,-1574.56,314.633);
   tcut_kr88->SetPoint(7,-1566.74,276.185);
-=======
   TCutG *pid_rb = new TCutG("pid_rb",10);
   pid_rb->SetVarX("PID_TAC");
   pid_rb->SetVarY("");
@@ -115,7 +113,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
    pid_br->SetPoint(8,1761.09,1662.95);
    pid_br->SetPoint(9,1758.8,1662.95);
    pid_br->SetPoint(10,1760.13,1649.34);
->>>>>>> crdc-unpack-test
   const int total_det_in_prev_rings[N_RINGS] = {0,10,24,48,72,96,120,144,168,182};
   if(caesar) {
     for(int y=0;y<caesar->Size();y++) {
@@ -160,15 +157,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
           caesar_det_corrtime->Fill(det+total_det_in_prev_rings[ring],corr_time);
 
           if (pid_kr88->IsInside(objtac_corr, ic_sum)){
-<<<<<<< HEAD
-=======
             TH1 *caesar_raw_energy_kr88 = GetHistogram(list,"RawEnergyKr88", 8192,0,8192);
             caesar_raw_energy_kr88->Fill(charge);
->>>>>>> crdc-unpack-test
             TH2 *caesar_corrtime_energyDC_kr88 = GetMatrix(list,"EnergyDCCorrTimeKr88",4000,-2000,2000,4096,0,4096);
             caesar_corrtime_energyDC_kr88->Fill(corr_time, energy_dc);
-            TH1 *caesar_raw_energy_kr88 = GetHistogram(list,"RawEnergyKr88", 8192,0,8192);
-            caesar_raw_energy_kr88->Fill(charge);
             if (tcut_kr88->IsInside(corr_time, energy_dc)){
               TH2 *caesar_det_energy_dc_kr88 = GetMatrix(list,"DetectorEnergyDCKr88",200,0,200,4096,0,4096);
               caesar_det_energy_dc_kr88->Fill(det+total_det_in_prev_rings[ring],energy_dc);
