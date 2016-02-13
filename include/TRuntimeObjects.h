@@ -2,6 +2,7 @@
 #define _RUNTIMEOBJECTS_H_
 
 #include <string>
+#include <map>
 
 #include "TCutG.h"
 #include "TDirectory.h"
@@ -17,13 +18,15 @@ class TH2;
    For each event, an instance of this type will be passed to the custom histogrammer.
    This class contains all detectors present, and all existing cuts and histograms.
  */
-class TRuntimeObjects : public TObject {
+class TRuntimeObjects : public TNamed {
 public:
   /// Constructor
   TRuntimeObjects(TUnpackedEvent& detectors,
                   TList* objects,
                   TList* variables,
-                  TDirectory* directory=NULL);
+                  TList* gates,
+                  TDirectory* directory=NULL,
+                  const char *name="default");
 
   /// Returns a pointer to the detector of type T
   template<typename T>
@@ -34,7 +37,7 @@ public:
   TCutG* GetCut(const std::string& name);
 
   TList& GetObjects();
-  TList& GetCuts();
+  TList& GetGates();
   TList& GetVariables();
 
   TH1* FillHistogram(std::string name,
@@ -48,11 +51,14 @@ public:
 
   double GetVariable(const char* name);
 
+  static TRuntimeObjects *Get(std::string name="default") { if(fRuntimeMap.count(name)) return fRuntimeMap.at(name); return 0; }
+
 private:
+  static std::map<std::string,TRuntimeObjects*> fRuntimeMap;
   TUnpackedEvent& detectors;
   TList* objects;
-  TList* cuts;
   TList* variables;
+  TList* gates;
   TDirectory* directory;
 
 

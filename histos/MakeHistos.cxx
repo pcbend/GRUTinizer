@@ -68,6 +68,11 @@ void MakeHistograms(TRuntimeObjects& obj) {
   TList *list = &(obj.GetObjects());
   int numobj = list->GetSize();
 
+  //std::cout << "obj pointer = 0x" << std::hex << &obj << std::dec << std::endl;
+  //std::cout << "obj::Get()  = 0x" << std::hex << TRuntimeObjects::Get() << std::dec << std::endl;
+  //std::cout << "---------------------------------------------" << std::endl;
+  //std::cout << "---------------------------------------------" << std::endl;
+
 
   //double MAFP_COEF = obj.GetVariable("MAFP_COEF");
   //double MCRDCX_COEF = obj.GetVariable("MCRDCX_COEF");
@@ -77,8 +82,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
   double E1_TDC_high = GValue::Value("E1_TDC_high");
   double BETA        = GValue::Value("BETA");
 
-  TList *cuts = &(obj.GetCuts());
-  bool haspids = cuts->GetSize();
+  TList *gates = &(obj.GetGates());
+  bool haspids = gates->GetSize();
 
   if(bank29) {
     for(int x=0;x<bank29->Size();x++) {
@@ -116,10 +121,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     if(bank29) {
       histname = "Gretina_Bank29_time";
-      obj.FillHistogram(histname,1200,-600,600,bank29->Timestamp()-hit.GetTimestamp(),
+      obj.FillHistogram(histname,600,-600,600,bank29->Timestamp()-hit.GetTimestamp(),
                                  2000,0,4000,hit.GetCoreEnergy());
       histname = "Gretina_t0_Bank29_time";
-      obj.FillHistogram(histname,1200,-600,600,bank29->Timestamp()-hit.GetTime(),
+      obj.FillHistogram(histname,600,-600,600,bank29->Timestamp()-hit.GetTime(),
                                  2000,0,4000,hit.GetCoreEnergy());
     }
 
@@ -151,7 +156,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       }
 
       if(haspids) {
-        TIter it(cuts);
+        TIter it(gates);
         while(TObject *itobj = it.Next()) {
           if(!itobj->InheritsFrom(TCutG::Class()))
             continue;

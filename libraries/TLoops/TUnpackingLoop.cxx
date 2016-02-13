@@ -194,6 +194,7 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
       fOutputEvent->AddRawData(event, kDetectorSystems::PHOSWALL);
       break;
     case 29: // Something.
+      fOutputEvent->AddRawData(event, kDetectorSystems::BANK29);
       break;
     default:
       std::cout << "Dance Party EventType: " << type << std::endl;

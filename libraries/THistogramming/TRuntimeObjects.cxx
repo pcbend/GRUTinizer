@@ -11,10 +11,14 @@
 
 #include "GValue.h"
 
-TRuntimeObjects::TRuntimeObjects(TUnpackedEvent& detectors, TList* objects, TList* variables,
-                                 TDirectory* directory)
-  : detectors(detectors), objects(objects), variables(variables), directory(directory) {
-  cuts = new TList;
+
+std::map<std::string,TRuntimeObjects*> TRuntimeObjects::fRuntimeMap;
+
+TRuntimeObjects::TRuntimeObjects(TUnpackedEvent& detectors, TList* objects, TList* variables, TList *gates,
+                                 TDirectory* directory,const char *name)
+  : detectors(detectors), objects(objects), variables(variables), gates(gates), directory(directory) {
+  SetName(name);
+  fRuntimeMap.insert(std::make_pair(name,this));
 }
 
 
@@ -63,8 +67,8 @@ TList& TRuntimeObjects::GetObjects() {
   return *objects;
 }
 
-TList& TRuntimeObjects::GetCuts() {
-  return *cuts;
+TList& TRuntimeObjects::GetGates() {
+  return *gates;
 }
 
 TList& TRuntimeObjects::GetVariables() {
@@ -72,6 +76,7 @@ TList& TRuntimeObjects::GetVariables() {
 }
 
 TCutG* TRuntimeObjects::GetCut(const std::string& name) {
+  /*
   TIter next(cuts);
   TObject* obj;
   while((obj = next())){
@@ -81,6 +86,7 @@ TCutG* TRuntimeObjects::GetCut(const std::string& name) {
       return (TCutG*)obj;
     }
   }
+  */
   return NULL;
 }
 

@@ -121,6 +121,10 @@ TList* THistogramLoop::GetObjects() {
   return compiled_histograms.GetObjects();
 }
 
+TList* THistogramLoop::GetGates() {
+  return compiled_histograms.GetGates();
+}
+
 void THistogramLoop::SetOutputFilename(const std::string& name){
   output_filename = name;
 }
