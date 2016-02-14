@@ -308,7 +308,6 @@ void TGRUTint::ApplyOptions() {
     RunMacroFile(filename);
   }
 
-
   if(opt->ExitAfterSorting()){
     while(StoppableThread::AnyThreadRunning()){
       std::this_thread::sleep_for(std::chrono::seconds(1));

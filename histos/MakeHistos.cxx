@@ -174,6 +174,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
       histname = "E1Raw";
       obj.FillHistogram(histname,2000,0,8000,s800->GetScint().GetTimeUp());
       
+      histname = "M_E1Raw";
+      for(int z=0;z<s800->GetMTof().E1UpSize();z++)
+        obj.FillHistogram(histname,2000,0,8000,s800->GetMTof().fE1Up[z]);
+      
       histname = "CRDC1_X";
       obj.FillHistogram(histname,800,-400,400,s800->GetCrdc(0).GetDispersiveX());
      

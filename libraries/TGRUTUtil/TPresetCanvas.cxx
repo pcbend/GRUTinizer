@@ -6,6 +6,11 @@
 #include <fstream>
 #include <sstream>
 
+#include <TGRUTUtilities.h>
+#include <GCanvas.h>
+
+#include <TROOT.h>
+
 ClassImp(TPresetPad) 
 
 
@@ -13,7 +18,24 @@ TPresetPad::TPresetPad(const char *name) : TNamed(name,name) {
   Clear();
 }
 
+TPresetPad::TPresetPad(const TPresetPad &pad) : TNamed(pad), 
+            fPadNumber(-1),fRowNumber(-1),fColNumber(-1) {
+  pad.Copy(*this);
+}
+
+
 TPresetPad::~TPresetPad() { }
+
+void TPresetPad::Copy(TObject &obj) const {
+  TNamed::Copy(obj);
+  ((TPresetPad&)obj).fPadNumber  = fPadNumber;
+  ((TPresetPad&)obj).fRowNumber  = fRowNumber;
+  ((TPresetPad&)obj).fColNumber  = fColNumber;
+  ((TPresetPad&)obj).fObjectName = fObjectName;
+  ((TPresetPad&)obj).fOption     = fOption;
+  ((TPresetPad&)obj).fColor      = fColor;
+}
+
 
 void TPresetPad::Print(Option_t *opt) const {
   printf("%s\t{\n",GetName());
@@ -21,8 +43,8 @@ void TPresetPad::Print(Option_t *opt) const {
   printf("\tCol:   \t%i\n",fColNumber);
   printf("\tObject:\t%s\n",fObjectName.Data());
   printf("\tOption:\t%s\n",fOption.Data());
+  printf("\tColor: \t%s\n",fColor.Data());
   printf("}\n\n");
-
 }
 
 std::string TPresetPad::PrintString(Option_t *opt) const {
@@ -38,6 +60,8 @@ std::string TPresetPad::PrintString(Option_t *opt) const {
   output.append(buffer);
   sprintf(buffer,"\tOption:\t%s\n",fOption.Data());
   output.append(buffer);
+  sprintf(buffer,"\tColor: \t%s\n",fColor.Data());
+  output.append(buffer);
   sprintf(buffer,"}\n\n");
   output.append(buffer);
   return output;
@@ -49,25 +73,28 @@ void TPresetPad::Clear(Option_t *opt) {
   fColNumber = -1;
   fObjectName.Clear();
   fOption.Clear();
-  parent = 0;
+  fColor.Clear();
 }
 
 void TPresetPad::Draw(Option_t *opt) {
-
-}
-
-void TPresetPad::Set(TPresetCanvas *p) {
-  if(!parent)
+  //printf("%s called\n",__PRETTY_FUNCTION__);
+  TObject *obj = gROOT->FindObjectAny(this->GetObjName());
+  if(!obj) {
+    printf("could not find %s",this->GetObjName());
     return;
-  parent = p;
-  fPadNumber = (fRowNumber-1)*p->GetMaxCol()+fColNumber;
+  }
+  if(obj->InheritsFrom(TH1::Class()) && ((TH1*)obj)->GetDimension()==1) {
+    if(FindColor(this->GetColor()))
+      ((TH1*)obj)->SetLineColor(FindColor(this->GetColor()));
+  }
+  obj->Draw(GetOption());
 }
 
-
-
+void TPresetPad::Set(int MaxCol,int MaxRow) {
+  fPadNumber = (fRowNumber-1)*MaxCol+fColNumber;
+}
 
 ClassImp(TPresetCanvas)
-
 
 TPresetCanvas::TPresetCanvas() {
   Clear();
@@ -98,9 +125,45 @@ void TPresetCanvas::Clear(Option_t *opt) {
 }
 
 void TPresetCanvas::Draw(Option_t *opt) { 
+  if(fRows<0 || fCols<0)
+    Set();
+  if(fRows<0 || fCols<0) {
+    fprintf(stderr,"%s: trying to draw negative pad number. %i %i\n",__PRETTY_FUNCTION__,fRows,fCols);
+    return;
+  }
+  gROOT->MakeDefCanvas();
+  GCanvas *c = (GCanvas*)gPad->GetCanvas();
+  c->Divide(fRows,fCols);
+  for(auto pad : fPadMap) {
+    c->cd(pad.second.GetPadNumber());
+    pad.second.Draw();
+  }
 
 }
 
+void TPresetCanvas::AddPad(TPresetPad &pad) { 
+  if(pad.GetRowNumber()>fRows)
+    fRows=pad.GetRowNumber();
+  if(pad.GetColNumber()>fCols)
+    fCols=pad.GetColNumber();
+  fPadMap.insert(std::make_pair(fPadMap.size(),TPresetPad(pad))); 
+}
+
+void TPresetCanvas::Set() {
+  std::map<int,TPresetPad> sortedmap;
+  for(auto pad : fPadMap) {
+    pad.second.Set(GetMaxCol(),GetMaxRow());
+    if(sortedmap.count(pad.second.GetPadNumber())) {
+      //if here, we already have a pad with that number, lets assume this 
+      //was done on purpose and over laythem.
+      //pad.second.AppendOption("same");
+      printf("found duplicate.\n");
+      sortedmap.insert(std::make_pair(pad.second.GetPadNumber()+fPadMap.size(),TPresetPad(pad.second)));
+    }
+    sortedmap.insert(std::make_pair(pad.second.GetPadNumber(),TPresetPad(pad.second)));
+  }
+  fPadMap = sortedmap;
+} 
 
 
 void TPresetCanvas::trim(std::string * line, const std::string & trimChars) {
@@ -202,11 +265,11 @@ int TPresetCanvas::ParseInputData(std::string input,Option_t *opt) {
     //=============================================//
     if(closebrace != std::string::npos) {
       brace_open = false;
-      if(pad.GetPadNumber()>0) {
-        pad.Set(this);
-        fPadMap.insert(std::make_pair(pad.GetPadNumber(),pad));
+      //if(pad.GetPadNumber()>0) {
+        //pad.Set(this);
+        fPadMap.insert(std::make_pair(fPadMap.size(),TPresetPad(pad)));
         newpads++;
-      }
+      //}
       pad.Clear();
       name.clear();
     }
@@ -250,14 +313,18 @@ int TPresetCanvas::ParseInputData(std::string input,Option_t *opt) {
         } else if(type.compare("OPTION")==0     ||
                   type.compare("OPT")==0        ){
           pad.SetOption(line.c_str());
+        } else if(type.compare("COLOR")==0     ||
+                  type.compare("LINECOLOR")==0 ||
+                  type.compare("LINE")==0        ){
+          pad.SetColor(line.c_str());
         }
       }
     }
   }
   if(newpads) {
-    for(auto pad : fPadMap)
-      pad.second.Set(this);
-
+    //for(auto pad : fPadMap)
+    //  pad.second.Set(this);
+    Set();
   }
 
   if(!strcmp(opt,"debug"))

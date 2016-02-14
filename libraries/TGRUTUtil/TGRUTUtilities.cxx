@@ -40,3 +40,8 @@ std::string get_run_number(std::string input) {
 
   return output;
 }
+
+EColor FindColor(std::string name) {
+  return color_system_map[name];
+}
+

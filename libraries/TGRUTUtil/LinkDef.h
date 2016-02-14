@@ -12,6 +12,7 @@
 #pragma link C++ class TPresetCanvas-;
 
 #pragma link C++ function get_run_number;
+#pragma link C++ function FindColor;
 
 
 

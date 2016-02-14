@@ -132,6 +132,11 @@ class MainWindow(object):
                            text='Load Root File',fg="black",bg="goldenrod",
                            command=self.LoadRootFile)
         button.pack(side=tk.LEFT)
+        
+        button = tk.Button(frame,
+                           text='Load Window File',fg="black",bg="goldenrod",
+                           command=self.LoadWindowFile)
+        button.pack(side=tk.LEFT)
 
         frame.pack(fill=tk.X,expand=False)
 
@@ -527,6 +532,18 @@ class MainWindow(object):
             self.variable_tab.AddFile(tfile)
         else:
             print 'MainWindow.LoadRootFile: Could not open {}'.format(filename)
+
+    def LoadWindowFile(self,filename=None):
+        if filename is None:
+            filename = tkFileDialog.askopenfilename(filetypes=(("Window File","*.win"),))
+
+        if not filename:
+            return
+        filename = os.path.abspath(filename)
+        can = ROOT.TPresetCanvas()
+        can.ReadWinFile(filename)
+        can.Draw()
+
 
     def Run(self):
         self.window.mainloop()

@@ -220,7 +220,9 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename) const{
   } else if (ext == "inv") {
     return kFileType::S800_INVMAP;
   } else if (ext == "val"){
-      return kFileType::GVALUE;
+    return kFileType::GVALUE;
+  } else if (ext == "win"){
+    return kFileType::PRESETWINDOW;
   } else {
     return kFileType::UNKNOWN_FILETYPE;
   }
@@ -263,6 +265,9 @@ bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
       return true;
     case kFileType::GVALUE:
       input_val_files.push_back(filename);
+      return true;
+    case kFileType::PRESETWINDOW:
+      input_win_files.push_back(filename);
       return true;
     case kFileType::CONFIG_FILE:
       return false;
