@@ -499,30 +499,30 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
   //   ((TCanvas*)GetSelected())->cd();
 
   TIter iter(gPad->GetListOfPrimitives());
-  //TH1 *hist = 0;
-  //while(TObject *obj = iter.Next()) {
-  //   if(obj->InheritsFrom(TH1::Class()))
-  //      hist = (TH1*)obj;
-  //}
+  TH1 *hist = 0;
+  while(TObject *obj = iter.Next()) {
+     if(obj->InheritsFrom(TH1::Class()))
+        hist = (TH1*)obj;
+  }
   std::vector<TH1*> hists = FindHists();
-  if(!hists.size())
+  if(!hist)
      return false;
   if(event == 0x00000007) {
     new GCanvas();
     TString options;
-    if(hists.at(0)->GetDimension()==2)
+    if(hist->GetDimension()==2)
       options.Append("colz");
-    if(hists.at(0)->InheritsFrom(GH1D::Class())) {
+    if(hist->InheritsFrom(GH1D::Class())) {
       GH1D* ghist = (GH1D*)hists.at(0);
       ghist->GetParent()->Draw("colz");
-    } else if(hists.at(0)->InheritsFrom(TH2::Class())) {
-      if(!hists.at(0)->InheritsFrom(GH2I::Class())) {
-        GH2I *ghist = new GH2I(*((TH2*)hists.at(0)));
+    } else if(hist->InheritsFrom(TH2::Class())) {
+      if(!hist->InheritsFrom(GH2I::Class())) {
+        GH2I *ghist = new GH2I(*((TH2*)hist));
         ghist->Draw();
       } else {
         hists.at(0)->DrawCopy(options.Data());
       }
-    } else if(hists.at(0)->GetDimension()==1){
+    } else if(hist->GetDimension()==1){
       hists.at(0)->DrawCopy(options.Data());
       for(unsigned int x=1;x<hists.size();x++) 
         hists.at(x)->DrawCopy("same");
@@ -531,13 +531,13 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
   }
 
   bool used = false;
-  if(hists.at(0)->GetDimension() > 2) {
+  if(hist->GetDimension() > 2) {
     return used;
   }
 
   if(fMarkerMode && (GetSelected()->InheritsFrom(TH1::Class()) ||
                      GetSelected()->InheritsFrom(TFrame::Class()))) {
-    AddMarker(x,y,hists.at(0)->GetDimension());
+    AddMarker(x,y,hist->GetDimension());
     used = true;
   }
 

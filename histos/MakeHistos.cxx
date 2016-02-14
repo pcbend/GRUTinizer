@@ -99,6 +99,16 @@ void MakeHistograms(TRuntimeObjects& obj) {
   if(!gretina)
     return;
 
+
+  if(s800) {
+    std::string histname = "S800_DTA";
+    obj.FillHistogram(histname,200,-10,10,s800->GetDta());
+    
+    histname = "S800_YTA";
+    obj.FillHistogram(histname,200,-10,10,s800->GetYta());
+
+  }
+
   double gsum = 0.0;
   for(int y=0;y<gretina->Size();y++) {
     TGretinaHit hit = gretina->GetGretinaHit(y);
