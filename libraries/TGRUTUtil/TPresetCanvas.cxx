@@ -157,7 +157,6 @@ void TPresetCanvas::Set() {
       //if here, we already have a pad with that number, lets assume this 
       //was done on purpose and over laythem.
       //pad.second.AppendOption("same");
-      printf("found duplicate.\n");
       sortedmap.insert(std::make_pair(pad.second.GetPadNumber()+fPadMap.size(),TPresetPad(pad.second)));
     }
     sortedmap.insert(std::make_pair(pad.second.GetPadNumber(),TPresetPad(pad.second)));
