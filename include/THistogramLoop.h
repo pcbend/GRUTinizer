@@ -30,6 +30,7 @@ public:
   TList* GetVariables();
 
   TList* GetObjects();
+  TList* GetGates();
 
   size_t GetItemsPopped()  { return input_queue.ItemsPopped(); }
   size_t GetItemsPushed()  { return input_queue.ItemsPushed(); }

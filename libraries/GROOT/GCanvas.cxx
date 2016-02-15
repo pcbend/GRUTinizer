@@ -504,6 +504,7 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
      if(obj->InheritsFrom(TH1::Class()))
         hist = (TH1*)obj;
   }
+  std::vector<TH1*> hists = FindHists();
   if(!hist)
      return false;
   if(event == 0x00000007) {
@@ -511,19 +512,20 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
     TString options;
     if(hist->GetDimension()==2)
       options.Append("colz");
-
     if(hist->InheritsFrom(GH1D::Class())) {
-      GH1D* ghist = (GH1D*)hist;
+      GH1D* ghist = (GH1D*)hists.at(0);
       ghist->GetParent()->Draw("colz");
     } else if(hist->InheritsFrom(TH2::Class())) {
       if(!hist->InheritsFrom(GH2I::Class())) {
         GH2I *ghist = new GH2I(*((TH2*)hist));
         ghist->Draw();
       } else {
-        hist->DrawCopy(options.Data());
+        hists.at(0)->DrawCopy(options.Data());
       }
-    } else {
-      hist->DrawCopy(options.Data());
+    } else if(hist->GetDimension()==1){
+      hists.at(0)->DrawCopy(options.Data());
+      for(unsigned int x=1;x<hists.size();x++) 
+        hists.at(x)->DrawCopy("same");
     }
     return true;
   }

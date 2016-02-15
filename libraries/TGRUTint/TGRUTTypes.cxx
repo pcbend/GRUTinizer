@@ -14,3 +14,26 @@ std::map<std::string, kDetectorSystems> detector_system_map{
   {"S800_SIM",        kDetectorSystems::S800_SIM},
   {"FastScint",       kDetectorSystems::FASTSCINT}
 };
+
+
+
+std::map<std::string, EColor> color_system_map {
+  {"kWhite",   EColor::kWhite},   
+  {"kBlack",   EColor::kBlack},   
+  {"kGray",    EColor::kGray},    
+  {"kRed",     EColor::kRed},     
+  {"kGreen",   EColor::kGreen},   
+  {"kBlue",    EColor::kBlue},    
+  {"kYellow",  EColor::kYellow},  
+  {"kMagenta", EColor::kMagenta}, 
+  {"kCyan",    EColor::kCyan},    
+  {"kOrange",  EColor::kOrange},  
+  {"kSpring",  EColor::kSpring},  
+  {"kTeal",    EColor::kTeal},    
+  {"kAzure",   EColor::kAzure},   
+  {"kViolet",  EColor::kViolet},  
+  {"kPink",    EColor::kPink} 
+};
+
+
+
