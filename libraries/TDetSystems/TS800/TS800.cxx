@@ -152,6 +152,21 @@ bool TS800::ReadInvMap(){
 
 
 void TS800::MapCalc(float *input){
+ 
+  float Shift_ata = 0;
+  float Shift_yta = 0;
+  float Shift_bta = 0;
+  float Shift_dta = 0;
+  
+  if(GValue::FindValue("ATA_SHIFT"))
+    Shift_ata = GValue::FindValue("ATA_SHIFT")->GetValue();
+  if(GValue::FindValue("YTA_SHIFT"))
+    Shift_yta = GValue::FindValue("YTA_SHIFT")->GetValue();
+  if(GValue::FindValue("BTA_SHIFT"))
+    Shift_bta = GValue::FindValue("BTA_SHIFT")->GetValue();
+  if(GValue::FindValue("DTA_SHIFT"))
+    Shift_dta = GValue::FindValue("DTA_SHIFT")->GetValue();
+  
   float cumul=0;
   float multi;
   int CalcOrder = 6; // Standard order in inv file.
@@ -176,10 +191,10 @@ void TS800::MapCalc(float *input){
       cumul += multi*current_.at(i).coef;
     }
     switch(param){
-    case 0: fAta = cumul-0.004406; break; std::cout << " HAVE A HARDCODED SI28 VALUE HERE"<<std::endl;
-    case 1: fYta = cumul; break;
-    case 2: fBta = cumul-0.008173; break;
-    case 3: fDta = cumul; break;
+    case 0: fAta = cumul + Shift_ata; break; 
+    case 1: fYta = cumul + Shift_yta; break;
+    case 2: fBta = cumul + Shift_bta; break;
+    case 3: fDta = cumul + Shift_dta; break;
     }
   }
   //return cumul;
