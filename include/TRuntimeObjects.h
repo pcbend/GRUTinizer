@@ -58,7 +58,17 @@ public:
   TH2* FillHistogramSym(std::string name,
                      int Xbins, double Xlow, double Xhigh, double Xvalue,
                      int Ybins, double Ylow, double Yhigh, double Yvalue);
-
+  //---------------------------------------------------------------------
+  TDirectory* FillHistogram(std::string dirname,std::string name,
+		     int bins, double low, double high, double value);
+  TDirectory* FillHistogram(std::string dirname,std::string name,
+                     int Xbins, double Xlow, double Xhigh, double Xvalue,
+                     int Ybins, double Ylow, double Yhigh, double Yvalue);
+  TDirectory* FillHistogramSym(std::string dirname,std::string name,
+                     int Xbins, double Xlow, double Xhigh, double Xvalue,
+                     int Ybins, double Ylow, double Yhigh, double Yvalue);
+  
+  
   double GetVariable(const char* name);
 
   static TRuntimeObjects *Get(std::string name="default") { if(fRuntimeMap.count(name)) return fRuntimeMap.at(name); return 0; }
