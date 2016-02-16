@@ -520,7 +520,7 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
         GH2I *ghist = new GH2I(*((TH2*)hist));
         ghist->Draw();
       } else {
-        hists.at(0)->DrawCopy(options.Data());
+        hist->DrawCopy(options.Data());
       }
     } else if(hist->GetDimension()==1){
       hists.at(0)->DrawCopy(options.Data());
