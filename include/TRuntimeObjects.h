@@ -40,9 +40,9 @@ public:
   TList& GetGates();
   TList& GetVariables();
 
-  TList* GetObjectsPtr();
-  TList* GetGatesPtr();
-  TList* GetVariablesPtr();
+  TList* GetObjectsPtr()    { return objects;   }
+  TList* GetGatesPtr()      { return gates;     }
+  TList* GetVariablesPtr()  { return variables; }
 
 
   TH1* FillHistogram(std::string name,
