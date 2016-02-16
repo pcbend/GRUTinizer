@@ -112,6 +112,8 @@ public:
   bool HandleArrowKeyPress(Event_t *event,UInt_t *keysym);
   bool HandleKeyboardPress(Event_t *event,UInt_t *keysym);
   bool HandleMousePress(Int_t event,Int_t x,Int_t y);
+  bool HandleMouseShiftPress(Int_t event,Int_t x,Int_t y);
+  bool HandleMouseControlPress(Int_t event,Int_t x,Int_t y);
 
   //private:
 
