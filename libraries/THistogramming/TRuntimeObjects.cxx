@@ -14,9 +14,16 @@
 
 std::map<std::string,TRuntimeObjects*> TRuntimeObjects::fRuntimeMap;
 
-TRuntimeObjects::TRuntimeObjects(TUnpackedEvent& detectors, TList* objects, TList* variables, TList *gates,
+TRuntimeObjects::TRuntimeObjects(TUnpackedEvent *detectors, TList* objects, TList* variables, TList *gates,
                                  TDirectory* directory,const char *name)
   : detectors(detectors), objects(objects), variables(variables), gates(gates), directory(directory) {
+  SetName(name);
+  fRuntimeMap.insert(std::make_pair(name,this));
+}
+
+TRuntimeObjects::TRuntimeObjects(TList* objects, TList* variables, TList *gates,
+                                 TDirectory* directory,const char *name)
+  : detectors(0),objects(objects), variables(variables), gates(gates), directory(directory) {
   SetName(name);
   fRuntimeMap.insert(std::make_pair(name,this));
 }
