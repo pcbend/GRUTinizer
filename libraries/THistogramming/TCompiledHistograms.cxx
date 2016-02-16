@@ -18,7 +18,9 @@ typedef void* __attribute__((__may_alias__)) void_alias;
 TCompiledHistograms::TCompiledHistograms()
   : libname(""), library(nullptr), func(nullptr),
     last_modified(0), last_checked(0), check_every(5),
-    default_directory(0) { }
+    default_directory(0),obj(0) {
+  obj = new TRuntimeObjects(&objects, &variables, &gates);
+}
 
 TCompiledHistograms::TCompiledHistograms(std::string input_lib)
   : check_every(5), default_directory(0) {
@@ -32,6 +34,15 @@ TCompiledHistograms::TCompiledHistograms(std::string input_lib)
   std::cout << "libname: " << input_lib << std::endl;
   last_modified = get_timestamp();
   last_checked = time(NULL);
+
+  
+  obj = new TRuntimeObjects(&objects, &variables, &gates);
+}
+
+TCompiledHistograms::~TCompiledHistograms() {
+  if(obj)
+    delete obj;
+  obj=0;
 }
 
 void TCompiledHistograms::ClearHistograms() {
@@ -101,14 +112,17 @@ void TCompiledHistograms::Fill(TUnpackedEvent& detectors) {
 
   TPreserveGDirectory preserve;
   default_directory->cd();
-
-  TRuntimeObjects obj(detectors, &objects, &variables, &gates);
-  func(obj);
+  
+  if(obj) {
+  obj->SetDetectors(&detectors);
+  //TRuntimeObjects obj(detectors, &objects, &variables, &gates);
+  func(*obj);
+  }
 }
 
-TList* TCompiledHistograms::GetVariables() {
-  return &variables;
-}
+//TList* TCompiledHistograms::GetVariables() {
+//  return &variables;
+//}
 
 void TCompiledHistograms::SetReplaceVariable(const char* name, double value) {
   GValue* val = (GValue*)variables.FindObject(name);

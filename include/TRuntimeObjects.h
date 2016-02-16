@@ -21,8 +21,13 @@ class TH2;
 class TRuntimeObjects : public TNamed {
 public:
   /// Constructor
-  TRuntimeObjects(TUnpackedEvent& detectors,
+  TRuntimeObjects(TUnpackedEvent *detectors,
                   TList* objects,
+                  TList* variables,
+                  TList* gates,
+                  TDirectory* directory=NULL,
+                  const char *name="default");
+  TRuntimeObjects(TList* objects,
                   TList* variables,
                   TList* gates,
                   TDirectory* directory=NULL,
@@ -31,7 +36,7 @@ public:
   /// Returns a pointer to the detector of type T
   template<typename T>
   T* GetDetector(){
-    return detectors.GetDetector<T>();
+    return detectors->GetDetector<T>();
   }
 
   TCutG* GetCut(const std::string& name);
@@ -39,6 +44,11 @@ public:
   TList& GetObjects();
   TList& GetGates();
   TList& GetVariables();
+
+  TList* GetObjectsPtr()    { return objects;   }
+  TList* GetGatesPtr()      { return gates;     }
+  TList* GetVariablesPtr()  { return variables; }
+
 
   TH1* FillHistogram(std::string name,
                      int bins, double low, double high, double value);
@@ -53,9 +63,11 @@ public:
 
   static TRuntimeObjects *Get(std::string name="default") { if(fRuntimeMap.count(name)) return fRuntimeMap.at(name); return 0; }
 
+  void SetDetectors(TUnpackedEvent *det) { detectors = det; }
+
 private:
   static std::map<std::string,TRuntimeObjects*> fRuntimeMap;
-  TUnpackedEvent& detectors;
+  TUnpackedEvent *detectors;
   TList* objects;
   TList* variables;
   TList* gates;
