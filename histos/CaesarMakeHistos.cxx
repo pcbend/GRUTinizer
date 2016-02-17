@@ -140,7 +140,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
         TH2 *caesar_det_time = GetMatrix(list,"DetectorTime",200,0,200,3000,0,3000);
         caesar_det_time->Fill(det+total_det_in_prev_rings[ring],time);
 
-        TH2 *caesar_time_energy = GetMatrix(list,"EnergyNoDC",3000,0,3000,4096,0,4096);
+        TH2 *caesar_time_energy = GetMatrix(list,"EnergyNoDCRawTme",3000,0,3000,4096,0,4096);
         caesar_time_energy->Fill(time, energy);
 
         TH2 *caesar_time_energyDC = GetMatrix(list,"EnergyDCRawTime",3000,0,3000,4096,0,4096);
@@ -196,10 +196,15 @@ void MakeHistograms(TRuntimeObjects& obj) {
     double objtac = s800->GetTof().GetTacOBJ();
     double crdc_1_x = s800->GetCrdc(0).GetDispersiveX();
     double crdc_2_x = s800->GetCrdc(1).GetDispersiveX();
+    double crdc_1_y = s800->GetCrdc(0).GetNonDispersiveY();
+    double crdc_2_y = s800->GetCrdc(1).GetNonDispersiveY();
     double afp = s800->GetAFP();
     double xfptac = s800->GetTof().GetTacXFP();
     double xfp = s800->GetTof().GetXFP();
     double obj = s800->GetTof().GetOBJ();
+    double ata = s800->GetAta();
+    double bta = s800->GetBta();
+    double dta = s800->GetDta();
     //if (s800->GetIonChamber().Size()){
     TH2 *tac_vs_ic= GetMatrix(list,"PID_TAC",4096,0,4096,4096,0,4096);
     tac_vs_ic->Fill(objtac_corr, ic_sum);
@@ -236,14 +241,25 @@ void MakeHistograms(TRuntimeObjects& obj) {
     tac_corr_vs_xfp->Fill(objtac_corr,crdc_1_x);
     TH1 *crdc1x = GetHistogram(list,"CRDC1_X",600,-300,300);
     crdc1x->Fill(crdc_1_x);
-    //}
-
-
-    //if (s800->GetCrdc(1).Size()){
     TH1 *crdc2x = GetHistogram(list,"CRDC2_X",600,-300,300);
     crdc2x->Fill(crdc_2_x);
+    TH1 *crdc1y = GetHistogram(list,"CRDC1_Y",600,-300,300);
+    crdc1y->Fill(crdc_1_y);
+    //}
+
+    //if (s800->GetCrdc(1).Size()){
+    TH1 *crdc2y = GetHistogram(list,"CRDC2_Y",600,-300,300);
+    crdc2y->Fill(crdc_2_y);
     // }
 
+    TH1 *ata_hist = GetHistogram(list, "ata", 10000,-100,100);
+    ata_hist->Fill(ata);
+
+    TH1 *bta_hist = GetHistogram(list, "bta", 10000,-100,100);
+    bta_hist->Fill(bta);
+
+    TH1 *dta_hist = GetHistogram(list, "dta", 10000,-100,100);
+    dta_hist->Fill(dta);
 
     TH1 *trig_bit = GetHistogram(list, "TrigBit", 10,0,10);
     int freg = s800->GetTrigger().GetRegistr();
