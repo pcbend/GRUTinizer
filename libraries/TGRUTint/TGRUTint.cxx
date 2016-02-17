@@ -115,17 +115,17 @@ void TGRUTint::SplashPopNWait(bool flag) {
 }
 
 void TGRUTint::LoadDetectorClasses() {
-  if(!gROOT->LoadClass("TGretina") ||
-     !gROOT->LoadClass("TGretinaHit") ||
-     !gROOT->LoadClass("std::vector<TGretinaHit>") ||
-     !gROOT->LoadClass("TS800") ||
+  // if(!gROOT->LoadClass("TGretina") ||
+  //    !gROOT->LoadClass("TGretinaHit") ||
+  //    !gROOT->LoadClass("std::vector<TGretinaHit>") ||
+  //    !gROOT->LoadClass("TS800") ||
 
-     !gROOT->LoadClass("TSega") ||
-     !gROOT->LoadClass("TJanus")
-    //gROOT->LoadClass("TPhosWall",false);
-  ){
-    std::cout << "Could not load all GRUT classes" << std::endl;
-  }
+  //    !gROOT->LoadClass("TSega") ||
+  //    !gROOT->LoadClass("TJanus")
+  //   //gROOT->LoadClass("TPhosWall",false);
+  // ){
+  //   std::cout << "Could not load all GRUT classes" << std::endl;
+  // }
 
 }
 

@@ -89,7 +89,7 @@ bool TS800::ReadInvMap(){
   int index;
   std::stringstream ssTest;
   int par = 0;
-  ifstream inFile;
+  std::ifstream inFile;
   inFile.open(filename);
   getline(inFile,eat);
   //std::cout << eat << std::endl;
@@ -932,13 +932,17 @@ float TS800::GetTofE1_MTDC(float c1,float c2,int i) const {
   //   std::cout << " In GetTOF MTDC, Size = " << mtof.fObj.size() << std::endl;
   for(unsigned int x=0;x<mtof.fObj.size();x++) {
     for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
-      result.push_back( mtof.fObj.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
+      if((mtof.fObj.at(x) - mtof.fE1Up.at(y)) < GValue::Value("MESY_UP") &&
+         (mtof.fObj.at(x) - mtof.fE1Up.at(y)) > GValue::Value("MESY_DOWN")) {
+         result.push_back( mtof.fObj.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
+        }
       }
     }
 
    if(result.size()>(unsigned int)i)
      return result.at(i);
    return sqrt(-1.0);
+   //return result;
 }
 
 float TS800::GetCorrTOF_OBJTAC() const {
@@ -954,8 +958,8 @@ float TS800::GetCorrTOF_OBJ() const {
   return GetTofE1_TDC(afp_cor,xfp_cor);
 }
 
-//std::vector<float> TS800::GetCorrTOF_OBJ_MESY() const {
 float TS800::GetCorrTOF_OBJ_MESY(int i) const {
+//float TS800::GetCorrTOF_OBJ_MESY(int i) const {
   double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
   double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
   return GetTofE1_MTDC(afp_cor,xfp_cor,i);

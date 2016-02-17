@@ -16,6 +16,7 @@
 htmldoc
 .grut_history
 bin
+lib
 .build
 .nfs*
 *.pyc

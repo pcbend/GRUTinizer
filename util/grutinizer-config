@@ -44,7 +44,7 @@ if [ -z "$GRUTSYS" ]; then
 fi
 
 bindir=$GRUTSYS/bin
-libdir=$GRUTSYS/libraries
+libdir=$GRUTSYS/lib
 incdir=$GRUTSYS/include
 #utildir=$GRUTSYS/etc
 

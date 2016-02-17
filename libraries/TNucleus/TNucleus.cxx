@@ -415,7 +415,7 @@ bool TNucleus::LoadTransitionFile(){
 
   fileName1.append(fileName2);
 
-  ifstream transFile;
+  std::ifstream transFile;
   transFile.open(fileName1.c_str());
 
   if(!transFile){

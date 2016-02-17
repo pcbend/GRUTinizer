@@ -7,6 +7,7 @@
 #include <ctime>
 #include <deque>
 #include <string>
+#include <fstream>
 
 #include <zlib.h>
 
@@ -24,7 +25,7 @@
 //#include <ios>
 
 inline size_t FindFileSize(const char* fname) {
-  ifstream temp;
+  std::ifstream temp;
   temp.open(fname, std::ios::in | std::ios::ate);
   size_t fsize = temp.tellg();
   temp.close();

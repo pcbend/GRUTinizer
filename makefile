@@ -39,18 +39,19 @@ NO_COLOR=\033[m
 OK_STRING="[OK]"
 ERROR_STRING="[ERROR]"
 WARN_STRING="[WARNING]"
-COM_STRING="Compiling"
-BLD_STRING="Building\ "
+COM_STRING= "Compiling"
+BLD_STRING= "Building\ "
+COPY_STRING="Copying\ \ "
 FIN_STRING="Finished Building"
 
 LIBRARY_DIRS   := $(shell find libraries -type d -links 2 2> /dev/null)
 LIBRARY_NAMES  := $(notdir $(LIBRARY_DIRS))
-LIBRARY_OUTPUT := $(patsubst %,libraries/lib%.so,$(LIBRARY_NAMES))
+LIBRARY_OUTPUT := $(patsubst %,lib/lib%.so,$(LIBRARY_NAMES))
 
 INCLUDES  := $(addprefix -I$(PWD)/,$(INCLUDES))
 CFLAGS    += $(shell root-config --cflags)
 CFLAGS    += -MMD -MP $(INCLUDES)
-LINKFLAGS += -Llibraries $(addprefix -l,$(LIBRARY_NAMES)) -Wl,-rpath,\$$ORIGIN/../libraries
+LINKFLAGS += -Llib $(addprefix -l,$(LIBRARY_NAMES)) -Wl,-rpath,\$$ORIGIN/../lib
 LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lPyROOT
 LINKFLAGS := $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX) $(CFLAGS)
 
@@ -61,7 +62,7 @@ MAIN_O_FILES    := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard src/*.$(SRC_
 EXE_O_FILES     := $(UTIL_O_FILES)
 EXECUTABLES     := $(patsubst %.o,bin/%,$(notdir $(EXE_O_FILES))) bin/grutinizer
 
-HISTOGRAM_SO    := $(patsubst histos/%.$(SRC_SUFFIX),libraries/lib%.so,$(wildcard histos/*.$(SRC_SUFFIX)))
+HISTOGRAM_SO    := $(patsubst histos/%.$(SRC_SUFFIX),lib/lib%.so,$(wildcard histos/*.$(SRC_SUFFIX)))
 
 ifdef VERBOSE
 run_and_test = @echo $(1) && $(1);
@@ -97,10 +98,10 @@ bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT) bin
 bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) bin
 	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
-bin:
+bin lib:
 	@mkdir -p $@
 
-libraries/lib%.so: .build/histos/%.o
+lib/lib%.so: .build/histos/%.o | lib
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 # Functions for determining the files included in a library.
@@ -113,7 +114,7 @@ lib_o_files     = $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(call lib_src_files,$(1
 lib_linkdef     = $(wildcard $(call libdir,$(1))/LinkDef.h)
 lib_dictionary  = $(patsubst %/LinkDef.h,.build/%/LibDictionary.o,$(call lib_linkdef,$(1)))
 
-libraries/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%)
+lib/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%) | lib
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 .build/%.o: %.$(SRC_SUFFIX)
@@ -133,7 +134,15 @@ define library_template
 
 .build/$(1)/LibDictionary.o: .build/$(1)/$(notdir $(1))Dict.cxx
 	$$(call run_and_test,$$(CPP) -fPIC -c $$< -o $$@ $$(CFLAGS),$$@,$$(COM_COLOR),$$(COM_STRING),$$(OBJ_COLOR) )
+
+lib/$(notdir $(1))Dict_rdict.pcm: .build/$(1)/$(notdir $(1))Dict_rdict.pcm | lib
+	$$(call run_and_test,cp $$< $$@,$$@,$$(COM_COLOR),$$(COPY_STRING),$$(OBJ_COLOR) )
 endef
+
+# rootcling makes the Dict_rdict.pcm at the same time as making Dict.cxx
+# We need to tell make that it will exist once Dict.cxx exists.
+%_rdict.pcm: %.cxx
+	@touch $@
 
 $(foreach lib,$(LIBRARY_DIRS),$(eval $(call library_template,$(lib))))
 
@@ -141,10 +150,7 @@ $(foreach lib,$(LIBRARY_DIRS),$(eval $(call library_template,$(lib))))
 
 clean:
 	@printf "\n$(WARN_COLOR)Cleaning up$(NO_COLOR)\n\n"
-	@-$(RM) -rf .build
-	@-$(RM) -rf bin
-	@-$(RM) -f $(LIBRARY_OUTPUT)
-	@-$(RM) -f libraries/*.so
+	@-$(RM) -rf .build bin lib
 
 cleaner: clean
 	@printf "\nEven more clean up\n\n"

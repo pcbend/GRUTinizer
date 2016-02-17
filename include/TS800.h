@@ -60,7 +60,7 @@ public:
 
   float GetCorrTOF_OBJTAC() const;
   float GetCorrTOF_OBJ() const;
-  float GetCorrTOF_OBJ_MESY(int i=0) const;
+  float GetCorrTOF_OBJ_MESY(int =0) const;
 //float GetCorrTOF_XFPTAC();
 //float GetCorrTOF_XFP();
 

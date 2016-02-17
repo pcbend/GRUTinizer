@@ -82,14 +82,24 @@ void MakeHistograms(TRuntimeObjects& obj) {
   double E1_TDC_high = GValue::Value("E1_TDC_high");
   double BETA        = GValue::Value("BETA");
 
+  double MESY_UP     = GValue::Value("MESY_UP");
+  double MESY_DOWN   = GValue::Value("MESY_DOWN");
+
+
   TList *gates = &(obj.GetGates());
   bool haspids = gates->GetSize();
+
+  std::string gdir = "GRETINA";
+  std::string sdir = "S800";
+  std::string bdir = "BANK29";
+
+
 
   if(bank29) {
     for(int x=0;x<bank29->Size();x++) {
       TMode3Hit &hit = (TMode3Hit&)bank29->GetHit(x);
       std::string histname = Form("bank29_%i",hit.GetChannel());
-      obj.FillHistogram(histname,16000,0,64000,hit.Charge());
+      obj.FillHistogram(bdir,histname,16000,0,64000,hit.Charge());
     }
     if(s800) {
       std::string histname = "S800_Bank29_time";
@@ -102,10 +112,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   if(s800) {
     std::string histname = "S800_DTA";
-    obj.FillHistogram(histname,200,-10,10,s800->GetDta());
+    obj.FillHistogram(sdir,histname,200,-10,10,s800->GetDta());
     
     histname = "S800_YTA";
-    obj.FillHistogram(histname,200,-10,10,s800->GetYta());
+    obj.FillHistogram(sdir,histname,200,-10,10,s800->GetYta());
 
   }
 
@@ -121,9 +131,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
       obj.FillHistogramSym(histname,2000,0,4000,hit.GetCoreEnergy(),
                                     2000,0,4000,hit2.GetCoreEnergy());
       histname = "Gamma_Gamma_Time";
-      obj.FillHistogram(histname,800,-400,400,hit2.GetTime()-hit.GetTime(),
+      obj.FillHistogram(gdir,histname,800,-400,400,hit2.GetTime()-hit.GetTime(),
                                  2000,0,4000,hit2.GetCoreEnergy());
-      obj.FillHistogram(histname,800,-400,400,hit.GetTime()-hit2.GetTime(),
+      obj.FillHistogram(gdir,histname,800,-400,400,hit.GetTime()-hit2.GetTime(),
                                  2000,0,4000,hit.GetCoreEnergy());
     }
       
@@ -131,39 +141,68 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     if(bank29) {
       histname = "Gretina_Bank29_time";
-      obj.FillHistogram(histname,600,-600,600,bank29->Timestamp()-hit.GetTimestamp(),
+      obj.FillHistogram(bdir,histname,600,-600,600,bank29->Timestamp()-hit.GetTimestamp(),
                                  2000,0,4000,hit.GetCoreEnergy());
       histname = "Gretina_t0_Bank29_time";
-      obj.FillHistogram(histname,600,-600,600,bank29->Timestamp()-hit.GetTime(),
+      obj.FillHistogram(bdir,histname,600,-600,600,bank29->Timestamp()-hit.GetTime(),
                                  2000,0,4000,hit.GetCoreEnergy());
     }
 
     if(s800) {
       histname = "Gretina_S800_time";
-      obj.FillHistogram(histname,1200,-600,600,s800->Timestamp()-hit.GetTimestamp(),
+      obj.FillHistogram(sdir,histname,1200,-600,600,s800->Timestamp()-hit.GetTimestamp(),
                                  2000,0,4000,hit.GetCoreEnergy());
       histname = "Gretina_t0_S800_time";
-      obj.FillHistogram(histname,1200,-600,600,s800->Timestamp()-hit.GetTime(),
+      obj.FillHistogram(sdir,histname,1200,-600,600,s800->Timestamp()-hit.GetTime(),
                                  2000,0,4000,hit.GetCoreEnergy());
 
       histname = "pidtune1_TDC_vs_DispX";
       obj.FillHistogram(histname,4000,-4000,4000,s800->GetCorrTOF_OBJ(),    //s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),
-                                 600,-300,300,s800->GetCrdc(0).GetDispersiveX());
+                                      600,-300,300,s800->GetCrdc(0).GetDispersiveX());
+
+      histname = "mystec_e1_obj_timediff";
+      for(int a=0;a<s800->GetMTof().fObj.size();a++) {
+        for(int b=0;b<s800->GetMTof().fE1Up.size();b++) {
+          float timediff = s800->GetMTof().fObj.at(a)-s800->GetMTof().fE1Up.at(b);
+          obj.FillHistogram(histname,20000,-10000,10000,timediff);
+          if(timediff>MESY_DOWN && timediff<MESY_UP)
+            obj.FillHistogram("mystec_e1_obj_timediff_gated",20000,-10000,10000,timediff);
+        }
+      }
+
 
       histname = "pidtune2_TDC_vs_AFP";
       obj.FillHistogram(histname,4000,-4000,4000,s800->GetCorrTOF_OBJ(),    //s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),
-                                 600,-0.1,0.1,s800->GetAFP());
+                                      600,-0.1,0.1,s800->GetAFP());
 
       double delta_t = s800->GetScint().GetTimeUp()-s800->GetTof().GetOBJ();
       histname ="pidtune3_PID_TDC";
       obj.FillHistogram(histname,4000,-4000,4000,s800->GetCorrTOF_OBJ(),    //s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),
-                                 2000,0,50000,s800->GetIonChamber().Charge());
+                                      2000,0,50000,s800->GetIonChamber().Charge());
 
       if(delta_t>E1_TDC_low && delta_t<E1_TDC_high){
         histname ="pidtune3_PID_TDC_Prompt";
         obj.FillHistogram(histname,8000,-4000,4000,s800->GetCorrTOF_OBJ(),  //s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),
-                                   2000,0,50000,s800->GetIonChamber().Charge());
+                                        2000,0,50000,s800->GetIonChamber().Charge());
       }
+      
+
+      //std::vector<float> mtof = s800->GetCorrTOF_OBJ_MESY();
+
+      //for(unsigned int z=0;z<mtof.size();z++) {
+        histname = "mpidtune1_TDC_vs_DispX";
+        obj.FillHistogram(histname,4000,-4000,4000,s800->GetCorrTOF_OBJ_MESY(),    //s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),
+                                        600,-300,300,s800->GetCrdc(0).GetDispersiveX());
+        
+        histname = "mpidtune2_TDC_vs_AFP";
+        obj.FillHistogram(histname,4000,-4000,4000,s800->GetCorrTOF_OBJ_MESY(),    //s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),
+                                        600,-0.1,0.1,s800->GetAFP());
+        
+        histname ="mpidtune3_PID_TDC";
+        obj.FillHistogram(histname,4000,-4000,0,s800->GetCorrTOF_OBJ_MESY(),    //s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),
+                                        4500,5000,50000,s800->GetIonChamber().Charge());
+      //}
+
 
       if(haspids) {
         TIter it(gates);
