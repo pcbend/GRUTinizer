@@ -35,6 +35,8 @@
 #include "GH2I.h"
 #include "GH1D.h"
 
+#include "TRuntimeObjects.h"
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -387,13 +389,19 @@ void GCanvas::HandleInput(Int_t event,Int_t x,Int_t y) {
   //If the below switch breaks. You need to upgrade your version of ROOT
   //Version 5.34.24 works. //older version should work now too pcb (8/2015)
   bool used = false;
-  //printf("event = 0x%08x\n",event);
+  //printf("event = 0x%08x\t x = 0x%08x\t y = 0x%08x \n",event,x,y);
   switch(event) {
     case 0x00000001: //single click
     case 0x0000003d: //double click
-    case 0x00000007: //shift-click
       used = HandleMousePress(event,x,y);
       break;
+    case 0x00000007: //shift-click
+      used = HandleMouseShiftPress(event,x,y);
+      break;
+    case 0x0000009:  //control-click
+      used = HandleMouseControlPress(event,x,y);
+      break;
+
   };
   if(!used)
     TCanvas::HandleInput((EEventType)event,x,y);
@@ -504,31 +512,8 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
      if(obj->InheritsFrom(TH1::Class()))
         hist = (TH1*)obj;
   }
-  std::vector<TH1*> hists = FindHists();
   if(!hist)
      return false;
-  if(event == 0x00000007) {
-    new GCanvas();
-    TString options;
-    if(hist->GetDimension()==2)
-      options.Append("colz");
-    if(hist->InheritsFrom(GH1D::Class())) {
-      GH1D* ghist = (GH1D*)hists.at(0);
-      ghist->GetParent()->Draw("colz");
-    } else if(hist->InheritsFrom(TH2::Class())) {
-      if(!hist->InheritsFrom(GH2I::Class())) {
-        GH2I *ghist = new GH2I(*((TH2*)hist));
-        ghist->Draw();
-      } else {
-        hist->DrawCopy(options.Data());
-      }
-    } else if(hist->GetDimension()==1){
-      hists.at(0)->DrawCopy(options.Data());
-      for(unsigned int x=1;x<hists.size();x++) 
-        hists.at(x)->DrawCopy("same");
-    }
-    return true;
-  }
 
   bool used = false;
   if(hist->GetDimension() > 2) {
@@ -547,6 +532,55 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
   }
   return used;
 }
+
+bool GCanvas::HandleMouseShiftPress(Int_t event,Int_t x,Int_t y) {
+  TH1 *hist = 0;
+  TIter iter(gPad->GetListOfPrimitives());
+  while(TObject *obj = iter.Next()) {
+     if(obj->InheritsFrom(TH1::Class()))
+        hist = (TH1*)obj;
+  }
+  if(!hist) 
+    return false;
+  
+  TString options;
+  switch(hist->GetDimension()) {
+    case 1:
+      {
+      if(hist->InheritsFrom(GH1D::Class())) {
+        new GCanvas();
+        ((GH1D*)hist)->GetParent()->Draw("colz");
+        return true;
+      }
+      std::vector<TH1*> hists = FindHists();
+      new GCanvas();
+      hists.at(0)->DrawCopy(options.Data());
+      for(unsigned int x=1;x<hists.size();x++) 
+        hists.at(x)->DrawCopy("same");
+      }
+      return true;
+    case 2:
+      options.Append("colz");
+      GH2I *ghist = new GH2I(*((TH2*)hist));
+      new GCanvas();
+      ghist->Draw();
+      return true;
+  };
+  return false;
+}
+
+bool GCanvas::HandleMouseControlPress(Int_t event,Int_t x,Int_t y) {
+  //printf("GetSelected() = 0x%08x\n",GetSelected());
+  if(!GetSelected())
+    return false;
+  //printf("GetSelected()->GetName() = %s\n",GetSelected()->GetName());
+  if(GetSelected()->InheritsFrom(TCutG::Class())) {
+    if(TRuntimeObjects::Get())
+      TRuntimeObjects::Get()->GetGates().Add(GetSelected());
+  }
+  return true;
+}
+
 
 
 TF1 *GCanvas::GetLastFit() {
