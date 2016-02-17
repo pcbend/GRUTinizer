@@ -69,6 +69,73 @@ TH2* TRuntimeObjects::FillHistogramSym(std::string name,
   return hist;
 }
 
+//-------------------------------------------------------------------------
+TDirectory* TRuntimeObjects::FillHistogram(std::string dirname,std::string name,
+                                    int bins, double low, double high, double value){
+  TDirectory *dir = (TDirectory*)GetObjects().FindObject(dirname.c_str());
+  if(!dir){
+    dir = new TDirectory(dirname.c_str(),dirname.c_str());
+    GetObjects().Add(dir);
+  }
+  dir->cd();
+  TH1* hist = (TH1*)dir->FindObject(name.c_str());
+  if(!hist){
+    hist = new TH1I(name.c_str(),name.c_str(),bins,low,high);
+    dir->Add(hist);
+  }
+  dir->cd();
+  hist->Fill(value);
+  dir->cd("../");
+  //return hist;
+  return dir;
+}
+
+TDirectory* TRuntimeObjects::FillHistogram(std::string dirname,std::string name,
+                                    int Xbins, double Xlow, double Xhigh, double Xvalue,
+                                    int Ybins, double Ylow, double Yhigh, double Yvalue){
+  TDirectory *dir = (TDirectory*)GetObjects().FindObject(dirname.c_str());
+  if(!dir){
+    dir = new TDirectory(dirname.c_str(),dirname.c_str());
+    GetObjects().Add(dir);
+  }
+  dir->cd();
+  TH2* hist = (TH2*)dir->FindObject(name.c_str());
+  if(!hist){
+    hist = new GH2I(name.c_str(),name.c_str(),
+                            Xbins, Xlow, Xhigh,
+                            Ybins, Ylow, Yhigh);
+    dir->Add(hist);
+  }
+  
+  hist->Fill(Xvalue, Yvalue);
+  dir->cd("../");
+  //return hist;
+  return dir;
+}
+
+TDirectory* TRuntimeObjects::FillHistogramSym(std::string dirname,std::string name,
+                                    int Xbins, double Xlow, double Xhigh, double Xvalue,
+                                    int Ybins, double Ylow, double Yhigh, double Yvalue){
+  TDirectory *dir = (TDirectory*)GetObjects().FindObject(dirname.c_str());
+  if(!dir){
+    dir = new TDirectory(dirname.c_str(),dirname.c_str());
+    GetObjects().Add(dir);
+  }
+  dir->cd();
+  TH2* hist = (TH2*)dir->FindObject(name.c_str());
+  if(!hist){
+    hist = new GH2I(name.c_str(),name.c_str(),
+                            Xbins, Xlow, Xhigh,
+                            Ybins, Ylow, Yhigh);
+    dir->Add(hist);
+  }
+  hist->Fill(Xvalue, Yvalue);
+  hist->Fill(Yvalue, Xvalue);
+  dir->cd("../");
+  //return hist;
+  return dir;
+}
+//-------------------------------------------------------------------------
 
 TList& TRuntimeObjects::GetObjects() {
   return *objects;
