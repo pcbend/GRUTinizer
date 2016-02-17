@@ -64,6 +64,8 @@ public:
 //float GetCorrTOF_XFPTAC();
 //float GetCorrTOF_XFP();
 
+  float GetCorrIonSum() const;
+
 private:
 
   bool ReadInvMap();

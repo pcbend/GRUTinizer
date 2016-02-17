@@ -952,6 +952,7 @@ float TS800::GetCorrTOF_OBJTAC() const {
 //std::cout << "TOF OBJTAC xfp COR" << xfp_cor << std::endl;
   return GetTofE1_TAC(afp_cor,xfp_cor);
 }
+
 float TS800::GetCorrTOF_OBJ() const {
   double afp_cor = GValue::Value("OBJ_TOF_CORR_AFP");
   double xfp_cor = GValue::Value("OBJ_TOF_CORR_XFP");
@@ -964,6 +965,19 @@ float TS800::GetCorrTOF_OBJ_MESY(int i) const {
   double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
   return GetTofE1_MTDC(afp_cor,xfp_cor,i);
 }
+
+
+
+float TS800::GetCorrIonSum() const {
+  //double ic afp_cor = GValue::Value("OBJTAC_TOF_CORR_AFP");
+  //double xfp_cori   = GValue::Value("OBJTAC_TOF_CORR_XFP");
+  //std::cout << "TOF OBJTAC AFP COR" << afp_cor << std::endl;
+  //std::cout << "TOF OBJTAC xfp COR" << xfp_cor << std::endl;
+  return GetIonChamber().Charge();
+}
+
+
+
 
 //float TS800::GetCorrTOF_XFP(){
 //  double afp_cor = GValue::Value("XFP_TOF_CORR_AFP");

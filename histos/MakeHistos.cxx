@@ -30,6 +30,8 @@
 
 //#define BETA .37
 
+#define ISPID 32
+
 std::map<int,int> HoleQMap;
 std::map<int,std::string> LayerMap;
 
@@ -87,7 +89,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
 
   TList *gates = &(obj.GetGates());
-  bool haspids = gates->GetSize();
 
   std::string gdir = "GRETINA";
   std::string sdir = "S800";
@@ -161,8 +162,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
                                       600,-300,300,s800->GetCrdc(0).GetDispersiveX());
 
       histname = "mystec_e1_obj_timediff";
-      for(int a=0;a<s800->GetMTof().fObj.size();a++) {
-        for(int b=0;b<s800->GetMTof().fE1Up.size();b++) {
+      for(unsigned int a=0;a<s800->GetMTof().fObj.size();a++) {
+        for(unsigned int b=0;b<s800->GetMTof().fE1Up.size();b++) {
           float timediff = s800->GetMTof().fObj.at(a)-s800->GetMTof().fE1Up.at(b);
           obj.FillHistogram(histname,20000,-10000,10000,timediff);
           if(timediff>MESY_DOWN && timediff<MESY_UP)
@@ -201,13 +202,18 @@ void MakeHistograms(TRuntimeObjects& obj) {
         histname ="mpidtune3_PID_TDC";
         obj.FillHistogram(histname,4000,-4000,0,s800->GetCorrTOF_OBJ_MESY(),    //s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),
                                         4500,5000,50000,s800->GetIonChamber().Charge());
+
+        //this spectrum needs a gate!
+        //histname ="mpidtune4_IC_vs_DispX";
+        //obj.FillHistogram(histname,4500,5000,50000,s800->GetCorrIonSum(),
+        //                           600,-300,300,s800->GetCrdc(0).GetDispersiveX());    //s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),
+
       //}
 
-
-      if(haspids) {
+      //if(haspids) {
         TIter it(gates);
         while(TObject *itobj = it.Next()) {
-          if(!itobj->InheritsFrom(TCutG::Class()))
+          if(!itobj->InheritsFrom(TCutG::Class()) && !itobj->TestBit(ISPID))
             continue;
           TCutG *mypid = (TCutG*)itobj;
           if(mypid->IsInside(s800->GetCorrTOF_OBJ(),s800->GetIonChamber().Charge())) {
@@ -215,7 +221,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
             obj.FillHistogram(histname,2000,0,4000,hit.GetDoppler(BETA));
           }
         }
-      }
+      //}
 
       histname = "E1_m_TDC";
       obj.FillHistogram(histname,8000,-8000,8000,s800->GetScint().GetTimeUp()-s800->GetTof().GetOBJ());

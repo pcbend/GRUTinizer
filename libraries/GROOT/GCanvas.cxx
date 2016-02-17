@@ -575,6 +575,7 @@ bool GCanvas::HandleMouseControlPress(Int_t event,Int_t x,Int_t y) {
     return false;
   //printf("GetSelected()->GetName() = %s\n",GetSelected()->GetName());
   if(GetSelected()->InheritsFrom(TCutG::Class())) {
+    GetSelected()->SetBit(ISPID);
     if(TRuntimeObjects::Get())
       TRuntimeObjects::Get()->GetGates().Add(GetSelected());
   }
