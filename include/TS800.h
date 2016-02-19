@@ -29,6 +29,7 @@ public:
   Long_t GetTimestamp()    { return Timestamp(); }
 
   TVector3 CRDCTrack();  // not a finished method
+  TVector3 ExitTargetVect();
   float GetAFP() const;
   float GetBFP() const;
   void MapCalc(float *input);
@@ -36,6 +37,8 @@ public:
   Float_t GetYta()         { return fYta; }
   Float_t GetBta()         { return fBta; }
   Float_t GetDta()         { return fDta; }
+
+  bool InvMapLoaded()      { return fMapLoaded; }
 
   virtual void Copy(TObject& obj)        const;
   //virtual void Print(Option_t *opt = "") const;
@@ -93,7 +96,9 @@ private:
   static short fMaxOrder;                         //!
   static float fBrho;                             //!
   static int fMass;                               //!
-  static int fCharge;                             //!
+  static int fZ;                                  //!
+  static bool fMapLoaded;                         //!
+
 
   TScintillator scint[3];
   TTrigger     trigger;

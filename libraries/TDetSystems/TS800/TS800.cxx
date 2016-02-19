@@ -26,7 +26,8 @@ std::vector<TS800::S800_InvMapLine> TS800::fIML_sec4;
 short TS800::fMaxOrder;
 float TS800::fBrho;
 int TS800::fMass;
-int TS800::fCharge;
+int TS800::fZ;
+bool TS800::fMapLoaded;
 
 TS800::TS800() {
   Clear();
@@ -39,6 +40,7 @@ TS800::TS800() {
     if(!InvMapFileRead){
       ReadInvMap();
       InvMapFileRead=true;
+      fMapLoaded = true;
     }
   }
 
@@ -93,7 +95,7 @@ bool TS800::ReadInvMap(){
   inFile.open(filename);
   getline(inFile,eat);
   //std::cout << eat << std::endl;
-  sscanf(eat.c_str(), "S800 inverse map - Brho=%g - M=%d - Q=%d", &fBrho, &fMass, &fCharge);
+  sscanf(eat.c_str(), "S800 inverse map - Brho=%g - M=%d - Q=%d", &fBrho, &fMass, &fZ);
 
   inFile >> I >> COEF >> ORDEXP;
   getline(inFile,eat);
@@ -201,6 +203,27 @@ void TS800::MapCalc(float *input){
   return;
 }
 
+TVector3 TS800::ExitTargetVect(){
+  TVector3 track;
+  double xsin  = GetAta();
+  double ysin  = GetBta();
+  double phi   = 0;
+  double theta = 0;
+
+  xsin = TMath::Sin(xsin);
+  ysin = TMath::Sin(ysin);
+  
+  if(xsin>0 && ysin>0)      phi = 2.0*TMath::Pi()-TMath::ATan(ysin/xsin);
+  else if(xsin<0 && ysin>0) phi = TMath::Pi()+TMath::ATan(ysin/TMath::Abs(xsin));
+  else if(xsin<0 && ysin<0) phi = TMath::Pi()-TMath::ATan(TMath::Abs(ysin)/TMath::Abs(xsin));
+  else if(xsin>0 && ysin<0) phi = TMath::ATan(TMath::Abs(ysin)/xsin);
+  else                      phi = 0;
+
+  theta = TMath::ASin(TMath::Sqrt(xsin*xsin+ysin*ysin));
+  track.SetPtThetaPhi(1,theta,phi);
+  return track;
+}
+
 TVector3 TS800::CRDCTrack(){
   /*TVector3 crdc1,crdc2;
 
@@ -249,7 +272,8 @@ void TS800::Clear(Option_t* opt){
   fMaxOrder = 0;
   fMass     = 0;
   fBrho     = -1;
-  fCharge   = 0;
+  fZ        = 0;
+  fMapLoaded= false;
 
   fAta = sqrt(-1);
   fYta = sqrt(-1);

@@ -9,6 +9,9 @@
 #include "TH1.h"
 #include "TFile.h"
 #include "TDirectory.h"
+#include "GRootCommands.h"
+#include "TROOT.h"
+#include "TKey.h"
 
 #include "GValue.h"
 #include "TPreserveGDirectory.h"
@@ -54,8 +57,21 @@ void TCompiledHistograms::ClearHistograms() {
     if(obj->InheritsFrom(TH1::Class())){
       TH1* hist = (TH1*)obj;
       hist->Reset();
+    } 
+    else if(obj->InheritsFrom(TDirectory::Class())){
+      TDirectory* dir = (TDirectory*)obj;
+      TIter dirnext(dir->GetList());
+      TObject* dirobj;
+      while((dirobj=dirnext())){
+	if(dirobj->InheritsFrom(TH1::Class())){
+	  TH1* hist = (TH1*)dirobj;
+	  hist->Reset();
+	}
+      }
     }
+    
   }
+  std::cout << "ended " << std::endl;
 }
 
 time_t TCompiledHistograms::get_timestamp() {
@@ -71,7 +87,26 @@ bool TCompiledHistograms::file_exists() {
 
 void TCompiledHistograms::Write() {
   objects.Sort();
-  objects.Write();
+
+  TIter next(&objects);
+  TObject *obj;
+  while((obj=next())){
+    if(obj->InheritsFrom(TDirectory::Class())){
+      TPreserveGDirectory preserve;
+      TDirectory *dir = (TDirectory*)obj;
+      gDirectory->mkdir(dir->GetName())->cd();
+      TIter dir_next(dir->GetList());
+      TObject *dir_obj;
+      while((dir_obj=dir_next())){
+	dir_obj->Write();
+      }
+    }
+    else obj->Write();
+  }
+  
+
+
+  //  objects.Write();
   TPreserveGDirectory preserve;
   gDirectory->mkdir("variables")->cd();
   variables.Write();
