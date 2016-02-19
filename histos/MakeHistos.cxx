@@ -201,13 +201,16 @@ void MakeHistograms(TRuntimeObjects& obj) {
         
         histname ="mpidtune3_PID_TDC";
         obj.FillHistogram(histname,4000,-4000,0,s800->GetCorrTOF_OBJ_MESY(),    //s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),
-                                        4500,5000,50000,s800->GetIonChamber().Charge());
+                                        4500,5000,50000,s800->GetCorrIonSum());
+                                        //4500,5000,50000,s800->GetIonChamber().Charge());
 
-        //this spectrum needs a gate!
-        //histname ="mpidtune4_IC_vs_DispX";
-        //obj.FillHistogram(histname,4500,5000,50000,s800->GetCorrIonSum(),
-        //                           600,-300,300,s800->GetCrdc(0).GetDispersiveX());    //s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),
-
+        if(TCutG *cut = (TCutG*)gates->FindObject("PIDCol")) {
+          if(cut->IsInside(s800->GetCorrTOF_OBJ_MESY(),s800->GetIonChamber().Charge())) {
+            histname ="mpidtune4_IC_vs_DispX";
+            obj.FillHistogram(histname,4500,5000,50000,s800->GetCorrIonSum(),
+                                       600,-300,300,s800->GetCrdc(0).GetDispersiveX());   //s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),
+          }
+        }
       //}
 
       //if(haspids) {

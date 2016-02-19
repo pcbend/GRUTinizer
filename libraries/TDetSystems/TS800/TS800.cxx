@@ -973,6 +973,14 @@ float TS800::GetCorrIonSum() const {
   //double xfp_cori   = GValue::Value("OBJTAC_TOF_CORR_XFP");
   //std::cout << "TOF OBJTAC AFP COR" << afp_cor << std::endl;
   //std::cout << "TOF OBJTAC xfp COR" << xfp_cor << std::endl;
+  if(GetCrdc(0).GetDispersiveX() < GValue::Value("IC_X0")) {
+    float dx = GetCrdc(0).GetDispersiveX() - GValue::Value("IC_X0");
+    float m  = GValue::Value("IC_M");
+    float ionc = GetIonChamber().Charge() + GetIonChamber().Charge()*exp(m*dx);
+    //printf("dx =  %.02f \t  m = %.04f\n",dx,m);
+    //printf("\t%.02f :    %.02f        |    %.02f  \n",GetCrdc(0).GetDispersiveX(), GetIonChamber().Charge(), ionc);  fflush(stdout);
+    return ionc;
+  }
   return GetIonChamber().Charge();
 }
 
