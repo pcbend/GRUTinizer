@@ -11,11 +11,13 @@
 #include "TH1F.h"
 #include "TFile.h"
 #include "TMath.h"
-#include "TChain.h"
+#include "TTree.h"
 #include "TGraph.h"
 #include "TCanvas.h"
 #include "TLine.h"
 #include "TCutG.h"
+#include "TChannel.h"
+#include "GValue.h"
 
 #include "TCaesarHit.h"
 #include "TS800Hit.h"
@@ -113,12 +115,13 @@ void getGeantHistograms(std::vector<TH1F*> &geant_hists, std::string geant_file_
   geant_hists.push_back(geant_compton);
   return;
 }
-void fillChain(TChain *chain, std::vector<std::string> &file_list){
+
+void getFiles(std::vector<TFile*> &files, std::vector<std::string> &file_list){
   for (unsigned int i = 0; i < file_list.size(); i++){
-    chain->Add(file_list.at(i).c_str());
+    files.push_back(new TFile(file_list.at(i).c_str(),"read"));
   }
-  if ((unsigned int)chain->GetNtrees() != file_list.size()){
-    std::cout << "Unexpected number of trees: "   << chain->GetNtrees() 
+  if (files.size() != file_list.size()){
+    std::cout << "Unexpected number of trees: "   << files.size() 
               << " compared to number of files: " << file_list.size() << std::endl;
   }
   return;
@@ -144,10 +147,11 @@ int fitCoulex(const char *cfg_file_name){
   std::vector<std::string> file_list;
   std::ofstream out_file;
 
-  TChain *chain = new TChain("EventTree");
   TCutG *pid_cut = 0;
   TCutG *in_cut  = 0;
   TCutG *tcut    = 0;
+
+  std::vector<TFile*> files;
   std::vector<TH1F*> data_hists;
   //the structure of the geant vector will be:
   //geant_hists.at(0) = full geant hist
@@ -315,7 +319,6 @@ int fitCoulex(const char *cfg_file_name){
 
   double n_bins_x = (data_high_x-data_low_x)/kev_per_bin;
 
-  //Create a TChain using all the files in the directory INPUT_DIR containing EVENT_TREE
   std::string search_string = (input_dir + "/run*.root");
   getFileList(search_string, file_list);
 
@@ -324,7 +327,7 @@ int fitCoulex(const char *cfg_file_name){
     return -1;
   }
 
-  fillChain(chain, file_list); 
+  getFiles(files, file_list); 
 
   //Get all necessary cuts from cut file
   initializeCuts(cut_file_name, pid_cut_name, in_cut_name, tcut_name, pid_cut, 
@@ -334,7 +337,8 @@ int fitCoulex(const char *cfg_file_name){
     std::cout << "ERROR: Failed to get one of the cuts" << std::endl;
     return -1;
   }
-  pid_cut->SavePrimitive(std::cout);
+  tcut->SavePrimitive(std::cout);
+  in_cut->SavePrimitive(std::cout);
 
 
   //Open Output file which will contain the histogram results
@@ -373,72 +377,81 @@ int fitCoulex(const char *cfg_file_name){
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////
   //FILLING HISTOGRAMS
-  chain->SetBranchAddress("TCaesar", &caesar);
-  chain->SetBranchAddress("TS800",   &s800);
-  total_entries = chain->GetEntries();
-  //for (int entry = 0; entry < total_entries; entry++){
-  for (int entry = 0; entry < 50; entry++){
+  for (unsigned int file_index = 0; file_index < files.size(); file_index++){
+    TTree *tree = (TTree*)files.at(file_index)->Get("EventTree");
+    GValue *gvalues = (GValue*)files.at(file_index)->Get("GValue");
+    TChannel *tchannels = (TChannel*)files.at(file_index)->Get("TChannel");
+    std::cout << "Currently parsing tree from: " << file_list[file_index] << std::endl;
+    total_entries = tree->GetEntries();
+    tree->SetBranchAddress("TCaesar", &caesar);
+    tree->SetBranchAddress("TS800",   &s800);
 
-    //Need to get all parameters here
-    chain->GetEntry(entry); 
-    if (!caesar || !s800){
-      continue;
-    }
-
-    n_gamma = caesar->Size();
-    for (int gamma = 0; gamma < n_gamma; gamma++){
-      TCaesarHit hit = caesar->GetCaesarHit(gamma);
-      if (!hit.IsValid()){
+  
+    for (int entry = 0; entry < total_entries; entry++){
+      //Need to get all parameters here
+      tree->GetEntry(entry); 
+      if (!caesar || !s800){
         continue;
       }
 
-      int det = hit.GetDetectorNumber();
-      int ring = hit.GetRingNumber();
-      absolute_det_id = det + TOTAL_DET_IN_PREV_RINGS[ring];
+      n_gamma = caesar->Size();
+      for (int gamma = 0; gamma < n_gamma; gamma++){
+        TCaesarHit hit = caesar->GetCaesarHit(gamma);
+        if (!hit.IsValid()){
+          continue;
+        }
 
-      if (absolute_det_id == omitted_det){
-        continue;
-      }
+        int det = hit.GetDetectorNumber();
+        int ring = hit.GetRingNumber();
+        absolute_det_id = det + TOTAL_DET_IN_PREV_RINGS[ring];
 
-      gamma_time = hit.GetTime();
-      gamma_energy_dc = caesar->GetEnergyDC(hit);
-      tof_obj_tac = s800->GetTof().GetTacOBJ();
-      tof_xfp_tac = s800->GetTof().GetTacXFP();
-      tof_obj_tac_corr = s800->GetCorrTOF_OBJTAC();
-      ic_sum = s800->GetIonChamber().GetSum();
+        if (absolute_det_id == omitted_det){
+          continue;
+        }
 
-//    ata = s800->GetAta();
-//    bta = s800->GetBta();
-//    double xsin = sin(ata);
-//    double ysin = sin(bta);
-//    scatter_angle = asin(sqrt(xsin*xsin+ysin*ysin))*180.0/TMath::Pi();
-//    FOR DEBUGGING
-      scatter_angle = 0;
+        gamma_time = caesar->GetCorrTime(hit,s800);
+        gamma_energy_dc = caesar->GetEnergyDC(hit);
+        tof_obj_tac = s800->GetTof().GetTacOBJ();
+        tof_xfp_tac = s800->GetTof().GetTacXFP();
+        tof_obj_tac_corr = s800->GetCorrTOF_OBJTAC();
+        ic_sum = s800->GetIonChamber().GetSum();
 
-      std::cout  << "TOF OBJ TAC CORR = " << tof_obj_tac_corr  
-                 << "\tic_sum = " << ic_sum <<  std::endl;
-      if (pid_cut->IsInside(tof_obj_tac_corr, ic_sum)){
-        std::cout << "INSIDE PID CUT" << std::endl;
-        if (tcut->IsInside(gamma_time,gamma_energy_dc)){
-          std::cout << "INSIDE TIME CUT" << std::endl;
-          if (in_cut->IsInside(tof_xfp_tac,tof_obj_tac)){
-            std::cout << "INSIDE IN-BEAM CUT" << std::endl;
-            bool done = false;
-            int cur_angle_index = 0;
-            while (!done && cur_angle_index < TOTAL_ANGLES){
-              if (scatter_angle < angles[cur_angle_index]){
-                for (int angle_index = cur_angle_index; angle_index < TOTAL_ANGLES; angle_index++){
-                  std::cout << "FILLING HISTOGRAM!" << std::endl;
-                  data_hists.at(angle_index)->Fill(gamma_energy_dc);
-                }
-                done = true;
-              }//scatter_angle < angles[cur_angle_index]
-            }//!done && cur_angle_index < TOTAL_ANGLES
-          }//in beam
-        }//time-energy cut
-      }//pid_cut
-    }//n_gamma loop
-  }//loop over entries
+  //    ata = s800->GetAta();
+  //    bta = s800->GetBta();
+  //    double xsin = sin(ata);
+  //    double ysin = sin(bta);
+  //    scatter_angle = asin(sqrt(xsin*xsin+ysin*ysin))*180.0/TMath::Pi();
+  //    FOR DEBUGGING
+        scatter_angle = 0;
+
+//      std::cout  << "TOF OBJ TAC CORR = " << tof_obj_tac_corr  
+//                 << "\tic_sum = " << ic_sum <<  std::endl;
+//      std::cout  << "gamma_time = " << gamma_time  
+//                 << "\tgamma_energy_dc = " << gamma_energy_dc <<  std::endl;
+//      std::cout  << "tof_xfp_tac = " << tof_xfp_tac  
+//                 << "\ttof_obj_tac = " << tof_obj_tac <<  std::endl;
+        if (pid_cut->IsInside(tof_obj_tac_corr, ic_sum)){
+          if (tcut->IsInside(gamma_time,gamma_energy_dc)){
+            if (in_cut->IsInside(tof_xfp_tac,tof_obj_tac)){
+              bool done = false;
+              int cur_angle_index = 0;
+              while (!done && cur_angle_index < TOTAL_ANGLES){
+                if (scatter_angle < angles[cur_angle_index]){
+                  for (int angle_index = cur_angle_index; angle_index < TOTAL_ANGLES; angle_index++){
+                    data_hists.at(angle_index)->Fill(gamma_energy_dc);
+                  }
+                  done = true;
+                }//scatter_angle < angles[cur_angle_index]
+              }//!done && cur_angle_index < TOTAL_ANGLES
+            }//in beam
+          }//time-energy cut
+        }//pid_cut
+      }//n_gamma loop
+    }//loop over entries
+    delete tree;
+    delete tchannels;
+    delete gvalues;
+  }//loop over trees
   //FINISHED LOOPING OVER INPUT TREES
   int num_res_points = (fit_high_x - fit_low_x)/kev_per_bin;
   std::vector<double> residuals;
