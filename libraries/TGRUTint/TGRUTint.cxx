@@ -202,7 +202,7 @@ void TGRUTint::ApplyOptions() {
     if(opt->InputRing().length()) {
       source = new TRawEventRingSource(opt->InputRing(),
                                        opt->DefaultFileType());
-    } else if(opt->RawInputFiles().size() > 1){
+    } else if(opt->RawInputFiles().size() > 1 && opt->SortMultiple()){
       TMultiRawFile* multi_source = new TMultiRawFile();
       for(auto& filename : opt->RawInputFiles()){
         multi_source->AddFile(new TRawFileIn(filename.c_str()));
@@ -430,6 +430,8 @@ void TGRUTint::ResortDataFile() {
   }
   StoppableThread::ResumeAll();
 }
+
+
 
 TRawFileIn *TGRUTint::OpenRawFile(const std::string& filename) {
   if(!file_exists(filename.c_str())){
