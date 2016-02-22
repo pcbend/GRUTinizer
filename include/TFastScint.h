@@ -37,6 +37,9 @@ public:
   //int GetQDC_Count()  {return qdc_channels; }
   int GetErrors() {return errors; };
 
+  void SetTrigTime(UShort_t time) { trig_time = time; }
+  int GetTrigTime()	      { return trig_time; }
+
 private:
   virtual int  BuildHits();
 
@@ -47,6 +50,8 @@ private:
 
   int qdc_TS;
   int tdc_TS;
+
+  int trig_time;
 
   static int errors; //!
 

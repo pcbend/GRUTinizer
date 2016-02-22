@@ -23,6 +23,7 @@ void TFastScint::Copy(TObject& obj) const {
   TFastScint& fs = (TFastScint&)obj;
   //fs_hits->Copy(*fs.fs_hits);
   fs.fs_hits = fs_hits;
+  fs.trig_time = trig_time;
   fs.raw_data.clear();
 }
 
@@ -34,6 +35,7 @@ void TFastScint::Clear(Option_t* opt){
   //tdc_channels = -1;
   //fs_hits->Clear(opt);
   fs_hits.clear();
+  trig_time = -1;
 }
 
 int TFastScint::BuildHits(){
@@ -123,10 +125,12 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	const TRawEvent::M_QDC_Data* Mq = (TRawEvent::M_QDC_Data*)Mword;
 	hit.SetChannel(Mq->Chan());
 	hit.SetTime(-1);
+        hit.SetAddress((12<<28) + hit.GetChannel());
+
 	if(Mq->isOOR()) hit.SetCharge(5000);
 	else            hit.SetCharge(Mq->Charge());
 
-	hit.SetEnergy();
+	//hit.SetEnergy();
 
 	if(Zero_Suppress){
 	  if(Mq->Charge()>0){
@@ -148,7 +152,13 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 
 	detNumber = -1;
 	detNumber = GetDetNumberIn_fs_hits(Int_t(Mt->Chan()));
-
+    
+/////////////////////////////////////////////////////////////////////////
+        if(Mt->isTrig()){  
+          SetTrigTime(Mt->Time());
+          continue;
+	}
+////////////////////////////////////////////////////////////////////////
 
 	if(detNumber!=-1){
 	  TFastScintHit *qdc_hit = GetLaBrHit(detNumber);
@@ -169,10 +179,11 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	  TFastScintHit tdc_hit;
 	  tdc_hit.SetTime(Mt->Time());
 	  tdc_hit.SetCharge(-1);
-          tdc_hit.SetEnergy();
+          //tdc_hit.SetEnergy();
 
-	  if(Mt->isTrig())  tdc_hit.SetChannel(-10);
-	  else   	    tdc_hit.SetChannel(Mt->Chan());
+	  //if(Mt->isTrig())  tdc_hit.SetChannel(-10);
+	  tdc_hit.SetChannel(Mt->Chan());
+          tdc_hit.SetAddress((12<<28) + tdc_hit.GetChannel());
 
 	  if(Zero_Suppress){
 	    if(Mt->Time()>0){
@@ -188,7 +199,7 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	    std::cout << " TDC Tr: " << Mt->isTrig() << std::endl;
 	  }
 	}
-      } // end elif isT
+      } // end elif isT	
       else{ // If not QDC or TDC
 	std::cout << " *** Not TDC or QDC **** " << std::endl;
       }
@@ -203,7 +214,7 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
     }// end elif isfill
     else if(Mword->isEOE()){
       if(DEBUG) std::cout << " EOE " << std::endl;
-    }// end elif eoe
+    }// end elif eoe    
   }// end for
   return 0;
 }

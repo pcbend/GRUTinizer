@@ -12,23 +12,23 @@ public:
   void Clear(Option_t* opt = "");
   void Copy(TObject& obj) const;
 
-  void SetCharge(int chg)    { fCharge  = chg;  }
+  //void SetCharge(int chg)    { fCharge  = chg;  }
   void SetChannel(int chan)  { fChannel = chan; }
-  void SetTime(int time)     { fTime = time;    }
-  void SetTimestamp(long ts) { fTimestamp = ts; }
-  void SetEnergy();
+  //void SetTime(int time)     { fTime = time;    }
+  //void SetTimestamp(long ts) { fTimestamp = ts; }
+  //void SetEnergy();
 
-  virtual int Charge() const { return fCharge;    }
+  //virtual int Charge() const { return fCharge;    }
   int  GetChannel()    const { return fChannel;   }
-  int  GetTime()       const { return fTime;      }
-  long GetTimestamp()  const { return fTimestamp; }
-  float GetEnergy()    const { return fEnergy;    }
+  //int  GetTime()       const { return fTime;      }
+  //long GetTimestamp()  const { return fTimestamp; }
+  //float GetEnergy()    const { return fEnergy;    }
 private:
-  long  fTimestamp;
+  //long  fTimestamp;
   int   fChannel;
-  int   fTime;
-  int   fCharge;
-  float fEnergy;
+  //int   fTime;
+  //int   fCharge;
+  //float fEnergy;
 
   ClassDef(TFastScintHit,22)
 };
