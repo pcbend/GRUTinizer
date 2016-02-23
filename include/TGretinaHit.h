@@ -60,7 +60,6 @@ public:
   double GetPhiDeg() { return GetPhi()*TMath::RadToDeg(); }
   double GetThetaDeg() { return GetTheta()*TMath::RadToDeg(); }
 
-
   bool HasInteractions() { return fNumberOfInteractions; }
   //TGretinaHit& operator+=(const TGretinaHit&);
   //TGretinaHit& operator+(const TGretinaHit&);

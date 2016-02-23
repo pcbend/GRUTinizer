@@ -140,12 +140,6 @@ class TCrdc : public TDetectorHit {
 
     int  Address(int i) const { return TDetectorHit::Address() + channel.at(i); }
 
-//  void SetXslope (float xm)  { fCRDCXslope = xm; }
-//  void SetYslope (float ym)  { fCRDCYslope = ym; }
-//  void SetXoffset (float xo) { fCRDCXoff = xo;   }
-//  void SetYoffset (float yo) { fCRDCYoff = yo;   }
-
-
     void AddPoint(int chan,int samp,int dat) { channel.push_back(chan);
                                                sample.push_back(samp);
                                                data.push_back(dat);    }
@@ -157,13 +151,6 @@ class TCrdc : public TDetectorHit {
 
     float GetDispersiveX() const;     
     float GetNonDispersiveY();  
-//  float GetXslope ()  { return fCRDCXslope; }
-//  float GetYslope ()  { return fCRDCYslope; }
-//  float GetXoffset () { return fCRDCXoff;   }
-//  float GetYoffset () { return fCRDCYoff;   }
-
-    
-
     int GetMaxPad() const;
 
     virtual void Copy(TObject&) const;
@@ -181,11 +168,6 @@ class TCrdc : public TDetectorHit {
     std::vector<int> channel;
     std::vector<int> sample;
     std::vector<int> data;
-
-//  float fCRDCXslope; //!
-//  float fCRDCYslope; //!
-//  float fCRDCXoff;   //!
-//  float fCRDCYoff;   //!
 
     unsigned short anode;
     unsigned short time;
