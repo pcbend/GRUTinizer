@@ -43,6 +43,7 @@ void TGRUTOptions::Clear(Option_t* opt) {
   fSortRoot   = false;
   fIsOnline   = false;
   fMakeHistos = false;
+  fSortMultiple = false;
 
   fShouldExit = false;
 }
@@ -98,6 +99,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("n no-sort", &fSortRaw)
     .description("Load raw data files without sorting")
     .default_value(true);
+  parser.option("m sort-multiple", &fSortMultiple)
+    .description("If passed multiple raw data files, treat them as one file.")
+    .default_value(false);
   parser.option("s sort", &fSortRoot)
     .description("Attempt to loop through root files.")
     .default_value(false);
