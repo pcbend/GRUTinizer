@@ -18,15 +18,14 @@
 #include "TPad.h"
 #include "TROOT.h"
 
-
-std::vector<TS800::S800_InvMapLine> TS800::fIML_sec1;
-std::vector<TS800::S800_InvMapLine> TS800::fIML_sec2;
-std::vector<TS800::S800_InvMapLine> TS800::fIML_sec3;
-std::vector<TS800::S800_InvMapLine> TS800::fIML_sec4;
-short TS800::fMaxOrder;
-float TS800::fBrho;
-int TS800::fMass;
-int TS800::fCharge;
+std::vector<short> TS800::fmaxcoefficient;                      
+std::vector<std::vector<short> > TS800::forder;                 
+std::vector<std::vector<std::vector<short> > > TS800::fexponent;
+std::vector<std::vector<float> > TS800::fcoefficient;           
+short TS800::fmaxorder;                                         
+float TS800::fbrho;                                             
+int TS800::fmass;                                               
+int TS800::fcharge;                                             
 
 TS800::TS800() {
   Clear();
@@ -37,25 +36,11 @@ TS800::TS800() {
     static std::mutex inv_map_mutex;
     std::lock_guard<std::mutex> lock(inv_map_mutex);
     if(!InvMapFileRead){
-      ReadInvMap();
       InvMapFileRead=true;
+      ReadMap_SpecTCL();
+      std::cout << " SPECTCL INV MAP LOADED!!!" << std::endl;
     }
   }
-
-//GetCrdc(0).SetXslope(2.54);
-//GetCrdc(0).SetYslope(-0.1074866936);
-//GetCrdc(0).SetXoffset(-281.94);
-//GetCrdc(0).SetYoffset(95.9966);
-//GetCrdc(0).SetYoffset(129.1513428524);
-
-//GetCrdc(1).SetXslope(2.54);
-//GetCrdc(1).SetYslope(0.1110700359);
-//GetCrdc(1).SetXoffset(-281.94);
-//GetCrdc(1).SetYoffset(-122.8);
-//GetCrdc(1).SetYoffset(-131.4070990297);
-
-//  std::cout << " Slopes and offsets are SET" << std::endl;
-//std::cout << " For Example : " <<     GetCrdc(0).GetYslope() << std::endl;
 }
 
 TS800::~TS800(){
@@ -65,10 +50,30 @@ void TS800::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 
   TS800& other = (TS800&)obj;
-  other.fAta = fAta;
-  other.fYta = fYta;
-  other.fBta = fBta;
-  other.fDta = fDta;
+  other.fAtaTCL1 = fAtaTCL1;
+  other.fYtaTCL1 = fYtaTCL1;
+  other.fBtaTCL1 = fBtaTCL1;
+  other.fDtaTCL1 = fDtaTCL1;
+  other.fAtaTCL2 = fAtaTCL2;
+  other.fYtaTCL2 = fYtaTCL2;
+  other.fBtaTCL2 = fBtaTCL2;
+  other.fDtaTCL2 = fDtaTCL2;
+  other.fAtaTCL3 = fAtaTCL3;
+  other.fYtaTCL3 = fYtaTCL3;
+  other.fBtaTCL3 = fBtaTCL3;
+  other.fDtaTCL3 = fDtaTCL3;
+  other.fAtaTCL4 = fAtaTCL4;
+  other.fYtaTCL4 = fYtaTCL4;
+  other.fBtaTCL4 = fBtaTCL4;
+  other.fDtaTCL4 = fDtaTCL4;
+  other.fAtaTCL5 = fAtaTCL5;
+  other.fYtaTCL5 = fYtaTCL5;
+  other.fBtaTCL5 = fBtaTCL5;
+  other.fDtaTCL5 = fDtaTCL5;
+  other.fAtaTCL6 = fAtaTCL6;
+  other.fYtaTCL6 = fYtaTCL6;
+  other.fBtaTCL6 = fBtaTCL6;
+  other.fDtaTCL6 = fDtaTCL6;
 
   for(int i = 0; i<3; i++){
     scint[i].Copy(other.scint[i]);
@@ -82,123 +87,195 @@ void TS800::Copy(TObject& obj) const {
   }
 }
 
-bool TS800::ReadInvMap(){
-  std::string filename = TGRUTOptions::Get()->S800InverseMapFile();
-
-  std::string eat,I,COEF,ORDEXP;
-  int index;
-  std::stringstream ssTest;
-  int par = 0;
-  ifstream inFile;
-  inFile.open(filename);
-  getline(inFile,eat);
-  //std::cout << eat << std::endl;
-  sscanf(eat.c_str(), "S800 inverse map - Brho=%g - M=%d - Q=%d", &fBrho, &fMass, &fCharge);
-
-  inFile >> I >> COEF >> ORDEXP;
-  getline(inFile,eat);
-
-  if(I!="I" && COEF!="COEFFICIENT"){
-    std::cout << " *** Bad S800 Inv Map File Format!!! " << std::endl;
-    std::cout << " *** Inv Map File Not Read !!! " << std::endl;
-    return false;
+float TS800::MapCalc_SpecTCL(int calcorder,int parameter,float *input){
+  float cumul=0;
+  float multiplicator;
+  for(int index=0; index<fmaxcoefficient[parameter]; index++){
+    if (calcorder < forder[parameter][index]) break;
+    multiplicator = 1;
+    for(int nex=0; nex<6; nex++){
+      if(fexponent[parameter][nex][index] != 0){
+	multiplicator *= pow(input[nex], fexponent[parameter][nex][index]);
+      }
+    }
+    cumul += multiplicator * fcoefficient[parameter][index];
   }
-
-  while(!(inFile.eof())){
-
-    if(ssTest.fail() == true){
-      std::cout << " *** sstream Failed while reading file : " << filename << std::endl;
-      std::cout << " *** File not loaded!! " << std::endl;
-      return false;
-    }
-    ssTest.str(""); eat = "";
-    getline(inFile,eat); ssTest << eat;
-
-
-    if(ssTest.str() == "    ----------------------------------------------\r"){
-      par++; continue;
-    }
-    else if (ssTest.str() == "     I  COEFFICIENT            ORDER EXPONENTS\r") continue;
-    else
-      ssTest >> index >> fIML.coef >> fIML.order >> fIML.exp[0]>> fIML.exp[1]>> fIML.exp[2]>> fIML.exp[3]>> fIML.exp[4] >> fIML.exp[5];
-
-
-    switch(par){
-    case 0:
-      fIML_sec1.push_back(fIML);
-      break;
-    case 1:
-      fIML_sec2.push_back(fIML);
-      break;
-    case 2:
-      fIML_sec3.push_back(fIML);
-      break;
-    case 3:
-      fIML_sec4.push_back(fIML);
-      break;
-    case 4:
-      // you get to 4 before the eof.
-      break;
-    default:
-      std::cout << " *** More than 4 sections!!" << std::endl
-		<< "     Leaving Now!!! File Not Read!! "<< std::endl;
-      return false;
-      break;
-    }
-  }
-  inFile.close();
-  return true;
+  
+  return cumul;
 }
 
-
-void TS800::MapCalc(float *input){
- 
+Float_t TS800::GetAta_Spec(int i){
   float Shift_ata = 0;
-  float Shift_yta = 0;
-  float Shift_bta = 0;
-  float Shift_dta = 0;
-  
   if(GValue::FindValue("ATA_SHIFT"))
     Shift_ata = GValue::FindValue("ATA_SHIFT")->GetValue();
-  if(GValue::FindValue("YTA_SHIFT"))
-    Shift_yta = GValue::FindValue("YTA_SHIFT")->GetValue();
+  
+  switch(i){
+  case 1: return (fAtaTCL1+Shift_ata);
+    break;
+  case 2: return (fAtaTCL2+Shift_ata);
+    break;
+  case 3: return (fAtaTCL3+Shift_ata);
+    break;
+  case 4: return (fAtaTCL4+Shift_ata);
+    break;
+  case 5: return (fAtaTCL5+Shift_ata);
+    break;
+  default: return (fAtaTCL6+Shift_ata);
+    break;
+  }
+}
+
+Float_t TS800::GetBta_Spec(int i){
+  float Shift_bta = 0;
   if(GValue::FindValue("BTA_SHIFT"))
     Shift_bta = GValue::FindValue("BTA_SHIFT")->GetValue();
+  
+  switch(i){
+  case 1: return (fBtaTCL1+Shift_bta);
+    break;
+  case 2: return (fBtaTCL2+Shift_bta);
+    break;
+  case 3: return (fBtaTCL3+Shift_bta);
+    break;
+  case 4: return (fBtaTCL4+Shift_bta);
+    break;
+  case 5: return (fBtaTCL5+Shift_bta);
+    break;
+  default: return (fBtaTCL6+Shift_bta);
+    break;
+  }
+}
+
+Float_t TS800::GetYta_Spec(int i){
+  float Shift_yta = 0;
+  if(GValue::FindValue("YTA_SHIFT"))
+    Shift_yta = GValue::FindValue("YTA_SHIFT")->GetValue();
+  
+  switch(i){
+  case 1: return (fYtaTCL1+Shift_yta);
+    break;
+  case 2: return (fYtaTCL2+Shift_yta);
+    break;
+  case 3: return (fYtaTCL3+Shift_yta);
+    break;
+  case 4: return (fYtaTCL4+Shift_yta);
+    break;
+  case 5: return (fYtaTCL5+Shift_yta);
+    break;
+  default: return (fYtaTCL6+Shift_yta);
+    break;
+  }
+}
+
+Float_t TS800::GetDta_Spec(int i){
+  float Shift_dta = 0;
   if(GValue::FindValue("DTA_SHIFT"))
     Shift_dta = GValue::FindValue("DTA_SHIFT")->GetValue();
   
-  float cumul=0;
-  float multi;
-  int CalcOrder = 6; // Standard order in inv file.
-  std::vector<S800_InvMapLine> current_;
-  for(int param = 0; param<4;param++){
-    switch(param){
-    case 0: current_ = fIML_sec1;  break;
-    case 1: current_ = fIML_sec2;  break;
-    case 2: current_ = fIML_sec3;  break;
-    case 3: current_ = fIML_sec4;  break;
-    default: printf(" *** Wrong Param passed to S800::MapCalc!!\n"); return;break;
-    }
-    for(size_t i=0; i<current_.size();i++){
-      if(CalcOrder<current_.at(i).order) break;
-      multi = 1;
-      //std::cout << " current coef : " << current_.at(i).coef << std::endl;
-      for(int j=0;j<CalcOrder;j++){
-	if(current_.at(i).exp[j]!=0){
-	  multi *= pow(input[j],current_.at(i).exp[j]);
-	}
-      }
-      cumul += multi*current_.at(i).coef;
-    }
-    switch(param){
-    case 0: fAta = cumul + Shift_ata; break; 
-    case 1: fYta = cumul + Shift_yta; break;
-    case 2: fBta = cumul + Shift_bta; break;
-    case 3: fDta = cumul + Shift_dta; break;
+  switch(i){
+  case 1: return (fDtaTCL1+Shift_dta);
+    break;
+  case 2: return (fDtaTCL2+Shift_dta);
+    break;
+  case 3: return (fDtaTCL3+Shift_dta);
+    break;
+  case 4: return (fDtaTCL4+Shift_dta);
+    break;
+  case 5: return (fDtaTCL5+Shift_dta);
+    break;
+  default: return (fDtaTCL6+Shift_dta);
+    break;
+  }
+}
+
+void TS800::ReadMap_SpecTCL(){
+  std::string filename = TGRUTOptions::Get()->S800InverseMapFile();
+  fmaxcoefficient.resize(6);
+  forder.resize(6);
+  fexponent.resize(6);
+  fcoefficient.resize(6);
+  for(short i=0;i<6;i++){
+    forder[i].resize(200);
+    fcoefficient[i].resize(200);
+    fexponent[i].resize(6);
+    for(short k=0;k<6;k++){
+      fexponent[i][k].resize(200);
     }
   }
-  //return cumul;
-  return;
+  fmaxorder = 0;
+  FILE* file;
+  char line[80];
+  int index, par, exp[6];
+  int ord;
+  float co;
+  char title[120];
+  char *ret=NULL;
+  file = fopen(filename.c_str(), "r");
+  if(file == NULL){
+    std::cout << "Sorry I couldn't find the map file: " << filename << std::endl;
+    std::cout << "Will continue without the map file" << std::endl;
+    return;
+  }
+  ret = fgets(title, 120, file);
+  sscanf(title, "S800 inverse map - Brho=%g - M=%d - Q=%d", &fbrho, &fmass, &fcharge);
+  //if(fSett->VLevel()>0)
+  //std::cout << "brho " << fbrho << " mass " << fmass << " charge " << fcharge << std::endl;
+  while(strstr(line, "COEFFICIENT") == NULL)
+    ret = fgets(line, 80, file);
+  par = 0;
+  while(!feof(file)){
+    ret = fgets(line, 80, file);
+    while (strstr(line, "------------------") == NULL){
+      sscanf(line, "%d %g %d %d %d %d %d %d %d", &index, &co, &ord, &exp[0], &exp[1], &exp[2], &exp[3], &exp[4], &exp[5]);
+      if(index > 200){
+	std::cout << "Too many coefficients in map.  Increase TS800_TRACK_COEFFICIENTS." << std::endl;
+	break;
+      }
+      if(par > 6){
+	std::cout << "Too many parameters in map.  Increase TS800_TRACK_PARAMETERS." << std::endl;
+	break;
+      }
+      fmaxcoefficient[par] = index;
+      forder[par][index-1] = ord;
+      fcoefficient[par][index-1] = co;
+      //std::cout << "max coef " << fmaxcoefficient[par] << " order " << forder[par][index-1] << " coef " << fcoefficient[par][index-1] << std::endl;
+      for(int k=0; k<6; k++){
+	fexponent[par][k][index-1] = exp[k];
+	//std::cout << "exp["<<k<<"] " << exp[k] << " fexponent["<<par<<"]["<<k<<"]["<<index-1<<"] " << fexponent[par][k][index-1] << std::endl;
+      }
+      ret = fgets(line, 80, file);
+    }
+    if(ord > fmaxorder)
+      fmaxorder = ord;
+    par++;
+  }
+  //std::cout << "Done reading map from " << filename << "." << std::endl;
+  //std::cout << "Title: " << title << std::endl;
+  //std::cout << "Order: " << fmaxorder << std::endl;
+  fclose(file);
+}
+
+TVector3 TS800::ExitTargetVect_Spec(int order){
+  TVector3 track;
+  double xsin = 0;
+  double ysin = 0;
+  xsin = GetAta_Spec(order);
+  ysin = GetBta_Spec(order);
+  double phi   = 0;
+  double theta = 0;
+
+  xsin = TMath::Sin(xsin);
+  ysin = TMath::Sin(ysin);
+  
+  if(xsin>0 && ysin>0)      phi = 2.0*TMath::Pi()-TMath::ATan(ysin/xsin);
+  else if(xsin<0 && ysin>0) phi = TMath::Pi()+TMath::ATan(ysin/TMath::Abs(xsin));
+  else if(xsin<0 && ysin<0) phi = TMath::Pi()-TMath::ATan(TMath::Abs(ysin)/TMath::Abs(xsin));
+  else if(xsin>0 && ysin<0) phi = TMath::ATan(TMath::Abs(ysin)/xsin);
+  else                      phi = 0;
+
+  theta = TMath::ASin(TMath::Sqrt(xsin*xsin+ysin*ysin));
+  track.SetPtThetaPhi(1,theta,phi);
+  return track;
 }
 
 TVector3 TS800::CRDCTrack(){
@@ -246,16 +323,31 @@ void TS800::Clear(Option_t* opt){
   mtof.Clear();
   trigger.Clear();
   ion.Clear();
-  fMaxOrder = 0;
-  fMass     = 0;
-  fBrho     = -1;
-  fCharge   = 0;
 
-  fAta = sqrt(-1);
-  fYta = sqrt(-1);
-  fBta = sqrt(-1);
-  fDta = sqrt(-1);
-
+  fAtaTCL1 = sqrt(-1);
+  fYtaTCL1 = sqrt(-1);
+  fBtaTCL1 = sqrt(-1);
+  fDtaTCL1 = sqrt(-1);
+  fAtaTCL2 = sqrt(-1);
+  fYtaTCL2 = sqrt(-1);
+  fBtaTCL2 = sqrt(-1);
+  fDtaTCL2 = sqrt(-1);
+  fAtaTCL3 = sqrt(-1);
+  fYtaTCL3 = sqrt(-1);
+  fBtaTCL3 = sqrt(-1);
+  fDtaTCL3 = sqrt(-1);
+  fAtaTCL4 = sqrt(-1);
+  fYtaTCL4 = sqrt(-1);
+  fBtaTCL4 = sqrt(-1);
+  fDtaTCL4 = sqrt(-1);
+  fAtaTCL5 = sqrt(-1);
+  fYtaTCL5 = sqrt(-1);
+  fBtaTCL5 = sqrt(-1);
+  fDtaTCL5 = sqrt(-1);
+  fAtaTCL6 = sqrt(-1);
+  fYtaTCL6 = sqrt(-1);
+  fBtaTCL6 = sqrt(-1);
+  fDtaTCL6 = sqrt(-1);
 
 }
 
@@ -358,7 +450,36 @@ int TS800::BuildHits(){
 
   //printf("-----------------------  --------------------\n");
   //std::cout << " BFP : " << input[3] << "  " << GetBFP() << std::endl;
-  MapCalc(input);
+  
+  fAtaTCL1 = MapCalc_SpecTCL(1,0,input);
+  fYtaTCL1 = MapCalc_SpecTCL(1,1,input);
+  fBtaTCL1 = MapCalc_SpecTCL(1,2,input);
+  fDtaTCL1 = MapCalc_SpecTCL(1,3,input);
+
+  fAtaTCL2 = MapCalc_SpecTCL(2,0,input);
+  fYtaTCL2 = MapCalc_SpecTCL(2,1,input);
+  fBtaTCL2 = MapCalc_SpecTCL(2,2,input);
+  fDtaTCL2 = MapCalc_SpecTCL(2,3,input);
+
+  fAtaTCL3 = MapCalc_SpecTCL(3,0,input);
+  fYtaTCL3 = MapCalc_SpecTCL(3,1,input);
+  fBtaTCL3 = MapCalc_SpecTCL(3,2,input);
+  fDtaTCL3 = MapCalc_SpecTCL(3,3,input);
+
+  fAtaTCL4 = MapCalc_SpecTCL(4,0,input);
+  fYtaTCL4 = MapCalc_SpecTCL(4,1,input);
+  fBtaTCL4 = MapCalc_SpecTCL(4,2,input);
+  fDtaTCL4 = MapCalc_SpecTCL(4,3,input);
+
+  fAtaTCL5 = MapCalc_SpecTCL(5,0,input);
+  fYtaTCL5 = MapCalc_SpecTCL(5,1,input);
+  fBtaTCL5 = MapCalc_SpecTCL(5,2,input);
+  fDtaTCL5 = MapCalc_SpecTCL(5,3,input);
+
+  fAtaTCL6 = MapCalc_SpecTCL(6,0,input);
+  fYtaTCL6 = MapCalc_SpecTCL(6,1,input);
+  fBtaTCL6 = MapCalc_SpecTCL(6,2,input);
+  fDtaTCL6 = MapCalc_SpecTCL(6,3,input);
 
   //printf("-----------------------\n");
   return 0;

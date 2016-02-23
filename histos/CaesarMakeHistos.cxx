@@ -175,6 +175,14 @@ void MakeHistograms(TRuntimeObjects& obj) {
             caesar_corrtime_energyDC_rb->Fill(corr_time, energy_dc);
             TH2 *caesar_det_energy_dc_rb = GetMatrix(list,"DetectorEnergyDCRb",200,0,200,4096,0,4096);
             caesar_det_energy_dc_rb->Fill(det+total_det_in_prev_rings[ring],energy_dc);
+            if (tcut_kr88->IsInside(corr_time, energy_dc)){
+              TH1 *caesar_rb_energycal_time = GetHistogram(list,"CalEnergyDCRbTime", 8192,0,8192);
+              caesar_rb_energycal_time->Fill(energy_dc);
+              TH1 *caesar_rb_energycal_time_nodc = GetHistogram(list,"CalEnergyRbTime", 8192,0,8192);
+              caesar_rb_energycal_time_nodc->Fill(energy);
+              TH1 *caesar_rb_energyraw_time = GetHistogram(list,"RawEnergyRbTime", 8192,0,8192);
+              caesar_rb_energyraw_time->Fill(charge);
+            }
           }
           if (pid_br->IsInside(objtac_corr, ic_sum)){
             TH1 *caesar_raw_energy_br = GetHistogram(list,"RawEnergyBr", 8192,0,8192);
@@ -183,6 +191,14 @@ void MakeHistograms(TRuntimeObjects& obj) {
             caesar_corrtime_energyDC_br->Fill(corr_time, energy_dc);
             TH2 *caesar_det_energy_dc_br = GetMatrix(list,"DetectorEnergyDCBr",200,0,200,4096,0,4096);
             caesar_det_energy_dc_br->Fill(det+total_det_in_prev_rings[ring],energy_dc);
+            if (tcut_kr88->IsInside(corr_time, energy_dc)){
+              TH1 *caesar_br_energycal_time = GetHistogram(list,"CalEnergyDCBrTime", 8192,0,8192);
+              caesar_br_energycal_time->Fill(energy_dc);
+              TH1 *caesar_br_energycal_time_nodc = GetHistogram(list,"CalEnergyBrTime", 8192,0,8192);
+              caesar_br_energycal_time_nodc->Fill(energy);
+              TH1 *caesar_br_energyraw_time = GetHistogram(list,"RawEnergyBrTime", 8192,0,8192);
+              caesar_br_energyraw_time->Fill(charge);
+            }
           }
         }//s800 exists
       }//hit has both energy and time
@@ -205,6 +221,38 @@ void MakeHistograms(TRuntimeObjects& obj) {
     double ata = s800->GetAta();
     double bta = s800->GetBta();
     double dta = s800->GetDta();
+    double crdc_1_anode = s800->GetCrdc(0).GetAnode();
+    double crdc_2_anode = s800->GetCrdc(1).GetAnode();
+    double crdc_1_tac = s800->GetCrdc(0).GetTime();
+    double crdc_2_tac = s800->GetCrdc(1).GetTime();
+    double crdc_1_tac_rand = s800->GetCrdc(0).GetTimeRand();
+    double crdc_2_tac_rand = s800->GetCrdc(1).GetTimeRand();
+    int crdc1_size = s800->GetCrdc(0).Size();
+    int crdc2_size = s800->GetCrdc(1).Size();
+    
+    for (int i =0; i < crdc1_size; i++){
+      int crdc_1_data = s800->GetCrdc(0)->GetData(i);
+      TH1 *crdc1data = GetHistogram(list,"CRDC1_data",4096,0,4096);
+      crdc1data->Fill(crdc_1_data);
+    }
+    for (int i =0; i < crdc2_size; i++){
+      int crdc_1_data = s800->GetCrdc(1)->GetData(i);
+      TH1 *crdc2data = GetHistogram(list,"crdc2_data",4096,0,4096);
+      crdc2data->Fill(crdc_1_data);
+    }
+
+    TH1 *crdc1anode = GetHistogram(list,"CRDC1_anode",4096,0,4096);
+    crdc1anode->Fill(crdc_1_anode);
+    TH1 *crdc2anode = GetHistogram(list,"CRDC2_anode",4096,0,4096);
+    crdc2anode->Fill(crdc_2_anode);
+    TH1 *crdc1tac = GetHistogram(list,"CRDC1_tac",4096,0,4096);
+    crdc1tac->Fill(crdc_1_tac);
+    TH1 *crdc2tac = GetHistogram(list,"CRDC2_tac",4096,0,4096);
+    crdc2tac->Fill(crdc_2_tac);
+    TH1 *crdc1tac_rand = GetHistogram(list,"CRDC1_tac_rand",4096,0,4096);
+    crdc1tac_rand->Fill(crdc_1_tac_rand);
+    TH1 *crdc2tac_rand = GetHistogram(list,"CRDC2_tac_rand",4096,0,4096);
+    crdc2tac_rand->Fill(crdc_2_tac_rand);
     //if (s800->GetIonChamber().Size()){
     TH2 *tac_vs_ic= GetMatrix(list,"PID_TAC",4096,0,4096,4096,0,4096);
     tac_vs_ic->Fill(objtac_corr, ic_sum);

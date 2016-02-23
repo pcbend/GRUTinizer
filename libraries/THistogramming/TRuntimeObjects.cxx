@@ -5,6 +5,7 @@
 #include "TClass.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "TDirectoryFile.h"
 
 #include "GH1D.h"
 #include "GH2I.h"
@@ -71,7 +72,8 @@ TH2* TRuntimeObjects::FillHistogramSym(std::string name,
 
 //-------------------------------------------------------------------------
 TDirectory* TRuntimeObjects::FillHistogram(std::string dirname,std::string name,
-                                    int bins, double low, double high, double value){
+					   int bins, double low, double high, double value){
+  
   TDirectory *dir = (TDirectory*)GetObjects().FindObject(dirname.c_str());
   if(!dir){
     dir = new TDirectory(dirname.c_str(),dirname.c_str());
@@ -80,14 +82,43 @@ TDirectory* TRuntimeObjects::FillHistogram(std::string dirname,std::string name,
   dir->cd();
   TH1* hist = (TH1*)dir->FindObject(name.c_str());
   if(!hist){
-    hist = new TH1I(name.c_str(),name.c_str(),bins,low,high);
+    hist = new TH1I(name.c_str(),name.c_str(),
+		    bins, low, high);
     dir->Add(hist);
   }
-  dir->cd();
+  
   hist->Fill(value);
   dir->cd("../");
   //return hist;
   return dir;
+
+  /*
+  std::cout << "1" << std::endl;
+  if(!(gDirectory->cd(dirname.c_str()))){
+      gDirectory->mkdir(dirname.c_str());
+        std::cout << "2" << std::endl;
+  }
+  std::cout << "3" << std::endl;
+  TDirectory *dir = gDirectory->GetDirectory(dirname.c_str());
+  //gDirectory->pwd()
+  std::cout << "4" << std::endl;;
+  TH1* hist = (TH1*)dir->FindObject(name.c_str());
+  std::cout << "4a" << std::endl;
+  if(!hist){
+    std::cout << "4b" << std::endl;
+    hist = new TH1I(name.c_str(),name.c_str(),bins,low,high);
+    //    GetObjects().Add(hist);
+    std::cout << "5" << std::endl;
+    dir->Add(hist);
+    std::cout << "6" << std::endl;
+  }
+  std::cout << "7" << std::endl;
+  hist->Fill(value);
+  std::cout << "8" << std::endl;
+  gDirectory->cd("../");
+  std::cout << "9" << std::endl;
+  return dir;
+  //return hist;*/
 }
 
 TDirectory* TRuntimeObjects::FillHistogram(std::string dirname,std::string name,
@@ -110,7 +141,16 @@ TDirectory* TRuntimeObjects::FillHistogram(std::string dirname,std::string name,
   hist->Fill(Xvalue, Yvalue);
   dir->cd("../");
   //return hist;
-  return dir;
+  return dir;/*
+  TH2* hist = (TH2*) GetObjects().FindObject(name.c_str());
+  if(!hist){
+    hist = new GH2I(name.c_str(),name.c_str(),
+                            Xbins, Xlow, Xhigh,
+                            Ybins, Ylow, Yhigh);
+    GetObjects().Add(hist);
+  }
+  hist->Fill(Xvalue, Yvalue);
+  return hist;*/
 }
 
 TDirectory* TRuntimeObjects::FillHistogramSym(std::string dirname,std::string name,
@@ -133,7 +173,16 @@ TDirectory* TRuntimeObjects::FillHistogramSym(std::string dirname,std::string na
   hist->Fill(Yvalue, Xvalue);
   dir->cd("../");
   //return hist;
-  return dir;
+  return dir;/*
+  TH2* hist = (TH2*) GetObjects().FindObject(name.c_str());
+  if(!hist){
+    hist = new GH2I(name.c_str(),name.c_str(),
+                            Xbins, Xlow, Xhigh,
+                            Ybins, Ylow, Yhigh);
+    GetObjects().Add(hist);
+  }
+  hist->Fill(Xvalue, Yvalue);
+  return hist;*/
 }
 //-------------------------------------------------------------------------
 
