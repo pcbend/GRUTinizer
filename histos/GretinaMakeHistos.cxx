@@ -99,6 +99,16 @@ void MakeHistograms(TRuntimeObjects& obj) {
   if(!gretina)
     return;
 
+
+  //if(s800) {
+    //std::string histname = "S800_DTA";
+    //obj.FillHistogram(histname,200,-10,10,s800->GetDta());
+    
+    //histname = "S800_YTA";
+    //obj.FillHistogram(histname,200,-10,10,s800->GetYta());
+
+  //}
+
   double gsum = 0.0;
   for(int y=0;y<gretina->Size();y++) {
     TGretinaHit hit = gretina->GetGretinaHit(y);
@@ -147,7 +157,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       double delta_t = s800->GetScint().GetTimeUp()-s800->GetTof().GetOBJ();
       histname ="pidtune3_PID_TDC";
       obj.FillHistogram(histname,4000,-4000,4000,s800->GetCorrTOF_OBJ(),    //s800->GetTofE1_TDC(AFP_COEF,CRDCX_COEF),
-                                 600,0,50000,s800->GetIonChamber().Charge());
+                                 2000,0,50000,s800->GetIonChamber().Charge());
 
       if(delta_t>E1_TDC_low && delta_t<E1_TDC_high){
         histname ="pidtune3_PID_TDC_Prompt";
@@ -162,7 +172,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
             continue;
           TCutG *mypid = (TCutG*)itobj;
           if(mypid->IsInside(s800->GetCorrTOF_OBJ(),s800->GetIonChamber().Charge())) {
-            histname = Form("GretinaDoppler_%s",mypid->GetName());
+            histname = "GretinaDoppler_%s",mypid->GetName();
             obj.FillHistogram(histname,2000,0,4000,hit.GetDoppler(BETA));
           }
         }
@@ -173,6 +183,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
       histname = "E1Raw";
       obj.FillHistogram(histname,2000,0,8000,s800->GetScint().GetTimeUp());
+      
+      histname = "M_E1Raw";
+      for(int z=0;z<s800->GetMTof().E1UpSize();z++)
+        obj.FillHistogram(histname,2000,0,8000,s800->GetMTof().fE1Up[z]);
       
       histname = "CRDC1_X";
       obj.FillHistogram(histname,800,-400,400,s800->GetCrdc(0).GetDispersiveX());

@@ -86,10 +86,10 @@ public:
   Int_t    NumberOfInteractions()         const { return fNumberOfInteractions; }
   Int_t    GetSegmentId(const int &i)     const { return fSegmentNumber.at(i); }
   Float_t  GetSegmentEng(const int &i)    const { return fInteractionEnergy.at(i); }
-  TVector3 GetInteractionPosition(int i) const; //{ return fGlobalInteractionPosition[i]; }
+  TVector3 GetInteractionPosition(int i)  const; //{ return fGlobalInteractionPosition[i]; }
   TVector3 GetLocalPosition(int i) const;
   //TVector3 GetCrystalPosition(int i)     const { return TVector3(0,0,1): }
-  TVector3 GetPosition()                 const { return GetFirstIntPosition(); }
+  TVector3 GetPosition()                  const { return GetFirstIntPosition(); }
 
   TVector3 GetFirstIntPosition() const;
   TVector3 GetSecondIntPosition() const;

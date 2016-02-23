@@ -4,6 +4,8 @@
 #include <set>
 
 #include <TRandom.h>
+
+#include "GValue.h"
 #include "TGretina.h"
 
 struct interaction_point {
@@ -301,15 +303,37 @@ TGretinaHiti& TGretinaHit::operator+(TGretinaHit lhs,const TGretinaHit& rhs) {
 
 
 TVector3 TGretinaHit::GetFirstIntPosition() const {
-   if(GetFirstIntPoint()>-1)
-     return GetInteractionPosition(GetFirstIntPoint());
+  double xoffset = GValue::Value("GRETINA_X_OFFSET");
+  if(std::isnan(xoffset))
+    xoffset=0.00;
+  double yoffset = GValue::Value("GRETINA_Y_OFFSET");
+  if(std::isnan(xoffset))
+    xoffset=0.00;
+  double zoffset = GValue::Value("GRETINA_Z_OFFSET");
+  if(std::isnan(xoffset))
+    xoffset=0.00;
+ 
+  TVector3 offset(xoffset,yoffset,zoffset);
+  
+  if(GetFirstIntPoint()>-1)
+     return GetInteractionPosition(GetFirstIntPoint()) + offset;
    return TDetectorHit::BeamUnitVec;
 }
 
 TVector3 TGretinaHit::GetSecondIntPosition() const {
-   if(GetSecondIntPoint()>-1)
-     return GetInteractionPosition(GetSecondIntPoint());
-   return TDetectorHit::BeamUnitVec;
+  double xoffset = GValue::Value("GRETINA_X_OFFSET");
+  if(std::isnan(xoffset))
+    xoffset=0.00;
+  double yoffset = GValue::Value("GRETINA_Y_OFFSET");
+  if(std::isnan(xoffset))
+    xoffset=0.00;
+  double zoffset = GValue::Value("GRETINA_Z_OFFSET");
+  if(std::isnan(xoffset))
+    xoffset=0.00;
+  TVector3 offset(xoffset,yoffset,zoffset);
+  if(GetSecondIntPoint()>-1)
+    return GetInteractionPosition(GetSecondIntPoint())+offset;
+  return TDetectorHit::BeamUnitVec;
 }
 
 void TGretinaHit::Print(Option_t *opt) const {
