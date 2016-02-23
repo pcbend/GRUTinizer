@@ -218,9 +218,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
     double xfptac = s800->GetTof().GetTacXFP();
     double xfp = s800->GetTof().GetXFP();
     double obj = s800->GetTof().GetOBJ();
-    double ata = s800->GetAta();
-    double bta = s800->GetBta();
-    double dta = s800->GetDta();
+    double ata = s800->GetAta_Spec();
+    double bta = s800->GetBta_Spec();
+    double dta = s800->GetDta_Spec();
+    double yta = s800->GetYta_Spec();
     double crdc_1_anode = s800->GetCrdc(0).GetAnode();
     double crdc_2_anode = s800->GetCrdc(1).GetAnode();
     double crdc_1_tac = s800->GetCrdc(0).GetTime();
@@ -231,12 +232,12 @@ void MakeHistograms(TRuntimeObjects& obj) {
     int crdc2_size = s800->GetCrdc(1).Size();
     
     for (int i =0; i < crdc1_size; i++){
-      int crdc_1_data = s800->GetCrdc(0)->GetData(i);
+      int crdc_1_data = s800->GetCrdc(0).GetData(i);
       TH1 *crdc1data = GetHistogram(list,"CRDC1_data",4096,0,4096);
       crdc1data->Fill(crdc_1_data);
     }
     for (int i =0; i < crdc2_size; i++){
-      int crdc_1_data = s800->GetCrdc(1)->GetData(i);
+      int crdc_1_data = s800->GetCrdc(1).GetData(i);
       TH1 *crdc2data = GetHistogram(list,"crdc2_data",4096,0,4096);
       crdc2data->Fill(crdc_1_data);
     }
@@ -308,6 +309,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     TH1 *dta_hist = GetHistogram(list, "dta", 10000,-100,100);
     dta_hist->Fill(dta);
+
+    TH1 *yta_hist = GetHistogram(list, "yta", 10000,-100,100);
+    yta_hist->Fill(yta);
 
     TH1 *trig_bit = GetHistogram(list, "TrigBit", 10,0,10);
     int freg = s800->GetTrigger().GetRegistr();
