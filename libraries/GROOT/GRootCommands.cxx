@@ -275,8 +275,8 @@ TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
 
   for(int x=0;x<xmax;x++) {
     for(int y=0;y<ymax;y++) {
-      int newx = mat->GetXaxis()->GetBinCenter(x);
-      int newy = mat->GetYaxis()->GetBinCenter(y);;
+      double newx = mat->GetXaxis()->GetBinCenter(x);
+      double newy = mat->GetYaxis()->GetBinCenter(y);;
       double bcont = mat->GetBinContent(x,y);
       if(axis&kXAxis)
         newx += offset;
