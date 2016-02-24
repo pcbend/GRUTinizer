@@ -20,6 +20,7 @@
 
 class TRawFileIn;
 class TDataLoop;
+class TChainLoop;
 class THistogramLoop;
 class TCutG;
 
@@ -77,6 +78,7 @@ private:
 
   TChain* fChain;
   TDataLoop* fDataLoop;
+  TChainLoop* fChainLoop;
   THistogramLoop* fHistogramLoop;
 
   void Init();
