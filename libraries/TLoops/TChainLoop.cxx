@@ -71,6 +71,9 @@ std::string TChainLoop::Status() {
 void TChainLoop::Restart() { 
   std::lock_guard<std::mutex> lock(restart_mutex);
   fEntriesRead = 0; 
+  if(!IsRunning())
+    Start();
+
   return;
 }
 
