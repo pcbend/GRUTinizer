@@ -83,7 +83,7 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
   fRawFilesOpened  = 0;
   fHistogramLoop = 0;
   fDataLoop = 0;
-
+  fChainLoop = 0;
 
   SetPrompt("GRizer [%d] ");
   TGRUTOptions::Get(argc, argv);
@@ -280,10 +280,13 @@ void TGRUTint::ApplyOptions() {
 
 
   //next, if given a root file and told to sort it.
-  TChainLoop* coop = NULL;
+  //TChainLoop* coop = NULL;
   if(gChain && (opt->MakeHistos() || opt->SortRoot()) ){
     printf("Attempting to sort root files.\n");
-    coop = TChainLoop::Get("1_chain_loop",gChain);
+    fChainLoop = TChainLoop::Get("1_chain_loop",gChain);
+    if(!opt->ExitAfterSorting()){
+      fChainLoop->SetSelfStopping(false);
+    }
     fHistogramLoop = THistogramLoop::Get("2_hist_loop");
     gChain->GetEntry(0);
     std::string histoutfile = "hist" + get_run_number(gChain->GetCurrentFile()->GetName()) + ".root";
@@ -299,9 +302,9 @@ void TGRUTint::ApplyOptions() {
       }
     }
     fHistogramLoop->SetOutputFilename(histoutfile);
-    coop->AttachHistogramLoop(fHistogramLoop);
+    fChainLoop->AttachHistogramLoop(fHistogramLoop);
     fHistogramLoop->Resume();
-    coop->Resume();
+    fChainLoop->Resume();
   }
 
   for(auto& filename : opt->MacroInputFiles()){
@@ -427,6 +430,12 @@ void TGRUTint::ResortDataFile() {
     for(auto thread : StoppableThread::GetAll()){
       thread->ClearQueue();
     }
+  } else if(fChainLoop) {
+    fChainLoop->Restart();
+    for(auto thread : StoppableThread::GetAll()){
+      thread->ClearQueue();
+    }
+
   }
   StoppableThread::ResumeAll();
 }
