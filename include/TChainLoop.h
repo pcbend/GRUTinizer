@@ -3,7 +3,10 @@
 
 #ifndef __CINT__
 #include <atomic>
+#include <condition_variable>
+#include <thread>
 #endif
+
 
 #include <map>
 #include <vector>
@@ -37,6 +40,8 @@ public:
 
   virtual std::string Status();
 
+  void Restart();
+
 protected:
   bool Iteration();
 
@@ -61,6 +66,10 @@ private:
   int SetupChain();
   std::map<TClass*, TDetector**> det_map;
   //std::vector<TUnpackedEvent*> learning_queue;
+
+#ifndef __CINT__
+  std::mutex restart_mutex;
+#endif
 
   ClassDef(TChainLoop, 0);
 };

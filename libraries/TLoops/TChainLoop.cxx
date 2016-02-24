@@ -67,6 +67,13 @@ std::string TChainLoop::Status() {
   return Form("Event: %ld / %ld", fEntriesRead, fEntriesTotal);
 }
 
+
+void TChainLoop::Restart() { 
+  std::lock_guard<std::mutex> lock(restart_mutex);
+  fEntriesRead = 0; 
+  return;
+}
+
 bool TChainLoop::Iteration() {
   if(fEntriesRead >= fEntriesTotal){
     if(hist_loop)
