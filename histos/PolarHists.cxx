@@ -102,6 +102,16 @@ void MakeHistograms(TRuntimeObjects& obj) {
                                   2000,0,4000,hit.GetCoreEnergy(0));
     }   
 
+    histname = "GretinaDopplerBeta";
+    double beta = 0.00;
+    for(int z=0;z<100;z++) {
+      beta += .1/100.0;
+      printf("GetDoppler%.02f() = %.02f\n",beta,hit.GetDoppler(beta));
+      hit.GetPosition().Print();
+      obj.FillHistogram(histname,8000,0,4000,hit.GetDoppler(beta),
+                                 101,0.00,0.10,beta);
+    }
+
     histname = "GretinaEnergyTheta";
     obj.FillHistogram(histname,314,0,3.14,hit.GetTheta(),
                               4000,0,4000,hit.GetCoreEnergy(0));
