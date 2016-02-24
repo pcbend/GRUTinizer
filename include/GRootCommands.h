@@ -5,6 +5,8 @@
 #include <TChain.h>
 class TTree;
 class TH1;
+class TH2;
+class GH2I;
 class GMarker;
 
 #include "TDirectory.h"
@@ -32,5 +34,10 @@ void Help();
 void Commands();
 void StartGUI();
 TH1 *GrabHist(int i=1); //return the histogram from the current canvas, pad i.
+
+//enum EAxis {kXAxis = 1,kYAxis = 2,kXYaxis = 3,kZaxis = 4,kXZaxis = 5,kYZAxis = 6,kXYZAxis=7};
+enum EAxis {kXAxis = 1,kYAxis = 2};
+
+TH2 *AddOffset(TH2 *mat,double offset,EAxis axis=kXAxis);
 
 #endif

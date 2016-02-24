@@ -237,6 +237,53 @@ void StartGUI() {
   
   
   
-  
-  
-  
+TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
+ TH2 *toreturn = 0; 
+ if(!mat)
+    return toreturn;
+ //int dim = mat->GetDimension();
+ int xmax = mat->GetXaxis()->GetNbins()+1; 
+ int ymax = mat->GetYaxis()->GetNbins()+1; 
+ /*
+ switch(dim) {
+   case 3:
+     xmax = mat->GetXaxis()->GetNbins()+1; 
+     ymax = mat->GetYaxis()->GetNbins()+1; 
+     zmax = mat->GetZaxis()->GetNbins()+1; 
+     break;
+   case 2:
+     if(axis>3) {
+       fprintf(stderr,"%s z-axis offest called on %s but has no z-axis",
+               __PRETTY_FUNCTION__,mat->GetName())
+       return toreturn;
+     }
+     xmax = mat->GetXaxis()->GetNbins()+1; 
+     ymax = mat->GetYaxis()->GetNbins()+1; 
+     break;
+   case 1:
+     if(axis!=1) {
+       fprintf(stderr,"%s offest called on %s with an axis it doesn't have.",
+               __PRETTY_FUNCTION__,mat->GetName())
+       return toreturn;
+     }
+     xmax = mat->GetXaxis()->GetNbins()+1; 
+     break;
+ };
+ */
+ toreturn = (TH2*)mat->Clone(Form("%s_offset",mat->GetName()));
+ toreturn->Reset();
+
+  for(int x=0;x<xmax;x++) {
+    for(int y=0;y<ymax;y++) {
+      int newx = mat->GetXaxis()->GetBinCenter(x);
+      int newy = mat->GetYaxis()->GetBinCenter(y);;
+      double bcont = mat->GetBinContent(x,y);
+      if(axis&kXAxis)
+        newx += offset;
+      if(axis&kYAxis)
+        newy += offset;
+      toreturn->Fill(newx,newy,bcont);
+     }
+   }
+  return toreturn;
+}
