@@ -101,24 +101,38 @@ GH1D* GH2I::Projection_Background(int axis,
                                   int last_bg_bin,
                                   kBackgroundSubtraction mode) {
   std::string title;
+  std::string name;
+  std::string sproj;
   TH1D* proj = NULL;
   TH1D* bg_proj = NULL;
 
+  double xlow,xhigh,bg_xlow,bg_xhigh;
+
   if(axis==0){
-    title = Form("%s_projx_%d_%d_bg_%d_%d",
-                 GetName(), firstbin, lastbin,
-                 first_bg_bin, last_bg_bin);
+    xlow     = this->GetXaxis()->GetBinLowEdge(firstbin);
+    xhigh    = this->GetXaxis()->GetBinUpEdge(lastbin);
+    bg_xlow  = this->GetXaxis()->GetBinLowEdge(first_bg_bin);
+    bg_xhigh = this->GetXaxis()->GetBinUpEdge(last_bg_bin);
+    sproj = "projx";
     proj = TH2I::ProjectionX("temp1", firstbin, lastbin);
     bg_proj = TH2I::ProjectionX("temp2", first_bg_bin, last_bg_bin);
   } else if (axis==1){
-    title = Form("%s_projy_%d_%d_bg_%d_%d",
-                 GetName(), firstbin, lastbin,
-                 first_bg_bin, last_bg_bin);
+    xlow     = this->GetYaxis()->GetBinLowEdge(firstbin);
+    xhigh    = this->GetYaxis()->GetBinUpEdge(lastbin);
+    bg_xlow  = this->GetYaxis()->GetBinLowEdge(first_bg_bin);
+    bg_xhigh = this->GetYaxis()->GetBinUpEdge(last_bg_bin);
+    sproj = "projy";
     proj = TH2I::ProjectionY("temp1", firstbin, lastbin);
     bg_proj = TH2I::ProjectionY("temp2", first_bg_bin, last_bg_bin);
   } else {
     return NULL;
   }
+  name  = Form("%s_%s_%d_%d_bg_%d_%d",GetName(),sproj.c_str()
+                                        ,firstbin,lastbin,
+                                         first_bg_bin,last_bg_bin);
+  title  = Form("%s_%s_%d[%.02f]_%d[%.02f]_bg_%d[%.02f]_%d[%.02f]",GetName(),sproj.c_str(),
+                                                                   firstbin,xlow,lastbin,xhigh,
+                                                                   first_bg_bin,bg_xlow,last_bg_bin,bg_xhigh);
 
   double bg_scaling = double(lastbin-firstbin)/double(last_bg_bin-first_bg_bin);
   if(mode == kNoBackground){
@@ -130,7 +144,6 @@ GH1D* GH2I::Projection_Background(int axis,
   proj->Delete();
   bg_proj->Delete();
 
-  std::string name = title;
   output->SetName(name.c_str());
   output->SetTitle(title.c_str());
   output->SetParent(this);
@@ -145,15 +158,23 @@ GH1D* GH2I::ProjectionX(const char* name,
                        int lastbin,
                        Option_t* option) {
   std::string title;
+  double xlow  = this->GetYaxis()->GetBinLowEdge(firstbin);
+  double xhigh = this->GetYaxis()->GetBinUpEdge(lastbin);
+  bool total = false;
   if(firstbin==0 && lastbin==-1){
+    total = true;
     title = Form("%s_totalx",GetName());
   } else {
-    title = Form("%s_projx_%d_%d",GetName(),firstbin,lastbin);
+    title  = Form("%s_projx_%d[%.02f]_%d[%.02f]",GetName(),
+                                                 firstbin,xlow,lastbin,xhigh);
   }
 
   std::string actual_name = name;
   if(actual_name == "_px"){
-    actual_name = title;
+    if(total)
+      actual_name = title;
+    else 
+      actual_name  = Form("%s_projx_%d_%d",GetName(),firstbin,lastbin);
   }
 
   TH1D* proj = TH2I::ProjectionX("temp", firstbin, lastbin, option);
@@ -190,15 +211,24 @@ GH1D* GH2I::ProjectionY(const char* name,
                        int lastbin,
                        Option_t* option) {
   std::string title;
+  double ylow  = this->GetXaxis()->GetBinLowEdge(firstbin);
+  double yhigh = this->GetXaxis()->GetBinUpEdge(lastbin);
+  bool total = false;
   if(firstbin==0 && lastbin==-1){
+    total = true;
     title = Form("%s_totaly",GetName());
   } else {
-    title = Form("%s_projy_%d_%d",GetName(),firstbin,lastbin);
+    title  = Form("%s_projy_%d[%.02f]_%d[%.02f]",GetName(),
+                                                 firstbin,ylow,lastbin,yhigh);
   }
 
   std::string actual_name = name;
   if(actual_name == "_py"){
-    actual_name = title;
+    if(total)
+      actual_name = title;
+    else 
+      actual_name  = Form("%s_projy_%d_%d",GetName(),firstbin,lastbin);
+      
   }
 
   TH1D* proj = TH2I::ProjectionY("temp", firstbin, lastbin, option);
@@ -227,6 +257,7 @@ GH1D* GH2I::ProjectionY_Background(int firstbin,
                                first_bg_bin, last_bg_bin,
                                mode);
 }
+
 
 GH1D* GH2I::GetPrevious(const GH1D* curr) {
   if(fIsSummary){

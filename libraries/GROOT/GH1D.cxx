@@ -67,17 +67,21 @@ GH1D* GH1D::GetNext() const {
   }
 }
 
-GH1D* GH1D::Project(int bin_low, int bin_high) const {
-  if(bin_low > bin_high){
-    std::swap(bin_low, bin_high);
-  }
+GH1D* GH1D::Project(double value_low, double value_high) const {
 
   if(parent.GetObject() && parent.GetObject()->InheritsFrom(GH2I::Class()) &&
      projection_axis!=-1) {
+    if(value_low > value_high){
+      std::swap(value_low, value_high);
+    }
     GH2I* gpar = (GH2I*)parent.GetObject();
     if(projection_axis == 0){
+      int bin_low  = gpar->GetXaxis()->FindBin(value_low);
+      int bin_high = gpar->GetXaxis()->FindBin(value_high);
       return gpar->ProjectionY("_py", bin_low, bin_high);
     } else {
+      int bin_low  = gpar->GetYaxis()->FindBin(value_low);
+      int bin_high = gpar->GetYaxis()->FindBin(value_high);
       return gpar->ProjectionX("_px", bin_low, bin_high);
     }
   } else {
@@ -85,24 +89,32 @@ GH1D* GH1D::Project(int bin_low, int bin_high) const {
   }
 }
 
-GH1D* GH1D::Project_Background(int bin_low, int bin_high,
-                               int bg_bin_low, int bg_bin_high,
+GH1D* GH1D::Project_Background(double value_low, double value_high,
+                               double bg_value_low, double bg_value_high,
                                kBackgroundSubtraction mode) const {
-  if(bin_low > bin_high){
-    std::swap(bin_low, bin_high);
-  }
-  if(bg_bin_low > bg_bin_high){
-    std::swap(bg_bin_low, bg_bin_high);
-  }
-
   if(parent.GetObject() && parent.GetObject()->InheritsFrom(GH2I::Class()) &&
      projection_axis!=-1) {
+    if(value_low > value_high){
+      std::swap(value_low, value_high);
+    }
+    if(bg_value_low > bg_value_high){
+      std::swap(bg_value_low, bg_value_high);
+    }
+
     GH2I* gpar = (GH2I*)parent.GetObject();
     if(projection_axis == 0){
+      int bin_low     = gpar->GetXaxis()->FindBin(value_low);
+      int bin_high    = gpar->GetXaxis()->FindBin(value_high);
+      int bg_bin_low  = gpar->GetXaxis()->FindBin(bg_value_low);
+      int bg_bin_high = gpar->GetXaxis()->FindBin(bg_value_high);
       return gpar->ProjectionY_Background(bin_low, bin_high,
                                           bg_bin_low, bg_bin_high,
                                           mode);
     } else {
+      int bin_low     = gpar->GetYaxis()->FindBin(value_low);
+      int bin_high    = gpar->GetYaxis()->FindBin(value_high);
+      int bg_bin_low  = gpar->GetYaxis()->FindBin(bg_value_low);
+      int bg_bin_high = gpar->GetYaxis()->FindBin(bg_value_high);
       return gpar->ProjectionX_Background(bin_low, bin_high,
                                           bg_bin_low, bg_bin_high,
                                           mode);
