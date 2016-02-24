@@ -33,6 +33,9 @@
 #pragma link C++ function GrabHist;
 #pragma link C++ function StartGUI();
 
+#pragma link C++ enum EAxis;
+#pragma link C++ function AddOffset;
+
 
 #pragma link C++ class GPopup+;
 
