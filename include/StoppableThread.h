@@ -29,7 +29,6 @@ public:
 
   void Resume();
   void Pause();
-  void Start();
   void Stop();
   bool IsPaused();
   bool IsRunning();

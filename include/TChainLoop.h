@@ -39,7 +39,9 @@ public:
   bool AttachHistogramLoop(THistogramLoop *loop) {hist_loop = loop; return loop; }
 
   virtual std::string Status();
-
+  
+  void SetSelfStopping(bool self_stopping) { fSelfStopping = self_stopping; }
+  bool GetSelfStopping() const { return fSelfStopping; }
   void Restart();
 
 protected:
@@ -58,6 +60,8 @@ private:
 
   TChain *input_chain;
   THistogramLoop *hist_loop;
+  
+  bool fSelfStopping;
 
   //std::mutex input_queue_mutex;
   //std::vector<TUnpackingLoop*> input_queues;

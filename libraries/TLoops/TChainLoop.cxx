@@ -35,7 +35,7 @@ TChainLoop* TChainLoop::Get(std::string name,TChain *chain){
 TChainLoop::TChainLoop(std::string name, TChain *chain)
   : StoppableThread(name),
     fEntriesRead(0), fEntriesTotal(chain->GetEntries()),
-    input_chain(chain), hist_loop(0) {
+    input_chain(chain), hist_loop(0), fSelfStopping(true) {
     SetupChain();
 }
 
@@ -71,17 +71,18 @@ std::string TChainLoop::Status() {
 void TChainLoop::Restart() { 
   std::lock_guard<std::mutex> lock(restart_mutex);
   fEntriesRead = 0; 
-  if(!IsRunning())
-    Start();
-
   return;
 }
 
 bool TChainLoop::Iteration() {
   if(fEntriesRead >= fEntriesTotal){
-    if(hist_loop)
-      hist_loop->SendStop();
-    return false;
+    if(fSelfStopping) {
+      if(hist_loop)
+        hist_loop->SendStop();
+      return false;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    return true;
   }
 
   for(auto& elem : det_map){

@@ -28,13 +28,6 @@ StoppableThread::StoppableThread(std::string name)
 
 }
 
-void StoppableThread::Start() {
-  if(running)
-    return;
-  thread = std::thread(&StoppableThread::Loop, this);
-  //if(!status_thread_on)
-  //  start_status_thread();
-}
 
 void StoppableThread::StopAll() {
   std::cout << "Stopping status thread" << std::endl;

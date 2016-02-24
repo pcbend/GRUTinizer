@@ -284,6 +284,9 @@ void TGRUTint::ApplyOptions() {
   if(gChain && (opt->MakeHistos() || opt->SortRoot()) ){
     printf("Attempting to sort root files.\n");
     fChainLoop = TChainLoop::Get("1_chain_loop",gChain);
+    if(!opt->ExitAfterSorting()){
+      fChainLoop->SetSelfStopping(false);
+    }
     fHistogramLoop = THistogramLoop::Get("2_hist_loop");
     gChain->GetEntry(0);
     std::string histoutfile = "hist" + get_run_number(gChain->GetCurrentFile()->GetName()) + ".root";
