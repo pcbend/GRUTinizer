@@ -237,9 +237,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
       crdc1data->Fill(crdc_1_data);
     }
     for (int i =0; i < crdc2_size; i++){
-      int crdc_1_data = s800->GetCrdc(1).GetData(i);
-      TH1 *crdc2data = GetHistogram(list,"crdc2_data",4096,0,4096);
-      crdc2data->Fill(crdc_1_data);
+      int crdc_2_data = s800->GetCrdc(1).GetData(i);
+      TH1 *crdc2data = GetHistogram(list,"CRDC2_data",4096,0,4096);
+      crdc2data->Fill(crdc_2_data);
     }
 
     TH1 *crdc1anode = GetHistogram(list,"CRDC1_anode",4096,0,4096);
