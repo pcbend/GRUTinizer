@@ -28,6 +28,7 @@ StoppableThread::StoppableThread(std::string name)
 
 }
 
+
 void StoppableThread::StopAll() {
   std::cout << "Stopping status thread" << std::endl;
   stop_status_thread();
@@ -72,6 +73,18 @@ std::string StoppableThread::AnyThreadStatus() {
     }
   }
   return "";
+}
+
+void StoppableThread::PauseAll() {
+  for(auto& elem : fthreadmap){
+    elem.second->Pause();
+  }
+}
+
+void StoppableThread::ResumeAll() {
+  for(auto& elem : fthreadmap){
+    elem.second->Resume();
+  }
 }
 
 std::string StoppableThread::Status() {
@@ -232,8 +245,8 @@ void StoppableThread::status_out() {
 
 }
 
-std::vector<const StoppableThread*> StoppableThread::GetAll() {
-  std::vector<const StoppableThread*> output;
+std::vector<StoppableThread*> StoppableThread::GetAll() {
+  std::vector<StoppableThread*> output;
   for(auto& elem : fthreadmap){
     output.push_back(elem.second);
   }

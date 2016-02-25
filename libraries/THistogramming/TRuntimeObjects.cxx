@@ -5,15 +5,31 @@
 #include "TClass.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "TDirectoryFile.h"
 
 #include "GH1D.h"
 #include "GH2I.h"
+#include "GH2D.h"
 
 #include "GValue.h"
 
-TRuntimeObjects::TRuntimeObjects(TUnpackedEvent& detectors, TList* objects, TList* variables,
-                                 TDirectory* directory)
-  : detectors(detectors), objects(objects), variables(variables), directory(directory) { }
+
+std::map<std::string,TRuntimeObjects*> TRuntimeObjects::fRuntimeMap;
+
+TRuntimeObjects::TRuntimeObjects(TUnpackedEvent *detectors, TList* objects, TList* variables, TList *gates,
+                                 TDirectory* directory,const char *name)
+  : detectors(detectors), objects(objects), variables(variables), gates(gates), directory(directory) {
+  SetName(name);
+  fRuntimeMap.insert(std::make_pair(name,this));
+}
+
+TRuntimeObjects::TRuntimeObjects(TList* objects, TList* variables, TList *gates,
+                                 TDirectory* directory,const char *name)
+  : detectors(0),objects(objects), variables(variables), gates(gates), directory(directory) {
+  SetName(name);
+  fRuntimeMap.insert(std::make_pair(name,this));
+}
+
 
 TH1* TRuntimeObjects::FillHistogram(std::string name,
                                     int bins, double low, double high, double value){
@@ -31,7 +47,7 @@ TH2* TRuntimeObjects::FillHistogram(std::string name,
                                     int Ybins, double Ylow, double Yhigh, double Yvalue){
   TH2* hist = (TH2*) GetObjects().FindObject(name.c_str());
   if(!hist){
-    hist = new GH2I(name.c_str(),name.c_str(),
+    hist = new GH2D(name.c_str(),name.c_str(),
                             Xbins, Xlow, Xhigh,
                             Ybins, Ylow, Yhigh);
     GetObjects().Add(hist);
@@ -45,7 +61,7 @@ TH2* TRuntimeObjects::FillHistogramSym(std::string name,
                                     int Ybins, double Ylow, double Yhigh, double Yvalue){
   TH2* hist = (TH2*) GetObjects().FindObject(name.c_str());
   if(!hist){
-    hist = new GH2I(name.c_str(),name.c_str(),
+    hist = new GH2D(name.c_str(),name.c_str(),
                             Xbins, Xlow, Xhigh,
                             Ybins, Ylow, Yhigh);
     GetObjects().Add(hist);
@@ -55,9 +71,128 @@ TH2* TRuntimeObjects::FillHistogramSym(std::string name,
   return hist;
 }
 
+//-------------------------------------------------------------------------
+TDirectory* TRuntimeObjects::FillHistogram(std::string dirname,std::string name,
+					   int bins, double low, double high, double value){
+  
+  TDirectory *dir = (TDirectory*)GetObjects().FindObject(dirname.c_str());
+  if(!dir){
+    dir = new TDirectory(dirname.c_str(),dirname.c_str());
+    GetObjects().Add(dir);
+  }
+  dir->cd();
+  TH1* hist = (TH1*)dir->FindObject(name.c_str());
+  if(!hist){
+    hist = new TH1I(name.c_str(),name.c_str(),
+		    bins, low, high);
+    dir->Add(hist);
+  }
+  
+  hist->Fill(value);
+  dir->cd("../");
+  //return hist;
+  return dir;
+
+  /*
+  std::cout << "1" << std::endl;
+  if(!(gDirectory->cd(dirname.c_str()))){
+      gDirectory->mkdir(dirname.c_str());
+        std::cout << "2" << std::endl;
+  }
+  std::cout << "3" << std::endl;
+  TDirectory *dir = gDirectory->GetDirectory(dirname.c_str());
+  //gDirectory->pwd()
+  std::cout << "4" << std::endl;;
+  TH1* hist = (TH1*)dir->FindObject(name.c_str());
+  std::cout << "4a" << std::endl;
+  if(!hist){
+    std::cout << "4b" << std::endl;
+    hist = new TH1I(name.c_str(),name.c_str(),bins,low,high);
+    //    GetObjects().Add(hist);
+    std::cout << "5" << std::endl;
+    dir->Add(hist);
+    std::cout << "6" << std::endl;
+  }
+  std::cout << "7" << std::endl;
+  hist->Fill(value);
+  std::cout << "8" << std::endl;
+  gDirectory->cd("../");
+  std::cout << "9" << std::endl;
+  return dir;
+  //return hist;*/
+}
+
+TDirectory* TRuntimeObjects::FillHistogram(std::string dirname,std::string name,
+                                    int Xbins, double Xlow, double Xhigh, double Xvalue,
+                                    int Ybins, double Ylow, double Yhigh, double Yvalue){
+  TDirectory *dir = (TDirectory*)GetObjects().FindObject(dirname.c_str());
+  if(!dir){
+    dir = new TDirectory(dirname.c_str(),dirname.c_str());
+    GetObjects().Add(dir);
+  }
+  dir->cd();
+  TH2* hist = (TH2*)dir->FindObject(name.c_str());
+  if(!hist){
+    hist = new GH2D(name.c_str(),name.c_str(),
+                            Xbins, Xlow, Xhigh,
+                            Ybins, Ylow, Yhigh);
+    dir->Add(hist);
+  }
+  
+  hist->Fill(Xvalue, Yvalue);
+  dir->cd("../");
+  //return hist;
+  return dir;/*
+  TH2* hist = (TH2*) GetObjects().FindObject(name.c_str());
+  if(!hist){
+    hist = new GH2I(name.c_str(),name.c_str(),
+                            Xbins, Xlow, Xhigh,
+                            Ybins, Ylow, Yhigh);
+    GetObjects().Add(hist);
+  }
+  hist->Fill(Xvalue, Yvalue);
+  return hist;*/
+}
+
+TDirectory* TRuntimeObjects::FillHistogramSym(std::string dirname,std::string name,
+                                    int Xbins, double Xlow, double Xhigh, double Xvalue,
+                                    int Ybins, double Ylow, double Yhigh, double Yvalue){
+  TDirectory *dir = (TDirectory*)GetObjects().FindObject(dirname.c_str());
+  if(!dir){
+    dir = new TDirectory(dirname.c_str(),dirname.c_str());
+    GetObjects().Add(dir);
+  }
+  dir->cd();
+  TH2* hist = (TH2*)dir->FindObject(name.c_str());
+  if(!hist){
+    hist = new GH2D(name.c_str(),name.c_str(),
+                            Xbins, Xlow, Xhigh,
+                            Ybins, Ylow, Yhigh);
+    dir->Add(hist);
+  }
+  hist->Fill(Xvalue, Yvalue);
+  hist->Fill(Yvalue, Xvalue);
+  dir->cd("../");
+  //return hist;
+  return dir;/*
+  TH2* hist = (TH2*) GetObjects().FindObject(name.c_str());
+  if(!hist){
+    hist = new GH2I(name.c_str(),name.c_str(),
+                            Xbins, Xlow, Xhigh,
+                            Ybins, Ylow, Yhigh);
+    GetObjects().Add(hist);
+  }
+  hist->Fill(Xvalue, Yvalue);
+  return hist;*/
+}
+//-------------------------------------------------------------------------
 
 TList& TRuntimeObjects::GetObjects() {
   return *objects;
+}
+
+TList& TRuntimeObjects::GetGates() {
+  return *gates;
 }
 
 TList& TRuntimeObjects::GetVariables() {
@@ -65,7 +200,8 @@ TList& TRuntimeObjects::GetVariables() {
 }
 
 TCutG* TRuntimeObjects::GetCut(const std::string& name) {
-  TIter next(objects);
+  /*
+  TIter next(cuts);
   TObject* obj;
   while((obj = next())){
     TCutG* cut = dynamic_cast<TCutG*>(obj);
@@ -74,6 +210,7 @@ TCutG* TRuntimeObjects::GetCut(const std::string& name) {
       return (TCutG*)obj;
     }
   }
+  */
   return NULL;
 }
 

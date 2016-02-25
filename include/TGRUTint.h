@@ -20,7 +20,9 @@
 
 class TRawFileIn;
 class TDataLoop;
+class TChainLoop;
 class THistogramLoop;
+class TCutG;
 
 extern TChain *gChain;
 
@@ -46,8 +48,11 @@ public:
   TFile* OpenRootFile(const std::string& filename, Option_t* opt="");
   TRawFileIn* OpenRawFile(const std::string& filename);
   void ResetAllHistograms();
+  void ResortDataFile();
 
   void LoadRawFile(std::string filename);
+
+  void LoadTCutG(TCutG* cutg);
 
 public:
   void DelayedProcessLine_Action();
@@ -73,6 +78,7 @@ private:
 
   TChain* fChain;
   TDataLoop* fDataLoop;
+  TChainLoop* fChainLoop;
   THistogramLoop* fHistogramLoop;
 
   void Init();

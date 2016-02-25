@@ -82,6 +82,16 @@ bool TUnpackingLoop::Iteration(){
   return true;
 }
 
+void TUnpackingLoop::ClearQueue() {
+  while(output_queue.Size()){
+    TUnpackedEvent* event = NULL;
+    output_queue.Pop(event);
+    if(event){
+      delete event;
+    }
+  }
+}
+
 void TUnpackingLoop::HandleNSCLData(TNSCLEvent& event) {
   switch(event.GetEventType()) {
     case kNSCLEventType::BEGIN_RUN:            // 0x0001
@@ -184,6 +194,7 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
       fOutputEvent->AddRawData(event, kDetectorSystems::PHOSWALL);
       break;
     case 29: // Something.
+      fOutputEvent->AddRawData(event, kDetectorSystems::BANK29);
       break;
     default:
       std::cout << "Dance Party EventType: " << type << std::endl;

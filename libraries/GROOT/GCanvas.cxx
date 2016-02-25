@@ -33,13 +33,18 @@
 //#include "GROOTGuiFactory.h"
 #include "GRootCommands.h"
 #include "GH2I.h"
+#include "GH2D.h"
 #include "GH1D.h"
+
+#include "TRuntimeObjects.h"
 
 #include <iostream>
 #include <fstream>
 #include <string>
 
 #include <TMath.h>
+
+#include "TGRUTint.h"
 
 #ifndef kArrowKeyPress
 #define kArrowKeyPress 25
@@ -69,7 +74,7 @@ void GMarker::Copy(TObject &object) const {
 /*
 ClassImp(GPopup)
 
-GPopup::GPopup(const TGWindow *p,const TGWindow *m) 
+GPopup::GPopup(const TGWindow *p,const TGWindow *m)
        : TGTransientFrame(p,m,200,200,kVerticalFrame) {
   SetCleanup(kDeepCleanup);
   Connect("CloseWindow()","GPopup",this,"CloseWindow()");
@@ -385,13 +390,19 @@ void GCanvas::HandleInput(Int_t event,Int_t x,Int_t y) {
   //If the below switch breaks. You need to upgrade your version of ROOT
   //Version 5.34.24 works. //older version should work now too pcb (8/2015)
   bool used = false;
-  //printf("event = 0x%08x\n",event);
+  //printf("event = 0x%08x\t x = 0x%08x\t y = 0x%08x \n",event,x,y);
   switch(event) {
     case 0x00000001: //single click
     case 0x0000003d: //double click
-    case 0x00000007: //shift-click
       used = HandleMousePress(event,x,y);
       break;
+    case 0x00000007: //shift-click
+      used = HandleMouseShiftPress(event,x,y);
+      break;
+    case 0x0000009:  //control-click
+      used = HandleMouseControlPress(event,x,y);
+      break;
+
   };
   if(!used)
     TCanvas::HandleInput((EEventType)event,x,y);
@@ -504,27 +515,6 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
   }
   if(!hist)
      return false;
-  if(event == 0x00000007) {
-    new GCanvas();
-    TString options;
-    if(hist->GetDimension()==2)
-      options.Append("colz");
-
-    if(hist->InheritsFrom(GH1D::Class())) {
-      GH1D* ghist = (GH1D*)hist;
-      ghist->GetParent()->Draw("colz");
-    } else if(hist->InheritsFrom(TH2::Class())) {
-      if(!hist->InheritsFrom(GH2I::Class())) {
-        GH2I *ghist = new GH2I(*((TH2*)hist));
-        ghist->Draw();
-      } else {
-        hist->DrawCopy(options.Data());
-      }
-    } else {
-      hist->DrawCopy(options.Data());
-    }
-    return true;
-  }
 
   bool used = false;
   if(hist->GetDimension() > 2) {
@@ -543,6 +533,56 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
   }
   return used;
 }
+
+bool GCanvas::HandleMouseShiftPress(Int_t event,Int_t x,Int_t y) {
+  TH1 *hist = 0;
+  TIter iter(gPad->GetListOfPrimitives());
+  while(TObject *obj = iter.Next()) {
+     if(obj->InheritsFrom(TH1::Class()))
+        hist = (TH1*)obj;
+  }
+  if(!hist) 
+    return false;
+  
+  TString options;
+  switch(hist->GetDimension()) {
+    case 1:
+      {
+      if(hist->InheritsFrom(GH1D::Class())) {
+        new GCanvas();
+        ((GH1D*)hist)->GetParent()->Draw("colz");
+        return true;
+      }
+      std::vector<TH1*> hists = FindHists();
+      new GCanvas();
+      options.Append("HIST");
+      hists.at(0)->DrawCopy(options.Data());
+      for(unsigned int x=1;x<hists.size();x++) 
+        hists.at(x)->DrawCopy("same");
+      }
+      return true;
+    case 2:
+      options.Append("colz");
+      GH2D *ghist = new GH2D(*((TH2*)hist));
+      new GCanvas();
+      ghist->Draw();
+      return true;
+  };
+  return false;
+}
+
+bool GCanvas::HandleMouseControlPress(Int_t event,Int_t x,Int_t y) {
+  //printf("GetSelected() = 0x%08x\n",GetSelected());
+  if(!GetSelected())
+    return false;
+  //printf("GetSelected()->GetName() = %s\n",GetSelected()->GetName());
+  if(GetSelected()->InheritsFrom(TCutG::Class())) {
+    if(TRuntimeObjects::Get())
+      TRuntimeObjects::Get()->GetGates().Add(GetSelected());
+  }
+  return true;
+}
+
 
 
 TF1 *GCanvas::GetLastFit() {
@@ -637,7 +677,7 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
       TH1* prev = ghist->GetPrevious();
       if(prev) {
         prev->GetXaxis()->SetRange(first,last);
-        prev->Draw();
+        prev->Draw("HIST");
         RedrawMarkers();
         edited = true;
       }
@@ -658,7 +698,7 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
       TH1* prev = ghist->GetNext();
       if(prev) {
         prev->GetXaxis()->SetRange(first,last);
-        prev->Draw();
+        prev->Draw("HIST");
         RedrawMarkers();
         edited = true;
       }
@@ -693,7 +733,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
     case kKey_B:
       edited = CycleBackgroundSubtraction();
       break;
- 
+
     case kKey_d:
       {
         printf("i am here.\n");
@@ -703,8 +743,8 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
         //TGFileInfo fi;
         //new TGFileDialog(gClient->GetDefaultRoot(),gClient->GetDefaultRoot(),
         //                 kFDOpen, &fi);
-            
-            
+
+
       }
       break;
 
@@ -825,7 +865,11 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
           break;
         }
       }
-
+      //  ok, i found a bug.  if someone tries to gate on a histogram 
+      //  that is already zoomed, bad things will happen; namely the bins
+      //  in the zoomed histogram will not map correctly to the parent. To get 
+      //  around this we need the bin value, not the bin!   pcb.
+      //
       if(ghist){
         GH1D* proj = NULL;
         int binlow = fMarkers.at(fMarkers.size()-1)->binx;
@@ -833,6 +877,9 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
         if(binlow > binhigh){
           std::swap(binlow, binhigh);
         }
+        double value_low  = ghist->GetXaxis()->GetBinCenter(binlow);
+        double value_high = ghist->GetXaxis()->GetBinCenter(binhigh);
+
         if(fBackgroundMarkers.size()>=2 &&
            fBackgroundMode!=kNoBackground){
           int bg_binlow = fBackgroundMarkers[0]->binx;
@@ -840,17 +887,20 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
           if(bg_binlow > bg_binhigh){
             std::swap(bg_binlow, bg_binhigh);
           }
+          double bg_value_low  = ghist->GetXaxis()->GetBinCenter(binlow);
+          double bg_value_high = ghist->GetXaxis()->GetBinCenter(binhigh);
           // Using binhigh-1 instead of binhigh,
           //  because the ProjectionX/Y functions from ROOT use inclusive bin numbers,
           //  rather than exclusive.
-          proj = ghist->Project_Background(binlow, binhigh-1,
-                                           bg_binlow, bg_binhigh-1,
+          //
+          proj = ghist->Project_Background(value_low, value_high,
+                                           bg_value_low, bg_value_high,
                                            fBackgroundMode);
         } else {
-          proj = ghist->Project(binlow, binhigh-1);
+          proj = ghist->Project(value_low, value_high);
         }
         if(proj){
-          proj->Draw();
+          proj->Draw("HIST");
           edited=true;
         }
       }
@@ -905,16 +955,18 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       if(GetNMarkers()<2)
           break;
        {
-       if(fMarkers.at(fMarkers.size()-1)->localx < fMarkers.at(fMarkers.size()-2)->localx)
-	 for(unsigned int i=0;i<hists.size();i++){
-	   hists.at(i)->GetXaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-1)->localx,fMarkers.at(fMarkers.size()-2)->localx);
-	   hists.at(i)->GetYaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-1)->localy,fMarkers.at(fMarkers.size()-2)->localy);
-	 }
-       else
-	 for(unsigned int i=0;i<hists.size();i++){
-            hists.at(i)->GetXaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-2)->localx,fMarkers.at(fMarkers.size()-1)->localx);
-            hists.at(i)->GetYaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-2)->localy,fMarkers.at(fMarkers.size()-1)->localy);
-	 }
+       double x1 = fMarkers.at(fMarkers.size()-1)->localx;
+       double y1 = fMarkers.at(fMarkers.size()-1)->localy;
+       double x2 = fMarkers.at(fMarkers.size()-2)->localx;
+       double y2 = fMarkers.at(fMarkers.size()-2)->localy;
+       if(x1>x2)
+         std::swap(x1,x2);
+       if(y1>y2)
+       std::swap(y1,y2);
+       for(unsigned int i=0;i<hists.size();i++){
+         hists.at(i)->GetXaxis()->SetRangeUser(x1,x2);
+         hists.at(i)->GetYaxis()->SetRangeUser(y1,y2);
+       }
        }
        edited = true;
        RemoveMarker("all");
@@ -951,6 +1003,8 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
        cut->SetPoint(8,x1,y1);
        cut->SetLineColor(kBlack);
        hists.at(0)->GetListOfFunctions()->Add(cut);
+
+       TGRUTint::instance()->LoadTCutG(cut);
       }
       edited = true;
       RemoveMarker("all");
@@ -979,26 +1033,26 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       break;
 
     case kKey_P: {
-      GH2I* ghist = NULL;
+      GH2D* ghist = NULL;
       for(auto hist : hists){
-        if(hist->InheritsFrom(GH2I::Class())){
-          ghist = (GH2I*)hist;
+        if(hist->InheritsFrom(GH2Base::Class())){
+          ghist = (GH2D*)hist;
           break;
         }
       }
 
       if(ghist && ghist->GetProjections()->GetSize()){
-        ghist->GetProjections()->At(0)->Draw();
+        ghist->GetProjections()->At(0)->Draw("HIST");
         edited=true;
       }
     }
       break;
 
     case kKey_x: {
-      GH2I* ghist = NULL;
+      GH2D* ghist = NULL;
       for(auto hist : hists) {
-        if(hist->InheritsFrom(GH2I::Class())){
-          ghist = (GH2I*)hist;
+        if(hist->InheritsFrom(GH2Base::Class())){
+          ghist = (GH2D*)hist;
           break;
         }
       }
@@ -1007,7 +1061,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
         TH1 *phist = ghist->ProjectionX();//->Draw();
         if(phist) {
           new GCanvas();
-          phist->Draw();
+          phist->Draw("HIST");
         }
         edited=true;
       }
@@ -1015,10 +1069,10 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       break;
 
     case kKey_X: {
-      GH2I* ghist = NULL;
+      GH2D* ghist = NULL;
       for(auto hist : hists) {
-        if(hist->InheritsFrom(GH2I::Class())){
-          ghist = (GH2I*)hist;
+        if(hist->InheritsFrom(GH2Base::Class())){
+          ghist = (GH2D*)hist;
           break;
         }
       }
@@ -1029,7 +1083,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
         TH1* phist = ghist->SummaryProject(1);
         if(phist) {
           new GCanvas();
-          phist->Draw();
+          phist->Draw("HIST");
         }
         edited = true;
       }
@@ -1037,10 +1091,10 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       break;
 
     case kKey_y: {
-      GH2I* ghist = NULL;
+      GH2D* ghist = NULL;
       for(auto hist : hists) {
-        if(hist->InheritsFrom(GH2I::Class())){
-          ghist = (GH2I*)hist;
+        if(hist->InheritsFrom(GH2Base::Class())){
+          ghist = (GH2D*)hist;
           break;
         }
       }
@@ -1052,7 +1106,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
         //printf("phist->GetName() = %s\n",phist->GetName());
         if(phist) {
           new GCanvas();
-          phist->Draw();
+          phist->Draw("HIST");
         }
         edited=true;
       }
@@ -1060,10 +1114,10 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       break;
 
     case kKey_Y: {
-      GH2I* ghist = NULL;
+      GH2D* ghist = NULL;
       for(auto hist : hists) {
-        if(hist->InheritsFrom(GH2I::Class())){
-          ghist = (GH2I*)hist;
+        if(hist->InheritsFrom(GH2Base::Class())){
+          ghist = (GH2D*)hist;
           break;
         }
       }
@@ -1074,7 +1128,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
         TH1* phist = ghist->SummaryProject(1);
         if(phist) {
           new GCanvas();
-          phist->Draw();
+          phist->Draw("HIST");
         }
         edited = true;
       }

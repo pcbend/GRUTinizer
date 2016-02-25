@@ -1,4 +1,4 @@
-//TChannel.h TGRUTUtilities.h
+//TChannel.h TGRUTUtilities.h TPresetCanvas.h
 #ifdef __CINT__
 
 #pragma link off all globals;
@@ -8,8 +8,11 @@
 
 #pragma link C++ class TChannel-;
 
+#pragma link C++ class TPresetPad+;
+#pragma link C++ class TPresetCanvas-;
 
 #pragma link C++ function get_run_number;
+#pragma link C++ function FindColor;
 
 
 

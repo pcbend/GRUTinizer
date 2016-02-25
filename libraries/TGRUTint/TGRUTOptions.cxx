@@ -43,6 +43,7 @@ void TGRUTOptions::Clear(Option_t* opt) {
   fSortRoot   = false;
   fIsOnline   = false;
   fMakeHistos = false;
+  fSortMultiple = false;
 
   fShouldExit = false;
 }
@@ -98,6 +99,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("n no-sort", &fSortRaw)
     .description("Load raw data files without sorting")
     .default_value(true);
+  parser.option("m sort-multiple", &fSortMultiple)
+    .description("If passed multiple raw data files, treat them as one file.")
+    .default_value(false);
   parser.option("s sort", &fSortRoot)
     .description("Attempt to loop through root files.")
     .default_value(false);
@@ -220,7 +224,9 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename) const{
   } else if (ext == "inv") {
     return kFileType::S800_INVMAP;
   } else if (ext == "val"){
-      return kFileType::GVALUE;
+    return kFileType::GVALUE;
+  } else if (ext == "win"){
+    return kFileType::PRESETWINDOW;
   } else {
     return kFileType::UNKNOWN_FILETYPE;
   }
@@ -263,6 +269,9 @@ bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
       return true;
     case kFileType::GVALUE:
       input_val_files.push_back(filename);
+      return true;
+    case kFileType::PRESETWINDOW:
+      input_win_files.push_back(filename);
       return true;
     case kFileType::CONFIG_FILE:
       return false;

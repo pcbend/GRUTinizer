@@ -132,6 +132,15 @@ class MainWindow(object):
                            text='Load Root File',fg="black",bg="goldenrod",
                            command=self.LoadRootFile)
         button.pack(side=tk.LEFT)
+        
+        button = tk.Button(frame,
+                           text='Load Window File',fg="black",bg="goldenrod",
+                           command=self.LoadWindowFile)
+        button.pack(side=tk.LEFT)
+
+        frame.pack(fill=tk.X,expand=False)
+
+        frame = tk.Frame(self.window)
 
         button = tk.Button(frame,
                            text='Refresh',fg="black",bg="goldenrod",
@@ -146,6 +155,11 @@ class MainWindow(object):
         button = tk.Button(frame,
                            text='Reset All',fg="black",bg="goldenrod",
                            command=self.ResetAllHistograms)
+        button.pack(side=tk.LEFT)
+
+        button = tk.Button(frame,
+                           text='Resort Data',fg="black",bg="goldenrod",
+                           command=self.ResortDataFile)
         button.pack(side=tk.LEFT)
 
         frame.pack(fill=tk.X,expand=False)
@@ -348,6 +362,8 @@ class MainWindow(object):
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="8 x 4",onvalue='8x4',
                                   variable=self.predefinedzones,command=self.set_zones)
+        zonesmenu.add_checkbutton(label="9 x 4",onvalue='9x4',
+                                  variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="12 x 12",onvalue='12x12',
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="13 x 13",onvalue='13x13',
@@ -426,6 +442,9 @@ class MainWindow(object):
     def ResetAllHistograms(self):
         ROOT.TGRUTint.instance().ResetAllHistograms()
 
+    def ResortDataFile(self):
+        ROOT.TGRUTint.instance().ResortDataFile()
+
     def _draw_single(self,hist,color=1,nselected=1):
         canvas_exists = bool(filter(None,self.canvases))
 
@@ -481,6 +500,10 @@ class MainWindow(object):
 
             self.tcut_tab.AddDirectory(tdir)
 
+    def LoadCutG(self, cutg):
+        if cutg:
+            self.tcut_tab.AddCut(cutg)
+
     def LoadDataFile(self, filename = None):
         if filename is None:
             filename = tkFileDialog.askopenfilename(filetypes=(("NSCL Evt", "*.evt"),
@@ -509,6 +532,18 @@ class MainWindow(object):
             self.variable_tab.AddFile(tfile)
         else:
             print 'MainWindow.LoadRootFile: Could not open {}'.format(filename)
+
+    def LoadWindowFile(self,filename=None):
+        if filename is None:
+            filename = tkFileDialog.askopenfilename(filetypes=(("Window File","*.win"),))
+
+        if not filename:
+            return
+        filename = os.path.abspath(filename)
+        can = ROOT.TPresetCanvas()
+        can.ReadWinFile(filename)
+        can.Draw()
+
 
     def Run(self):
         self.window.mainloop()

@@ -17,6 +17,7 @@
 #include <TTree.h>
 #include <TUnixSystem.h>
 
+#include <TCutG.h>
 #include <TThread.h>
 #include <TMethodCall.h>
 #include <TVirtualPad.h>
@@ -82,7 +83,7 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
   fRawFilesOpened  = 0;
   fHistogramLoop = 0;
   fDataLoop = 0;
-
+  fChainLoop = 0;
 
   SetPrompt("GRizer [%d] ");
   TGRUTOptions::Get(argc, argv);
@@ -201,7 +202,7 @@ void TGRUTint::ApplyOptions() {
     if(opt->InputRing().length()) {
       source = new TRawEventRingSource(opt->InputRing(),
                                        opt->DefaultFileType());
-    } else if(opt->RawInputFiles().size() > 1){
+    } else if(opt->RawInputFiles().size() > 1 && opt->SortMultiple()){
       TMultiRawFile* multi_source = new TMultiRawFile();
       for(auto& filename : opt->RawInputFiles()){
         multi_source->AddFile(new TRawFileIn(filename.c_str()));
@@ -279,10 +280,13 @@ void TGRUTint::ApplyOptions() {
 
 
   //next, if given a root file and told to sort it.
-  TChainLoop* coop = NULL;
+  //TChainLoop* coop = NULL;
   if(gChain && (opt->MakeHistos() || opt->SortRoot()) ){
     printf("Attempting to sort root files.\n");
-    coop = TChainLoop::Get("1_chain_loop",gChain);
+    fChainLoop = TChainLoop::Get("1_chain_loop",gChain);
+    if(!opt->ExitAfterSorting()){
+      fChainLoop->SetSelfStopping(false);
+    }
     fHistogramLoop = THistogramLoop::Get("2_hist_loop");
     gChain->GetEntry(0);
     std::string histoutfile = "hist" + get_run_number(gChain->GetCurrentFile()->GetName()) + ".root";
@@ -298,15 +302,14 @@ void TGRUTint::ApplyOptions() {
       }
     }
     fHistogramLoop->SetOutputFilename(histoutfile);
-    coop->AttachHistogramLoop(fHistogramLoop);
+    fChainLoop->AttachHistogramLoop(fHistogramLoop);
     fHistogramLoop->Resume();
-    coop->Resume();
+    fChainLoop->Resume();
   }
 
   for(auto& filename : opt->MacroInputFiles()){
     RunMacroFile(filename);
   }
-
 
   if(opt->ExitAfterSorting()){
     while(StoppableThread::AnyThreadRunning()){
@@ -401,6 +404,13 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
   return file;
 }
 
+void TGRUTint::LoadTCutG(TCutG* cutg) {
+  if(TGRUTOptions::Get()->StartGUI()) {
+    TPython::Bind(cutg, "cutg");
+    ProcessLine("TPython::Exec(\"window.LoadCutG(cutg)\");");
+  }
+}
+
 void TGRUTint::LoadRawFile(std::string filename) {
   if(fDataLoop){
     TRawEventSource* source = new TRawFileIn(filename.c_str());
@@ -412,6 +422,25 @@ void TGRUTint::LoadRawFile(std::string filename) {
     fDataLoop->ReplaceSource(source);
   }
 }
+
+void TGRUTint::ResortDataFile() {
+  StoppableThread::PauseAll();
+  if(fDataLoop){
+    fDataLoop->ResetSource();
+    for(auto thread : StoppableThread::GetAll()){
+      thread->ClearQueue();
+    }
+  } else if(fChainLoop) {
+    fChainLoop->Restart();
+    for(auto thread : StoppableThread::GetAll()){
+      thread->ClearQueue();
+    }
+
+  }
+  StoppableThread::ResumeAll();
+}
+
+
 
 TRawFileIn *TGRUTint::OpenRawFile(const std::string& filename) {
   if(!file_exists(filename.c_str())){

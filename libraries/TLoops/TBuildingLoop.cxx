@@ -39,6 +39,12 @@ TBuildingLoop::~TBuildingLoop(){
   //delete next_event;
 }
 
+void TBuildingLoop::ClearQueue() {
+  std::vector<TRawEvent> event;
+  while(output_queue.Size()){
+    output_queue.Pop(event);
+  }
+}
 
 int TBuildingLoop::Pop(std::vector<TRawEvent> &event) {
   return output_queue.Pop(event);
@@ -73,7 +79,7 @@ bool TBuildingLoop::CheckBuildWindow(TRawEvent *event) {
   if(timestamp == -1){
     return false;
   }
-  
+
   if(timestamp > event_start + build_window ||
      timestamp < event_start - build_window) {
     //next_event->Build();

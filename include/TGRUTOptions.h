@@ -17,9 +17,11 @@ public:
 
   bool ShouldExit() { return fShouldExit; }
   const std::vector<std::string>& RawInputFiles()   { return input_raw_files;   }
+        std::vector<std::string>& GetRawInputFiles()   { return input_raw_files;   }
   const std::vector<std::string>& RootInputFiles()  { return input_root_files;  }
   const std::vector<std::string>& CalInputFiles()   { return input_cal_files;   }
   const std::vector<std::string>& ValInputFiles()   { return input_val_files;   }
+  const std::vector<std::string>& WinInputFiles()   { return input_win_files;   }
   const std::vector<std::string>& MacroInputFiles() { return input_macro_files; }
   const std::vector<std::string>& GuiSaveSetFiles() { return input_gui_hist_files; }
   const std::string& DetectorEnvironment()          { return detector_environment; }
@@ -41,6 +43,7 @@ public:
   bool ExtractWaves()       const { return fExtractWaves;  }
   bool StartGUI()           const { return fStartGui; }
   bool MakeHistos()         const { return fMakeHistos; }
+  bool SortMultiple()       const { return fSortMultiple; }
 
   bool IsOnline()           const { return fIsOnline; }
 
@@ -65,8 +68,10 @@ private:
 
   std::vector<std::string> input_raw_files;
   std::vector<std::string> input_root_files;
+  std::vector<std::string> input_cuts_files;
   std::vector<std::string> input_cal_files;
   std::vector<std::string> input_val_files;
+  std::vector<std::string> input_win_files;
   std::vector<std::string> input_macro_files;
   std::vector<std::string> input_gui_hist_files;
   std::string input_ring;
@@ -90,6 +95,7 @@ private:
   bool fIsOnline;
   bool fStartGui;
   bool fMakeHistos;
+  bool fSortMultiple;
 
   bool fTimeSortInput;
   int fTimeSortDepth;

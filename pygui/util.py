@@ -55,8 +55,8 @@ class TKeyDict(dict):
         if isinstance(output, ROOT.TKey):
             output = output.ReadObj()
             if (isinstance(output, ROOT.TH2) and
-                not isinstance(output, ROOT.GH2I)):
-                output = ROOT.GH2I(output)
+                not isinstance(output, ROOT.GH2Base)):
+                output = ROOT.GH2D(output)
             self[key] = output
 
         return output

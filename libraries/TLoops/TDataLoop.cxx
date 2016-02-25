@@ -4,6 +4,7 @@
 #include <thread>
 #include <utility>
 
+#include "TGRUTOptions.h"
 #include "TRawSource.h"
 #include "TString.h"
 
@@ -26,10 +27,22 @@ TDataLoop *TDataLoop::Get(std::string name,TRawEventSource* source) {
   return loop;
 }
 
+void TDataLoop::ClearQueue() {
+  TRawEvent event;
+  while(output_queue.Size()){
+    output_queue.Pop(event);
+  }
+}
+
 void TDataLoop::ReplaceSource(TRawEventSource* new_source) {
   std::lock_guard<std::mutex> lock(source_mutex);
   delete source;
   source = new_source;
+}
+
+void TDataLoop::ResetSource() {
+  std::lock_guard<std::mutex> lock(source_mutex);
+  source->Reset();
 }
 
 bool TDataLoop::Iteration() {
@@ -40,13 +53,20 @@ bool TDataLoop::Iteration() {
     bytes_read = source->Read(evt);
   }
 
-  if(bytes_read < 0 && fSelfStopping){
+  if(bytes_read < 0 && (TGRUTOptions::Get()->RawInputFiles().size()==1) && fSelfStopping){
     // Error, and no point in trying again.
-    printf("file finished??\n");
+    printf("finished sorting all input.\n");
     return false;
   } else if(bytes_read > 0){
     // A good event was returned
     output_queue.Push(evt);
+    return true;
+  } else if(bytes_read < 0 && (TGRUTOptions::Get()->RawInputFiles().size()>1)) { 
+    printf(DBLUE   "\nswitching form: %s" RESET_COLOR "n",TGRUTOptions::Get()->RawInputFiles().at(0).c_str());
+    TGRUTOptions::Get()->GetRawInputFiles().erase(TGRUTOptions::Get()->GetRawInputFiles().begin());
+    TRawFileIn *source  = new TRawFileIn(TGRUTOptions::Get()->RawInputFiles().at(0).c_str());
+    printf(DYELLOW "\n          to:   %s" RESET_COLOR "n",TGRUTOptions::Get()->RawInputFiles().at(0).c_str());
+    ReplaceSource(source);
     return true;
   } else {
     static TRawEventSource* source_ptr = NULL;
@@ -58,6 +78,7 @@ bool TDataLoop::Iteration() {
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     return true;
   }
+  return true;
 }
 
 int TDataLoop::Pop(TRawEvent &event) {

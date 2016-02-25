@@ -4,6 +4,8 @@
 #include <map>
 #include <string>
 
+#include <Rtypes.h>
+
 enum kDetectorSystems {
   UNKNOWN_SYSTEM = -1,
 
@@ -35,11 +37,14 @@ enum kFileType {
   ROOT_MACRO = 257,
   CALIBRATED = 512,
   GVALUE     = 513,
+  PRESETWINDOW = 514,
   DETECTOR_ENVIRONMENT = 1024,
   GUI_HIST_FILE = 2048,
   COMPILED_HISTOGRAMS = 2049,
   CONFIG_FILE = 2050,
   S800_INVMAP = 2051
 };
+
+extern std::map<std::string, EColor> color_system_map;
 
 #endif /* _TGRUTTYPES_H_ */

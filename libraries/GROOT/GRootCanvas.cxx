@@ -153,6 +153,9 @@ enum ERootCanvasCommands {
 #define kArrowKeyPress 25
 #define kArrowKeyRelease 26
 
+#define kButton1Ctrl 9
+#define kButton1CtrlMotion 10
+
 
 static const char *gOpenTypes[] = { "ROOT files",   "*.root",
                                     "All files",    "*",
@@ -1735,9 +1738,12 @@ Bool_t GRootCanvas::HandleContainerButton(Event_t *event)
          gSystem->ProcessEvents();
       }
       fButton = button;
+      //printf("Event_t::State = 0x%08x\n",event->fState);
       if (button == kButton1) {
          if (event->fState & kKeyShiftMask)
             ((GCanvas*)fCanvas)->HandleInput(kButton1Shift, x, y);
+         else if(event->fState & kKeyControlMask)
+            ((GCanvas*)fCanvas)->HandleInput(kButton1Ctrl, x, y);
          else
             ((GCanvas*)fCanvas)->HandleInput(kButton1Down, x, y);
       }

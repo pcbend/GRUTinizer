@@ -23,11 +23,14 @@ public:
 
   void Write();
 
+  virtual void ClearQueue();
+
   void SetReplaceVariable(const char* name, double value);
   void RemoveVariable(const char* name);
   TList* GetVariables();
 
   TList* GetObjects();
+  TList* GetGates();
 
   size_t GetItemsPopped()  { return input_queue.ItemsPopped(); }
   size_t GetItemsPushed()  { return input_queue.ItemsPushed(); }

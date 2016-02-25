@@ -2,6 +2,7 @@
 #define _RUNTIMEOBJECTS_H_
 
 #include <string>
+#include <map>
 
 #include "TCutG.h"
 #include "TDirectory.h"
@@ -17,24 +18,37 @@ class TH2;
    For each event, an instance of this type will be passed to the custom histogrammer.
    This class contains all detectors present, and all existing cuts and histograms.
  */
-class TRuntimeObjects : public TObject {
+class TRuntimeObjects : public TNamed {
 public:
   /// Constructor
-  TRuntimeObjects(TUnpackedEvent& detectors,
+  TRuntimeObjects(TUnpackedEvent *detectors,
                   TList* objects,
                   TList* variables,
-                  TDirectory* directory=NULL);
+                  TList* gates,
+                  TDirectory* directory=NULL,
+                  const char *name="default");
+  TRuntimeObjects(TList* objects,
+                  TList* variables,
+                  TList* gates,
+                  TDirectory* directory=NULL,
+                  const char *name="default");
 
   /// Returns a pointer to the detector of type T
   template<typename T>
   T* GetDetector(){
-    return detectors.GetDetector<T>();
+    return detectors->GetDetector<T>();
   }
 
   TCutG* GetCut(const std::string& name);
 
   TList& GetObjects();
+  TList& GetGates();
   TList& GetVariables();
+
+  TList* GetObjectsPtr()    { return objects;   }
+  TList* GetGatesPtr()      { return gates;     }
+  TList* GetVariablesPtr()  { return variables; }
+
 
   TH1* FillHistogram(std::string name,
                      int bins, double low, double high, double value);
@@ -44,13 +58,29 @@ public:
   TH2* FillHistogramSym(std::string name,
                      int Xbins, double Xlow, double Xhigh, double Xvalue,
                      int Ybins, double Ylow, double Yhigh, double Yvalue);
-
+  //---------------------------------------------------------------------
+  TDirectory* FillHistogram(std::string dirname,std::string name,
+		     int bins, double low, double high, double value);
+  TDirectory* FillHistogram(std::string dirname,std::string name,
+                     int Xbins, double Xlow, double Xhigh, double Xvalue,
+                     int Ybins, double Ylow, double Yhigh, double Yvalue);
+  TDirectory* FillHistogramSym(std::string dirname,std::string name,
+                     int Xbins, double Xlow, double Xhigh, double Xvalue,
+                     int Ybins, double Ylow, double Yhigh, double Yvalue);
+  
+  
   double GetVariable(const char* name);
 
+  static TRuntimeObjects *Get(std::string name="default") { if(fRuntimeMap.count(name)) return fRuntimeMap.at(name); return 0; }
+
+  void SetDetectors(TUnpackedEvent *det) { detectors = det; }
+
 private:
-  TUnpackedEvent& detectors;
+  static std::map<std::string,TRuntimeObjects*> fRuntimeMap;
+  TUnpackedEvent *detectors;
   TList* objects;
   TList* variables;
+  TList* gates;
   TDirectory* directory;
 
 

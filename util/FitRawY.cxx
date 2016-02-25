@@ -15,6 +15,8 @@
 #include "TPaveText.h"
 #include "TRandom.h"
 
+#include "TApplication.h"
+
 //#include <map>
 
 using namespace std;
@@ -28,18 +30,26 @@ TH2F* masterall = new TH2F("masterall","masterall",
 TH2F* masterallcore = new TH2F("masterallcore","masterallcore",
                                1000,0,1000,8000,0,8000);
 
-TList *FitRawY(TH1 *hist,bool draw=false,bool is_core=false) { //,TChannel *chan=0) {
+static int fit_attempts = 0;
+
+TList *FitRawY(TH1 *hist,bool draw=false,bool is_core=false,double threshold=.18,bool sub = true) { //,TChannel *chan=0) {
   TList *list = 0;
-  if(!hist)
+  printf("threshold = %.02f\n",threshold);
+  if(!hist || threshold < 0.01) {
+    printf("min threshold reach.\n");
+
     return list;
+  }
   list = new TList;
   list->Add(hist);
-  TH1 *bg = hist->ShowBackground(100,"");
-  bg->SetNameTitle(Form("%s_bg",hist->GetName()),Form("%s_bg",hist->GetName()));
-  list->Add(bg);
   TH1 *newhist = (TH1*)hist->Clone(Form("%s_bgsub",hist->GetName()));
-  newhist->SetTitle(Form("%s_bgsub",hist->GetName()));
-  newhist->Add(bg,-1);
+  if(sub) {
+    TH1 *bg = hist->ShowBackground(100,"");
+    bg->SetNameTitle(Form("%s_bg",hist->GetName()),Form("%s_bg",hist->GetName()));
+    list->Add(bg);
+    newhist->SetTitle(Form("%s_bgsub",hist->GetName()));
+    newhist->Add(bg,-1);
+  }
   list->Add(newhist);
 
   if(is_core){
@@ -50,10 +60,25 @@ TList *FitRawY(TH1 *hist,bool draw=false,bool is_core=false) { //,TChannel *chan
     newhist->GetXaxis()->SetRangeUser(2000,newhist->GetXaxis()->GetXmax());
   }
   TSpectrum s;
-  s.Search(newhist,2.0,"",.2);
+  s.Search(newhist,2.0,"",threshold);
 
-  if(s.GetNPeaks()!=2)
-    printf("Raw Y fit failed.");
+  if(s.GetNPeaks()!=2) {
+    printf("Raw Y fit failed. %i\t",s.GetNPeaks());
+    //fit_attempts++;
+    //if(fit_attempts>50) {
+    //  printf(" max attempts reached.\n"); fflush(stdout);
+    //  return list;
+    //}
+    //if(s.GetNPeaks()>2) {
+    //  printf(" trying increased threshold\n");  fflush(stdout);
+    //  list->Delete();
+    //  return FitRawY(newhist,draw,is_core,threshold+.02,false);
+    //} else {
+    //  printf(" trying decreased threshold\n");  fflush(stdout);
+    //  list->Delete();
+    //  return FitRawY(newhist,draw,is_core,threshold-.02,false);
+    //}
+  }
 
   double highx = s.GetPositionX()[0];
   double highy = s.GetPositionY()[0];
@@ -199,10 +224,12 @@ TList *MakeSummary(TH2 *hist,int qnum){
     printf("%s\n",HistName.c_str());
     TH1D *raw = hist->ProjectionY(HistName.c_str(),i,i);
 
+    fit_attempts = 0;
     TList *fit_list;
     if((i%10)==0) {
       fit_list = FitRawY(raw,true, true);
     } else {
+      continue;
       fit_list = FitRawY(raw,false, false);
     }
     list->Add(fit_list);

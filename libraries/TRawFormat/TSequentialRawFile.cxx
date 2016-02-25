@@ -14,6 +14,13 @@ void TSequentialRawFile::Add(TRawEventSource* infile) {
   sources.push_back(infile);
 }
 
+void TSequentialRawFile::Reset() {
+  for(auto source : sources){
+    source->Reset();
+  }
+  active_source = 0;
+}
+
 std::string TSequentialRawFile::SourceDescription() const {
   if(sources.size()){
     return sources[0]->SourceDescription();

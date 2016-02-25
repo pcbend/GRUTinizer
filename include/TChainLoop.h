@@ -3,7 +3,10 @@
 
 #ifndef __CINT__
 #include <atomic>
+#include <condition_variable>
+#include <thread>
 #endif
+
 
 #include <map>
 #include <vector>
@@ -36,6 +39,10 @@ public:
   bool AttachHistogramLoop(THistogramLoop *loop) {hist_loop = loop; return loop; }
 
   virtual std::string Status();
+  
+  void SetSelfStopping(bool self_stopping) { fSelfStopping = self_stopping; }
+  bool GetSelfStopping() const { return fSelfStopping; }
+  void Restart();
 
 protected:
   bool Iteration();
@@ -53,6 +60,8 @@ private:
 
   TChain *input_chain;
   THistogramLoop *hist_loop;
+  
+  bool fSelfStopping;
 
   //std::mutex input_queue_mutex;
   //std::vector<TUnpackingLoop*> input_queues;
@@ -61,6 +70,10 @@ private:
   int SetupChain();
   std::map<TClass*, TDetector**> det_map;
   //std::vector<TUnpackedEvent*> learning_queue;
+
+#ifndef __CINT__
+  std::mutex restart_mutex;
+#endif
 
   ClassDef(TChainLoop, 0);
 };
