@@ -2,7 +2,13 @@
 
 #include <iostream>
 
+#include "TVirtualPad.h"
 #include "GH2I.h"
+#include "GH2D.h"
+
+#include "TFrame.h"
+//#include "TROOT.h"
+//#include "TSystem.h"
 
 GH1D::GH1D(const TH1D& source)
   : parent(NULL), projection_axis(-1) {
@@ -49,9 +55,32 @@ void GH1D::Copy(TObject& obj) const {
   ((GH1D&)obj).parent = parent;
 }
 
+
+void GH1D::Draw(Option_t* opt) {
+  TH1D::Draw(opt);
+  gPad->Update();
+  gPad->GetFrame()->SetBit(TBox::kCannotMove);
+}
+
+TH1 *GH1D::DrawCopy(Option_t *opt) const {
+  TH1 *h = TH1D::DrawCopy(opt);
+  gPad->Update();
+  gPad->GetFrame()->SetBit(TBox::kCannotMove);
+  return h;
+}
+
+TH1 *GH1D::DrawNormalized(Option_t *opt,Double_t norm) const {
+  TH1 *h = TH1D::DrawNormalized(opt,norm);
+  gPad->Update();
+  gPad->GetFrame()->SetBit(TBox::kCannotMove);
+  return h;
+}
+
+
+
 GH1D* GH1D::GetPrevious() const {
-  if(parent.GetObject() && parent.GetObject()->InheritsFrom(GH2I::Class())) {
-    GH2I* gpar = (GH2I*)parent.GetObject();
+  if(parent.GetObject() && parent.GetObject()->InheritsFrom(GH2Base::Class())) {
+    GH2D* gpar = (GH2D*)parent.GetObject();
     return gpar->GetPrevious(this);
   } else {
     return NULL;
@@ -59,8 +88,8 @@ GH1D* GH1D::GetPrevious() const {
 }
 
 GH1D* GH1D::GetNext() const {
-  if(parent.GetObject() && parent.GetObject()->InheritsFrom(GH2I::Class())) {
-    GH2I* gpar = (GH2I*)parent.GetObject();
+  if(parent.GetObject() && parent.GetObject()->InheritsFrom(GH2Base::Class())) {
+    GH2D* gpar = (GH2D*)parent.GetObject();
     return gpar->GetNext(this);
   } else {
     return NULL;
@@ -69,12 +98,12 @@ GH1D* GH1D::GetNext() const {
 
 GH1D* GH1D::Project(double value_low, double value_high) const {
 
-  if(parent.GetObject() && parent.GetObject()->InheritsFrom(GH2I::Class()) &&
+  if(parent.GetObject() && parent.GetObject()->InheritsFrom(GH2Base::Class()) &&
      projection_axis!=-1) {
     if(value_low > value_high){
       std::swap(value_low, value_high);
     }
-    GH2I* gpar = (GH2I*)parent.GetObject();
+    GH2D* gpar = (GH2D*)parent.GetObject();
     if(projection_axis == 0){
       int bin_low  = gpar->GetXaxis()->FindBin(value_low);
       int bin_high = gpar->GetXaxis()->FindBin(value_high);
@@ -92,7 +121,7 @@ GH1D* GH1D::Project(double value_low, double value_high) const {
 GH1D* GH1D::Project_Background(double value_low, double value_high,
                                double bg_value_low, double bg_value_high,
                                kBackgroundSubtraction mode) const {
-  if(parent.GetObject() && parent.GetObject()->InheritsFrom(GH2I::Class()) &&
+  if(parent.GetObject() && parent.GetObject()->InheritsFrom(GH2Base::Class()) &&
      projection_axis!=-1) {
     if(value_low > value_high){
       std::swap(value_low, value_high);
@@ -101,7 +130,7 @@ GH1D* GH1D::Project_Background(double value_low, double value_high,
       std::swap(bg_value_low, bg_value_high);
     }
 
-    GH2I* gpar = (GH2I*)parent.GetObject();
+    GH2D* gpar = (GH2D*)parent.GetObject();
     if(projection_axis == 0){
       int bin_low     = gpar->GetXaxis()->FindBin(value_low);
       int bin_high    = gpar->GetXaxis()->FindBin(value_high);

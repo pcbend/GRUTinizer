@@ -20,7 +20,6 @@ public:
 
   GH1D(const TH1D& source);
   //GH1D(const TH1 *source);
-
   //virtual void SetOption(Option_t* option=" ");
 
   TObject* GetParent() const { return parent.GetObject(); }
@@ -32,6 +31,11 @@ public:
   void Clear(Option_t* opt="");
   void Print(Option_t* opt="") const;
   void Copy(TObject& obj) const;
+  void Draw(Option_t* opt="");
+  TH1 *DrawCopy(Option_t *opt="") const;
+  TH1 *DrawNormalized(Option_t *opt="",Double_t norm=1) const;
+
+
 
   GH1D* GetPrevious() const;
   GH1D* GetNext() const;
