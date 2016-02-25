@@ -7,6 +7,8 @@
 #include <TNamed.h>
 #include <TH2.h>
 #include <TList.h>
+#include <TVirtualPad.h>
+#include <TFrame.h>
 
 #include <GH2Base.h>
 
@@ -28,6 +30,8 @@ public:
   ~GH2I();
 
   virtual void Draw(Option_t *opt="");
+  TH1 *DrawCopy(Option_t *opt="") const;
+  TH1 *DrawNormalized(Option_t *opt="",Double_t norm=1) const;
 
   virtual void Clear(Option_t *opt="");
   virtual void Print(Option_t *opt="") const;

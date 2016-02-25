@@ -58,21 +58,27 @@ void GH1D::Copy(TObject& obj) const {
 
 void GH1D::Draw(Option_t* opt) {
   TH1D::Draw(opt);
-  gPad->Update();
-  gPad->GetFrame()->SetBit(TBox::kCannotMove);
+  if(gPad) {
+    gPad->Update();
+    gPad->GetFrame()->SetBit(TBox::kCannotMove);
+  }
 }
 
 TH1 *GH1D::DrawCopy(Option_t *opt) const {
   TH1 *h = TH1D::DrawCopy(opt);
-  gPad->Update();
-  gPad->GetFrame()->SetBit(TBox::kCannotMove);
+  if(gPad) {
+    gPad->Update();
+    gPad->GetFrame()->SetBit(TBox::kCannotMove);
+  }
   return h;
 }
 
 TH1 *GH1D::DrawNormalized(Option_t *opt,Double_t norm) const {
   TH1 *h = TH1D::DrawNormalized(opt,norm);
-  gPad->Update();
-  gPad->GetFrame()->SetBit(TBox::kCannotMove);
+  if(gPad) {
+    gPad->Update();
+    gPad->GetFrame()->SetBit(TBox::kCannotMove);
+  }
   return h;
 }
 

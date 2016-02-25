@@ -73,7 +73,37 @@ void GH2I::Draw(Option_t *opt) {
     option = "colz";
   }
   TH2I::Draw(option.c_str());
+  if(gPad) {
+    gPad->Update();
+    gPad->GetFrame()->SetBit(TBox::kCannotMove);
+  }
 }
+
+TH1 *GH2I::DrawCopy(Option_t *opt) const {
+  TH1 *h = TH2I::DrawCopy(opt);
+  if(gPad) {
+    gPad->Update();
+    gPad->GetFrame()->SetBit(TBox::kCannotMove);
+  }
+  return h;
+}
+
+TH1 *GH2I::DrawNormalized(Option_t *opt,Double_t norm) const {
+  TH1 *h = TH2I::DrawNormalized(opt,norm);
+  if(gPad) {
+    gPad->Update();
+    gPad->GetFrame()->SetBit(TBox::kCannotMove);
+  }
+  return h;
+}
+
+
+
+
+
+
+
+
 
 
 GH1D* GH2I::ProjectionX(const char* name,
