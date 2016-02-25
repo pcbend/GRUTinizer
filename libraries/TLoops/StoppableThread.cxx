@@ -28,6 +28,7 @@ StoppableThread::StoppableThread(std::string name)
 
 }
 
+
 void StoppableThread::StopAll() {
   std::cout << "Stopping status thread" << std::endl;
   stop_status_thread();

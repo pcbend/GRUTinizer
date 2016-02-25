@@ -100,14 +100,14 @@ void MakeHistograms(TRuntimeObjects& obj) {
     return;
 
 
-  if(s800) {
-    std::string histname = "S800_DTA";
-    obj.FillHistogram(histname,200,-10,10,s800->GetDta());
+  //if(s800) {
+    //std::string histname = "S800_DTA";
+    //obj.FillHistogram(histname,200,-10,10,s800->GetDta());
     
-    histname = "S800_YTA";
-    obj.FillHistogram(histname,200,-10,10,s800->GetYta());
+    //histname = "S800_YTA";
+    //obj.FillHistogram(histname,200,-10,10,s800->GetYta());
 
-  }
+  //}
 
   double gsum = 0.0;
   for(int y=0;y<gretina->Size();y++) {
@@ -254,11 +254,11 @@ void MakeHistograms(TRuntimeObjects& obj) {
     obj.FillHistogram(histname,8000,0,4000,hit.GetDoppler(BETA));
 
     histname = "GretinaDopplerBeta";
-    double beta = 0.2;
+    double beta = 0.00;
     for(int z=0;z<100;z++) {
-      beta += .3/100.0;
+      beta += .1/100.0;
       obj.FillHistogram(histname,8000,0,4000,hit.GetCoreEnergy(beta),
-                                 101,0.2,0.5,beta);
+                                 101,0.0,0.1,beta);
     }
 
     histname = Form("Q%iCoreCharge",HoleQMap[hit.GetCrystalId()/4]);

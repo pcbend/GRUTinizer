@@ -29,13 +29,17 @@ public:
   Long_t GetTimestamp()    { return Timestamp(); }
 
   TVector3 CRDCTrack();  // not a finished method
+  TVector3 ExitTargetVect_Spec(int order=6);
   float GetAFP() const;
   float GetBFP() const;
-  void MapCalc(float *input);
-  Float_t GetAta()         { return fAta; }
-  Float_t GetYta()         { return fYta; }
-  Float_t GetBta()         { return fBta; }
-  Float_t GetDta()         { return fDta; }
+  float MapCalc_SpecTCL(int calcorder,int parameter,float *input);
+
+  Float_t GetAta_Spec(int i=6);
+  Float_t GetYta_Spec(int i=6);
+  Float_t GetBta_Spec(int i=6);
+  Float_t GetDta_Spec(int i=6);
+
+  //bool InvMapLoaded()      { return fMapLoaded; }
 
   virtual void Copy(TObject& obj)        const;
   //virtual void Print(Option_t *opt = "") const;
@@ -66,7 +70,18 @@ public:
 
 private:
 
-  bool ReadInvMap();
+  //---------------------
+  static std::vector<short> fmaxcoefficient;                      //!
+  static std::vector<std::vector<short> > forder;                 //!
+  static std::vector<std::vector<std::vector<short> > > fexponent;//!
+  static std::vector<std::vector<float> > fcoefficient;           //!
+  static short fmaxorder;                                         //!
+  static float fbrho;                                             //!
+  static int fmass;                                               //!
+  static int fcharge;                                             //!
+  //---------------------
+
+  void ReadMap_SpecTCL();
   virtual int  BuildHits();
 
   bool HandleTrigPacket(unsigned short*,int);     //!
@@ -76,25 +91,6 @@ private:
   bool HandleCRDCPacket(unsigned short*,int);     //!
   bool HandleMTDCPacket(unsigned short*,int);     //!
 
-  struct S800_InvMapLine {
-    float coef;
-    int order,exp[6];
-    void Clear(){
-      coef = -1; order = -1;
-      for(int i=0;i<6;i++)
-	exp[i]=-1;
-    }
-  }; //!
-  S800_InvMapLine fIML;                           //!
-  static std::vector<S800_InvMapLine> fIML_sec1;  //!
-  static std::vector<S800_InvMapLine> fIML_sec2;  //!
-  static std::vector<S800_InvMapLine> fIML_sec3;  //!
-  static std::vector<S800_InvMapLine> fIML_sec4;  //!
-  static short fMaxOrder;                         //!
-  static float fBrho;                             //!
-  static int fMass;                               //!
-  static int fCharge;                             //!
-
   TScintillator scint[3];
   TTrigger     trigger;
   TTof         tof;
@@ -103,11 +99,42 @@ private:
   TCrdc        crdc[2];
   //THodoscope   hodo[32];
   //TMultiHitTof multi_tof;
+  
+  //std::map<int,Float_t> fAta;
+  //std::map<int,Float_t> fYta;
+  //std::map<int,Float_t> fBta;
+  //std::map<int,Float_t> fDta;
+  
+  Float_t fAtaTCL1;
+  Float_t fYtaTCL1;
+  Float_t fBtaTCL1;
+  Float_t fDtaTCL1;
 
-  Float_t fAta;
-  Float_t fYta;
-  Float_t fBta;
-  Float_t fDta;
+  Float_t fAtaTCL2;
+  Float_t fYtaTCL2;
+  Float_t fBtaTCL2;
+  Float_t fDtaTCL2;
+
+  Float_t fAtaTCL3;
+  Float_t fYtaTCL3;
+  Float_t fBtaTCL3;
+  Float_t fDtaTCL3;
+
+  Float_t fAtaTCL4;
+  Float_t fYtaTCL4;
+  Float_t fBtaTCL4;
+  Float_t fDtaTCL4;
+
+  Float_t fAtaTCL5;
+  Float_t fYtaTCL5;
+  Float_t fBtaTCL5;
+  Float_t fDtaTCL5;
+
+  Float_t fAtaTCL6;
+  Float_t fYtaTCL6;
+  Float_t fBtaTCL6;
+  Float_t fDtaTCL6;
+  
 
   Long_t fEventCounter;
 

@@ -1,4 +1,4 @@
-// GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GRootBrowser.h GCanvas.h GH2I.h  GPeak.h GValue.h GH1D.h GrutNotifier.h GPopup.h
+// GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GRootBrowser.h GCanvas.h GH2Base.h  GH2I.h GH2D.h  GPeak.h GValue.h GH1D.h GrutNotifier.h GPopup.h
 
 
 #ifdef __CINT__
@@ -33,6 +33,9 @@
 #pragma link C++ function GrabHist;
 #pragma link C++ function StartGUI();
 
+#pragma link C++ enum EAxis;
+#pragma link C++ function AddOffset;
+
 
 #pragma link C++ class GPopup+;
 
@@ -46,8 +49,11 @@
 #pragma link C++ class GBrowserPlugin+;
 #pragma link C++ class GRootGuiFactory+;
 
+
 #pragma link C++ class GH1D+;
+#pragma link C++ class GH2Base+;
 #pragma link C++ class GH2I+;
+#pragma link C++ class GH2D+;
 
 #pragma link C++ class GPeak+;
 //#pragma link C++ class GEfficiency+;
