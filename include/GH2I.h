@@ -47,7 +47,7 @@ public:
   virtual TH2 *GetTH2() { return this; }
 
 private:
-  ClassDef(GH2I,1)
+  ClassDef(GH2I,2)
 };
 
 #endif
