@@ -12,7 +12,7 @@
 
 class GH1D;
 
-class GH2D : public TH2I , public GH2Base {
+class GH2D : public TH2D , public GH2Base {
 
 public:
   GH2D() { }
