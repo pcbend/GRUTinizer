@@ -33,6 +33,7 @@
 //#include "GROOTGuiFactory.h"
 #include "GRootCommands.h"
 #include "GH2I.h"
+#include "GH2D.h"
 #include "GH1D.h"
 
 #include "TRuntimeObjects.h"
@@ -562,7 +563,7 @@ bool GCanvas::HandleMouseShiftPress(Int_t event,Int_t x,Int_t y) {
       return true;
     case 2:
       options.Append("colz");
-      GH2I *ghist = new GH2I(*((TH2*)hist));
+      GH2D *ghist = new GH2D(*((TH2*)hist));
       new GCanvas();
       ghist->Draw();
       return true;
@@ -1032,10 +1033,10 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       break;
 
     case kKey_P: {
-      GH2I* ghist = NULL;
+      GH2D* ghist = NULL;
       for(auto hist : hists){
-        if(hist->InheritsFrom(GH2I::Class())){
-          ghist = (GH2I*)hist;
+        if(hist->InheritsFrom(GH2Base::Class())){
+          ghist = (GH2D*)hist;
           break;
         }
       }
@@ -1048,10 +1049,10 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       break;
 
     case kKey_x: {
-      GH2I* ghist = NULL;
+      GH2D* ghist = NULL;
       for(auto hist : hists) {
-        if(hist->InheritsFrom(GH2I::Class())){
-          ghist = (GH2I*)hist;
+        if(hist->InheritsFrom(GH2Base::Class())){
+          ghist = (GH2D*)hist;
           break;
         }
       }
@@ -1068,10 +1069,10 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       break;
 
     case kKey_X: {
-      GH2I* ghist = NULL;
+      GH2D* ghist = NULL;
       for(auto hist : hists) {
-        if(hist->InheritsFrom(GH2I::Class())){
-          ghist = (GH2I*)hist;
+        if(hist->InheritsFrom(GH2Base::Class())){
+          ghist = (GH2D*)hist;
           break;
         }
       }
@@ -1090,10 +1091,10 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       break;
 
     case kKey_y: {
-      GH2I* ghist = NULL;
+      GH2D* ghist = NULL;
       for(auto hist : hists) {
-        if(hist->InheritsFrom(GH2I::Class())){
-          ghist = (GH2I*)hist;
+        if(hist->InheritsFrom(GH2Base::Class())){
+          ghist = (GH2D*)hist;
           break;
         }
       }
@@ -1113,10 +1114,10 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       break;
 
     case kKey_Y: {
-      GH2I* ghist = NULL;
+      GH2D* ghist = NULL;
       for(auto hist : hists) {
-        if(hist->InheritsFrom(GH2I::Class())){
-          ghist = (GH2I*)hist;
+        if(hist->InheritsFrom(GH2Base::Class())){
+          ghist = (GH2D*)hist;
           break;
         }
       }
