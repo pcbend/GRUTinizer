@@ -275,6 +275,35 @@ struct GEBMode3Data {
 friend std::ostream& operator<<(std::ostream& os, const GEBMode3Data &data);
 static void SwapMode3Data(GEBMode3Data &data);
 
+struct GEBArgonneLEDHead {
+  UShort_t a2;
+  UShort_t a1;
+  UShort_t lengthGA;
+  UShort_t board_id;
+}__attribute__((__packed__));
+
+//friend std::ostream& operator<<(std::ostream& os, const GEBArgonneLEDHead &head);
+//static void SwapArgonneLEDHead(GEBArgonneLEDHead &head);
+
+struct GEBArgonneLEDData {
+  UShort_t led_middle;
+  UShort_t led_low;
+  UShort_t energy_low;
+  UShort_t led_high;
+  UShort_t cfd_low;
+  UShort_t energy_high;
+  UShort_t cfd_high;
+  UShort_t cfd_middle;
+  UShort_t cfd_pt1_high;
+  UShort_t cfd_pt1_low;
+  UShort_t cfd_pt2_high;
+  UShort_t cfd_pt2_low;
+}__attribute__((__packed__));
+
+//friend std::ostream& operator<<(std::ostream& os, const GEBArgonneLEDData &data);
+//static void SwapArgonneLEDData(GEBArgonneLEDData &data);
+
+
 struct GEBS800Header {
   Int_t    total_size;
   UShort_t total_size2;
