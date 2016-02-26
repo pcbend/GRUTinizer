@@ -307,11 +307,11 @@ TVector3 TGretinaHit::GetFirstIntPosition() const {
   if(std::isnan(xoffset))
     xoffset=0.00;
   double yoffset = GValue::Value("GRETINA_Y_OFFSET");
-  if(std::isnan(xoffset))
-    xoffset=0.00;
+  if(std::isnan(yoffset))
+    yoffset=0.00;
   double zoffset = GValue::Value("GRETINA_Z_OFFSET");
-  if(std::isnan(xoffset))
-    xoffset=0.00;
+  if(std::isnan(zoffset))
+    zoffset=0.00;
  
   TVector3 offset(xoffset,yoffset,zoffset);
   

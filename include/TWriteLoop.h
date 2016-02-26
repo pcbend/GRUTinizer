@@ -29,7 +29,7 @@ public:
 
   void Write();
 
-  size_t GetItemsPushed()  { return event_tree->GetEntries();   }
+  size_t GetItemsPushed()  { return items_handled; }
   size_t GetItemsPopped()  { return 0; }
   size_t GetItemsCurrent() { return 0;      }
   size_t GetRate()         { return 0; }
@@ -53,6 +53,8 @@ private:
   std::vector<TUnpackingLoop*> input_queues;
   TTree* event_tree;
   std::map<TClass*, TDetector**> det_map;
+
+  size_t items_handled;
 #endif
 
   ClassDef(TWriteLoop, 0);

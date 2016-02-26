@@ -68,17 +68,21 @@ std::string TChainLoop::Status() {
 }
 
 
-void TChainLoop::Restart() { 
+void TChainLoop::Restart() {
   std::lock_guard<std::mutex> lock(restart_mutex);
-  fEntriesRead = 0; 
+  fEntriesRead = 0;
   return;
+}
+
+void TChainLoop::OnEnd() {
+  if(hist_loop){
+    hist_loop->SendStop();
+  }
 }
 
 bool TChainLoop::Iteration() {
   if(fEntriesRead >= fEntriesTotal){
     if(fSelfStopping) {
-      if(hist_loop)
-        hist_loop->SendStop();
       return false;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));

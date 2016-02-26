@@ -1,5 +1,5 @@
-#ifndef GH2I__H
-#define GH2I__H
+#ifndef GH2D__H
+#define GH2D__H
 
 #include <cstdio>
 #include <map>
@@ -14,20 +14,20 @@
 
 class GH1D;
 
-class GH2I : public TH2I , public GH2Base {
+class GH2D : public TH2D , public GH2Base {
 
 public:
-  GH2I() { }
-  GH2I(const TObject&);
-  GH2I(const char *name,const char *title,Int_t nbinsx,const Double_t *xbins,Int_t nbinsy, const Double_t *ybins);
-  GH2I(const char *name,const char *title,Int_t nbinsx,const Float_t *xbins,Int_t nbinsy, const Float_t *ybins);
-  GH2I(const char *name,const char *title,Int_t nbinsx,const Double_t *xbins,
+  GH2D() { }
+  GH2D(const TObject&);
+  GH2D(const char *name,const char *title,Int_t nbinsx,const Double_t *xbins,Int_t nbinsy, const Double_t *ybins);
+  GH2D(const char *name,const char *title,Int_t nbinsx,const Float_t *xbins,Int_t nbinsy, const Float_t *ybins);
+  GH2D(const char *name,const char *title,Int_t nbinsx,const Double_t *xbins,
                                           Int_t nbinsy, Double_t ylow, Double_t yup);
-  GH2I(const char *name,const char *title,Int_t nbinsx, Double_t xlow, Double_t xup,
+  GH2D(const char *name,const char *title,Int_t nbinsx, Double_t xlow, Double_t xup,
                                           Int_t nbinsy, Double_t *ybins);
-  GH2I(const char *name,const char *title,Int_t nbinsx, Double_t xlow, Double_t xup,
+  GH2D(const char *name,const char *title,Int_t nbinsx, Double_t xlow, Double_t xup,
                                           Int_t nbinsy, Double_t ylow, Double_t yup);
-  ~GH2I();
+  ~GH2D();
 
   virtual void Draw(Option_t *opt="");
   TH1 *DrawCopy(Option_t *opt="") const;
@@ -51,7 +51,7 @@ public:
   virtual TH2 *GetTH2() { return this; }
 
 private:
-  ClassDef(GH2I,2)
+  ClassDef(GH2D,1)
 };
 
 #endif
