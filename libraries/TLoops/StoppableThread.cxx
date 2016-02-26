@@ -189,6 +189,8 @@ void StoppableThread::Loop() {
       break;
     }
   }
+
+  OnEnd();
 }
 
 void StoppableThread::Print() {

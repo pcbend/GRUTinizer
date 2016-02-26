@@ -34,6 +34,7 @@ public:
   bool IsRunning();
   void Join();
 
+  virtual void OnEnd() { }
   virtual std::string Status();
   std::string Name() const     { return fname; }
 
