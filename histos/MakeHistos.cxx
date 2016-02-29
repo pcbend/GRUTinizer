@@ -343,7 +343,15 @@ void MakeHistograms(TRuntimeObjects& obj) {
 			2000,0,4000,hit.GetCoreEnergy(beta),
 			101,0.2,0.5,beta);
     }
+
+    //--------------------------------------------------------------------
+    dirname = "VectCorrByXtal";
+    histname = Form("Gret_VectCorr_Xtal");
     
+    obj.FillHistogram(dirname,histname,
+			100,0,100,hit.GetCrystalId(),
+			2000,0,4000,hit.GetDoppler(BETA,&trackvect_Spec));
+
     //--------------------------------------------------------------------
     dirname  = "VectGretResDiag";
     histname = "GretinaDoppVectTotal";

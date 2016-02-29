@@ -1062,6 +1062,45 @@ float TS800::GetTofE1_MTDC(float c1,float c2,int i) const {
    return sqrt(-1.0);
 }
 
+float TS800::GetOBJRaw_TAC() const {
+  return (GetTof().GetTacOBJ());
+}
+float TS800::GetOBJRaw() const {
+  return (GetTof().GetOBJ() - GetScint().GetTimeUp()); // Time in OBJ - Time in E1
+}
+float TS800::GetOBJRaw_MESY(int i) const {
+  std::vector<float> result;
+  for(unsigned int x=0;x<mtof.fObj.size();x++) {
+    for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
+      result.push_back( mtof.fObj.at(x) - mtof.fE1Up.at(y));
+      }
+    }
+
+  if(result.size()>(unsigned int)i)
+    return result.at(i);
+  return sqrt(-1.0);
+}
+
+float TS800::GetXFRaw_TAC() const {
+  return (GetTof().GetTacXFP());
+}
+float TS800::GetXFRaw() const {
+  return (GetTof().GetXFP() - GetScint().GetTimeUp()); // Time in XF - Time in E1
+}
+float TS800::GetXFRaw_MESY(int i) const {
+  std::vector<float> result;
+  for(unsigned int x=0;x<mtof.fXfp.size();x++) {
+    for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
+      result.push_back( mtof.fXfp.at(x) - mtof.fE1Up.at(y));
+    }
+  }
+  if(result.size()>(unsigned int)i)
+    return result.at(i);
+  return sqrt(-1.0);
+}
+
+
+
 float TS800::GetCorrTOF_OBJTAC() const {
   double afp_cor = GValue::Value("OBJTAC_TOF_CORR_AFP");
   double xfp_cor = GValue::Value("OBJTAC_TOF_CORR_XFP");
