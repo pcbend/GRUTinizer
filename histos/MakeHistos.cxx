@@ -336,7 +336,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 		      2000,0,4000,hit.GetDoppler(BETA));
 
     histname = "GretinaDopplerBeta";
-    double beta = 0.2;
+    double beta = 0.00;
     for(int z=0;z<100;z++) {
       beta += .3/100.0;
       obj.FillHistogram(dirname,histname,

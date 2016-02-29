@@ -1,5 +1,7 @@
 #include "DynamicLibrary.h"
 
+#include <cstdlib>
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -11,7 +13,7 @@
 #include <unistd.h>
 
 //#include "RuntimeExceptions.h"
-//#include "FullPath.h"
+#include "FullPath.h"
 
 namespace {
   int incremental_id() {
@@ -22,13 +24,17 @@ namespace {
   }
 }
 
-DynamicLibrary::DynamicLibrary(std::string libname, bool unique_name) {
+DynamicLibrary::DynamicLibrary(std::string libname_param, bool unique_name)
+  : libname(libname_param) {
   if(unique_name){
     std::stringstream ss;
-    ss << "./temp_dynlib_" << getpid() << "_" << incremental_id() << ".so";
-    std::string tempname = ss.str();
-    //libname = full_path(libname);
-    libname = libname;
+    ss << "/tmp/temp_dynlib_" << getpid() << "_" << incremental_id() << ".so";
+    tempname = ss.str();
+
+    // Need to symlink to full path, not a relative path.
+    // If a relative path is given, then the symlink will look for that library
+    //  relative to /tmp, instead of relative to the current directory.
+    libname = full_path(libname);
 
     int error = symlink(libname.c_str(), tempname.c_str());
     if(error){
@@ -36,7 +42,6 @@ DynamicLibrary::DynamicLibrary(std::string libname, bool unique_name) {
       //throw RuntimeSymlinkCreation("Could not make temp symlink");
     }
     library = dlopen(tempname.c_str(), RTLD_NOW);
-    unlink(tempname.c_str());
   } else {
     library = dlopen(libname.c_str(), RTLD_NOW);
   }
@@ -50,6 +55,9 @@ DynamicLibrary::DynamicLibrary(std::string libname, bool unique_name) {
 DynamicLibrary::~DynamicLibrary() {
   if(library) {
     dlclose(library);
+    if(tempname.length()){
+      unlink(tempname.c_str());
+    }
   }
 }
 
@@ -65,6 +73,8 @@ DynamicLibrary& DynamicLibrary::operator=(DynamicLibrary&& other){
 
 void DynamicLibrary::swap(DynamicLibrary& other){
   std::swap(library, other.library);
+  std::swap(libname, other.libname);
+  std::swap(tempname, other.tempname);
 }
 
 void* DynamicLibrary::GetSymbol(const char* symbol) {

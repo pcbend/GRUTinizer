@@ -24,7 +24,7 @@
 #include "TGretina.h"
 #include "TBank29.h"
 
-#define BETA .05
+#include "GValue.h"
 
 //std::map<int,int> HoleQMap;
 std::map<int,std::string> LayerMap;
@@ -61,6 +61,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   TList *list = &(obj.GetObjects());
   int numobj  = list->GetSize();
+
+
+  double BETA = GValue::Value("BETA"); 
 
   if(bank29) {
 //    for(int x=0;x<bank29->Size();x++) {
@@ -101,6 +104,42 @@ void MakeHistograms(TRuntimeObjects& obj) {
       obj.FillHistogram(histname,800,-400,400,hit.GetTime()-hit2.GetTime(),
                                   2000,0,4000,hit.GetCoreEnergy(0));
     }   
+
+    histname = "GretinaDopplerBeta";
+    std::string histnamecal = "GretinaDopplerBetaCal";
+
+    double beta = 0.00;
+    double betamax = 0.005;
+    for(int z=0;z<100;z++) {
+      beta += betamax/100.0;
+      //printf("GetDoppler%.02f() = %.02f\n",beta,hit.GetDoppler(beta));
+      //hit.GetPosition().Print();
+      obj.FillHistogram(histname,8000,0,4000,hit.GetDoppler(beta),
+                                 101,0.00,betamax,beta);
+      obj.FillHistogram(histnamecal,8000,0,4000,hit.GetDoppler(0,beta),
+                                 101,0.00,betamax,beta);
+    }
+   
+    histname = "GretinaDopplerPhi";
+    obj.FillHistogram(histname,628,0,6.28,hit.GetPhi(),
+                               8000,0,4000,hit.GetDoppler(BETA));
+    
+    histname = "GretinaDopplerXId";
+    obj.FillHistogram(histname,200,0,200,hit.GetCrystalId(),
+                               8000,0,4000,hit.GetDoppler(BETA));
+
+    histname = "GretinaDopplerXIdCal";
+    obj.FillHistogram(histname,200,0,200,hit.GetCrystalId(),
+                               8000,0,4000,hit.GetDoppler(0,BETA));
+
+    histname = "GretinaEnergyXId";
+    obj.FillHistogram(histname,200,0,200,hit.GetCrystalId(),
+                               8000,0,4000,hit.GetCoreEnergy());
+
+    histname = "GretinaEnergyXIdCal";
+    obj.FillHistogram(histname,200,0,200,hit.GetCrystalId(),
+                               8000,0,4000,hit.GetCoreEnergy(0));
+
 
     histname = "GretinaEnergyTheta";
     obj.FillHistogram(histname,314,0,3.14,hit.GetTheta(),
