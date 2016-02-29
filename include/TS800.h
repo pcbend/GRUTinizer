@@ -65,6 +65,15 @@ public:
   float GetCorrTOF_OBJTAC() const;
   float GetCorrTOF_OBJ() const;
   float GetCorrTOF_OBJ_MESY(int i=0) const;
+  
+  float GetOBJRaw_TAC() const;
+  float GetOBJRaw() const;
+  float GetOBJRaw_MESY(int i=0) const;
+
+  float GetXFRaw_TAC() const;
+  float GetXFRaw() const;
+  float GetXFRaw_MESY(int i=0) const;
+  
 //float GetCorrTOF_XFPTAC();
 //float GetCorrTOF_XFP();
 
