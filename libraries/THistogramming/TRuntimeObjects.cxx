@@ -8,7 +8,7 @@
 #include "TDirectoryFile.h"
 
 #include "GH1D.h"
-#include "GH2I.h"
+#include "GH2D.h"
 #include "GH2D.h"
 
 #include "GValue.h"
@@ -145,7 +145,7 @@ TDirectory* TRuntimeObjects::FillHistogram(const char* dirname,const char* name,
   return dir;/*
   TH2* hist = (TH2*) GetObjects().FindObject(name);
   if(!hist){
-    hist = new GH2I(name,name,
+    hist = new GH2D(name.c_str(),name.c_str(),
                             Xbins, Xlow, Xhigh,
                             Ybins, Ylow, Yhigh);
     GetObjects().Add(hist);
@@ -177,7 +177,7 @@ TDirectory* TRuntimeObjects::FillHistogramSym(const char* dirname,const char* na
   return dir;/*
   TH2* hist = (TH2*) GetObjects().FindObject(name);
   if(!hist){
-    hist = new GH2I(name,name,
+    hist = new GH2D(name.c_str(),name.c_str(),
                             Xbins, Xlow, Xhigh,
                             Ybins, Ylow, Yhigh);
     GetObjects().Add(hist);
