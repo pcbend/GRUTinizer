@@ -32,6 +32,7 @@
 #include "TOrderedRawFile.h"
 #include "TRawSource.h"
 #include "TMultiRawFile.h"
+#include "TSequentialRawFile.h"
 
 #include "GrutNotifier.h"
 #include "TGRUTUtilities.h"
@@ -198,18 +199,30 @@ void TGRUTint::ApplyOptions() {
   if((opt->InputRing().length() || opt->RawInputFiles().size())
      && opt->SortRaw()) {
 
-    // Open a ring, multiple files, or a single file, as requested.
     TRawEventSource* source = NULL;
     if(opt->InputRing().length()) {
+      // Open a source from a ring.
       source = new TRawEventRingSource(opt->InputRing(),
                                        opt->DefaultFileType());
+
     } else if(opt->RawInputFiles().size() > 1 && opt->SortMultiple()){
+      // Open multiple files, read from all at the same time.
       TMultiRawFile* multi_source = new TMultiRawFile();
       for(auto& filename : opt->RawInputFiles()){
         multi_source->AddFile(new TRawFileIn(filename.c_str()));
       }
       source = multi_source;
+
+    } else if(opt->RawInputFiles().size() > 1 && !opt->SortMultiple()){
+      // Open multiple files, read from each one at a a time.
+      TSequentialRawFile* seq_source = new TSequentialRawFile();
+      for(auto& filename : opt->RawInputFiles()){
+        seq_source->Add(new TRawFileIn(filename.c_str()));
+      }
+      source = seq_source;
+
     } else {
+      // Open a single file.
       std::string filename = opt->RawInputFiles().at(0);
       source = new TRawFileIn(filename.c_str());
     }

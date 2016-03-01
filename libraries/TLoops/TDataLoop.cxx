@@ -53,20 +53,13 @@ bool TDataLoop::Iteration() {
     bytes_read = source->Read(evt);
   }
 
-  if(bytes_read < 0 && (TGRUTOptions::Get()->RawInputFiles().size()==1) && fSelfStopping){
+  if(bytes_read < 0 && fSelfStopping){
     // Error, and no point in trying again.
     printf("finished sorting all input.\n");
     return false;
   } else if(bytes_read > 0){
     // A good event was returned
     output_queue.Push(evt);
-    return true;
-  } else if(bytes_read < 0 && (TGRUTOptions::Get()->RawInputFiles().size()>1)) { 
-    printf(DBLUE   "\nswitching form: %s" RESET_COLOR "n",TGRUTOptions::Get()->RawInputFiles().at(0).c_str());
-    TGRUTOptions::Get()->GetRawInputFiles().erase(TGRUTOptions::Get()->GetRawInputFiles().begin());
-    TRawFileIn *source  = new TRawFileIn(TGRUTOptions::Get()->RawInputFiles().at(0).c_str());
-    printf(DYELLOW "\n          to:   %s" RESET_COLOR "n",TGRUTOptions::Get()->RawInputFiles().at(0).c_str());
-    ReplaceSource(source);
     return true;
   } else {
     static TRawEventSource* source_ptr = NULL;
