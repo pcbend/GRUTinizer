@@ -53,6 +53,8 @@ void InitMap() {
 // extern "C" is needed to prevent name mangling.
 // The function signature must be exactly as shown here,
 //   or else bad things will happen.
+//
+
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
   InitMap();
@@ -62,6 +64,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
   TList *list = &(obj.GetObjects());
   int numobj  = list->GetSize();
 
+  static int entry = 0;
 
   double BETA = GValue::Value("BETA"); 
 
@@ -78,8 +81,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
 //    }
   }
 
-  if(!gretina || gretina->Size()<1 || gretina->Size()>(7*4))
+  if(!gretina || gretina->Size()<1 || gretina->Size()>(7*4)) {
+    entry++;
     return;
+  }
 
 
   double gsum = 0.0;
@@ -105,20 +110,25 @@ void MakeHistograms(TRuntimeObjects& obj) {
                                   2000,0,4000,hit.GetCoreEnergy(0));
     }   
 
-    histname = "GretinaDopplerBeta";
-    std::string histnamecal = "GretinaDopplerBetaCal";
+    histname = "Gretina_Energy_Entry";
+    obj.FillHistogram(histname,1000,0,4000,hit.GetCoreEnergy(0),
+                               9000,0,9000000,entry);
+    entry++;
 
-    double beta = 0.00;
-    double betamax = 0.005;
-    for(int z=0;z<100;z++) {
-      beta += betamax/100.0;
+
+    //histname = "GretinaDopplerBeta";
+    //std::string histnamecal = "GretinaDopplerBetaCal";
+    //double beta = 0.00;
+    //double betamax = 0.005;
+    //for(int z=0;z<100;z++) {
+    //  beta += betamax/100.0;
       //printf("GetDoppler%.02f() = %.02f\n",beta,hit.GetDoppler(beta));
       //hit.GetPosition().Print();
-      obj.FillHistogram(histname,8000,0,4000,hit.GetDoppler(beta),
-                                 101,0.00,betamax,beta);
-      obj.FillHistogram(histnamecal,8000,0,4000,hit.GetDoppler(0,beta),
-                                 101,0.00,betamax,beta);
-    }
+    //  obj.FillHistogram(histname,8000,0,4000,hit.GetDoppler(beta),
+    //                             101,0.00,betamax,beta);
+    //  obj.FillHistogram(histnamecal,8000,0,4000,hit.GetDoppler(0,beta),
+    //                             101,0.00,betamax,beta);
+    //}
    
     histname = "GretinaDopplerPhi";
     obj.FillHistogram(histname,628,0,6.28,hit.GetPhi(),
@@ -134,7 +144,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     histname = "GretinaEnergyXId";
     obj.FillHistogram(histname,200,0,200,hit.GetCrystalId(),
-                               8000,0,4000,hit.GetCoreEnergy());
+                               8000,0,4000,hit.GetCoreEnergy(0));
 
     histname = "GretinaEnergyXIdCal";
     obj.FillHistogram(histname,200,0,200,hit.GetCrystalId(),
@@ -164,6 +174,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
     obj.FillHistogram(histname,4000,0,4000,hit.GetCoreEnergy(0),
                                   60,20,80,hit.GetCrystalId());
 
+    /*
     histname = Form("GretinaSummaryX%02i",hit.GetCrystalId());
     for(int z=0;z<hit.NumberOfInteractions();z++) {
       obj.FillHistogram(histname,40,0,40,hit.GetSegmentId(z),
@@ -177,7 +188,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       obj.FillHistogram(histname2,628,0,6.28,phi,
                                   314,0,3.14,theta);
     }
-    
+    */
     histname = Form("GretinaPosition");
     obj.FillHistogram(histname,628,0,6.28,hit.GetPhi(),
                                 314,0,3.14,hit.GetTheta());
