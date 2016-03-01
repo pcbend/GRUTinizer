@@ -71,7 +71,8 @@ TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions
 
 TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t noLogo,const char *appClassName)
   :TRint(appClassName, &argc, argv, options, numOptions,noLogo),
-   main_thread_id(std::this_thread::get_id()), fIsTabComplete(false){
+   main_thread_id(std::this_thread::get_id()), fIsTabComplete(false),
+   fAllowedToTerminate(true) {
 
   fGRUTEnv = gEnv;
   GetSignalHandler()->Remove();
@@ -314,14 +315,15 @@ void TGRUTint::ApplyOptions() {
   if(opt->ExitAfterSorting()){
     while(StoppableThread::AnyThreadRunning()){
       std::this_thread::sleep_for(std::chrono::seconds(1));
+
+      // We need to process events in case a different thread is asking for a file to be opened.
+      // However, if there is no stdin, ProcessEvents() will call Terminate().
+      // This prevents the terminate from taking effect while in this context.
+      fAllowedToTerminate = false;
       gSystem->ProcessEvents();
+      fAllowedToTerminate = true;
+
       std::cout << "\r" << StoppableThread::AnyThreadStatus() << std::flush;
-      // if(fDataLoop) {
-      //   std::cout << "\r" << fDataLoop->Status() << std::flush;
-      // }
-      // if(coop){
-      //   std::cout << "\r" << coop->Status() << std::flush;
-      // }
     }
     std::cout << std::endl;
 
@@ -516,6 +518,9 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
 
 
 void TGRUTint::Terminate(Int_t status){
+  if(!fAllowedToTerminate){
+    return;
+  }
   StoppableThread::StopAllClean();
 
   //if(TGRUTOptions::Get()->StartGUI()){
