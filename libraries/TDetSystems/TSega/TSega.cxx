@@ -74,10 +74,10 @@ int TSega::BuildHits() {
       // }
       lines_displayed++;
 
-      sega_hits.emplace_back();
-      TSegaHit* hit = &sega_hits.back();
-      hit->SetAddress(address);
-      hit->SetTimestamp(nscl.GetTimestamp());
+      // sega_hits.emplace_back();
+      // TSegaHit* hit = &sega_hits.back();
+      // hit->SetAddress(address);
+      // hit->SetTimestamp(nscl.GetTimestamp());
       continue;
     }
 
