@@ -30,56 +30,26 @@ void TUnpackedEvent::Build() {
 }
 
 void TUnpackedEvent::AddRawData(const TRawEvent& event, kDetectorSystems detector) {
-  switch(detector){
-  case kDetectorSystems::GRETINA:
-    GetDetector<TGretina>(true)->AddRawData(event);
-    break;
-    
-  case kDetectorSystems::GRETINA_SIM:
-    GetDetector<TGretSim>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::MODE3:
-    GetDetector<TMode3>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::S800:
-    GetDetector<TS800>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::S800_SIM:
-    GetDetector<TS800Sim>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::S800SCALER:
-    GetDetector<TS800Scaler>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::BANK29:
-    GetDetector<TBank29>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::SEGA:
-    GetDetector<TSega>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::JANUS:
-    GetDetector<TJanus>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::FASTSCINT:
-    GetDetector<TFastScint>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::CAESAR:
-    GetDetector<TCaesar>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::PHOSWALL:
-    GetDetector<TPhosWall>(true)->AddRawData(event);
-    break;
-
-  default:
-    break;
+  TDetectorFactoryBase* factory = detector_factory_map[detector];
+  if(!factory){
+    std::cout << "No factory to construct type " << detector << "\n"
+              << "Please add it in libraries/TGRUTint/TGRUTTypes.cxx"
+              << std::endl;
+    return;
   }
+
+  TDetector* current_det = NULL;
+  for(auto det : detectors) {
+    if(factory->is_instance(det)) {
+      current_det = det;
+      break;
+    }
+  }
+
+  if(!current_det){
+    current_det = factory->construct();
+    detectors.push_back(current_det);
+  }
+
+  current_det->AddRawData(event);
 }

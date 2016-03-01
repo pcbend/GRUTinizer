@@ -17,7 +17,7 @@ public:
   ~TUnpackedEvent();
 
   template<typename T>
-  T* GetDetector(bool make_if_not_found = false);
+  T* GetDetector();
 
   std::vector<TDetector*>& GetDetectors() { return detectors; }
   void AddDetector(TDetector* det) { detectors.push_back(det); }
@@ -33,7 +33,7 @@ private:
 
 #ifndef __CINT__
 template<typename T>
-T* TUnpackedEvent::GetDetector(bool make_if_not_found) {
+T* TUnpackedEvent::GetDetector() {
   static_assert(std::is_base_of<TDetector, T>::value,
                 "T must be a subclass of TDetector");
   for(auto det : detectors) {
@@ -43,13 +43,7 @@ T* TUnpackedEvent::GetDetector(bool make_if_not_found) {
     }
   }
 
-  if(make_if_not_found) {
-    T* output = new T;
-    detectors.push_back(output);
-    return output;
-  } else {
-    return NULL;
-  }
+  return NULL;
 }
 #endif
 
