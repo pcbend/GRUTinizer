@@ -20,3 +20,4 @@ bin
 .nfs*
 *.pyc
 .grut_thread
+histos/MakeHistos.cxx

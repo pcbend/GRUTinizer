@@ -183,7 +183,7 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanus* janus) {
     if(hit_detnum==1){
       obj.FillHistogram(Form("janus_Sector%02i_v_ring_det%02i",hit.GetSector(),hit_detnum),
 			40,0,40,hit.GetRing(),
-			6000,-4,6000,hit.Charge());
+			6000,0,6000,hit.Charge());
     }
 
     // ---- Added by JAB 1/20/16 ----
@@ -191,6 +191,10 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanus* janus) {
     obj.FillHistogram(Form("janus_theta_v_energy_det%02i",hit_detnum),
 		      180,0,180,hit.GetPosition().Theta()*TMath::RadToDeg(),
 		      4000,0,400e3,hit.GetEnergy());
+
+    obj.FillHistogram(Form("janus_theta_v_charge_det%02i",hit_detnum),
+		      180,0,180,hit.GetPosition().Theta()*TMath::RadToDeg(),
+		      6000,0,6000,hit.Charge());
 
     obj.FillHistogram(Form("janus_ring_v_energy_det%02i",hit_detnum),
 		      30,0,30,hit.GetRing(),
