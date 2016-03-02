@@ -235,6 +235,7 @@ typedef struct { // Decomposed GRETINA Data
 friend std::ostream& operator<<(std::ostream& os, const GEBBankType1 &bank);
 
 static UShort_t SwapShort(UShort_t datum);
+static UInt_t SwapInt(UInt_t datum);
 
 struct GEBMode3Head {
   UShort_t a2;
@@ -275,34 +276,65 @@ struct GEBMode3Data {
 friend std::ostream& operator<<(std::ostream& os, const GEBMode3Data &data);
 static void SwapMode3Data(GEBMode3Data &data);
 
-struct GEBArgonneLEDHead {
-  UShort_t a2;
-  UShort_t a1;
-  UShort_t lengthGA;
-  UShort_t board_id;
-}__attribute__((__packed__));
+enum ArgonneType { LEDv10, LEDv11, CFDv11 };
 
-//friend std::ostream& operator<<(std::ostream& os, const GEBArgonneLEDHead &head);
-//static void SwapArgonneLEDHead(GEBArgonneLEDHead &head);
-
-struct GEBArgonneLEDData {
-  UShort_t led_middle;
-  UShort_t led_low;
-  UShort_t energy_low;
+struct GEBArgonneHead {
+  UShort_t GA_packetlength;
+  UShort_t ud_channel;
+  UInt_t   led_low;
+  UShort_t hdrlength_evttype_hdrtype;
   UShort_t led_high;
-  UShort_t cfd_low;
-  UShort_t energy_high;
-  UShort_t cfd_high;
-  UShort_t cfd_middle;
-  UShort_t cfd_pt1_high;
-  UShort_t cfd_pt1_low;
-  UShort_t cfd_pt2_high;
-  UShort_t cfd_pt2_low;
+  UShort_t GetGA() const;
+  UShort_t GetLength() const;
+  UShort_t GetBoardID() const;
+  UShort_t GetChannel() const;
+  UInt_t   GetHeaderType() const;
+  UShort_t GetEventType() const;
+  UShort_t GetHeaderLength() const;
+  ULong_t  GetLED() const;
 }__attribute__((__packed__));
 
-//friend std::ostream& operator<<(std::ostream& os, const GEBArgonneLEDData &data);
-//static void SwapArgonneLEDData(GEBArgonneLEDData &data);
+friend std::ostream& operator<<(std::ostream& os, const GEBArgonneHead &header);
+void SwapArgonneHead(TRawEvent::GEBArgonneHead& header);
 
+struct GEBArgonneLEDv11 {
+  UShort_t led_low_prev;
+  UShort_t flags;
+  UInt_t   led_high_prev;
+  UInt_t   sampled_baseline;
+  UInt_t   _blank_;
+  UInt_t   postrise_sum_low_prerise_sum;
+  UShort_t timestamp_peak_low;
+  UShort_t postrise_sum_high;
+  UInt_t   timestamp_peak_high;
+  UShort_t postrise_end_sample;
+  UShort_t postrise_begin_sample;
+  UShort_t prerise_end_sample;
+  UShort_t prerise_begin_sample;
+  UShort_t base_sample;
+  UShort_t peak_sample;
+  ULong_t  GetPreviousLED() const;
+  UInt_t   GetBaseline() const;
+  UInt_t   GetPreRiseE() const;
+  UInt_t   GetPostRiseE() const;
+  ULong_t  GetPeakTimestamp() const;
+  UShort_t GetPostRiseSampleBegin() const;
+  UShort_t GetPostRiseSampleEnd() const;
+  UShort_t GetPreRiseSampleBegin() const;
+  UShort_t GetPreRiseSampleEnd() const;
+  UShort_t GetBaseSample() const;
+  UShort_t GetPeakSample() const;
+  UShort_t ExternalDiscFlag() const;
+  UShort_t PeakValidFlag() const;
+  UShort_t OffsetFlag() const;
+  UShort_t SyncErrorFlag() const;
+  UShort_t GeneralErrorFlag() const;
+  UShort_t PileUpOnlyFlag() const;
+  UShort_t PileUpFlag() const;
+}__attribute__((__packed__));
+
+friend std::ostream& operator<<(std::ostream& os, const GEBArgonneLEDv11& data);
+void SwapArgonneLEDv11(TRawEvent::GEBArgonneLEDv11& data);
 
 struct GEBS800Header {
   Int_t    total_size;

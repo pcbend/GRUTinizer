@@ -1,9 +1,10 @@
-#ifndef TARGONNE3HIT_H
-#define TARGONNE3HIT_H
+#ifndef TARGONNEHIT_H
+#define TARGONNEHIT_H
 
 #include "TDetector.h"
 #include "TDetectorHit.h"
-//#include "TGretinaHit.h"
+
+
 
 #define MAXTRACE 1024
 
@@ -16,12 +17,6 @@ class TArgonneHit : public TDetectorHit {
     //virtual void Compare(TObject &obj) const;
     virtual void Print(Option_t *opt = "") const;
     virtual void Clear(Option_t *opt = "");
-    virtual void ClearWave(Option_t *opt = "");
-
-    //virtual void          InsertHit(const TDetectorHit& hit) { return;       }
-    //virtual TDetectorHit& GetHit(const int &i=0)             { return hit; }
-    //virtual int           Size()                             { return 1;     }
-  double AverageWave(int samples=-1);
 
   void     BuildFrom(TSmartBuffer buf);
 
@@ -31,41 +26,46 @@ class TArgonneHit : public TDetectorHit {
     Int_t    GetHole()      const { return (board_id & 0x1f00)>>8;        }
     Int_t    GetSegmentId() const { return GetVME()*10 + GetChannel(); }
     Int_t    GetCrystalId() const { return GetHole()*4 + GetCrystal(); }
-    Int_t    GetWaveSize()  const { return wavesize; }
-    Short_t* GetWave()      const { return wave;     }
 
     Long_t   GetLed()       const { return led; }
     Long_t   GetCfd()       const { return cfd; }
 
 
-    static void SetExtractWaves(bool flag=true) { fExtractWaves = flag;  }
-    static bool ExtractWaves()                  { return fExtractWaves;  }
 
-    virtual Int_t  Charge() const   { return charge; }
-    //Int_t    Address()    { return hit.Address(); }
 
   private:
-    //virtual int BuildHits();
 
-    static bool fExtractWaves; //!
-    //mutable bool fOwnWave;             //!
-
-    //TDetectorHit hit;
-
-    Int_t  board_id;
-    Int_t  charge;
-    Int_t  wavesize; // In 16-bit elements
-    Long_t led;
-    Long_t cfd;
-    Short_t wavebuffer[MAXTRACE];  //!
-    Short_t *wave;                 //[wavesize]
+    UShort_t global_addr;
+    UShort_t board_id;
+    UShort_t channel;
+    ULong_t led;
+    ULong_t cfd;
 
 
-  ClassDef(TArgonneHit,2);
+    ULong_t led_prev;
+    // store flags as one uint
+    UInt_t flags;
+    //UShort_t external_disc;
+    //UShort_t peak_valid;
+    //UShort_t offset;
+    //UShort_t sync_error;
+    //UShort_t general_error;
+    //UShort_t pile_up_only;
+    //UShort_t pile_up;
+
+    //UInt_t sampled_baseline;
+    UInt_t prerise_energy;
+    UInt_t postrise_energy;
+    //ULong_t peak_timestamp;
+    UShort_t postrise_end_sample;
+    UShort_t postrise_begin_sample;
+    UShort_t prerise_end_sample;
+    UShort_t prerise_begin_sample;
+    //UShort_t base_sample;
+    //UShort_t peak_sample;
+
+  ClassDef(TArgonneHit,1);
 };
-
-
-
 
 
 #endif

@@ -31,7 +31,7 @@ private:
   //TClonesArray* anl_hits;//("TArgonneHit");
   std::vector<TArgonneHit> anl_hits;
 
-  ClassDef(TArgonne,3);
+  ClassDef(TArgonne,1);
 };
 
 

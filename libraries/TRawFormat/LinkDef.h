@@ -28,6 +28,6 @@
 #pragma link C++ class TOrderedRawFile+;
 #pragma link C++ class TSequentialRawFile+;
 
-
+#pragma link C++ enum TRawEvent::ArgonneType;
 
 #endif
