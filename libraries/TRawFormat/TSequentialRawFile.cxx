@@ -22,16 +22,16 @@ void TSequentialRawFile::Reset() {
 }
 
 std::string TSequentialRawFile::SourceDescription() const {
-  if(sources.size()){
-    return sources[0]->SourceDescription();
+  if(active_source < sources.size()){
+    return sources[active_source]->SourceDescription();
   } else {
     return "";
   }
 }
 
 std::string TSequentialRawFile::Status() const {
-  if(sources.size()){
-    return sources[0]->Status();
+  if(active_source < sources.size()){
+    return sources[active_source]->Status();
   } else {
     return "";
   }
@@ -46,8 +46,8 @@ int TSequentialRawFile::GetLastErrno() const {
 }
 
 std::string TSequentialRawFile::GetLastError() const {
-  if(sources.size()){
-    return sources[0]->GetLastError();
+  if(active_source < sources.size()){
+    return sources[active_source]->GetLastError();
   } else {
     return 0;
   }

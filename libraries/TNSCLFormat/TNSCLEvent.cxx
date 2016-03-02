@@ -51,6 +51,19 @@ int TNSCLEvent::IsBuiltData() const {
     return is_built_data;
   }
 
+  // If the event has only 4 bytes, then it might
+  // The e13701 filter wasn't smart enough to remove these entirely,
+  //   so they exist in the filtered data.
+  // They shouldn't exist in normal data, though.
+  // For now, if the only thing in the payload is the 0x00000004,
+  //   call it a built ring item, but wait until the next event to decide for sure.
+  if(GetPayloadSize() == 4){
+    int inclusive_size = *(int*)GetPayload();
+    if(inclusive_size == 4){
+      return true;
+    }
+  }
+
   // If this is built data, there will be a 4-byte size, followed by a fragment header
   TRawEvent::TNSCLFragmentHeader* header = (TRawEvent::TNSCLFragmentHeader*)(GetPayload() + sizeof(Int_t));
   unsigned int sourceid = header->sourceid;

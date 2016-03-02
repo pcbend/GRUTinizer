@@ -17,7 +17,7 @@ public:
 
   bool ShouldExit() { return fShouldExit; }
   const std::vector<std::string>& RawInputFiles()   { return input_raw_files;   }
-        std::vector<std::string>& GetRawInputFiles()   { return input_raw_files;   }
+  const std::vector<std::string>& GetRawInputFiles(){ return input_raw_files;   }
   const std::vector<std::string>& RootInputFiles()  { return input_root_files;  }
   const std::vector<std::string>& CalInputFiles()   { return input_cal_files;   }
   const std::vector<std::string>& ValInputFiles()   { return input_val_files;   }
