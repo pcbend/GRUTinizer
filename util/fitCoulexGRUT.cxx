@@ -204,6 +204,7 @@ int fitCoulex(const char *cfg_file_name){
   double bta;//radians
   int absolute_det_id;
   TCaesar *caesar = 0;
+  TS800::ReadInverseMap(inverse_map_file_name.c_str());
   TS800   *s800   = 0;
 
   
@@ -416,20 +417,14 @@ int fitCoulex(const char *cfg_file_name){
         tof_obj_tac_corr = s800->GetCorrTOF_OBJTAC();
         ic_sum = s800->GetIonChamber().GetSum();
 
-  //    ata = s800->GetAta();
-  //    bta = s800->GetBta();
-  //    double xsin = sin(ata);
-  //    double ysin = sin(bta);
-  //    scatter_angle = asin(sqrt(xsin*xsin+ysin*ysin))*180.0/TMath::Pi();
+        ata = s800->GetAta_Spec();
+        bta = s800->GetBta_Spec();
+        double xsin = sin(ata);
+        double ysin = sin(bta);
+        scatter_angle = asin(sqrt(xsin*xsin+ysin*ysin))*180.0/TMath::Pi();
   //    FOR DEBUGGING
-        scatter_angle = 0;
+  //    scatter_angle = 0;
 
-//      std::cout  << "TOF OBJ TAC CORR = " << tof_obj_tac_corr  
-//                 << "\tic_sum = " << ic_sum <<  std::endl;
-//      std::cout  << "gamma_time = " << gamma_time  
-//                 << "\tgamma_energy_dc = " << gamma_energy_dc <<  std::endl;
-//      std::cout  << "tof_xfp_tac = " << tof_xfp_tac  
-//                 << "\ttof_obj_tac = " << tof_obj_tac <<  std::endl;
         if (pid_cut->IsInside(tof_obj_tac_corr, ic_sum)){
           if (tcut->IsInside(gamma_time,gamma_energy_dc)){
             if (in_cut->IsInside(tof_xfp_tac,tof_obj_tac)){
@@ -463,8 +458,6 @@ int fitCoulex(const char *cfg_file_name){
   bin_centers.resize(num_res_points);
   peak_sum.resize(TOTAL_ANGLES);
 
-  TCanvas *disentangled_can = new TCanvas("dis_can","dis_can", 800,600);
-  disentangled_can->cd();
   TF1 *used_fit_function = new TF1("double_expo_fit", 
                                    "[0]*([1]*TMath::Exp([2]*x)+[3]*TMath::Exp([4]*x))", data_low_x,data_high_x);
   used_fit_function->SetParameter(1,init_pars[2]);
@@ -472,6 +465,7 @@ int fitCoulex(const char *cfg_file_name){
   used_fit_function->SetParameter(3,init_pars[4]);
   used_fit_function->SetParameter(4,init_pars[5]);
 
+  TFile *out_hist_file = new TFile("output_fit_hists.root","recreate");
   for (int angle_index = 0; angle_index < TOTAL_ANGLES; angle_index++){
     peak_sum[angle_index] = 0;
     TF1 *fit_func = FitDoubleExpHist(data_hists.at(angle_index), geant_hists.at(0), fit_low_x, fit_high_x, init_pars);
@@ -490,7 +484,7 @@ int fitCoulex(const char *cfg_file_name){
 
     int start_bin = data_hists[angle_index]->FindBin(fit_low_x);
     int end_bin = data_hists[angle_index]->FindBin(fit_high_x);
-    if (angle_index <= 0){
+    if (angle_index == 0){
       used_fit_function->SetParameter(0, fit_func->GetParameter(1));//set double exponential scaling factor
     }
     
@@ -516,7 +510,6 @@ int fitCoulex(const char *cfg_file_name){
     out_file <<  hist_constant[angle_index] << "     " << fit_error[angle_index] << "     " << chi_squared[angle_index] << "     " << res_sum << "     " << res_sum_in_peak << "     " << peak_sum[angle_index] << "     " << std::endl;
 
 
-    TFile *out_hist_file = new TFile("output_fit_hists.root","recreate");
     out_hist_file->cd();
     residual_plot->Write();
     norm_residual_plot->Write();
@@ -533,7 +526,9 @@ int fitCoulex(const char *cfg_file_name){
     }
   }
 
-  //data_hists[22]->Draw();
+  TCanvas *disentangled_can = new TCanvas("dis_can","dis_can", 800,600);
+  disentangled_can->cd();
+  data_hists[0]->Draw();
   TLine *fit_low = new TLine(fit_low_x, 0, fit_low_x, 780);
   TLine *fit_high = new TLine(fit_high_x, 0, fit_high_x, 780);
   TLine *peak_low = new TLine(peak_low_x, 0, peak_low_x, 780);
@@ -559,6 +554,8 @@ int fitCoulex(const char *cfg_file_name){
     used_fit_function->Draw("same");
   }
   
+  out_hist_file->cd();
+  disentangled_can->Write();
   out_file.close();
   //END OF OLD FILE
   ////////////////////////////////////////////////////////////////////////////////////////////////////
