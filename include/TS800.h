@@ -17,6 +17,7 @@ public:
   TS800();
   virtual ~TS800();
 
+  static void ReadInverseMap(const char *);
 
   //////////////////////////////////////////////
   virtual void InsertHit(const TDetectorHit&);
@@ -81,7 +82,7 @@ private:
   static int fcharge;                                             //!
   //---------------------
 
-  void ReadMap_SpecTCL();
+  static bool ReadMap_SpecTCL(std::string);
   virtual int  BuildHits();
 
   bool HandleTrigPacket(unsigned short*,int);     //!

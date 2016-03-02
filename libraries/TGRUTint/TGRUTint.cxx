@@ -44,6 +44,8 @@
 #include "TChainLoop.h"
 #include "THistogramLoop.h"
 
+#include "TS800.h"
+
 //extern "C" G__value G__getitem(const char* item);
 //#include "FastAllocString.h"
 //char* G__valuemonitor(G__value buf, G__FastAllocString& temp);
@@ -164,6 +166,9 @@ void TGRUTint::ApplyOptions() {
 
   TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
 
+  if(opt->S800InverseMapFile().length()) {
+    TS800::ReadInverseMap(opt->S800InverseMapFile().c_str());
+  }
 
   //next, if given a root file and NOT told to sort it..
   if(opt->RootInputFiles().size()){
