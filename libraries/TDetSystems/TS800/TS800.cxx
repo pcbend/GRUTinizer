@@ -18,6 +18,7 @@
 #include "TPad.h"
 #include "TROOT.h"
 
+
 std::vector<short> TS800::fmaxcoefficient;                      
 std::vector<std::vector<short> > TS800::forder;                 
 std::vector<std::vector<std::vector<short> > > TS800::fexponent;
@@ -29,19 +30,23 @@ int TS800::fcharge;
 
 TS800::TS800() {
   Clear();
+}
+
+void TS800::ReadInverseMap(const char *mapfile) {
   static std::atomic_bool InvMapFileRead(false);
+  std::string filename = mapfile; // TGRUTOptions::Get()->S800InverseMapFile();
   if(!InvMapFileRead){
     //   Quick little mutex to make sure that multiple threads
     // don't try to read the map file at the same time.
     static std::mutex inv_map_mutex;
     std::lock_guard<std::mutex> lock(inv_map_mutex);
     if(!InvMapFileRead){
-      InvMapFileRead=true;
-      ReadMap_SpecTCL();
+      InvMapFileRead=ReadMap_SpecTCL(filename);
       std::cout << " SPECTCL INV MAP LOADED!!!" << std::endl;
     }
   }
 }
+
 
 TS800::~TS800(){
 }
@@ -188,8 +193,8 @@ Float_t TS800::GetDta_Spec(int i){
   }
 }
 
-void TS800::ReadMap_SpecTCL(){
-  std::string filename = TGRUTOptions::Get()->S800InverseMapFile();
+bool TS800::ReadMap_SpecTCL(std::string filename){
+  //std::string filename = TGRUTOptions::Get()->S800InverseMapFile();
   fmaxcoefficient.resize(6);
   forder.resize(6);
   fexponent.resize(6);
@@ -214,7 +219,7 @@ void TS800::ReadMap_SpecTCL(){
   if(file == NULL){
     std::cout << "Sorry I couldn't find the map file: " << filename << std::endl;
     std::cout << "Will continue without the map file" << std::endl;
-    return;
+    return false;
   }
   ret = fgets(title, 120, file);
   sscanf(title, "S800 inverse map - Brho=%g - M=%d - Q=%d", &fbrho, &fmass, &fcharge);
@@ -254,6 +259,7 @@ void TS800::ReadMap_SpecTCL(){
   //std::cout << "Title: " << title << std::endl;
   //std::cout << "Order: " << fmaxorder << std::endl;
   fclose(file);
+  return true;
 }
 
 TVector3 TS800::ExitTargetVect_Spec(int order){
