@@ -2,8 +2,10 @@
 #include "TRuntimeObjects.h"
 
 #include <iostream>
-#include <map>
-#include <cstdio>
+#include <chrono>
+#include <thread>
+#include <sstream>
+#include <string>
 
 #include <TH1.h>
 #include <TH2.h>
@@ -16,8 +18,13 @@
 //#include "TChannel.h"
 //#include "GValue.h"
 
-#define PRINT(x) std::cout << #x"=" << x << std::endl
+#define PRINT(x) std::cout << #x" = " << x << std::endl
 #define STR(x) #x << " = " << x
+
+using namespace std;
+
+
+string name;
 
 // extern "C" is needed to prevent name mangling.
 // The function signature must be exactly as shown here,
@@ -32,16 +39,20 @@ void MakeHistograms(TRuntimeObjects& obj) {
   if(!cagra)
     return;
 
-
   for(int y=0;y<cagra->Size();y++) {
     TArgonneHit hit = cagra->GetArgonneHit(y);
-    //histname = "Energy";
-    //obj.FillHistogram(histname,,0,100,hit.GetCrystalId());
-    std::cout << STR(hit.GetLed()) << std::endl;
-    std::cout << STR(hit.GetPostE()) << std::endl;
-    std::cout << STR(hit.GetPreE()) << std::endl;
-    std::cout << STR((hit.GetPostE() - hit.GetPreE())/350.0) << std::endl;
-    std::cin.get();
+    //stringstream stream; stream.str("");
+    //stream << "Energy";
+    name = "Energy";
+    obj.FillHistogram(name,10000,0,20000,((hit.GetPostE() - hit.GetPreE())/350.0));
+    // PRINT(hit.GetBoardID());
+    // if (hit.GetChannel() > 2) PRINT(hit.GetChannel());
+    // PRINT(hit.GetLED());
+    // PRINT(hit.GetPostE());
+    // PRINT(hit.GetPreE());
+    // PRINT((hit.GetPostE() - hit.GetPreE())/350.0);
+    //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
   }
 
 

@@ -41,6 +41,7 @@ void TArgonneHit::BuildFrom(TSmartBuffer buf){
   // Extract header data
   global_addr = header->GetGA();
   board_id = header->GetBoardID();
+  channel = header->GetChannel();
   led = header->GetLED();
   cfd = 0;
 
