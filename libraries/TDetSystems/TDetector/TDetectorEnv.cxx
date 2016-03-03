@@ -156,6 +156,7 @@ kDetectorSystems TDetectorEnv::DetermineSystem(TRawEvent& event) const {
   }
     break;
 
+  case ANL_RAW:
   case GRETINA_MODE2:
   case GRETINA_MODE3:
   {

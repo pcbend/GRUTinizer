@@ -14,6 +14,7 @@
 #include "TS800Scaler.h"
 #include "TSega.h"
 #include "TFastScint.h"
+#include "TArgonne.h"
 
 TUnpackedEvent::TUnpackedEvent() { }
 
@@ -34,7 +35,7 @@ void TUnpackedEvent::AddRawData(const TRawEvent& event, kDetectorSystems detecto
   case kDetectorSystems::GRETINA:
     GetDetector<TGretina>(true)->AddRawData(event);
     break;
-    
+
   case kDetectorSystems::GRETINA_SIM:
     GetDetector<TGretSim>(true)->AddRawData(event);
     break;
@@ -77,6 +78,10 @@ void TUnpackedEvent::AddRawData(const TRawEvent& event, kDetectorSystems detecto
 
   case kDetectorSystems::PHOSWALL:
     GetDetector<TPhosWall>(true)->AddRawData(event);
+    break;
+
+  case kDetectorSystems::ANL:
+    GetDetector<TArgonne>(true)->AddRawData(event);
     break;
 
   default:
