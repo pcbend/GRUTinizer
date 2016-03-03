@@ -14,6 +14,7 @@
 #include "TS800Scaler.h"
 #include "TSega.h"
 #include "TFastScint.h"
+#include "TArgonne.h"
 
 TUnpackedEvent::TUnpackedEvent() { }
 

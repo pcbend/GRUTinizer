@@ -228,7 +228,7 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename) const{
   } else if (ext == "win"){
     return kFileType::PRESETWINDOW;
   } else if (ext.find("gtd")!=std::string::npos) {
-    return kFileType::ANL;
+    return kFileType::ANL_RAW;
   } else {
     return kFileType::UNKNOWN_FILETYPE;
   }
@@ -237,7 +237,7 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename) const{
 bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
   switch(DetermineFileType(filename)){
     case kFileType::NSCL_EVT:
-    case kFileType::ANL:
+    case kFileType::ANL_RAW:
     case kFileType::GRETINA_MODE2:
     case kFileType::GRETINA_MODE3:
       input_raw_files.push_back(filename);

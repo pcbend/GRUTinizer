@@ -295,7 +295,7 @@ struct GEBArgonneHead {
 }__attribute__((__packed__));
 
 friend std::ostream& operator<<(std::ostream& os, const GEBArgonneHead &header);
-void SwapArgonneHead(TRawEvent::GEBArgonneHead& header);
+static void SwapArgonneHead(TRawEvent::GEBArgonneHead& header);
 
 struct GEBArgonneLEDv11 {
   UShort_t led_low_prev;
@@ -334,7 +334,7 @@ struct GEBArgonneLEDv11 {
 }__attribute__((__packed__));
 
 friend std::ostream& operator<<(std::ostream& os, const GEBArgonneLEDv11& data);
-void SwapArgonneLEDv11(TRawEvent::GEBArgonneLEDv11& data);
+static void SwapArgonneLEDv11(TRawEvent::GEBArgonneLEDv11& data);
 
 struct GEBS800Header {
   Int_t    total_size;

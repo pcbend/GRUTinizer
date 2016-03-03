@@ -66,7 +66,7 @@ Int_t TRawEvent::GetEventType() const {
   case NSCL_EVT:
     return ((EVTHeader*)(&fEventHeader))->type();
 
-  case ANL:
+  case ANL_RAW:
   case GRETINA_MODE2:
   case GRETINA_MODE3:
     return ((GEBHeader*)(&fEventHeader))->type();
@@ -83,7 +83,7 @@ Int_t TRawEvent::GetBodySize() const {
   case NSCL_EVT:
     return ((EVTHeader*)(&fEventHeader))->size() - sizeof(RawHeader); //Size in nscldaq is inclusive
 
-  case ANL:
+  case ANL_RAW:
   case GRETINA_MODE2:
   case GRETINA_MODE3:
     return ((GEBHeader*)(&fEventHeader))->size() + sizeof(Long_t);  //Size in gretinadaq is exclusive, plus timestamp
@@ -112,7 +112,7 @@ Long_t TRawEvent::GetTimestamp() const {
    case NSCL_EVT:
      return ((TNSCLEvent*)this)->GetTimestamp();
 
-   case ANL:
+   case ANL_RAW:
    case GRETINA_MODE2:
    case GRETINA_MODE3:
      return ((TGEBEvent*)this)->GetTimestamp();
@@ -137,7 +137,7 @@ const char* TRawEvent::GetPayload() const {
    case NSCL_EVT:
      return ((TNSCLEvent*)this)->GetPayload();
 
-   case ANL:
+   case ANL_RAW:
    case GRETINA_MODE2:
    case GRETINA_MODE3:
      return ((TGEBEvent*)this)->GetPayload();
@@ -162,7 +162,7 @@ TSmartBuffer TRawEvent::GetPayloadBuffer() const {
    case NSCL_EVT:
      return ((TNSCLEvent*)this)->GetPayloadBuffer();
 
-   case ANL:
+   case ANL_RAW:
    case GRETINA_MODE2:
    case GRETINA_MODE3:
      return ((TGEBEvent*)this)->GetPayloadBuffer();

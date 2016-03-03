@@ -60,7 +60,7 @@ bool TUnpackingLoop::Iteration(){
       }
       break;
 
-    case kFileType::ANL:
+    case kFileType::ANL_RAW:
     case kFileType::GRETINA_MODE2:
     case kFileType::GRETINA_MODE3:
     {

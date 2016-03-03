@@ -37,7 +37,7 @@ void TArgonneHit::BuildFrom(TSmartBuffer buf){
   auto header = (TRawEvent::GEBArgonneHead*)buf.GetData();
   buf.Advance(sizeof(TRawEvent::GEBArgonneHead));
   // Swap big endian for little endian
-  SwapArgonneHead(*header);
+  TRawEvent::SwapArgonneHead(*header);
   // Extract header data
   global_addr = header->GetGA();
   board_id = header->GetBoardID();
@@ -55,7 +55,7 @@ void TArgonneHit::BuildFrom(TSmartBuffer buf){
     auto data = (TRawEvent::GEBArgonneLEDv11*)buf.GetData();
     buf.Advance(sizeof(TRawEvent::GEBArgonneLEDv11));
     // Swap big endian for little endian
-    SwapArgonneLEDv11(*data);
+    TRawEvent::SwapArgonneLEDv11(*data);
     // Extract data from payload
     led_prev = data->GetPreviousLED();
     flags = data->flags;
