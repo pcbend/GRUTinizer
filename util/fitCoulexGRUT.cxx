@@ -177,6 +177,7 @@ int fitCoulex(const char *cfg_file_name){
   std::string pid_cut_name;
   std::string tcut_name;
   std::string in_cut_name;
+  std::string inverse_map_file_name;
 
   int data_low_x;
   int data_high_x;
@@ -203,9 +204,6 @@ int fitCoulex(const char *cfg_file_name){
   double ata;//radians
   double bta;//radians
   int absolute_det_id;
-  TCaesar *caesar = 0;
-  TS800::ReadInverseMap(inverse_map_file_name.c_str());
-  TS800   *s800   = 0;
 
   
 
@@ -291,12 +289,19 @@ int fitCoulex(const char *cfg_file_name){
     return -1;
   }
 
+
+  inverse_map_file_name = cfg->GetValue("INVERSE_MAP_FILE_NAME","");
+  if (inverse_map_file_name.empty()){
+    std::cout << "ERROR: Failed to get INVERSE_MAP_FILE_NAME from cfg file: " << cfg_file_name << std::endl;
+    return -1;
+  }
+
   num_pars = cfg->GetValue("NUM_PARS",0);
   if (num_pars == 0 || num_pars > MAX_PARS){
     std::cout << "ERROR: Bad NUM_PARS Value : " << num_pars << std::endl;
     return -1;
   }
-
+  
   std::cout << "Using " << num_pars << " parameters: " << std::endl;
   for (int i = 0; i < num_pars; i++){
     init_pars[i] = cfg->GetValue(Form("PAR.%d", i), 0.0);
@@ -315,6 +320,9 @@ int fitCoulex(const char *cfg_file_name){
   //Finished parsing cfg file
   ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  TS800::ReadInverseMap(inverse_map_file_name.c_str());
+  TCaesar *caesar = 0;
+  TS800   *s800   = 0;
   //TODO: I Should probably make a CONFIG class that stores all these parameters as simple
   //members so that I can write this class to an output file and keep better track of my fits
 
@@ -417,26 +425,54 @@ int fitCoulex(const char *cfg_file_name){
         tof_obj_tac_corr = s800->GetCorrTOF_OBJTAC();
         ic_sum = s800->GetIonChamber().GetSum();
 
+        
         ata = s800->GetAta_Spec();
         bta = s800->GetBta_Spec();
         double xsin = sin(ata);
         double ysin = sin(bta);
         scatter_angle = asin(sqrt(xsin*xsin+ysin*ysin))*180.0/TMath::Pi();
   //    FOR DEBUGGING
-  //    scatter_angle = 0;
+  //      scatter_angle = 0;
+        if (entry == 2064){
+          std::cout << "Scatter angle: " << scatter_angle << std::endl;
+          std::cout << "ata = " << ata << std::endl;
+          std::cout << "bta = " << bta << std::endl;
+          std::cout << "gamma_energy_dc = " << gamma_energy_dc << std::endl;
+          std::cout << "tof_obj_tac_corr = " << tof_obj_tac_corr << std::endl;
+        }
+
 
         if (pid_cut->IsInside(tof_obj_tac_corr, ic_sum)){
+          if (entry == 2064){
+            std::cout << "INSIDE PID CUT" << std::endl;
+          }
           if (tcut->IsInside(gamma_time,gamma_energy_dc)){
+            if (entry == 2064){
+              std::cout << "INSIDE TIME CUT" << std::endl;
+            }
             if (in_cut->IsInside(tof_xfp_tac,tof_obj_tac)){
+              if (entry == 2064){
+                std::cout << "IN IN_BEAM_CUT" << std::endl;
+              }
               bool done = false;
               int cur_angle_index = 0;
               while (!done && cur_angle_index < TOTAL_ANGLES){
+                if (entry == 2064){
+                  std::cout << "Not done yet." << std::endl;
+                  std::cout << "angles[cur_angle_index]: " << angles[cur_angle_index] << std::endl;
+                  std::cout << "TOTAL ANGLES: " << TOTAL_ANGLES<< std::endl;
+                  std::cout << "cur_angle_index: " << cur_angle_index<< std::endl;
+                }
                 if (scatter_angle < angles[cur_angle_index]){
                   for (int angle_index = cur_angle_index; angle_index < TOTAL_ANGLES; angle_index++){
+                    if (entry == 2064){
+                      std::cout << "FILLING HISTOGRAM" << std::endl;
+                    }
                     data_hists.at(angle_index)->Fill(gamma_energy_dc);
-                  }
+                  }//loop through angles above cur_angle_index to fill all histos
                   done = true;
                 }//scatter_angle < angles[cur_angle_index]
+                cur_angle_index++;
               }//!done && cur_angle_index < TOTAL_ANGLES
             }//in beam
           }//time-energy cut
