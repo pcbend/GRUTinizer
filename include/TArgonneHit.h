@@ -20,16 +20,12 @@ class TArgonneHit : public TDetectorHit {
 
   void     BuildFrom(TSmartBuffer buf);
 
-    Int_t    GetChannel()   const { return (board_id & 0x000f);     }
-    Int_t    GetVME()       const { return (board_id & 0x0030)>>4;    }
-    Int_t    GetCrystal()   const { return (board_id & 0x00c0)>>6;    }
-    Int_t    GetHole()      const { return (board_id & 0x1f00)>>8;        }
-    Int_t    GetSegmentId() const { return GetVME()*10 + GetChannel(); }
-    Int_t    GetCrystalId() const { return GetHole()*4 + GetCrystal(); }
 
     Long_t   GetLed()       const { return led; }
     Long_t   GetCfd()       const { return cfd; }
-
+    Int_t    GetPreE()      const { return prerise_energy; }
+    Int_t    GetPostE()      const { return postrise_energy; }
+    //Float_t  GetEnergy()    const { return  ((Int_t)postrise_energy - (Int_t)prerise_energy)/350.0; }
 
 
 

@@ -139,7 +139,7 @@ ULong_t  TRawEvent::GEBArgonneHead::GetLED() const { return (((ULong_t)led_high)
 ULong_t  TRawEvent::GEBArgonneLEDv11::GetPreviousLED() const { return (((ULong_t)led_high_prev) << 16) + ((ULong_t)led_low_prev); }
 UInt_t   TRawEvent::GEBArgonneLEDv11::GetBaseline() const { return ((sampled_baseline & 0x00FFFFFF) >> 0); }
 UInt_t   TRawEvent::GEBArgonneLEDv11::GetPreRiseE() const { return (postrise_sum_low_prerise_sum & 0xffffff); }
-UInt_t   TRawEvent::GEBArgonneLEDv11::GetPostRiseE() const { return ((postrise_sum_low_prerise_sum & 0xff000000)>>24); }
+UInt_t   TRawEvent::GEBArgonneLEDv11::GetPostRiseE() const { return ((postrise_sum_low_prerise_sum & 0xff000000)>>24) + (((UInt_t)postrise_sum_high) << 8); }
 ULong_t  TRawEvent::GEBArgonneLEDv11::GetPeakTimestamp() const { return ((ULong_t)timestamp_peak_low) + (((ULong_t)timestamp_peak_high)<<16); }
 UShort_t TRawEvent::GEBArgonneLEDv11::GetPostRiseSampleBegin() const { return (postrise_begin_sample & 0x3fff); }
 UShort_t TRawEvent::GEBArgonneLEDv11::GetPostRiseSampleEnd() const { return (postrise_end_sample & 0x3fff); }
