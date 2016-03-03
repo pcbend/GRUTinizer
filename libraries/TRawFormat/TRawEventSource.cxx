@@ -131,6 +131,7 @@ std::string TRawEventByteSource::Status() const {
 int TRawEventByteSource::GetEvent(TRawEvent& rawevent) {
   switch(fFileType) {
     case kFileType::NSCL_EVT:
+    case kFileType::ANL_RAW:
     case kFileType::GRETINA_MODE2:
     case kFileType::GRETINA_MODE3:
       break;
