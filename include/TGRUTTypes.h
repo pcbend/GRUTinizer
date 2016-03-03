@@ -31,6 +31,7 @@ enum kFileType {
   NSCL_EVT = 1,
   GRETINA_MODE2 = 2,
   GRETINA_MODE3 = 3,
+  ANL = 4,
   ROOT_DATA = 256,
   ROOT_MACRO = 257,
   CALIBRATED = 512,

@@ -36,6 +36,9 @@ void TArgonneHit::BuildFrom(TSmartBuffer buf){
   // Extract header data. Header format should stay constant pending FW updates
   auto header = (TRawEvent::GEBArgonneHead*)buf.GetData();
   buf.Advance(sizeof(TRawEvent::GEBArgonneHead));
+  // Swap big endian for little endian
+  SwapArgonneHead(*header);
+  // Extract header data
   global_addr = header->GetGA();
   board_id = header->GetBoardID();
   led = header->GetLED();
@@ -51,6 +54,9 @@ void TArgonneHit::BuildFrom(TSmartBuffer buf){
   case TRawEvent::ArgonneType::LEDv11: {
     auto data = (TRawEvent::GEBArgonneLEDv11*)buf.GetData();
     buf.Advance(sizeof(TRawEvent::GEBArgonneLEDv11));
+    // Swap big endian for little endian
+    SwapArgonneLEDv11(*data);
+    // Extract data from payload
     led_prev = data->GetPreviousLED();
     flags = data->flags;
     prerise_energy = data->GetPreRiseE();

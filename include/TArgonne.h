@@ -28,7 +28,6 @@ public:
 private:
   virtual int BuildHits();
 
-  //TClonesArray* anl_hits;//("TArgonneHit");
   std::vector<TArgonneHit> anl_hits;
 
   ClassDef(TArgonne,1);
