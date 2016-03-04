@@ -25,6 +25,7 @@ using namespace std;
 
 
 string name;
+stringstream stream;
 
 // extern "C" is needed to prevent name mangling.
 // The function signature must be exactly as shown here,
@@ -41,10 +42,18 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   for(int y=0;y<cagra->Size();y++) {
     TArgonneHit hit = cagra->GetArgonneHit(y);
-    //stringstream stream; stream.str("");
-    //stream << "Energy";
-    name = "Energy";
-    obj.FillHistogram(name,10000,0,20000,((hit.GetPostE() - hit.GetPreE())/350.0));
+
+
+    if(hit.GetBoardID() == 113) {
+      stream.str("");
+      stream << "Crystal" << hit.GetChannel();
+      float Energy = ((hit.GetPostE() - hit.GetPreE())/350.0);
+      obj.FillHistogram(stream.str(),10000,0,20000,Energy);
+    }
+
+
+
+
     // PRINT(hit.GetBoardID());
     // if (hit.GetChannel() > 2) PRINT(hit.GetChannel());
     // PRINT(hit.GetLED());
