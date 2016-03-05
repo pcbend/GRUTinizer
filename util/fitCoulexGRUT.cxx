@@ -23,6 +23,7 @@
 #include "TS800Hit.h"
 #include "TCaesar.h"
 #include "TS800.h"
+
 //This program takes as input a config file containing:
 //    -  directory containing necessary input root tree files (INPUT_DIR)
 //    -  number of parameters to use in the fit (NUM_PARS)
@@ -98,21 +99,23 @@ void initializeHistograms(std::vector<TH1F*> &data_hists, std::vector<double> &a
   }
 }
 
-void getGeantHistograms(std::vector<TH1F*> &geant_hists, std::string geant_file_name){
-  TFile *geant_file = new TFile(geant_file_name.c_str(),"read");
-  if (!geant_file){
-    std::cout << "Failed loading geant file: " << geant_file_name << std::endl;
-    return;
-  }
-  std::string geant_hist_name("all_dop");
-  std::string geant_fep_hist_name("all_dop_fep");
+void getGeantHistograms(std::vector<TH1F*> &geant_hists, std::vector<std::string> &geant_file_names){
+  for (unsigned int i = 0; i < geant_file_names.size(); i++){
+    TFile *geant_file = new TFile(geant_file_names.at(i).c_str(),"read");
+    if (!geant_file){
+      std::cout << "Failed loading geant file: " << geant_file_names.at(i) << std::endl;
+      return;
+    }
+    std::string geant_hist_name("all_dop");
+    std::string geant_fep_hist_name("all_dop_fep");
 
-  geant_hists.push_back( (TH1F*)geant_file->Get(geant_hist_name.c_str()));
-  TH1F *geant_fep_hist = (TH1F*)geant_file->Get(geant_fep_hist_name.c_str());
-  
-  TH1F *geant_compton = (TH1F*)geant_hists.at(0)->Clone("geant_compton");
-  geant_compton->Add(geant_fep_hist,-1);
-  geant_hists.push_back(geant_compton);
+    geant_hists.push_back( (TH1F*)geant_file->Get(geant_hist_name.c_str()));
+    TH1F *geant_fep_hist = (TH1F*)geant_file->Get(geant_fep_hist_name.c_str());
+    
+    TH1F *geant_compton = (TH1F*)geant_hists.at(0)->Clone("geant_compton");
+    geant_compton->Add(geant_fep_hist,-1);
+    geant_hists.push_back(geant_compton);
+  }
   return;
 }
 
@@ -164,7 +167,7 @@ int fitCoulex(const char *cfg_file_name){
   angles.reserve(TOTAL_ANGLES);
 
   //Fitting Arrays
-  double hist_constant[TOTAL_ANGLES];
+  double hist_constant[TOTAL_ANGLES][2];
   double fit_error[TOTAL_ANGLES];
   double chi_squared[TOTAL_ANGLES];
 
@@ -173,7 +176,7 @@ int fitCoulex(const char *cfg_file_name){
   std::string input_dir;
   std::string out_file_name;
   std::string cut_file_name;
-  std::string geant_file_name;
+  std::vector<std::string> geant_file_names;
   std::string pid_cut_name;
   std::string tcut_name;
   std::string in_cut_name;
@@ -188,6 +191,7 @@ int fitCoulex(const char *cfg_file_name){
   
   int kev_per_bin;
   int num_pars;
+  int num_geant_files;
 
   int omitted_det;
 
@@ -233,11 +237,22 @@ int fitCoulex(const char *cfg_file_name){
     std::cout << "ERROR: Failed to get CUT_FILE_NAME from cfg file: " << cfg_file_name << std::endl;
     return -1;
   }
-  geant_file_name = cfg->GetValue("GEANT_FILE_NAME", "");
-  if (geant_file_name.empty()){
-    std::cout << "ERROR: Failed to get GEANT_FILE_NAME from cfg file: " << cfg_file_name << std::endl;
+
+  num_geant_files = cfg->GetValue("NUM_GEANT_FILES", 0);
+  if (num_geant_files == 0){
+    std::cout << "ERROR: Failed to get correct number of geant files from cfg file: " << cfg_file_name << std::endl;
     return -1;
   }
+
+  for (int i = 0; i < num_geant_files; i++){
+    std::string geant_file_name = cfg->GetValue(Form("GEANT_FILE_NAME_%d",i), "");
+    if (geant_file_name.empty()){
+      std::cout << "ERROR: Failed to get GEANT_FILE_NAME_"<<i<<" from cfg file: " << cfg_file_name << std::endl;
+      return -1;
+    }
+    geant_file_names.push_back(geant_file_name);
+  }
+  
   pid_cut_name = cfg->GetValue("PID_CUT_NAME", "");
   if (pid_cut_name.empty()){
     std::cout << "ERROR: Failed to get PID_CUT_NAME from cfg file: " << cfg_file_name << std::endl;
@@ -373,14 +388,17 @@ int fitCoulex(const char *cfg_file_name){
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   //GET GEANT HISTOGRAMS
 
-  getGeantHistograms(geant_hists,geant_file_name);
-  if (geant_hists.size() != 2){
-    std::cout << "Incorrect number of histograms ("<<geant_hists.size()
-              <<"added to vector!" << std::endl;
+  getGeantHistograms(geant_hists,geant_file_names);
+  if (geant_hists.size() != num_geant_files*2){
+    std::cout << "ERROR: Incorrect number of histograms ("<<geant_hists.size()
+              <<") added to vector! Expected " << num_geant_files*2 <<  std::endl;
+    return -1 ;
   }
   //Need to rebin these to match the binning from my filled histograms
-  geant_hists.at(0)->Rebin(kev_per_bin);
-  geant_hists.at(1)->Rebin(kev_per_bin);
+  for (unsigned int geant_file = 0; geant_file < num_geant_files; geant_file+=2){
+    geant_hists.at(geant_file)->Rebin(kev_per_bin);
+    geant_hists.at(geant_file+1)->Rebin(kev_per_bin);
+  }
   //DONE GETTING GEANT HISTOGRAMS
   ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -433,41 +451,16 @@ int fitCoulex(const char *cfg_file_name){
         scatter_angle = asin(sqrt(xsin*xsin+ysin*ysin))*180.0/TMath::Pi();
   //    FOR DEBUGGING
   //      scatter_angle = 0;
-        if (entry == 2064){
-          std::cout << "Scatter angle: " << scatter_angle << std::endl;
-          std::cout << "ata = " << ata << std::endl;
-          std::cout << "bta = " << bta << std::endl;
-          std::cout << "gamma_energy_dc = " << gamma_energy_dc << std::endl;
-          std::cout << "tof_obj_tac_corr = " << tof_obj_tac_corr << std::endl;
-        }
 
 
         if (pid_cut->IsInside(tof_obj_tac_corr, ic_sum)){
-          if (entry == 2064){
-            std::cout << "INSIDE PID CUT" << std::endl;
-          }
           if (tcut->IsInside(gamma_time,gamma_energy_dc)){
-            if (entry == 2064){
-              std::cout << "INSIDE TIME CUT" << std::endl;
-            }
             if (in_cut->IsInside(tof_xfp_tac,tof_obj_tac)){
-              if (entry == 2064){
-                std::cout << "IN IN_BEAM_CUT" << std::endl;
-              }
               bool done = false;
               int cur_angle_index = 0;
               while (!done && cur_angle_index < TOTAL_ANGLES){
-                if (entry == 2064){
-                  std::cout << "Not done yet." << std::endl;
-                  std::cout << "angles[cur_angle_index]: " << angles[cur_angle_index] << std::endl;
-                  std::cout << "TOTAL ANGLES: " << TOTAL_ANGLES<< std::endl;
-                  std::cout << "cur_angle_index: " << cur_angle_index<< std::endl;
-                }
                 if (scatter_angle < angles[cur_angle_index]){
                   for (int angle_index = cur_angle_index; angle_index < TOTAL_ANGLES; angle_index++){
-                    if (entry == 2064){
-                      std::cout << "FILLING HISTOGRAM" << std::endl;
-                    }
                     data_hists.at(angle_index)->Fill(gamma_energy_dc);
                   }//loop through angles above cur_angle_index to fill all histos
                   done = true;
@@ -484,6 +477,9 @@ int fitCoulex(const char *cfg_file_name){
     delete gvalues;
   }//loop over trees
   //FINISHED LOOPING OVER INPUT TREES
+  
+  ////////////////////////////////////////////////////
+  //Now Starting Fitting Routine
   int num_res_points = (fit_high_x - fit_low_x)/kev_per_bin;
   std::vector<double> residuals;
   std::vector<double> normed_residuals;
@@ -496,32 +492,59 @@ int fitCoulex(const char *cfg_file_name){
 
   TF1 *used_fit_function = new TF1("double_expo_fit", 
                                    "[0]*([1]*TMath::Exp([2]*x)+[3]*TMath::Exp([4]*x))", data_low_x,data_high_x);
-  used_fit_function->SetParameter(1,init_pars[2]);
-  used_fit_function->SetParameter(2,init_pars[3]);
-  used_fit_function->SetParameter(3,init_pars[4]);
-  used_fit_function->SetParameter(4,init_pars[5]);
+  if (num_geant_files == 1){
+    used_fit_function->SetParameter(1,init_pars[2]);
+    used_fit_function->SetParameter(2,init_pars[3]);
+    used_fit_function->SetParameter(3,init_pars[4]);
+    used_fit_function->SetParameter(4,init_pars[5]);
+  }
+  else if (num_geant_files == 2){
+    used_fit_function->SetParameter(1,init_pars[3]);
+    used_fit_function->SetParameter(2,init_pars[4]);
+    used_fit_function->SetParameter(3,init_pars[5]);
+    used_fit_function->SetParameter(4,init_pars[6]);
+  }
 
   TFile *out_hist_file = new TFile("output_fit_hists.root","recreate");
   for (int angle_index = 0; angle_index < TOTAL_ANGLES; angle_index++){
     peak_sum[angle_index] = 0;
-    TF1 *fit_func = FitDoubleExpHist(data_hists.at(angle_index), geant_hists.at(0), fit_low_x, fit_high_x, init_pars);
+    TF1 *fit_func = 0;
+  
+    if (num_geant_files == 1){
+      fit_func = FitDoubleExpHist(data_hists.at(angle_index), geant_hists.at(0), fit_low_x, fit_high_x, init_pars);
+    }
+    else if (num_geant_files == 2){
+      fit_func = FitDoubleExpTwoHist(data_hists.at(angle_index), geant_hists.at(0), geant_hists.at(2), fit_low_x, fit_high_x, init_pars);
+    }
     data_hists.at(angle_index)->SetTitle(Form("Fit to %s with Scatter Cut (< %3.3f)", isotope_name.c_str(),angles.at(angle_index)));
     data_hists.at(angle_index)->GetXaxis()->SetTitle("Energy (keV)");
     data_hists.at(angle_index)->GetYaxis()->SetTitle(Form("Counts / %d keV", kev_per_bin));
 
-    hist_constant[angle_index] = fit_func->GetParameter(0);
+    std::cout << "GETTING FIT FUNC PARAMETERS INTO HIST CONSTANT ARRAY" << std::endl;
+    for (int i = 0; i < num_geant_files; i++){
+
+      hist_constant[angle_index][i] = fit_func->GetParameter(i);
+      std::cout << "i = " << i << " angle_index = " << angle_index 
+                << " hist_constant[angle_index][i] = "  
+                << hist_constant[angle_index][i] << std::endl;
+    }
+
     fit_error[angle_index]     = fit_func->GetParError(0); 
     chi_squared[angle_index]   = fit_func->GetChisquare();
 
     //Now we get residuals
-    
     double res_sum = 0;
     double res_sum_in_peak = 0;
 
     int start_bin = data_hists[angle_index]->FindBin(fit_low_x);
     int end_bin = data_hists[angle_index]->FindBin(fit_high_x);
     if (angle_index == 0){
-      used_fit_function->SetParameter(0, fit_func->GetParameter(1));//set double exponential scaling factor
+      if (num_geant_files == 1){
+        used_fit_function->SetParameter(0, fit_func->GetParameter(1));//set double exponential scaling factor
+      }
+      else if (num_geant_files == 2){
+        used_fit_function->SetParameter(0, fit_func->GetParameter(2));//set double exponential scaling factor
+      }
     }
     
     for (int bin = start_bin; bin < end_bin; bin++){
@@ -543,8 +566,15 @@ int fitCoulex(const char *cfg_file_name){
     TGraph *norm_residual_plot = new TGraph(num_res_points, &bin_centers[0], &normed_residuals[0]);
     norm_residual_plot->SetName(Form("norm_res_plot_angle_%f", angles.at(angle_index)));
 
-    out_file <<  hist_constant[angle_index] << "     " << fit_error[angle_index] << "     " << chi_squared[angle_index] << "     " << res_sum << "     " << res_sum_in_peak << "     " << peak_sum[angle_index] << "     " << std::endl;
+    if (num_geant_files == 1){
+      out_file <<  hist_constant[angle_index][0] << "     " << fit_error[angle_index] << "     " << chi_squared[angle_index] << "     " << res_sum << "     " << res_sum_in_peak << "     " << peak_sum[angle_index] << "     " << std::endl;
+    }
 
+    else if (num_geant_files == 2){
+      out_file <<  hist_constant[angle_index][0] << "     " << "     " << hist_constant[angle_index][1] << "     " << fit_error[angle_index] << "     " << chi_squared[angle_index] << "     " << res_sum << "     " << res_sum_in_peak << "     " << peak_sum[angle_index] << "     " << std::endl;
+    }
+
+        
 
     out_hist_file->cd();
     residual_plot->Write();
@@ -581,8 +611,10 @@ int fitCoulex(const char *cfg_file_name){
   geant_hists.at(1)->SetLineColor(kRed);
   used_fit_function->SetLineColor(kBlack);
   //FOR DEBUGGING
-  geant_hists.at(1)->Scale(hist_constant[0]);
+  geant_hists.at(1)->Scale(hist_constant[0][0]);
   geant_hists.at(1)->Draw("same");
+  geant_hists.at(3)->Scale(hist_constant[0][1]);
+  geant_hists.at(3)->Draw("same");
   if (!used_fit_function){
     std::cout << "Fit function doesn't exist." << std::endl;
   }
