@@ -1180,7 +1180,11 @@ float TS800::MCorrelatedE1() const{
 }
 
 float TS800::MCorrelatedOBJ_E1(bool corrected) const{
-  if(mtof.fCorrelatedOBJ>-1 && mtof.fCorrelatedE1>-1){
+  if(!(mtof.fE1Up.size()==1)) {
+    mtof.fCorrelatedOBJ = -1;
+    mtof.fCorrelatedE1  = -1;
+  }
+  else if(mtof.fCorrelatedOBJ>-1 && mtof.fCorrelatedE1>-1){
     double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
     double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
     if(corrected==false){
@@ -1259,7 +1263,11 @@ float TS800::MCorrelatedOBJ_E1(bool corrected) const{
 }
 
 float TS800::MCorrelatedXFP_E1(bool corrected) const{
-  if(mtof.fCorrelatedXFP>-1 && mtof.fCorrelatedE1>-1)  {
+  if(!(mtof.fE1Up.size()==1)) {
+    mtof.fCorrelatedXFP = -1;
+    mtof.fCorrelatedE1  = -1;
+  }
+  else if(mtof.fCorrelatedXFP>-1 && mtof.fCorrelatedE1>-1)  {
     double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
     double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
     if(corrected==false){
