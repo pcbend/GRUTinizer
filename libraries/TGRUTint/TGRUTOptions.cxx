@@ -57,7 +57,8 @@ void TGRUTOptions::Load(int argc, char** argv) {
   if(compiled_histogram_file.length() == 0){
     compiled_histogram_file = std::string(getenv("GRUTSYS")) + "/libraries/libMakeHistos.so";
   }
-  //s800_inverse_map_file = "invmap.inv"; no; if we want to make this default, please use the grutrc.  pcb.
+
+  s800_inverse_map_file = "";//"invmap.inv";
 
   // Load default TChannels, if specified.
   {

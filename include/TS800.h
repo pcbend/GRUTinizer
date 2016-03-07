@@ -17,7 +17,7 @@ public:
   TS800();
   virtual ~TS800();
 
-  static void ReadInverseMap(const char *);
+  static void ReadInverseMap(const char *mapfile="");
 
   //////////////////////////////////////////////
   virtual void InsertHit(const TDetectorHit&);
@@ -93,7 +93,7 @@ public:
   float MCorrelatedXFP() const;
   float MCorrelatedE1() const;
   float MCorrelatedOBJ_E1(bool corrected=true) const;
-  float MCorrelatedXFP_E1() const;
+  float MCorrelatedXFP_E1(bool corrected=true) const;
   
 
 private:
@@ -107,9 +107,10 @@ private:
   static float fbrho;                                             //!
   static int fmass;                                               //!
   static int fcharge;                                             //!
+  static bool fMapLoaded;                                         //!
   //---------------------
 
-  static bool ReadMap_SpecTCL(std::string);
+  static bool ReadMap_SpecTCL(std::string filename);
   virtual int  BuildHits();
 
   bool HandleTrigPacket(unsigned short*,int);     //!
