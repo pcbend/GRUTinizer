@@ -617,31 +617,37 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
   current_crdc->SetAddress((0x58<<24) + (1<<16) + (current_crdc->GetId() <<8) + 0);
 
   std::map<int,std::map<int,int> > pad;
-  //for(;x<subsize;x+=2) {
+
+  // This is deliberately different from SpecTcl,
+  //   in how it handles multiple word2 occurring in a row.
+  // We talked to Daniel, and this is when it has read out
+  //   the same sample/channel on multiple connectors.
+  // Therefore, in this case, we should use the same word1 (top bit set)
+  //   with all the word2 (top bit unset) instances that follow.
+  unsigned short word1 = 0;
   while(x<subsize){
-    unsigned short word1 = *(data+x); x++;
-    //std::cout << std::hex << " word 1 " << word1 << std::endl;
-    if((word1&0x8000)!=0x8000) { continue; }
-    unsigned short word2 = *(data+x);
-    //std::cout << std::hex << " word 2 " << word2 << std::endl;
+    unsigned short current_word = *(data+x); x++;
+    // Remember the header.
+    if(current_word & 0x8000) {
+      word1 = current_word;
+    } else if (word1 != 0) {
+      // Not a header, so it is
+      unsigned short word2 = current_word;
+      int sample_number    = (word1&(0x7fc0)) >> 6;
+      int channel_number   =  word1&(0x003f);
+      int connector_number = (word2&(0x0c00)) >> 10;
+      int databits         = (word2&(0x03ff));
+      int real_channel = (connector_number << 6) + channel_number;
 
-
-    int sample_number    = (word1&(0x7fc0)) >> 6;
-    int channel_number   =  word1&(0x003f);
-    int connector_number = (word2&(0x0c00)) >> 10;
-    int databits         = (word2&(0x03ff));
-    int real_channel = (connector_number << 6) + channel_number;
-
-
-
-    /*std::cout << " sample Number    : " << std::dec << sample_number << std::endl;
-    std::cout << " channel Number   : " << std::dec << channel_number << std::endl;
-    std::cout << " connector Number : " << std::dec << connector_number << std::endl;
-    std::cout << " data bits        : " << std::dec << databits << std::endl;
-    std::cout << " real channel     : " << std::dec << real_channel << std::endl;
-    std::dec;
-    */
-    pad[real_channel][sample_number] = databits;
+      /*std::cout << " sample Number    : " << std::dec << sample_number << std::endl;
+        std::cout << " channel Number   : " << std::dec << channel_number << std::endl;
+        std::cout << " connector Number : " << std::dec << connector_number << std::endl;
+        std::cout << " data bits        : " << std::dec << databits << std::endl;
+        std::cout << " real channel     : " << std::dec << real_channel << std::endl;
+        std::dec;
+      */
+      pad[real_channel][sample_number] = databits;
+    }
   }
   x+=1;
   std::map<int,std::map<int,int> >::iterator it1;
@@ -1079,21 +1085,22 @@ float TS800::GetTofE1_TAC(float c1,float c2)  const {
   | are not present  |
   \*----------------*/
 
-  return GetTof().GetTacOBJ() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+  if(GetTof().GetTacOBJ()>-1)
+    return GetTof().GetTacOBJ() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+  return sqrt(-1);
+
 }
 
 
 float TS800::GetTofE1_TDC(float c1,float c2)  const {
-  /*  if (GetCrdc(0).GetId() == -1) {
-    return sqrt(-1);
-  }
-  */
   /*----------------*\
   | AFP returns nan  |
   | if both crdc's   |
   | are not present  |
   \*----------------*/
-  return GetTof().GetOBJ() - GetScint().GetTimeUp() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+  if(GetTof().GetOBJ()>-1)
+    return GetTof().GetOBJ() - GetScint().GetTimeUp() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+  return sqrt(-1);
 }
 
 float TS800::GetTofE1_MTDC(float c1,float c2,int i) const {
@@ -1389,15 +1396,15 @@ void TS800::DrawPID(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) 
     if(!OptString.Contains("Tune"))
       gPad->GetCanvas()->Clear();
   }
-  
+
   std::string name = Form("%s_PID",Class()->GetName()); //_%s",opt);
   std::string title = Form("%s PID AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJTAC_TOF_CORR_AFP"),GValue::Value("OBJTAC_TOF_CORR_XFP")); //_%s",opt);
   GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
   if(!h)
     h = new GH2I(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJTAC()",4096,0,4096,4000,0,4000);
   chain->Project(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJTAC()","","colz",nentries);
-  h->GetXaxis()->SetTitle("Corrected TOF (objtac)");  
-  h->GetYaxis()->SetTitle("Ion Chamber Energy loss (arb. units)");  
+  h->GetXaxis()->SetTitle("Corrected TOF (objtac)");
+  h->GetYaxis()->SetTitle("Ion Chamber Energy loss (arb. units)");
   h->Draw("colz");
 }
 
@@ -1414,21 +1421,21 @@ void TS800::DrawAFP(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) 
     if(!OptString.Contains("Tune"))
       gPad->GetCanvas()->Clear();
   }
-  
+
   std::string name = Form("%s_AFP",Class()->GetName()); //_%s",opt);
   std::string title = Form("%s AFP AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJTAC_TOF_CORR_AFP"),GValue::Value("OBJTAC_TOF_CORR_XFP")); //_%s",opt);
   GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
   if(!h)
     h = new GH2I(name.c_str(),title.c_str(),2048,0,2048,4000,-0.1,0.1);
   chain->Project(name.c_str(),"GetAFP():GetCorrTOF_OBJTAC()","","colz",nentries);
-  h->GetXaxis()->SetTitle("Corrected TOF (objtac)");  
-  h->GetYaxis()->SetTitle("Corrected AFP (objtac)");  
+  h->GetXaxis()->SetTitle("Corrected TOF (objtac)");
+  h->GetYaxis()->SetTitle("Corrected AFP (objtac)");
   h->Draw("colz");
 }
 
 
 void TS800::DrawDispX(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) {
-  
+
   TString OptString = opt;
 
   if(!chain)
@@ -1441,7 +1448,7 @@ void TS800::DrawDispX(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain
     if(!OptString.Contains("Tune"))
        gPad->GetCanvas()->Clear();
   }
-  
+
   std::string name = Form("%s_DispX",Class()->GetName()); //_%s",opt);
   std::string title = Form("%s DispX AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJTAC_TOF_CORR_AFP"),GValue::Value("OBJTAC_TOF_CORR_XFP")); //_%s",opt);
   GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
@@ -1449,8 +1456,8 @@ void TS800::DrawDispX(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain
     h = new GH2I(name.c_str(),title.c_str(),4096,-2047,2048,4000,-300,300);
   h->SetTitle(title.c_str());
   chain->Project(name.c_str(),"GetCrdc(0)->GetDispersiveX():GetCorrTOF_OBJTAC()","","colz",nentries);
-  h->GetXaxis()->SetTitle("Corrected TOF (objtac)");  
-  h->GetYaxis()->SetTitle("Dispersive X (objtac)");  
+  h->GetXaxis()->SetTitle("Corrected TOF (objtac)");
+  h->GetYaxis()->SetTitle("Dispersive X (objtac)");
   h->Draw("colz");
 }
 
@@ -1470,7 +1477,7 @@ void TS800::DrawPID_Tune(Long_t nentries,TChain *chain){
 
   gPad->GetCanvas()->cd(2);
   DrawAFP("","Tune",nentries);
-  
+
   gPad->GetCanvas()->cd(3);
   DrawPID("","Tune",nentries);
 
@@ -1489,15 +1496,15 @@ void TS800::DrawPID_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TCha
     if(!OptString.Contains("Tune"))
       gPad->GetCanvas()->Clear();
   }
-  
+
   std::string name = Form("%s_PID",Class()->GetName()); //_%s",opt);
   std::string title = Form("%s PID AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJ_MTOF_CORR_AFP"),GValue::Value("OBJ_MTOF_CORR_XFP")); //_%s",opt);
   GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
   if(!h)
     h = new GH2I(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJ_MESY()",4096,-4096,4096,4000,-4000,4000);
   chain->Project(name.c_str(),Form("GetIonChamber()->GetSum():GetCorrTOF_OBJ_MESY(%i)",i),"","colz",nentries);
-  h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");  
-  h->GetYaxis()->SetTitle("Ion Chamber Energy loss (arb. units)");  
+  h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");
+  h->GetYaxis()->SetTitle("Ion Chamber Energy loss (arb. units)");
   h->Draw("colz");
 }
 
@@ -1514,21 +1521,21 @@ void TS800::DrawAFP_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TCha
     if(!OptString.Contains("Tune"))
       gPad->GetCanvas()->Clear();
   }
-  
+
   std::string name = Form("%s_AFP",Class()->GetName()); //_%s",opt);
   std::string title = Form("%s AFP AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJ_MTOF_CORR_AFP"),GValue::Value("OBJ_MTOF_CORR_XFP")); //_%s",opt);
   GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
   if(!h)
     h = new GH2I(name.c_str(),title.c_str(),2048,-4096,2048,4000,-0.1,0.1);
   chain->Project(name.c_str(),Form("GetAFP():GetCorrTOF_OBJ_MESY(%i)",i),"","colz",nentries);
-  h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");  
-  h->GetYaxis()->SetTitle("Corrected AFP (Mesy)");  
+  h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");
+  h->GetYaxis()->SetTitle("Corrected AFP (Mesy)");
   h->Draw("colz");
 }
 
 
 void TS800::DrawDispX_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TChain *chain) {
-  
+
   TString OptString = opt;
 
   if(!chain)
@@ -1541,7 +1548,7 @@ void TS800::DrawDispX_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TC
     if(!OptString.Contains("Tune"))
        gPad->GetCanvas()->Clear();
   }
-  
+
   std::string name = Form("%s_DispX",Class()->GetName()); //_%s",opt);
   std::string title = Form("%s DispX AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJ_MTOF_CORR_AFP"),GValue::Value("OBJ_MTOF_CORR_XFP")); //_%s",opt);
   GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
@@ -1549,8 +1556,8 @@ void TS800::DrawDispX_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TC
     h = new GH2I(name.c_str(),title.c_str(),4096,-4096,4096,4000,-300,300);
   h->SetTitle(title.c_str());
   chain->Project(name.c_str(),Form("GetCrdc(0)->GetDispersiveX():GetCorrTOF_OBJ_MESY(%i)",i),"","colz",nentries);
-  h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");  
-  h->GetYaxis()->SetTitle("Dispersive X (Mesy)");  
+  h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");
+  h->GetYaxis()->SetTitle("Dispersive X (Mesy)");
   h->Draw("colz");
 }
 
@@ -1570,10 +1577,9 @@ void TS800::DrawPID_Mesy_Tune(Long_t nentries,int i,TChain *chain){
 
   gPad->GetCanvas()->cd(2);
   DrawAFP_Mesy("","Tune",nentries,i);
-  
+
   gPad->GetCanvas()->cd(3);
   DrawPID_Mesy("","Tune",nentries,i);
 
 
 }
-
