@@ -66,10 +66,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
     double xfptac = s800->GetTof().GetTacXFP();
     double xfp = s800->GetTof().GetXFP();
     double obj = s800->GetTof().GetOBJ();
-    double ata = s800->GetAta_Spec();
-    double bta = s800->GetBta_Spec();
-    double dta = s800->GetDta_Spec();
-    double yta = s800->GetYta_Spec();
+    double ata = s800->GetAta();
+    double bta = s800->GetBta();
+    double dta = s800->GetDta();
+    double yta = s800->GetYta();
     double crdc_1_anode = s800->GetCrdc(0).GetAnode();
     double crdc_2_anode = s800->GetCrdc(1).GetAnode();
     double crdc_1_tac = s800->GetCrdc(0).GetTime();

@@ -161,7 +161,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
           double objtac_corr = s800->GetCorrTOF_OBJTAC();
           double ic_sum = s800->GetIonChamber().GetSum();
           //targ_exit_vec = (pt,theta,phi)
-          TVector3 targ_exit_vec = s800->ExitTargetVect_Spec();
+          TVector3 targ_exit_vec = s800->ExitTargetVect();
           double scatter_angle = targ_exit_vec.Y();
 
 
@@ -221,8 +221,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
     double objtac = s800->GetTof().GetTacOBJ();
     double xfptac = s800->GetTof().GetTacXFP();
     //double afp = s800->GetAFP();
-    double ata = s800->GetAta_Spec();
-    double bta = s800->GetBta_Spec();
+    double ata = s800->GetAta();
+    double bta = s800->GetBta();
 
     TH1 *ata_hist = GetHistogram(list, "ata", 5000,-0.5,0.5);
     ata_hist->Fill(ata);

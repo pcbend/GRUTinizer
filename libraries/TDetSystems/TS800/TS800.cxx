@@ -51,7 +51,7 @@ void TS800::ReadInverseMap(const char *mapfile) {
     static std::mutex inv_map_mutex;
     std::lock_guard<std::mutex> lock(inv_map_mutex);
     if(!InvMapFileRead){
-      InvMapFileRead=ReadMap_SpecTCL(filename);
+      InvMapFileRead=ReadMap(filename);
       //std::cout << " SPECTCL INV MAP LOADED!!!" << std::endl;
     }
   }
@@ -102,7 +102,7 @@ void TS800::Copy(TObject& obj) const {
   }
 }
 
-float TS800::MapCalc_SpecTCL(int calcorder,int parameter,float *input){
+float TS800::MapCalc(int calcorder,int parameter,float *input){
   if(fMapLoaded==false){
     return sqrt(-1);
   }else{
@@ -123,7 +123,7 @@ float TS800::MapCalc_SpecTCL(int calcorder,int parameter,float *input){
   }
 }
 
-Float_t TS800::GetAta_Spec(int i){
+Float_t TS800::GetAta(int i){
   float Shift_ata = 0;
   if(GValue::Value("ATA_SHIFT"))
     Shift_ata = GValue::Value("ATA_SHIFT");
@@ -144,7 +144,7 @@ Float_t TS800::GetAta_Spec(int i){
   }
 }
 
-Float_t TS800::GetBta_Spec(int i){
+Float_t TS800::GetBta(int i){
   float Shift_bta = 0;
   if(GValue::Value("BTA_SHIFT"))
     Shift_bta = GValue::Value("BTA_SHIFT");
@@ -165,7 +165,7 @@ Float_t TS800::GetBta_Spec(int i){
   }
 }
 
-Float_t TS800::GetYta_Spec(int i){
+Float_t TS800::GetYta(int i){
   float Shift_yta = 0;
   if(GValue::Value("YTA_SHIFT"))
     Shift_yta = GValue::Value("YTA_SHIFT");
@@ -186,7 +186,7 @@ Float_t TS800::GetYta_Spec(int i){
   }
 }
 
-Float_t TS800::GetDta_Spec(int i){
+Float_t TS800::GetDta(int i){
   float Shift_dta = 0;
   if(GValue::Value("DTA_SHIFT"))
     Shift_dta = GValue::Value("DTA_SHIFT");
@@ -209,7 +209,7 @@ Float_t TS800::GetDta_Spec(int i){
 }
 
 
-bool TS800::ReadMap_SpecTCL(std::string filename){
+bool TS800::ReadMap(std::string filename){
   //  std::string filename = TGRUTOptions::Get()->S800InverseMapFile();
   if(!(filename.size())){
     fMapLoaded = false;
@@ -286,12 +286,12 @@ bool TS800::ReadMap_SpecTCL(std::string filename){
   }
 }
 
-TVector3 TS800::ExitTargetVect_Spec(int order){
+TVector3 TS800::ExitTargetVect(int order){
   TVector3 track;
   double xsin = 0;
   double ysin = 0;
-  xsin = GetAta_Spec(order);
-  ysin = GetBta_Spec(order);
+  xsin = GetAta(order);
+  ysin = GetBta(order);
   double phi   = 0;
   double theta = 0;
 
@@ -489,35 +489,35 @@ int TS800::BuildHits(){
   //std::cout << " BFP : " << input[3] << "  " << GetBFP() << std::endl;
   
   if(GetCrdc(0).Size()>0 && GetCrdc(1).Size()>0){
-    fAtaTCL1 = MapCalc_SpecTCL(1,0,input);
-    fYtaTCL1 = MapCalc_SpecTCL(1,1,input);
-    fBtaTCL1 = MapCalc_SpecTCL(1,2,input);
-    fDtaTCL1 = MapCalc_SpecTCL(1,3,input);
+    fAtaTCL1 = MapCalc(1,0,input);
+    fYtaTCL1 = MapCalc(1,1,input);
+    fBtaTCL1 = MapCalc(1,2,input);
+    fDtaTCL1 = MapCalc(1,3,input);
 
-    fAtaTCL2 = MapCalc_SpecTCL(2,0,input);
-    fYtaTCL2 = MapCalc_SpecTCL(2,1,input);
-    fBtaTCL2 = MapCalc_SpecTCL(2,2,input);
-    fDtaTCL2 = MapCalc_SpecTCL(2,3,input);
+    fAtaTCL2 = MapCalc(2,0,input);
+    fYtaTCL2 = MapCalc(2,1,input);
+    fBtaTCL2 = MapCalc(2,2,input);
+    fDtaTCL2 = MapCalc(2,3,input);
 
-    fAtaTCL3 = MapCalc_SpecTCL(3,0,input);
-    fYtaTCL3 = MapCalc_SpecTCL(3,1,input);
-    fBtaTCL3 = MapCalc_SpecTCL(3,2,input);
-    fDtaTCL3 = MapCalc_SpecTCL(3,3,input);
+    fAtaTCL3 = MapCalc(3,0,input);
+    fYtaTCL3 = MapCalc(3,1,input);
+    fBtaTCL3 = MapCalc(3,2,input);
+    fDtaTCL3 = MapCalc(3,3,input);
 
-    fAtaTCL4 = MapCalc_SpecTCL(4,0,input);
-    fYtaTCL4 = MapCalc_SpecTCL(4,1,input);
-    fBtaTCL4 = MapCalc_SpecTCL(4,2,input);
-    fDtaTCL4 = MapCalc_SpecTCL(4,3,input);
+    fAtaTCL4 = MapCalc(4,0,input);
+    fYtaTCL4 = MapCalc(4,1,input);
+    fBtaTCL4 = MapCalc(4,2,input);
+    fDtaTCL4 = MapCalc(4,3,input);
 
-    fAtaTCL5 = MapCalc_SpecTCL(5,0,input);
-    fYtaTCL5 = MapCalc_SpecTCL(5,1,input);
-    fBtaTCL5 = MapCalc_SpecTCL(5,2,input);
-    fDtaTCL5 = MapCalc_SpecTCL(5,3,input);
+    fAtaTCL5 = MapCalc(5,0,input);
+    fYtaTCL5 = MapCalc(5,1,input);
+    fBtaTCL5 = MapCalc(5,2,input);
+    fDtaTCL5 = MapCalc(5,3,input);
 
-    fAtaTCL6 = MapCalc_SpecTCL(6,0,input);
-    fYtaTCL6 = MapCalc_SpecTCL(6,1,input);
-    fBtaTCL6 = MapCalc_SpecTCL(6,2,input);
-    fDtaTCL6 = MapCalc_SpecTCL(6,3,input);
+    fAtaTCL6 = MapCalc(6,0,input);
+    fYtaTCL6 = MapCalc(6,1,input);
+    fBtaTCL6 = MapCalc(6,2,input);
+    fDtaTCL6 = MapCalc(6,3,input);
   }
   
 

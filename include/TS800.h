@@ -30,15 +30,15 @@ public:
   Long_t GetTimestamp()    { return Timestamp(); }
 
   TVector3 CRDCTrack();  // not a finished method
-  TVector3 ExitTargetVect_Spec(int order=6);
+  TVector3 ExitTargetVect(int order=6);
   float GetAFP() const;
   float GetBFP() const;
-  float MapCalc_SpecTCL(int calcorder,int parameter,float *input);
+  float MapCalc(int calcorder,int parameter,float *input);
 
-  Float_t GetAta_Spec(int i=6);
-  Float_t GetYta_Spec(int i=6);
-  Float_t GetBta_Spec(int i=6);
-  Float_t GetDta_Spec(int i=6);
+  Float_t GetAta(int i=6);
+  Float_t GetYta(int i=6);
+  Float_t GetBta(int i=6);
+  Float_t GetDta(int i=6);
 
   //bool InvMapLoaded()      { return fMapLoaded; }
 
@@ -110,7 +110,7 @@ private:
   static bool fMapLoaded;                                         //!
   //---------------------
 
-  static bool ReadMap_SpecTCL(std::string filename);
+  static bool ReadMap(std::string filename);
   virtual int  BuildHits();
 
   bool HandleTrigPacket(unsigned short*,int);     //!

@@ -444,8 +444,8 @@ int fitCoulex(const char *cfg_file_name){
         ic_sum = s800->GetIonChamber().GetSum();
 
         
-        ata = s800->GetAta_Spec();
-        bta = s800->GetBta_Spec();
+        ata = s800->GetAta();
+        bta = s800->GetBta();
         double xsin = sin(ata);
         double ysin = sin(bta);
         scatter_angle = asin(sqrt(xsin*xsin+ysin*ysin))*180.0/TMath::Pi();
