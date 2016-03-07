@@ -92,7 +92,7 @@ public:
   float MCorrelatedXFP() const;
   float MCorrelatedE1() const;
   float MCorrelatedOBJ_E1(bool corrected=true) const;
-  float MCorrelatedXFP_E1() const;
+  float MCorrelatedXFP_E1(bool corrected=true) const;
   
 
 private:
@@ -106,6 +106,7 @@ private:
   static float fbrho;                                             //!
   static int fmass;                                               //!
   static int fcharge;                                             //!
+  static bool fMapLoaded;                                         //!
   //---------------------
 
   void ReadMap_SpecTCL();

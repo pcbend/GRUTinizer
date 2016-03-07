@@ -107,10 +107,12 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   //std::cout << " Passed GRET Check, Before S800-1" << std::endl;
   if(s800) {
+    //std::cout << " Before ExitTargetVect_Spec " << std::endl;
     trackvect_Spec=s800->ExitTargetVect_Spec(6);
     
     dirname = "S800";
     histname = "S800_DTA";
+    //std::cout << " Before first DTA " << std::endl;
     obj.FillHistogram(dirname,histname,
 		      1000,-0.2,0.2,s800->GetDta_Spec());
     histname = "S800_ATA";
@@ -311,12 +313,14 @@ void MakeHistograms(TRuntimeObjects& obj) {
     histname = "GretinaEnergyTotal";
     obj.FillHistogram(histname,
 		      8000,0,4000,hit.GetCoreEnergy());   
+    //std::cout << "After GretEnergyTotal " << std::endl;
     //--------------------------------------------------------------------
     dirname = "DopplerGretResDiag";
     histname = "GretinaDopplerTotal";
     obj.FillHistogram(dirname,histname,
 		      2000,0,4000,hit.GetDoppler(BETA));
 
+    //std::cout << " Before Opening angle calculation " << std::endl;
     double openang = hit.GetPosition().Phi()-trackvect_top.Phi();
     double openang_Spec = hit.GetPosition().Phi()-trackvect_Spec.Phi();
 
@@ -324,11 +328,12 @@ void MakeHistograms(TRuntimeObjects& obj) {
     obj.FillHistogram(dirname,histname,
 		      1000,-3.15,3.15,openang,
 		      2000,0,4000,hit.GetDoppler(BETA));
-
+    if(s800){
     histname = "GretinaDopplerVsDTA";
     obj.FillHistogram(dirname,histname,
 		      1000,-0.2,0.2,s800->GetDta_Spec(),
 		      2000,0,4000,hit.GetDoppler(BETA));
+    }
 
     histname = "QuadDoppSummary";
     obj.FillHistogram(dirname,histname,
@@ -343,6 +348,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 			2000,0,4000,hit.GetCoreEnergy(beta),
 			101,0.2,0.5,beta);
     }
+    //std::cout << " After Beta stuff" << std::endl;
 
     //--------------------------------------------------------------------
     dirname = "VectCorrByXtal";
@@ -352,12 +358,14 @@ void MakeHistograms(TRuntimeObjects& obj) {
 			100,0,100,hit.GetCrystalId(),
 			2000,0,4000,hit.GetDoppler(BETA,&trackvect_Spec));
 
+    //std::cout << "After vector correction by crystal" << std::endl;
     //--------------------------------------------------------------------
     dirname  = "VectGretResDiag";
     histname = "GretinaDoppVectTotal";
     obj.FillHistogram(dirname,histname,
 		      2000,0,4000,hit.GetDoppler(BETA,&trackvect_top));
 
+    //std::cout << "After total (1d) plot made, before vs opening angle" << std::endl;
     histname = "GretinaDoppVectVsOpenAng";
     obj.FillHistogram(dirname,histname,
 		      1000,-3.15,3.15,openang,
@@ -367,33 +375,42 @@ void MakeHistograms(TRuntimeObjects& obj) {
     obj.FillHistogram(dirname,histname,
 		      2000,0,4000,hit.GetDoppler(BETA,&trackvect_Spec));
 
+    //std::cout << "After one done with Spec" << std::endl;
     histname = "GretinaDoppVectVsOpenAng_Spec";
     obj.FillHistogram(dirname,histname,
 		      1000,-3.15,3.15,openang_Spec,
 		      2000,0,4000,hit.GetDoppler(BETA,&trackvect_Spec));
-    
+
+    if(s800){
+    //std::cout << " Before dopp vs DTA" << std::endl;
     histname = "GretinaDoppVectVsDTA";
     obj.FillHistogram(dirname,histname,
 		      1000,-0.2,0.2,s800->GetDta_Spec(),
 		      2000,0,4000,hit.GetDoppler(BETA,&trackvect_Spec));
-    
+    }
+    //std::cout << " After dopp vs DTA" << std::endl;
     histname = "QuadDoppVectSummary";
     obj.FillHistogram(dirname,histname,
 		      10,0,10,HoleQMap[hit.GetCrystalId()/4],
 		      2000,0,4000,hit.GetDoppler(BETA,&trackvect_Spec));
-    
+    //std::cout << "Before loop over z value" << std::endl;
     histname = "GretinaDoppVectPosLoopZ";
     double z_ = -5.0;
-    double zdef = GValue::FindValue("GRETINA_Z_OFFSET")->GetValue();
-    for(int z=0;z<100;z++) {
-      z_ += 10.0/100.0;
-      GValue::FindValue("GRETINA_Z_OFFSET")->SetValue(z_);
-      obj.FillHistogram(dirname,histname,
-			2000,0,4000,hit.GetDoppler(BETA,&trackvect_Spec),
-			101,-5.0,5.0,z_);
-    }      
-    GValue::FindValue("GRETINA_Z_OFFSET")->SetValue(zdef);
-
+    //std::cout << "Find val : " << GValue::Value("GRETINA_Z_OFFSET") << std::endl;
+    double zdef = GValue::Value("GRETINA_Z_OFFSET");
+    //std::cout << "zdef = " << zdef << std::endl;
+    if(!(std::isnan(zdef))){
+      //std::cout << " In isnan condition" << std::endl;
+      for(int z=0;z<100;z++) {
+	z_ += 10.0/100.0;
+	GValue::FindValue("GRETINA_Z_OFFSET")->SetValue(z_);
+	obj.FillHistogram(dirname,histname,
+			  2000,0,4000,hit.GetDoppler(BETA,&trackvect_Spec),
+			  101,-5.0,5.0,z_);
+      }      
+      GValue::FindValue("GRETINA_Z_OFFSET")->SetValue(zdef);
+    }
+    //std::cout << " After gretina z offset gvalue stuff" << std::endl;
 
     /* histname = "GretinaDoppVectPosLoopX";
     double x_ = -5.0;
@@ -420,26 +437,28 @@ void MakeHistograms(TRuntimeObjects& obj) {
     }      
     GValue::FindValue("GRETINA_Y_OFFSET")->SetValue(ydef);*/
     //--------------------------------------------------------------------
-    dirname  = "MomentumGretResDiag_Spec";
-    histname = "GretinaDoppMomTotal";
-    obj.FillHistogram(dirname,histname,
-		      2000,0,4000,hit.GetDoppler_dB(BETA,&trackvect_Spec,s800->GetDta_Spec()));
+    if(s800){
+      dirname  = "MomentumGretResDiag_Spec";
+      histname = "GretinaDoppMomTotal";
+      obj.FillHistogram(dirname,histname,
+			2000,0,4000,hit.GetDoppler_dB(BETA,&trackvect_Spec,s800->GetDta_Spec()));
 
-    histname = "GretinaDoppMomVsOpenAng";
-    obj.FillHistogram(dirname,histname,
-		      1000,-3.15,3.15,openang_Spec,
-		      2000,0,4000,hit.GetDoppler_dB(BETA,&trackvect_Spec,s800->GetDta_Spec()));
+      histname = "GretinaDoppMomVsOpenAng";
+      obj.FillHistogram(dirname,histname,
+			1000,-3.15,3.15,openang_Spec,
+			2000,0,4000,hit.GetDoppler_dB(BETA,&trackvect_Spec,s800->GetDta_Spec()));
 
-    histname = "GretinaDoppMomVsDTA";
-    obj.FillHistogram(dirname,histname,
-		      1000,-0.2,0.2,s800->GetDta_Spec(),
-		      2000,0,4000,hit.GetDoppler_dB(BETA,&trackvect_Spec,s800->GetDta_Spec()));
+      histname = "GretinaDoppMomVsDTA";
+      obj.FillHistogram(dirname,histname,
+			1000,-0.2,0.2,s800->GetDta_Spec(),
+			2000,0,4000,hit.GetDoppler_dB(BETA,&trackvect_Spec,s800->GetDta_Spec()));
 
-    histname = "QuadDoppMomSummary";
-    obj.FillHistogram(dirname,histname,
-		      10,0,10,HoleQMap[hit.GetCrystalId()/4],
-		      2000,0,4000,hit.GetDoppler_dB(BETA,&trackvect_Spec,s800->GetDta_Spec()));
-
+      histname = "QuadDoppMomSummary";
+      obj.FillHistogram(dirname,histname,
+			10,0,10,HoleQMap[hit.GetCrystalId()/4],
+			2000,0,4000,hit.GetDoppler_dB(BETA,&trackvect_Spec,s800->GetDta_Spec()));
+    }
+    //std::cout << "After momentum gretina resolution diagnosis" << std::endl;
     //====================================================================
     dirname = "GretSummCoreCharge";
     histname = Form("Q%iCoreCharge",HoleQMap[hit.GetCrystalId()/4]);
@@ -456,6 +475,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 		      16,0,16,4*hit.GetCrystalNumber()+3.,
 		      4000,0,32000,((double)hit.GetCoreCharge(3)));
 
+    //std::cout << "After gretina core charge summary" << std::endl;
     /*    histname = "GretinaDopplerBeta";
     double beta = 0.2;
     for(int z=0;z<100;z++) {
