@@ -17,6 +17,7 @@ public:
   TS800();
   virtual ~TS800();
 
+  static void ReadInverseMap(const char *mapfile="");
 
   //////////////////////////////////////////////
   virtual void InsertHit(const TDetectorHit&);
@@ -109,7 +110,7 @@ private:
   static bool fMapLoaded;                                         //!
   //---------------------
 
-  void ReadMap_SpecTCL();
+  static bool ReadMap_SpecTCL(std::string filename);
   virtual int  BuildHits();
 
   bool HandleTrigPacket(unsigned short*,int);     //!

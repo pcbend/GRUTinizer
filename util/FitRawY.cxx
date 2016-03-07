@@ -229,7 +229,6 @@ TList *MakeSummary(TH2 *hist,int qnum){
     if((i%10)==0) {
       fit_list = FitRawY(raw,true, true);
     } else {
-      continue;
       fit_list = FitRawY(raw,false, false);
     }
     list->Add(fit_list);
