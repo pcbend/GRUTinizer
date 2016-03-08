@@ -24,18 +24,6 @@ int main(int argc, char *argv[]){
     std::cout << "Usaged: MakeCalibrationHists input_filelist.dat output_file.root" << std::endl;
     return -1;
   }
-  char ring_name[N_RINGS][100] = {
-    "Caesar.Ring.a",
-    "Caesar.Ring.b",
-    "Caesar.Ring.c",
-    "Caesar.Ring.d",
-    "Caesar.Ring.e",
-    "Caesar.Ring.f",
-    "Caesar.Ring.g",
-    "Caesar.Ring.h",
-    "Caesar.Ring.i",
-    "Caesar.Ring.j"
-  };
 
   //CHANGE THIS
   std::string source_name[NUM_FILES] = {
@@ -114,6 +102,9 @@ int main(int argc, char *argv[]){
     cur_tree->SetBranchAddress("TCaesar", &caesar);
     GValue *gvalues = (GValue*)files.at(file)->Get("GValue");
     TChannel *tchannels = (TChannel*)files.at(file)->Get("TChannel");
+    if (!gvalues || !tchannels){
+      std::cout << "Missing GValue or TChannel for file = " << file << std::endl;
+    }
     n_entries = cur_tree->GetEntries();
     for (int entry = 0; entry < n_entries; entry++){
       caesar->Clear();

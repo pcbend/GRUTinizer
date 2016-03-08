@@ -11,7 +11,6 @@
 #include "TRandom.h"
 
 #include "TObject.h"
-#include "TCaesar.h"
 #include "TS800.h"
 
 #include "TChannel.h"
@@ -45,14 +44,11 @@ TH2 *GetMatrix(TList *list, std::string histname,int xbins, double xlow,double x
 //   or else bad things will happen.
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
-  TCaesar  *caesar  = obj.GetDetector<TCaesar>();
   TS800    *s800    = obj.GetDetector<TS800>();
 
   TList *list = &(obj.GetObjects());
   int numobj = list->GetSize();
   
-  const int total_det_in_prev_rings[N_RINGS] = {0,10,24,48,72,96,120,144,168,182};
-
   if(s800) {
   
     double ic_sum = s800->GetIonChamber().GetSum();
@@ -62,7 +58,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
     double crdc_2_x = s800->GetCrdc(1).GetDispersiveX();
     double crdc_1_y = s800->GetCrdc(0).GetNonDispersiveY();
     double crdc_2_y = s800->GetCrdc(1).GetNonDispersiveY();
-    double afp = s800->GetAFP();
     double xfptac = s800->GetTof().GetTacXFP();
     double xfp = s800->GetTof().GetXFP();
     double obj = s800->GetTof().GetOBJ();
