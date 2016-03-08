@@ -57,6 +57,8 @@ private:
   void swap(DynamicLibrary& other);
 
   void* library;
+  std::string libname;
+  std::string tempname;
 };
 
 #endif /* _DYNAMICLIBRARY_H_ */

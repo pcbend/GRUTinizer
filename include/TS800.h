@@ -17,6 +17,7 @@ public:
   TS800();
   virtual ~TS800();
 
+  static void ReadInverseMap(const char *mapfile="");
 
   //////////////////////////////////////////////
   virtual void InsertHit(const TDetectorHit&);
@@ -29,15 +30,15 @@ public:
   Long_t GetTimestamp()    { return Timestamp(); }
 
   TVector3 CRDCTrack();  // not a finished method
-  TVector3 ExitTargetVect_Spec(int order=6);
+  TVector3 ExitTargetVect(int order=6);
   float GetAFP() const;
   float GetBFP() const;
-  float MapCalc_SpecTCL(int calcorder,int parameter,float *input);
+  float MapCalc(int calcorder,int parameter,float *input);
 
-  Float_t GetAta_Spec(int i=6);
-  Float_t GetYta_Spec(int i=6);
-  Float_t GetBta_Spec(int i=6);
-  Float_t GetDta_Spec(int i=6);
+  Float_t GetAta(int i=6);
+  Float_t GetYta(int i=6);
+  Float_t GetBta(int i=6);
+  Float_t GetDta(int i=6);
 
   //bool InvMapLoaded()      { return fMapLoaded; }
 
@@ -63,10 +64,37 @@ public:
   float GetTofE1_MTDC(float c1=0.00,float c2=0.00,int i=0) const;
 
   float GetCorrTOF_OBJTAC() const;
+  float GetOBJRaw_TAC() const;
+  float GetXFRaw_TAC() const;
+  
   float GetCorrTOF_OBJ() const;
+  float GetOBJ_E1Raw() const;
+  float GetXF_E1Raw() const;
+  //===================================================  
+
+
+
+
+
+
   float GetCorrTOF_OBJ_MESY(int i=0) const;
-//float GetCorrTOF_XFPTAC();
-//float GetCorrTOF_XFP();
+  
+  float GetOBJ_E1Raw_MESY(int i=0) const;
+ 
+  float GetRawOBJ_MESY(int i=0) const;
+
+  float GetRawE1_MESY(int i=0) const;
+  
+  float GetXF_E1Raw_MESY(int i=0) const;
+  
+  float GetRawXF_MESY(int i=0) const;
+
+  float MCorrelatedOBJ() const;
+  float MCorrelatedXFP() const;
+  float MCorrelatedE1() const;
+  float MCorrelatedOBJ_E1(bool corrected=true) const;
+  float MCorrelatedXFP_E1(bool corrected=true) const;
+  
 
 private:
 
@@ -79,9 +107,10 @@ private:
   static float fbrho;                                             //!
   static int fmass;                                               //!
   static int fcharge;                                             //!
+  static bool fMapLoaded;                                         //!
   //---------------------
 
-  void ReadMap_SpecTCL();
+  static bool ReadMap(std::string filename);
   virtual int  BuildHits();
 
   bool HandleTrigPacket(unsigned short*,int);     //!

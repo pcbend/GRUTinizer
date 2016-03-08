@@ -31,12 +31,15 @@ TWriteLoop* TWriteLoop::Get(std::string name, std::string output_filename){
 
 TWriteLoop::TWriteLoop(std::string name, std::string output_filename)
   : StoppableThread(name),
-    hist_loop(0) {
-  //TPreserveGDirectory preserve;
+    hist_loop(0), output_file(NULL), event_tree(NULL),
+    items_handled(0) {
 
-  output_file = new TFile(output_filename.c_str(),"RECREATE");
-  event_tree = new TTree("EventTree","EventTree");
-  //scaler_tree = new TTree("ScalerTree","ScalerTree");
+  if(output_filename != "/dev/null"){
+    //TPreserveGDirectory preserve;
+    output_file = new TFile(output_filename.c_str(),"RECREATE");
+    event_tree = new TTree("EventTree","EventTree");
+    //scaler_tree = new TTree("ScalerTree","ScalerTree");
+  }
 }
 
 TWriteLoop::~TWriteLoop() {
@@ -44,15 +47,17 @@ TWriteLoop::~TWriteLoop() {
     delete elem.second;
   }
 
-  output_file->cd();
-  event_tree->Write(event_tree->GetName(), TObject::kOverwrite);
-  if(GValue::Size())
-    GValue::Get()->Write();
-  if(TChannel::Size())
-    TChannel::Get()->Write();
+  if(output_file){
+    output_file->cd();
+    event_tree->Write(event_tree->GetName(), TObject::kOverwrite);
+    if(GValue::Size())
+      GValue::Get()->Write();
+    if(TChannel::Size())
+      TChannel::Get()->Write();
 
-  output_file->Close();
-  output_file->Delete();
+    output_file->Close();
+    output_file->Delete();
+  }
 }
 
 void TWriteLoop::Connect(TUnpackingLoop* input_queue){
@@ -73,7 +78,8 @@ bool TWriteLoop::Iteration() {
     for(auto& queue : input_queues){
       int size = queue->Pop(event,0);
       if(size >= 0) {
-	WriteEvent(event);
+        WriteEvent(event);
+        items_handled++;
 	handled_event = true;
 	living_parent = true;
       } else if (queue->IsRunning()){
@@ -92,9 +98,11 @@ bool TWriteLoop::Iteration() {
 }
 
 void TWriteLoop::Write() {
-  //TPreserveGDirectory preserve;
-  output_file->cd();
-  event_tree->Write();
+  if(output_file){
+    //TPreserveGDirectory preserve;
+    output_file->cd();
+    event_tree->Write();
+  }
 }
 
 void TWriteLoop::AddBranch(TClass* cls){
@@ -136,24 +144,27 @@ void TWriteLoop::AddBranch(TClass* cls){
 }
 
 void TWriteLoop::WriteEvent(TUnpackedEvent* event) {
-  // Clear pointers from previous writes.
-  for(auto& elem : det_map){
-    *elem.second = NULL;
-  }
-
-  // Load current events
-  for(auto det : event->GetDetectors()) {    
-    TClass* cls = det->IsA();
-    try{
-      *det_map.at(cls) = det;
-    } catch (std::out_of_range& e) {
-      AddBranch(cls);
-      *det_map.at(cls) = det;
+  if(event_tree){
+    // Clear pointers from previous writes.
+    for(auto& elem : det_map){
+      *elem.second = NULL;
     }
+
+    // Load current events
+    for(auto det : event->GetDetectors()) {
+      TClass* cls = det->IsA();
+      try{
+        *det_map.at(cls) = det;
+      } catch (std::out_of_range& e) {
+        AddBranch(cls);
+        *det_map.at(cls) = det;
+      }
+    }
+
+    // Fill
+    event_tree->Fill();
   }
 
-  // Fill
-  event_tree->Fill();
   if(hist_loop)
     hist_loop->Push(event);
   else

@@ -432,6 +432,12 @@ float TCrdc::GetDispersiveX() const{
     x_slope = GValue::Value("CRDC2_X_SLOPE");
     x_offset = GValue::Value("CRDC2_X_OFFSET");
   }
+  if(std::isnan(x_slope))
+    x_slope = 1.0;
+  if(std::isnan(x_offset))
+    x_offset = 0.0;
+  
+
 
   std::map<int,int> datamap;
   int mpad = GetMaxPad();
@@ -562,6 +568,11 @@ void TMTof::Clear(Option_t *opt) {
   fRf.clear();
   fHodoscope.clear();
   fRef.clear();
+
+  fCorrelatedXFP=-1;
+  fCorrelatedOBJ=-1;
+  fCorrelatedE1=-1;
+  
 }
 
 void TMTof::Print(Option_t *opt) const {    }

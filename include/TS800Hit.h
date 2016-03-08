@@ -367,6 +367,10 @@ class TMTof : public TDetectorHit {
 
 
   //private:
+    mutable int fCorrelatedXFP;   //!
+    mutable int fCorrelatedOBJ;   //!
+    mutable int fCorrelatedE1;    //!
+
 
     std::vector<unsigned short> fE1Up;         // Channel 0
     std::vector<unsigned short> fE1Down;       // Channel 1

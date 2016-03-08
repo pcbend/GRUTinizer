@@ -32,6 +32,7 @@
 #include "TOrderedRawFile.h"
 #include "TRawSource.h"
 #include "TMultiRawFile.h"
+#include "TSequentialRawFile.h"
 
 #include "GrutNotifier.h"
 #include "TGRUTUtilities.h"
@@ -43,6 +44,8 @@
 #include "TWriteLoop.h"
 #include "TChainLoop.h"
 #include "THistogramLoop.h"
+
+#include "TS800.h"
 
 //extern "C" G__value G__getitem(const char* item);
 //#include "FastAllocString.h"
@@ -71,7 +74,8 @@ TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions
 
 TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t noLogo,const char *appClassName)
   :TRint(appClassName, &argc, argv, options, numOptions,noLogo),
-   main_thread_id(std::this_thread::get_id()), fIsTabComplete(false){
+   main_thread_id(std::this_thread::get_id()), fIsTabComplete(false),
+   fAllowedToTerminate(true) {
 
   fGRUTEnv = gEnv;
   GetSignalHandler()->Remove();
@@ -164,6 +168,9 @@ void TGRUTint::ApplyOptions() {
 
   TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
 
+  if(opt->S800InverseMapFile().length()) {
+    TS800::ReadInverseMap(opt->S800InverseMapFile().c_str());
+  }
 
   //next, if given a root file and NOT told to sort it..
   if(opt->RootInputFiles().size()){
@@ -197,18 +204,30 @@ void TGRUTint::ApplyOptions() {
   if((opt->InputRing().length() || opt->RawInputFiles().size())
      && opt->SortRaw()) {
 
-    // Open a ring, multiple files, or a single file, as requested.
     TRawEventSource* source = NULL;
     if(opt->InputRing().length()) {
+      // Open a source from a ring.
       source = new TRawEventRingSource(opt->InputRing(),
                                        opt->DefaultFileType());
+
     } else if(opt->RawInputFiles().size() > 1 && opt->SortMultiple()){
+      // Open multiple files, read from all at the same time.
       TMultiRawFile* multi_source = new TMultiRawFile();
       for(auto& filename : opt->RawInputFiles()){
         multi_source->AddFile(new TRawFileIn(filename.c_str()));
       }
       source = multi_source;
+
+    } else if(opt->RawInputFiles().size() > 1 && !opt->SortMultiple()){
+      // Open multiple files, read from each one at a a time.
+      TSequentialRawFile* seq_source = new TSequentialRawFile();
+      for(auto& filename : opt->RawInputFiles()){
+        seq_source->Add(new TRawFileIn(filename.c_str()));
+      }
+      source = seq_source;
+
     } else {
+      // Open a single file.
       std::string filename = opt->RawInputFiles().at(0);
       source = new TRawFileIn(filename.c_str());
     }
@@ -314,14 +333,15 @@ void TGRUTint::ApplyOptions() {
   if(opt->ExitAfterSorting()){
     while(StoppableThread::AnyThreadRunning()){
       std::this_thread::sleep_for(std::chrono::seconds(1));
+
+      // We need to process events in case a different thread is asking for a file to be opened.
+      // However, if there is no stdin, ProcessEvents() will call Terminate().
+      // This prevents the terminate from taking effect while in this context.
+      fAllowedToTerminate = false;
       gSystem->ProcessEvents();
+      fAllowedToTerminate = true;
+
       std::cout << "\r" << StoppableThread::AnyThreadStatus() << std::flush;
-      // if(fDataLoop) {
-      //   std::cout << "\r" << fDataLoop->Status() << std::flush;
-      // }
-      // if(coop){
-      //   std::cout << "\r" << coop->Status() << std::flush;
-      // }
     }
     std::cout << std::endl;
 
@@ -516,6 +536,9 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
 
 
 void TGRUTint::Terminate(Int_t status){
+  if(!fAllowedToTerminate){
+    return;
+  }
   StoppableThread::StopAllClean();
 
   //if(TGRUTOptions::Get()->StartGUI()){
