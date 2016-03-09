@@ -366,8 +366,8 @@ void TCrdc::Copy(TObject &obj) const {
 void TCrdc::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
   fId   = -1;
-  anode = -1;
-  time  = -1;
+  anode = 0;
+  time  = 0;
   channel.clear();
   sample.clear();
   data.clear();

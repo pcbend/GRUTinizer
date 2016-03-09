@@ -46,7 +46,8 @@ public:
   //virtual void Print(Option_t *opt = "") const;
   virtual void Clear(Option_t* opt = "");
 
-  TCrdc         &GetCrdc(int x=0)  const { return (TCrdc&)crdc[x];   }
+  TCrdc         &GetCrdc(int x=0)  const { if(x==0) return (TCrdc&)crdc1;
+                                           else return (TCrdc&)crdc2;}
   TTof          &GetTof()          const { return (TTof&)tof;        }
   TMTof         &GetMTof()         const { return (TMTof&)mtof;        }
   TIonChamber   &GetIonChamber()   const { return (TIonChamber&)ion; }
@@ -125,7 +126,8 @@ private:
   TTof         tof;
   TMTof        mtof;
   TIonChamber  ion;
-  TCrdc        crdc[2];
+  TCrdc        crdc1;
+  TCrdc        crdc2;
   //THodoscope   hodo[32];
   //TMultiHitTof multi_tof;
   
