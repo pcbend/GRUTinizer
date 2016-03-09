@@ -258,7 +258,7 @@ int TCrdc::GetMaxPad() const {
     }
 
     if(!good){
-      std::cout << "i = " << i << "\t continued" << std::endl; 
+//      std::cout << "i = " << i << "\t continued" << std::endl; 
       continue;
     }
 
@@ -317,7 +317,7 @@ void TCrdc::DrawChannels(Option_t *opt,bool calibrate) const {
       TChannel *c = TChannel::GetChannel(Address(x));
       if(c && calibrate) {
         cal_data = c->CalEnergy(data.at(x)) - c->GetNumber();
-        printf("cal_data[%03i]  = %f\n",channel.at(x),cal_data);
+//        printf("cal_data[%03i]  = %f\n",channel.at(x),cal_data);
       } else {
         if(!c)
           printf("failed to find TChannel for 0x%08x\n",Address(x));
