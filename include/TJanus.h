@@ -31,7 +31,10 @@ private:
   std::vector<TJanusHit> janus_channels;
   std::vector<TJanusHit> janus_hits;
 
-  ClassDef(TJanus,2);
+  char stack_triggered;
+  int num_packets;
+
+  ClassDef(TJanus,3);
 };
 
 #endif /* _TJANUS_H_ */

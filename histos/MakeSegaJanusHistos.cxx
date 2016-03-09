@@ -24,11 +24,13 @@
 #include "TObject.h"
 #include "TSega.h"
 #include "TJanus.h"
+#include "TKinematics.h"
 #include "TPreserveGDirectory.h"
 
 TCutG* pid_low = NULL;
 TCutG* pid_middle = NULL;
 TCutG* pid_high = NULL;
+TCutG* time_energy = NULL;
 
 void LoadGates(){
   if(pid_low == NULL){
@@ -38,6 +40,7 @@ void LoadGates(){
     pid_low = (TCutG*)f->Get("pid_low");
     pid_middle = (TCutG*)f->Get("pid_middle");
     pid_high = (TCutG*)f->Get("pid_high");
+    time_energy = (TCutG*)f->Get("time_energy");
   }
 }
 
@@ -178,6 +181,17 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanus* janus) {
     obj.FillHistogram(Form("janus%d_xy", hit_detnum),
                       100,-3,3,hit.GetPosition().X(),
                       100,-3,3,hit.GetPosition().Y());
+
+    double theta_deg = hit.GetPosition().Theta() * TMath::RadToDeg();
+    obj.FillHistogram("janus_theta",
+                      180, 0, 180, theta_deg);
+    if(pid_low->IsInside(theta_deg, hit.GetEnergy())) {
+      static TKinematics kin("78Kr","208Pb","78Kr","208Pb",3.9*78*1000);
+      kin.SetAngles(theta_deg * TMath::DegToRad(), 3); // Set the 208Pb angle
+      double theta_78Kr = kin.GetThetalab(2) * TMath::RadToDeg(); // Get the 78Kr angle
+      obj.FillHistogram("janus_theta_recon",
+                        180, 0, 180, theta_78Kr);
+    }
 
     // ---- Added by JAB 1/28/16 ----
     if(hit_detnum==1){
@@ -321,20 +335,6 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus)
                         16, 1, 17, hit.GetDetnum());
     }
 
-    // if(hit.GetDetnum()!=15 &&
-    //    hit.GetDetnum()!=8  &&
-    //    hit.GetDetnum()!=7  &&
-    //    hit.GetDetnum()!=12){
-    //   coinc_missing4 = true;
-    // }
-
-    // if(hit.GetDetnum()!=15 &&
-    //    hit.GetDetnum()!=8  &&
-    //    hit.GetDetnum()!=7){
-    //   coinc_missing3 = true;
-    // }
-
-
     obj.FillHistogram("sega_detnum_janus_tdiff",
                       16, 1, 17, hit_detnum,
                       1000, -5000, 5000, hit.Timestamp() - janus->Timestamp());
@@ -465,6 +465,14 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus)
 			8000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta")));
       obj.FillHistogram("sega_DCenergy_janus_pidlow",
 			8000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta"), j_hit_pidlow->GetPosition()));
+
+      obj.FillHistogram("sega_DCenergy_janus_pidlow_conjugate",
+                        8000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta"), j_hit_pidlow->GetConjugateDirection()));
+      if(time_energy->IsInside(s_hit.GetEnergy(),
+                             s_hit.Timestamp() - j_hit_pidlow->Timestamp())){
+        obj.FillHistogram("sega_DCenergy_janus_pidlow_conjugate_timegate",
+                        8000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta"), j_hit_pidlow->GetConjugateDirection()));
+      }
     }
     if(in_pid_middle){
       obj.FillHistogram("sega_energy_pidmiddle",
@@ -487,6 +495,12 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus)
 			8000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta")));
       obj.FillHistogram("sega_DCenergy_janus_pidhigh",
 			8000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta"), j_hit_pidhigh->GetPosition()));
+
+      if(time_energy->IsInside(s_hit.GetEnergy(),
+                             s_hit.Timestamp() - j_hit_pidhigh->Timestamp())){
+        obj.FillHistogram("sega_DCenergy_janus_pidhigh_timegate",
+                          8000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta"), j_hit_pidhigh->GetPosition()));
+      }
     }
   }
 

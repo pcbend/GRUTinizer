@@ -50,10 +50,14 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   const VMUSB_Header* vmusb_header = (VMUSB_Header*)data;
   data += sizeof(VMUSB_Header);
 
+  // This value should ALWAYS be zero, because that corresponds to the i1 trigger of the VMUSB.
+  // If it is not, it is a malformed event.
+  stack_triggered = vmusb_header->stack();
+
   // vmusb_header.size() returns the number of 16-bit words in the payload.
   // Each adc entry is a 32-bit word.
-  // 3 additional 16-bit words for the timestamp
-  int num_packets = vmusb_header->size()/2 - 3;
+  // 6 additional 16-bit words for the timestamp (2 48-bit numbers)
+  num_packets = vmusb_header->size()/2 - 3;
 
   const VME_Timestamp* vme_timestamp = (VME_Timestamp*)(data + num_packets*sizeof(CAEN_DataPacket));
   long timestamp = vme_timestamp->ts1() * 20;

@@ -1,8 +1,8 @@
+#include "GrutNotifier.h"
 
-#include "GrutNotifier.h" 
 #include "GValue.h"
-
 #include "TFile.h"
+#include "TGRUTOptions.h"
 
 GrutNotifier *GrutNotifier::fGrutNotifier = 0;
 
@@ -25,7 +25,10 @@ bool GrutNotifier::Notify() {
   //}
   TFile *f = gChain->GetCurrentFile();
   f->Get("GValue");
+
+  for(auto& val_file : TGRUTOptions::Get()->ValInputFiles()){
+    GValue::ReadValFile(val_file.c_str());
+  }
+
   return true;
 }
-
-
