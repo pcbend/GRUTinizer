@@ -248,18 +248,6 @@ void readInitialCalibration(char *in_par_file_name, double cal_par[N_RINGS][MAX_
 //Caesar.Ring.a.e_a0.1: #, where 1 is the det_id (1,..,24),  a is the ring name, and E = a0+a1*E_raw+a2*E_raw^2
 void CalibrateCaesar(char *in_hist_file_name, char *in_source_list, char *out_cal_file_name, 
                      char *out_hist_file_name, char *in_par_file_name = NULL){
-  char ring_name[N_RINGS][100] = {
-    "Caesar.Ring.a",
-    "Caesar.Ring.b",
-    "Caesar.Ring.c",
-    "Caesar.Ring.d",
-    "Caesar.Ring.e",
-    "Caesar.Ring.f",
-    "Caesar.Ring.g",
-    "Caesar.Ring.h",
-    "Caesar.Ring.i",
-    "Caesar.Ring.j"
-  };
   unsigned int det_per_ring[N_RINGS] = {
     10, 14, 24, 24, 24,
     24, 24, 24, 14, 10

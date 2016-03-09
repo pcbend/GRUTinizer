@@ -389,13 +389,13 @@ int fitCoulex(const char *cfg_file_name){
   //GET GEANT HISTOGRAMS
 
   getGeantHistograms(geant_hists,geant_file_names);
-  if (geant_hists.size() != num_geant_files*2){
+  if (geant_hists.size() != (unsigned int)num_geant_files*2){
     std::cout << "ERROR: Incorrect number of histograms ("<<geant_hists.size()
               <<") added to vector! Expected " << num_geant_files*2 <<  std::endl;
     return -1 ;
   }
   //Need to rebin these to match the binning from my filled histograms
-  for (unsigned int geant_file = 0; geant_file < num_geant_files; geant_file+=2){
+  for (unsigned int geant_file = 0; geant_file < (unsigned int)num_geant_files; geant_file+=2){
     geant_hists.at(geant_file)->Rebin(kev_per_bin);
     geant_hists.at(geant_file+1)->Rebin(kev_per_bin);
   }
