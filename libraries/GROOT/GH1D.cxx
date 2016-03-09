@@ -10,7 +10,7 @@
 //#include "TROOT.h"
 //#include "TSystem.h"
 
-GH1D::GH1D(const TH1D& source)
+GH1D::GH1D(const TH1& source)
   : parent(NULL), projection_axis(-1) {
   source.Copy(*this);
 }
@@ -158,3 +158,24 @@ GH1D* GH1D::Project_Background(double value_low, double value_high,
     return NULL;
   }
 }
+
+GH1D *GH1D::Project(int bins) {
+  GH1D *proj = 0;
+  double ymax = GetMinimum();
+  double ymin = GetMaximum();
+  if(bins==-1) {
+    bins = abs(ymax-ymin);
+    if(bins<1)
+      bins=100;
+  }
+  proj = new GH1D(Form("%s_y_axis_projection",GetName()),
+                  Form("%s_y_axis_projection",GetName()),
+                  bins,ymin,ymax);
+  for(int x=0;x<GetNbinsX();x++) {
+    if(GetBinContent(x)!=0)
+      proj->Fill(GetBinContent(x));
+  }
+
+  return proj;
+}
+

@@ -160,7 +160,7 @@ class TCrdc : public TDetectorHit {
     virtual void DrawChannels(Option_t *opt="",bool calibrate=true) const;
     virtual void DrawHit(Option_t *opt="") const;
 
-    int Sum() const { int result; for(unsigned int x=0;x<data.size();x++) result +=data[x]; return result; }
+    int Sum() const { int result=0; for(unsigned int x=0;x<data.size();x++) result +=data[x]; return result; }
 
   private:
     virtual int Charge() const { return 0; }

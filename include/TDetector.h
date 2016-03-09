@@ -6,7 +6,12 @@
 #include "TNamed.h"
 
 #include "TDetectorHit.h"
+#ifndef __CINT__
 #include "TRawEvent.h"
+#else
+class TRawEvent;
+#endif
+
 //class TRawEvent;
 class TSmartBuffer;
 
