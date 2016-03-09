@@ -32,6 +32,13 @@ public:
   int GetSector() const;
   TVector3 GetPosition(bool apply_array_offset = true) const;
 
+  /// Assuming this hit was the 208Pb, return the direction of the 78Kr.
+  /**
+     Assumes that the collision happened at the origin.
+     Assumes that the incoming 78Kr had 3.9 MeV/u.
+   */
+  TVector3 GetConjugateDirection() const;
+
 private:
 	 // Energy
   bool  fEnergyOverflowBit;
