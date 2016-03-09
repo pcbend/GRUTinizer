@@ -220,18 +220,22 @@ TF1 *TCrdc::fgaus = new TF1("fgaus","gaus");
 
 
 int TCrdc::GetMaxPad() const {
-  double temp = 0;
-  int    place =0;
+//  double temp = 0;
+//  int    place =0;
   if(!data.size())
     return -1.0;
 
-  temp = data.at(0);
+ std::map<int,double> sum; 
+
+//  temp = data.at(0);
   for(unsigned int i = 0; i < data.size(); i++){
-    /* std::cout << " ------ " << std::endl;
+    /*
+    std::cout << " ------ " << std::endl;
     std::cout << " Data    : " << data.at(i) << " at " << i << std::endl;
     std::cout << " Sample  : " << sample.at(i) << " at " << i << std::endl;
     std::cout << " Channel : " << channel.at(i) << " at " << i << std::endl;
     */
+    
 
     /*if(data.at(i)>0){
       WeightedSumNum += float(data.at(i))*float(channel.at(i));
@@ -239,20 +243,50 @@ int TCrdc::GetMaxPad() const {
 
     }*/
 
+    bool good = false;
+    if (i == 0 && data.size()>1) {
+      if(channel.at(i) == channel.at(i+1))
+        good = true;
+    }
+    else if(i == data.size()-1 && data.size()>2) {
+      if(channel.at(i) == channel.at(i-1))
+        good = true;
+    } else if(data.size()>2) {
+      if((channel.at(i) == channel.at(i-1)) ||
+         (channel.at(i) == channel.at(i+1)))
+        good = true;
+    }
+
+    if(!good){
+      std::cout << "i = " << i << "\t continued" << std::endl; 
+      continue;
+    }
+
     TChannel *c = TChannel::GetChannel(Address(i));
     double cal_data;
     if(c)
       cal_data = c->CalEnergy(data.at(i)) - c->GetNumber();
     else
-      cal_data = data.at(i);
+      cal_data = (double)data.at(i);
 
-    if(cal_data>temp) {
-      temp = cal_data;
-      place = i;
-    }
+//  if(cal_data>temp) {
+//    temp = cal_data;
+//    place = i;
+//  }
+    sum[channel.at(i)] += cal_data;
   }
 
-  return (float)(channel.at(place))+gRandom->Uniform();
+  std::map<int,double>::iterator  it;
+  int max = 0;
+  double maxd =0.0;
+  for(it = sum.begin();it!=sum.end();it++) {
+    if(it->second > maxd){
+      max = it->first;
+      maxd = it->second;
+    }
+  }
+  //return (float)(channel.at(place))+gRandom->Uniform();
+  return max;
 }
 
 void TCrdc::DrawChannels(Option_t *opt,bool calibrate) const {
