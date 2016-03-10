@@ -25,6 +25,10 @@ TCutG *pid_kr88  = 0;
 TCutG *tcut_kr88 = 0;
 TCutG *pid_rb    = 0;
 TCutG *pid_br    = 0;
+TCutG *pid_rb_left    = 0;
+TCutG *pid_br_left    = 0;
+TCutG *pid_rb_right    = 0;
+TCutG *pid_br_right    = 0;
 TCutG *in_kr88    = 0;
 TH1 *GetHistogram(TList *list, std::string histname,int xbins,double xlow,double xhigh) {
   //TList *list = &(obj.GetObjects());
@@ -49,7 +53,9 @@ TH2 *GetMatrix(TList *list, std::string histname,int xbins, double xlow,double x
 }
 
 void initializeKr88Cuts(TFile * &cut_file, TCutG* &pid_kr88, TCutG* &tcut_kr88, 
-                        TCutG* &pid_rb, TCutG* &pid_br, TCutG* &in_kr88) {
+                        TCutG* &pid_rb, TCutG* &pid_br, TCutG* &in_kr88,
+                        TCutG* &pid_rb_left, TCutG* &pid_br_left,
+                        TCutG* &pid_rb_right, TCutG* &pid_br_right) {
 //  pid_kr88 = new TCutG("pid_kr88",8);
 //  pid_kr88->SetVarX("GetCorrTOF_OBJTAC()");
 //  pid_kr88->SetVarY("GetIonChamber()->GetSum()");
@@ -125,12 +131,17 @@ void initializeKr88Cuts(TFile * &cut_file, TCutG* &pid_kr88, TCutG* &tcut_kr88,
 //  tcut_kr88->SetPoint(6,-1577.16,4053.61);
 //  tcut_kr88->SetPoint(7,-1566.74,4080.78);
 //  tcut_kr88->Draw("");
-    cut_file = new TFile("/mnt/analysis/pecan-gade/elman/Kr88/kr88_cuts.root","Read");
+    cut_file = new TFile("/mnt/analysis/pecan-gade/elman/Kr88/cut_files/kr88_cuts.root","Read");
     pid_kr88 = (TCutG*)cut_file->Get("pid_kr88_large");
     pid_rb = (TCutG*)cut_file->Get("pid_rb_large");
     pid_br = (TCutG*)cut_file->Get("pid_br_large");
     tcut_kr88 = (TCutG*)cut_file->Get("tcut_03_08_2016");
     in_kr88 = (TCutG*)cut_file->Get("in_kr88_large");
+
+    pid_rb_left = (TCutG*)cut_file->Get("pid_rb_left");
+    pid_br_left = (TCutG*)cut_file->Get("pid_br_left");
+    pid_rb_right = (TCutG*)cut_file->Get("pid_rb_right");
+    pid_br_right = (TCutG*)cut_file->Get("pid_br_right");
 }
 // extern "C" is needed to prevent name mangling.
 // The function signature must be exactly as shown here,
@@ -167,7 +178,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     for(int y=0;y<caesar->Size();y++) {
       if (cut_file == 0){
-        initializeKr88Cuts(cut_file,pid_kr88,tcut_kr88,pid_rb,pid_br,in_kr88);//cuts are global
+        initializeKr88Cuts(cut_file,pid_kr88,tcut_kr88,pid_rb,pid_br,in_kr88,
+                           pid_rb_left, pid_br_left, pid_rb_right, pid_br_right);//cuts are global
       }
       TCaesarHit hit = caesar->GetCaesarHit(y);
       int det = hit.GetDetectorNumber();
@@ -252,6 +264,56 @@ void MakeHistograms(TRuntimeObjects& obj) {
               caesar_br_energycal_time->Fill(energy_dc);
             }
           }//is in pid_br
+          if (pid_br_left->IsInside(objtac_corr, ic_sum)){
+            TH2 *caesar_corrtime_energyDC_br_left = GetMatrix(list,"EnergyDC_vs_CorrTime_Br_left",4000,-2000,2000,4096,0,4096);
+            caesar_corrtime_energyDC_br_left->Fill(corr_time, energy_dc);
+            TH2 *tacxfp_vs_tacobj_gated_br_left = GetMatrix(list,"in_beam_gated_br_left",4096,0,4096,4096,0,4096);
+            tacxfp_vs_tacobj_gated_br_left->Fill(xfptac,objtac);
+            TH2 *caesar_det_energy_dc_br_left = GetMatrix(list,"Detector_EnergyDC_Br_left",200,0,200,4096,0,4096);
+            caesar_det_energy_dc_br_left->Fill(det+total_det_in_prev_rings[ring],energy_dc);
+            if (tcut_kr88->IsInside(corr_time, energy_dc)){
+              TH1 *caesar_br_left_energycal_time = GetHistogram(list,"EnergyDC_Br_tcut_left", 8192,0,8192);
+              caesar_br_left_energycal_time->Fill(energy_dc);
+            }
+          }//inside pid_br_lrft
+          if (pid_br_right->IsInside(objtac_corr, ic_sum)){
+            TH2 *caesar_corrtime_energyDC_br_right = GetMatrix(list,"EnergyDC_vs_CorrTime_Br_right",4000,-2000,2000,4096,0,4096);
+            caesar_corrtime_energyDC_br_right->Fill(corr_time, energy_dc);
+            TH2 *tacxfp_vs_tacobj_gated_br_right = GetMatrix(list,"in_beam_gated_br_right",4096,0,4096,4096,0,4096);
+            tacxfp_vs_tacobj_gated_br_right->Fill(xfptac,objtac);
+            TH2 *caesar_det_energy_dc_br_right = GetMatrix(list,"Detector_EnergyDC_Br_right",200,0,200,4096,0,4096);
+            caesar_det_energy_dc_br_right->Fill(det+total_det_in_prev_rings[ring],energy_dc);
+            if (tcut_kr88->IsInside(corr_time, energy_dc)){
+              TH1 *caesar_br_right_energycal_time = GetHistogram(list,"EnergyDC_Br_tcut_right", 8192,0,8192);
+              caesar_br_right_energycal_time->Fill(energy_dc);
+            }
+          }//inside pid_br_right
+          if (pid_rb_right->IsInside(objtac_corr, ic_sum)){
+            TH2 *caesar_corrtime_energyDC_rb_right = GetMatrix(list,"EnergyDC_vs_CorrTime_rb_right",4000,-2000,2000,4096,0,4096);
+            caesar_corrtime_energyDC_rb_right->Fill(corr_time, energy_dc);
+            TH2 *tacxfp_vs_tacobj_gated_rb_right = GetMatrix(list,"in_beam_gated_rb_right",4096,0,4096,4096,0,4096);
+            tacxfp_vs_tacobj_gated_rb_right->Fill(xfptac,objtac);
+            TH2 *caesar_det_energy_dc_rb_right = GetMatrix(list,"Detector_EnergyDC_rb_right",200,0,200,4096,0,4096);
+            caesar_det_energy_dc_rb_right->Fill(det+total_det_in_prev_rings[ring],energy_dc);
+            if (tcut_kr88->IsInside(corr_time, energy_dc)){
+              TH1 *caesar_rb_right_energycal_time = GetHistogram(list,"EnergyDC_rb_tcut_right", 8192,0,8192);
+              caesar_rb_right_energycal_time->Fill(energy_dc);
+            }
+          }//inside pid_rb_right
+          if (pid_rb_left->IsInside(objtac_corr, ic_sum)){
+            TH2 *caesar_corrtime_energyDC_rb_left = GetMatrix(list,"EnergyDC_vs_CorrTime_rb_left",4000,-2000,2000,4096,0,4096);
+            caesar_corrtime_energyDC_rb_left->Fill(corr_time, energy_dc);
+            TH2 *tacxfp_vs_tacobj_gated_rb_left = GetMatrix(list,"in_beam_gated_rb_left",4096,0,4096,4096,0,4096);
+            tacxfp_vs_tacobj_gated_rb_left->Fill(xfptac,objtac);
+            TH2 *caesar_det_energy_dc_rb_left = GetMatrix(list,"Detector_EnergyDC_rb_left",200,0,200,4096,0,4096);
+            caesar_det_energy_dc_rb_left->Fill(det+total_det_in_prev_rings[ring],energy_dc);
+            if (tcut_kr88->IsInside(corr_time, energy_dc)){
+              TH1 *caesar_rb_left_energycal_time = GetHistogram(list,"EnergyDC_rb_tcut_left", 8192,0,8192);
+              caesar_rb_left_energycal_time->Fill(energy_dc);
+            }
+          }//inside pid_rb_left
+
+
         }//s800 exists
       }//hit has both energy and time
     }//loop over hits

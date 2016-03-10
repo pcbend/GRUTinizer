@@ -114,22 +114,22 @@ void MakeHistograms(TRuntimeObjects& obj) {
     obj_hist->Fill(obj);
     TH1 *xfp_hist = GetHistogram(list,"grut_xfp",6000,-3000,3000);
     xfp_hist->Fill(xfp);
+    TH1 *crdc1x = GetHistogram(list,"grut_crdc1_x",600,-300,300);
+    crdc1x->Fill(crdc_1_x);
+    TH1 *crdc2x = GetHistogram(list,"grut_crdc2_x",600,-300,300);
+    crdc2x->Fill(crdc_2_x);
+    TH1 *crdc1y = GetHistogram(list,"grut_crdc1_y",600,-300,300);
+    crdc1y->Fill(crdc_1_y);
+    TH1 *crdc2y = GetHistogram(list,"grut_crdc2_y",600,-300,300);
+    crdc2y->Fill(crdc_2_y);
+
+    TH1 *tacobj_corr = GetHistogram(list,"grut_tacobj_corr",4096,0,4096);
+    tacobj_corr->Fill(objtac_corr);
+
 
 
 
     if (crdc1_size && crdc2_size){
-      TH1 *crdc1x = GetHistogram(list,"grut_crdc1_x",600,-300,300);
-      crdc1x->Fill(crdc_1_x);
-      TH1 *crdc2x = GetHistogram(list,"grut_crdc2_x",600,-300,300);
-      crdc2x->Fill(crdc_2_x);
-      TH1 *crdc1y = GetHistogram(list,"grut_crdc1_y",600,-300,300);
-      crdc1y->Fill(crdc_1_y);
-      TH1 *crdc2y = GetHistogram(list,"grut_crdc2_y",600,-300,300);
-      crdc2y->Fill(crdc_2_y);
-
-      TH1 *tacobj_corr = GetHistogram(list,"grut_tacobj_corr",4096,0,4096);
-      tacobj_corr->Fill(objtac_corr);
-
       TH1 *ata_hist = GetHistogram(list, "grut_ata", 9999,-0.1,0.1);
       ata_hist->Fill(ata);
 
