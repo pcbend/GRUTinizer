@@ -472,7 +472,7 @@ void TChannel::Streamer(TBuffer &R__b) {
      TNamed::Streamer(R__b);
      if(R__v>1) { }
      { TString R__str; R__str.Streamer(R__b); fChannelData.assign(R__str.Data()); }
-     ParseInputData(fChannelData,"debug");
+     ParseInputData(fChannelData);
      R__b.CheckByteCount(R__s,R__c,TChannel::IsA());
   } else {
      R__c = R__b.WriteVersion(TChannel::IsA(),true);
