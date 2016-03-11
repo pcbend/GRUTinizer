@@ -29,7 +29,8 @@ TUnpackingLoop *TUnpackingLoop::Get(std::string name,TBuildingLoop *input) {
 }
 
 TUnpackingLoop::TUnpackingLoop(std::string name,TBuildingLoop *input) :
-  StoppableThread(name),input_source(input),fOutputEvent(NULL) { }
+  StoppableThread(name),input_source(input),fOutputEvent(NULL),
+  fRunStart(0) { }
 
 
 TUnpackingLoop::~TUnpackingLoop(){
@@ -73,7 +74,8 @@ bool TUnpackingLoop::Iteration(){
     }
   }
 
-    fOutputEvent->Build();
+  fOutputEvent->Build();
+  fOutputEvent->SetRunStart(fRunStart);
 
   if(fOutputEvent->GetDetectors().size() != 0){
     output_queue.Push(fOutputEvent);
@@ -95,6 +97,11 @@ void TUnpackingLoop::ClearQueue() {
 void TUnpackingLoop::HandleNSCLData(TNSCLEvent& event) {
   switch(event.GetEventType()) {
     case kNSCLEventType::BEGIN_RUN:            // 0x0001
+    {
+      TRawEvent::TNSCLBeginRun* begin = (TRawEvent::TNSCLBeginRun*)event.GetPayload();
+      fRunStart = begin->unix_time;
+    }
+      break;
     case kNSCLEventType::END_RUN:              // 0x0002
     case kNSCLEventType::PAUSE_RUN:            // 0x0003
     case kNSCLEventType::RESUME_RUN:           // 0x0004
@@ -149,6 +156,7 @@ void TUnpackingLoop::HandleNSCLPeriodicScalers(TNSCLEvent& event){
   TUnpackedEvent* scaler_event = new TUnpackedEvent;
   scaler_event->AddRawData(event, kDetectorSystems::S800SCALER);
   scaler_event->Build();
+  scaler_event->SetRunStart(fRunStart);
   output_queue.Push(scaler_event);
 }
 
@@ -156,6 +164,7 @@ void TUnpackingLoop::HandleS800Scaler(TGEBEvent& event){
   TUnpackedEvent* scaler_event = new TUnpackedEvent;
   scaler_event->AddRawData(event, kDetectorSystems::S800SCALER);
   scaler_event->Build();
+  scaler_event->SetRunStart(fRunStart);
   output_queue.Push(scaler_event);
 }
 

@@ -54,12 +54,12 @@ struct G4SimPacket {
 
 friend std::ostream& operator<<(std::ostream& os, const G4SimPacket &packet);
 
-// -- End of Geant4 Gamma Sim stuff 
+// -- End of Geant4 Gamma Sim stuff
 // -- Beginning of Geant4 S800 Sim stuff
 
 struct G4S800 {
 
-  
+
   Int_t type;    /* defined abcd1234 for indicating this version */
   // All of this vvv is zero in the sim. ***************************
   float crdc1_x;   /* Crdc x/y positions in mm */
@@ -69,10 +69,10 @@ struct G4S800 {
   float ic_sum;    /* ion chamber energy loss         */
   float tof_xfp;   /* TOF scintillator after A1900    */
   float tof_obj;   /* TOF scintillator in object box  */
-  float rf;        /* Cyclotron RF for TOF            */ 
+  float rf;        /* Cyclotron RF for TOF            */
   Int_t trigger; /* Trigger register bit pattern    */
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
-  /* from here corrected values extracted from data above */ 
+  /* from here corrected values extracted from data above */
   /* - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
   float ic_de;
   /* TOF values with TOF correction applied (from afp/crdc x) */
@@ -82,7 +82,7 @@ struct G4S800 {
   // All of this ^^^ is zero in the sim. ***************************
 
 
-  /* Trajectory information at target position calculated from 
+  /* Trajectory information at target position calculated from
      a map and afp/bfp/xfp/yfp. New map and you need to re-calc */
   float ata; /* dispersive angle        */
   float bta; /* non-dispersive angle    */
@@ -401,5 +401,15 @@ typedef struct TNSCLFragmentHeader {
 } __attribute__((__packed__)) TNSCLFragmentHeader;
 
 friend std::ostream& operator<<(std::ostream& os, const TNSCLFragmentHeader &head);
+
+typedef struct TNSCLBeginRun {
+  unsigned int run_number;
+  unsigned int time_offset;
+  unsigned int unix_time;
+  unsigned int offset_divisor;
+  char title[81];
+} __attribute__((__packed__)) TNSCLBeginRun;
+
+friend std::ostream& operator<<(std::ostream& os, const TNSCLBeginRun& begin);
 
 #endif

@@ -199,10 +199,13 @@ double TSegaHit::GetDCEnergy(double beta, TVector3 particle_dir) const {
 }
 
 double TSegaHit::GetDoppler(double beta,const TVector3& vec) {
-  if(GetNumSegments()<1)
+  if(GetNumSegments()<1) {
     return std::sqrt(-1);
+  }
 
   double gamma = 1/(sqrt(1-pow(beta,2)));
-  double tmp = GetEnergy()*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(vec)));
-  return tmp;
+  TVector3 pos = GetPosition();
+  double cos_angle = TMath::Cos(pos.Angle(vec));
+  double dc_en = GetEnergy()*gamma *(1 - beta*cos_angle);
+  return dc_en;
 }
