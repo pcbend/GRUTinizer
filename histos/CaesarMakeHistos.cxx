@@ -206,20 +206,36 @@ void MakeHistograms(TRuntimeObjects& obj) {
           double ic_sum = s800->GetIonChamber().GetSum();
           //targ_exit_vec = (pt,theta,phi)
           TVector3 targ_exit_vec = s800->ExitTargetVect();
-          double scatter_angle = targ_exit_vec.Y();
+          double scatter_angle = targ_exit_vec.Theta()*(180.0/TMath::Pi());
+
+          TH1 *scatter_angle_hist = GetHistogram(list, "scatter_angle", 18000,0,180);
+          scatter_angle_hist->Fill(fabs(scatter_angle));
 
           double objtac = s800->GetTof().GetTacOBJ();
           double xfptac = s800->GetTof().GetTacXFP();
+
 
           TH2 *caesar_corrtime_energyDC = GetMatrix(list,"EnergyDC_vs_CorrTime",4000,-2000,2000,4096,0,4096);
           caesar_corrtime_energyDC->Fill(corr_time, energy_dc);
           
           if (pid_kr88->IsInside(objtac_corr, ic_sum)){
+            int maxpad1 = s800->GetCrdc(0).GetMaxPad();
+            int maxpad1_sum = s800->GetCrdc(0).GetMaxPadSum();
+            int maxpad2 = s800->GetCrdc(1).GetMaxPad();
+            int maxpad2_sum = s800->GetCrdc(1).GetMaxPadSum();
+
+            TH2 *crdc1_cal_spec = GetMatrix(list,"CRDC1_MAXPAD_SPEC", 300,0,300,4000,0,4000);
+            crdc1_cal_spec->Fill(maxpad1,maxpad1_sum);
+            TH2 *crdc2_cal_spec = GetMatrix(list,"CRDC2_MAXPAD_SPEC", 300,0,300,4000,0,4000);
+            crdc2_cal_spec->Fill(maxpad2,maxpad2_sum);
             TH2 *caesar_corrtime_energyDC_kr88 = GetMatrix(list,"EnergyDC_vs_CorrTime_Kr88",4000,-2000,2000,4096,0,4096);
             caesar_corrtime_energyDC_kr88->Fill(corr_time, energy_dc);
 
             TH2 *tacxfp_vs_tacobj_gated = GetMatrix(list,"in_beam_gated_kr88",4096,0,4096,4096,0,4096);
             tacxfp_vs_tacobj_gated->Fill(xfptac,objtac);
+
+            TH1 *scatter_angle_kr88_hist = GetHistogram(list, "scatter_angle_kr88", 18000,0,180);
+            scatter_angle_kr88_hist->Fill(fabs(scatter_angle));
             if (tcut_kr88->IsInside(corr_time, energy_dc)){
               if (in_kr88->IsInside(xfptac,objtac)){
                 TH1 *caesar_energydc_kr88 = GetHistogram(list,"EnergyDC_Kr88_tcut_incut", 8192,0,8192);
@@ -227,7 +243,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
                 bool done = false;
                 int cur_angle_index = 0;
                 while (!done && cur_angle_index < TOTAL_ANGLES){
-                  if (scatter_angle < angles.at(cur_angle_index)){
+                  if (fabs(scatter_angle) < angles.at(cur_angle_index)){
                     for (int angle_index = cur_angle_index; angle_index < TOTAL_ANGLES; angle_index++){
                       std::stringstream ss;
                       ss << "fit_angle_" << angles.at(cur_angle_index);

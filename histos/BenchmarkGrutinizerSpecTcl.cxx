@@ -133,10 +133,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
       TH1 *ata_hist = GetHistogram(list, "grut_ata", 9999,-0.1,0.1);
       ata_hist->Fill(ata);
 
-      TH1 *bta_hist = GetHistogram(list, "grut_bta", 9999,-0.06,0.06);
+      TH1 *bta_hist = GetHistogram(list, "grut_bta", 9999,-0.1,0.1);
       bta_hist->Fill(bta);
 
-      TH1 *dta_hist = GetHistogram(list, "grut_dta", 9999,-0.1,0.1);
+      TH1 *dta_hist = GetHistogram(list, "grut_dta", 9999,-0.06,0.06);
       dta_hist->Fill(dta);
 
       TH1 *yta_hist = GetHistogram(list, "grut_yta", 9999,-0.1,0.1);

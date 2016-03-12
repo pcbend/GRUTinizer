@@ -288,7 +288,9 @@ int fitCoulex(const char *cfg_file_name){
   }
   //Need to rebin these to match the binning from my filled histograms
   for (int geant_file = 0; geant_file < num_geant_files*2; geant_file+=2){
+    geant_hists.at(geant_file)->GetXaxis()->SetRangeUser(data_low_x,data_high_x);
     geant_hists.at(geant_file)->Rebin(kev_per_bin);
+    geant_hists.at(geant_file+1)->GetXaxis()->SetRangeUser(data_low_x,data_high_x);
     geant_hists.at(geant_file+1)->Rebin(kev_per_bin);
   }
   //DONE GETTING GEANT HISTOGRAMS
@@ -339,9 +341,7 @@ int fitCoulex(const char *cfg_file_name){
     data_hists.at(angle_index)->GetXaxis()->SetTitle("Energy (keV)");
     data_hists.at(angle_index)->GetYaxis()->SetTitle(Form("Counts / %d keV", kev_per_bin));
 
-    std::cout << "GETTING FIT FUNC PARAMETERS INTO HIST CONSTANT ARRAY" << std::endl;
     for (int i = 0; i < num_geant_files; i++){
-
       hist_constant[angle_index][i] = fit_func->GetParameter(i);
       std::cout << "i = " << i << " angle_index = " << angle_index 
                 << " hist_constant[angle_index][i] = "  
@@ -374,7 +374,14 @@ int fitCoulex(const char *cfg_file_name){
       normed_residuals[bin-start_bin] = residuals[bin-start_bin]/TMath::Sqrt(data_hists[angle_index]->GetBinContent(bin));
 
       if (bin_centers[bin-start_bin] >= peak_low_x  && bin_centers[bin-start_bin] <= peak_high_x){
-        peak_sum[angle_index] += (fit_func->Eval(bin_centers[bin-start_bin])-used_fit_function->Eval(bin_centers[bin-start_bin]));
+        if (num_geant_files == 1){
+          peak_sum[angle_index] += (fit_func->Eval(bin_centers[bin-start_bin])-used_fit_function->Eval(bin_centers[bin-start_bin]));
+        }
+        if (num_geant_files == 2){
+          TH1D geant_compton_hist = *((TH1D*)geant_hists.at(3)->Clone("geant_compton_hist"));
+          geant_compton_hist.Scale(hist_constant[angle_index][1]);
+          peak_sum[angle_index] += (fit_func->Eval(bin_centers[bin-start_bin])-used_fit_function->Eval(bin_centers[bin-start_bin]) - geant_compton_hist.GetBinContent(bin));
+        }
         res_sum_in_peak += residuals[bin-start_bin];
       }
     }//bin loop
@@ -432,8 +439,10 @@ int fitCoulex(const char *cfg_file_name){
   //FOR DEBUGGING
   geant_hists.at(1)->Scale(hist_constant[0][0]);
   geant_hists.at(1)->Draw("same");
-  geant_hists.at(3)->Scale(hist_constant[0][1]);
-  geant_hists.at(3)->Draw("same");
+  if (num_geant_files == 2){
+    geant_hists.at(3)->Scale(hist_constant[0][1]);
+    geant_hists.at(3)->Draw("same");
+  }
   if (!used_fit_function){
     std::cout << "Fit function doesn't exist." << std::endl;
   }

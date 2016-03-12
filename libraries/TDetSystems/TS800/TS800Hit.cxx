@@ -289,6 +289,54 @@ int TCrdc::GetMaxPad() const {
   return max;
 }
 
+int TCrdc::GetMaxPadSum() const{
+  if(!data.size())
+    return -1.0;
+
+ std::map<int,double> sum; 
+
+  for(unsigned int i = 0; i < data.size(); i++){
+    bool good = false;
+    if (i == 0 && data.size()>1) {
+      if(channel.at(i) == channel.at(i+1))
+        good = true;
+    }
+    else if(i == data.size()-1 && data.size()>2) {
+      if(channel.at(i) == channel.at(i-1))
+        good = true;
+    } else if(data.size()>2) {
+      if((channel.at(i) == channel.at(i-1)) ||
+         (channel.at(i) == channel.at(i+1)))
+        good = true;
+    }
+
+    if(!good){
+      continue;
+    }
+
+    TChannel *c = TChannel::GetChannel(Address(i));
+    double cal_data;
+    if(c){
+      cal_data = c->CalEnergy(data.at(i)) - c->GetNumber();
+    }
+    else{
+      cal_data = (double)data.at(i);
+    }
+
+    sum[channel.at(i)] += cal_data;
+  }
+
+  std::map<int,double>::iterator  it;
+  double maxd =0.0;
+  for(it = sum.begin();it!=sum.end();it++) {
+    if(it->second > maxd){
+      maxd = it->second;
+    }
+  }
+  //return (float)(channel.at(place))+gRandom->Uniform();
+  return maxd; 
+}
+
 void TCrdc::DrawChannels(Option_t *opt,bool calibrate) const {
   if(!gPad)
     new GCanvas();

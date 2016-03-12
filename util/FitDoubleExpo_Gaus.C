@@ -264,6 +264,13 @@ TF1 *FitDoubleExpTwoHist(TH1F *hist_to_fit, TH1F *geant_hist1, TH1F *geant_hist2
     fitfunc->FixParameter(i, init[i]);
   }
 
+  std::cout << "Setting par limit 0" << std::endl;
+  fitfunc->SetParLimits(0, 1e-05, 1.0);
+  std::cout << "Setting par limit 1" << std::endl;
+  fitfunc->SetParLimits(1, 1.5e-04, 2.5e-04);
+//std::cout << "Setting par limit 2" << std::endl;
+//fitfunc->SetParLimits(2, 0.2,2);
+
   fitfunc->SetRange(gLowX, gUpX);
   fitfunc->SetLineColor(4);
   fitfunc->SetLineWidth(3);
