@@ -50,8 +50,12 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus)
 void MakeTimestampDiffs(TRuntimeObjects& obj, TSega* sega, TJanus* janus);
 void MakeLaBrCoincPlots(TRuntimeObjects& obj, TSega* sega, TJanus* janus);
 
+long event_num = -1;
+
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
+  event_num++;
+
   LoadGates();
 
   TSega* sega = obj.GetDetector<TSega>();
@@ -226,7 +230,14 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanus* janus) {
   }
 }
 
-
+// Returns the timestamp in nanoseconds since the start of the first production run.
+// Minimum value: 0
+// Maximum value: 2.141e14 (End of Pb-208 target runs)
+// Total seconds: ~214100 seconds
+double global_timestamp(unsigned int run_start, unsigned long timestamp) {
+  unsigned int experiment_start = 1453953429; // Wed Jan 27 22:57:09 2016
+  return (run_start - experiment_start)*1e9 + timestamp;
+}
 
 void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega) {
   obj.FillHistogram("sega_size",
@@ -254,6 +265,11 @@ void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega) {
     //                   36000, 0, 3600e9, hit.Timestamp(),
     //                   33, 0, 33, hit.GetNumSegments());
 
+    obj.FillHistogram(Form("sega_energy_det%02d_time", hit_detnum),
+                      214100/60, 0, 2.141e14, global_timestamp(sega->RunStart(), hit.Timestamp()),
+                      1000, 0, 2000, energy);
+
+
     for(unsigned int segi=0; segi<hit.GetNumSegments(); segi++){
       TSegaSegmentHit& seg = hit.GetSegment(segi);
       int segnum = seg.GetSegnum();
@@ -275,15 +291,15 @@ void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega) {
     }
   }
 
-  for(int i=0; i<sega->Size(); i++) {
-    TSegaHit& s_hit = sega->GetSegaHit(i);
-    for(int beta_i = 0; beta_i<150; beta_i++) {
-      double beta = 0.0 + beta_i*((0.15-0.00)/150);
-      obj.FillHistogram("sega_DCenergy_beamaxis_beta",
-			150, 0.0, 0.15, beta,
-			8000, 0, 4000, s_hit.GetDoppler(beta));
-    }
-  }
+  // for(int i=0; i<sega->Size(); i++) {
+  //   TSegaHit& s_hit = sega->GetSegaHit(i);
+  //   for(int beta_i = 0; beta_i<150; beta_i++) {
+  //     double beta = 0.0 + beta_i*((0.15-0.00)/150);
+  //     obj.FillHistogram("sega_DCenergy_beamaxis_beta",
+  //       		150, 0.0, 0.15, beta,
+  //       		8000, 0, 4000, s_hit.GetDoppler(beta));
+  //   }
+  // }
 
   obj.FillHistogram("hascore_hassegment",
                     2, 0, 2, cc_timestamp!=-1,
@@ -299,30 +315,30 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus)
   // bool coinc_missing3 = false;
   // bool coinc_missing4 = false;
 
-  for(int i=0; i<sega->Size(); i++) {
-    TSegaHit& s_hit = sega->GetSegaHit(i);
-    for(int beta_i = 0; beta_i<150; beta_i++) {
-      double beta = 0.0 + beta_i*((0.15-0.00)/150);
-      obj.FillHistogram("sega_DCenergy_beamaxis_beta_coinc",
-			150, 0.0, 0.15, beta,
-			8000, 0, 4000, s_hit.GetDoppler(beta));
-    }
+  // for(int i=0; i<sega->Size(); i++) {
+  //   TSegaHit& s_hit = sega->GetSegaHit(i);
+  //   for(int beta_i = 0; beta_i<150; beta_i++) {
+  //     double beta = 0.0 + beta_i*((0.15-0.00)/150);
+  //     obj.FillHistogram("sega_DCenergy_beamaxis_beta_coinc",
+  //       		150, 0.0, 0.15, beta,
+  //       		8000, 0, 4000, s_hit.GetDoppler(beta));
+  //   }
 
 
-    double beta = GValue::Value("beta");
-    for(int z=-20;z<20;z++) {
-      TVector3 offset(0,0,z);
+  //   double beta = GValue::Value("beta");
+  //   for(int z=-20;z<20;z++) {
+  //     TVector3 offset(0,0,z);
 
-      if(s_hit.GetNumSegments()>0) {
-        double tmp = 0.0;
-        double gamma = 1/(sqrt(1-pow(beta,2)));
-        tmp = s_hit.GetEnergy()*gamma *(1 - beta*TMath::Cos((s_hit.GetPosition()+offset).Theta()));
-        obj.FillHistogram("sega_DCenergy_beamaxis_zoffset_coinc",
-                          40, -20, 20, z,
-                          8000, 0, 4000, tmp);
-      }
-    }
-  }
+  //     if(s_hit.GetNumSegments()>0) {
+  //       double tmp = 0.0;
+  //       double gamma = 1/(sqrt(1-pow(beta,2)));
+  //       tmp = s_hit.GetEnergy()*gamma *(1 - beta*TMath::Cos((s_hit.GetPosition()+offset).Theta()));
+  //       obj.FillHistogram("sega_DCenergy_beamaxis_zoffset_coinc",
+  //                         40, -20, 20, z,
+  //                         8000, 0, 4000, tmp);
+  //     }
+  //   }
+  // }
 
 
 
@@ -498,8 +514,22 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus)
 
       if(time_energy->IsInside(s_hit.GetEnergy(),
                              s_hit.Timestamp() - j_hit_pidhigh->Timestamp())){
+        double dc_energy = s_hit.GetDoppler(GValue::Value("beta"), j_hit_pidhigh->GetPosition());
+        double timestamp = global_timestamp(sega->RunStart(), s_hit.Timestamp());
         obj.FillHistogram("sega_DCenergy_janus_pidhigh_timegate",
-                          8000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta"), j_hit_pidhigh->GetPosition()));
+                          8000, 0, 4000, dc_energy);
+        obj.FillHistogram(Form("sega_DCenergy_janus_pidhigh_timegate_det%02d_time",s_hit.GetDetnum()),
+                          214100/60, 0, 2.141e14, timestamp,
+                          1000, 0, 2000, dc_energy);
+        if(s_hit.GetDetnum() == 16 && dc_energy > 440 && dc_energy<480){
+          std::ofstream of("events.txt",std::ios_base::app);
+          of << "Entry: " << event_num
+             << "\tEnergy: " << s_hit.GetEnergy()
+             << "\tDC Energy: " << dc_energy
+             << "\tglobal timestamp: " << long(timestamp)
+             << "\ttimestamp: " << s_hit.Timestamp()
+             << std::endl;
+        }
       }
     }
   }

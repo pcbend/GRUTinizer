@@ -34,7 +34,7 @@ void TUnpackedEvent::AddRawData(const TRawEvent& event, kDetectorSystems detecto
   case kDetectorSystems::GRETINA:
     GetDetector<TGretina>(true)->AddRawData(event);
     break;
-    
+
   case kDetectorSystems::GRETINA_SIM:
     GetDetector<TGretSim>(true)->AddRawData(event);
     break;
@@ -81,5 +81,11 @@ void TUnpackedEvent::AddRawData(const TRawEvent& event, kDetectorSystems detecto
 
   default:
     break;
+  }
+}
+
+void TUnpackedEvent::SetRunStart(unsigned int unix_time){
+  for(auto det : detectors){
+    det->SetRunStart(unix_time);
   }
 }

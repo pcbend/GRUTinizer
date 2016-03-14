@@ -34,19 +34,30 @@ public:
   Long_t Timestamp() const { return fTimestamp; }
   void   SetTimestamp(Long_t timestamp)  { fTimestamp   = timestamp; }
 
+  unsigned int RunStart() const { return fRunStart; }
+  void SetRunStart(unsigned int unix_time) { fRunStart = unix_time; }
+
 protected:
   #ifndef __CINT__
   std::vector<TRawEvent> raw_data; //!
   #endif
 
   int fSize;
-  Long_t   fTimestamp;
+  Long_t fTimestamp;
+
+  /// Start of the run, in unix time.
+  /**
+     This comes from the BEGIN_RUN packet in NSCL data.
+     It is the number of seconds since January 1, 1970.
+     If unavailable, will be 0.
+   */
+  unsigned int fRunStart;
 
 private:
   virtual int  BuildHits() = 0;
 
 
-  ClassDef(TDetector,1)
+  ClassDef(TDetector,2)
 };
 
 #endif
