@@ -58,6 +58,7 @@ int LabelPeaks(TH1 *hist,double sigma,double thresh,Option_t *opt) {
   double *x = pm->GetX();
   double *y = pm->GetY();
   for(int i=0;i<n;i++) {
+    y[i] += 20.0;
     text = new TText(x[i],y[i],Form("%.1f",x[i]));
     text->SetTextSize(0.025);
     text->SetTextAngle(90);
@@ -73,9 +74,7 @@ int LabelPeaks(TH1 *hist,double sigma,double thresh,Option_t *opt) {
 }
 
 
-bool ShowPeaks(TH1 **hists,unsigned int nhists) {
-  double sigma  = 2.0;
-  double thresh = 0.02;
+bool ShowPeaks(TH1 **hists,unsigned int nhists,double sigma,double thresh) {
   int num_found = 0;
   for(unsigned int i=0;i<nhists;i++) {
     if(TObject *obj = hists[i]->GetListOfFunctions()->FindObject("PeakLabels")) {
