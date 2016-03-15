@@ -130,12 +130,17 @@ void TUnpackingLoop::HandleNSCLData(TNSCLEvent& event) {
 
 void TUnpackingLoop::HandleBuiltNSCLData(TNSCLEvent& event){
   TNSCLBuiltRingItem built(event);
-  //std::cout << "------------------" << std::endl;
   for(unsigned int i=0; i<built.NumFragments(); i++){
     TNSCLFragment& fragment = built.GetFragment(i);
     int source_id = fragment.GetFragmentSourceID();
     kDetectorSystems detector = TDetectorEnv::Get().DetermineSystem(source_id);
-    fOutputEvent->AddRawData(fragment.GetNSCLEvent(), detector);
+    TRawEvent frag_event = fragment.GetNSCLEvent();
+    // S800 events in CAESAR/S800 event have no body header.
+    // This grabs the timestamp from the fragment header so it can be used later.
+    if(frag_event.GetTimestamp() == -1){
+      frag_event.SetFragmentTimestamp(fragment.GetFragmentTimestamp());
+    }
+    fOutputEvent->AddRawData(frag_event, detector);
   }
 }
 
