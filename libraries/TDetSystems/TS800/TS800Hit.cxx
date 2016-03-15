@@ -506,7 +506,7 @@ float TCrdc::GetNonDispersiveY() {
   } else if(fId==1) {
     y_slope = GValue::Value("CRDC2_Y_SLOPE");
     y_offset = GValue::Value("CRDC2_Y_OFFSET");
-    y_GlobalOffset = GValue::Value("CRDC1_GLOB_Y_OFF");
+    y_GlobalOffset = GValue::Value("CRDC2_GLOB_Y_OFF");
   }
   if(std::isnan(y_GlobalOffset)) y_GlobalOffset = 0;
   return ((GetTimeRand()*y_slope+y_offset)+y_GlobalOffset);
