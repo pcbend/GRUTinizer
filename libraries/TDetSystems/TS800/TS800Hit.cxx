@@ -497,7 +497,45 @@ float TCrdc::GetDispersiveX() const{
 }
 */
 
-float TCrdc::GetDispersiveX() const{
+//float TCrdc::GetDispersiveX() const{
+//  if (GetMaxPad() ==-1){
+//    return sqrt(-1);
+//  }
+
+//  float x_slope = sqrt(-1);
+//  float x_offset = sqrt(-1);
+//  if(fId==0) {
+//    x_slope = GValue::Value("CRDC1_X_SLOPE");
+//    x_offset = GValue::Value("CRDC1_X_OFFSET");
+//  } else if(fId==1) {
+//    x_slope = GValue::Value("CRDC2_X_SLOPE");
+//    x_offset = GValue::Value("CRDC2_X_OFFSET");
+//  }
+//  if(std::isnan(x_slope))
+//    x_slope = 1.0;
+//  if(std::isnan(x_offset))
+//    x_offset = 0.0;
+//  
+
+
+//  std::map<int,int> datamap;
+//  int mpad = GetMaxPad();
+//  double datasum = 0;
+//  for(int i=0;i<Size();i++) {
+//    if((channel.at(i) <( mpad-10)) || (channel.at(i)>(mpad+10)))
+//      continue;
+//    datamap[channel.at(i)] += GetData(i);
+//    datasum += GetData(i);
+//  }
+//  std::map<int,int>::iterator it;
+//  double wchansum = 0.0;
+//  for(it=datamap.begin();it!=datamap.end();it++) {
+//    wchansum += it->first*(it->second/datasum);
+//  }
+//  return (wchansum*x_slope+x_offset);
+//}
+
+  float TCrdc::GetDispersiveX() const{
   if (GetMaxPad() ==-1){
     return sqrt(-1);
   }
@@ -516,25 +554,41 @@ float TCrdc::GetDispersiveX() const{
   if(std::isnan(x_offset))
     x_offset = 0.0;
   
-
-
-  std::map<int,int> datamap;
-  int mpad = GetMaxPad();
+  std::map<int,double> datamap;
+  const int GRAVITY_WIDTH = 10;//determines how many pads one uses in averaging
+  const int NUM_PADS = 224;
+  int maxpad = GetMaxPad();
+  int lowpad = maxpad - GRAVITY_WIDTH/2;
+  int highpad = lowpad + GRAVITY_WIDTH + 1;
   double datasum = 0;
-  for(int i=0;i<Size();i++) {
-    if((channel.at(i) <( mpad-10)) || (channel.at(i)>(mpad+10)))
-      continue;
-    datamap[channel.at(i)] += GetData(i);
-    datasum += GetData(i);
+  if (lowpad < 0){
+    lowpad = 0;
   }
-  std::map<int,int>::iterator it;
+  if (highpad >= NUM_PADS){
+    highpad = NUM_PADS-1;
+  }
+
+  for(int i=0;i<Size();i++) {
+    if((channel.at(i) < lowpad)||(channel.at(i)>highpad))
+      continue;
+    TChannel *c = TChannel::GetChannel(Address(i));
+    double cal_data;
+    if (c){
+      cal_data = c->CalEnergy(GetData(i));
+    }
+    else{
+      cal_data = (double)GetData(i);
+    }
+    datamap[channel.at(i)] += cal_data;
+    datasum += cal_data;
+  }
+  std::map<int,double>::iterator it;
   double wchansum = 0.0;
   for(it=datamap.begin();it!=datamap.end();it++) {
     wchansum += it->first*(it->second/datasum);
   }
   return (wchansum*x_slope+x_offset);
 }
-
 
 
 float TCrdc::GetNonDispersiveY() {
