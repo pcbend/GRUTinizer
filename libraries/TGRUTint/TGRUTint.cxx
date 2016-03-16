@@ -390,9 +390,9 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
 
       // If EventTree exists, add the file to the chain.
       if(file->FindObjectAny("EventTree")) {
-        if(!gChain) {
-          gChain = new TChain("EventTree");
-          gChain->SetNotify(GrutNotifier::Get());
+        if(!gChain) { // Should never go in here!!
+	  gChain = new TChain("EventTree");
+	  gChain->SetNotify(GrutNotifier::Get());
         }
         gChain->Add(file->GetName());
       }
