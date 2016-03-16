@@ -263,22 +263,19 @@ int TCrdc::GetMaxPad() const {
     }
 
     TChannel *c = TChannel::GetChannel(Address(i));
-    double cal_data;
-    if(c)
-      cal_data = c->CalEnergy(data.at(i)) - c->GetNumber();
-    else
+    double cal_data = 0;
+    if(c){
+      cal_data = c->CalEnergy(cal_data);
+    }
+    else{
       cal_data = (double)data.at(i);
-
-//  if(cal_data>temp) {
-//    temp = cal_data;
-//    place = i;
-//  }
+    }
     sum[channel.at(i)] += cal_data;
   }
 
   std::map<int,double>::iterator  it;
-  int max = 0;
-  double maxd =0.0;
+  int max = -1;
+  double maxd =-1;
   for(it = sum.begin();it!=sum.end();it++) {
     if(it->second > maxd){
       max = it->first;
@@ -315,9 +312,9 @@ int TCrdc::GetMaxPadSum() const{
     }
 
     TChannel *c = TChannel::GetChannel(Address(i));
-    double cal_data;
+    double cal_data = 0;
     if(c){
-      cal_data = c->CalEnergy(data.at(i)) - c->GetNumber();
+        cal_data = c->CalEnergy(cal_data);
     }
     else{
       cal_data = (double)data.at(i);
@@ -327,7 +324,7 @@ int TCrdc::GetMaxPadSum() const{
   }
 
   std::map<int,double>::iterator  it;
-  double maxd =0.0;
+  double maxd =-1.0;
   for(it = sum.begin();it!=sum.end();it++) {
     if(it->second > maxd){
       maxd = it->second;
@@ -364,7 +361,7 @@ void TCrdc::DrawChannels(Option_t *opt,bool calibrate) const {
       //printf("x = %i  ",x);
       TChannel *c = TChannel::GetChannel(Address(x));
       if(c && calibrate) {
-        cal_data = c->CalEnergy(data.at(x)) - c->GetNumber();
+        cal_data = c->CalEnergy(data.at(x));
 //        printf("cal_data[%03i]  = %f\n",channel.at(x),cal_data);
       } else {
         if(!c)
