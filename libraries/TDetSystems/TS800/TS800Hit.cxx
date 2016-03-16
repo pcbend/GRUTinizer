@@ -263,9 +263,9 @@ int TCrdc::GetMaxPad() const {
     }
 
     TChannel *c = TChannel::GetChannel(Address(i));
-    double cal_data = 0;
+    double cal_data;
     if(c){
-      cal_data = c->CalEnergy(cal_data);
+      cal_data = c->CalEnergy(data.at(i));
     }
     else{
       cal_data = (double)data.at(i);
@@ -312,9 +312,9 @@ int TCrdc::GetMaxPadSum() const{
     }
 
     TChannel *c = TChannel::GetChannel(Address(i));
-    double cal_data = 0;
+    double cal_data;
     if(c){
-        cal_data = c->CalEnergy(cal_data);
+        cal_data = c->CalEnergy(data.at(i));
     }
     else{
       cal_data = (double)data.at(i);
