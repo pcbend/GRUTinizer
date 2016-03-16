@@ -41,7 +41,7 @@ double TDetectorHit::GetEnergy() const {
   if(!chan){
     return Charge() + gRandom->Uniform();
   }
-  return chan->CalEnergy(Charge());
+  return chan->CalEnergy(Charge(), fTimestamp);
 }
 
 double TDetectorHit::GetTime() const {
@@ -49,7 +49,7 @@ double TDetectorHit::GetTime() const {
   if(!chan){
     return Time() + gRandom->Uniform();
   }
-  return chan->CalTime(Time());
+  return chan->CalTime(Time(), fTimestamp);
 }
 
 
