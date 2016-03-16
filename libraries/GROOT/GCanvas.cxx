@@ -190,7 +190,9 @@ void GCanvas::AddMarker(int x,int y,int dim) {
   mark->y = y;
   if(dim==1) {
     mark->localx = gPad->AbsPixeltoX(x);
+    mark->localy = gPad->AbsPixeltoY(y);
     mark->binx = hist->GetXaxis()->FindBin(mark->localx);
+    mark->biny = hist->GetYaxis()->FindBin(mark->localy);
     double bin_edge = hist->GetXaxis()->GetBinLowEdge(mark->binx);
     mark->linex = new TLine(bin_edge,hist->GetMinimum(),
                             bin_edge,hist->GetMaximum());
@@ -924,7 +926,28 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       break;
 
     case kKey_s:
-      edited = ShowPeaks(hists.data(),hists.size());
+      
+      if(GetNMarkers()<2){
+	edited = ShowPeaks(hists.data(),hists.size());
+	RemoveMarker("all");
+      } else{
+	double x1 = fMarkers.at(fMarkers.size()-1)->localx;
+	double x2 = fMarkers.at(fMarkers.size()-2)->localx;
+	if(x1>x2)
+	  std::swap(x1,x2);
+	double y1 = fMarkers.at(fMarkers.size()-1)->localy;
+	double y2 = fMarkers.at(fMarkers.size()-2)->localy;
+	if(y1>y2)
+	  std::swap(y1,y2);
+	
+	double ymax = hists.at(0)->GetMaximum();
+	double thresh = y1/ymax;
+	double sigma = x2-x1;
+	if(sigma>10.0)
+	  sigma = 10.0;
+	edited = ShowPeaks(hists.data(),hists.size(),sigma,thresh);
+	RemoveMarker("all");
+      }
       break;
     case kKey_F10:{
       }
