@@ -32,13 +32,14 @@ TCompiledHistograms::TCompiledHistograms(std::string input_lib)
   // Casting required to keep gcc from complaining.
   *(void_alias*)(&func) = library->GetSymbol("MakeHistograms");
 
-  std::cout << "library: " << library
-            << "\tfunc: " << func << std::endl;
-  std::cout << "libname: " << input_lib << std::endl;
+  if(!func){
+    std::cout << "Could not find MakeHistograms() inside "
+              <<"\"" << input_lib << "\"" << std::endl;
+  }
   last_modified = get_timestamp();
   last_checked = time(NULL);
 
-  
+
   obj = new TRuntimeObjects(&objects, &variables, &gates);
 }
 
@@ -57,7 +58,7 @@ void TCompiledHistograms::ClearHistograms() {
     if(obj->InheritsFrom(TH1::Class())){
       TH1* hist = (TH1*)obj;
       hist->Reset();
-    } 
+    }
     else if(obj->InheritsFrom(TDirectory::Class())){
       TDirectory* dir = (TDirectory*)obj;
       TIter dirnext(dir->GetList());
@@ -69,7 +70,7 @@ void TCompiledHistograms::ClearHistograms() {
 	}
       }
     }
-    
+
   }
   std::cout << "ended " << std::endl;
 }
@@ -103,7 +104,7 @@ void TCompiledHistograms::Write() {
     }
     else obj->Write();
   }
-  
+
 
 
   //  objects.Write();
@@ -147,7 +148,7 @@ void TCompiledHistograms::Fill(TUnpackedEvent& detectors) {
 
   TPreserveGDirectory preserve;
   default_directory->cd();
-  
+
   if(obj) {
   obj->SetDetectors(&detectors);
   //TRuntimeObjects obj(detectors, &objects, &variables, &gates);

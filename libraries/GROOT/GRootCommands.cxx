@@ -215,9 +215,13 @@ TH1 *GrabHist(int i)  {
   }
   return hist;
 }
-  
-  
-void StartGUI() { 
+
+
+namespace {
+  bool gui_is_running = false;
+}
+
+void StartGUI() {
   std::string   script_filename = Form("%s/pygui/grut-view.py",getenv("GRUTSYS"));
   std::ifstream script(script_filename);
   std::string   script_text((std::istreambuf_iterator<char>(script)),
@@ -227,28 +231,32 @@ void StartGUI() {
   TTimer* gui_timer = new TTimer("TPython::Exec(\"update()\");", 10, true);
   gui_timer->TurnOn();
 
-  TGRUTOptions::Get()->SetStartGUI();
+  gui_is_running = true;
   for(int i=0;i<gROOT->GetListOfFiles()->GetSize();i++) {
     TPython::Bind((TFile*)gROOT->GetListOfFiles()->At(i),"tdir");
     gROOT->ProcessLine("TPython::Exec(\"window.AddDirectory(tdir)\");");
   }
-} 
-  
-  
-  
+}
+
+bool GUIIsRunning() {
+  return gui_is_running;
+}
+
+
+
 TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
- TH2 *toreturn = 0; 
+ TH2 *toreturn = 0;
  if(!mat)
     return toreturn;
  //int dim = mat->GetDimension();
- int xmax = mat->GetXaxis()->GetNbins()+1; 
- int ymax = mat->GetYaxis()->GetNbins()+1; 
+ int xmax = mat->GetXaxis()->GetNbins()+1;
+ int ymax = mat->GetYaxis()->GetNbins()+1;
  /*
  switch(dim) {
    case 3:
-     xmax = mat->GetXaxis()->GetNbins()+1; 
-     ymax = mat->GetYaxis()->GetNbins()+1; 
-     zmax = mat->GetZaxis()->GetNbins()+1; 
+     xmax = mat->GetXaxis()->GetNbins()+1;
+     ymax = mat->GetYaxis()->GetNbins()+1;
+     zmax = mat->GetZaxis()->GetNbins()+1;
      break;
    case 2:
      if(axis>3) {
@@ -256,8 +264,8 @@ TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
                __PRETTY_FUNCTION__,mat->GetName())
        return toreturn;
      }
-     xmax = mat->GetXaxis()->GetNbins()+1; 
-     ymax = mat->GetYaxis()->GetNbins()+1; 
+     xmax = mat->GetXaxis()->GetNbins()+1;
+     ymax = mat->GetYaxis()->GetNbins()+1;
      break;
    case 1:
      if(axis!=1) {
@@ -265,7 +273,7 @@ TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
                __PRETTY_FUNCTION__,mat->GetName())
        return toreturn;
      }
-     xmax = mat->GetXaxis()->GetNbins()+1; 
+     xmax = mat->GetXaxis()->GetNbins()+1;
      break;
  };
  */
