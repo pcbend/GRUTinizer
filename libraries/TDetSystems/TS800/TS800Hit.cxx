@@ -536,7 +536,8 @@ float TCrdc::GetDispersiveX() const{
 //}
 
   float TCrdc::GetDispersiveX() const{
-  if (GetMaxPad() ==-1){
+  int maxpad = GetMaxPad();
+  if (maxpad ==-1){
     return sqrt(-1);
   }
 
@@ -555,11 +556,10 @@ float TCrdc::GetDispersiveX() const{
     x_offset = 0.0;
   
   std::map<int,double> datamap;
-  const int GRAVITY_WIDTH = 10;//determines how many pads one uses in averaging
+  const int GRAVITY_WIDTH = 14;//determines how many pads one uses in averaging
   const int NUM_PADS = 224;
-  int maxpad = GetMaxPad();
   int lowpad = maxpad - GRAVITY_WIDTH/2;
-  int highpad = lowpad + GRAVITY_WIDTH + 1;
+  int highpad = lowpad + GRAVITY_WIDTH;
   double datasum = 0;
   if (lowpad < 0){
     lowpad = 0;
@@ -569,8 +569,25 @@ float TCrdc::GetDispersiveX() const{
   }
 
   for(int i=0;i<Size();i++) {
+
     if((channel.at(i) < lowpad)||(channel.at(i)>highpad))
       continue;
+    bool good = false;
+    if (i == 0 && data.size()>1) {
+      if(channel.at(i) == channel.at(i+1))
+        good = true;
+    }
+    else if(i == (int)data.size()-1 && data.size()>2) {
+      if(channel.at(i) == channel.at(i-1))
+        good = true;
+    } else if(data.size()>2) {
+      if((channel.at(i) == channel.at(i-1)) ||
+         (channel.at(i) == channel.at(i+1)))
+        good = true;
+    }
+    if(!good){
+      continue;
+    }
     TChannel *c = TChannel::GetChannel(Address(i));
     double cal_data;
     if (c){
@@ -582,6 +599,7 @@ float TCrdc::GetDispersiveX() const{
     datamap[channel.at(i)] += cal_data;
     datasum += cal_data;
   }
+
   std::map<int,double>::iterator it;
   double wchansum = 0.0;
   for(it=datamap.begin();it!=datamap.end();it++) {
