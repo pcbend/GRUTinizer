@@ -74,7 +74,7 @@ public:
   TList* GetSummaryProjections() { return fSummaryProjections; }
 
   void SetSummary(bool is_summary = true) { fIsSummary = is_summary; }
-  bool GetSummmary() const { return fIsSummary; }
+  bool GetSummary() const { return fIsSummary; }
 
   void SetSummaryDirection(kDirection dir) { fSummaryDirection = dir; }
   kDirection GetSummaryDirection() const { return fSummaryDirection; }
