@@ -16,7 +16,6 @@ void TBank29::Copy(TObject& obj) const {
 
   TBank29& bank = (TBank29&)obj;
   bank.channels = channels;
-  bank.raw_data.clear();
 }
 
 void TBank29::InsertHit(const TDetectorHit& hit){
@@ -24,12 +23,13 @@ void TBank29::InsertHit(const TDetectorHit& hit){
   fSize++;
 }
 
-int TBank29::BuildHits(){
+int TBank29::BuildHits(std::vector<TRawEvent>& raw_data){
   for(auto& event : raw_data){
     TGEBEvent* geb = (TGEBEvent*)&event;
     SetTimestamp(geb->GetTimestamp());
     TMode3Hit hit;
-    hit.BuildFrom(geb->GetPayloadBuffer());
+    TSmartBuffer buf = geb->GetPayloadBuffer();
+    hit.BuildFrom(buf);
     InsertHit(hit);
   }
   if(Size()) {
@@ -43,5 +43,4 @@ void TBank29::Print(Option_t *opt) const { }
 void TBank29::Clear(Option_t *opt) {
   TDetector::Clear(opt);
   channels.clear();
-  raw_data.clear();
 }

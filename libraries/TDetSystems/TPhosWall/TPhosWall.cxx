@@ -70,7 +70,7 @@ void TPhosWall::Print(Option_t *opt) const {
   }
 }
 
-int TPhosWall::BuildHits() {
+int TPhosWall::BuildHits(std::vector<TRawEvent>& raw_data) {
 
   for(size_t i=0;i<raw_data.size();i++) {
     TGEBEvent &geb = (TGEBEvent&)raw_data.at(i);

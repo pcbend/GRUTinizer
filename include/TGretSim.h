@@ -37,7 +37,7 @@ public:
   static TVector3 GetCrystalPosition(int cryid); //return the position of the crysal in the lab system*/
 
 private:
-  virtual int BuildHits();
+  virtual int BuildHits(std::vector<TRawEvent>& raw_data);
   //int Build_From(TNSCLEvent &event,bool Zero_Suppress = false);
   void BuildFrom(TGEBEvent &event);
 

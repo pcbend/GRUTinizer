@@ -27,7 +27,7 @@ public:
 
 private:
   std::vector<int> scalers;
-  virtual int BuildHits();
+  virtual int BuildHits(std::vector<TRawEvent>& raw_data);
 
   int interval_start;
   int interval_end;

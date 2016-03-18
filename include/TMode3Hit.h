@@ -7,6 +7,8 @@
 
 #define MAXTRACE 1024
 
+class TSmartBuffer;
+
 class TMode3Hit : public TDetectorHit {
   public:
     TMode3Hit();
@@ -23,7 +25,7 @@ class TMode3Hit : public TDetectorHit {
     //virtual int           Size()                             { return 1;     }
   double AverageWave(int samples=-1);
 
-  void     BuildFrom(TSmartBuffer buf);
+  void     BuildFrom(TSmartBuffer& buf);
 
     Int_t    GetChannel()   const { return (board_id & 0x000f);     }
     Int_t    GetVME()       const { return (board_id & 0x0030)>>4;    }

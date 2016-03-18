@@ -112,7 +112,7 @@ private:
   //---------------------
 
   static bool ReadMap(std::string filename);
-  virtual int  BuildHits();
+  virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 
   bool HandleTrigPacket(unsigned short*,int);     //!
   bool HandleTOFPacket(unsigned short*,int);      //!

@@ -23,7 +23,7 @@ public:
   static TVector3 CrystalToGlobal(int detnum, TVector3 crystal_pos);
 
 private:
-  virtual int BuildHits();
+  virtual int BuildHits(std::vector<TRawEvent>& raw_data);
   static void LoadDetectorPositions();
 
   std::vector<TSegaHit> sega_hits;

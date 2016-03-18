@@ -39,7 +39,7 @@ public:
 
 
 private:
-  virtual int BuildHits();
+  virtual int BuildHits(std::vector<TRawEvent>& raw_data);
   //void BuildAddbackHits();
 
   std::vector<TGretinaHit> gretina_hits;

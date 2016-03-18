@@ -23,7 +23,6 @@ void TFastScint::Copy(TObject& obj) const {
   TFastScint& fs = (TFastScint&)obj;
   //fs_hits->Copy(*fs.fs_hits);
   fs.fs_hits = fs_hits;
-  fs.raw_data.clear();
 }
 
 void TFastScint::Clear(Option_t* opt){
@@ -36,7 +35,7 @@ void TFastScint::Clear(Option_t* opt){
   fs_hits.clear();
 }
 
-int TFastScint::BuildHits(){
+int TFastScint::BuildHits(std::vector<TRawEvent>& raw_data){
   for(auto& event : raw_data){
     TNSCLEvent& nscl = (TNSCLEvent&)event;
     SetTimestamp(nscl.GetTimestamp());
