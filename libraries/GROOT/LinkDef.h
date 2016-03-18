@@ -31,7 +31,8 @@
 #pragma link C++ function Help;
 #pragma link C++ function Commands;
 #pragma link C++ function GrabHist;
-#pragma link C++ function StartGUI();
+#pragma link C++ function StartGUI;
+#pragma link C++ function GUIIsRunning;
 
 #pragma link C++ enum EAxis;
 #pragma link C++ function AddOffset;

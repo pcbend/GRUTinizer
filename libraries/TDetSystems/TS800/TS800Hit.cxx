@@ -263,22 +263,19 @@ int TCrdc::GetMaxPad() const {
     }
 
     TChannel *c = TChannel::GetChannel(Address(i));
-    double cal_data;
-    if(c)
-      cal_data = c->CalEnergy(data.at(i)) - c->GetNumber();
-    else
+    double cal_data = 0;
+    if(c){
+      cal_data = c->CalEnergy(cal_data);
+    }
+    else{
       cal_data = (double)data.at(i);
-
-//  if(cal_data>temp) {
-//    temp = cal_data;
-//    place = i;
-//  }
+    }
     sum[channel.at(i)] += cal_data;
   }
 
   std::map<int,double>::iterator  it;
-  int max = 0;
-  double maxd =0.0;
+  int max = -1;
+  double maxd =-1;
   for(it = sum.begin();it!=sum.end();it++) {
     if(it->second > maxd){
       max = it->first;
@@ -287,6 +284,54 @@ int TCrdc::GetMaxPad() const {
   }
   //return (float)(channel.at(place))+gRandom->Uniform();
   return max;
+}
+
+int TCrdc::GetMaxPadSum() const{
+  if(!data.size())
+    return -1.0;
+
+ std::map<int,double> sum; 
+
+  for(unsigned int i = 0; i < data.size(); i++){
+    bool good = false;
+    if (i == 0 && data.size()>1) {
+      if(channel.at(i) == channel.at(i+1))
+        good = true;
+    }
+    else if(i == data.size()-1 && data.size()>2) {
+      if(channel.at(i) == channel.at(i-1))
+        good = true;
+    } else if(data.size()>2) {
+      if((channel.at(i) == channel.at(i-1)) ||
+         (channel.at(i) == channel.at(i+1)))
+        good = true;
+    }
+
+    if(!good){
+      continue;
+    }
+
+    TChannel *c = TChannel::GetChannel(Address(i));
+    double cal_data = 0;
+    if(c){
+        cal_data = c->CalEnergy(cal_data);
+    }
+    else{
+      cal_data = (double)data.at(i);
+    }
+
+    sum[channel.at(i)] += cal_data;
+  }
+
+  std::map<int,double>::iterator  it;
+  double maxd =-1.0;
+  for(it = sum.begin();it!=sum.end();it++) {
+    if(it->second > maxd){
+      maxd = it->second;
+    }
+  }
+  //return (float)(channel.at(place))+gRandom->Uniform();
+  return maxd; 
 }
 
 void TCrdc::DrawChannels(Option_t *opt,bool calibrate) const {
@@ -316,7 +361,7 @@ void TCrdc::DrawChannels(Option_t *opt,bool calibrate) const {
       //printf("x = %i  ",x);
       TChannel *c = TChannel::GetChannel(Address(x));
       if(c && calibrate) {
-        cal_data = c->CalEnergy(data.at(x)) - c->GetNumber();
+        cal_data = c->CalEnergy(data.at(x));
 //        printf("cal_data[%03i]  = %f\n",channel.at(x),cal_data);
       } else {
         if(!c)
