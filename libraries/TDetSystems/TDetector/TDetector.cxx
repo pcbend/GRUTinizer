@@ -24,6 +24,7 @@ void TDetector::Clear(Option_t *opt) {
   TNamed::Clear(opt);
   fTimestamp = -1;
   fSize = 0;
+  fRunStart = 0;
 }
 
 void TDetector::Print(Option_t *opt) const { }
@@ -34,6 +35,7 @@ void TDetector::Copy(TObject& obj) const {
   TDetector& det = (TDetector&)obj;
   det.fTimestamp = fTimestamp;
   det.fSize = fSize;
+  det.fRunStart = fRunStart;
 }
 
 int TDetector::Compare(const TObject& obj) const {

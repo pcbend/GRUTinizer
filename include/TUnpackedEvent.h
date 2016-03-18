@@ -24,6 +24,7 @@ public:
   void AddRawData(const TRawEvent& event, kDetectorSystems detector);
 
   void Build();
+  void SetRunStart(unsigned int unix_time);
 
   int Size() { return detectors.size(); }
 

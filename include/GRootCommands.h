@@ -14,7 +14,7 @@ class GMarker;
 extern TChain *gChain;
 
 int  LabelPeaks(TH1*,double,double,Option_t *opt="");
-bool ShowPeaks(TH1**,unsigned int);
+bool ShowPeaks(TH1**,unsigned int, double sigma=2.0, double thresh=0.02);
 bool RemovePeaks(TH1**,unsigned int);
 
 bool PhotoPeakFit(TH1*,double,double,Option_t *opt="");
@@ -27,13 +27,15 @@ std::string MergeStrings(const std::vector<std::string>& strings, char split='\n
 
 //
 //  Below are in the interpretur commands. (added to the linkdef!)
-//  
+//
 
 void Prompt();
 void Help();
 void Commands();
-void StartGUI();
 TH1 *GrabHist(int i=1); //return the histogram from the current canvas, pad i.
+
+void StartGUI();
+bool GUIIsRunning();
 
 //enum EAxis {kXAxis = 1,kYAxis = 2,kXYaxis = 3,kZaxis = 4,kXZaxis = 5,kYZAxis = 6,kXYZAxis=7};
 enum EAxis {kXAxis = 1,kYAxis = 2};

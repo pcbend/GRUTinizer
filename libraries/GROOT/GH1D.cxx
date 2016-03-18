@@ -142,6 +142,7 @@ GH1D* GH1D::Project_Background(double value_low, double value_high,
       int bin_high    = gpar->GetXaxis()->FindBin(value_high);
       int bg_bin_low  = gpar->GetXaxis()->FindBin(bg_value_low);
       int bg_bin_high = gpar->GetXaxis()->FindBin(bg_value_high);
+
       return gpar->ProjectionY_Background(bin_low, bin_high,
                                           bg_bin_low, bg_bin_high,
                                           mode);
@@ -150,6 +151,7 @@ GH1D* GH1D::Project_Background(double value_low, double value_high,
       int bin_high    = gpar->GetYaxis()->FindBin(value_high);
       int bg_bin_low  = gpar->GetYaxis()->FindBin(bg_value_low);
       int bg_bin_high = gpar->GetYaxis()->FindBin(bg_value_high);
+
       return gpar->ProjectionX_Background(bin_low, bin_high,
                                           bg_bin_low, bg_bin_high,
                                           mode);

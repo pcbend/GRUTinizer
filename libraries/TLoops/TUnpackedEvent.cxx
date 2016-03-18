@@ -88,3 +88,9 @@ void TUnpackedEvent::Build() {
 void TUnpackedEvent::AddRawData(const TRawEvent& event, kDetectorSystems detector) {
   raw_data_map[detector].push_back(event);
 }
+
+void TUnpackedEvent::SetRunStart(unsigned int unix_time){
+  for(auto det : detectors){
+    det->SetRunStart(unix_time);
+  }
+}

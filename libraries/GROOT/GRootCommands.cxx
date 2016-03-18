@@ -28,8 +28,18 @@
 //#include <GRootObjectManager.h>
 #include <TGRUTOptions.h>
 //#include <TGRUTInt.h>
+#include <GrutNotifier.h>
 
-TChain *gChain = NULL;
+TChain *gChain = new TChain("EventTree");//NULL;
+
+class TempThing{
+public:
+  TempThing() {
+    gChain->SetNotify(GrutNotifier::Get());
+  }
+} temp_thing;
+  
+
 
 void Help()     { printf("This is helpful information.\n"); }
 
@@ -58,6 +68,7 @@ int LabelPeaks(TH1 *hist,double sigma,double thresh,Option_t *opt) {
   double *x = pm->GetX();
   double *y = pm->GetY();
   for(int i=0;i<n;i++) {
+    y[i] += 20.0;
     text = new TText(x[i],y[i],Form("%.1f",x[i]));
     text->SetTextSize(0.025);
     text->SetTextAngle(90);
@@ -73,9 +84,7 @@ int LabelPeaks(TH1 *hist,double sigma,double thresh,Option_t *opt) {
 }
 
 
-bool ShowPeaks(TH1 **hists,unsigned int nhists) {
-  double sigma  = 2.0;
-  double thresh = 0.02;
+bool ShowPeaks(TH1 **hists,unsigned int nhists,double sigma,double thresh) {
   int num_found = 0;
   for(unsigned int i=0;i<nhists;i++) {
     if(TObject *obj = hists[i]->GetListOfFunctions()->FindObject("PeakLabels")) {
@@ -216,9 +225,13 @@ TH1 *GrabHist(int i)  {
   }
   return hist;
 }
-  
-  
-void StartGUI() { 
+
+
+namespace {
+  bool gui_is_running = false;
+}
+
+void StartGUI() {
   std::string   script_filename = Form("%s/pygui/grut-view.py",getenv("GRUTSYS"));
   std::ifstream script(script_filename);
   std::string   script_text((std::istreambuf_iterator<char>(script)),
@@ -228,28 +241,32 @@ void StartGUI() {
   TTimer* gui_timer = new TTimer("TPython::Exec(\"update()\");", 10, true);
   gui_timer->TurnOn();
 
-  TGRUTOptions::Get()->SetStartGUI();
+  gui_is_running = true;
   for(int i=0;i<gROOT->GetListOfFiles()->GetSize();i++) {
     TPython::Bind((TFile*)gROOT->GetListOfFiles()->At(i),"tdir");
     gROOT->ProcessLine("TPython::Exec(\"window.AddDirectory(tdir)\");");
   }
-} 
-  
-  
-  
+}
+
+bool GUIIsRunning() {
+  return gui_is_running;
+}
+
+
+
 TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
- TH2 *toreturn = 0; 
+ TH2 *toreturn = 0;
  if(!mat)
     return toreturn;
  //int dim = mat->GetDimension();
- int xmax = mat->GetXaxis()->GetNbins()+1; 
- int ymax = mat->GetYaxis()->GetNbins()+1; 
+ int xmax = mat->GetXaxis()->GetNbins()+1;
+ int ymax = mat->GetYaxis()->GetNbins()+1;
  /*
  switch(dim) {
    case 3:
-     xmax = mat->GetXaxis()->GetNbins()+1; 
-     ymax = mat->GetYaxis()->GetNbins()+1; 
-     zmax = mat->GetZaxis()->GetNbins()+1; 
+     xmax = mat->GetXaxis()->GetNbins()+1;
+     ymax = mat->GetYaxis()->GetNbins()+1;
+     zmax = mat->GetZaxis()->GetNbins()+1;
      break;
    case 2:
      if(axis>3) {
@@ -257,8 +274,8 @@ TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
                __PRETTY_FUNCTION__,mat->GetName())
        return toreturn;
      }
-     xmax = mat->GetXaxis()->GetNbins()+1; 
-     ymax = mat->GetYaxis()->GetNbins()+1; 
+     xmax = mat->GetXaxis()->GetNbins()+1;
+     ymax = mat->GetYaxis()->GetNbins()+1;
      break;
    case 1:
      if(axis!=1) {
@@ -266,7 +283,7 @@ TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
                __PRETTY_FUNCTION__,mat->GetName())
        return toreturn;
      }
-     xmax = mat->GetXaxis()->GetNbins()+1; 
+     xmax = mat->GetXaxis()->GetNbins()+1;
      break;
  };
  */

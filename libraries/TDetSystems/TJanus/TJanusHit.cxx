@@ -1,7 +1,10 @@
 #include "TJanusHit.h"
 
+#include <mutex>
+
 #include "GValue.h"
 #include "TJanus.h"
+#include "TKinematics.h"
 
 void TJanusHit::Copy(TObject& obj) const {
   TDetectorHit::Copy(obj);
@@ -67,7 +70,7 @@ int TJanusHit::GetSector() const {
 void TJanusHit::Print(Option_t *opt) const {
   printf("JanusHit[%03i,%03i]  Ring: %02i  Sector: %02i  Charge: %i   Energy: %.02f\n",
           GetFrontChannel(),GetBackChannel(),GetRing(),GetSector(),Charge(),GetEnergy());
- 
+
 }
 
 
@@ -80,4 +83,19 @@ TVector3 TJanusHit::GetPosition(bool apply_array_offset) const {
                        GValue::Value("Janus_Z_offset"));
   }
   return output;
+}
+
+TVector3 TJanusHit::GetConjugateDirection() const {
+  static std::mutex mutex;
+  std::lock_guard<std::mutex> lock(mutex);
+
+  static TKinematics kin("78Kr","208Pb","78Kr","208Pb",3.9*78*1000);
+
+  TVector3 pos = GetPosition();
+  kin.SetAngles(pos.Theta(), 3); // Set the 208Pb angle
+  double theta_78Kr = kin.GetThetalab(2); // Get the 78Kr angle
+
+  pos.SetTheta(theta_78Kr);
+  pos.SetPhi(pos.Phi() + 3.1415926535);
+  return pos;
 }

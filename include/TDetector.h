@@ -32,16 +32,27 @@ public:
   void   SetTimestamp(Long_t timestamp)  { fTimestamp   = timestamp; }
 
   enum EDetectorStatus { kBuilt = BIT(15) };
+  
+  unsigned int RunStart() const { return fRunStart; }
+  void SetRunStart(unsigned int unix_time) { fRunStart = unix_time; }
 
 protected:
   int fSize;
-  Long_t   fTimestamp;
+  Long_t fTimestamp;
+
+  /// Start of the run, in unix time.
+  /**
+     This comes from the BEGIN_RUN packet in NSCL data.
+     It is the number of seconds since January 1, 1970.
+     If unavailable, will be 0.
+   */
+  unsigned int fRunStart;
 
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data) = 0;
 
 
-  ClassDef(TDetector,1)
+  ClassDef(TDetector,2)
 };
 
 #endif

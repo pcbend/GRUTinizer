@@ -114,7 +114,7 @@ int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
 }
 
 TVector3 TSega::GetSegmentPosition(int detnum, int segnum) {
-  if(detnum < 0 || detnum > 15 ||
+  if(detnum < 1 || detnum > 16 ||
      segnum < 1 || segnum > 32){
     return TVector3(std::sqrt(-1),std::sqrt(-1),std::sqrt(-1));
   }
