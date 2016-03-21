@@ -237,10 +237,6 @@ void GCanvas::RemoveMarker(Option_t* opt) {
       delete marker;
     }
     fMarkers.clear();
-
-    for(auto marker : fBackgroundMarkers){
-      delete marker;
-    }
     fBackgroundMarkers.clear();
   } else {
     if(fMarkers.size()<1)
@@ -887,18 +883,18 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
 
         if(fBackgroundMarkers.size()>=2 &&
            fBackgroundMode!=kNoBackground){
-          int bg_binlow = fBackgroundMarkers[0]->binx;
-          int bg_binhigh = fBackgroundMarkers[1]->binx;
+          int bg_binlow = fBackgroundMarkers.at(0)->binx;
+          int bg_binhigh = fBackgroundMarkers.at(1)->binx;
           if(bg_binlow > bg_binhigh){
             std::swap(bg_binlow, bg_binhigh);
           }
-          double bg_value_low  = ghist->GetXaxis()->GetBinCenter(binlow);
-          double bg_value_high = ghist->GetXaxis()->GetBinCenter(binhigh);
+          double bg_value_low  = ghist->GetXaxis()->GetBinCenter(bg_binlow);
+          double bg_value_high = ghist->GetXaxis()->GetBinCenter(bg_binhigh);
           // Using binhigh-1 instead of binhigh,
           //  because the ProjectionX/Y functions from ROOT use inclusive bin numbers,
           //  rather than exclusive.
           //
-          proj = ghist->Project_Background(value_low, value_high,
+	  proj = ghist->Project_Background(value_low, value_high,
                                            bg_value_low, bg_value_high,
                                            fBackgroundMode);
         } else {
@@ -1112,7 +1108,8 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
         }
       }
 
-      if(ghist){
+      if(ghist){        
+	ghist->SetSummary(0);
         TH1 *phist = ghist->ProjectionX();//->Draw();
         if(phist) {
           new GCanvas();
@@ -1155,6 +1152,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       }
 
       if(ghist){
+        ghist->SetSummary(0);
         //printf("ghist = 0x%08x\n",ghist);
         TH1 *phist = ghist->ProjectionY();//->Draw();
         //printf("phist = 0x%08x\n",phist);

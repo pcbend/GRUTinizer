@@ -18,7 +18,7 @@ public:
   GH1D(const char* name, const char* title, Int_t nbinsx, Double_t xlow, Double_t xup)
     : TH1D(name, title, nbinsx, xlow, xup), parent(NULL), projection_axis(-1) { }
 
-  GH1D(const TH1D& source);
+  GH1D(const TH1& source);
   //GH1D(const TH1 *source);
   //virtual void SetOption(Option_t* option=" ");
 
@@ -35,7 +35,7 @@ public:
   TH1 *DrawCopy(Option_t *opt="") const;
   TH1 *DrawNormalized(Option_t *opt="",Double_t norm=1) const;
 
-
+  GH1D* Project(int bins=-1);
 
   GH1D* GetPrevious() const;
   GH1D* GetNext() const;

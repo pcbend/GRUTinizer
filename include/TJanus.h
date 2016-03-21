@@ -26,7 +26,7 @@ public:
   virtual void SetRunStart(unsigned int unix_time);
 
 private:
-  virtual int  BuildHits();
+  virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 
   void Build_VMUSB_Read(TSmartBuffer buf);
 

@@ -381,7 +381,7 @@ void TS800::Clear(Option_t* opt){
 
 }
 
-int TS800::BuildHits(){
+int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
   if(raw_data.size() != 1){
     std::cout << "Data buffers: " << raw_data.size() << std::endl;
   }
@@ -1198,7 +1198,7 @@ float TS800::MCorrelatedOBJ_E1(bool corrected) const{
 	    afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
   }
   else if(mtof.fCorrelatedE1>-1){
-    double OBJLow  = GValue::Value("MOBJ_CORR_LOW");
+      double OBJLow  = GValue::Value("MOBJ_CORR_LOW");
     double OBJHigh = GValue::Value("MOBJ_CORR_HIGH");
     
     double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
@@ -1215,7 +1215,7 @@ float TS800::MCorrelatedOBJ_E1(bool corrected) const{
 
     std::vector<float> val2;
     float val;
-    for(unsigned int y=0;y<mtof.fObj.size();y++) {
+      for(unsigned int y=0;y<mtof.fObj.size();y++) {
       val = (mtof.fObj.at(y) - mtof.fE1Up.at(mtof.fCorrelatedE1) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX()) ;
       if(val<OBJHigh && val>OBJLow){
 	val2.push_back(val);      

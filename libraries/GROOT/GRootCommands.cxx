@@ -28,8 +28,18 @@
 //#include <GRootObjectManager.h>
 #include <TGRUTOptions.h>
 //#include <TGRUTInt.h>
+#include <GrutNotifier.h>
 
-TChain *gChain = NULL;
+TChain *gChain = new TChain("EventTree");//NULL;
+
+class TempThing{
+public:
+  TempThing() {
+    gChain->SetNotify(GrutNotifier::Get());
+  }
+} temp_thing;
+  
+
 
 void Help()     { printf("This is helpful information.\n"); }
 
@@ -294,3 +304,10 @@ TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
    }
   return toreturn;
 }
+
+
+
+
+
+
+

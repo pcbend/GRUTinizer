@@ -29,7 +29,7 @@ public:
     //if(Size()>0) return ((TMode3Hit&)GetHit(0)).GetTimestamp(); else return -1; }
 
 private:
-  virtual int BuildHits();
+  virtual int BuildHits(std::vector<TRawEvent>& raw_data);
 
   std::vector<TMode3Hit> channels;
 

@@ -17,7 +17,6 @@ void TGretSim::Copy(TObject& obj) const {
 
   TGretSim& gretsim = (TGretSim&)obj;
   gretsim.gretsim_hits = gretsim_hits; 
-  gretsim.raw_data.clear();
 }
 
 void TGretSim::InsertHit(const TDetectorHit& hit){
@@ -25,7 +24,7 @@ void TGretSim::InsertHit(const TDetectorHit& hit){
   //  fSize++;
 }
 
-int TGretSim::BuildHits(){
+int TGretSim::BuildHits(std::vector<TRawEvent>& raw_data){
   /*  for(auto& event : raw_data){
     TNSCLEvent& nscl = (TNSCLEvent&)event;
     SetTimestamp(nscl.GetTimestamp());
@@ -37,7 +36,6 @@ int TGretSim::BuildHits(){
     TGEBEvent& geb = (TGEBEvent&)event;
     BuildFrom(geb);
   }
-  raw_data.clear();
   return 0;
 }
 
@@ -46,7 +44,6 @@ void TGretSim::Print(Option_t *opt) const { }
 void TGretSim::Clear(Option_t *opt) {
   TDetector::Clear(opt);
   gretsim_hits.clear(); 
-  raw_data.clear();
 }
 
 void TGretSim::BuildFrom(TGEBEvent &event){

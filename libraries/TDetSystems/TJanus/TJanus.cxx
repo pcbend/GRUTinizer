@@ -17,7 +17,6 @@ void TJanus::Copy(TObject& obj) const {
 
   TJanus& janus = (TJanus&)obj;
   janus.janus_hits = janus_hits;
-  janus.raw_data.clear();
 }
 
 void TJanus::Clear(Option_t* opt){
@@ -26,7 +25,7 @@ void TJanus::Clear(Option_t* opt){
   janus_hits.clear();
 }
 
-int TJanus::BuildHits(){
+int TJanus::BuildHits(std::vector<TRawEvent>& raw_data){
   for(auto& event : raw_data){
     TNSCLEvent& nscl = (TNSCLEvent&)event;
     SetTimestamp(nscl.GetTimestamp());

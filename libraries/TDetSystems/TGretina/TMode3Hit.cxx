@@ -23,7 +23,7 @@ TMode3Hit::~TMode3Hit() {
 
 
 
-void TMode3Hit::BuildFrom(TSmartBuffer buf){
+void TMode3Hit::BuildFrom(TSmartBuffer& buf){
   Clear();
 
   bool read_waveform = TGRUTOptions::Get()->ExtractWaves();

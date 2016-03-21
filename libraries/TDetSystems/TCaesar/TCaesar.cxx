@@ -42,7 +42,6 @@ void TCaesar::Copy(TObject& obj) const {
 
   TCaesar& caesar = (TCaesar&)obj;
   caesar.caesar_hits = caesar_hits;
-  caesar.raw_data.clear();
 }
 
 void TCaesar::Clear(Option_t* opt){
@@ -52,7 +51,7 @@ void TCaesar::Clear(Option_t* opt){
   caesar_hits.clear();
 }
 
-int TCaesar::BuildHits(){
+int TCaesar::BuildHits(std::vector<TRawEvent>& raw_data){
   //if(raw_data.size()!=1) 
     //printf("\nCaesar event size = %i\n",raw_data.size());
 

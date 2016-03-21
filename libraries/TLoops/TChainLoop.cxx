@@ -96,7 +96,12 @@ bool TChainLoop::Iteration() {
 
   TUnpackedEvent* event = new TUnpackedEvent;
   for(auto& elem : det_map){
-    event->AddDetector(*elem.second);
+    TDetector* det = *elem.second;
+    if(det->TestBit(TDetector::kBuilt)){
+      event->AddDetector(det);
+    } else {
+      delete det;
+    }
   }
 
   if(hist_loop){

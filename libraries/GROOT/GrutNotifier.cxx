@@ -30,5 +30,9 @@ bool GrutNotifier::Notify() {
     GValue::ReadValFile(val_file.c_str());
   }
 
+  for(auto& callback : callbacks){
+    callback();
+  }
+
   return true;
 }

@@ -30,6 +30,7 @@ public:
 
 private:
   std::vector<TDetector*> detectors;
+  std::map<kDetectorSystems, std::vector<TRawEvent> > raw_data_map;
 };
 
 #ifndef __CINT__
