@@ -32,10 +32,10 @@ public:
 
 
   Long_t Timestamp() const { return fTimestamp; }
-  void   SetTimestamp(Long_t timestamp)  { fTimestamp   = timestamp; }
+  void   SetTimestamp(Long_t timestamp)  { fTimestamp = timestamp; }
 
   unsigned int RunStart() const { return fRunStart; }
-  void SetRunStart(unsigned int unix_time) { fRunStart = unix_time; }
+  virtual void SetRunStart(unsigned int unix_time) { fRunStart = unix_time; }
 
 protected:
   #ifndef __CINT__

@@ -262,3 +262,15 @@ void TJanus::Print(Option_t *opt) const {
   printf("---------------------------\n");
 
 }
+
+void TJanus::SetRunStart(unsigned int unix_time) {
+  // Wed Jan 27 22:57:09 2016
+  unsigned int previous = fRunStart==0 ? 1453953429 : fRunStart;
+  int tdiff = unix_time - previous;
+  long timestamp_diff = (1e9) * tdiff;
+
+  fTimestamp += timestamp_diff;
+  for(auto& hit : janus_hits) {
+    hit.SetTimestamp(timestamp_diff + hit.Timestamp());
+  }
+}
