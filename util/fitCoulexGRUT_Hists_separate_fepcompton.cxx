@@ -120,9 +120,9 @@ int fitCoulex(const char *cfg_file_name){
   //All Variables
   const int MAX_PARS = 10;
   //These angles determine the maximum angle cut that will be used
-  const double START_ANGLE = 3.2;
-  const double FINAL_ANGLE = 3.2;
-  const double ANGLE_STEPS = 0.1;
+  const double START_ANGLE = 1.0;
+  const double FINAL_ANGLE = 3.5;
+  const double ANGLE_STEPS = 0.5;
   const int TOTAL_ANGLES = (FINAL_ANGLE-START_ANGLE)/ANGLE_STEPS + 1;
 
   double init_pars[MAX_PARS];
@@ -281,7 +281,7 @@ int fitCoulex(const char *cfg_file_name){
     out_file << "HistConstant     FitError     ChiSquared     ResSum     ResSumInPeak     PeakSum" << std::endl;
   }
   else if (num_geant_files == 2){
-    out_file << "HistConstant1     HistConstant2     FitError     ChiSquared     ResSum     ResSumInPeak     PeakSum" << std::endl;
+    out_file << "Angle\t Fep Scaling\t Compton Scaling\t 2nd-2Plus Scaling\t FitError\t ChiSquared\t ResSum\t ResSumInPeak\t PeakSum" << std::endl;
   }
   
 
@@ -358,9 +358,7 @@ int fitCoulex(const char *cfg_file_name){
 
     int start_bin = data_hists[angle_index]->FindBin(fit_low_x);
     int end_bin = data_hists[angle_index]->FindBin(fit_high_x);
-    if (angle_index == 0){
-      used_fit_function->SetParameter(0, fit_func->GetParameter(3));//set double exponential scaling factor
-    }
+    used_fit_function->SetParameter(0, fit_func->GetParameter(3));//set double exponential scaling factor
     
     for (int bin = start_bin; bin < end_bin; bin++){
       bin_centers[bin-start_bin] = data_hists.at(angle_index)->GetBinCenter(bin);
@@ -388,10 +386,10 @@ int fitCoulex(const char *cfg_file_name){
     TGraph *norm_residual_plot = new TGraph(num_res_points, &bin_centers[0], &normed_residuals[0]);
     norm_residual_plot->SetName(Form("norm_res_plot_angle_%f", angles.at(angle_index)));
 
-    out_file <<  hist_constant[angle_index][0] << "     " << hist_constant[angle_index][1] <<  "     " 
-             << hist_constant[angle_index][2] << "     " << fit_error[angle_index] << "     " 
-             << chi_squared[angle_index] << "     " << res_sum << "     " << res_sum_in_peak 
-             << "     " << peak_sum[angle_index] << "     " << std::endl;
+    out_file <<  angles[angle_index] <<"\t"<<hist_constant[angle_index][0] << "\t" << hist_constant[angle_index][1] <<  "\t" 
+             << hist_constant[angle_index][2] << "\t" << fit_error[angle_index] << "\t" 
+             << chi_squared[angle_index] << "\t" << res_sum << "\t" << res_sum_in_peak 
+             << "\t" << peak_sum[angle_index] << "\t" << std::endl;
 
         
 
@@ -400,54 +398,57 @@ int fitCoulex(const char *cfg_file_name){
     norm_residual_plot->Write();
     data_hists[angle_index]->Write();
 
+    TCanvas *disentangled_can = new TCanvas(Form("dis_can_%f",angles[angle_index]),Form("dis_can_%f",angles[angle_index]), 800,600);
+    disentangled_can->cd();
+    data_hists[angle_index]->Draw();
+    TLine *fit_low = new TLine(fit_low_x, 0, fit_low_x, 780);
+    TLine *fit_high = new TLine(fit_high_x, 0, fit_high_x, 780);
+    TLine *peak_low = new TLine(peak_low_x, 0, peak_low_x, 780);
+    TLine *peak_high = new TLine(peak_high_x, 0, peak_high_x, 780);
+    fit_low->SetLineStyle(2);
+    fit_high->SetLineStyle(2);
+    peak_low->SetLineStyle(3);
+    peak_high->SetLineStyle(3);
+    fit_low->Draw();
+    fit_high->Draw();
+    peak_low->Draw();
+    peak_high->Draw();
+
+    geant_hists.at(0)->SetLineColor(kGreen+3);
+    geant_hists.at(1)->SetLineColor(kRed);
+    geant_hists.at(2)->SetLineColor(kMagenta);
+    used_fit_function->SetLineColor(kBlack);
+
+    TH1D fep_hist = *((TH1D*)geant_hists.at(0)->Clone("fep_hist"));
+    fep_hist.Scale(hist_constant[angle_index][0]);
+    fep_hist.Draw("same");
+
+    TH1D compton_hist = *((TH1D*)geant_hists.at(1)->Clone("compton_hist"));
+    compton_hist.Scale(hist_constant[angle_index][1]);
+    compton_hist.Draw("same");
+
+    TH1D second_2plus_hist = *((TH1D*)geant_hists.at(2)->Clone("second_2plus_hist"));
+    second_2plus_hist.Scale(hist_constant[angle_index][2]);
+    second_2plus_hist.Draw("same");
+    if (!used_fit_function){
+      std::cout << "Fit function doesn't exist." << std::endl;
+    }
+    else{
+      used_fit_function->Draw("same");
+    }
+    out_hist_file->cd();
+    gStyle->SetOptStat(0);
+    gStyle->SetOptFit(1);
+    disentangled_can->Write();
 
     delete residual_plot;
     delete norm_residual_plot;
-    
-
     delete fit_func;
+    delete disentangled_can;
     if (angle_index % 10 == 0){
       std::cout << " Completed Angle " << angles[angle_index] << std::endl; 
     }
   }
-
-  TCanvas *disentangled_can = new TCanvas("dis_can","dis_can", 800,600);
-  disentangled_can->cd();
-  data_hists[0]->Draw();
-  TLine *fit_low = new TLine(fit_low_x, 0, fit_low_x, 780);
-  TLine *fit_high = new TLine(fit_high_x, 0, fit_high_x, 780);
-  TLine *peak_low = new TLine(peak_low_x, 0, peak_low_x, 780);
-  TLine *peak_high = new TLine(peak_high_x, 0, peak_high_x, 780);
-  fit_low->SetLineStyle(2);
-  fit_high->SetLineStyle(2);
-  peak_low->SetLineStyle(3);
-  peak_high->SetLineStyle(3);
-  fit_low->Draw();
-  fit_high->Draw();
-  peak_low->Draw();
-  peak_high->Draw();
-
-  geant_hists.at(0)->SetLineColor(kGreen+3);
-  geant_hists.at(1)->SetLineColor(kRed);
-  geant_hists.at(2)->SetLineColor(kMagenta);
-  used_fit_function->SetLineColor(kBlack);
-
-  geant_hists.at(0)->Scale(hist_constant[0][0]);
-  geant_hists.at(0)->Draw("same");
-  geant_hists.at(1)->Scale(hist_constant[0][1]);
-  geant_hists.at(1)->Draw("same");
-  geant_hists.at(2)->Scale(hist_constant[0][2]);
-  geant_hists.at(2)->Draw("same");
-  if (!used_fit_function){
-    std::cout << "Fit function doesn't exist." << std::endl;
-  }
-  else{
-    used_fit_function->Draw("same");
-  }
-  out_hist_file->cd();
-  gStyle->SetOptStat(0);
-  gStyle->SetOptFit(1);
-  disentangled_can->Write();
   out_file.close();
   //END OF OLD FILE
   ////////////////////////////////////////////////////////////////////////////////////////////////////
