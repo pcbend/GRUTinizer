@@ -553,7 +553,7 @@ bool GCanvas::HandleMouseShiftPress(Int_t event,Int_t x,Int_t y) {
       }
       std::vector<TH1*> hists = FindHists();
       new GCanvas();
-      options.Append("HIST");
+      //options.Append("HIST");
       hists.at(0)->DrawCopy(options.Data());
       for(unsigned int x=1;x<hists.size();x++) 
         hists.at(x)->DrawCopy("same");
@@ -675,7 +675,7 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
       TH1* prev = ghist->GetPrevious();
       if(prev) {
         prev->GetXaxis()->SetRange(first,last);
-        prev->Draw("HIST");
+        prev->Draw("");
         RedrawMarkers();
         edited = true;
       }
@@ -696,7 +696,7 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
       TH1* prev = ghist->GetNext();
       if(prev) {
         prev->GetXaxis()->SetRange(first,last);
-        prev->Draw("HIST");
+        prev->Draw("");
         RedrawMarkers();
         edited = true;
       }
@@ -898,7 +898,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
           proj = ghist->Project(value_low, value_high);
         }
         if(proj){
-          proj->Draw("HIST");
+          proj->Draw("");
           edited=true;
         }
       }
@@ -1061,7 +1061,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       }
 
       if(ghist && ghist->GetProjections()->GetSize()){
-        ghist->GetProjections()->At(0)->Draw("HIST");
+        ghist->GetProjections()->At(0)->Draw("");
         edited=true;
       }
     }
@@ -1081,7 +1081,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
         TH1 *phist = ghist->ProjectionX();//->Draw();
         if(phist) {
           new GCanvas();
-          phist->Draw("HIST");
+          phist->Draw("");
         }
         edited=true;
       }
@@ -1103,7 +1103,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
         TH1* phist = ghist->SummaryProject(1);
         if(phist) {
           new GCanvas();
-          phist->Draw("HIST");
+          phist->Draw("");
         }
         edited = true;
       }
@@ -1127,7 +1127,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
         //printf("phist->GetName() = %s\n",phist->GetName());
         if(phist) {
           new GCanvas();
-          phist->Draw("HIST");
+          phist->Draw("");
         }
         edited=true;
       }
@@ -1149,7 +1149,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
         TH1* phist = ghist->SummaryProject(1);
         if(phist) {
           new GCanvas();
-          phist->Draw("HIST");
+          phist->Draw("");
         }
         edited = true;
       }
