@@ -543,9 +543,9 @@ bool GCanvas::HandleMouseShiftPress(Int_t event,Int_t x,Int_t y) {
      if(obj->InheritsFrom(TH1::Class()))
         hist = (TH1*)obj;
   }
-  if(!hist) 
+  if(!hist)
     return false;
-  
+
   TString options;
   switch(hist->GetDimension()) {
     case 1:
@@ -559,7 +559,7 @@ bool GCanvas::HandleMouseShiftPress(Int_t event,Int_t x,Int_t y) {
       new GCanvas();
       options.Append("HIST");
       hists.at(0)->DrawCopy(options.Data());
-      for(unsigned int x=1;x<hists.size();x++) 
+      for(unsigned int x=1;x<hists.size();x++)
         hists.at(x)->DrawCopy("same");
       }
       return true;
@@ -798,12 +798,15 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
          edited = PhotoPeakFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
        }
        break;
-  case kKey_g:
-    edited = GausFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
-    break;
+
+    case kKey_g:
+      edited = GausFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
+      break;
+
     //case kKey_G:
     //   edited = GausBGFit();
     //   break;
+
     case kKey_i:
        if(!hists.empty() && GetNMarkers()>1) {
          double xlow  = (fMarkers.at(fMarkers.size()-2)->localx);
@@ -867,9 +870,9 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
           break;
         }
       }
-      //  ok, i found a bug.  if someone tries to gate on a histogram 
+      //  ok, i found a bug.  if someone tries to gate on a histogram
       //  that is already zoomed, bad things will happen; namely the bins
-      //  in the zoomed histogram will not map correctly to the parent. To get 
+      //  in the zoomed histogram will not map correctly to the parent. To get
       //  around this we need the bin value, not the bin!   pcb.
       //
       if(ghist){
@@ -926,7 +929,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       break;
 
     case kKey_s:
-      
+
       if(GetNMarkers()<2){
 	edited = ShowPeaks(hists.data(),hists.size());
 	RemoveMarker("all");
@@ -939,7 +942,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
 	double y2 = fMarkers.at(fMarkers.size()-2)->localy;
 	if(y1>y2)
 	  std::swap(y1,y2);
-	
+
 	double ymax = hists.at(0)->GetMaximum();
 	double thresh = y1/ymax;
 	double sigma = x2-x1;
@@ -993,6 +996,35 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
        }
        edited = true;
        RemoveMarker("all");
+       break;
+
+    case kKey_E:
+       //this->GetListOfPrimitives()->Print();
+       GetContextMenu()->Action(hists.back()->GetXaxis(),hists.back()->GetXaxis()->Class()->GetMethodAny("SetRangeUser"));
+       {
+          double x1 = hists.back()->GetXaxis()->GetBinCenter(hists.back()->GetXaxis()->GetFirst());
+          double x2 = hists.back()->GetXaxis()->GetBinCenter(hists.back()->GetXaxis()->GetLast());
+          TIter iter(this->GetListOfPrimitives());
+          while(TObject *obj = iter.Next()) {
+            if(obj->InheritsFrom(TPad::Class())) {
+              TPad *pad = (TPad*)obj;
+              TIter iter2(pad->GetListOfPrimitives());
+              while(TObject *obj2=iter2.Next()) {
+                if(obj2->InheritsFrom(TH1::Class())) {
+                  TH1* hist = (TH1*)obj2;
+                  hist->GetXaxis()->SetRangeUser(x1,x2);
+                  pad->Modified();
+                  pad->Update();
+                }
+              }
+            }
+          }
+
+       //for(int i=0;i<hists.size()-1;i++)   // this doesn't work, set range needs values not bins.   pcb.
+       //   hists.at(i)->GetXaxis()->SetRangeUser(hists.back()->GetXaxis()->GetFirst(),hists.back()->GetXaxis()->GetLast());
+
+       }
+       edited = true;
        break;
     case kKey_g:
       if(GetNMarkers()<2)
