@@ -67,7 +67,7 @@ private:
   void ReadVSNMap(std::string in_file_name);
   TCaesarHit& GetHit_VSNChannel(int vsn, int channel);
 
-  virtual int  BuildHits();
+  virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 
   void Build_Single_Read(TSmartBuffer buf);
 

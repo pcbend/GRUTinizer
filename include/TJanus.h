@@ -24,7 +24,7 @@ public:
   static TVector3 GetPosition(int detnum, int ring_num, int sector_num);
 
 private:
-  virtual int  BuildHits();
+  virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 
   void Build_VMUSB_Read(TSmartBuffer buf);
 

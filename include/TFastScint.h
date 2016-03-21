@@ -38,7 +38,7 @@ public:
   int GetErrors() {return errors; };
 
 private:
-  virtual int  BuildHits();
+  virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 
   int Build_From(TNSCLEvent &event,bool Zero_Suppress = false);
 

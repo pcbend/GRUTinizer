@@ -18,7 +18,6 @@ void TSega::Copy(TObject& obj) const {
 
   TSega& sega = (TSega&)obj;
   sega.sega_hits = sega_hits;
-  sega.raw_data.clear();
 }
 
 void TSega::Clear(Option_t* opt){
@@ -48,7 +47,7 @@ TDetectorHit& TSega::GetHit(int i){
   return sega_hits.at(i);
 }
 
-int TSega::BuildHits() {
+int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
   for(auto& event : raw_data){
     TNSCLEvent& nscl = (TNSCLEvent&)event;
 

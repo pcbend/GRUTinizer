@@ -237,10 +237,6 @@ void GCanvas::RemoveMarker(Option_t* opt) {
       delete marker;
     }
     fMarkers.clear();
-
-    for(auto marker : fBackgroundMarkers){
-      delete marker;
-    }
     fBackgroundMarkers.clear();
   } else {
     if(fMarkers.size()<1)
@@ -884,8 +880,8 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
 
         if(fBackgroundMarkers.size()>=2 &&
            fBackgroundMode!=kNoBackground){
-          int bg_binlow = fBackgroundMarkers[0]->binx;
-          int bg_binhigh = fBackgroundMarkers[1]->binx;
+          int bg_binlow = fBackgroundMarkers.at(0)->binx;
+          int bg_binhigh = fBackgroundMarkers.at(1)->binx;
           if(bg_binlow > bg_binhigh){
             std::swap(bg_binlow, bg_binhigh);
           }

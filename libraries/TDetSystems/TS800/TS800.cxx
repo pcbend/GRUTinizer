@@ -381,7 +381,7 @@ void TS800::Clear(Option_t* opt){
 
 }
 
-int TS800::BuildHits(){
+int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
   if(raw_data.size() != 1){
     std::cout << "Data buffers: " << raw_data.size() << std::endl;
   }

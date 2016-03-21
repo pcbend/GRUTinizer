@@ -6,6 +6,7 @@
 #include <TRandom.h>
 
 #include "GValue.h"
+#include "TGEBEvent.h"
 #include "TGretina.h"
 
 struct interaction_point {
@@ -68,7 +69,18 @@ const char *TGretinaHit::GetName() const {
   return channel->GetName();
 }
 
-void TGretinaHit::BuildFrom(const TRawEvent::GEBBankType1& raw){
+
+TVector3 TGretinaHit::GetCrystalPosition()  const { return TGretina::GetCrystalPosition(fCrystalId); }
+TVector3 TGretinaHit::GetSegmentPosition()  const { if(fSegmentNumber.size()) 
+                                                    return TGretina::GetSegmentPosition(fCrystalId,fSegmentNumber.at(0));
+                                                  else
+                                                    return TGretina::GetSegmentPosition(fCrystalId,0);
+                                                }
+
+
+
+void TGretinaHit::BuildFrom(TSmartBuffer& buf){
+  const TRawEvent::GEBBankType1& raw = *(const TRawEvent::GEBBankType1*)buf.GetData();
   //SetAddress(kDetectorSystems::GRETINA, 1, raw.crystal_id);
   //                     HOLE          CRYSTAL     SEGMENT
   //SetAddress(kDetectorSystems::GRETINA, 1, raw.crystal_id);
