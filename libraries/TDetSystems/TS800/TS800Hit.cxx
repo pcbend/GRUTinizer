@@ -615,18 +615,18 @@ float TCrdc::GetNonDispersiveY() {
   }
   float y_slope = sqrt(-1);
   float y_offset = sqrt(-1);
-  float y_GlobalOffset = sqrt(-1);
+  float y_GlobalSlope = sqrt(-1);
   if(fId==0) {
     y_slope = GValue::Value("CRDC1_Y_SLOPE");
     y_offset = GValue::Value("CRDC1_Y_OFFSET");
-    y_GlobalOffset = GValue::Value("CRDC1_GLOB_Y_OFF");
+    y_GlobalSlope = GValue::Value("CRDC1_GLOB_Y_SLOPE");
   } else if(fId==1) {
     y_slope = GValue::Value("CRDC2_Y_SLOPE");
     y_offset = GValue::Value("CRDC2_Y_OFFSET");
-    y_GlobalOffset = GValue::Value("CRDC2_GLOB_Y_OFF");
+    y_GlobalSlope = GValue::Value("CRDC2_GLOB_Y_SLOPE");
   }
-  if(std::isnan(y_GlobalOffset)) y_GlobalOffset = 0;
-  return ((GetTimeRand()*y_slope+y_offset)+y_GlobalOffset);
+  if(std::isnan(y_GlobalSlope)) y_GlobalSlope = 1;
+  return ((GetTimeRand()*y_slope+y_offset)*y_GlobalSlope);
 }
 
 void TCrdc::Print(Option_t *opt) const { }
