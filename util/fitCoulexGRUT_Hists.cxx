@@ -55,45 +55,24 @@ void getFileList(std::string &search_string, std::vector<std::string> &file_list
   return;
 }
 
-void initializeCuts(std::string &cut_file_name, std::string &pid_cut_name, std::string &in_cut_name, 
-                    std::string &tcut_name, TCutG *&pid_cut, TCutG *&in_cut, TCutG *&tcut){
-  TFile *cut_file = new TFile(cut_file_name.c_str(), "read");
-  if (!cut_file->IsOpen()){
-    std::cout << "ERROR: Failed to open cut file with name " << cut_file_name << std::endl; 
-  }
-
-  pid_cut = (TCutG*)cut_file->Get(pid_cut_name.c_str());
-  if (!pid_cut){
-    std::cout << "ERROR: Failed to get PID cut with name: " << pid_cut_name 
-              << " from file " << cut_file_name << std::endl;
-    return;
-  }
-  tcut = (TCutG*)cut_file->Get(tcut_name.c_str());
-  if (!tcut){
-    std::cout << "ERROR: Failed to get time cut with name: " << tcut_name 
-              << " from file " << cut_file_name << std::endl;
-    return;
-  }
-  in_cut = (TCutG*)cut_file->Get(in_cut_name.c_str());
-  if (!in_cut){
-    std::cout << "ERROR: Failed to get in-beam cut with name: " << in_cut_name 
-              << " from file " << cut_file_name << std::endl;
-    return;
-  }
-  return;
-}
-
-void initializeHistograms(std::vector<TH1F*> &data_hists, std::vector<double> &angles,
-                          const double START_ANGLE, const double FINAL_ANGLE, 
-                          const double ANGLE_STEPS, int data_low_x, int data_high_x, int n_bins_x){
+void getHistograms(std::vector<TH1F*> &data_hists, std::vector<double> &angles,
+                   TFile *&input_file, const double START_ANGLE, 
+                   const double FINAL_ANGLE,  const double ANGLE_STEPS,
+                   int data_low_x, int data_high_x, int kev_per_bin){
   const int TOTAL_ANGLES = (FINAL_ANGLE-START_ANGLE)/ANGLE_STEPS + 1;
   double temp_angle = START_ANGLE;
   for (int i = 0; i < TOTAL_ANGLES; i++){
     std::stringstream ss;
     ss << "fit_angle_" << temp_angle;
     std::string data_hist_name = ss.str();
-    data_hists.push_back(new TH1F(data_hist_name.c_str(), data_hist_name.c_str(),
-                                  n_bins_x, data_low_x, data_high_x));
+    data_hists.push_back((TH1F*)input_file->Get(data_hist_name.c_str()));
+    if (data_hists.at(i)->GetNbinsX() != data_hists.at(i)->GetXaxis()->GetXmax()){
+      std::cout << "Number of bins ("<<data_hists.at(i)->GetNbinsX()<<") does not equal x-axis length ("
+                << data_hists.at(i)->GetXaxis()->GetXmax()<<") so should not rebin!" << std::endl;
+      exit(1);
+    }
+    data_hists.at(i)->GetXaxis()->SetRangeUser(data_low_x,data_high_x);
+    data_hists.at(i)->Rebin(kev_per_bin);
     angles.push_back(temp_angle);
     temp_angle += ANGLE_STEPS;
   }
@@ -112,7 +91,7 @@ void getGeantHistograms(std::vector<TH1F*> &geant_hists, std::vector<std::string
     geant_hists.push_back( (TH1F*)geant_file->Get(geant_hist_name.c_str()));
     TH1F *geant_fep_hist = (TH1F*)geant_file->Get(geant_fep_hist_name.c_str());
     
-    TH1F *geant_compton = (TH1F*)geant_hists.at(0)->Clone("geant_compton");
+    TH1F *geant_compton = (TH1F*)geant_hists.at(i*2)->Clone("geant_compton");
     geant_compton->Add(geant_fep_hist,-1);
     geant_hists.push_back(geant_compton);
   }
@@ -139,7 +118,6 @@ int fitCoulex(const char *cfg_file_name){
   const double FINAL_ANGLE = 3.2;
   const double ANGLE_STEPS = 0.1;
   const int TOTAL_ANGLES = (FINAL_ANGLE-START_ANGLE)/ANGLE_STEPS + 1;
-  const int TOTAL_DET_IN_PREV_RINGS[N_RINGS] = {0,10,24,48,72,96,120,144,168,182};
 
   double init_pars[MAX_PARS];
   for (int i = 0; i < MAX_PARS; i++){
@@ -149,10 +127,6 @@ int fitCoulex(const char *cfg_file_name){
   TEnv *cfg = new TEnv(cfg_file_name);
   std::vector<std::string> file_list;
   std::ofstream out_file;
-
-  TCutG *pid_cut = 0;
-  TCutG *in_cut  = 0;
-  TCutG *tcut    = 0;
 
   std::vector<TFile*> files;
   std::vector<TH1F*> data_hists;
@@ -173,14 +147,9 @@ int fitCoulex(const char *cfg_file_name){
 
   //Config File Settings
   std::string isotope_name;
-  std::string input_dir;
+  std::string input_file_name;
   std::string out_file_name;
-  std::string cut_file_name;
   std::vector<std::string> geant_file_names;
-  std::string pid_cut_name;
-  std::string tcut_name;
-  std::string in_cut_name;
-  std::string inverse_map_file_name;
 
   int data_low_x;
   int data_high_x;
@@ -193,25 +162,6 @@ int fitCoulex(const char *cfg_file_name){
   int num_pars;
   int num_geant_files;
 
-  int omitted_det;
-
-  //Tree Parameters
-  int total_entries;
-  int n_gamma;
-  double tof_obj_tac;
-  double tof_obj_tac_corr;
-  double tof_xfp_tac;
-  double ic_sum;
-  double scatter_angle;//degrees
-  double gamma_time;
-  double gamma_energy_dc;
-  double ata;//radians
-  double bta;//radians
-  int absolute_det_id;
-
-  
-
-
   //////////////////////////////////////////////////
   //Get configuration values from file
   isotope_name     = cfg->GetValue("ISOTOPE_NAME", "");
@@ -219,9 +169,9 @@ int fitCoulex(const char *cfg_file_name){
     std::cout << "ERROR: Failed to get ISOTOPE_NAME from cfg file: " << cfg_file_name << std::endl;
     return -1;
   }
-  input_dir     = cfg->GetValue("INPUT_DIR", "");
-  if (input_dir.empty()){
-    std::cout << "ERROR: Failed to get INPUT_DIR from cfg file: " << cfg_file_name << std::endl;
+  input_file_name     = cfg->GetValue("INPUT_FILE", "");
+  if (input_file_name.empty()){
+    std::cout << "ERROR: Failed to get INPUT_FILE from cfg file: " << cfg_file_name << std::endl;
     return -1;
   }
 
@@ -232,11 +182,6 @@ int fitCoulex(const char *cfg_file_name){
   }
 
 
-  cut_file_name = cfg->GetValue("CUT_FILE_NAME", "");
-  if (cut_file_name.empty()){
-    std::cout << "ERROR: Failed to get CUT_FILE_NAME from cfg file: " << cfg_file_name << std::endl;
-    return -1;
-  }
 
   num_geant_files = cfg->GetValue("NUM_GEANT_FILES", 0);
   if (num_geant_files == 0){
@@ -253,21 +198,6 @@ int fitCoulex(const char *cfg_file_name){
     geant_file_names.push_back(geant_file_name);
   }
   
-  pid_cut_name = cfg->GetValue("PID_CUT_NAME", "");
-  if (pid_cut_name.empty()){
-    std::cout << "ERROR: Failed to get PID_CUT_NAME from cfg file: " << cfg_file_name << std::endl;
-    return -1;
-  }
-  tcut_name = cfg->GetValue("TCUT_NAME", "");
-  if (tcut_name.empty()){
-    std::cout << "ERROR: Failed to get TCUT_NAME from cfg file: " << cfg_file_name << std::endl;
-    return -1;
-  }
-  in_cut_name = cfg->GetValue("IN_CUT_NAME", "");
-  if (in_cut_name.empty()){
-    std::cout << "ERROR: Failed to get IN_CUT_NAME from cfg file: " << cfg_file_name << std::endl;
-    return -1;
-  }
   data_low_x = cfg->GetValue("DATA_LOW_X", -1);
   if (data_low_x == -1){
     std::cout << "ERROR: Bad data_low_x Value : " << data_low_x << std::endl;
@@ -304,13 +234,6 @@ int fitCoulex(const char *cfg_file_name){
     return -1;
   }
 
-
-  inverse_map_file_name = cfg->GetValue("INVERSE_MAP_FILE_NAME","");
-  if (inverse_map_file_name.empty()){
-    std::cout << "ERROR: Failed to get INVERSE_MAP_FILE_NAME from cfg file: " << cfg_file_name << std::endl;
-    return -1;
-  }
-
   num_pars = cfg->GetValue("NUM_PARS",0);
   if (num_pars == 0 || num_pars > MAX_PARS){
     std::cout << "ERROR: Bad NUM_PARS Value : " << num_pars << std::endl;
@@ -327,42 +250,17 @@ int fitCoulex(const char *cfg_file_name){
       return -1;
     }
   }
-  //OPTIONAL VALUES
-  omitted_det = cfg->GetValue("OMITTED_DET",-1);
-  if (omitted_det != -1){
-    std::cout << "Omitting detector " << omitted_det << std::endl;
-  }
+
   //Finished parsing cfg file
   ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  TS800::ReadInverseMap(inverse_map_file_name.c_str());
-  TCaesar *caesar = 0;
-  TS800   *s800   = 0;
-  //TODO: I Should probably make a CONFIG class that stores all these parameters as simple
-  //members so that I can write this class to an output file and keep better track of my fits
-
-  double n_bins_x = (data_high_x-data_low_x)/kev_per_bin;
-
-  std::string search_string = (input_dir + "/run*.root");
-  getFileList(search_string, file_list);
-
-  if (file_list.size() == 0){
-    std::cout << "ERROR: Empty file list!" << std::endl;
+  //Open file containing histograms 
+  TFile *input_file = new TFile(input_file_name.c_str(), "read");
+  if (!input_file){
+    std::cout << "ERROR: Failed to open input file." << std::endl;
     return -1;
   }
-
-  getFiles(files, file_list); 
-
-  //Get all necessary cuts from cut file
-  initializeCuts(cut_file_name, pid_cut_name, in_cut_name, tcut_name, pid_cut, 
-                  in_cut, tcut);
-  std::cout << "Checking cuts after initialization" << std::endl;
-  if (!pid_cut || !in_cut || !tcut){
-    std::cout << "ERROR: Failed to get one of the cuts" << std::endl;
-    return -1;
-  }
-  tcut->SavePrimitive(std::cout);
-  in_cut->SavePrimitive(std::cout);
+  
 
 
   //Open Output file which will contain the histogram results
@@ -371,19 +269,13 @@ int fitCoulex(const char *cfg_file_name){
     std::cout << "ERROR: Failed to open out_file!" << std::endl;
     return -1;
   }
-  out_file << "HistConstant     FitError     ChiSquared     ResSum     ResSumInPeak     PeakSum" << std::endl;
+  if (num_geant_files == 1){
+    out_file << "HistConstant     FitError     ChiSquared     ResSum     ResSumInPeak     PeakSum" << std::endl;
+  }
+  else if (num_geant_files == 2){
+    out_file << "HistConstant1     HistConstant2     FitError     ChiSquared     ResSum     ResSumInPeak     PeakSum" << std::endl;
+  }
   
-  //Create empty histograms
-  initializeHistograms(data_hists, angles, START_ANGLE, FINAL_ANGLE, ANGLE_STEPS,
-                       data_low_x, data_high_x, n_bins_x);
-  if(angles.size() != data_hists.size()){
-    std::cout << "ERROR: Angles (Size = "<<angles.size()<<") and Data Hist vector (Size = "
-              << data_hists.size()<<")  not of same length!" << std::endl;
-    return -1;
-  }
-  if(data_hists.at(0) == 0){
-    std::cout << "Not correctly initializing histograms" << std::endl;
-  }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   //GET GEANT HISTOGRAMS
@@ -395,88 +287,17 @@ int fitCoulex(const char *cfg_file_name){
     return -1 ;
   }
   //Need to rebin these to match the binning from my filled histograms
-  for (unsigned int geant_file = 0; geant_file < (unsigned int)num_geant_files; geant_file+=2){
+  for (int geant_file = 0; geant_file < num_geant_files*2; geant_file+=2){
+    geant_hists.at(geant_file)->GetXaxis()->SetRangeUser(data_low_x,data_high_x);
     geant_hists.at(geant_file)->Rebin(kev_per_bin);
+    geant_hists.at(geant_file+1)->GetXaxis()->SetRangeUser(data_low_x,data_high_x);
     geant_hists.at(geant_file+1)->Rebin(kev_per_bin);
   }
   //DONE GETTING GEANT HISTOGRAMS
   ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////////
-  //FILLING HISTOGRAMS
-  for (unsigned int file_index = 0; file_index < files.size(); file_index++){
-    TTree *tree = (TTree*)files.at(file_index)->Get("EventTree");
-    GValue *gvalues = (GValue*)files.at(file_index)->Get("GValue");
-    TChannel *tchannels = (TChannel*)files.at(file_index)->Get("TChannel");
-    std::cout << "Currently parsing tree from: " << file_list[file_index] << std::endl;
-    total_entries = tree->GetEntries();
-    tree->SetBranchAddress("TCaesar", &caesar);
-    tree->SetBranchAddress("TS800",   &s800);
-
-  
-    for (int entry = 0; entry < total_entries; entry++){
-      //Need to get all parameters here
-      tree->GetEntry(entry); 
-      if (!caesar || !s800){
-        continue;
-      }
-
-      n_gamma = caesar->Size();
-      for (int gamma = 0; gamma < n_gamma; gamma++){
-        TCaesarHit hit = caesar->GetCaesarHit(gamma);
-        if (!hit.IsValid()){
-          continue;
-        }
-
-        int det = hit.GetDetectorNumber();
-        int ring = hit.GetRingNumber();
-        absolute_det_id = det + TOTAL_DET_IN_PREV_RINGS[ring];
-
-        if (absolute_det_id == omitted_det){
-          continue;
-        }
-
-        gamma_time = caesar->GetCorrTime(hit,s800);
-        gamma_energy_dc = caesar->GetEnergyDC(hit);
-        tof_obj_tac = s800->GetTof().GetTacOBJ();
-        tof_xfp_tac = s800->GetTof().GetTacXFP();
-        tof_obj_tac_corr = s800->GetCorrTOF_OBJTAC();
-        ic_sum = s800->GetIonChamber().GetSum();
-
-        
-        ata = s800->GetAta();
-        bta = s800->GetBta();
-        double xsin = sin(ata);
-        double ysin = sin(bta);
-        scatter_angle = asin(sqrt(xsin*xsin+ysin*ysin))*180.0/TMath::Pi();
-  //    FOR DEBUGGING
-  //      scatter_angle = 0;
-
-
-        if (pid_cut->IsInside(tof_obj_tac_corr, ic_sum)){
-          if (tcut->IsInside(gamma_time,gamma_energy_dc)){
-            if (in_cut->IsInside(tof_xfp_tac,tof_obj_tac)){
-              bool done = false;
-              int cur_angle_index = 0;
-              while (!done && cur_angle_index < TOTAL_ANGLES){
-                if (scatter_angle < angles[cur_angle_index]){
-                  for (int angle_index = cur_angle_index; angle_index < TOTAL_ANGLES; angle_index++){
-                    data_hists.at(angle_index)->Fill(gamma_energy_dc);
-                  }//loop through angles above cur_angle_index to fill all histos
-                  done = true;
-                }//scatter_angle < angles[cur_angle_index]
-                cur_angle_index++;
-              }//!done && cur_angle_index < TOTAL_ANGLES
-            }//in beam
-          }//time-energy cut
-        }//pid_cut
-      }//n_gamma loop
-    }//loop over entries
-    delete tree;
-    delete tchannels;
-    delete gvalues;
-  }//loop over trees
-  //FINISHED LOOPING OVER INPUT TREES
+  getHistograms(data_hists, angles, input_file, START_ANGLE, FINAL_ANGLE,ANGLE_STEPS, 
+                data_low_x, data_high_x, kev_per_bin);
   
   ////////////////////////////////////////////////////
   //Now Starting Fitting Routine
@@ -520,9 +341,7 @@ int fitCoulex(const char *cfg_file_name){
     data_hists.at(angle_index)->GetXaxis()->SetTitle("Energy (keV)");
     data_hists.at(angle_index)->GetYaxis()->SetTitle(Form("Counts / %d keV", kev_per_bin));
 
-    std::cout << "GETTING FIT FUNC PARAMETERS INTO HIST CONSTANT ARRAY" << std::endl;
     for (int i = 0; i < num_geant_files; i++){
-
       hist_constant[angle_index][i] = fit_func->GetParameter(i);
       std::cout << "i = " << i << " angle_index = " << angle_index 
                 << " hist_constant[angle_index][i] = "  
@@ -555,7 +374,14 @@ int fitCoulex(const char *cfg_file_name){
       normed_residuals[bin-start_bin] = residuals[bin-start_bin]/TMath::Sqrt(data_hists[angle_index]->GetBinContent(bin));
 
       if (bin_centers[bin-start_bin] >= peak_low_x  && bin_centers[bin-start_bin] <= peak_high_x){
-        peak_sum[angle_index] += (fit_func->Eval(bin_centers[bin-start_bin])-used_fit_function->Eval(bin_centers[bin-start_bin]));
+        if (num_geant_files == 1){
+          peak_sum[angle_index] += (fit_func->Eval(bin_centers[bin-start_bin])-used_fit_function->Eval(bin_centers[bin-start_bin]));
+        }
+        if (num_geant_files == 2){
+          TH1D geant_compton_hist = *((TH1D*)geant_hists.at(3)->Clone("geant_compton_hist"));
+          geant_compton_hist.Scale(hist_constant[angle_index][1]);
+          peak_sum[angle_index] += (fit_func->Eval(bin_centers[bin-start_bin])-used_fit_function->Eval(bin_centers[bin-start_bin]) - geant_compton_hist.GetBinContent(bin));
+        }
         res_sum_in_peak += residuals[bin-start_bin];
       }
     }//bin loop
@@ -613,8 +439,10 @@ int fitCoulex(const char *cfg_file_name){
   //FOR DEBUGGING
   geant_hists.at(1)->Scale(hist_constant[0][0]);
   geant_hists.at(1)->Draw("same");
-  geant_hists.at(3)->Scale(hist_constant[0][1]);
-  geant_hists.at(3)->Draw("same");
+  if (num_geant_files == 2){
+    geant_hists.at(3)->Scale(hist_constant[0][1]);
+    geant_hists.at(3)->Draw("same");
+  }
   if (!used_fit_function){
     std::cout << "Fit function doesn't exist." << std::endl;
   }

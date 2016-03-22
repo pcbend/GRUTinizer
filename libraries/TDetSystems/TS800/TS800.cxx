@@ -97,9 +97,8 @@ void TS800::Copy(TObject& obj) const {
   tof.Copy(other.tof);
   mtof.Copy(other.mtof);
   ion.Copy(other.ion);
-  for(int i=0; i<2; i++){
-    crdc[i].Copy(other.crdc[i]);
-  }
+  crdc1.Copy(other.crdc1);
+  crdc2.Copy(other.crdc2);
 }
 
 float TS800::MapCalc(int calcorder,int parameter,float *input){
@@ -310,12 +309,6 @@ TVector3 TS800::ExitTargetVect(int order){
 }
 
 TVector3 TS800::CRDCTrack(){
-  /*TVector3 crdc1,crdc2;
-
-  crdc1.SetXYZ(crdc[0].GetDispersiveX(),crdc[0].GetNonDispersiveY(),0);
-  crdc2.SetXYZ(crdc[1].GetDispersiveX(),crdc[1].GetNonDispersiveY(),1000);
-
-  TVector3 track = crdc2-crdc1;*/
   TVector3 track;
   track.SetTheta(TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1073.0)); // rad
   track.SetPhi(TMath::ATan((GetCrdc(0).GetNonDispersiveY()-GetCrdc(1).GetNonDispersiveY())/1073.0)); // rad
@@ -349,9 +342,9 @@ float TS800::GetBFP() const{
 
 void TS800::Clear(Option_t* opt){
   TDetector::Clear(opt);
-  crdc[0].Clear();
-  crdc[1].Clear();
-
+  crdc1.Clear();
+  crdc2.Clear();
+  
   scint[0].Clear();
   scint[1].Clear();
   scint[2].Clear();
@@ -388,7 +381,7 @@ void TS800::Clear(Option_t* opt){
 
 }
 
-int TS800::BuildHits(){
+int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
   if(raw_data.size() != 1){
     std::cout << "Data buffers: " << raw_data.size() << std::endl;
   }
@@ -592,8 +585,11 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
   //std::cout << " In Handle CRDC " << std::endl;
 
   TCrdc *current_crdc=0;
-  if((*data)<3)
-    current_crdc = &crdc[*data];
+  if((*data)<3){
+    if(*data==0) current_crdc = &crdc1;
+    else if(*data==1) current_crdc = &crdc2;
+    else return false;
+  }
   if(!current_crdc)
     return false;
 
@@ -1202,7 +1198,7 @@ float TS800::MCorrelatedOBJ_E1(bool corrected) const{
 	    afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
   }
   else if(mtof.fCorrelatedE1>-1){
-    double OBJLow  = GValue::Value("MOBJ_CORR_LOW");
+      double OBJLow  = GValue::Value("MOBJ_CORR_LOW");
     double OBJHigh = GValue::Value("MOBJ_CORR_HIGH");
     
     double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
@@ -1219,7 +1215,7 @@ float TS800::MCorrelatedOBJ_E1(bool corrected) const{
 
     std::vector<float> val2;
     float val;
-    for(unsigned int y=0;y<mtof.fObj.size();y++) {
+      for(unsigned int y=0;y<mtof.fObj.size();y++) {
       val = (mtof.fObj.at(y) - mtof.fE1Up.at(mtof.fCorrelatedE1) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX()) ;
       if(val<OBJHigh && val>OBJLow){
 	val2.push_back(val);      

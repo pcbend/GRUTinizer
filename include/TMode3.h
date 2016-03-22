@@ -26,7 +26,7 @@ public:
   void PrintHit(int i){ mode3_hits.at(i).Print(); }
 
 private:
-  virtual int BuildHits();
+  virtual int BuildHits(std::vector<TRawEvent>& raw_data);
 
   //TClonesArray* mode3_hits;//("TMode3Hit");
   std::vector<TMode3Hit> mode3_hits;

@@ -23,8 +23,8 @@ TDetector::~TDetector() { }
 void TDetector::Clear(Option_t *opt) {
   TNamed::Clear(opt);
   fTimestamp = -1;
-  raw_data.clear();
   fSize = 0;
+  fRunStart = 0;
 }
 
 void TDetector::Print(Option_t *opt) const { }
@@ -35,6 +35,7 @@ void TDetector::Copy(TObject& obj) const {
   TDetector& det = (TDetector&)obj;
   det.fTimestamp = fTimestamp;
   det.fSize = fSize;
+  det.fRunStart = fRunStart;
 }
 
 int TDetector::Compare(const TObject& obj) const {
@@ -48,13 +49,10 @@ int TDetector::Compare(const TObject& obj) const {
   }
 }
 
-bool TDetector::AddRawData(const TRawEvent& buf){
-  raw_data.push_back(buf);
-  return true;
-}
-
-int TDetector::Build(){
-  int output = BuildHits();
-  raw_data.clear();
+int TDetector::Build(std::vector<TRawEvent>& raw_data){
+  int output = BuildHits(raw_data);
+  if(output>0){
+    SetBit(kBuilt,1);
+  }
   return output;
 }

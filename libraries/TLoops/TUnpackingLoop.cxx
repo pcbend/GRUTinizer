@@ -29,7 +29,8 @@ TUnpackingLoop *TUnpackingLoop::Get(std::string name,TBuildingLoop *input) {
 }
 
 TUnpackingLoop::TUnpackingLoop(std::string name,TBuildingLoop *input) :
-  StoppableThread(name),input_source(input),fOutputEvent(NULL) { }
+  StoppableThread(name),input_source(input),fOutputEvent(NULL),
+  fRunStart(0) { }
 
 
 TUnpackingLoop::~TUnpackingLoop(){
@@ -73,7 +74,8 @@ bool TUnpackingLoop::Iteration(){
     }
   }
 
-    fOutputEvent->Build();
+  fOutputEvent->Build();
+  fOutputEvent->SetRunStart(fRunStart);
 
   if(fOutputEvent->GetDetectors().size() != 0){
     output_queue.Push(fOutputEvent);
@@ -95,6 +97,11 @@ void TUnpackingLoop::ClearQueue() {
 void TUnpackingLoop::HandleNSCLData(TNSCLEvent& event) {
   switch(event.GetEventType()) {
     case kNSCLEventType::BEGIN_RUN:            // 0x0001
+    {
+      TRawEvent::TNSCLBeginRun* begin = (TRawEvent::TNSCLBeginRun*)event.GetPayload();
+      fRunStart = begin->unix_time;
+    }
+      break;
     case kNSCLEventType::END_RUN:              // 0x0002
     case kNSCLEventType::PAUSE_RUN:            // 0x0003
     case kNSCLEventType::RESUME_RUN:           // 0x0004
@@ -123,12 +130,17 @@ void TUnpackingLoop::HandleNSCLData(TNSCLEvent& event) {
 
 void TUnpackingLoop::HandleBuiltNSCLData(TNSCLEvent& event){
   TNSCLBuiltRingItem built(event);
-  //std::cout << "------------------" << std::endl;
   for(unsigned int i=0; i<built.NumFragments(); i++){
     TNSCLFragment& fragment = built.GetFragment(i);
     int source_id = fragment.GetFragmentSourceID();
     kDetectorSystems detector = TDetectorEnv::Get().DetermineSystem(source_id);
-    fOutputEvent->AddRawData(fragment.GetNSCLEvent(), detector);
+    TRawEvent frag_event = fragment.GetNSCLEvent();
+    // S800 events in CAESAR/S800 event have no body header.
+    // This grabs the timestamp from the fragment header so it can be used later.
+    if(frag_event.GetTimestamp() == -1){
+      frag_event.SetFragmentTimestamp(fragment.GetFragmentTimestamp());
+    }
+    fOutputEvent->AddRawData(frag_event, detector);
   }
 }
 
@@ -149,6 +161,7 @@ void TUnpackingLoop::HandleNSCLPeriodicScalers(TNSCLEvent& event){
   TUnpackedEvent* scaler_event = new TUnpackedEvent;
   scaler_event->AddRawData(event, kDetectorSystems::S800SCALER);
   scaler_event->Build();
+  scaler_event->SetRunStart(fRunStart);
   output_queue.Push(scaler_event);
 }
 
@@ -156,6 +169,7 @@ void TUnpackingLoop::HandleS800Scaler(TGEBEvent& event){
   TUnpackedEvent* scaler_event = new TUnpackedEvent;
   scaler_event->AddRawData(event, kDetectorSystems::S800SCALER);
   scaler_event->Build();
+  scaler_event->SetRunStart(fRunStart);
   output_queue.Push(scaler_event);
 }
 

@@ -35,7 +35,7 @@ void TS800Scaler::Clear(Option_t *opt) {
   scalers.clear();
 }
 
-int TS800Scaler::BuildHits() {
+int TS800Scaler::BuildHits(std::vector<TRawEvent>& raw_data) {
   for(auto& event : raw_data){
     TGEBEvent* geb = (TGEBEvent*)&event;
     SetTimestamp(geb->GetTimestamp());

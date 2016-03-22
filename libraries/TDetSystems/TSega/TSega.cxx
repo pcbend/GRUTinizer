@@ -18,7 +18,6 @@ void TSega::Copy(TObject& obj) const {
 
   TSega& sega = (TSega&)obj;
   sega.sega_hits = sega_hits;
-  sega.raw_data.clear();
 }
 
 void TSega::Clear(Option_t* opt){
@@ -48,7 +47,7 @@ TDetectorHit& TSega::GetHit(int i){
   return sega_hits.at(i);
 }
 
-int TSega::BuildHits() {
+int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
   for(auto& event : raw_data){
     TNSCLEvent& nscl = (TNSCLEvent&)event;
 
@@ -115,7 +114,7 @@ int TSega::BuildHits() {
 }
 
 TVector3 TSega::GetSegmentPosition(int detnum, int segnum) {
-  if(detnum < 0 || detnum > 15 ||
+  if(detnum < 1 || detnum > 16 ||
      segnum < 1 || segnum > 32){
     return TVector3(std::sqrt(-1),std::sqrt(-1),std::sqrt(-1));
   }

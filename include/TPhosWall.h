@@ -66,7 +66,7 @@ public:
 
 
 private:
-  virtual int BuildHits();
+  virtual int BuildHits(std::vector<TRawEvent>& raw_data);
 
   Short_t  fLargestHit;
   Int_t    fNumberOfHits;

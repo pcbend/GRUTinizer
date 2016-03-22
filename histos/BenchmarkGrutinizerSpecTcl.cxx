@@ -11,7 +11,6 @@
 #include "TRandom.h"
 
 #include "TObject.h"
-#include "TCaesar.h"
 #include "TS800.h"
 
 #include "TChannel.h"
@@ -45,14 +44,11 @@ TH2 *GetMatrix(TList *list, std::string histname,int xbins, double xlow,double x
 //   or else bad things will happen.
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
-  TCaesar  *caesar  = obj.GetDetector<TCaesar>();
   TS800    *s800    = obj.GetDetector<TS800>();
 
   TList *list = &(obj.GetObjects());
   int numobj = list->GetSize();
   
-  const int total_det_in_prev_rings[N_RINGS] = {0,10,24,48,72,96,120,144,168,182};
-
   if(s800) {
   
     double ic_sum = s800->GetIonChamber().GetSum();
@@ -62,7 +58,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
     double crdc_2_x = s800->GetCrdc(1).GetDispersiveX();
     double crdc_1_y = s800->GetCrdc(0).GetNonDispersiveY();
     double crdc_2_y = s800->GetCrdc(1).GetNonDispersiveY();
-    double afp = s800->GetAFP();
     double xfptac = s800->GetTof().GetTacXFP();
     double xfp = s800->GetTof().GetXFP();
     double obj = s800->GetTof().GetOBJ();
@@ -119,29 +114,29 @@ void MakeHistograms(TRuntimeObjects& obj) {
     obj_hist->Fill(obj);
     TH1 *xfp_hist = GetHistogram(list,"grut_xfp",6000,-3000,3000);
     xfp_hist->Fill(xfp);
+    TH1 *crdc1x = GetHistogram(list,"grut_crdc1_x",600,-300,300);
+    crdc1x->Fill(crdc_1_x);
+    TH1 *crdc2x = GetHistogram(list,"grut_crdc2_x",600,-300,300);
+    crdc2x->Fill(crdc_2_x);
+    TH1 *crdc1y = GetHistogram(list,"grut_crdc1_y",600,-300,300);
+    crdc1y->Fill(crdc_1_y);
+    TH1 *crdc2y = GetHistogram(list,"grut_crdc2_y",600,-300,300);
+    crdc2y->Fill(crdc_2_y);
+
+    TH1 *tacobj_corr = GetHistogram(list,"grut_tacobj_corr",4096,0,4096);
+    tacobj_corr->Fill(objtac_corr);
+
 
 
 
     if (crdc1_size && crdc2_size){
-      TH1 *crdc1x = GetHistogram(list,"grut_crdc1_x",600,-300,300);
-      crdc1x->Fill(crdc_1_x);
-      TH1 *crdc2x = GetHistogram(list,"grut_crdc2_x",600,-300,300);
-      crdc2x->Fill(crdc_2_x);
-      TH1 *crdc1y = GetHistogram(list,"grut_crdc1_y",600,-300,300);
-      crdc1y->Fill(crdc_1_y);
-      TH1 *crdc2y = GetHistogram(list,"grut_crdc2_y",600,-300,300);
-      crdc2y->Fill(crdc_2_y);
-
-      TH1 *tacobj_corr = GetHistogram(list,"grut_tacobj_corr",4096,0,4096);
-      tacobj_corr->Fill(objtac_corr);
-
       TH1 *ata_hist = GetHistogram(list, "grut_ata", 9999,-0.1,0.1);
       ata_hist->Fill(ata);
 
-      TH1 *bta_hist = GetHistogram(list, "grut_bta", 9999,-0.06,0.06);
+      TH1 *bta_hist = GetHistogram(list, "grut_bta", 9999,-0.1,0.1);
       bta_hist->Fill(bta);
 
-      TH1 *dta_hist = GetHistogram(list, "grut_dta", 9999,-0.1,0.1);
+      TH1 *dta_hist = GetHistogram(list, "grut_dta", 9999,-0.06,0.06);
       dta_hist->Fill(dta);
 
       TH1 *yta_hist = GetHistogram(list, "grut_yta", 9999,-0.1,0.1);

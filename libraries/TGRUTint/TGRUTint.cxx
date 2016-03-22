@@ -300,7 +300,7 @@ void TGRUTint::ApplyOptions() {
 
   //next, if given a root file and told to sort it.
   //TChainLoop* coop = NULL;
-  if(gChain && (opt->MakeHistos() || opt->SortRoot()) ){
+  if(gChain->GetListOfBranches() &&  (opt->MakeHistos() || opt->SortRoot()) ){
     printf("Attempting to sort root files.\n");
     fChainLoop = TChainLoop::Get("1_chain_loop",gChain);
     if(!opt->ExitAfterSorting()){
@@ -390,10 +390,11 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
 
       // If EventTree exists, add the file to the chain.
       if(file->FindObjectAny("EventTree")) {
-        if(!gChain) {
-          gChain = new TChain("EventTree");
-          gChain->SetNotify(GrutNotifier::Get());
+        if(!gChain) { // Should never go in here!!
+	  gChain = new TChain("EventTree");
+	  gChain->SetNotify(GrutNotifier::Get());
         }
+        printf("file %s added to gChain.\n",file->GetName());
         gChain->Add(file->GetName());
       }
 
@@ -417,7 +418,7 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
   }
 
   // Pass the TFile to the python GUI.
-  if(file && TGRUTOptions::Get()->StartGUI()){
+  if(file && GUIIsRunning()){
     TPython::Bind(file,"tdir");
     ProcessLine("TPython::Exec(\"window.AddDirectory(tdir)\");");
   }
@@ -425,7 +426,7 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
 }
 
 void TGRUTint::LoadTCutG(TCutG* cutg) {
-  if(TGRUTOptions::Get()->StartGUI()) {
+  if(GUIIsRunning()) {
     TPython::Bind(cutg, "cutg");
     ProcessLine("TPython::Exec(\"window.LoadCutG(cutg)\");");
   }
@@ -541,7 +542,7 @@ void TGRUTint::Terminate(Int_t status){
   }
   StoppableThread::StopAllClean();
 
-  //if(TGRUTOptions::Get()->StartGUI()){
+  //if(GUIIsRunning()){
   //  TPython::Exec("on_close()");
   //}
 

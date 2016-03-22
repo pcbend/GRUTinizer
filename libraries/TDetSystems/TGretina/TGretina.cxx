@@ -170,7 +170,6 @@ void TGretina::Copy(TObject& obj) const {
   TGretina& gretina = (TGretina&)obj;
   gretina.gretina_hits = gretina_hits; // gretina_hits->Copy(*gretina.gretina_hits);
   //addback_hits->Copy(*gretina.addback_hits);
-  gretina.raw_data.clear();
 }
 
 void TGretina::InsertHit(const TDetectorHit& hit){
@@ -180,19 +179,18 @@ void TGretina::InsertHit(const TDetectorHit& hit){
   fSize++;
 }
 
-int TGretina::BuildHits(){
+int TGretina::BuildHits(std::vector<TRawEvent>& raw_data){
   //printf("%s\n",__PRETTY_FUNCTION__);
   for(auto& event : raw_data){
-    TGEBEvent* geb = (TGEBEvent*)&event;
-    SetTimestamp(geb->GetTimestamp());
-    const TRawEvent::GEBBankType1* raw = (const TRawEvent::GEBBankType1*)geb->GetPayloadBuffer().GetData();
+    SetTimestamp(event.GetTimestamp());
+    // TGEBEvent* geb = (TGEBEvent*)&event;
+    // const TRawEvent::GEBBankType1* raw = (const TRawEvent::GEBBankType1*)geb->GetPayloadBuffer().GetData();
     TGretinaHit hit;
-    hit.BuildFrom(*raw);
+    TSmartBuffer buf = event.GetPayloadBuffer();
+    hit.BuildFrom(buf);
     InsertHit(hit);
   }
   //gretina_hits->At(0)->Print();
-  raw_data.clear();
-
   //BuildAddbackHits();
 
   //gretina_hits->At(0)->Print();
@@ -267,7 +265,6 @@ void TGretina::Clear(Option_t *opt) {
   TDetector::Clear(opt);
   gretina_hits.clear(); //("TGretinaHit");
   //addback_hits->Clear(opt);//("TGretinaHit");
-  raw_data.clear();
 }
 
 

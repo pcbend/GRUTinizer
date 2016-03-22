@@ -27,7 +27,7 @@ public:
   void PrintHit(int i){ s800sim_hits.at(i).Print(); }
 
  private:
-  virtual int BuildHits();
+  virtual int BuildHits(std::vector<TRawEvent>& raw_data);
   void BuildFrom(TGEBEvent &event);
 
   std::vector<TS800SimHit> s800sim_hits;
