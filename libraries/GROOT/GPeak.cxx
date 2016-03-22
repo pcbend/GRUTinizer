@@ -120,7 +120,7 @@ bool GPeak::InitParams(TH1 *fithist){
     printf("No histogram is associated yet, no initial guesses made\n");
     return false;
   }
-  printf("%s called.\n",__PRETTY_FUNCTION__); fflush(stdout);
+  //printf("%s called.\n",__PRETTY_FUNCTION__); fflush(stdout);
   //Makes initial guesses at parameters for the fit. Uses the histogram to
   Double_t xlow,xhigh;
   GetRange(xlow,xhigh);
@@ -220,7 +220,7 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   //  }
   //}
 
-  TF1::Print();
+  //TF1::Print();
 
 
   Double_t binwidth = fithist->GetBinWidth(GetParameter("centroid"));

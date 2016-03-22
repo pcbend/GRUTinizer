@@ -672,7 +672,7 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
     }
 
     if(ghist) {
-      TH1* prev = ghist->GetPrevious();
+      TH1* prev = ghist->GetNext();
       if(prev) {
         prev->GetXaxis()->SetRange(first,last);
         prev->Draw("");
@@ -693,7 +693,7 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
     }
 
     if(ghist) {
-      TH1* prev = ghist->GetNext();
+      TH1* prev = ghist->GetPrevious();
       if(prev) {
         prev->GetXaxis()->SetRange(first,last);
         prev->Draw("");
