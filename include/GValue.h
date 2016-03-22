@@ -8,9 +8,16 @@
 
 class GValue : public TNamed {
 public:
+  enum EPriority {
+    kUser = 0,
+    kValFile = 1,
+    kRootFile = 2,
+    kUnset = 999999
+  };
+  
   GValue();
   GValue(const char *name);
-  GValue(const char *name,double value);
+  GValue(const char *name,double value, GValue::EPriority priority=kUser);
   GValue(const GValue &val);
 
   double GetValue() { return fValue; }
@@ -26,7 +33,8 @@ public:
   static GValue* GetDefaultValue() { return fDefaultValue; }
   //Search fValueVector for GValue with name given by string
   static GValue* FindValue(std::string="");
-  static void SetReplaceValue(std::string name, double value);
+  static void SetReplaceValue(std::string name, double value,
+			      GValue::EPriority priority = kUser);
   static GValue* Get(std::string name="") { return FindValue(name); }
   static double Value(std::string);
   static TList* AllValues() {
@@ -55,12 +63,15 @@ public:
   static std::string  WriteToBuffer(Option_t *opt="");
 
 
+
 private:
   double fValue;
+  EPriority fPriority;
   std::string info;
   static GValue *fDefaultValue;
   static std::map<std::string,GValue*> fValueVector;
-  static int  ParseInputData(const std::string input,Option_t *opt="");
+  static int  ParseInputData(const std::string input, EPriority priority,
+			     Option_t *opt="");
   static void trim(std::string *, const std::string &trimChars=" \f\n\r\t\v");
 
   ClassDef(GValue,1);
