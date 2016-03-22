@@ -1212,7 +1212,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       if(ghist){
         ghist->SetSummary(true);
         ghist->SetSummaryDirection(kYDirection);
-        TH1* phist = ghist->SummaryProject(1);
+        TH1* phist = ghist->GetNextSummary(0,false);
         if(phist) {
           new GCanvas();
           phist->Draw("");
@@ -1258,7 +1258,8 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       if(ghist){
         ghist->SetSummary(true);
         ghist->SetSummaryDirection(kXDirection);
-        TH1* phist = ghist->SummaryProject(1);
+        //TH1* phist = ghist->SummaryProject(1);
+        TH1* phist = ghist->GetNextSummary(0,false);
         if(phist) {
           new GCanvas();
           phist->Draw("");

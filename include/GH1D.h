@@ -37,8 +37,8 @@ public:
 
   GH1D* Project(int bins=-1);
 
-  GH1D* GetPrevious() const;
-  GH1D* GetNext() const;
+  GH1D* GetPrevious(bool DrawEmpty=false) const;
+  GH1D* GetNext(bool DrawEmpty=false) const;
 
   GH1D* Project(double bin_low, double bin_high) const;
   GH1D* Project_Background(double bin_low, double bin_high,
