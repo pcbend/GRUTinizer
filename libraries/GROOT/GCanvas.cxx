@@ -846,8 +846,10 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       edited = true;
       break;
     case kKey_o:
-      for(unsigned int i=0;i<hists.size();i++)
+      for(unsigned int i=0;i<hists.size();i++) {
         hists.at(i)->GetXaxis()->UnZoom();
+        hists.at(i)->GetYaxis()->UnZoom();
+      }
       RemoveMarker("all");
       edited = true;
       break;
