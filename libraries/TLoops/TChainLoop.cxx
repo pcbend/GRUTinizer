@@ -46,6 +46,7 @@ TChainLoop::~TChainLoop() {
 int TChainLoop::SetupChain() {
   if(!input_chain)
     return 0;
+  printf("name = %s",input_chain->GetName()); fflush(stdout);
   TObjArray *array = input_chain->GetListOfBranches();
   for(int x=0;x<array->GetSize();x++) {
     TBranch *b = (TBranch*)array->At(x);
