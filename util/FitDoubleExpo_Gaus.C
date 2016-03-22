@@ -386,10 +386,10 @@ TF1 *FitDoubleExpThreeHist(TH1F *hist_to_fit, TH1F *geant_fep, TH1F *geant_compt
     fitfunc->FixParameter(i, init[i]);
   }
 
-  fitfunc->SetParLimits(0, 5e-04, 5.0e-03);
-  fitfunc->SetParLimits(1, 5e-04, 5.0e-03);
-  fitfunc->SetParLimits(2, 1.0e-04, 2.5e-04);
-  fitfunc->SetParLimits(3, 0.5, 1.5);
+//fitfunc->SetParLimits(0, 5e-04, 5.0e-03);
+//fitfunc->SetParLimits(1, 5e-04, 5.0e-03);
+//fitfunc->SetParLimits(2, 1.0e-04, 2.5e-04);
+//fitfunc->SetParLimits(3, 0.5, 1.5);
 
   fitfunc->SetRange(gLowX, gUpX);
   fitfunc->SetLineColor(4);

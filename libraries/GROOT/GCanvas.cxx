@@ -553,7 +553,7 @@ bool GCanvas::HandleMouseShiftPress(Int_t event,Int_t x,Int_t y) {
       }
       std::vector<TH1*> hists = FindHists();
       new GCanvas();
-      options.Append("HIST");
+      //options.Append("HIST");
       hists.at(0)->DrawCopy(options.Data());
       for(unsigned int x=1;x<hists.size();x++)
         hists.at(x)->DrawCopy("same");
@@ -672,10 +672,10 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
     }
 
     if(ghist) {
-      TH1* prev = ghist->GetPrevious();
+      TH1* prev = ghist->GetNext();
       if(prev) {
         prev->GetXaxis()->SetRange(first,last);
-        prev->Draw("HIST");
+        prev->Draw("");
         RedrawMarkers();
         edited = true;
       }
@@ -693,10 +693,10 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
     }
 
     if(ghist) {
-      TH1* prev = ghist->GetNext();
+      TH1* prev = ghist->GetPrevious();
       if(prev) {
         prev->GetXaxis()->SetRange(first,last);
-        prev->Draw("HIST");
+        prev->Draw("");
         RedrawMarkers();
         edited = true;
       }
@@ -849,8 +849,10 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       edited = true;
       break;
     case kKey_o:
-      for(unsigned int i=0;i<hists.size();i++)
+      for(unsigned int i=0;i<hists.size();i++) {
         hists.at(i)->GetXaxis()->UnZoom();
+        hists.at(i)->GetYaxis()->UnZoom();
+      }
       RemoveMarker("all");
       edited = true;
       break;
@@ -901,7 +903,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
           proj = ghist->Project(value_low, value_high);
         }
         if(proj){
-          proj->Draw("HIST");
+          proj->Draw("");
           edited=true;
         }
       }
@@ -923,6 +925,48 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       }
     }
       break;
+    case kKey_r:
+       if(GetNMarkers()<2)
+          break;
+       {
+       if(fMarkers.at(fMarkers.size()-1)->localy < fMarkers.at(fMarkers.size()-2)->localy)
+          for(unsigned int i=0;i<hists.size();i++)
+            hists.at(i)->GetYaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-1)->localy,fMarkers.at(fMarkers.size()-2)->localy);
+       else
+          for(unsigned int i=0;i<hists.size();i++)
+            hists.at(i)->GetXaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-2)->localy,fMarkers.at(fMarkers.size()-1)->localy);
+       }
+       edited = true;
+       RemoveMarker("all");
+       break;
+    case kKey_R:
+       //this->GetListOfPrimitives()->Print();
+       GetContextMenu()->Action(hists.back()->GetYaxis(),hists.back()->GetYaxis()->Class()->GetMethodAny("SetRangeUser"));
+       {
+          double y1 = hists.back()->GetXaxis()->GetBinCenter(hists.back()->GetYaxis()->GetFirst());
+          double y2 = hists.back()->GetXaxis()->GetBinCenter(hists.back()->GetYaxis()->GetLast());
+          TIter iter(this->GetListOfPrimitives());
+          while(TObject *obj = iter.Next()) {
+            if(obj->InheritsFrom(TPad::Class())) {
+              TPad *pad = (TPad*)obj;
+              TIter iter2(pad->GetListOfPrimitives());
+              while(TObject *obj2=iter2.Next()) {
+                if(obj2->InheritsFrom(TH1::Class())) {
+                  TH1* hist = (TH1*)obj2;
+                  hist->GetYaxis()->SetRangeUser(y1,y2);
+                  pad->Modified();
+                  pad->Update();
+                }
+              }
+            }
+          }
+
+       //for(int i=0;i<hists.size()-1;i++)   // this doesn't work, set range needs values not bins.   pcb.
+       //   hists.at(i)->GetXaxis()->SetRangeUser(hists.back()->GetXaxis()->GetFirst(),hists.back()->GetXaxis()->GetLast());
+
+       }
+       edited = true;
+       break;
 
     case kKey_s:
 
@@ -1093,11 +1137,53 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       }
 
       if(ghist && ghist->GetProjections()->GetSize()){
-        ghist->GetProjections()->At(0)->Draw("HIST");
+        ghist->GetProjections()->At(0)->Draw("");
         edited=true;
       }
     }
       break;
+    case kKey_r:
+       if(GetNMarkers()<2)
+          break;
+       {
+       if(fMarkers.at(fMarkers.size()-1)->localy < fMarkers.at(fMarkers.size()-2)->localy)
+          for(unsigned int i=0;i<hists.size();i++)
+            hists.at(i)->GetYaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-1)->localy,fMarkers.at(fMarkers.size()-2)->localy);
+       else
+          for(unsigned int i=0;i<hists.size();i++)
+            hists.at(i)->GetXaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-2)->localy,fMarkers.at(fMarkers.size()-1)->localy);
+       }
+       edited = true;
+       RemoveMarker("all");
+       break;
+    case kKey_R:
+       //this->GetListOfPrimitives()->Print();
+       GetContextMenu()->Action(hists.back()->GetYaxis(),hists.back()->GetYaxis()->Class()->GetMethodAny("SetRangeUser"));
+       {
+          double y1 = hists.back()->GetXaxis()->GetBinCenter(hists.back()->GetYaxis()->GetFirst());
+          double y2 = hists.back()->GetXaxis()->GetBinCenter(hists.back()->GetYaxis()->GetLast());
+          TIter iter(this->GetListOfPrimitives());
+          while(TObject *obj = iter.Next()) {
+            if(obj->InheritsFrom(TPad::Class())) {
+              TPad *pad = (TPad*)obj;
+              TIter iter2(pad->GetListOfPrimitives());
+              while(TObject *obj2=iter2.Next()) {
+                if(obj2->InheritsFrom(TH1::Class())) {
+                  TH1* hist = (TH1*)obj2;
+                  hist->GetYaxis()->SetRangeUser(y1,y2);
+                  pad->Modified();
+                  pad->Update();
+                }
+              }
+            }
+          }
+
+       //for(int i=0;i<hists.size()-1;i++)   // this doesn't work, set range needs values not bins.   pcb.
+       //   hists.at(i)->GetXaxis()->SetRangeUser(hists.back()->GetXaxis()->GetFirst(),hists.back()->GetXaxis()->GetLast());
+
+       }
+       edited = true;
+       break;
 
     case kKey_x: {
       GH2D* ghist = NULL;
@@ -1108,12 +1194,12 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
         }
       }
 
-      if(ghist){        
+      if(ghist){
 	ghist->SetSummary(0);
         TH1 *phist = ghist->ProjectionX();//->Draw();
         if(phist) {
           new GCanvas();
-          phist->Draw("HIST");
+          phist->Draw("");
         }
         edited=true;
       }
@@ -1132,10 +1218,10 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       if(ghist){
         ghist->SetSummary(true);
         ghist->SetSummaryDirection(kYDirection);
-        TH1* phist = ghist->SummaryProject(1);
+        TH1* phist = ghist->GetNextSummary(0,false);
         if(phist) {
           new GCanvas();
-          phist->Draw("HIST");
+          phist->Draw("");
         }
         edited = true;
       }
@@ -1159,7 +1245,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
         //printf("phist->GetName() = %s\n",phist->GetName());
         if(phist) {
           new GCanvas();
-          phist->Draw("HIST");
+          phist->Draw("");
         }
         edited=true;
       }
@@ -1178,10 +1264,11 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       if(ghist){
         ghist->SetSummary(true);
         ghist->SetSummaryDirection(kXDirection);
-        TH1* phist = ghist->SummaryProject(1);
+        //TH1* phist = ghist->SummaryProject(1);
+        TH1* phist = ghist->GetNextSummary(0,false);
         if(phist) {
           new GCanvas();
-          phist->Draw("HIST");
+          phist->Draw("");
         }
         edited = true;
       }

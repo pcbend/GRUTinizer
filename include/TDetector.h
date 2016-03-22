@@ -31,7 +31,7 @@ public:
   Long_t Timestamp() const { return fTimestamp; }
   void   SetTimestamp(Long_t timestamp)  { fTimestamp = timestamp; }
 
-  enum EDetectorStatus { kBuilt = BIT(15) };
+  enum EDetectorStatus { kUnbuilt = BIT(15) };
   
   unsigned int RunStart() const { return fRunStart; }
   virtual void SetRunStart(unsigned int unix_time) { fRunStart = unix_time; }

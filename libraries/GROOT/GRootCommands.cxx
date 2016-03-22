@@ -168,13 +168,16 @@ bool GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
   printf(GREEN "FWHM      : % 4.02f +/- %.02f" RESET_COLOR "\n",TMath::Abs(param[2]*2.35),TMath::Abs(error[2]*2.35));
   printf(GREEN "Resolution: %.02f %%" RESET_COLOR "\n",TMath::Abs(param[2]*2.35)/param[1]*100.0);
 
-
-
-
-
-
   edit = true;
-
+  
+  TIter it(hist->GetListOfFunctions());
+  while(TObject *obj=it.Next()) {
+    if(!hist->InheritsFrom(TF1::Class()))
+      continue;
+    ((TF1*)obj)->Draw("same");
+  }
+  
+  
   return edit;
 
 }
@@ -185,6 +188,8 @@ bool PhotoPeakFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
     return edit;
   if(xlow>xhigh)
     std::swap(xlow,xhigh);
+
+  //std::cout << "here." << std::endl;
 
   GPeak *mypeak= new GPeak((xlow+xhigh)/2.0,xlow,xhigh);
   mypeak->Fit(hist,"Q+");

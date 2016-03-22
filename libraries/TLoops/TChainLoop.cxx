@@ -46,6 +46,7 @@ TChainLoop::~TChainLoop() {
 int TChainLoop::SetupChain() {
   if(!input_chain)
     return 0;
+  printf("name = %s",input_chain->GetName()); fflush(stdout);
   TObjArray *array = input_chain->GetListOfBranches();
   for(int x=0;x<array->GetSize();x++) {
     TBranch *b = (TBranch*)array->At(x);
@@ -97,7 +98,7 @@ bool TChainLoop::Iteration() {
   TUnpackedEvent* event = new TUnpackedEvent;
   for(auto& elem : det_map){
     TDetector* det = *elem.second;
-    if(det->TestBit(TDetector::kBuilt)){
+    if(!det->TestBit(TDetector::kUnbuilt)){
       event->AddDetector(det);
     } else {
       delete det;

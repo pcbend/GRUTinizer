@@ -135,7 +135,7 @@ void initializeKr88Cuts(TFile * &cut_file, TCutG* &pid_kr88, TCutG* &tcut_kr88,
     pid_kr88 = (TCutG*)cut_file->Get("pid_kr88_large");
     pid_rb = (TCutG*)cut_file->Get("pid_rb_large");
     pid_br = (TCutG*)cut_file->Get("pid_br_large");
-    tcut_kr88 = (TCutG*)cut_file->Get("tcut_03_08_2016");
+    tcut_kr88 = (TCutG*)cut_file->Get("tcut_widest_03_17_2016");
     in_kr88 = (TCutG*)cut_file->Get("in_kr88_large");
 
     pid_rb_left = (TCutG*)cut_file->Get("pid_rb_left");

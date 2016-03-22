@@ -5,6 +5,7 @@
 #include <TFitResult.h>
 #include <TFitResultPtr.h>
 
+
 #include "Globals.h"
 #include "GRootFunctions.h"
 #include "GCanvas.h"
@@ -12,8 +13,8 @@
 ClassImp(GPeak)
 
 GPeak::GPeak(Double_t cent,Double_t xlow,Double_t xhigh,Option_t *opt)
-      : TF1("photopeakbg",GRootFunctions::PhotoPeakBG,xlow,xhigh,10),
-        background("background",GRootFunctions::StepBG,xlow,xhigh,10)  {
+      : TF1("photopeakbg",GRootFunctions::PhotoPeakBG,xlow,xhigh,7),
+        fBGFit("background",GRootFunctions::StepBG,xlow,xhigh,6)  {
   Clear("");
   if(cent>xhigh || cent<xlow) {
     //out of range...
@@ -27,9 +28,9 @@ GPeak::GPeak(Double_t cent,Double_t xlow,Double_t xhigh,Option_t *opt)
 
   TF1::SetRange(xlow,xhigh);
 
-  background.SetNpx(1000);
-  background.SetLineStyle(2);
-  background.SetLineColor(kBlack);
+  fBGFit.SetNpx(1000);
+  fBGFit.SetLineStyle(2);
+  fBGFit.SetLineColor(kBlack);
 
   SetName(Form("Chan%d_%d_to_%d",(Int_t)(cent),(Int_t)(xlow),(Int_t)(xhigh)));
   InitNames();
@@ -37,15 +38,45 @@ GPeak::GPeak(Double_t cent,Double_t xlow,Double_t xhigh,Option_t *opt)
 
 }
 
+GPeak::GPeak(Double_t cent,Double_t xlow,Double_t xhigh,TF1 *bg,Option_t *opt)
+      : TF1("photopeakbg",GRootFunctions::PhotoPeakBG,xlow,xhigh,7) {
+  Clear("");
+  if(cent>xhigh || cent<xlow) {
+    //out of range...
+    if(xlow>cent)
+      std::swap(xlow,cent);
+    if(xlow>xhigh)
+      std::swap(xlow,xhigh);
+    if(cent>xhigh)
+      std::swap(cent,xhigh);
+  }
+  TF1::SetRange(xlow,xhigh);
+  SetName(Form("Chan%d_%d_to_%d",(Int_t)(cent),(Int_t)(xlow),(Int_t)(xhigh)));
+  InitNames();
+  TF1::SetParameter("centroid",cent);
+
+  if(bg) {
+    fBGFit.Clear(); 
+    fBGFit.Copy(*bg);
+  } else {
+    fBGFit = TF1("BGFit",GRootFunctions::StepBG,xlow,xhigh,10);
+  }
+
+  fBGFit.SetNpx(1000);
+  fBGFit.SetLineStyle(2);
+  fBGFit.SetLineColor(kBlack);
+}
+
+
 GPeak::GPeak()
       : TF1("photopeakbg",GRootFunctions::PhotoPeakBG,0,1000,10),
-        background("background",GRootFunctions::StepBG,0,1000,10) {
+        fBGFit("background",GRootFunctions::StepBG,0,1000,10) {
 
   Clear();
   InitNames();
-  background.SetNpx(1000);
-  background.SetLineStyle(2);
-  background.SetLineColor(kBlack);
+  fBGFit.SetNpx(1000);
+  fBGFit.SetLineStyle(2);
+  fBGFit.SetLineColor(kBlack);
 }
 
 GPeak::GPeak(const GPeak &peak)
@@ -62,26 +93,26 @@ void GPeak::InitNames(){
   TF1::SetParName(0,"Height");
   TF1::SetParName(1,"centroid");
   TF1::SetParName(2,"sigma");
-  TF1::SetParName(3,"beta");
-  TF1::SetParName(4,"R");
+  TF1::SetParName(3,"R");
+  TF1::SetParName(4,"beta");
+  //TF1::SetParName(5,"step");
+  //TF1::SetParName(6,"A");
+  //TF1::SetParName(7,"B");
+  //TF1::SetParName(8,"C");
   TF1::SetParName(5,"step");
-  TF1::SetParName(6,"A");
-  TF1::SetParName(7,"B");
-  TF1::SetParName(8,"C");
-  TF1::SetParName(9,"bg_offset");
+  TF1::SetParName(6,"bg_offset");
+  //TF1::SetParName(7,"bg_slope");
 }
 
 void GPeak::Copy(TObject &obj) const {
   TF1::Copy(obj);
   ((GPeak&)obj).init_flag = init_flag;
-  ((GPeak&)obj).farea     = farea;
-  ((GPeak&)obj).fd_area   = fd_area;
-  ((GPeak&)obj).fchi2     = fchi2;
+  ((GPeak&)obj).fArea     = fArea;
+  ((GPeak&)obj).fDArea    = fDArea;
+  ((GPeak&)obj).fChi2     = fChi2;
   ((GPeak&)obj).fNdf      = fNdf;
 
-
-
-  background.Copy((((GPeak&)obj).background));
+  fBGFit.Copy((((GPeak&)obj).fBGFit));
 }
 
 bool GPeak::InitParams(TH1 *fithist){
@@ -89,52 +120,83 @@ bool GPeak::InitParams(TH1 *fithist){
     printf("No histogram is associated yet, no initial guesses made\n");
     return false;
   }
+  //printf("%s called.\n",__PRETTY_FUNCTION__); fflush(stdout);
   //Makes initial guesses at parameters for the fit. Uses the histogram to
   Double_t xlow,xhigh;
   GetRange(xlow,xhigh);
 
-  Int_t bin = fithist->GetXaxis()->FindBin(GetParameter("centroid"));
+  //Int_t bin = fithist->GetXaxis()->FindBin(GetParameter("centroid"));
   Int_t binlow = fithist->GetXaxis()->FindBin(xlow);
   Int_t binhigh = fithist->GetXaxis()->FindBin(xhigh);
 
+  Double_t highy  = fithist->GetBinContent(binlow);
+  Double_t lowy   = fithist->GetBinContent(binhigh);
+//  Double_t yhigh  = fithist->GetBinContent(binhigh);
+//  Double_t ylow   = fithist->GetBinContent(binlow);
+  if(lowy>highy)
+    std::swap(lowy,highy);
+
   double largestx=0.0;
   double largesty=0.0;
-  for(int i = binlow;i<=binhigh;i++) {
-    //printf("bin[%i] content:  %.1f\n",i,fithist->GetBinContent(i));
+  int i = binlow;
+  for(;i<=binhigh;i++) {
     if(fithist->GetBinContent(i) > largesty) {
       largesty = fithist->GetBinContent(i);
       largestx = fithist->GetXaxis()->GetBinCenter(i);
     }
   }
-  //printf("largest x = %.1f\n",largestx);
-  //printf("largest y = %.1f\n",largesty);
 
+  // - par[0]: height of peak
+  // - par[1]: cent of peak
+  // - par[2]: sigma
+  // - par[3]: R:    relative height of skewed gaus to gaus
+  // - par[4]: beta: "skewedness" of the skewed gaussin
+  // - par[5]: step: size of stepfunction step.
+  
+  // - par[6]: base bg height.
+ 
+  //limits. 
+  TF1::SetParLimits(0,0,largesty*2);
   TF1::SetParLimits(1,xlow,xhigh);
   TF1::SetParLimits(2,0.1,xhigh-xlow);
-  TF1::SetParLimits(3,0.000,10);
-  TF1::SetParLimits(4,0,100); //
-  //Step size is allow to vary to anything. If it goes below 0, the code will fix it to 0
-  TF1::SetParLimits(6,0.0,fithist->GetBinContent(bin)*1.4);
-  //this->SetParLimits(9,xlow,xhigh);
-  TF1::SetParLimits(5,0.0,1.0E2);
+  TF1::SetParLimits(3,0.000,25);
+  TF1::SetParLimits(4,0.01,5); 
+  double step = ((highy-lowy)/largesty)*100;
+  TF1::SetParLimits(5,step-step/2.,2*step); 
+  //double slope  = (yhigh-ylow)/(xhigh-xlow);
+  //double offset = yhigh-slope*xhigh;
+  double offset = lowy;
+  TF1::SetParLimits(6,offset-0.5*offset,offset+0.5*offset); 
+  //TF1::SetParLimits(7,-2*slope,2*slope);                    
 
   //Make initial guesses
-  TF1::SetParameter("Height",largesty);  //fithist->GetBinContent(bin));
-  TF1::SetParameter("centroid",largestx);          //GetParameter("centroid"));
-  //TF1::SetParameter("sigma",(xhigh-xlow)*0.5);
-  TF1::SetParameter("sigma",(xhigh-xlow));//2.0/binWidth); //
-  TF1::SetParameter("beta",0.5);
-  TF1::SetParameter("R", 1.0);
-  TF1::SetParameter("step",1.0);
-  TF1::SetParameter("A",fithist->GetBinContent(binhigh));
-  TF1::SetParameter("B",(fithist->GetBinContent(binlow) - fithist->GetBinContent(binhigh))/(xlow-xhigh));
-  TF1::SetParameter("C",-0.5);
-  TF1::SetParameter("bg_offset",GetParameter("centroid"));
-  //TF1::FixParameter(8,0.00);
-  //TF1::FixParameter(4,0.00);
+  TF1::SetParameter(0,largesty);         //fithist->GetBinContent(bin));
+  TF1::SetParameter(1,largestx);         //GetParameter("centroid"));
+  TF1::SetParameter(2,(largestx*.01)/2.35);                    //2,(xhigh-xlow));     //2.0/binWidth); //
+  TF1::SetParameter(3,5.);
+  TF1::SetParameter(4,1.);
+  TF1::SetParameter(5,step);
+  TF1::SetParameter(6,offset);
+  //TF1::SetParameter(7,slope);
+
+  TF1::SetParError(0,0.10 * largesty);
+  TF1::SetParError(1,0.25);
+  TF1::SetParError(2,0.10 *((largestx*.01)/2.35));
+  TF1::SetParError(3,5);
+  TF1::SetParError(4,0.5);
+  TF1::SetParError(5,0.10 * step);
+  TF1::SetParError(6,0.10 * offset);
+
+
+
+
+
+  TF1::Print();
+
   SetInitialized();
   return true;
 }
+
 
 Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   if(!fithist)
@@ -145,20 +207,21 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   TVirtualFitter::SetMaxIterations(100000);
 
   bool verbose = !options.Contains("Q");
-  TF1::SetParLimits(1,GetXmin(),GetXmax());
-  TF1::SetParLimits(9,GetXmin(),GetXmax());
 
-  TFitResultPtr fitres = fithist->Fit(this,Form("%sRSM",options.Data()));
+  TFitResultPtr fitres = fithist->Fit(this,Form("%sLRSM",options.Data()));
 
-  if(fitres->ParError(2) != fitres->ParError(2)) { // checks if nan.
-    if(fitres->Parameter(3)<1) {
-      FixParameter(4,0);
-      FixParameter(3,1);
+  //if(fitres->ParError(2) != fitres->ParError(2)) { // checks if nan.
+  //  if(fitres->Parameter(3)<1) {
+  //    FixParameter(4,0);
+  //    FixParameter(3,1);
       //printf("Beta may have broken the fit, retrying with R=0);
-      fithist->GetListOfFunctions()->Last()->Delete();
-      fitres = fithist->Fit(this,Form("%sRSM",options.Data()));
-    }
-  }
+  //    fithist->GetListOfFunctions()->Last()->Delete();
+  //    fitres = fithist->Fit(this,Form("%sRSM",options.Data()));
+  //  }
+  //}
+
+  //TF1::Print();
+
 
   Double_t binwidth = fithist->GetBinWidth(GetParameter("centroid"));
   Double_t width    = TF1::GetParameter("sigma");
@@ -172,31 +235,51 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   //Intgrate the background.
   GPeak *tmppeak = new GPeak;
   this->Copy(*tmppeak);
-  tmppeak->SetParameter("step",0.0);
-  tmppeak->SetParameter("A",0.0);
-  tmppeak->SetParameter("B",0.0);
-  tmppeak->SetParameter("C",0.0);
+  //tmppeak->SetParameter("step",0.0);
+  //tmppeak->SetParameter("A",0.0);
+  //tmppeak->SetParameter("B",0.0);
+  //tmppeak->SetParameter("C",0.0);
   tmppeak->SetParameter("bg_offset",0.0);
   tmppeak->SetRange(int_low,int_high);//This will help get the true area of the gaussian 200 ~ infinity in a gaus
   tmppeak->SetName("tmppeak");
 
-  farea = (tmppeak->Integral(int_low,int_high))/binwidth;
-  TMatrixDSym CovMat = fitres->GetCovarianceMatrix();
-  CovMat(6,6) = 0.0;
-  CovMat(7,7) = 0.0;
-  CovMat(8,8) = 0.0;
-  CovMat(9,9) = 0.0;
+  fArea = (tmppeak->Integral(int_low,int_high))/binwidth;
+//  TMatrixDSym CovMat = fitres->GetCovarianceMatrix();
+//  CovMat(6,6) = 0.0;
+//  CovMat(7,7) = 0.0;
+//  CovMat(8,8) = 0.0;
+//  CovMat(9,9) = 0.0;
 
-  fd_area = (tmppeak->IntegralError(int_low,int_high,tmppeak->GetParameters(),CovMat.GetMatrixArray()))/binwidth;
+//  fDArea = (tmppeak->IntegralError(int_low,int_high,tmppeak->GetParameters(),CovMat.GetMatrixArray()))/binwidth;
   if(!verbose)
     Print();
 
+  double bgpars[5];
+  bgpars[0] = TF1::GetParameters()[0];
+  bgpars[1] = TF1::GetParameters()[1];
+  bgpars[2] = TF1::GetParameters()[2];
+  bgpars[3] = TF1::GetParameters()[5];
+  bgpars[4] = TF1::GetParameters()[6];
+  //bgpars[5] = TF1::GetParameters()[7];
 
-  background.SetParameters(TF1::GetParameters());
+ 
+  fBGFit.SetParameters(bgpars);
   Copy(*fithist->GetListOfFunctions()->Last());
   delete tmppeak;
   return true;
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 void GPeak::Clear(Option_t *opt){
@@ -205,10 +288,10 @@ void GPeak::Clear(Option_t *opt){
   if(options.Contains("all"))
     TF1::Clear();
   init_flag = false;
-  farea = 0.0;
-  fd_area = 0.0;
-  fchi2 = 0.0;
-  fNdf = 0.0;
+  fArea  = 0.0;
+  fDArea = 0.0;
+  fChi2  = 0.0;
+  fNdf   = 0.0;
 }
 
 void GPeak::Print(Option_t *opt) const {
@@ -216,11 +299,9 @@ void GPeak::Print(Option_t *opt) const {
   printf(GREEN "\n");
   printf("Name: %s \n", this->GetName());
   printf("Centroid:  %1f +/- %1f \n", this->GetParameter("centroid"),this->GetParError(GetParNumber("centroid")));
-  printf("Area:      %1f +/- %1f \n", farea, fd_area);
-  printf("FWHM:      %1f +/- %1f \n",
-         this->GetParameter("sigma")*2.35,
-         this->GetParError(GetParNumber("sigma"))*2.35);
-  printf("Chi^2/NDF: %1f\n",fchi2/fNdf);
+  printf("Area:      %1f +/- %1f \n", fArea, fDArea);
+  printf("FWHM:      %1f +/- %1f \n",this->GetFWHM(),this->GetFWHMErr());
+  printf("Chi^2/NDF: %1f\n",fChi2/fNdf);
   if(options.Contains("+")){
     TF1::Print(opt);
   }
@@ -232,7 +313,7 @@ void GPeak::DrawResiduals(TH1 *hist) const{
   if(hist){
     return;
   }
-  if(fchi2<0.000000001){
+  if(fChi2<0.000000001){
     printf("No fit performed\n");
     return;
   }
