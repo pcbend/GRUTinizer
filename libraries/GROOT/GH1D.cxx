@@ -84,19 +84,27 @@ TH1 *GH1D::DrawNormalized(Option_t *opt,Double_t norm) const {
 
 
 
-GH1D* GH1D::GetPrevious() const {
+GH1D* GH1D::GetPrevious(bool DrawEmpty) const {
   if(parent.GetObject() && parent.GetObject()->InheritsFrom(GH2Base::Class())) {
     GH2D* gpar = (GH2D*)parent.GetObject();
-    return gpar->GetPrevious(this);
+    int first = GetXaxis()->GetFirst();
+    int last =  GetXaxis()->GetLast();
+    GH1D *prev = gpar->GetPrevious(this,DrawEmpty);
+    prev->GetXaxis()->SetRange(first,last);
+    return prev; //gpar->GetPrevious(this,DrawEmpty);
   } else {
     return NULL;
   }
 }
 
-GH1D* GH1D::GetNext() const {
+GH1D* GH1D::GetNext(bool DrawEmpty) const {
   if(parent.GetObject() && parent.GetObject()->InheritsFrom(GH2Base::Class())) {
     GH2D* gpar = (GH2D*)parent.GetObject();
-    return gpar->GetNext(this);
+    int first = GetXaxis()->GetFirst();
+    int last =  GetXaxis()->GetLast();
+    GH1D *next = gpar->GetNext(this,DrawEmpty);
+    next->GetXaxis()->SetRange(first,last);
+    return next; //gpar->GetNext(this,DrawEmpty);
   } else {
     return NULL;
   }
