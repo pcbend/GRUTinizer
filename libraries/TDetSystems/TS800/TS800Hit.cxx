@@ -622,6 +622,11 @@ float TCrdc::GetNonDispersiveY() {
     y_slope = GValue::Value("CRDC2_Y_SLOPE");
     y_offset = GValue::Value("CRDC2_Y_OFFSET");
   }
+
+  // std::cout << " ------------------ "  << std::endl;
+  // std::cout << " 2 Slope = " << y_slope << std::endl;
+  // std::cout << " 2 Offst = " << y_offset << std::endl;
+
   return ((GetTimeRand()*y_slope+y_offset));
 }
 
