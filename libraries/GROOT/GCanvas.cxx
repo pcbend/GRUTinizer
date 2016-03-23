@@ -811,7 +811,13 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
          printf( BLUE "\n\tSum [%.01f : %.01f] = %.01f" RESET_COLOR  "\n",xlow,xhigh,sum);
        }
        break;
-
+    case kKey_I:
+      if(!hists.empty()) {
+        printf( BLUE );
+        
+        printf( RESET_COLOR );
+      }
+      break;
     case kKey_l:
       if(GetLogy()){
         // Show full y range, not restricted to positive values.

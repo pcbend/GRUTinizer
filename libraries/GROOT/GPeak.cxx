@@ -208,7 +208,9 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
 
   bool verbose = !options.Contains("Q");
 
-  TFitResultPtr fitres = fithist->Fit(this,Form("%sLRSM",options.Data()));
+  fithist->Sumw2();
+
+  TFitResultPtr fitres = fithist->Fit(this,Form("%sLRSME",options.Data()));
 
   //if(fitres->ParError(2) != fitres->ParError(2)) { // checks if nan.
   //  if(fitres->Parameter(3)<1) {
