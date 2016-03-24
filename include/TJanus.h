@@ -23,6 +23,8 @@ public:
 
   static TVector3 GetPosition(int detnum, int ring_num, int sector_num);
 
+  virtual void SetRunStart(unsigned int unix_time);
+
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 

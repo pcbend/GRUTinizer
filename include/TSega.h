@@ -19,6 +19,8 @@ public:
   virtual void InsertHit(const TDetectorHit&);
   virtual TDetectorHit& GetHit(int i);
 
+  virtual void SetRunStart(unsigned int unix_time);
+
   static TVector3 GetSegmentPosition(int detnum, int segnum);
   static TVector3 CrystalToGlobal(int detnum, TVector3 crystal_pos);
 
