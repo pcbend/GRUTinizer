@@ -133,6 +133,11 @@ std::string THistogramLoop::GetOutputFilename() const {
   return output_filename;
 }
 
+void THistogramLoop::AddCutFile(TFile* cut_file) {
+  std::cout << __PRETTY_FUNCTION__ << "\t cut_file" << std::endl;
+  compiled_histograms.AddCutFile(cut_file);
+}
+
 void THistogramLoop::cd(Option_t* opt) {
   if(strncmp(opt,"..",2)){
     popd();
