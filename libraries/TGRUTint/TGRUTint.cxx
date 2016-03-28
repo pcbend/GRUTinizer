@@ -172,14 +172,17 @@ void TGRUTint::ApplyOptions() {
     TS800::ReadInverseMap(opt->S800InverseMapFile().c_str());
   }
 
-  //next, if given a root file and NOT told to sort it..
-  if(opt->RootInputFiles().size()){
-    for(unsigned int x=0;x<opt->RootInputFiles().size();x++) {
-      OpenRootFile(opt->RootInputFiles().at(x));
-      // this we creat and populate gChain if able.
-      //   TChannels from the root file will be loaded as file is opened.
-      //   GValues from the root file will be loaded as file is opened.
-    }
+  std::vector<TFile*> cuts_files;
+  for(auto filename : opt->CutsInputFiles()) {
+    TFile* tfile = OpenRootFile(filename);
+    cuts_files.push_back(tfile);
+  }
+
+  for(auto filename : opt->RootInputFiles()) {
+    OpenRootFile(filename);
+    // this will populate gChain if able.
+    //   TChannels from the root file will be loaded as file is opened.
+    //   GValues from the root file will be loaded as file is opened.
   }
 
   //if I am passed any calibrations, lets load those, this
@@ -233,7 +236,6 @@ void TGRUTint::ApplyOptions() {
     }
 
     if(opt->TimeSortInput()){
-      std::cout << "\n\nI am time sorted\n\n" << std::endl;
       TOrderedRawFile* ordered_source = new TOrderedRawFile(source);
       ordered_source->SetDepth(opt->TimeSortDepth());
       source = ordered_source;
@@ -283,9 +285,13 @@ void TGRUTint::ApplyOptions() {
     woop->Connect(uoop1);
     //woop->Connect(uoop2);
 
-    if(TGRUTOptions::Get()->MakeHistos()){
+    if(opt->MakeHistos()){
       fHistogramLoop = THistogramLoop::Get("5_hist_loop");
       fHistogramLoop->SetOutputFilename(histoutfile);
+      for(auto cut_file : cuts_files) {
+        fHistogramLoop->AddCutFile(cut_file);
+      }
+
       woop->AttachHistogramLoop(fHistogramLoop);
       fHistogramLoop->Resume();
     }
@@ -321,6 +327,9 @@ void TGRUTint::ApplyOptions() {
       }
     }
     fHistogramLoop->SetOutputFilename(histoutfile);
+    for(auto cut_file : cuts_files) {
+      fHistogramLoop->AddCutFile(cut_file);
+    }
     fChainLoop->AttachHistogramLoop(fHistogramLoop);
     fHistogramLoop->Resume();
     fChainLoop->Resume();

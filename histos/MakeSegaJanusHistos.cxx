@@ -32,15 +32,26 @@ TCutG* pid_middle = NULL;
 TCutG* pid_high = NULL;
 TCutG* time_energy = NULL;
 
-void LoadGates(){
-  if(pid_low == NULL){
-    TPreserveGDirectory preserve;
-    std::string cuts_file = std::string(std::getenv("GRUTSYS")) + "/config/cuts_new.root";
-    TFile* f = new TFile(cuts_file.c_str());
-    pid_low = (TCutG*)f->Get("pid_low");
-    //pid_middle = (TCutG*)f->Get("pid_middle");
-    pid_high = (TCutG*)f->Get("pid_high");
-    time_energy = (TCutG*)f->Get("time_energy");
+void LoadGates(TRuntimeObjects& obj){
+  if(!pid_low){
+    pid_low = obj.GetCut("pid_low");
+    if(!pid_low){
+      std::cout << "Warning: could not find cut \"pid_low\"" << std::endl;
+    }
+  }
+
+  if(!pid_high){
+    pid_high = obj.GetCut("pid_high");
+    if(!pid_high){
+      std::cout << "Warning: could not find cut \"pid_high\"" << std::endl;
+    }
+  }
+
+  if(!time_energy){
+    time_energy = obj.GetCut("time_energy");
+    if(!time_energy){
+      std::cout << "Warning: could not find cut \"time_energy\"" << std::endl;
+    }
   }
 }
 
@@ -56,7 +67,7 @@ extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
   event_num++;
 
-  LoadGates();
+  LoadGates(obj);
 
   TSega* sega = obj.GetDetector<TSega>();
   TJanus* janus = obj.GetDetector<TJanus>();

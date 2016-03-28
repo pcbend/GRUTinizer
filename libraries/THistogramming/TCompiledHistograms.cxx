@@ -22,7 +22,7 @@ TCompiledHistograms::TCompiledHistograms()
   : libname(""), library(nullptr), func(nullptr),
     last_modified(0), last_checked(0), check_every(5),
     default_directory(0),obj(0) {
-  obj = new TRuntimeObjects(&objects, &variables, &gates);
+  obj = new TRuntimeObjects(&objects, &variables, &gates, cut_files);
 }
 
 TCompiledHistograms::TCompiledHistograms(std::string input_lib)
@@ -40,7 +40,7 @@ TCompiledHistograms::TCompiledHistograms(std::string input_lib)
   last_checked = time(NULL);
 
 
-  obj = new TRuntimeObjects(&objects, &variables, &gates);
+  obj = new TRuntimeObjects(&objects, &variables, &gates, cut_files);
 }
 
 TCompiledHistograms::~TCompiledHistograms() {
@@ -153,6 +153,12 @@ void TCompiledHistograms::Fill(TUnpackedEvent& detectors) {
   obj->SetDetectors(&detectors);
   //TRuntimeObjects obj(detectors, &objects, &variables, &gates);
   func(*obj);
+  }
+}
+
+void TCompiledHistograms::AddCutFile(TFile* cut_file) {
+  if(cut_file) {
+    cut_files.push_back(cut_file);
   }
 }
 
