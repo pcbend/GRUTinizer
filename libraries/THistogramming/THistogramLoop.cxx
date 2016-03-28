@@ -80,9 +80,14 @@ void THistogramLoop::OpenFile() {
 
 void THistogramLoop::CloseFile() {
   if(output_file){
-    TPreserveGDirectory preserve;
-    output_file->cd();
-    compiled_histograms.Write();
+    {
+      TPreserveGDirectory preserve;
+      output_file->cd();
+      compiled_histograms.Write();
+    }
+
+    compiled_histograms.SetDefaultDirectory(NULL);
+
     output_file->Close();
     output_file = 0;
     output_filename = "last.root";
@@ -134,7 +139,6 @@ std::string THistogramLoop::GetOutputFilename() const {
 }
 
 void THistogramLoop::AddCutFile(TFile* cut_file) {
-  std::cout << __PRETTY_FUNCTION__ << "\t cut_file" << std::endl;
   compiled_histograms.AddCutFile(cut_file);
 }
 

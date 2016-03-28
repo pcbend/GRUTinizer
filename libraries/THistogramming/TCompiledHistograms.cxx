@@ -9,11 +9,12 @@
 #include "TH1.h"
 #include "TFile.h"
 #include "TDirectory.h"
-#include "GRootCommands.h"
+#include "TObject.h"
 #include "TROOT.h"
 #include "TKey.h"
 
 #include "GValue.h"
+#include "GRootCommands.h"
 #include "TPreserveGDirectory.h"
 
 typedef void* __attribute__((__may_alias__)) void_alias;
@@ -44,8 +45,9 @@ TCompiledHistograms::TCompiledHistograms(std::string input_lib)
 }
 
 TCompiledHistograms::~TCompiledHistograms() {
-  if(obj)
+  if(obj) {
     delete obj;
+  }
   obj=0;
 }
 
@@ -150,9 +152,8 @@ void TCompiledHistograms::Fill(TUnpackedEvent& detectors) {
   default_directory->cd();
 
   if(obj) {
-  obj->SetDetectors(&detectors);
-  //TRuntimeObjects obj(detectors, &objects, &variables, &gates);
-  func(*obj);
+    obj->SetDetectors(&detectors);
+    func(*obj);
   }
 }
 
@@ -161,10 +162,6 @@ void TCompiledHistograms::AddCutFile(TFile* cut_file) {
     cut_files.push_back(cut_file);
   }
 }
-
-//TList* TCompiledHistograms::GetVariables() {
-//  return &variables;
-//}
 
 void TCompiledHistograms::SetReplaceVariable(const char* name, double value) {
   GValue* val = (GValue*)variables.FindObject(name);
@@ -180,5 +177,18 @@ void TCompiledHistograms::RemoveVariable(const char* name) {
   GValue* val = (GValue*)variables.FindObject(name);
   if(val){
     variables.Remove(val);
+  }
+}
+
+void TCompiledHistograms::SetDefaultDirectory(TDirectory* dir) {
+  default_directory = dir;
+
+  TObject* obj = NULL;
+  TIter next(&objects);
+  while((obj = next())) {
+    TH1* hist = dynamic_cast<TH1*>(obj);
+    if(hist) {
+      hist->SetDirectory(dir);
+    }
   }
 }
