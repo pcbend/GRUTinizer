@@ -89,7 +89,7 @@ TVector3 TJanusHit::GetConjugateDirection() const {
   static std::mutex mutex;
   std::lock_guard<std::mutex> lock(mutex);
 
-  static TKinematics kin("78Kr","208Pb","78Kr","208Pb",3.9*78*1000);
+  static TKinematics kin("78Kr","208Pb","78Kr","208Pb",3.9*78);
 
   TVector3 pos = GetPosition();
   kin.SetAngles(pos.Theta(), 3); // Set the 208Pb angle
