@@ -203,9 +203,17 @@ void TGRUTint::ApplyOptions() {
     StartGUI();
   }
 
+  bool missing_file = false;
+  for(auto& filename : opt->RawInputFiles()) {
+    if(!file_exists(filename.c_str())) {
+      missing_file = true;
+      std::cerr << "File not found: " << filename << std::endl;
+    }
+  }
+
   //next most important thing, if given a raw file && NOT told to not sort!
   if((opt->InputRing().length() || opt->RawInputFiles().size())
-     && opt->SortRaw()) {
+     && !missing_file && opt->SortRaw()) {
 
     TRawEventSource* source = NULL;
     if(opt->InputRing().length()) {
@@ -232,7 +240,9 @@ void TGRUTint::ApplyOptions() {
     } else {
       // Open a single file.
       std::string filename = opt->RawInputFiles().at(0);
-      source = new TRawFileIn(filename.c_str());
+      if(file_exists(filename.c_str())){
+        source = new TRawFileIn(filename.c_str());
+      }
     }
 
     if(opt->TimeSortInput()){
@@ -354,7 +364,8 @@ void TGRUTint::ApplyOptions() {
     }
     std::cout << std::endl;
 
-    this->Terminate();
+    int exit_status = missing_file ? 1 : 0;
+    this->Terminate(exit_status);
   }
 }
 
