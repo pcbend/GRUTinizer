@@ -16,9 +16,9 @@ class HistTab(object):
         self._setup_GUI(frame)
         self.active_dirs = []
 
+        self._requires_resort = False
         self.CheckOnlineHists()
         self.main.window.after_idle(self._PeriodicHistogramCheck)
-        self._requires_resort = False
 
     def _setup_GUI(self, frame):
         self.frame = frame
@@ -153,6 +153,7 @@ class HistTab(object):
             self.hist_lookup[name] = obj
 
         if name not in self.treeview.get_children(parent):
+            #print 'Performing insertion of',name,'into',parent
             self._requires_resort = True
             if icon is None:
                 icon = self.main._PickIcon(obj)
@@ -171,9 +172,9 @@ class HistTab(object):
                 self.Insert(tdir.GetListOfKeys(),
                             objname=tdir.GetName(), icon=self.main.icons['tfile'])
 
-            if self._requires_resort:
-                self.Resort()
-                self._requires_resort = False
+        if self._requires_resort:
+            self.Resort()
+            self._requires_resort = False
 
     def Resort(self, parent=''):
         children = list(self.treeview.get_children(parent))
