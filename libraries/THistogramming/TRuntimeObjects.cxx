@@ -3,6 +3,8 @@
 #include <iostream>
 
 #include "TClass.h"
+#include "TCutG.h"
+#include "TFile.h"
 #include "TH1.h"
 #include "TH2.h"
 #include "TDirectoryFile.h"
@@ -17,15 +19,21 @@
 std::map<std::string,TRuntimeObjects*> TRuntimeObjects::fRuntimeMap;
 
 TRuntimeObjects::TRuntimeObjects(TUnpackedEvent *detectors, TList* objects, TList* variables, TList *gates,
+                                 std::vector<TFile*>& cut_files,
                                  TDirectory* directory,const char *name)
-  : detectors(detectors), objects(objects), variables(variables), gates(gates), directory(directory) {
+  : detectors(detectors), objects(objects), variables(variables), gates(gates),
+    cut_files(cut_files),
+    directory(directory) {
   SetName(name);
   fRuntimeMap.insert(std::make_pair(name,this));
 }
 
 TRuntimeObjects::TRuntimeObjects(TList* objects, TList* variables, TList *gates,
+                                 std::vector<TFile*>& cut_files,
                                  TDirectory* directory,const char *name)
-  : detectors(0),objects(objects), variables(variables), gates(gates), directory(directory) {
+  : detectors(0),objects(objects), variables(variables), gates(gates),
+    cut_files(cut_files),
+    directory(directory) {
   SetName(name);
   fRuntimeMap.insert(std::make_pair(name,this));
 }
@@ -200,17 +208,15 @@ TList& TRuntimeObjects::GetVariables() {
 }
 
 TCutG* TRuntimeObjects::GetCut(const std::string& name) {
-  /*
-  TIter next(cuts);
-  TObject* obj;
-  while((obj = next())){
-    TCutG* cut = dynamic_cast<TCutG*>(obj);
-    if(cut &&
-       obj->GetName() == name){
-      return (TCutG*)obj;
+  for(auto& tfile : cut_files) {
+    TObject* obj = tfile->Get(name.c_str());
+    if(obj) {
+      TCutG* cut = dynamic_cast<TCutG*>(obj);
+      if(cut) {
+        return cut;
+      }
     }
   }
-  */
   return NULL;
 }
 

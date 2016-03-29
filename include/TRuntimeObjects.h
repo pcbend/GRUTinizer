@@ -12,6 +12,7 @@
 
 class TH1;
 class TH2;
+class TFile;
 
 /// Object passed to the online histograms.
 /**
@@ -25,11 +26,13 @@ public:
                   TList* objects,
                   TList* variables,
                   TList* gates,
+                  std::vector<TFile*>& cut_files,
                   TDirectory* directory=NULL,
                   const char *name="default");
   TRuntimeObjects(TList* objects,
                   TList* variables,
                   TList* gates,
+                  std::vector<TFile*>& cut_files,
                   TDirectory* directory=NULL,
                   const char *name="default");
 
@@ -123,7 +126,10 @@ private:
   TList* objects;
   TList* variables;
   TList* gates;
+  std::vector<TFile*>& cut_files;
+
   TDirectory* directory;
+
 
 
   ClassDef(TRuntimeObjects, 0);

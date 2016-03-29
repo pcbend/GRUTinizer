@@ -67,7 +67,7 @@ class Merger:
             future = self.executor.submit(self._submerge, merge_this_iter)
             to_merge.append(future)
 
-        print(' '.join('mv', to_merge[0].result(), output_file))
+        print(' '.join(['mv', to_merge[0].result(), output_file]))
         shutil.move(to_merge[0].result(), output_file)
 
     def _submerge(self, input_files):

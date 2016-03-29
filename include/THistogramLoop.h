@@ -21,6 +21,8 @@ public:
   std::string GetLibraryName() const;
   void ClearHistograms();
 
+  void AddCutFile(TFile* cut_file);
+
   void Write();
 
   virtual void ClearQueue();

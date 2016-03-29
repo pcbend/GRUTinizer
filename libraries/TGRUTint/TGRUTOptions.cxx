@@ -4,10 +4,10 @@
 #include <cctype>
 #include <iostream>
 
+#include "TEnv.h"
+
 #include "ArgParser.h"
 #include "TGRUTUtilities.h"
-
-#include <TEnv.h>
 
 TGRUTOptions* TGRUTOptions::Get(int argc, char** argv){
   static TGRUTOptions* item = NULL;
@@ -228,6 +228,8 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename) const{
     return kFileType::GVALUE;
   } else if (ext == "win"){
     return kFileType::PRESETWINDOW;
+  } else if (ext == "cuts") {
+    return kFileType::CUTS_FILE;
   } else {
     return kFileType::UNKNOWN_FILETYPE;
   }
@@ -268,12 +270,19 @@ bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
     case kFileType::S800_INVMAP:
       s800_inverse_map_file = filename;
       return true;
+
     case kFileType::GVALUE:
       input_val_files.push_back(filename);
       return true;
+
     case kFileType::PRESETWINDOW:
       input_win_files.push_back(filename);
       return true;
+
+    case kFileType::CUTS_FILE:
+      input_cuts_files.push_back(filename);
+      return true;
+
     case kFileType::CONFIG_FILE:
       return false;
     case kFileType::UNKNOWN_FILETYPE:

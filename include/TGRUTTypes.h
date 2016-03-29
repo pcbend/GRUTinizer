@@ -42,7 +42,8 @@ enum kFileType {
   GUI_HIST_FILE = 2048,
   COMPILED_HISTOGRAMS = 2049,
   CONFIG_FILE = 2050,
-  S800_INVMAP = 2051
+  S800_INVMAP = 2051,
+  CUTS_FILE = 2052
 };
 
 extern std::map<std::string, EColor> color_system_map;

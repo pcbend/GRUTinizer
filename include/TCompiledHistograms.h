@@ -15,8 +15,8 @@
 #include "TRuntimeObjects.h"
 
 #include "TUnpackedEvent.h"
-//#include "THistogramLoop.h"
 
+class TFile;
 
 class TCompiledHistograms : public TObject {
 public:
@@ -34,7 +34,7 @@ public:
   void SetReplaceVariable(const char* name, double value);
   void RemoveVariable(const char* name);
 
-  void SetDefaultDirectory(TDirectory* dir) { default_directory = dir; }
+  void SetDefaultDirectory(TDirectory* dir);
   TDirectory* GetDefaultDirectory() { return default_directory; }
 
   void ClearHistograms();
@@ -42,6 +42,8 @@ public:
   TList* GetObjects()   { return &objects;   }
   TList* GetVariables() { return &variables; }
   TList* GetGates()     { return &gates;     }
+
+  void AddCutFile(TFile* cut_file);
 
   void Write();
 
@@ -65,6 +67,7 @@ private:
   TList objects;
   TList gates;
   TList variables;
+  std::vector<TFile*> cut_files;
 
   TDirectory* default_directory;
 
