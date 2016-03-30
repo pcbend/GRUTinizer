@@ -32,7 +32,7 @@ std::string MergeStrings(const std::vector<std::string>& strings, char split='\n
 void Prompt();
 void Help();
 void Commands();
-TH1 *GrabHist(int i=1); //return the histogram from the current canvas, pad i.
+TH1 *GrabHist(int i=0); //return the ith histogram from the current canvas.
 
 void StartGUI();
 bool GUIIsRunning();
