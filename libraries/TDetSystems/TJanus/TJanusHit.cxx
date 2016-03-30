@@ -4,7 +4,7 @@
 
 #include "GValue.h"
 #include "TJanus.h"
-#include "TKinematics.h"
+#include "TReaction.h"
 
 void TJanusHit::Copy(TObject& obj) const {
   TDetectorHit::Copy(obj);
@@ -89,13 +89,14 @@ TVector3 TJanusHit::GetConjugateDirection() const {
   static std::mutex mutex;
   std::lock_guard<std::mutex> lock(mutex);
 
-  static TKinematics kin("78Kr","208Pb","78Kr","208Pb",3.9*78);
+  static TReaction reac("78Kr","208Pb","78Kr","208Pb",3.9*78);
 
   TVector3 pos = GetPosition();
-  kin.SetAngles(pos.Theta(), 3); // Set the 208Pb angle
-  double theta_78Kr = kin.GetThetalab(2); // Get the 78Kr angle
 
-  pos.SetTheta(theta_78Kr);
+  // Convert from 208Pb angle to 78Kr angle
+  double theta_78kr = reac.ConvertThetaLab(pos.Theta(), 3, 2);
+
+  pos.SetTheta(theta_78kr);
   pos.SetPhi(pos.Phi() + 3.1415926535);
   return pos;
 }

@@ -3,32 +3,22 @@
 #include <iostream>
 #include <map>
 #include <string>
-// extern "C" is needed to prevent name mangling.
-// The function signature must be exactly as shown here,
-//   or else bad things will happen.
-//
-// Note: from TRuntimeObjects:
-//    TList& GetDetectors();
-//    TList& GetObjects();
-//
-
 #include <cstdio>
 
-#include <TH1.h>
-#include <TH2.h>
-#include <TMath.h>
-#include "TRandom.h"
 #include "TFile.h"
+#include "TH1.h"
+#include "TH2.h"
+#include "TMath.h"
+#include "TRandom.h"
 
 #include "GValue.h"
 #include "TObject.h"
 #include "TSega.h"
 #include "TJanus.h"
-#include "TKinematics.h"
+#include "TReaction.h"
 #include "TPreserveGDirectory.h"
 
 TCutG* pid_low = NULL;
-TCutG* pid_middle = NULL;
 TCutG* pid_high = NULL;
 TCutG* time_energy = NULL;
 
@@ -55,18 +45,21 @@ void LoadGates(TRuntimeObjects& obj){
   }
 }
 
-void MakeJanusHistograms(TRuntimeObjects& obj, TJanus* janus);
-void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega);
-void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus);
+void MakeJanusHistograms(TRuntimeObjects& obj, TJanus& janus);
+void MakeSegaHistograms(TRuntimeObjects& obj, TSega& sega);
+void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega& sega, TJanus& janus);
 void MakeTimestampDiffs(TRuntimeObjects& obj, TSega* sega, TJanus* janus);
-void MakeLaBrCoincPlots(TRuntimeObjects& obj, TSega* sega, TJanus* janus);
 
-long event_num = -1;
+// Returns the timestamp in nanoseconds since the start of the first production run.
+// Minimum value: 0
+// Maximum value: 2.141e14 (End of Pb-208 target runs)
+// Total seconds: ~214100 seconds
 
+// extern "C" is needed to prevent name mangling.
+// The function signature must be exactly as shown here,
+//   or else bad things will happen.
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
-  event_num++;
-
   LoadGates(obj);
 
   TSega* sega = obj.GetDetector<TSega>();
@@ -74,233 +67,148 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
 
   if(janus){
-    MakeJanusHistograms(obj, janus);
+    MakeJanusHistograms(obj, *janus);
   }
   if(sega){
-    MakeSegaHistograms(obj, sega);
+    MakeSegaHistograms(obj, *sega);
   }
   if(sega && janus){
-    MakeCoincidenceHistograms(obj, sega, janus);
-    // MakeLaBrCoincPlots(obj, sega, janus);
+    MakeCoincidenceHistograms(obj, *sega, *janus);
   }
 
   MakeTimestampDiffs(obj, sega, janus);
 }
 
-void MakeJanusHistograms(TRuntimeObjects& obj, TJanus* janus) {
-  for(auto& chan : janus->GetAllChannels()){
-    obj.FillHistogram("channel",
+void MakeJanusHistograms(TRuntimeObjects& obj, TJanus& janus) {
+  for(auto& chan : janus.GetAllChannels()){
+    obj.FillHistogram("janus","channel",
                       128, 0, 128, chan.GetFrontChannel());
-    obj.FillHistogram("channel_charge",
+    obj.FillHistogram("janus","channel_charge",
                       128, 0, 128, chan.GetFrontChannel(),
                       6000, -4, 6000, chan.Charge());
-    obj.FillHistogram("channel_energy",
+    obj.FillHistogram("janus","channel_energy",
                       128, 0, 128, chan.GetFrontChannel(),
                       4000, 0, 400e3, chan.GetEnergy());
-    obj.FillHistogram("channel_time",
+    obj.FillHistogram("janus","channel_time",
                       128, 0, 128, chan.GetFrontChannel(),
                       6000, 0, 6000, chan.Time());
   }
 
 
-  obj.FillHistogram("janus_size",
-                    256, 0, 256, janus->Size());
+  obj.FillHistogram("janus","num_hits",
+                    256, 0, 256, janus.Size());
 
-
-  bool any_is_inside_blob = false;
-  bool any_is_inside_blob2 = false;
-  for(int i=0; i<janus->Size(); i++){
-    TJanusHit& hit = janus->GetJanusHit(i);
-    static TCutG* blob = NULL;
-    if(!blob){
-      blob = new TCutG("blob",6);
-      blob->SetVarX("janus_hits.GetFrontChannel()");
-      blob->SetVarY("janus_hits.Charge()");
-      blob->SetTitle("Graph");
-      blob->SetFillColor(1);
-      blob->SetPoint(0,117.729,2405.3);
-      blob->SetPoint(1,117.729,2608.23);
-      blob->SetPoint(2,122.646,2614.99);
-      blob->SetPoint(3,121.752,2412.07);
-      blob->SetPoint(4,118.921,2337.66);
-      blob->SetPoint(5,117.729,2405.3);
-    }
-
-    static TCutG* blob2 = NULL;
-    if(!blob2){
-      blob2 = new TCutG("blob2",5);
-      blob2->SetVarX("channel_charge_gated");
-      blob2->SetVarY("");
-      blob2->SetTitle("Graph");
-      blob2->SetFillColor(1);
-      blob2->SetPoint(0,70.015,4383.94);
-      blob2->SetPoint(1,90.4662,4383.94);
-      blob2->SetPoint(2,91.4687,2239.66);
-      blob2->SetPoint(3,71.619,2305.03);
-      blob2->SetPoint(4,70.015,4383.94);
-    }
-
-
-    if(blob->IsInside(hit.GetFrontChannel(), hit.Charge())){
-      any_is_inside_blob = true;
-    }
-    if(blob2->IsInside(hit.GetFrontChannel(), hit.Charge())){
-      any_is_inside_blob2 = true;
-    }
-  }
-
-  for(auto& hit : janus->GetAllHits()){
-    obj.FillHistogram("hit_channel",
+  for(auto& hit : janus.GetAllHits()){
+    obj.FillHistogram("janus","hit_channel",
                       128, 0, 128, hit.GetFrontChannel());
-    obj.FillHistogram("hit_channel_charge",
+    obj.FillHistogram("janus","hit_channel_charge",
                       128, 0, 128, hit.GetFrontChannel(),
                       6000, -4, 6000, hit.Charge());
-    obj.FillHistogram("hit_channel_energy",
+    obj.FillHistogram("janus","hit_channel_energy",
                       128, 0, 128, hit.GetFrontChannel(),
                       4000, 0, 400e3, hit.GetEnergy());
-    obj.FillHistogram("hit_channel_time",
+    obj.FillHistogram("janus","hit_channel_time",
                       128, 0, 128, hit.GetFrontChannel(),
                       6000, 0, 6000, hit.Time());
   }
 
-  for(int i=0; i<janus->Size(); i++){
-    TJanusHit& hit = janus->GetJanusHit(i);
+  for(int i=0; i<janus.Size(); i++){
+    TJanusHit& hit = janus.GetJanusHit(i);
     int hit_detnum = hit.GetDetnum();
 
-
-    for(int j=0; j<janus->Size(); j++){
-      TJanusHit& hit2 = janus->GetJanusHit(j);
-      if(hit.GetFrontChannel()==118 &&
-	 hit2.GetFrontChannel()==119){
-	obj.FillHistogram("chan118_chan119",
-			  6000,-4,6000, hit.Charge(),
-			  6000,-4,6000, hit2.Charge());
-
-      }
-    }
-
-
-    if(any_is_inside_blob){
-      obj.FillHistogram("channel_charge_inblob",
-			128, 0, 128, hit.GetFrontChannel(),
-			6000,-4,6000, hit.Charge());
-    }
-    if(any_is_inside_blob && !any_is_inside_blob2){
-      obj.FillHistogram("channel_charge_inblob_notinblob2",
-			128, 0, 128, hit.GetFrontChannel(),
-			6000,-4,6000, hit.Charge());
-    }
-
-
-    obj.FillHistogram(Form("janus%d_xy", hit_detnum),
+    obj.FillHistogram("janus",Form("det%d_xy", hit_detnum),
                       100,-3,3,hit.GetPosition().X(),
                       100,-3,3,hit.GetPosition().Y());
 
-    double theta_deg = hit.GetPosition().Theta() * TMath::RadToDeg();
-    obj.FillHistogram("janus_theta",
+    double theta = hit.GetPosition().Theta();
+    double theta_deg = theta * TMath::RadToDeg();
+    obj.FillHistogram("janus","theta",
                       180, 0, 180, theta_deg);
-    //if(pid_low->IsInside(theta_deg, hit.GetEnergy())) {
     if(pid_low->IsInside(hit.GetFrontChannel(), hit.Charge())) {
-      static TKinematics kin("78Kr","208Pb","78Kr","208Pb",3.9*78);
-      kin.SetAngles(theta_deg * TMath::DegToRad(), 3); // Set the 208Pb angle
-      double theta_78Kr = kin.GetThetalab(2) * TMath::RadToDeg(); // Get the 78Kr angle
-      obj.FillHistogram("janus_theta_recon",
-                        180, 0, 180, theta_78Kr);
+      static TReaction reac("78Kr","208Pb","78Kr","208Pb",3.9*78);
+      // Convert from 208Pb angle to 78Kr angle
+      double theta_78kr = reac.ConvertThetaLab(theta, 3, 2);
+      obj.FillHistogram("janus","theta78Kr_recon",
+                        180, 0, 180, theta_78kr * TMath::RadToDeg());
     }
 
-    // ---- Added by JAB 1/28/16 ----
-    if(hit_detnum==1){
-      obj.FillHistogram(Form("janus_Sector%02i_v_ring_det%02i",hit.GetSector(),hit_detnum),
-			40,0,40,hit.GetRing(),
-			6000,0,6000,hit.Charge());
-    }
+    obj.FillHistogram("janus",Form("janus_Sector%02i_v_ring_det%02i",hit.GetSector(),hit_detnum),
+                      40,0,40,hit.GetRing(),
+                      6000,0,6000,hit.Charge());
 
-    // ---- Added by JAB 1/20/16 ----
-
-    obj.FillHistogram(Form("janus_theta_v_energy_det%02i",hit_detnum),
-		      180,0,180,hit.GetPosition().Theta()*TMath::RadToDeg(),
+    obj.FillHistogram("janus", "theta_v_energy",
+		      180,0,180,theta_deg,
 		      4000,0,400e3,hit.GetEnergy());
 
-    obj.FillHistogram(Form("janus_theta_v_charge_det%02i",hit_detnum),
-		      180,0,180,hit.GetPosition().Theta()*TMath::RadToDeg(),
+    obj.FillHistogram("janus","theta_v_charge",
+		      180,0,180,theta_deg,
 		      6000,0,6000,hit.Charge());
 
-    obj.FillHistogram(Form("janus_ring_v_energy_det%02i",hit_detnum),
+    obj.FillHistogram("janus",Form("ring_v_energy_det%02i",hit_detnum),
 		      30,0,30,hit.GetRing(),
 		      4000,0,400e3,hit.GetEnergy());
 
-    obj.FillHistogram(Form("janus_phi_v_energy_det%02i",hit_detnum),
+    obj.FillHistogram("janus",Form("phi_v_energy_det%02i",hit_detnum),
 		      360,-180,180,hit.GetPosition().Phi()*TMath::RadToDeg(),
 		      4000,0,400e3,hit.GetEnergy());
 
-    obj.FillHistogram(Form("janus_secotr_v_energy_det%02i",hit_detnum),
-		      64,0,64,hit.GetSector(),
+    obj.FillHistogram("janus",Form("sector_v_energy_det%02i",hit_detnum),
+		      32,0,32,hit.GetSector(),
 		      4000,0,400e3,hit.GetEnergy());
 
-    // ---- ^^ End JAB ^^ ----
   }
 }
 
-// Returns the timestamp in nanoseconds since the start of the first production run.
-// Minimum value: 0
-// Maximum value: 2.141e14 (End of Pb-208 target runs)
-// Total seconds: ~214100 seconds
-double global_timestamp(unsigned int run_start, unsigned long timestamp) {
-  unsigned int experiment_start = 1453953429; // Wed Jan 27 22:57:09 2016
-  return (run_start - experiment_start)*1e9 + timestamp;
-}
 
-void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega) {
-  obj.FillHistogram("sega_size",
-                    256,0,256,sega->Size());
+void MakeSegaHistograms(TRuntimeObjects& obj, TSega& sega) {
+  obj.FillHistogram("sega","num_hits",
+                    256,0,256,sega.Size());
 
   long cc_timestamp = -1;
   long segment_timestamp = -1;
-  for(int i=0; i<sega->Size(); i++){
-    TSegaHit& hit = sega->GetSegaHit(i);
+  for(int i=0; i<sega.Size(); i++){
+    TSegaHit& hit = sega.GetSegaHit(i);
     int hit_detnum = hit.GetDetnum();
     double energy = hit.GetEnergy();
-    obj.FillHistogram("sega_energy",
+    obj.FillHistogram("sega","energy",
                       8000, 0, 4000, energy);
-    obj.FillHistogram("sega_charge_summary",
+    obj.FillHistogram("sega","charge_summary",
                       18, 1, 19, hit_detnum,
                       32768, 0, 32768, hit.Charge());
-    obj.FillHistogram("sega_energy_summary",
+    obj.FillHistogram("sega","energy_summary",
                       18, 1, 19, hit_detnum,
                       8000, 0, 4000, energy);
-    obj.FillHistogram("sega_numsegments",
+
+    obj.FillHistogram("sega","numsegments",
                       16, 1, 17, hit_detnum,
                       33, 0, 33, hit.GetNumSegments());
 
-    // obj.FillHistogram(Form("sega_det%d_numsegments_ts", hit_detnum),
+    // obj.FillHistogram("sega", Form("det%d_numsegments_ts", hit_detnum),
     //                   36000, 0, 3600e9, hit.Timestamp(),
     //                   33, 0, 33, hit.GetNumSegments());
 
-    // obj.FillHistogram(Form("sega_energy_det%02d_time", hit_detnum),
+    // obj.FillHistogram("sega", Form("energy_det%02d_ts", hit_detnum),
     //                   214100/60, 0, 2.141e14, hit.Timestamp(),
     //                   1000, 0, 2000, energy);
 
-    // if(hit_detnum==1 || hit_detnum==12 ||
-    //    hit_detnum==7 || hit_detnum==8){
-    //   obj.FillHistogram(Form("sega_charge_det%02d_time", hit_detnum),
-    //                     214100/60, 0, 2.141e14, hit.Timestamp(),
-    //                     22000, 0, 22000, hit.Charge());
-    // }
+    // obj.FillHistogram("sega", Form("charge_det%02d_ts", hit_detnum),
+    //                   214100/60, 0, 2.141e14, hit.Timestamp(),
+    //                   22000, 0, 22000, hit.Charge());
 
 
-    // for(unsigned int segi=0; segi<hit.GetNumSegments(); segi++){
-    //   TSegaSegmentHit& seg = hit.GetSegment(segi);
-    //   int segnum = seg.GetSegnum();
-    //   obj.FillHistogram(Form("sega_det%02d_segsummary", hit_detnum),
-    //                     32, 1, 33, segnum,
-    //                     32768, 0, 32768, seg.Charge());
-    //   obj.FillHistogram(Form("sega_energy_det%02d_segsummary", hit_detnum),
-    //                     32, 1, 33, segnum,
-    //                     32768, 0, 32768, seg.GetEnergy());
-    //   obj.FillHistogram("sega_allseg_summary",
-    //                     32*16, 1, 32*16 + 1, 32*(hit_detnum-1) + segnum,
-    //                     32768, 0, 32768, seg.Charge());
-    // }
+    for(unsigned int segi=0; segi<hit.GetNumSegments(); segi++){
+      TSegaSegmentHit& seg = hit.GetSegment(segi);
+      int segnum = seg.GetSegnum();
+      obj.FillHistogram("sega", Form("det%02d_charge_segsummary", hit_detnum),
+                        32, 1, 33, segnum,
+                        32768, 0, 32768, seg.Charge());
+      obj.FillHistogram("sega", Form("det%02d_energy_segsummary", hit_detnum),
+                        32, 1, 33, segnum,
+                        32768, 0, 32768, seg.GetEnergy());
+      obj.FillHistogram("sega", "allseg_summary",
+                        32*16, 1, 32*16 + 1, 32*(hit_detnum-1) + segnum,
+                        32768, 0, 32768, seg.Charge());
+    }
 
     if(hit.GetCrate()==1){
       cc_timestamp = hit.Timestamp();
@@ -309,334 +217,339 @@ void MakeSegaHistograms(TRuntimeObjects& obj, TSega* sega) {
     }
   }
 
-  // for(int i=0; i<sega->Size(); i++) {
-  //   TSegaHit& s_hit = sega->GetSegaHit(i);
-  //   for(int beta_i = 0; beta_i<150; beta_i++) {
-  //     double beta = 0.0 + beta_i*((0.15-0.00)/150);
-  //     obj.FillHistogram("sega_DCenergy_beamaxis_beta",
-  //       		150, 0.0, 0.15, beta,
-  //       		8000, 0, 4000, s_hit.GetDoppler(beta));
-  //   }
-  // }
 
-  obj.FillHistogram("hascore_hassegment",
-                    2, 0, 2, cc_timestamp!=-1,
-                    2, 0, 2, segment_timestamp!=-1);
   if(cc_timestamp>0 && segment_timestamp>0){
-    obj.FillHistogram("segment_core_tdiff",
+    obj.FillHistogram("sega","segment_core_tdiff",
                       1000, -5000, 5000, cc_timestamp - segment_timestamp);
   }
 }
 
-void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega* sega, TJanus* janus) {
-  bool has_455keV = false;
-  // bool coinc_missing3 = false;
-  // bool coinc_missing4 = false;
+void Make78KrPlots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_hit) {
+  double energy = s_hit.GetEnergy();
+  TVector3 particle_position = j_hit.GetPosition();
+  double time_diff = s_hit.Timestamp() - j_hit.Timestamp();
+  double beta = GValue::Value("beta");
 
-  // for(int i=0; i<sega->Size(); i++) {
-  //   TSegaHit& s_hit = sega->GetSegaHit(i);
-  //   for(int beta_i = 0; beta_i<150; beta_i++) {
-  //     double beta = 0.0 + beta_i*((0.15-0.00)/150);
-  //     obj.FillHistogram("sega_DCenergy_beamaxis_beta_coinc",
-  //       		150, 0.0, 0.15, beta,
-  //       		8000, 0, 4000, s_hit.GetDoppler(beta));
-  //   }
-
-
-  //   double beta = GValue::Value("beta");
-  //   for(int z=-20;z<20;z++) {
-  //     TVector3 offset(0,0,z);
-
-  //     if(s_hit.GetNumSegments()>0) {
-  //       double tmp = 0.0;
-  //       double gamma = 1/(sqrt(1-pow(beta,2)));
-  //       tmp = s_hit.GetEnergy()*gamma *(1 - beta*TMath::Cos((s_hit.GetPosition()+offset).Theta()));
-  //       obj.FillHistogram("sega_DCenergy_beamaxis_zoffset_coinc",
-  //                         40, -20, 20, z,
-  //                         8000, 0, 4000, tmp);
-  //     }
-  //   }
-  // }
+  obj.FillHistogram("kr78","energy_notimegate",
+                    8000, 0, 4000, energy);
+  obj.FillHistogram("kr78","energy_summary_notimegate",
+                    18, 1, 19, s_hit.GetDetnum(),
+                    8000, 0, 4000, energy);
+  obj.FillHistogram("kr78","DCenergy_beamaxis_notimegate",
+                    8000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta")));
+  obj.FillHistogram("kr78","DCenergy_notimegate",
+                    8000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta"), particle_position));
 
 
 
-  for(int i=0; i<sega->Size(); i++){
-    TSegaHit& hit = sega->GetSegaHit(i);
-    int hit_detnum = hit.GetDetnum();
-    if(hit.GetEnergy()>425 && hit.GetEnergy()<485){
-      has_455keV = true;
-      obj.FillHistogram("sega_has_455keV",
-                        16, 1, 17, hit.GetDetnum());
-    }
+  if(time_energy->IsInside(energy, time_diff)){
+    // Doppler corrected energies, using janus
+    double dc_energy = s_hit.GetDoppler(beta, particle_position);
 
-    obj.FillHistogram("sega_detnum_janus_tdiff",
-                      16, 1, 17, hit_detnum,
-                      1000, -5000, 5000, hit.Timestamp() - janus->Timestamp());
-    obj.FillHistogram("sega_energy_janus_tdiff",
-                      4000, 0, 4000, hit.GetEnergy(),
-                      1000, -5000, 5000, hit.Timestamp() - janus->Timestamp());
-    // obj.FillHistogram("sega_traceheight_summary",
-    //                   16, 1, 17, hit.GetDetnum(),
-    //                   3100, -100, 3000, hit.GetTraceHeight());
-    // obj.FillHistogram(Form("sega_traceheight_det%02d_timestamp",hit.GetDetnum()),
-    //                   214100/60, 0, 2.141e14, hit.Timestamp(),
-    //                   3100, -100, 3000, hit.GetTraceHeight());
-  }
+    obj.FillHistogram("kr78","energy",
+                      4000, 0, 4000, s_hit.GetEnergy());
+    obj.FillHistogram("kr78","DCenergy",
+                      4000, 0, 4000, dc_energy);
 
-  obj.FillHistogram("sega_janus_tdiff",
-                    1000, -5000, 5000, sega->Timestamp() - janus->Timestamp());
+    double theta_deg = s_hit.GetPosition().Angle(particle_position) * (180/3.1415926);
+    obj.FillHistogram("kr78","energy_angle",
+                      2000, 0, 2000, s_hit.GetEnergy(),
+                      180, 0, 180, theta_deg);
+    obj.FillHistogram("kr78","DCenergy_angle",
+                      2000, 0, 2000, dc_energy,
+                      180, 0, 180, theta_deg);
 
 
-  for(int i=0; i<janus->Size(); i++){
-    TJanusHit& hit = janus->GetJanusHit(i);
-    if(has_455keV){
-      obj.FillHistogram("channel_energy_455keV_coinc",
-                        128, 0, 128, hit.GetFrontChannel(),
-                        6000, 0, 6000, hit.Charge());
-      obj.FillHistogram("channel_energy_455keV_coinc",
-                        128, 0, 128, hit.GetBackChannel(),
-                        6000, 0, 6000, hit.GetBackHit().Charge());
-    }
+    obj.FillHistogram("kr78",Form("energy_angle_ring%02d", j_hit.GetRing()),
+                      2000, 0, 2000, energy,
+                      180, 0, 180, theta_deg);
+    obj.FillHistogram("kr78",Form("DCenergy_angle_ring%02d", j_hit.GetRing()),
+                      2000, 0, 2000, dc_energy,
+                      180, 0, 180, theta_deg);
 
 
+    // // Scan along beta
+    // for(int beta_i = 0; beta_i<150; beta_i++) {
+    //   double beta = 0.0 + beta_i*((0.15-0.00)/150);
 
+    //   obj.FillHistogram("kr78","beamaxis_betascan",
+    //                     150, 0.0, 0.15, beta,
+    //                     8000, 0, 4000, s_hit.GetDoppler(beta));
 
-    for(int j=0; j<sega->Size(); j++){
-      TSegaHit& s_hit = sega->GetSegaHit(j);
-      double energy = s_hit.GetEnergy();
-      if(hit.GetFrontChannel()==87){
-        obj.FillHistogram("senergy_jcharge_innermost_ring",
-                          6000, 0, 6000, hit.Charge(),
-                          8000, 0, 4000, energy);
-      }
-
-      // ---- Added by JAB 1/20/16 ----
-      TVector3 SegaPos = s_hit.GetPosition();
-      TVector3 JanusPos = hit.GetPosition();
-      double CT_sj = SegaPos.Dot(JanusPos);
-      double angle = hit.GetPosition().Angle(s_hit.GetPosition());
-      double dc_energy = s_hit.GetDoppler(GValue::Value("beta"),hit.GetPosition());
-
-      obj.FillHistogram(Form("senergy_sjtheta_ring%02i",hit.GetRing()),
-			280,-70,70, CT_sj,
-			8000,0,4000, energy);
-
-
-      obj.FillHistogram(Form("doppler_with_ring%02i_gate",hit.GetRing()),
-			//280,-70,70, s_hit.GetPosition().Angle(hit.GetPosition())*TMath::RadToDeg(),
-			180,0,180, angle*TMath::RadToDeg(),
-			8000,0,4000, dc_energy); //Energy());
-
-      obj.FillHistogram("sega_DCenergy",
-                        8000,0,4000,dc_energy);
-
-
-      obj.FillHistogram("sega_DCenergy_theta",
-			180,0,180, angle*TMath::RadToDeg(),
-			8000,0,4000,dc_energy); //Energy());
-
-
-
-      // ---- ^^ End JAB ^^ ----
-    }
-
-
-
-    obj.FillHistogram("channel_energy_any_coinc",
-                      128, 0, 128, hit.GetFrontChannel(),
-                      6000, 0, 6000, hit.Charge());
-    obj.FillHistogram("channel_energy_any_coinc",
-                      128, 0, 128, hit.GetBackChannel(),
-                      6000, 0, 6000, hit.GetBackHit().Charge());
-
-
-    // if(coinc_missing3){
-    //   obj.FillHistogram("channel_energy_any_coinc_missing3",
-    //                     128, 0, 128, hit.GetFrontChannel(),
-    //                     4096, 0, 4096, hit.Charge());
-    //   obj.FillHistogram("channel_energy_any_coinc_missing3",
-    //                     128, 0, 128, hit.GetBackChannel(),
-    //                     4096, 0, 4096, hit.GetBackHit().Charge());
+    //   obj.FillHistogram("kr78","betascan",
+    //                     150, 0.0, 0.15, beta,
+    //                     8000, 0, 4000, s_hit.GetDoppler(beta, particle_position));
     // }
 
-    // if(coinc_missing4){
-    //   obj.FillHistogram("channel_energy_any_coinc_missing4",
-    //                     128, 0, 128, hit.GetFrontChannel(),
-    //                     4096, 0, 4096, hit.Charge());
-    //   obj.FillHistogram("channel_energy_any_coinc_missing4",
-    //                     128, 0, 128, hit.GetBackChannel(),
-    //                     4096, 0, 4096, hit.GetBackHit().Charge());
+    // // Scan along z
+    // for(int z=-20; z<20; z++) {
+    //   TVector3 offset(0,0,z);
+    //   obj.FillHistogram("kr78","DCenergy_zscan",
+    //                     40, -20, 20, z,
+    //                     8000, 0, 4000, s_hit.GetDoppler(beta, particle_position, offset));
     // }
   }
-
-
-  bool in_pid_low = false;
-  TJanusHit* j_hit_pidlow = NULL;
-  //bool in_pid_middle = false;
-  //TJanusHit* j_hit_pidmiddle = NULL;
-  bool in_pid_high = false;
-  TJanusHit* j_hit_pidhigh = NULL;
-  for(auto& j_hit : janus->GetAllHits()){
-    double theta_deg = j_hit.GetPosition().Theta() * TMath::RadToDeg();
-    double energy = j_hit.GetEnergy();
-    //if( pid_low->IsInside(theta_deg, energy) ) {
-    if(pid_low->IsInside(j_hit.GetFrontChannel(), j_hit.Charge())) {
-      in_pid_low = true;
-      j_hit_pidlow = &j_hit;
-    }
-    // if( pid_middle->IsInside(theta_deg, energy) ) {
-    //   in_pid_middle = true;
-    //   j_hit_pidmiddle = &j_hit;
-    // }
-    //if( pid_high->IsInside(theta_deg, energy) ) {
-    if(pid_high->IsInside(j_hit.GetFrontChannel(), j_hit.Charge())) {
-      in_pid_high = true;
-      j_hit_pidhigh = &j_hit;
-    }
-  }
-
-  for(int i=0; i<sega->Size(); i++){
-    TSegaHit& s_hit = sega->GetSegaHit(i);
-    if(in_pid_low){
-      obj.FillHistogram("sega_energy_pidlow",
-			8000, 0, 4000, s_hit.GetEnergy());
-      obj.FillHistogram("sega_energy_summary_pidlow",
-			18,1,19, s_hit.GetDetnum(),
-			8000, 0, 4000, s_hit.GetEnergy());
-      obj.FillHistogram("sega_DCenergy_beamaxis_pidlow",
-			8000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta")));
-      obj.FillHistogram("sega_DCenergy_janus_pidlow",
-			8000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta"), j_hit_pidlow->GetPosition()));
-
-      obj.FillHistogram("sega_DCenergy_janus_pidlow_conjugate",
-                        8000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta"), j_hit_pidlow->GetConjugateDirection()));
-      if(time_energy->IsInside(s_hit.GetEnergy(),
-                             s_hit.Timestamp() - j_hit_pidlow->Timestamp())){
-
-        TVector3 kr_direction = j_hit_pidlow->GetConjugateDirection();
-        double dc_energy = s_hit.GetDoppler(GValue::Value("beta_reconstructed"), kr_direction);
-        obj.FillHistogram("sega_DCenergy_janus_pidlow_conjugate_timegate",
-                          8000, 0, 4000, dc_energy);
-        obj.FillHistogram("sega_energy_janus_pidlow_conjugate_timegate",
-                          8000, 0, 4000, s_hit.GetEnergy());
-
-        double dop_theta = s_hit.GetPosition().Angle(kr_direction);
-        obj.FillHistogram("sega_energy_angle_janus_pidlow_conjugate_timegate",
-                          2000, 0, 2000, s_hit.GetEnergy(),
-                          180, 0, 180, dop_theta*(180/3.1415926));
-
-        double kr_theta_degree = (180/3.1415926)*kr_direction.Theta();
-        if(75 < kr_theta_degree && kr_theta_degree < 105){
-          obj.FillHistogram("sega_energy_angle_janus_pidlow_conjugate_timegate_near90",
-                            2000, 0, 2000, s_hit.GetEnergy(),
-                            180, 0, 180, dop_theta*(180/3.1415926));
-
-          obj.FillHistogram("sega_DCenergy_janus_pidlow_conjugate_timegate_near90",
-                            8000, 0, 4000, dc_energy);
-
-          obj.FillHistogram("sega_energy_janus_pidlow_conjugate_timegate_near90",
-                            8000, 0, 4000, s_hit.GetEnergy());
-        } else {
-          obj.FillHistogram("sega_energy_angle_janus_pidlow_conjugate_timegate_notnear90",
-                            2000, 0, 2000, s_hit.GetEnergy(),
-                            180, 0, 180, dop_theta*(180/3.1415926));
-
-          obj.FillHistogram("sega_DCenergy_janus_pidlow_conjugate_timegate_notnear90",
-                            8000, 0, 4000, dc_energy);
-
-          obj.FillHistogram("sega_energy_janus_pidlow_conjugate_timegate_notnear90",
-                            8000, 0, 4000, s_hit.GetEnergy());
-
-
-          for(int beta_i = 0; beta_i<150; beta_i++) {
-            double beta = 0.0 + beta_i*((0.15-0.00)/150);
-            obj.FillHistogram("sega_DCenergy_janus_pidlow_conjugate_timegate_notnear90_beta",
-                              150, 0.0, 0.15, beta,
-                              8000, 0, 4000, s_hit.GetDoppler(beta,kr_direction));
-          }
-        }
-
-
-        obj.FillHistogram(Form("sega_energy_angle_janus_pidlow_conjugate_timegate_ring%02d",j_hit_pidlow->GetRing()),
-                          2000, 0, 2000, s_hit.GetEnergy(),
-                          180, 0, 180, dop_theta*(180/3.1415926));
-      }
-    }
-    if(in_pid_high){
-      obj.FillHistogram("sega_energy_pidhigh",
-			8000, 0, 4000, s_hit.GetEnergy());
-      obj.FillHistogram("sega_energy_summary_pidhigh",
-			18,1,19, s_hit.GetDetnum(),
-			8000, 0, 4000, s_hit.GetEnergy());
-      obj.FillHistogram("sega_DCenergy_beamaxis_pidhigh",
-			8000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta")));
-      obj.FillHistogram("sega_DCenergy_janus_pidhigh",
-			8000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta"), j_hit_pidhigh->GetPosition()));
-
-      if(time_energy->IsInside(s_hit.GetEnergy(),
-                               s_hit.Timestamp() - j_hit_pidhigh->Timestamp())){
-        double dc_energy = s_hit.GetDoppler(GValue::Value("beta"), j_hit_pidhigh->GetPosition());
-        obj.FillHistogram("sega_energy_janus_pidhigh_timegate",
-                          8000, 0, 4000, s_hit.GetEnergy());
-        obj.FillHistogram("sega_DCenergy_janus_pidhigh_timegate",
-                          8000, 0, 4000, dc_energy);
-
-        double theta = s_hit.GetPosition().Angle(j_hit_pidhigh->GetPosition());
-        obj.FillHistogram("sega_energy_angle_janus_pidhigh_timegate",
-                          2000, 0, 2000, s_hit.GetEnergy(),
-                          180, 0, 180, theta*(180/3.1415926));
-
-
-        // double timestamp = s_hit.Timestamp();
-        // obj.FillHistogram(Form("sega_DCenergy_janus_pidhigh_timegate_det%02d_time",s_hit.GetDetnum()),
-        //                   214100/60, 0, 2.141e14, timestamp,
-        //                   1000, 0, 2000, dc_energy);
-
-        // double dc_traceheight = s_hit.GetTraceHeightDoppler(GValue::Value("beta"), j_hit_pidhigh->GetPosition());
-        // obj.FillHistogram(Form("sega_traceheight_janus_pidhigh_timegate_det%02d_timestamp",s_hit.GetDetnum()),
-        //                   214100/60, 0, 2.141e14, timestamp,
-        //                   3100, -100, 3000, dc_traceheight);
-      }
-    }
-  }
-
 }
 
-void MakeLaBrCoincPlots(TRuntimeObjects& obj, TSega* sega, TJanus* janus) {
-  bool has_labr_1332 = false;
-  for(int i=0; i<janus->Size(); i++){
-    TJanusHit& hit = janus->GetJanusHit(i);
-    obj.FillHistogram("labr_energy",
-                      8000, 0, 4000, hit.GetEnergy());
-    if(hit.GetFrontChannel() == 26 &&
-       hit.GetEnergy() > 1310 &&
-       hit.GetEnergy() < 1350){
-      obj.FillHistogram("labr_energy_gated",
-                        8000, 0, 4000, hit.GetEnergy());
-      has_labr_1332 = true;
-      break;
+void Make78KrPlots_Reconstructed(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_hit) {
+  TVector3 particle_position = j_hit.GetConjugateDirection();
+  double time_diff = s_hit.Timestamp() - j_hit.Timestamp();
+  double beta = GValue::Value("beta_reconstructed");
+  double energy = s_hit.GetEnergy();
+  double dc_energy = s_hit.GetDoppler(beta, particle_position);
+
+  obj.FillHistogram("kr78_recon","energy_notimegate",
+                    8000, 0, 4000, energy);
+  obj.FillHistogram("kr78_recon","energy_summary_notimegate",
+                    18, 1, 19, s_hit.GetDetnum(),
+                    8000, 0, 4000, energy);
+  obj.FillHistogram("kr78_recon","DCenergy_beamaxis_notimegate",
+                    8000, 0, 4000, s_hit.GetDoppler(beta));
+  obj.FillHistogram("kr78_recon","DCenergy_notimegate",
+                    8000, 0, 4000, dc_energy);
+
+
+
+  if(time_energy->IsInside(energy, time_diff)){
+    // Doppler corrected energies, using janus
+    obj.FillHistogram("kr78_recon","energy",
+                      4000, 0, 4000, energy);
+    obj.FillHistogram("kr78_recon","DCenergy",
+                      4000, 0, 4000, dc_energy);
+
+    double theta_deg = s_hit.GetPosition().Angle(particle_position) * (180/3.14159);
+    obj.FillHistogram("kr78_recon","energy_angle",
+                      2000, 0, 2000, energy,
+                      180, 0, 180, theta_deg);
+    obj.FillHistogram("kr78_recon","DCenergy_angle",
+                      2000, 0, 2000, dc_energy,
+                      180, 0, 180, theta_deg);
+
+    obj.FillHistogram("kr78_recon",Form("energy_angle_ring%02d", j_hit.GetRing()),
+                      2000, 0, 2000, energy,
+                      180, 0, 180, theta_deg);
+    obj.FillHistogram("kr78_recon",Form("DCenergy_angle_ring%02d", j_hit.GetRing()),
+                      2000, 0, 2000, dc_energy,
+                      180, 0, 180, theta_deg);
+
+    // // Scan along beta
+    // for(int beta_i = 0; beta_i<150; beta_i++) {
+    //   double beta = 0.0 + beta_i*((0.15-0.00)/150);
+    //   obj.FillHistogram("kr78_recon","beamaxis_betascan",
+    //                     150, 0.0, 0.15, beta,
+    //                     8000, 0, 4000, s_hit.GetDoppler(beta));
+
+    //   obj.FillHistogram("kr78_recon","betascan",
+    //                     150, 0.0, 0.15, beta,
+    //                     8000, 0, 4000, s_hit.GetDoppler(beta, particle_position));
+    // }
+
+    // // Scan along z
+    // for(int z=-20; z<20; z++) {
+    //   TVector3 offset(0,0,z);
+    //   obj.FillHistogram("kr78_recon","DCenergy_zscan",
+    //                     40, -20, 20, z,
+    //                     8000, 0, 4000, s_hit.GetDoppler(beta, particle_position, offset));
+    // }
+
+    double kr_theta_deg = particle_position.Theta() * (180/3.1415926);
+    if(75 > kr_theta_deg || 105 < kr_theta_deg) {
+      // DC energies ignoring area around 90 degrees
+      obj.FillHistogram("kr78_recon","energy_notnear90",
+                        4000, 0, 4000, energy);
+      obj.FillHistogram("kr78_recon","DCenergy_notnear90",
+                        4000, 0, 4000, dc_energy);
+
+      double theta_deg = s_hit.GetPosition().Angle(particle_position) * (180/3.14159);
+      obj.FillHistogram("kr78_recon","energy_angle_notnear90",
+                        2000, 0, 2000, energy,
+                        180, 0, 180, theta_deg);
+      obj.FillHistogram("kr78_recon","DCenergy_angle_notnear90",
+                        2000, 0, 2000, dc_energy,
+                        180, 0, 180, theta_deg);
+
+      // // Scan along z
+      // for(int z=-20; z<20; z++) {
+      //   TVector3 offset(0,0,z);
+      //   obj.FillHistogram("kr78_recon","DCenergy_zscan_notnear90",
+      //                     40, -20, 20, z,
+      //                     8000, 0, 4000, s_hit.GetDoppler(beta, particle_position, offset));
+      // }
     }
   }
+}
 
-  if(has_labr_1332){
-    for(int i=0; i<sega->Size(); i++){
-      TSegaHit& hit = sega->GetSegaHit(i);
-      obj.FillHistogram("sega_energy_labr1332coinc",
-                        8000, 0, 4000, hit.GetEnergy());
-      obj.FillHistogram("sega_energy_summary_labr1332coinc",
-                        16, 1, 17, hit.GetDetnum(),
-                        8000, 0, 4000, hit.GetEnergy());
+void Make208PbPlots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_hit) {
+  double energy = s_hit.GetEnergy();
+  TVector3 particle_position = j_hit.GetPosition();
+  double time_diff = s_hit.Timestamp() - j_hit.Timestamp();
+
+  obj.FillHistogram("pb208","energy_notimegate",
+                    8000, 0, 4000, energy);
+  obj.FillHistogram("pb208","energy_summary_notimegate",
+                    18, 1, 19, s_hit.GetDetnum(),
+                    8000, 0, 4000, energy);
+  obj.FillHistogram("pb208","DCenergy_beamaxis_notimegate",
+                    8000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta")));
+  obj.FillHistogram("pb208","DCenergy_notimegate",
+                    8000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta"), particle_position));
+
+
+
+  if(time_energy->IsInside(energy, time_diff)){
+    // Doppler corrected energies, using janus
+    double dc_energy = s_hit.GetDoppler(GValue::Value("beta"), particle_position);
+
+    obj.FillHistogram("pb208","energy",
+                      4000, 0, 4000, s_hit.GetEnergy());
+    obj.FillHistogram("pb208","DCenergy",
+                      4000, 0, 4000, dc_energy);
+
+    double theta_deg = s_hit.GetPosition().Angle(particle_position);
+    obj.FillHistogram("pb208","energy_angle",
+                      2000, 0, 2000, s_hit.GetEnergy(),
+                      180, 0, 180, theta_deg);
+    obj.FillHistogram("pb208","DCenergy_angle",
+                      2000, 0, 2000, dc_energy,
+                      180, 0, 180, theta_deg);
+
+
+    // // Scan along beta
+    // for(int beta_i = 0; beta_i<150; beta_i++) {
+    //   double beta = 0.0 + beta_i*((0.15-0.00)/150);
+
+    //   obj.FillHistogram("pb208","beamaxis_betascan",
+    //                     150, 0.0, 0.15, beta,
+    //                     8000, 0, 4000, s_hit.GetDoppler(beta));
+
+    //   obj.FillHistogram("pb208","betascan",
+    //                     150, 0.0, 0.15, beta,
+    //                     8000, 0, 4000, s_hit.GetDoppler(beta, particle_position));
+    // }
+
+    // // Scan along z
+    // for(int z=-20; z<20; z++) {
+    //   double beta = GValue::Value("beta");
+    //   TVector3 offset(0,0,z);
+    //   obj.FillHistogram("pb208","DCenergy_zscan",
+    //                     40, -20, 20, z,
+    //                     8000, 0, 4000, s_hit.GetDoppler(beta, particle_position, offset));
+    // }
+  }
+}
+
+void MakeTimeDependentHistograms(TRuntimeObjects& obj, TSega& sega, TJanus& janus) {
+  for(int i=0; i<sega.Size(); i++){
+    TSegaHit& hit = sega.GetSegaHit(i);
+    obj.FillHistogram("traceheight","sega_traceheight_summary",
+                      16, 1, 17, hit.GetDetnum(),
+                      3100, -100, 3000, hit.GetTraceHeight());
+    obj.FillHistogram("traceheight",Form("sega_traceheight_det%02d_timestamp",hit.GetDetnum()),
+                      214100/60, 0, 2.141e14, hit.Timestamp(),
+                      3100, -100, 3000, hit.GetTraceHeight());
+  }
+
+  for(auto& j_hit : janus.GetAllHits()){
+    bool in_pid_high = pid_high->IsInside(j_hit.GetFrontChannel(), j_hit.Charge());
+    for(int i=0; i<sega.Size(); i++){
+      TSegaHit& s_hit = sega.GetSegaHit(i);
+      if(in_pid_high){
+        if(time_energy->IsInside(s_hit.GetEnergy(),
+                                 s_hit.Timestamp() - j_hit.Timestamp())){
+          int detnum = s_hit.GetDetnum();
+          double timestamp = s_hit.Timestamp();
+          double beta = GValue::Value("beta");
+          TVector3 particle_pos = j_hit.GetPosition();
+
+          double dc_energy = s_hit.GetDoppler(beta, particle_pos);
+          obj.FillHistogram("traceheight",Form("DCenergy_det%02d_time",detnum),
+                            214100/60, 0, 2.141e14, timestamp,
+                            1000, 0, 2000, dc_energy);
+
+          double dc_traceheight = s_hit.GetTraceHeightDoppler(beta, particle_pos);
+          obj.FillHistogram("traceheight",Form("DCtraceheight_det%02d_timestamp",detnum),
+                            214100/60, 0, 2.141e14, timestamp,
+                            3100, -100, 3000, dc_traceheight);
+        }
+      }
+    }
+  }
+}
+
+void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega& sega, TJanus& janus) {
+  bool has_455keV = false;
+
+  for(int i=0; i<sega.Size(); i++){
+    TSegaHit& hit = sega.GetSegaHit(i);
+    if(hit.GetEnergy()>425 && hit.GetEnergy()<485){
+      has_455keV = true;
+    }
+    obj.FillHistogram("coinc","sega_energy_janus_tdiff",
+                      4000, 0, 4000, hit.GetEnergy(),
+                      1000, -5000, 5000, hit.Timestamp() - janus.Timestamp());
+  }
+
+
+  for(int i=0; i<janus.Size(); i++){
+    TJanusHit& j_hit = janus.GetJanusHit(i);
+    if(has_455keV){
+      obj.FillHistogram("coinc","janus_channel_energy_455keV_coinc",
+                        128, 0, 128, j_hit.GetFrontChannel(),
+                        6000, 0, 6000, j_hit.Charge());
+      obj.FillHistogram("coinc","janus_channel_energy_455keV_coinc",
+                        128, 0, 128, j_hit.GetBackChannel(),
+                        6000, 0, 6000, j_hit.GetBackHit().Charge());
+    }
+
+
+    obj.FillHistogram("coinc","janus_channel_energy",
+                      128, 0, 128, j_hit.GetFrontChannel(),
+                      6000, 0, 6000, j_hit.Charge());
+    obj.FillHistogram("coinc","janus_channel_energy",
+                      128, 0, 128, j_hit.GetBackChannel(),
+                      6000, 0, 6000, j_hit.GetBackHit().Charge());
+  }
+
+  for(auto& j_hit : janus.GetAllHits()) {
+    bool in_pid_low = pid_low->IsInside(j_hit.GetFrontChannel(), j_hit.Charge());
+    bool in_pid_high = pid_high->IsInside(j_hit.GetFrontChannel(), j_hit.Charge());
+
+    for(int i=0; i<sega.Size(); i++){
+      TSegaHit& s_hit = sega.GetSegaHit(i);
+      if(in_pid_low){
+        Make208PbPlots(obj, s_hit, j_hit);
+        Make78KrPlots_Reconstructed(obj, s_hit, j_hit);
+      }
+      if(in_pid_high){
+        Make78KrPlots(obj, s_hit, j_hit);
+      }
     }
   }
 }
 
 void MakeTimestampDiffs(TRuntimeObjects& obj, TSega* sega, TJanus* janus) {
+
+  if(sega && janus) {
+    obj.FillHistogram("tdiff","sega_janus_tdiff",
+                      1000, -5000, 5000, sega->Timestamp() - janus->Timestamp());
+
+    for(int i=0; i<sega->Size(); i++){
+      TSegaHit& hit = sega->GetSegaHit(i);
+      obj.FillHistogram("tdiff","sega_detnum_janus_tdiff",
+                        16, 1, 17, hit.GetDetnum(),
+                        1000, -5000, 5000, hit.Timestamp() - janus->Timestamp());
+    }
+  }
+
   long crate1_ts = -1;
   long crate2_ts = -1;
   long crate3_ts = -1;
   long analog_ts = -1;
+  std::map<int,long> source_ids;
+
   if(janus){
     analog_ts = janus->Timestamp();
+    source_ids[4] = analog_ts;
   }
   if(sega){
     for(int i=0; i<sega->Size(); i++){
@@ -648,51 +561,40 @@ void MakeTimestampDiffs(TRuntimeObjects& obj, TSega* sega, TJanus* janus) {
       } else if(hit.GetCrate()==3){
         crate3_ts = hit.Timestamp();
       }
+
+      source_ids[hit.GetCrate()] = hit.Timestamp();
     }
   }
+
+  for(auto& item : source_ids) {
+    obj.FillHistogram("tdiff","timestamp_sourceid",
+                      2.141e14/60e9, 0, 2.141e14, item.second,
+                      4, 1, 5, item.first);
+  }
+
+
   if(crate1_ts!=-1 && crate2_ts!=-1){
-    obj.FillHistogram("tdiff_crate1_crate2",
+    obj.FillHistogram("tdiff","crate1_crate2",
                       600, -3000, 3000, crate2_ts - crate1_ts);
   }
   if(crate1_ts!=-1 && crate3_ts!=-1){
-    obj.FillHistogram("tdiff_crate1_crate3",
+    obj.FillHistogram("tdiff", "crate1_crate3",
                       600, -3000, 3000, crate3_ts - crate1_ts);
   }
   if(crate2_ts!=-1 && crate3_ts!=-1){
-    obj.FillHistogram("tdiff_crate2_crate3",
+    obj.FillHistogram("tdiff", "crate2_crate3",
                       600, -3000, 3000, crate3_ts - crate2_ts);
   }
   if(analog_ts!=-1 && crate1_ts!=-1){
-    obj.FillHistogram("tdiff_analog_crate1",
+    obj.FillHistogram("tdiff", "analog_crate1",
                       600, -3000, 3000, analog_ts - crate1_ts);
   }
   if(analog_ts!=-1 && crate2_ts!=-1){
-    obj.FillHistogram("tdiff_analog_crate2",
+    obj.FillHistogram("tdiff", "analog_crate2",
                       600, -3000, 3000, analog_ts - crate2_ts);
   }
   if(analog_ts!=-1 && crate3_ts!=-1){
-    obj.FillHistogram("tdiff_analog_crate3",
+    obj.FillHistogram("tdiff", "analog_crate3",
                       600, -3000, 3000, analog_ts - crate3_ts);
-  }
-
-  if(crate1_ts!=-1){
-    obj.FillHistogram("timestamp_sourceid",
-                      1000000, 0, 1000e9, crate1_ts,
-                      4, 1, 5, 1);
-  }
-  if(crate2_ts!=-1){
-    obj.FillHistogram("timestamp_sourceid",
-                      1000000, 0, 1000e9, crate2_ts,
-                      4, 1, 5, 2);
-  }
-  if(crate3_ts!=-1){
-    obj.FillHistogram("timestamp_sourceid",
-                      1000000, 0, 1000e9, crate3_ts,
-                      4, 1, 5, 3);
-  }
-  if(analog_ts!=-1){
-    obj.FillHistogram("timestamp_sourceid",
-                      1000000, 0, 1000e9, analog_ts,
-                      4, 1, 5, 4);
   }
 }

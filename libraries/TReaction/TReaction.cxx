@@ -25,31 +25,31 @@ ClassImp(TReaction)
     fTBeam = beame;
     fQVal = (fM[0]+fM[1])-(fM[2]+fM[3])-ex3;  // effective Q value (includes excitation)
     fExc = ex3;
-    fInverse = inverse;    
+    fInverse = inverse;
 
     if(inverse)
       SetName(Form("%s(%s,%s)%s",beam,targ,ejec,reco));
     else
-      SetName(Form("%s(%s,%s)%s",targ,beam,ejec,reco));  
+      SetName(Form("%s(%s,%s)%s",targ,beam,ejec,reco));
 
-    InitReaction();  
+    InitReaction();
   }
 
 
 void TReaction::InitReaction(){
 
   // An initializing function that sets the energies and momenta of the beam and target in the lab and CM frame,
-  // as well as a few basic calculations.       
+  // as well as a few basic calculations.
 
   fTLab[0] = fTBeam;                                    // target kinetic energy is ebeam
   fELab[0] = fTLab[0] + fM[0];                          // total E of beam in lab
   fPLab[0] = sqrt(pow(fTLab[0],2)+2*fTLab[0]*fM[0]);    // momentum of beam in lab
-  fVLab[0] = fPLab[0]/fELab[0];                         // velocity of beam in lab 
+  fVLab[0] = fPLab[0]/fELab[0];                         // velocity of beam in lab
   fGLab[0] = 1/sqrt(1-pow(fVLab[0],2));                 // gamma factor of beam
 
   fTLab[1] = 0;                                         // target kinetic energy is always 0
   fELab[1] = fM[1];                                     // total E of target in lab
-  fPLab[1] = 0;                                         // momentum of target in lab  
+  fPLab[1] = 0;                                         // momentum of target in lab
   fVLab[1] = 0;                                         // velocity of target in lab
   fGLab[1] = 1;                                         // gamma factor of target
 
@@ -59,22 +59,22 @@ void TReaction::InitReaction(){
   // CM motion
   fCmE = fInvariantMass;
   fCmTi = fCmE - fM[0] - fM[1];
-  fCmTf = fCmTi + fQVal; 
+  fCmTf = fCmTi + fQVal;
   fCmV = fPLab[0]/(fELab[0]+fM[1]);
   fCmP = fCmV*fCmE;
   fCmG = 1/sqrt(1-pow(fCmV,2));
 
-  // take care of particles in CM frame using the reaction excitation energy 
+  // take care of particles in CM frame using the reaction excitation energy
   SetCmFrame(fExc);
 
   // options to make graphs draw nicely
   gStyle->SetTitleYOffset(1.5);
-  gStyle->SetTitleXOffset(1.2); 
+  gStyle->SetTitleXOffset(1.2);
   gStyle->SetDrawOption("AC");
 
 }
 
-double TReaction::GetTBeam(bool inverse) { 
+double TReaction::GetTBeam(bool inverse) {
   if(fInverse || inverse)
     return (fGLab[0]-1)*fM[1];
   else
@@ -85,8 +85,8 @@ void TReaction::SetCmFrame(double exc){
 
   // particles in CM frame
   fPCm[0] = sqrt((fS-pow(fM[0]-fM[1],2)) * (fS-pow(fM[0]+fM[1],2)))/(2*sqrt(fS));
-  fPCm[1] = fPCm[0]; 
-  fPCm[2] = sqrt((fS-pow(exc+fM[2]-fM[3],2)) * (fS-pow(exc+fM[2]+fM[3],2)))/(2*sqrt(fS)); 
+  fPCm[1] = fPCm[0];
+  fPCm[2] = sqrt((fS-pow(exc+fM[2]-fM[3],2)) * (fS-pow(exc+fM[2]+fM[3],2)))/(2*sqrt(fS));
   fPCm[3] = fPCm[2];
 
   for(int i=0; i<4; i++){
@@ -101,12 +101,12 @@ void TReaction::SetCmFrame(double exc){
     else{
       double val = fPCm[i]/(fM[i]*fCmV*fCmG);
       if(val<1)
-        fThetaMax[i] = asin(val);                       
+        fThetaMax[i] = asin(val);
       else if(val<1.001) // catches elastic channels with small numerical rounding errors
         fThetaMax[i] = PI/2;
-      else      
+      else
         fThetaMax[i] = PI;
-    }   
+    }
   }
 }
 
@@ -121,7 +121,7 @@ double TReaction::GetELabFromThetaCm(double theta_cm, int part){
 double TReaction::GetTLabFromThetaCm(double theta_cm, int part){
   if(part==0 || part==1) return fTLab[part];
 
-  double ELab = GetELabFromThetaCm(theta_cm,part);              
+  double ELab = GetELabFromThetaCm(theta_cm,part);
   return ELab-fM[part]; // T = E - M
 }
 
@@ -151,13 +151,13 @@ double TReaction::GetGLabFromThetaCm(double theta_cm, int part){
 
 double TReaction::GetExcEnergy(double ekin, double theta_lab, int part){
   if(ekin==0.00 && theta_lab==0.00)
-    return fExc; 
+    return fExc;
 
   double val1 = pow(fM[0]+fM[1],2)+pow(fM[2],2)+2*fM[1]*fTLab[0];
   double val2 = 2*fCmG*sqrt(pow(fM[0]+fM[1],2)+2*fM[1]*fTLab[0]);
   double val3 = fM[2] + ekin - fCmV*sqrt(pow(ekin,2)+2*fM[2]*ekin)*TMath::Cos(theta_lab);
 
-  return sqrt(val1-val2*val3)-fM[3];  
+  return sqrt(val1-val2*val3)-fM[3];
 }
 
 void TReaction::AnalysisAngDist(double ekin, double theta_lab, int part, double &exc, double &theta_cm, double &omega_lab2cm){
@@ -171,7 +171,7 @@ void TReaction::AnalysisAngDist(double ekin, double theta_lab, int part, double 
   omega_lab2cm = ConvertOmegaLabToCm(theta_lab,part);
 
   // reset the cm frame to normal
-  SetCmFrame(fExc); 
+  SetCmFrame(fExc);
 }
 
 double TReaction::AnalysisBeta(double ekin, int part){
@@ -186,7 +186,7 @@ double TReaction::GetRutherfordCm(double theta_cm, int part, bool Units_mb){
   static const double alpha = 1.29596;//0.359994;
   double scale = 1;
   if(!Units_mb)
-    scale = 0.1; // fm^2 = 10^-30 m^2, mb = 10^-31 m^2  
+    scale = 0.1; // fm^2 = 10^-30 m^2, mb = 10^-31 m^2
   // motion is described in lab frame (so TLab instead of TCm) because
   // Rutherford scattering approximates lab frame == cm frame
   /*
@@ -195,7 +195,7 @@ double TReaction::GetRutherfordCm(double theta_cm, int part, bool Units_mb){
      return scale*alpha*a*b/pow(sin(theta_cm/2),4); // ?
      */
   double a = pow(fNuc[0]->GetZ()*fNuc[1]->GetZ()/fTLab[0],2);
-  return scale*alpha*a/pow(sin(theta_cm/2),4); // ?  
+  return scale*alpha*a/pow(sin(theta_cm/2),4); // ?
 }
 
 double TReaction::GetRutherfordLab(double theta_lab, int part, bool Units_mb){
@@ -206,6 +206,17 @@ double TReaction::GetRutherfordLab(double theta_lab, int part, bool Units_mb){
 }
 
 
+double TReaction::ConvertThetaLab(double theta_lab_a, int parta, int partb) {
+  double theta_cm_a = ConvertThetaLabToCm(theta_lab_a, parta);
+
+  if(parta==3) {
+    theta_cm_a = -theta_cm_a;
+  }
+
+  double theta_cm_b = TMath::Pi() - theta_cm_a;
+  double theta_lab_b = ConvertThetaCmToLab(theta_cm_b, partb);
+  return theta_lab_b;
+}
 
 // Conversion from LAB frame to CM frame
 double TReaction::ConvertThetaLabToCm(double theta_lab, int part){
@@ -213,7 +224,7 @@ double TReaction::ConvertThetaLabToCm(double theta_lab, int part){
   if(theta_lab>fThetaMax[part])
     theta_lab = fThetaMax[part];
 
-  // Uses the particle velocity in the CM frame, which makes it more complex  
+  // Uses the particle velocity in the CM frame, which makes it more complex
   double gtan2 = pow(tan(theta_lab)*fCmG,2);
   double x = fCmV/fVCm[part];
   double expr = sqrt(1+gtan2*(1-pow(x,2)));
@@ -223,7 +234,7 @@ double TReaction::ConvertThetaLabToCm(double theta_lab, int part){
   if(tan(theta_lab)>=0)
     theta_cm = acos((-x*gtan2 + expr)/(1 + gtan2));
   else
-    theta_cm = acos((-x*gtan2 - expr)/(1 + gtan2));  
+    theta_cm = acos((-x*gtan2 - expr)/(1 + gtan2));
 
   if(fInverse)
     theta_cm = PI - theta_cm;
@@ -231,7 +242,7 @@ double TReaction::ConvertThetaLabToCm(double theta_lab, int part){
   if(part==3)
     theta_cm = -theta_cm;
 
-  return theta_cm;      
+  return theta_cm;
 }
 
 // dOmegaLab/dOmegaCm[ThetaLab,ThetaCm]
@@ -248,7 +259,7 @@ void TReaction::ConvertLabToCm(double theta_lab, double omega_lab, double &theta
   return;
 }
 
-// Conversion from CM frame to LAB frame 
+// Conversion from CM frame to LAB frame
 double TReaction::ConvertThetaCmToLab(double theta_cm, int part){
 
   if(fInverse)
@@ -258,7 +269,7 @@ double TReaction::ConvertThetaCmToLab(double theta_cm, int part){
 
   if(theta_lab>fThetaMax[part])
     return fThetaMax[part];
-  else  
+  else
     return theta_lab;
 }
 
@@ -272,7 +283,7 @@ double TReaction::ConvertOmegaCmToLab(double theta_cm, int part){
   double val2 = (fCmG*(1+x*cos(theta_cm)));
 
   return val1/val2;
-}       
+}
 
 void TReaction::ConvertCmToLab(double theta_cm, double omega_cm, double &theta_lab, double &omega_lab, int part){
   theta_lab = ConvertThetaCmToLab(theta_cm,part);
@@ -288,19 +299,19 @@ void TReaction::ConvertCmToLab(double theta_cm, double omega_cm, double &theta_l
 
 // Theta (lab frame part 2) versus theta (lab frame part 3)
 TGraph *TReaction::ThetaLabVsThetaLab(int parta, int partb) {
-  TGraph* g = new TGraph(181);
+  int max_angle = fThetaMax[parta]*TMath::RadToDeg();
+
+  TGraph* g = new TGraph(max_angle-1);
   g->SetName(Form("Theta Lab %s vs Theta Lab %s", fNuc[parta]->GetName(), fNuc[partb]->GetName()));
   g->GetXaxis()->SetTitle(Form("Theta Lab %s", fNuc[parta]->GetName()));
   g->GetYaxis()->SetTitle(Form("Theta Lab %s", fNuc[partb]->GetName()));
 
-  for(int i=0; i<=180; i++) {
-    double theta_lab_a = i*TMath::DegToRad();
-    double theta_cm_a = ConvertThetaLabToCm(theta_lab_a, parta);
-    double theta_cm_b = TMath::Pi() - theta_cm_a;
-    double theta_lab_b = ConvertThetaCmToLab(theta_cm_b, partb);
+  for(int i=1; i<max_angle; i++) {
+    double theta_lab_a = (i-1)*TMath::DegToRad();
+    double theta_lab_b = ConvertThetaLab(theta_lab_a, parta, partb);
     g->SetPoint(i, theta_lab_a*TMath::RadToDeg(), theta_lab_b*TMath::RadToDeg());
   }
-  
+
   return g;
 }
 
@@ -312,14 +323,14 @@ TGraph *TReaction::KinVsTheta(double thmin, double thmax, int part, bool Frame_L
   g->SetName(Form("KinVsTheta%s_%s",frame,GetName()));
   g->SetTitle(Form("Kinematics for %s; Theta_{%s} [deg]; Kinetic energy [%s]",GetName(),frame,Units_keV?"keV":"MeV"));
 
-  double theta, T;      
+  double theta, T;
 
   for(int i=0; i<=180; i++){
     theta = (double)i; // always in CM frame since function is continuous
 
     T = GetTLabFromThetaCm(theta*D2R,part);
     if(Units_keV)
-      T *=1e3;  
+      T *=1e3;
 
     if(Frame_Lab){ // this is now converted to specified frame (from Frame_Lab)
       theta = ConvertThetaCmToLab(theta*D2R,part)*R2D;
@@ -327,8 +338,8 @@ TGraph *TReaction::KinVsTheta(double thmin, double thmax, int part, bool Frame_L
       //        continue;
     }
 
-    if(theta<thmin || theta>thmax) 
-      continue;         // set angular range                            
+    if(theta<thmin || theta>thmax)
+      continue;         // set angular range
     g->SetPoint(i,theta,T);
   }
 
@@ -344,7 +355,7 @@ TGraph *TReaction::ThetaVsTheta(double thmin, double thmax, int part, bool Frame
   g->SetName(Form("ThetaVsTheta%s_%s",frame,GetName()));
   g->SetTitle(Form("Angle conversion for %s; Theta_{%s} [deg]; Theta_{%s} [deg]",GetName(),frame,other));
 
-  double theta_cm, theta_lab;   
+  double theta_cm, theta_lab;
 
   for(int i=0; i<=180; i++){
     theta_cm = (double)i; // always in CM frame
@@ -354,7 +365,7 @@ TGraph *TReaction::ThetaVsTheta(double thmin, double thmax, int part, bool Frame
       continue;
     else if(!Frame_Lab && (theta_cm<thmin || theta_cm>thmax))
       continue;
-    // set angular range        
+    // set angular range
 
     if(Frame_Lab) // this is now converted to specified frame (from Frame_Lab)
       g->SetPoint(i,theta_lab,theta_cm);
@@ -374,7 +385,7 @@ TGraph *TReaction::OmegaVsTheta(double thmin, double thmax, int part, bool Frame
   g->SetName(Form("%s_OmegaVsTheta%s",GetName(),frame));
   g->SetTitle(Form("Solid angle conversion for %s; Theta_{%s} [deg]; dOmega_{%s} / dOmega_{%s}",GetName(),frame,other,frame));
 
-  double theta, Om;     
+  double theta, Om;
   for(int i=0; i<=180; i++){
 
     theta = (double)i; // always in CM frame
@@ -383,10 +394,10 @@ TGraph *TReaction::OmegaVsTheta(double thmin, double thmax, int part, bool Frame
     if(Frame_Lab){ // this is now converted to specified frame (from Frame_Lab)
       theta = ConvertThetaCmToLab(theta*D2R,part)*R2D;
       Om = 1/Om;
-    } 
+    }
 
     //  printf("Theta_%s = %2f deg \t dOmega%s/dOmega%s = %.2e\n",frame,theta,other,frame,Om);
-    if(theta<thmin || theta>thmax || Om>1e3 )//|| Om<=0 || isnan(Om) || isinf(Om)) 
+    if(theta<thmin || theta>thmax || Om>1e3 )//|| Om<=0 || isnan(Om) || isinf(Om))
       continue;         // set angular range and remove singularities
     g->SetPoint(g->GetN(),theta,Om);
   }
@@ -402,7 +413,7 @@ TGraph *TReaction::RutherfordVsTheta(double thmin, double thmax, int part, bool 
   g->SetName(Form("%s_RutherfordVsTheta%s",GetName(),frame));
   g->SetTitle(Form("Rutherford cross section for %s; Theta_{%s} [deg]; dSigma / dOmega_{%s} [%s/sr]",GetName(),frame,frame,Units_mb?"mb":"fm^2"));
 
-  double theta, R;      
+  double theta, R;
 
   for(int i=1; i<=180; i++){
     theta = (double)i; // always in CM frame
@@ -414,8 +425,8 @@ TGraph *TReaction::RutherfordVsTheta(double thmin, double thmax, int part, bool 
       theta = ConvertThetaCmToLab(theta*D2R,part)*R2D;
     }
 
-    if(theta<thmin || theta>thmax) 
-      continue;         // set angular range                    
+    if(theta<thmin || theta>thmax)
+      continue;         // set angular range
     g->SetPoint(g->GetN(),theta,R);
   }
 
@@ -423,7 +434,7 @@ TGraph *TReaction::RutherfordVsTheta(double thmin, double thmax, int part, bool 
 }
 
 
-void TReaction::Print(Option_t *opt) const { 
+void TReaction::Print(Option_t *opt) const {
 
   std::string pstring;
   pstring.assign(opt);
@@ -440,10 +451,10 @@ void TReaction::Print(Option_t *opt) const {
   }
 
   printf("\n Center of mass motion :- \n");
-  printf("\t CmE  = %.4e [MeV]\n\t CmTi = %.4e [MeV]\n\t CmTf = %.4e [MeV]\n\t CmV  = %.4e [/c]\n\t CmP  = %.4e [MeV/c]\n\t CmG  = %.4e \n\n",fCmE,fCmTi,fCmTf,fCmV,fCmP,fCmG);         
+  printf("\t CmE  = %.4e [MeV]\n\t CmTi = %.4e [MeV]\n\t CmTf = %.4e [MeV]\n\t CmV  = %.4e [/c]\n\t CmP  = %.4e [MeV/c]\n\t CmG  = %.4e \n\n",fCmE,fCmTi,fCmTf,fCmV,fCmP,fCmG);
 
   if(pstring.find("all")!=std::string::npos){
-    for(int i=0; i<4; i++){     
+    for(int i=0; i<4; i++){
       printf("\n Particle %i : '%s' : \t A = %i, Z = %i, Mass = %.4e [MeV]\n",i,fNuc[i]->GetName(),fNuc[i]->GetA(),fNuc[i]->GetZ(),fM[i]);
 
       if(i<2){
@@ -459,9 +470,9 @@ void TReaction::Print(Option_t *opt) const {
         printf("\t PCm = %.4e [MeV/c]\t PLab = N/A       \n",fPCm[i]);
         printf("\t GCm = %.4e \t\t GLab = N/A       \n",fGCm[i]);
         printf("\t\t ThetaLab_max = %.2f [deg]\n",fThetaMax[i]*R2D);
-      }                                 
-    }   
-  }     
+      }
+    }
+  }
   printf("\n\n * * * * * * * * * * * * * * * * * * * * * * * * *\n\n");
 
   return;
@@ -476,11 +487,11 @@ void TReaction::Clear(Option_t *opt) {
   fInverse = false;
 
   fCmTi = 0;
-  fCmTf = 0;    
+  fCmTf = 0;
   fCmE = 0;
   fCmV = 0;
   fCmP = 0;
-  fCmG = 0;                     
+  fCmG = 0;
 
   for(int i=0; i<4; i++){
 
@@ -498,10 +509,8 @@ void TReaction::Clear(Option_t *opt) {
       fELab[i] = 0;
       fVLab[i] = 0;
       fPLab[i] = 0;
-      fGLab[i] = 0;             
+      fGLab[i] = 0;
     }
   }
   return;
 }
-
-
