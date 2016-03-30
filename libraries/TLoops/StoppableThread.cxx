@@ -21,12 +21,9 @@ StoppableThread::StoppableThread(std::string name)
   //TODO: check if a thread already exists and delete?
   fthreadmap.insert(std::make_pair(fname,this));
   thread = std::thread(&StoppableThread::Loop, this);
-  if(!status_thread_on)
+  if(!status_thread_on) {
     start_status_thread();
-  //items_in  = 0;
-  //items_out = 0;
-  //rate      = 0;
-
+  }
 }
 
 

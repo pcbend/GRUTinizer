@@ -34,7 +34,7 @@ public:
   void SetReplaceVariable(const char* name, double value);
   void RemoveVariable(const char* name);
 
-  void SetDefaultDirectory(TDirectory* dir) { default_directory = dir; }
+  void SetDefaultDirectory(TDirectory* dir);
   TDirectory* GetDefaultDirectory() { return default_directory; }
 
   void ClearHistograms();
