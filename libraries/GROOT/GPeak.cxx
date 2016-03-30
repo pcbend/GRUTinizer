@@ -209,7 +209,7 @@ bool GPeak::InitParams(TH1 *fithist){
 
 
 
-  TF1::Print();
+  //TF1::Print();
 
   SetInitialized();
   return true;
@@ -288,12 +288,12 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   fArea -= bgArea;
 
   if(!verbose) {
-    Print();
+    Print();/*
     printf("BG Area:         %.02f\n",bgArea);
     printf("GetChisquared(): %.4f\n", TF1::GetChisquare());
     printf("GetNDF():        %i\n",   TF1::GetNDF());
-    printf("GetProb():       %.4f\n", TF1::GetProb());
-    TF1::Print();
+    printf("GetProb():       %.4f\n", TF1::GetProb());*/
+    //TF1::Print();
   }
   
   //printf("fithist->GetListOfFunctions()->FindObject(this) = 0x%08x\n",fithist->GetListOfFunctions()->FindObject(GetName()));
@@ -338,9 +338,10 @@ void GPeak::Print(Option_t *opt) const {
   printf("Centroid:  %1f +/- %1f \n", this->GetParameter("centroid"),this->GetParError(GetParNumber("centroid")));
   printf("Area:      %1f +/- %1f \n", fArea, fDArea);
   printf("FWHM:      %1f +/- %1f \n",this->GetFWHM(),this->GetFWHMErr());
+  printf("Reso:      %1f%%  \n",this->GetFWHM()/this->GetParameter("centroid")*100.);
   printf("Chi^2/NDF: %1f\n",fChi2/fNdf);
   if(options.Contains("+")){
-    TF1::Print(opt);
+    //TF1::Print(opt);
   }
   printf(RESET_COLOR);
 }
