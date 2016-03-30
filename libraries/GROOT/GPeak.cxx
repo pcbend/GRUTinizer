@@ -89,6 +89,19 @@ GPeak::~GPeak() {
   //  delete background;
 }
 
+//void GPeak::Fcn(Int_t &npar,Double_t *gin,Double_T &f,Double_t *par,Int_t iflag) {
+  //chisquared calculator 
+  //
+//  int i=0;
+//  double chisq = 0;
+//  double delta = 0;
+//  for(i=0;i<nbins;i++) {
+//    delta = (data[i] - GRootFunctions::PhotoPeakBG((x+i),par))/error[i];
+//    chisq += delta*delta;
+//  }
+//  f=chisq;
+//}
+
 void GPeak::InitNames(){
   TF1::SetParName(0,"Height");
   TF1::SetParName(1,"centroid");
@@ -105,6 +118,11 @@ void GPeak::InitNames(){
 }
 
 void GPeak::Copy(TObject &obj) const {
+  //printf("0x%08x\n",&obj);
+  //fflush(stdout);
+  //printf("%s\n",obj.GetName());
+  //fflush(stdout);
+
   TF1::Copy(obj);
   ((GPeak&)obj).init_flag = init_flag;
   ((GPeak&)obj).fArea     = fArea;
@@ -161,8 +179,8 @@ bool GPeak::InitParams(TH1 *fithist){
   TF1::SetParLimits(2,0.1,xhigh-xlow);
   TF1::SetParLimits(3,0.000,25);
   TF1::SetParLimits(4,0.01,5); 
-  double step = ((highy-lowy)/largesty)*100;
-  TF1::SetParLimits(5,step-step/2.,2*step); 
+  double step = ((highy-lowy)/largesty)*50;
+  TF1::SetParLimits(5,step-step*.1,step+.1*step); 
   //double slope  = (yhigh-ylow)/(xhigh-xlow);
   //double offset = yhigh-slope*xhigh;
   double offset = lowy;
@@ -208,7 +226,8 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
 
   bool verbose = !options.Contains("Q");
 
-  fithist->Sumw2();
+  if(fithist->GetSumw2()->fN!=fithist->GetNbinsX()+2) 
+    fithist->Sumw2();
 
   TFitResultPtr fitres = fithist->Fit(this,Form("%sLRSME",options.Data()));
 
@@ -225,27 +244,24 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   //TF1::Print();
 
 
-  Double_t binwidth = fithist->GetBinWidth(GetParameter("centroid"));
+  //Double_t binwidth = fithist->GetBinWidth(GetParameter("centroid"));
   Double_t width    = TF1::GetParameter("sigma");
   Double_t xlow,xhigh;
-  Double_t int_low,int_high;
+  //Double_t int_low,int_high;
   TF1::GetRange(xlow,xhigh);
-  int_low  = xlow - 5.*width;
-  int_high = xhigh +5.*width;
+  //int_low  = xlow - 5.*width;
+  //int_high = xhigh +5.*width;
 
   //Make a function that does not include the background
   //Intgrate the background.
-  GPeak *tmppeak = new GPeak;
-  this->Copy(*tmppeak);
-  //tmppeak->SetParameter("step",0.0);
-  //tmppeak->SetParameter("A",0.0);
-  //tmppeak->SetParameter("B",0.0);
-  //tmppeak->SetParameter("C",0.0);
-  tmppeak->SetParameter("bg_offset",0.0);
-  tmppeak->SetRange(int_low,int_high);//This will help get the true area of the gaussian 200 ~ infinity in a gaus
-  tmppeak->SetName("tmppeak");
+  //GPeak *tmppeak = new GPeak;
+  //this->Copy(*tmppeak);
+  
+  //tmppeak->SetParameter("bg_offset",0.0);
+  //tmppeak->SetRange(int_low,int_high);//This will help get the true area of the gaussian 200 ~ infinity in a gaus
+  //tmppeak->SetName("tmppeak");
 
-  fArea = (tmppeak->Integral(int_low,int_high))/binwidth;
+  //fArea = (tmppeak->Integral(int_low,int_high))/binwidth;
 //  TMatrixDSym CovMat = fitres->GetCovarianceMatrix();
 //  CovMat(6,6) = 0.0;
 //  CovMat(7,7) = 0.0;
@@ -253,8 +269,7 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
 //  CovMat(9,9) = 0.0;
 
 //  fDArea = (tmppeak->IntegralError(int_low,int_high,tmppeak->GetParameters(),CovMat.GetMatrixArray()))/binwidth;
-  if(!verbose)
-    Print();
+
 
   double bgpars[5];
   bgpars[0] = TF1::GetParameters()[0];
@@ -264,10 +279,30 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   bgpars[4] = TF1::GetParameters()[6];
   //bgpars[5] = TF1::GetParameters()[7];
 
- 
   fBGFit.SetParameters(bgpars);
-  Copy(*fithist->GetListOfFunctions()->Last());
-  delete tmppeak;
+  //fithist->GetListOfFunctions()->Print();
+
+
+  fArea = this->Integral(xlow,xhigh);
+  double bgArea = fBGFit.Integral(xlow,xhigh);
+  fArea -= bgArea;
+
+  if(!verbose) {
+    Print();
+    printf("BG Area:         %.02f\n",bgArea);
+    printf("GetChisquared(): %.4f\n", TF1::GetChisquare());
+    printf("GetNDF():        %i\n",   TF1::GetNDF());
+    printf("GetProb():       %.4f\n", TF1::GetProb());
+    TF1::Print();
+  }
+  
+  //printf("fithist->GetListOfFunctions()->FindObject(this) = 0x%08x\n",fithist->GetListOfFunctions()->FindObject(GetName()));
+  //fflush(stdout);
+  Copy(*fithist->GetListOfFunctions()->FindObject(GetName()));
+  fithist->GetListOfFunctions()->Add(fBGFit.Clone());
+
+
+  //delete tmppeak;
   return true;
 }
 

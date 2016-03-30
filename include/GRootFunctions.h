@@ -13,6 +13,10 @@ namespace GRootFunctions {
   Double_t Gaus(Double_t *dim, Double_t *par);
   Double_t SkewedGaus(Double_t *dim, Double_t *par);
   Double_t Efficiency(Double_t *dim, Double_t *par);
+
+  Double_t LanGaus(Double_t *dim,Double_t *par);
+  Double_t LanGausHighRes(Double_t *dim,Double_t *par);
+
 }
 
 #endif
