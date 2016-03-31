@@ -25,6 +25,10 @@ public:
 
   virtual void SetRunStart(unsigned int unix_time);
 
+  // Allows for looping over all hits with for(auto& hit : janus) { }
+  std::vector<TJanusHit>::iterator begin() { return janus_hits.begin(); }
+  std::vector<TJanusHit>::iterator end() { return janus_hits.end(); }
+
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 

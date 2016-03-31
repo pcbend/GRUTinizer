@@ -24,6 +24,10 @@ public:
   static TVector3 GetSegmentPosition(int detnum, int segnum);
   static TVector3 CrystalToGlobal(int detnum, TVector3 crystal_pos);
 
+  // Allows for looping over all hits with for(auto& hit : sega) { }
+  std::vector<TSegaHit>::iterator begin() { return sega_hits.begin(); }
+  std::vector<TSegaHit>::iterator end() { return sega_hits.end(); }
+
 private:
   virtual int BuildHits(std::vector<TRawEvent>& raw_data);
   static void LoadDetectorPositions();

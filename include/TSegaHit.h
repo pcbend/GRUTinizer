@@ -48,7 +48,9 @@ public:
 
   TVector3 GetPosition(bool apply_array_offset = true) const;
 
-  double GetDoppler(double beta,const TVector3& vec = TVector3(0,0,1)) const;
+  double GetDoppler(double beta,
+                    const TVector3& particle_vec = TVector3(0,0,1),
+                    const TVector3& sega_offset = TVector3(0,0,0)) const;
 
   double GetTraceHeight() const;
   double GetTraceHeightDoppler(double beta,const TVector3& vec = TVector3(0,0,1)) const;
