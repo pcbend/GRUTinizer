@@ -44,7 +44,7 @@ void GValue::SetReplaceValue(std::string name, double value,
   if(!gvalue) {
     gvalue = new GValue(name.c_str(), value, priority);
     AddValue(gvalue);
-  } else if (gvalue->fPriority <= priority) {
+  } else if (priority <= gvalue->fPriority) {
     gvalue->SetValue(value);
     gvalue->fPriority = priority;
   }

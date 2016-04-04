@@ -849,10 +849,24 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       SetMarkerMode(false);
     case kKey_n:
       RemoveMarker("all");
-      for(unsigned int i=0;i<hists.size();i++)
-        hists.at(i)->GetListOfFunctions()->Delete();
+      for(unsigned int i=0;i<hists.size();i++) {
+        hists.at(i)->GetListOfFunctions()->Clear();
+      }
       RemovePeaks(hists.data(),hists.size());
       edited = true;
+      break;
+    case kKey_N:
+      RemoveMarker("all");
+      for(unsigned int i=0;i<hists.size();i++) {
+        hists.at(i)->GetListOfFunctions()->Clear();
+      }
+      RemovePeaks(hists.data(),hists.size());
+      this->Clear();
+      hists.at(0)->Draw("hist");
+      for(unsigned int i=1;i<hists.size();i++) {
+        hists.at(i)->Draw("histsame");
+      }
+      edited=true;
       break;
     case kKey_o:
       for(unsigned int i=0;i<hists.size();i++) {
@@ -931,6 +945,26 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       }
     }
       break;
+  case kKey_q:{
+    TH1* ghist = hists.at(0);
+    if(GetNMarkers()>1) {
+      
+      edited = PhotoPeakFit(ghist,fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
+    }
+    if(edited){
+      ghist->Draw("hist");
+    
+      TIter iter(ghist->GetListOfFunctions());
+      while(TObject *o = iter.Next()){
+	if(o->InheritsFrom(TF1::Class())) {
+	  ((TF1*)o)->Draw("same");
+	}
+      }
+    }
+  }
+    
+    break;
+
     case kKey_r:
        if(GetNMarkers()<2)
           break;

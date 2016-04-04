@@ -127,6 +127,8 @@ Float_t TS800::GetAta(int i){
   if(GValue::Value("ATA_SHIFT"))
     Shift_ata = GValue::Value("ATA_SHIFT");
   
+  //std::cout << " ATA Shift = " << Shift_ata << std::endl;
+
   switch(i){
   case 1: return (fAtaTCL1+Shift_ata);
     break;
@@ -515,7 +517,7 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
   
 
   //printf("-----------------------\n");
-  return 0;
+  return 1;
 }
 
 bool TS800::HandleTrigPacket(unsigned short *data,int size) {
