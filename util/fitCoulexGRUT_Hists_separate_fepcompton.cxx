@@ -15,16 +15,19 @@
 #include "TGraph.h"
 #include "TCanvas.h"
 #include "TLine.h"
+#include "TSpline.h"
 #include "TCutG.h"
 #include "TStyle.h"
 #include "TChannel.h"
 #include "GValue.h"
+#include "TLegend.h"
 
 #include "TCaesarHit.h"
 #include "TS800Hit.h"
 #include "TCaesar.h"
 #include "TS800.h"
 
+#include "GH1D.h"
 //This program takes as input a config file containing:
 //    -  directory containing necessary input root tree files (INPUT_DIR)
 //    -  number of parameters to use in the fit (NUM_PARS)
@@ -336,22 +339,22 @@ int fitCoulex(const char *cfg_file_name){
   
 
     fit_func = FitDoubleExpThreeHist(data_hists.at(angle_index), geant_hists.at(0), geant_hists.at(1), geant_hists.at(2), fit_low_x, fit_high_x, init_pars);
+    GH1D *fit_func_hist = new GH1D(*fit_func, 512,0,8192);
+    TSpline3 *fit_func_spline = new TSpline3(fit_func_hist);
+
     std::cout << "Parameters from Fit Function are: " << std::endl;
+    fit_func->Print();
     
     data_hists.at(angle_index)->SetTitle(Form("Fit to %s with Scatter Cut (< %3.3f)", isotope_name.c_str(),angles.at(angle_index)));
     data_hists.at(angle_index)->GetXaxis()->SetTitle("Energy (keV)");
     data_hists.at(angle_index)->GetYaxis()->SetTitle(Form("Counts / %d keV", kev_per_bin));
 
-    for (int i = 0; i < 3; i++){
-      hist_constant[angle_index][i] = fit_func->GetParameter(i);
-      std::cout << "i = " << i << " angle_index = " << angle_index 
-                << " hist_constant[angle_index][i] = "  
-                << hist_constant[angle_index][i] << std::endl;
-    }
-
     fit_error[angle_index]     = fit_func->GetParError(0); 
     chi_squared[angle_index]   = fit_func->GetChisquare();
 
+    hist_constant[angle_index][0] = fit_func->GetParameter(0);
+    hist_constant[angle_index][1] = fit_func->GetParameter(1);
+    hist_constant[angle_index][2] = fit_func->GetParameter(2);
     //Now we get residuals
     double res_sum = 0;
     double res_sum_in_peak = 0;
@@ -398,9 +401,10 @@ int fitCoulex(const char *cfg_file_name){
     norm_residual_plot->Write();
     data_hists[angle_index]->Write();
 
-    TCanvas *disentangled_can = new TCanvas(Form("dis_can_%f",angles[angle_index]),Form("dis_can_%f",angles[angle_index]), 800,600);
+    TCanvas *disentangled_can = new TCanvas(Form("dis_can_%1.1f",angles[angle_index]),Form("dis_can_%f",angles[angle_index]), 800,600);
     disentangled_can->cd();
-    data_hists[angle_index]->Draw();
+    data_hists[angle_index]->Draw("HIST");
+    data_hists[angle_index]->SetLineWidth(2);
     TLine *fit_low = new TLine(fit_low_x, 0, fit_low_x, 780);
     TLine *fit_high = new TLine(fit_high_x, 0, fit_high_x, 780);
     TLine *peak_low = new TLine(peak_low_x, 0, peak_low_x, 780);
@@ -414,10 +418,17 @@ int fitCoulex(const char *cfg_file_name){
     peak_low->Draw();
     peak_high->Draw();
 
-    geant_hists.at(0)->SetLineColor(kGreen+3);
+    geant_hists.at(0)->SetLineColor(kGreen+2);
     geant_hists.at(1)->SetLineColor(kRed);
     geant_hists.at(2)->SetLineColor(kMagenta);
     used_fit_function->SetLineColor(kBlack);
+    fit_func_spline->SetLineColor(kCyan+2);
+
+    geant_hists.at(0)->SetLineWidth(2);
+    geant_hists.at(1)->SetLineWidth(2);
+    geant_hists.at(2)->SetLineWidth(2);
+    used_fit_function->SetLineWidth(2);
+    fit_func_spline->SetLineWidth(2);
 
     TH1D fep_hist = *((TH1D*)geant_hists.at(0)->Clone("fep_hist"));
     fep_hist.Scale(hist_constant[angle_index][0]);
@@ -436,17 +447,48 @@ int fitCoulex(const char *cfg_file_name){
     else{
       used_fit_function->Draw("same");
     }
-    fit_func->SetNpx(1e6);
-    fit_func->Draw("same");
+//    fit_func->Draw("same");
+    fit_func_spline->SetNpx(1000);
+    fit_func_spline->Draw("same");
+
     out_hist_file->cd();
     gStyle->SetOptStat(0);
     gStyle->SetOptFit(1);
     disentangled_can->Write();
 
+
+    TCanvas *residual_with_hists_can = new TCanvas("res_can", "res_can", 800,600);
+    residual_with_hists_can->Divide(1,2);
+    residual_with_hists_can->cd(1);
+    data_hists[angle_index]->SetLineWidth(3);
+    fit_func_hist->SetLineWidth(3);
+    data_hists[angle_index]->SetLineColor(kBlue);
+    fit_func_hist->SetLineColor(kRed);
+    data_hists[angle_index]->Draw("HIST");
+    TLegend leg(0.5,0.5,1.0,1.0);
+    leg.AddEntry(fit_func_hist, "Fit Function", "l");
+    leg.AddEntry(data_hists[angle_index], "Data", "l");
+    leg.Draw();
+    fit_func_hist->Draw("same");
+    
+    
+    residual_with_hists_can->cd(2);
+    TH1D *res_sub_hist = (TH1D*)data_hists[angle_index]->Clone("res_sub_hist");
+    res_sub_hist->Add(fit_func_hist,-1);
+    res_sub_hist->Draw("HIST");
+    res_sub_hist->SetTitle("Residuals"); 
+
+
+    residual_with_hists_can->Write();
+
+
     delete residual_plot;
     delete norm_residual_plot;
     delete fit_func;
+    delete fit_func_spline;
+    delete fit_func_hist;
     delete disentangled_can;
+    delete residual_with_hists_can;
     if (angle_index % 10 == 0){
       std::cout << " Completed Angle " << angles[angle_index] << std::endl; 
     }

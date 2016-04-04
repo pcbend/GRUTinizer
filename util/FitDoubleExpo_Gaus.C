@@ -388,13 +388,16 @@ TF1 *FitDoubleExpThreeHist(TH1F *hist_to_fit, TH1F *geant_fep, TH1F *geant_compt
     return NULL;
   }
 
-  fitfunc->FixParameter(1,init[1]);
-  for (int i = 4; i < 8; i++){
+//for (int i = 4; i < 8; i++){
+//  fitfunc->FixParameter(i, init[i]);
+//}
+//  fitfunc->FixParameter(1,init[1]);
+  for (int i = 1; i < 8; i++){
     fitfunc->FixParameter(i, init[i]);
   }
 
 //fitfunc->SetParLimits(0, 9e-04, 1.2e-03);
-  fitfunc->SetParLimits(2, 0, 1);
+//fitfunc->SetParLimits(2, 0, 1);
 //fitfunc->SetParLimits(2, 1.0e-04, 2.5e-04);
 //fitfunc->SetParLimits(3, 0.5, 1.5);
 
@@ -416,9 +419,9 @@ TF1 *FitDoubleExpThreeHist(TH1F *hist_to_fit, TH1F *geant_fep, TH1F *geant_compt
   fitfunc->SetParName(7, "2nd Exp. Decay Const  ");
 
   //hist_to_fit->Fit(fitfunc, "PRMEQ");
-  hist_to_fit->Fit(fitfunc, "PMENQ","",gLowX,gUpX);
-  fitfunc_to_draw->SetParameters(fitfunc->GetParameters());
+  hist_to_fit->Fit(fitfunc, "PMEOQ","",gLowX,gUpX);
   fitfunc_to_draw->SetRange(0,4096);
+  fitfunc_to_draw->SetParameters(fitfunc->GetParameters());
   
   return fitfunc_to_draw;
 }
