@@ -83,6 +83,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   if(!gretina || gretina->Size()<1 || gretina->Size()>(7*4)) {
     entry++;
+    printf("Here\n"); fflush(stdout);
     return;
   }
 
