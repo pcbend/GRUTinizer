@@ -358,7 +358,7 @@ void GPeak::Clear(Option_t *opt){
 
 void GPeak::Print(Option_t *opt) const {
   TString options = opt;
-  printf(GREEN "\n");
+  printf(GREEN );
   printf("Name: %s \n", this->GetName());
   printf("Centroid:  %1f +/- %1f \n", this->GetParameter("centroid"),this->GetParError(GetParNumber("centroid")));
   printf("Area:      %1f +/- %1f \n", fArea, fDArea);
@@ -369,6 +369,7 @@ void GPeak::Print(Option_t *opt) const {
     TF1::Print(opt);
   }
   printf(RESET_COLOR);
+  printf("\n");
 }
 
 
