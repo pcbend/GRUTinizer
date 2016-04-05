@@ -108,7 +108,9 @@ public:
 
   double GetExcEnergy(double ekin=0.00, double theta_lab=0.00, int part = 2);
   void AnalysisAngDist(double ekin, double theta_lab, int part, double &exc, double &theta_cm, double &omega_lab2cm);
+
   double AnalysisBeta(double ekin, int part);
+  double AnalysisBetaFromThetaLab(double theta_lab, int part);
 
   double GetRutherfordCm(double theta_cm, int part = 2, bool Units_mb = true);
   double GetRutherfordLab(double theta_lab, int part = 2, bool Units_mb = true);
@@ -136,6 +138,8 @@ public:
   TGraph *OmegaVsTheta(double thmin = 0.0, double thmax = 180.0, int part = 2, bool Frame_Lab = true);
   // Frame_Lab -> dSigma/dThetaLab[ThetaLab]  and     Frame_Cm -> dSigma/dThetaCm[ThetaCm]
   TGraph *RutherfordVsTheta(double thmin = 1.0, double thmax = 179.0, int part = 2, bool Frame_Lab = true, bool Units_mbSr = true);
+
+  TGraph* BetaVsScatteringAngle(int part);
 
   void Print(Option_t *opt="") const;
   void Clear(Option_t *opt="");

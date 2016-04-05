@@ -437,3 +437,8 @@ bool TNucleus::LoadTransitionFile(){
   return true;
 
 }
+
+double TNucleus::GetEnergyFromBeta(double beta) {
+  double gamma = 1/std::sqrt(1-beta*beta);
+  return fMass * (gamma-1);
+}
