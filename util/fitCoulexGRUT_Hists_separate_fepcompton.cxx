@@ -120,8 +120,8 @@ int fitCoulex(const char *cfg_file_name){
   //All Variables
   const int MAX_PARS = 10;
   //These angles determine the maximum angle cut that will be used
-  const double START_ANGLE = 1.0;
-  const double FINAL_ANGLE = 3.5;
+  const double START_ANGLE = 3.0;
+  const double FINAL_ANGLE = 3.0;
   const double ANGLE_STEPS = 0.5;
   const int TOTAL_ANGLES = (FINAL_ANGLE-START_ANGLE)/ANGLE_STEPS + 1;
 
@@ -370,7 +370,7 @@ int fitCoulex(const char *cfg_file_name){
       if (bin_centers[bin-start_bin] >= peak_low_x  && bin_centers[bin-start_bin] <= peak_high_x){
         TH1D geant_compton_hist1 = *((TH1D*)geant_hists.at(1)->Clone("geant_compton_hist1"));
         TH1D geant_compton_hist2 = *((TH1D*)geant_hists.at(3)->Clone("geant_compton_hist2"));
-        geant_compton_hist1.Scale(hist_constant[angle_index][1]);
+        geant_compton_hist1.Scale(hist_constant[angle_index][1]*hist_constant[angle_index][0]);
         geant_compton_hist2.Scale(hist_constant[angle_index][2]);
         peak_sum[angle_index] += (fit_func->Eval(bin_centers[bin-start_bin])
                                   - used_fit_function->Eval(bin_centers[bin-start_bin]) 
@@ -424,7 +424,7 @@ int fitCoulex(const char *cfg_file_name){
     fep_hist.Draw("same");
 
     TH1D compton_hist = *((TH1D*)geant_hists.at(1)->Clone("compton_hist"));
-    compton_hist.Scale(hist_constant[angle_index][1]);
+    compton_hist.Scale(hist_constant[angle_index][1]*hist_constant[angle_index][0]);
     compton_hist.Draw("same");
 
     TH1D second_2plus_hist = *((TH1D*)geant_hists.at(2)->Clone("second_2plus_hist"));
@@ -436,6 +436,8 @@ int fitCoulex(const char *cfg_file_name){
     else{
       used_fit_function->Draw("same");
     }
+    fit_func->SetNpx(1e6);
+    fit_func->Draw("same");
     out_hist_file->cd();
     gStyle->SetOptStat(0);
     gStyle->SetOptFit(1);
