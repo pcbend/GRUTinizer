@@ -149,6 +149,13 @@ bool GPeak::InitParams(TH1 *fithist){
 
   Double_t highy  = fithist->GetBinContent(binlow);
   Double_t lowy   = fithist->GetBinContent(binhigh);
+  for(int x=1;x<5;x++) {
+    highy += fithist->GetBinContent(binlow-x);
+    lowy  += fithist->GetBinContent(binhigh+x);
+  }
+  highy = highy/5.0;
+  lowy = lowy/5.0;
+
 //  Double_t yhigh  = fithist->GetBinContent(binhigh);
 //  Double_t ylow   = fithist->GetBinContent(binlow);
   if(lowy>highy)
@@ -177,14 +184,17 @@ bool GPeak::InitParams(TH1 *fithist){
   TF1::SetParLimits(0,0,largesty*2);
   TF1::SetParLimits(1,xlow,xhigh);
   TF1::SetParLimits(2,0.1,xhigh-xlow);
-  TF1::SetParLimits(3,0.000,25);
+  TF1::SetParLimits(3,0.0,40);
   TF1::SetParLimits(4,0.01,5); 
   double step = ((highy-lowy)/largesty)*50;
-  TF1::SetParLimits(5,step-step*.1,step+.1*step); 
+  
+  //TF1::SetParLimits(5,step-step*.1,step+.1*step); 
+  TF1::SetParLimits(5,0.0,step+step); 
+  
   //double slope  = (yhigh-ylow)/(xhigh-xlow);
   //double offset = yhigh-slope*xhigh;
   double offset = lowy;
-  TF1::SetParLimits(6,offset-0.5*offset,offset+0.5*offset); 
+  TF1::SetParLimits(6,offset-0.5*offset,offset+offset); 
   //TF1::SetParLimits(7,-2*slope,2*slope);                    
 
   //Make initial guesses
@@ -230,6 +240,21 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
     fithist->Sumw2();
 
   TFitResultPtr fitres = fithist->Fit(this,Form("%sLRSME",options.Data()));
+
+  //fitres.Get()->Print();
+  if(!fitres.Get()->IsValid()) {
+    printf(RED  "fit has failed, trying refit... " RESET_COLOR);
+    //SetParameter(3,0.1);
+    //SetParameter(4,0.01);
+    //SetParameter(5,0.0);
+    fithist->GetListOfFunctions()->Last()->Delete();
+    fitres = fithist->Fit(this,Form("%sLRSME",options.Data())); //,Form("%sRSM",options.Data()))
+    if( fitres.Get()->IsValid() ) {
+      printf(DGREEN " refit passed!" RESET_COLOR "\n");
+    } else {
+      printf(DRED " refit also failed :( " RESET_COLOR "\n");
+    }
+  }
 
   //if(fitres->ParError(2) != fitres->ParError(2)) { // checks if nan.
   //  if(fitres->Parameter(3)<1) {
@@ -333,17 +358,18 @@ void GPeak::Clear(Option_t *opt){
 
 void GPeak::Print(Option_t *opt) const {
   TString options = opt;
-  printf(GREEN "\n");
+  printf(GREEN );
   printf("Name: %s \n", this->GetName());
   printf("Centroid:  %1f +/- %1f \n", this->GetParameter("centroid"),this->GetParError(GetParNumber("centroid")));
   printf("Area:      %1f +/- %1f \n", fArea, fDArea);
   printf("FWHM:      %1f +/- %1f \n",this->GetFWHM(),this->GetFWHMErr());
   printf("Reso:      %1f%%  \n",this->GetFWHM()/this->GetParameter("centroid")*100.);
   printf("Chi^2/NDF: %1f\n",fChi2/fNdf);
-  if(options.Contains("+")){
-    //TF1::Print(opt);
+  if(options.Contains("all")){
+    TF1::Print(opt);
   }
   printf(RESET_COLOR);
+  printf("\n");
 }
 
 

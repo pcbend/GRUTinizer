@@ -1,9 +1,10 @@
 #include "TRuntimeObjects.h"
 
+#include <cstdio>
 #include <iostream>
 #include <map>
 #include <string>
-#include <cstdio>
+#include <utility>
 
 #include "TFile.h"
 #include "TH1.h"
@@ -43,6 +44,16 @@ void LoadGates(TRuntimeObjects& obj){
       std::cout << "Warning: could not find cut \"time_energy\"" << std::endl;
     }
   }
+}
+
+TReaction& get_reaction(double betamax) {
+  static std::map<double,TReaction> reac_map;
+  if(reac_map.count(betamax) == 0) {
+    TNucleus nuc("78Kr");
+    double collision_energy = nuc.GetEnergyFromBeta(betamax);
+    reac_map.insert(std::make_pair(betamax,TReaction("78Kr","208Pb","78Kr","208Pb",collision_energy)));
+  }
+  return reac_map.at(betamax);
 }
 
 void MakeJanusHistograms(TRuntimeObjects& obj, TJanus& janus);
@@ -268,6 +279,34 @@ void Make78KrPlots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_hit) {
                       180, 0, 180, theta_deg);
 
 
+    double kr_theta = particle_position.Theta();
+    //double kr_theta_deg = kr_theta * (180/3.1415926);
+
+    // Angle-dependent beta
+    {
+      double betamax = GValue::Value("betamax");
+      TReaction& reac = get_reaction(betamax);
+
+      double beta_vary = reac.AnalysisBetaFromThetaLab(kr_theta, 2);
+      double dc_energy_betavary = s_hit.GetDoppler(beta_vary, particle_position);
+      obj.FillHistogram("kr78",Form("DCenergy_angle_varybeta_ring%02d", j_hit.GetRing()),
+                        2000, 0, 2000, dc_energy_betavary,
+                        180, 0, 180, theta_deg);
+
+      //Scan along betamax
+      for(int betamax_i = 0; betamax_i<150; betamax_i++) {
+        double betamax = 0.0 + betamax_i*((0.15-0.00)/150);
+        TReaction& reac = get_reaction(betamax);
+
+        double beta_vary = reac.AnalysisBetaFromThetaLab(kr_theta, 2);
+        double dc_energy_betavary = s_hit.GetDoppler(beta_vary, particle_position);
+        obj.FillHistogram("kr78","DCenergy_varybeta_betascan",
+                          150, 0.0, 0.15, betamax,
+                          8000, 0, 4000, dc_energy_betavary);
+      }
+    }
+
+
     // // Scan along beta
     // for(int beta_i = 0; beta_i<150; beta_i++) {
     //   double beta = 0.0 + beta_i*((0.15-0.00)/150);
@@ -332,6 +371,34 @@ void Make78KrPlots_Reconstructed(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHi
                       2000, 0, 2000, dc_energy,
                       180, 0, 180, theta_deg);
 
+    double kr_theta = particle_position.Theta();
+    double kr_theta_deg = kr_theta * (180/3.1415926);
+
+    // Angle-dependent beta
+    {
+      double betamax = GValue::Value("betamax");
+      TReaction& reac = get_reaction(betamax);
+
+      double beta_vary = reac.AnalysisBetaFromThetaLab(kr_theta, 2);
+      double dc_energy_betavary = s_hit.GetDoppler(beta_vary, particle_position);
+      obj.FillHistogram("kr78_recon",Form("DCenergy_angle_varybeta_ring%02d", j_hit.GetRing()),
+                        2000, 0, 2000, dc_energy_betavary,
+                        180, 0, 180, theta_deg);
+    }
+
+    //Scan along betamax
+    for(int betamax_i = 0; betamax_i<150; betamax_i++) {
+      double betamax = 0.0 + betamax_i*((0.15-0.00)/150);
+      TReaction& reac = get_reaction(betamax);
+
+
+      double beta_vary = reac.AnalysisBetaFromThetaLab(kr_theta, 2);
+      double dc_energy_betavary = s_hit.GetDoppler(beta_vary, particle_position);
+      obj.FillHistogram("kr78_recon","DCenergy_varybeta_betascan",
+                        150, 0.0, 0.15, betamax,
+                        8000, 0, 4000, dc_energy_betavary);
+    }
+
     // // Scan along beta
     // for(int beta_i = 0; beta_i<150; beta_i++) {
     //   double beta = 0.0 + beta_i*((0.15-0.00)/150);
@@ -352,7 +419,6 @@ void Make78KrPlots_Reconstructed(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHi
     //                     8000, 0, 4000, s_hit.GetDoppler(beta, particle_position, offset));
     // }
 
-    double kr_theta_deg = particle_position.Theta() * (180/3.1415926);
     if(75 > kr_theta_deg || 105 < kr_theta_deg) {
       // DC energies ignoring area around 90 degrees
       obj.FillHistogram("kr78_recon","energy_notnear90",
@@ -367,6 +433,20 @@ void Make78KrPlots_Reconstructed(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHi
       obj.FillHistogram("kr78_recon","DCenergy_angle_notnear90",
                         2000, 0, 2000, dc_energy,
                         180, 0, 180, theta_deg);
+
+
+      //Scan along betamax
+      for(int betamax_i = 0; betamax_i<150; betamax_i++) {
+        double betamax = 0.0 + betamax_i*((0.15-0.00)/150);
+        TReaction& reac = get_reaction(betamax);
+
+
+        double beta_vary = reac.AnalysisBetaFromThetaLab(kr_theta, 2);
+        double dc_energy_betavary = s_hit.GetDoppler(beta_vary, particle_position);
+        obj.FillHistogram("kr78_recon","DCenergy_varybeta_betascan_notnear90",
+                          150, 0.0, 0.15, betamax,
+                          8000, 0, 4000, dc_energy_betavary);
+      }
 
       // // Scan along z
       // for(int z=-20; z<20; z++) {
