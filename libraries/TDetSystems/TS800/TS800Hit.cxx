@@ -109,6 +109,25 @@ void TIonChamber::Set(int ch, int data){
   fData.push_back(data);
 }
 
+float TIonChamber::GetAve(){
+  float temp =0.0;
+  //if(fdE==-1.0) {
+  
+  for(unsigned int x=0;x<fData.size();x++) {   
+      TChannel *c = TChannel::GetChannel(Address(x));
+      if (c){
+        temp += c->CalEnergy(fData.at(x));
+      }
+      else{
+        temp += fData.at(x);
+      }
+  }
+  if(temp>0)
+    temp = temp/((float)fData.size());
+  return temp;
+}
+
+
 float TIonChamber::GetSum(){
   float temp =0.0;
   //if(fdE==-1.0) {
@@ -742,6 +761,9 @@ void TMTof::Clear(Option_t *opt) {
   fCorrelatedXFP=-1;
   fCorrelatedOBJ=-1;
   fCorrelatedE1=-1;
+  fCorrelatedXFP_Ch15=-1;
+  fCorrelatedOBJ_Ch15=-1;
+  fCorrelatedE1_Ch15=-1;
   
 }
 
