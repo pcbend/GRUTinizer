@@ -128,6 +128,7 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
         hit.SetAddress((12<<28) + hit.GetChannel());
 
 	if(Mq->isOOR()) hit.SetCharge(5000);
+
 	else            hit.SetCharge(Mq->Charge());
 
 	//hit.SetEnergy();
@@ -153,12 +154,9 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	detNumber = -1;
 	detNumber = GetDetNumberIn_fs_hits(Int_t(Mt->Chan()));
     
-/////////////////////////////////////////////////////////////////////////
         if(Mt->isTrig()){  
           SetTrigTime(Mt->Time());
           continue;
-	}
-////////////////////////////////////////////////////////////////////////
 
 	if(detNumber!=-1){
 	  TFastScintHit *qdc_hit = GetLaBrHit(detNumber);
@@ -179,6 +177,7 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	  TFastScintHit tdc_hit;
 	  tdc_hit.SetTime(Mt->Time());
 	  tdc_hit.SetCharge(-1);
+
           //tdc_hit.SetEnergy();
 
 	  //if(Mt->isTrig())  tdc_hit.SetChannel(-10);
@@ -200,7 +199,9 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 	  }
 	}
       } // end elif isT	
+
       else{ // If not QDC or TDC
+
 	std::cout << " *** Not TDC or QDC **** " << std::endl;
       }
     }// end elif is data

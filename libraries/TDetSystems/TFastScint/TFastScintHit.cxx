@@ -12,7 +12,6 @@ TFastScintHit::TFastScintHit(const TDetectorHit &hit) {
   hit.Copy(*this);
 }
 
-
 void TFastScintHit::Copy(TObject& obj) const {
   TDetectorHit::Copy(obj);
 
@@ -32,6 +31,7 @@ void TFastScintHit::Clear(Option_t* opt) {
   //fEnergy  = -1;
 }
 /*
+
 void TFastScintHit::SetEnergy(){
   double charge = fCharge;
   charge+=gRandom->Uniform();
