@@ -52,7 +52,7 @@ CFLAGS    += $(shell root-config --cflags)
 CFLAGS    += -MMD -MP $(INCLUDES)
 LINKFLAGS += -Llibraries $(addprefix -l,$(LIBRARY_NAMES)) -Wl,-rpath,\$$ORIGIN/../libraries -Wl,-rpath-link,.
 LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lPyROOT
-LINKFLAGS := $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX) $(CFLAGS)
+LINKFLAGS := $(CFLAGS) $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX) 
 
 ROOT_LIBFLAGS := $(shell root-config --cflags)
 
