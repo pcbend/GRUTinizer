@@ -195,16 +195,18 @@ void MakeHistograms(TRuntimeObjects& obj) {
 			600,-0.1,0.1,s800->GetAFP());
 
       histname ="PID_TDC";
+      double low = GValue::Value("PID_LOW");
+      double high = GValue::Value("PID_HIGH");
       obj.FillHistogram(dirname,histname,
 			1000,-1000,000,s800->GetCorrTOF_OBJ(),
-			1000,0,40000,s800->GetIonChamber().Charge());
+			1000,low,high,s800->GetIonChamber().Charge());
       
       double delta_t = s800->GetScint().GetTimeUp()-s800->GetTof().GetOBJ();
       if(delta_t>E1_TDC_low && delta_t<E1_TDC_high){
         histname ="PID_TDC_Prompt";
         obj.FillHistogram(dirname,histname,
 			  8000,-4000,4000,s800->GetCorrTOF_OBJ(),
-			  2000,0,50000,s800->GetIonChamber().Charge());
+			  2000,10000,60000,s800->GetIonChamber().Charge());
       }
       
       //std::cout << " In gret loop + s800 before haspids" << std::endl;
@@ -212,6 +214,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	dirname = "PID_GATED";
         TIter it(gates);
         while(TObject *itobj = it.Next()) {
+          if(!itobj)
+            continue;
+
           if(!itobj->InheritsFrom(TCutG::Class()))
             continue;
           TCutG *mypid = (TCutG*)itobj;
