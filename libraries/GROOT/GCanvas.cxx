@@ -539,9 +539,9 @@ bool GCanvas::HandleMouseShiftPress(Int_t event,Int_t x,Int_t y) {
      if(obj->InheritsFrom(TH1::Class()))
         hist = (TH1*)obj;
   }
-  if(!hist) 
+  if(!hist)
     return false;
-  
+
   TString options;
   switch(hist->GetDimension()) {
     case 1:
@@ -555,7 +555,7 @@ bool GCanvas::HandleMouseShiftPress(Int_t event,Int_t x,Int_t y) {
       new GCanvas();
       //options.Append("HIST");
       hists.at(0)->DrawCopy(options.Data());
-      for(unsigned int x=1;x<hists.size();x++) 
+      for(unsigned int x=1;x<hists.size();x++)
         hists.at(x)->DrawCopy("same");
       }
       return true;
@@ -794,12 +794,15 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
          edited = PhotoPeakFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
        }
        break;
-  case kKey_g:
-    edited = GausFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
-    break;
+
+    case kKey_g:
+      edited = GausFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
+      break;
+
     //case kKey_G:
     //   edited = GausBGFit();
     //   break;
+
     case kKey_i:
        if(!hists.empty() && GetNMarkers()>1) {
          double xlow  = (fMarkers.at(fMarkers.size()-2)->localx);
@@ -811,7 +814,13 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
          printf( BLUE "\n\tSum [%.01f : %.01f] = %.01f" RESET_COLOR  "\n",xlow,xhigh,sum);
        }
        break;
-
+    case kKey_I:
+      if(!hists.empty()) {
+        printf( BLUE );
+        
+        printf( RESET_COLOR );
+      }
+      break;
     case kKey_l:
       if(GetLogy()){
         // Show full y range, not restricted to positive values.
@@ -840,10 +849,24 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       SetMarkerMode(false);
     case kKey_n:
       RemoveMarker("all");
-      for(unsigned int i=0;i<hists.size();i++)
-        hists.at(i)->GetListOfFunctions()->Delete();
+      for(unsigned int i=0;i<hists.size();i++) {
+        hists.at(i)->GetListOfFunctions()->Clear();
+      }
       RemovePeaks(hists.data(),hists.size());
       edited = true;
+      break;
+    case kKey_N:
+      RemoveMarker("all");
+      for(unsigned int i=0;i<hists.size();i++) {
+        hists.at(i)->GetListOfFunctions()->Clear();
+      }
+      RemovePeaks(hists.data(),hists.size());
+      this->Clear();
+      hists.at(0)->Draw("hist");
+      for(unsigned int i=1;i<hists.size();i++) {
+        hists.at(i)->Draw("histsame");
+      }
+      edited=true;
       break;
     case kKey_o:
       for(unsigned int i=0;i<hists.size();i++) {
@@ -865,9 +888,9 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
           break;
         }
       }
-      //  ok, i found a bug.  if someone tries to gate on a histogram 
+      //  ok, i found a bug.  if someone tries to gate on a histogram
       //  that is already zoomed, bad things will happen; namely the bins
-      //  in the zoomed histogram will not map correctly to the parent. To get 
+      //  in the zoomed histogram will not map correctly to the parent. To get
       //  around this we need the bin value, not the bin!   pcb.
       //
       if(ghist){
@@ -922,6 +945,26 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       }
     }
       break;
+  case kKey_q:{
+    TH1* ghist = hists.at(0);
+    if(GetNMarkers()>1) {
+      
+      edited = PhotoPeakFit(ghist,fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
+    }
+    if(edited){
+      ghist->Draw("hist");
+    
+      TIter iter(ghist->GetListOfFunctions());
+      while(TObject *o = iter.Next()){
+	if(o->InheritsFrom(TF1::Class())) {
+	  ((TF1*)o)->Draw("same");
+	}
+      }
+    }
+  }
+    
+    break;
+
     case kKey_r:
        if(GetNMarkers()<2)
           break;
@@ -966,7 +1009,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
        break;
 
     case kKey_s:
-      
+
       if(GetNMarkers()<2){
 	edited = ShowPeaks(hists.data(),hists.size());
 	RemoveMarker("all");
@@ -979,7 +1022,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
 	double y2 = fMarkers.at(fMarkers.size()-2)->localy;
 	if(y1>y2)
 	  std::swap(y1,y2);
-	
+
 	double ymax = hists.at(0)->GetMaximum();
 	double thresh = y1/ymax;
 	double sigma = x2-x1;
@@ -1034,6 +1077,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
        edited = true;
        RemoveMarker("all");
        break;
+
     case kKey_E:
        //this->GetListOfPrimitives()->Print();
        GetContextMenu()->Action(hists.back()->GetXaxis(),hists.back()->GetXaxis()->Class()->GetMethodAny("SetRangeUser"));
@@ -1190,7 +1234,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
         }
       }
 
-      if(ghist){        
+      if(ghist){
 	ghist->SetSummary(0);
         TH1 *phist = ghist->ProjectionX();//->Draw();
         if(phist) {

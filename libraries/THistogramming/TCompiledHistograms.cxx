@@ -9,11 +9,12 @@
 #include "TH1.h"
 #include "TFile.h"
 #include "TDirectory.h"
-#include "GRootCommands.h"
+#include "TObject.h"
 #include "TROOT.h"
 #include "TKey.h"
 
 #include "GValue.h"
+#include "GRootCommands.h"
 #include "TPreserveGDirectory.h"
 
 typedef void* __attribute__((__may_alias__)) void_alias;
@@ -22,7 +23,7 @@ TCompiledHistograms::TCompiledHistograms()
   : libname(""), library(nullptr), func(nullptr),
     last_modified(0), last_checked(0), check_every(5),
     default_directory(0),obj(0) {
-  obj = new TRuntimeObjects(&objects, &variables, &gates);
+  obj = new TRuntimeObjects(&objects, &variables, &gates, cut_files);
 }
 
 TCompiledHistograms::TCompiledHistograms(std::string input_lib)
@@ -40,12 +41,13 @@ TCompiledHistograms::TCompiledHistograms(std::string input_lib)
   last_checked = time(NULL);
 
 
-  obj = new TRuntimeObjects(&objects, &variables, &gates);
+  obj = new TRuntimeObjects(&objects, &variables, &gates, cut_files);
 }
 
 TCompiledHistograms::~TCompiledHistograms() {
-  if(obj)
+  if(obj) {
     delete obj;
+  }
   obj=0;
 }
 
@@ -150,15 +152,16 @@ void TCompiledHistograms::Fill(TUnpackedEvent& detectors) {
   default_directory->cd();
 
   if(obj) {
-  obj->SetDetectors(&detectors);
-  //TRuntimeObjects obj(detectors, &objects, &variables, &gates);
-  func(*obj);
+    obj->SetDetectors(&detectors);
+    func(*obj);
   }
 }
 
-//TList* TCompiledHistograms::GetVariables() {
-//  return &variables;
-//}
+void TCompiledHistograms::AddCutFile(TFile* cut_file) {
+  if(cut_file) {
+    cut_files.push_back(cut_file);
+  }
+}
 
 void TCompiledHistograms::SetReplaceVariable(const char* name, double value) {
   GValue* val = (GValue*)variables.FindObject(name);
@@ -174,5 +177,18 @@ void TCompiledHistograms::RemoveVariable(const char* name) {
   GValue* val = (GValue*)variables.FindObject(name);
   if(val){
     variables.Remove(val);
+  }
+}
+
+void TCompiledHistograms::SetDefaultDirectory(TDirectory* dir) {
+  default_directory = dir;
+
+  TObject* obj = NULL;
+  TIter next(&objects);
+  while((obj = next())) {
+    TH1* hist = dynamic_cast<TH1*>(obj);
+    if(hist) {
+      hist->SetDirectory(dir);
+    }
   }
 }

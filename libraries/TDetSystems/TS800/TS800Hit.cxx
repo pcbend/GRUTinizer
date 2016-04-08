@@ -1,3 +1,4 @@
+#include "Globals.h"
 
 #include "TS800Hit.h"
 #include "TRandom.h"
@@ -108,7 +109,7 @@ void TIonChamber::Set(int ch, int data){
   fData.push_back(data);
 }
 
-float TIonChamber::GetSum(){
+float TIonChamber::GetAve(){
   float temp =0.0;
   //if(fdE==-1.0) {
   
@@ -123,6 +124,34 @@ float TIonChamber::GetSum(){
   }
   if(temp>0)
     temp = temp/((float)fData.size());
+  return temp;
+}
+
+
+float TIonChamber::GetSum(){
+  float temp =0.0;
+  //if(fdE==-1.0) {
+  /*
+  for(unsigned int x=0;x<fData.size();x++) {   
+      TChannel *c = TChannel::GetChannel(Address(x));
+      if (c){
+        temp += c->CalEnergy(fData.at(x));
+      }
+      else{
+        temp += fData.at(x);
+      }
+  }
+  if(temp>0)
+  temp = temp/((float)fData.size());*/
+
+  for(int x=0;x<Size();x++){
+    TChannel *c = TChannel::GetChannel(Address(x));
+    if(c){
+      temp+=c->CalEnergy(GetData(x));
+    }else{
+      temp+=GetData(x);
+    }
+  }
   return temp;
 }
 
@@ -169,7 +198,7 @@ float TIonChamber::GetSum(){
 //      based on the track through the CRDCs
 
 float TIonChamber::GetdE(){
-  std::cout << "GetdE() NOT IMPLEMENTED! Just returning GetSum()" << std::endl;
+  //std::cout << "GetdE() NOT IMPLEMENTED! Just returning GetSum()" << std::endl;
   return GetSum();
 }
 
@@ -184,8 +213,16 @@ float TIonChamber::GetdECorr(TCrdc *crdc){
   float ytilt  = GValue::Value("IC_DE_YTILT");
   float x0tilt = GValue::Value("IC_DE_X0TILT");
 
+  /*  std::cout << "---------------------" << std::endl;
+  std::cout << " xtilt = " << xtilt << std::endl;
+  std::cout << " ytilt = " << ytilt << std::endl;
+  std::cout << " x0tilt = " << x0tilt << std::endl;
+  std::cout << BLUE << " SUM = " << sum << RESET_COLOR << std::endl;
+  */
   sum += sum * ytilt * y;
-  sum *= exp(xtilt*(x0tilt-x));
+  //  std::cout << GREEN << " SUM2 = " << sum << RESET_COLOR << std::endl;
+  sum *= TMath::Exp(xtilt*(x0tilt-x));
+  //std::cout << RED << " SUM3 = " << sum << RESET_COLOR << std::endl;
   return sum;
 }
 
@@ -622,6 +659,11 @@ float TCrdc::GetNonDispersiveY() {
     y_slope = GValue::Value("CRDC2_Y_SLOPE");
     y_offset = GValue::Value("CRDC2_Y_OFFSET");
   }
+
+  // std::cout << " ------------------ "  << std::endl;
+  // std::cout << " 2 Slope = " << y_slope << std::endl;
+  // std::cout << " 2 Offst = " << y_offset << std::endl;
+
   return ((GetTimeRand()*y_slope+y_offset));
 }
 
@@ -719,6 +761,9 @@ void TMTof::Clear(Option_t *opt) {
   fCorrelatedXFP=-1;
   fCorrelatedOBJ=-1;
   fCorrelatedE1=-1;
+  fCorrelatedXFP_Ch15=-1;
+  fCorrelatedOBJ_Ch15=-1;
+  fCorrelatedE1_Ch15=-1;
   
 }
 

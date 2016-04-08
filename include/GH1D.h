@@ -6,6 +6,8 @@
 
 #include "GH2I.h"
 
+class TF1;
+
 class GH1D : public TH1D {
 public:
   GH1D() : TH1D(), parent(NULL), projection_axis(-1) { }
@@ -17,6 +19,8 @@ public:
     : TH1D(name, title, nbinsx, xbins), parent(NULL), projection_axis(-1) { }
   GH1D(const char* name, const char* title, Int_t nbinsx, Double_t xlow, Double_t xup)
     : TH1D(name, title, nbinsx, xlow, xup), parent(NULL), projection_axis(-1) { }
+
+  GH1D(const TF1& function,Int_t nbinsx,Double_t xlow,Double_t xup);
 
   GH1D(const TH1& source);
   //GH1D(const TH1 *source);

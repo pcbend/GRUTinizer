@@ -8,6 +8,7 @@ class TH1;
 class TH2;
 class GH2I;
 class GMarker;
+class TF1;
 
 #include "TDirectory.h"
 
@@ -32,7 +33,8 @@ std::string MergeStrings(const std::vector<std::string>& strings, char split='\n
 void Prompt();
 void Help();
 void Commands();
-TH1 *GrabHist(int i=1); //return the histogram from the current canvas, pad i.
+TH1 *GrabHist(int i=0); //return the ith histogram from the current canvas.
+TF1 *GrabFit(int i=0); //return the ith fit from the current canvas.
 
 void StartGUI();
 bool GUIIsRunning();

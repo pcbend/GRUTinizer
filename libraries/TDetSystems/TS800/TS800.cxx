@@ -127,6 +127,8 @@ Float_t TS800::GetAta(int i){
   if(GValue::Value("ATA_SHIFT"))
     Shift_ata = GValue::Value("ATA_SHIFT");
   
+  //std::cout << " ATA Shift = " << Shift_ata << std::endl;
+
   switch(i){
   case 1: return (fAtaTCL1+Shift_ata);
     break;
@@ -515,7 +517,7 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
   
 
   //printf("-----------------------\n");
-  return 0;
+  return 1;
 }
 
 bool TS800::HandleTrigPacket(unsigned short *data,int size) {
@@ -1137,6 +1139,19 @@ float TS800::GetOBJ_E1Raw_MESY(int i) const {
   return sqrt(-1.0);
 }
 
+float TS800::GetOBJ_E1Raw_MESY_Ch15(int i) const {
+  std::vector<float> result;
+  for(unsigned int x=0;x<mtof.fObj.size();x++) {
+    for(unsigned int y=0;y<mtof.fRef.size();y++) {
+      result.push_back( mtof.fObj.at(x) - mtof.fRef.at(y));
+      }
+    }
+
+  if(result.size()>(unsigned int)i)
+    return result.at(i);
+  return sqrt(-1.0);
+}
+
 float TS800::GetRawOBJ_MESY(int i) const {
   return (mtof.fObj.at(i));
 }
@@ -1155,11 +1170,24 @@ float TS800::GetXFRaw_TAC() const {
 float TS800::GetXF_E1Raw() const {
   return (GetTof().GetXFP() - GetScint().GetTimeUp()); // Time in XF - Time in E1
 }
+
 float TS800::GetXF_E1Raw_MESY(int i) const {
   std::vector<float> result;
   for(unsigned int x=0;x<mtof.fXfp.size();x++) {
     for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
       result.push_back( mtof.fXfp.at(x) - mtof.fE1Up.at(y));
+    }
+  }
+  if(result.size()>(unsigned int)i)
+    return result.at(i);
+  return sqrt(-1.0);
+}
+
+float TS800::GetXF_E1Raw_MESY_Ch15(int i) const {
+  std::vector<float> result;
+  for(unsigned int x=0;x<mtof.fXfp.size();x++) {
+    for(unsigned int y=0;y<mtof.fRef.size();y++) {
+      result.push_back( mtof.fXfp.at(x) - mtof.fRef.at(y));
     }
   }
   if(result.size()>(unsigned int)i)
@@ -1267,10 +1295,11 @@ float TS800::MCorrelatedOBJ_E1(bool corrected) const{
 
 float TS800::MCorrelatedXFP_E1(bool corrected) const{
   if(!(mtof.fE1Up.size()==1)) {
+    std::cout << " In IF " << std::endl;
     mtof.fCorrelatedXFP = -1;
     mtof.fCorrelatedE1  = -1;
   }
-  else if(mtof.fCorrelatedXFP>-1 && mtof.fCorrelatedE1>-1)  {
+  else if(mtof.fCorrelatedXFP>-1 && mtof.fCorrelatedE1>-1)  {    
     double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
     double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
     if(corrected==false){
@@ -1340,9 +1369,186 @@ float TS800::MCorrelatedXFP_E1(bool corrected) const{
     mtof.fCorrelatedXFP =-1;
     mtof.fCorrelatedE1  =-1;
   }
+  return 0;
+}
+
+
+float TS800::MCorrelatedOBJ_Ch15() const{
+  if(mtof.fCorrelatedOBJ_Ch15>-1) return mtof.fObj.at(mtof.fCorrelatedOBJ_Ch15);
+  else return 0;
+}
+
+float TS800::MCorrelatedXFP_Ch15() const{
+  if(mtof.fCorrelatedXFP_Ch15>-1) return mtof.fXfp.at(mtof.fCorrelatedXFP_Ch15);
+  else return 0;
+}
+
+float TS800::MCorrelatedE1_Ch15() const{
+  if(mtof.fCorrelatedE1_Ch15>-1) return mtof.fRef.at(mtof.fCorrelatedE1_Ch15);
+  else return 0;
+}
+
+float TS800::MCorrelatedOBJ_E1_Ch15(bool corrected) const{
+  if(!(mtof.fRef.size()==1)) {
+    mtof.fCorrelatedOBJ_Ch15 = -1;
+    mtof.fCorrelatedE1_Ch15  = -1;
+  }
+  else if(mtof.fCorrelatedOBJ_Ch15>-1 && mtof.fCorrelatedE1_Ch15>-1){
+    double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+    if(corrected==false){
+      afp_cor = 0;
+      xfp_cor = 0;
+    }
+    return (mtof.fObj.at(mtof.fCorrelatedOBJ_Ch15)-mtof.fRef.at(mtof.fCorrelatedE1_Ch15) + 
+	    afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+  }
+  else if(mtof.fCorrelatedE1_Ch15>-1){
+    double OBJLow  = GValue::Value("MOBJ_CORR_LOW_CH15");
+    double OBJHigh = GValue::Value("MOBJ_CORR_HIGH_CH15");
+    
+    double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+    if(corrected==false){
+      afp_cor = 0;
+      xfp_cor = 0;
+    }
+
+    if(std::isnan(afp_cor)) return 0;
+    if(std::isnan(xfp_cor)) return 0;
+    if(std::isnan(OBJLow))  return 0;
+    if(std::isnan(OBJHigh)) return 0;
+
+    std::vector<float> val2;
+    float val;
+      for(unsigned int y=0;y<mtof.fObj.size();y++) {
+      val = (mtof.fObj.at(y) - mtof.fRef.at(mtof.fCorrelatedE1_Ch15) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX()) ;
+      if(val<OBJHigh && val>OBJLow){
+	val2.push_back(val);      
+	mtof.fCorrelatedOBJ_Ch15=y;
+      }
+    }
+    if(val2.size()==1)
+      return val2.at(0);
+    mtof.fCorrelatedOBJ_Ch15 =-1;
+  }
+  else{
+    double OBJLow  = GValue::Value("MOBJ_CORR_LOW_CH15");
+    double OBJHigh = GValue::Value("MOBJ_CORR_HIGH_CH15");
+    
+    double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+    
+    if(corrected==false){
+      afp_cor = 0;
+      xfp_cor = 0;
+    }
+
+    if(std::isnan(afp_cor))  return 0;
+    if(std::isnan(xfp_cor))  return 0;
+    if(std::isnan(OBJLow))   return 0;
+    if(std::isnan(OBJHigh))  return 0;
+    
+    std::vector<float> val2;
+    float val;
+    for(unsigned int x=0;x<mtof.fRef.size();x++) {
+      for(unsigned int y=0;y<mtof.fObj.size();y++) {
+	val = (mtof.fObj.at(y) - mtof.fRef.at(x) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+	if(val<OBJHigh && val>OBJLow){
+	  val2.push_back(val);      
+	  mtof.fCorrelatedOBJ_Ch15=y;
+	  mtof.fCorrelatedE1_Ch15=x;
+	}
+      }
+    }
+    
+    if(val2.size()==1)
+      return val2.at(0);
+    mtof.fCorrelatedOBJ_Ch15 =-1;
+    mtof.fCorrelatedE1_Ch15  =-1;
+  }
 
   return 0;
 }
+
+float TS800::MCorrelatedXFP_E1_Ch15(bool corrected) const{
+  if(!(mtof.fRef.size()==1)) {
+    mtof.fCorrelatedXFP_Ch15 = -1;
+    mtof.fCorrelatedE1_Ch15  = -1;
+  }
+  else if(mtof.fCorrelatedXFP_Ch15>-1 && mtof.fCorrelatedE1_Ch15>-1)  {
+    double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+    if(corrected==false){
+      afp_cor = 0;
+      xfp_cor = 0;
+    }
+    
+    return (mtof.fXfp.at(mtof.fCorrelatedXFP_Ch15)-mtof.fRef.at(mtof.fCorrelatedE1_Ch15) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+  }
+  else if(mtof.fCorrelatedE1_Ch15>-1){
+    double XFLow = GValue::Value("MXF_CORR_LOW_CH15");
+    double XFHigh = GValue::Value("MXF_CORR_HIGH_CH15");
+    double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+    if(corrected==false){
+      afp_cor = 0;
+      xfp_cor = 0;
+    }
+
+    if(std::isnan(afp_cor)) return 0;
+    if(std::isnan(xfp_cor)) return 0;
+    if(std::isnan(XFLow))   return 0;
+    if(std::isnan(XFHigh))  return 0;
+
+    std::vector<float> val2;
+    float val;
+    for(unsigned int y=0;y<mtof.fXfp.size();y++) {
+      val = (mtof.fXfp.at(y) - mtof.fRef.at(mtof.fCorrelatedE1_Ch15) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+      if(val<XFHigh && val>XFLow){
+	val2.push_back(val);      
+	mtof.fCorrelatedXFP_Ch15=y;
+      }
+    }
+    if(val2.size()==1)
+      return val2.at(0);
+    mtof.fCorrelatedXFP_Ch15 =-1;
+  }
+  else{
+    double XFLow = GValue::Value("MXF_CORR_LOW_CH15");
+    double XFHigh = GValue::Value("MXF_CORR_HIGH_CH15");
+    double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+    if(corrected==false){
+      afp_cor = 0;
+      xfp_cor = 0;
+    }
+
+    if(std::isnan(afp_cor)) return 0;
+    if(std::isnan(xfp_cor)) return 0;
+    if(std::isnan(XFLow))   return 0;
+    if(std::isnan(XFHigh))  return 0;
+
+    std::vector<float> val2;
+    float val;
+    for(unsigned int x=0;x<mtof.fRef.size();x++) {
+      for(unsigned int y=0;y<mtof.fXfp.size();y++) {
+	val = (mtof.fXfp.at(y) - mtof.fRef.at(x) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+	if(val<XFHigh && val>XFLow){
+	  val2.push_back(val);      
+	  mtof.fCorrelatedXFP_Ch15=y;
+	  mtof.fCorrelatedE1_Ch15=x;
+	}
+      }
+    }
+    if(val2.size()==1)
+      return val2.at(0);
+    mtof.fCorrelatedXFP_Ch15 =-1;
+    mtof.fCorrelatedE1_Ch15  =-1;
+  }
+  return 0;
+}
+
 
 float TS800::GetCorrTOF_OBJTAC() const {
   double afp_cor = GValue::Value("OBJTAC_TOF_CORR_AFP");

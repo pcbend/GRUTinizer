@@ -130,3 +130,67 @@ Double_t GRootFunctions::Efficiency(Double_t *dim, Double_t *par){
     return 0;
 
 }
+
+
+
+Double_t GRootFunctions::LanGaus(Double_t *x, Double_t *pars){
+   double dy, y, conv, spec, gaus;
+   conv = 0;
+
+   for(int i=0; i<10; i++){
+    dy = 5*pars[2]/10.0; // truncate the convolution by decreasing number of evaluation points and decreasing range [2.5 sigma still covers 98.8% of gaussian]
+    y = x[0]-2.5*pars[2]+dy*i;
+
+    spec = pars[0]+pars[1]*y; // define background SHOULD THIS BE CONVOLUTED ????? *************************************
+    //for( int n=0; n<(int)(pars[0]+0.5); n++) // the implementation of landau function should be done using the landau function
+      spec +=pars[3]*TMath::Landau(-y,-pars[4],pars[5])/TMath::Landau(0,0,100); // add peaks, dividing by max height of landau
+
+    gaus = TMath::Gaus(-x[0],-y,pars[2])/sqrt(2*TMath::Pi()*pars[2]*pars[2]); // gaus must be normalisd so there is no sigma weighting
+    conv += gaus*spec*dy; // now convolve this [integrate the product] with a gaussian centered at x;
+  }
+
+  return conv;
+}
+
+
+Double_t GRootFunctions::LanGausHighRes(Double_t *x, Double_t *pars){ // 5x more convolution points with 1.6x larger range
+  double dy, y, conv, spec, gaus;
+  conv = 0;
+
+  for(int i=0; i<50; i++){
+    dy = 8*pars[2]/50.0; // 4 sigma covers 99.99% of gaussian
+    y  = x[0]-4*pars[2]+dy*i;
+
+    spec = pars[0]+pars[1]*y;
+    //for( int n=0; n<(int)(pars[0]+0.5); n++)
+    spec +=pars[3]*TMath::Landau(-y,-pars[4],pars[5])/TMath::Landau(0,0,100);
+
+    gaus = TMath::Gaus(-x[0],-y,pars[2])/sqrt(2*TMath::Pi()*pars[2]*pars[2]);
+    conv += gaus*spec*dy;
+  }
+  return conv;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

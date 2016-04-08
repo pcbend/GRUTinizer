@@ -22,6 +22,7 @@ TDetector::~TDetector() { }
 
 void TDetector::Clear(Option_t *opt) {
   TNamed::Clear(opt);
+  SetBit(kUnbuilt,1);
   fTimestamp = -1;
   fSize = 0;
   fRunStart = 0;
@@ -52,7 +53,7 @@ int TDetector::Compare(const TObject& obj) const {
 int TDetector::Build(std::vector<TRawEvent>& raw_data){
   int output = BuildHits(raw_data);
   if(output>0){
-    SetBit(kBuilt,1);
+    SetBit(kUnbuilt,0);
   }
   return output;
 }

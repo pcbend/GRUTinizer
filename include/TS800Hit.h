@@ -224,6 +224,7 @@ class TIonChamber : public TDetectorHit {
     int Size() const { return fChan.size(); }
     float GetdE();
     float GetSum();
+    float GetAve();
     float GetdECorr(TCrdc*);
 
     int  Address(int i) const { return TDetectorHit::Address() + GetChannel(i); }
@@ -371,6 +372,9 @@ class TMTof : public TDetectorHit {
     mutable int fCorrelatedXFP;   //!
     mutable int fCorrelatedOBJ;   //!
     mutable int fCorrelatedE1;    //!
+    mutable int fCorrelatedXFP_Ch15;   //!
+    mutable int fCorrelatedOBJ_Ch15;   //!
+    mutable int fCorrelatedE1_Ch15;    //!
 
 
     std::vector<unsigned short> fE1Up;         // Channel 0

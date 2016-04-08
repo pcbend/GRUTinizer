@@ -48,7 +48,7 @@ libdir=$GRUTSYS/libraries
 incdir=$GRUTSYS/include
 #utildir=$GRUTSYS/etc
 
-grutlibs="-lTGRUTUtil -lTRawFormat -lGROOT -lTNSCLFormat -lTGEBFormat -lTGRUTUtil -lTNucleus -lTKinematics"
+grutlibs="-lTGRUTUtil -lTRawFormat -lGROOT -lTNSCLFormat -lTGEBFormat -lTGRUTUtil -lTNucleus -lTKinematics -lTReaction"
 detlibs="-lTSega -lTDetector  -lTGretina -lTJanus -lTPhosWall -lTS800 -lTFastScint -lTCaesar -lTS800Sim -lTGretSim"
 grutmore="-lTGRUTint -lTLoops -lTHistogramming "
 

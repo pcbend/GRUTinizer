@@ -102,7 +102,9 @@ class threeHistHolder{
     }
 
     virtual double operator() (double *x, double *par){
-      return histValue(hist1, x[0])*par[0]+histValue(hist2,x[0])*par[1] + histValue(hist3,x[0])*par[2];
+      //return histValue(hist1, x[0])*par[0]+histValue(hist2,x[0])*par[1] + histValue(hist3,x[0])*par[2];
+      //Testing varying compton and FEP More consistently 
+      return par[0]*(histValue(hist1, x[0])+histValue(hist2,x[0])*par[1]) + histValue(hist3,x[0])*par[2];
     }
 };
 class histHolder{
@@ -216,7 +218,10 @@ class DoubleExpThreeHist : threeHistHolder{
   public:
     DoubleExpThreeHist(TH1 *hist1, TH1 *hist2, TH1 *hist3): threeHistHolder(hist1,hist2,hist3){}
     virtual double operator()(double *x, double *par){
-      return (par[0]*histValue(hist1, x[0])+par[1]*histValue(hist2,x[0]) + 
+    //return (par[0]*histValue(hist1, x[0])+par[1]*histValue(hist2,x[0]) + 
+    //        par[2]*histValue(hist3,x[0]) + par[3]*(par[4]*TMath::Exp(par[5]*x[0])+
+    //        par[6]*TMath::Exp(par[7]*x[0])));
+      return (par[0]*(histValue(hist1, x[0])+par[1]*histValue(hist2,x[0])) + 
               par[2]*histValue(hist3,x[0]) + par[3]*(par[4]*TMath::Exp(par[5]*x[0])+
               par[6]*TMath::Exp(par[7]*x[0])));
     }
@@ -334,10 +339,10 @@ TF1 *FitDoubleExpTwoHist(TH1F *hist_to_fit, TH1F *geant_hist1, TH1F *geant_hist2
     fitfunc->FixParameter(i, init[i]);
   }
 
-  std::cout << "Setting par limit 0" << std::endl;
-  fitfunc->SetParLimits(0, 1e-05, 1.0);
-  std::cout << "Setting par limit 1" << std::endl;
-  fitfunc->SetParLimits(1, 1.5e-04, 2.5e-04);
+//std::cout << "Setting par limit 0" << std::endl;
+//fitfunc->SetParLimits(0, 1e-05, 1.0);
+//std::cout << "Setting par limit 1" << std::endl;
+//fitfunc->SetParLimits(1, 1.5e-04, 2.5e-04);
 //std::cout << "Setting par limit 2" << std::endl;
 //fitfunc->SetParLimits(2, 0.2,2);
 
@@ -375,6 +380,7 @@ TF1 *FitDoubleExpThreeHist(TH1F *hist_to_fit, TH1F *geant_fep, TH1F *geant_compt
 
   DoubleExpThreeHist* deh3 = new DoubleExpThreeHist(geant_fep,geant_compton, geant_2ndpeak);
   TF1* fitfunc = new TF1("double_exp_three_hist",deh3, 0, 1, 8,"DoubleExpThreeHist");
+  TF1* fitfunc_to_draw = new TF1("double_exp_three_hist_check",deh3, 0, 1, 8,"DoubleExpThreeHist");
 
 
   if (init==NULL){
@@ -382,16 +388,17 @@ TF1 *FitDoubleExpThreeHist(TH1F *hist_to_fit, TH1F *geant_fep, TH1F *geant_compt
     return NULL;
   }
 
+  fitfunc->FixParameter(1,init[1]);
   for (int i = 4; i < 8; i++){
     fitfunc->FixParameter(i, init[i]);
   }
 
-//fitfunc->SetParLimits(0, 5e-04, 5.0e-03);
-//fitfunc->SetParLimits(1, 5e-04, 5.0e-03);
+//fitfunc->SetParLimits(0, 9e-04, 1.2e-03);
+  fitfunc->SetParLimits(2, 0, 1);
 //fitfunc->SetParLimits(2, 1.0e-04, 2.5e-04);
 //fitfunc->SetParLimits(3, 0.5, 1.5);
 
-  fitfunc->SetRange(gLowX, gUpX);
+  //fitfunc->SetRange(gLowX, gUpX);
   fitfunc->SetLineColor(4);
   fitfunc->SetLineWidth(3);
   hist_to_fit->SetLineColor(kBlue);
@@ -408,6 +415,10 @@ TF1 *FitDoubleExpThreeHist(TH1F *hist_to_fit, TH1F *geant_fep, TH1F *geant_compt
   fitfunc->SetParName(6, "2nd Exp. Intercept    ");
   fitfunc->SetParName(7, "2nd Exp. Decay Const  ");
 
-  hist_to_fit->Fit(fitfunc, "PRMEQ", "");
-  return fitfunc;
+  //hist_to_fit->Fit(fitfunc, "PRMEQ");
+  hist_to_fit->Fit(fitfunc, "PMENQ","",gLowX,gUpX);
+  fitfunc_to_draw->SetParameters(fitfunc->GetParameters());
+  fitfunc_to_draw->SetRange(0,4096);
+  
+  return fitfunc_to_draw;
 }
