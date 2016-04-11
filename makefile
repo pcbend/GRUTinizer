@@ -49,10 +49,10 @@ LIBRARY_OUTPUT := $(patsubst %,libraries/lib%.so,$(LIBRARY_NAMES))
 
 INCLUDES  := $(addprefix -I$(PWD)/,$(INCLUDES))
 CFLAGS    += $(shell root-config --cflags)
-CFLAGS    += -MMD -MP $(INCLUDES)
+CFLAGS    += -MMD -MP $(INCLUDES) -D_GLIBCXX_USE_NANOSLEEP
 LINKFLAGS += -Llibraries $(addprefix -l,$(LIBRARY_NAMES)) -Wl,-rpath,\$$ORIGIN/../libraries -Wl,-rpath-link,.
 LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lPyROOT
-LINKFLAGS := $(CFLAGS) $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX) 
+LINKFLAGS := $(CFLAGS) $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX)
 
 ROOT_LIBFLAGS := $(shell root-config --cflags)
 
