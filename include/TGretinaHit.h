@@ -118,8 +118,7 @@ public:
   TVector3 GetFirstIntPosition() const;
   TVector3 GetSecondIntPosition() const;
 
-  bool CheckAddback(const TGretinaHit&) const;
-  void AddToSelf(const TGretinaHit& other, double& max_energy);
+  void AddToSelf(const TGretinaHit& other);
 
   //void SetPosition(TVector3 &vec) { fCorePosition = vec; }
 
