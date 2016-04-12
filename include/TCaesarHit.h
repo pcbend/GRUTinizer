@@ -1,6 +1,8 @@
 #ifndef _TCAESARDETECTORHIT_H_
 #define _TCAESARDETECTORHIT_H_
 
+#include "TMath.h"
+
 #include "TDetectorHit.h"
 
 class TCaesarHit : public TDetectorHit {
@@ -42,14 +44,16 @@ public:
   TVector3 GetPosition() const; 
  
   double GetDoppler(double beta, TVector3 *track=0) {
-    if(vec==0) {
-      vec = &BeamUnitVec;
+    if(track==0) {
+      track = (TVector3*)&BeamUnitVec;
     }
     double tmp = 0.0;
     double gamma = 1/(sqrt(1-pow(beta,2)));
-    tmp = fCoreEnergy*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*vec)));
+    tmp = GetEnergy()*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*track)));
     return tmp;
   }
+
+  void AddToSelf(const TCaesarHit& other);
 
 private:
 	 
@@ -58,7 +62,9 @@ private:
   int fDet;
   int fRing;
   double pos[3];
-      	 
+
+  
+
   ClassDef(TCaesarHit,2);
 };
 

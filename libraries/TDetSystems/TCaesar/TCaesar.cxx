@@ -1,5 +1,7 @@
 #include "TCaesar.h"
 
+#include <deque>
+
 #include "TNSCLEvent.h"
 
 #define FERA_TIME_ID        0x2301
@@ -8,6 +10,54 @@
 #define FERA_ERROR_ID       0x23ff
 
 #define DEBUG_BRANDON 0
+
+bool DefaultAddback(const TCaesarHit& one,const TCaesarHit &two) {
+  TVector3 res = one.GetPosition()-two.GetPosition();
+  return ((std::abs(one.GetTime()-two.GetTime()) < 200.0) &&
+           (res.Mag() < 150.0) ) ;
+}
+
+
+std::function<bool(const TCaesarHit&,const TCaesarHit&)> TCaesar::fAddbackCondition = DefaultAddback;
+
+void TCaesar::BuildAddback() const {
+  if( addback_hits.size() > 0 ||
+      caesar_hits.size() == 0) {
+    return;
+  }
+
+  
+  std::deque<const TCaesarHit*> hits;
+  for(auto& hit : caesar_hits) {
+    hits.push_back(&hit);
+  }
+  std::sort(hits.begin(), hits.end(), [](const TCaesarHit* a, const TCaesarHit* b) {
+      return a->GetEnergy() > b->GetEnergy();
+    });
+
+  while(hits.size()) {
+    addback_hits.push_back(*hits.front());
+    hits.pop_front();
+    TCaesarHit& new_hit = addback_hits.back();
+    
+    for(int i=hits.size()-1; i>=0; i--) {
+      const TCaesarHit& other_hit = *hits[i];
+      if(fAddbackCondition(new_hit, other_hit)) {
+        new_hit.AddToSelf(other_hit);
+        hits.erase(hits.begin() + i);
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
 
 
 int  const TCaesar::det_per_ring[] = {10,14,24,24,24, 24, 24, 24, 14, 10};
@@ -56,6 +106,7 @@ void TCaesar::Clear(Option_t* opt){
 
   fUlm = -1;
   caesar_hits.clear();
+  addback_hits.clear();
 }
 
 int TCaesar::BuildHits(std::vector<TRawEvent>& raw_data){
@@ -426,10 +477,30 @@ void TCaesar::ReadVSNMap(std::string in_file_name){
   return;
 }
 
-TVector3 TCaesar::GetPosition(int ring,int det) const {
-  double x = detector_position[ring][det][0];
-  double y = detector_position[ring][det][1];
-  double z = detector_position[ring][det][2];
+TVector3 TCaesar::GetPosition(int ring,int det) {
+  double x = detector_positions[ring][det][0];
+  double y = detector_positions[ring][det][1];
+  double z = detector_positions[ring][det][2];
+
+  double shift = GValue::Value("TARGET_SHIFT_X");
+  if(!std::isnan(shift)) {
+    x += shift;
+  }
+
+  shift = GValue::Value("TARGET_SHIFT_Y");
+  if(!std::isnan(shift)) {
+    y += shift;
+  }
+  
+  shift = GValue::Value("TARGET_SHIFT_Z");
+  if(!std::isnan(shift)) {
+    z += shift;
+  }
+ 
+  x*= 10.0;
+  y*= 10.0;
+  z*= 10.0;
+
   return TVector3(x,y,z);
 }
 

@@ -35,6 +35,7 @@ public:
   //Is there any reason the below are virtual? There is no GetCaesarHit in other
   //classes.
   virtual TCaesarHit&   GetCaesarHit(int i);
+  virtual TCaesarHit&   GetAddbackHit(int i) { BuildAddback(); return addback_hits.at(i); }
   virtual const TCaesarHit& GetCaesarHit(int i) const;
   virtual std::vector<TCaesarHit> GetCaesarHits() const  { return caesar_hits; };
   
@@ -46,14 +47,15 @@ public:
   
   //static TVector3 GetPosition(int detnum, int ring_num, int sector_num);
   int Size() const { return caesar_hits.size(); }
+  int AddbackSize() { BuildAddback(); return addback_hits.size(); }
 
   double GetEnergyDC(TCaesarHit hit);
   double GetEnergyDC(int ring, int det, double energy);
   double GetCorrTime(TCaesarHit hit, TS800 *s800);
 
 
-  static TVector3 GetPotition(const TCaesarHit*) const { return GetPosition(hit->GetRingNumber(),hit->GetDetectorNumber()); }
-  static TVector3 GetPosition(int ring,int det) const;
+  static TVector3 GetPosition(const TCaesarHit* hit) { return GetPosition(hit->GetRingNumber(),hit->GetDetectorNumber()); }
+  static TVector3 GetPosition(int ring,int det);
 
 
   static char const ring_names[]; 
@@ -77,7 +79,21 @@ public:
   static bool filled_neighbor_map;
   static bool filled_det_pos;
 
+#if !defined (__CINT__)
+  static void SetAddbackCondition(std::function<bool(const TCaesarHit&,const TCaesarHit&)> condition) {
+    fAddbackCondition = condition;
+  }
+  static std::function<bool(const TCaesarHit&,const TCaesarHit&)> GetAddbackCondition() {
+    return fAddbackCondition;
+  }
+#endif
+
 private:
+  void BuildAddback() const;
+#if !defined (__CINT__)
+  static std::function<bool(const TCaesarHit&,const TCaesarHit&)> fAddbackCondition;
+#endif
+
   void SetCharge(int vsn, int channel, int data);
   void SetTime(int vsn, int channel, int data);
   void ReadDetectorPositions(std::string in_file_name);
@@ -93,9 +109,11 @@ private:
   std::string vsn_file_name      = std::string(getenv("GRUTSYS")) + "/config/caesar/VSNMap.dat";
   std::string det_pos_file_name  = std::string(getenv("GRUTSYS")) + "/config/caesar/CaesarPos.dat";
   std::string neighbor_file_name = std::string(getenv("GRUTSYS")) + "/config/caesar/CaesarNeighbors.dat";
-  std::vector<TCaesarHit> caesar_hits;
 
-  ClassDef(TCaesar,1);
+  std::vector<TCaesarHit> caesar_hits;
+  mutable std::vector<TCaesarHit> addback_hits; //!
+
+  ClassDef(TCaesar,2);
 };
 
 #endif /* _TCAESAR_H_ */
