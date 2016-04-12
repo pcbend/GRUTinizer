@@ -19,8 +19,11 @@ int TCaesar::vsnchn_det_map_energy[MAX_VSN][MAX_CHN] = {{0}};
 int TCaesar::vsnchn_det_map_time[MAX_VSN][MAX_CHN] = {{0}};
 double TCaesar::detector_positions[N_RINGS][MAX_DETS][3] = {{{0.0,0.0,0.0}}};
 
+int TCaesar::num_neighbors[N_RINGS][MAX_DETS] = {{0}};
+int TCaesar::neighbors[N_RINGS][MAX_DETS][MAX_NEIGHBORS][2] = {{{{0}}}};
 bool TCaesar::filled_map = false;
 bool TCaesar::filled_det_pos = false;
+bool TCaesar::filled_neighbor_map = false;
 TCaesar::TCaesar() {
   if (!filled_map){
     ReadVSNMap(vsn_file_name);
@@ -29,6 +32,10 @@ TCaesar::TCaesar() {
   if (!filled_det_pos){
     ReadDetectorPositions(det_pos_file_name);
     filled_det_pos = true;
+  }
+  if (!filled_neighbor_map){
+    ReadNeighborMap(neighbor_file_name);
+    filled_neighbor_map = true;
   }
   Clear();
 }
@@ -122,6 +129,27 @@ double TCaesar::GetEnergyDC(TCaesarHit hit){
   return (gamma*(1-BETA*cos_angle)*hit.GetEnergy());
 }
 
+double TCaesar::GetEnergyDC(int ring, int det, double energy){
+  double BETA = GValue::Value("BETA");
+  double Z_SHIFT = GValue::Value("TARGET_SHIFT_Z");
+  
+  if (!BETA){
+    std::cout << "No Beta given, can't correct" << std::endl;
+    return sqrt(-1);
+  }
+  if (!Z_SHIFT){
+    std::cout << "Warning no Z-shift applied" << std::endl;
+  }
+  double x = detector_positions[ring][det][0];
+  double y = detector_positions[ring][det][1];
+  double z = detector_positions[ring][det][2];
+
+  //cos_angle is equal to z/(z^2+x^2+y^2) where x,y,z have to be corrected for shift
+  double cos_angle = (z-Z_SHIFT)/(sqrt(pow((z-Z_SHIFT),2)+x*x+y*y));
+  double gamma = 1.0/(sqrt(1-BETA*BETA));
+
+  return (gamma*(1-BETA*cos_angle)*energy);
+}
 double TCaesar::GetCorrTime(TCaesarHit hit, TS800 *s800){
   if (!s800 || !hit.IsValid()){
     return sqrt(-1);
@@ -285,6 +313,20 @@ void TCaesar::ReadDetectorPositions(std::string in_file_name){
   }
 }
 
+void TCaesar::ReadNeighborMap(std::string in_file_name){
+  TEnv *map = new TEnv(in_file_name.c_str());
+  for (int ring = 0; ring < N_RINGS; ring++){
+    for (int det = 0; det < det_per_ring[ring]; det++){
+      num_neighbors[ring][det] = map->GetValue(Form("Caesar.Neigh.Ring.%c.%d", ring_names[ring],det+1),0);
+      for (int neigh = 0; neigh < num_neighbors[ring][det]; neigh++){
+        //-1 because we want to count from 0
+	neighbors[ring][det][neigh][0] = map->GetValue(Form("Caesar.Neigh.Ring.%c.Det.%d.Ring.%d",ring_names[ring],det+1,neigh),0) - 1; 
+	neighbors[ring][det][neigh][1] = map->GetValue(Form("Caesar.Neigh.Ring.%c.Det.%d.Det.%d", ring_names[ring],det+1,neigh),0) - 1; 
+      }
+    }
+  }
+}
+
 void TCaesar::ReadVSNMap(std::string in_file_name){
   //Note that in the VSN mapping file, VSN is referenced from 1 while the channel
   //is referenced from 0.
@@ -383,4 +425,16 @@ void TCaesar::ReadVSNMap(std::string in_file_name){
   }//rings
   return;
 }
+
+TVector3 TCaesar::GetPosition(int ring,int det) const {
+  double x = detector_position[ring][det][0];
+  double y = detector_position[ring][det][1];
+  double z = detector_position[ring][det][2];
+  return TVector3(x,y,z);
+}
+
+
+
+
+
 

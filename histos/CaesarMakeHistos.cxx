@@ -56,81 +56,6 @@ void initializeKr88Cuts(TFile * &cut_file, TCutG* &pid_kr88, TCutG* &tcut_kr88,
                         TCutG* &pid_rb, TCutG* &pid_br, TCutG* &in_kr88,
                         TCutG* &pid_rb_left, TCutG* &pid_br_left,
                         TCutG* &pid_rb_right, TCutG* &pid_br_right) {
-//  pid_kr88 = new TCutG("pid_kr88",8);
-//  pid_kr88->SetVarX("GetCorrTOF_OBJTAC()");
-//  pid_kr88->SetVarY("GetIonChamber()->GetSum()");
-//  pid_kr88->SetTitle("pid_kr88");
-//  pid_kr88->SetFillColor(1);
-//  pid_kr88->SetPoint(0,1774.82,1816.05);
-//  pid_kr88->SetPoint(1,1788,1816.05);
-//  pid_kr88->SetPoint(2,1796.15,1599.7);
-//  pid_kr88->SetPoint(3,1786.11,1510.61);
-//  pid_kr88->SetPoint(4,1775.45,1512.43);
-//  pid_kr88->SetPoint(5,1766.04,1614.24);
-//  pid_kr88->SetPoint(6,1772.94,1805.14);
-//  pid_kr88->SetPoint(7,1774.82,1816.05);
-//  tcut_kr88 = new TCutG("tcut_kr88",8);
-//  tcut_kr88->SetVarX("EnergyDCCorrTimeKr88");
-//  tcut_kr88->SetVarY("");
-//  tcut_kr88->SetTitle("Graph");
-//  tcut_kr88->SetFillColor(1);
-//  tcut_kr88->SetLineWidth(3);
-//  tcut_kr88->SetPoint(0,-1566.74,276.185);
-//  tcut_kr88->SetPoint(1,-1431.18,289.001);
-//  tcut_kr88->SetPoint(2,-1467.67,532.506);
-//  tcut_kr88->SetPoint(3,-1467.67,4108.18);
-//  tcut_kr88->SetPoint(4,-1561.52,4108.18);
-//  tcut_kr88->SetPoint(5,-1558.92,417.161);
-//  tcut_kr88->SetPoint(6,-1574.56,314.633);
-//  tcut_kr88->SetPoint(7,-1566.74,276.185);
-//  pid_rb = new TCutG("pid_rb",10);
-//  pid_rb->SetVarX("PID_TAC");
-//  pid_rb->SetVarY("");
-//  pid_rb->SetTitle("Graph");
-//  pid_rb->SetFillColor(1);
-//  pid_rb->SetLineWidth(3);
-//  pid_rb->SetPoint(0,1801.13,1828.56);
-//  pid_rb->SetPoint(1,1805.33,1830.83);
-//  pid_rb->SetPoint(2,1811.24,1767.31);
-//  pid_rb->SetPoint(3,1811.43,1649.34);
-//  pid_rb->SetPoint(4,1806.28,1592.63);
-//  pid_rb->SetPoint(5,1795.41,1585.82);
-//  pid_rb->SetPoint(6,1790.83,1692.44);
-//  pid_rb->SetPoint(7,1790.45,1755.96);
-//  pid_rb->SetPoint(8,1794.46,1848.97);
-//  pid_rb->SetPoint(9,1801.13,1828.56);
-//  pid_br = new TCutG("pid_br",11);
-//  pid_br->SetVarX("PID_TAC");
-//  pid_br->SetVarY("");
-//  pid_br->SetTitle("Graph");
-//  pid_br->SetFillColor(1);
-//  pid_br->SetLineWidth(3);
-//  pid_br->SetPoint(0,1760.13,1649.34);
-//  pid_br->SetPoint(1,1756.13,1638);
-//  pid_br->SetPoint(2,1751.93,1558.6);
-//  pid_br->SetPoint(3,1752.89,1510.96);
-//  pid_br->SetPoint(4,1758.61,1447.44);
-//  pid_br->SetPoint(5,1768.71,1436.09);
-//  pid_br->SetPoint(6,1774.44,1508.69);
-//  pid_br->SetPoint(7,1766.81,1631.19);
-//  pid_br->SetPoint(8,1761.09,1662.95);
-//  pid_br->SetPoint(9,1758.8,1662.95);
-//  pid_br->SetPoint(10,1760.13,1649.34);
-//  tcut_kr88 = new TCutG("tcut_03_08_2016",8);
-//  tcut_kr88->SetVarX("EnergyDC_vs_CorrTime_Kr88");
-//  tcut_kr88->SetVarY("");
-//  tcut_kr88->SetTitle("Graph");
-//  tcut_kr88->SetFillColor(1);
-//  tcut_kr88->SetLineWidth(3);
-//  tcut_kr88->SetPoint(0,-1566.74,4080.78);
-//  tcut_kr88->SetPoint(1,-1485.92,4080.78);
-//  tcut_kr88->SetPoint(2,-1467.67,645.707);
-//  tcut_kr88->SetPoint(3,-1376.43,200.017);
-//  tcut_kr88->SetPoint(4,-1608.45,200.017);
-//  tcut_kr88->SetPoint(5,-1577.16,504.391);
-//  tcut_kr88->SetPoint(6,-1577.16,4053.61);
-//  tcut_kr88->SetPoint(7,-1566.74,4080.78);
-//  tcut_kr88->Draw("");
     cut_file = new TFile("/mnt/analysis/pecan-gade/elman/Kr88/cut_files/kr88_cuts.root","Read");
     pid_kr88 = (TCutG*)cut_file->Get("pid_kr88_large");
     pid_rb = (TCutG*)cut_file->Get("pid_rb_large");
@@ -143,6 +68,7 @@ void initializeKr88Cuts(TFile * &cut_file, TCutG* &pid_kr88, TCutG* &tcut_kr88,
     pid_rb_right = (TCutG*)cut_file->Get("pid_rb_right");
     pid_br_right = (TCutG*)cut_file->Get("pid_br_right");
 }
+
 // extern "C" is needed to prevent name mangling.
 // The function signature must be exactly as shown here,
 //   or else bad things will happen.
@@ -164,6 +90,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
     const double START_ANGLE = 3.2;
     const double FINAL_ANGLE = 3.2;
     const double ANGLE_STEPS = 0.1;
+    const int ENERGY_THRESHOLD = 300;
     const int TOTAL_ANGLES = (FINAL_ANGLE-START_ANGLE)/ANGLE_STEPS + 1;
     std::vector<double> angles;
     angles.reserve(TOTAL_ANGLES);
@@ -175,6 +102,11 @@ void MakeHistograms(TRuntimeObjects& obj) {
     }
 
     
+
+    std::vector<double> energies_in_tcut_kr88;
+    std::vector<double> energies_in_tcut_rb;
+    std::vector<double> energies_in_tcut_rb_left;
+    std::vector<double> energies_in_tcut_rb_right;
 
     for(int y=0;y<caesar->Size();y++) {
       if (cut_file == 0){
@@ -200,6 +132,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
         TH2 *caesar_det_energy_dc = GetMatrix(list,"Detector_EnergyDC_Summary",200,0,200,4096,0,4096);
         caesar_det_energy_dc->Fill(det+total_det_in_prev_rings[ring],energy_dc);
 
+
         if (s800){
           double corr_time = caesar->GetCorrTime(hit,s800);
           double objtac_corr = s800->GetCorrTOF_OBJTAC();
@@ -218,7 +151,13 @@ void MakeHistograms(TRuntimeObjects& obj) {
           TH2 *caesar_corrtime_energyDC = GetMatrix(list,"EnergyDC_vs_CorrTime",4000,-2000,2000,4096,0,4096);
           caesar_corrtime_energyDC->Fill(corr_time, energy_dc);
           
+          TH2 *caesar_coincidence_spec = GetMatrix(list, "ungated_coincidence", 8192,0,8192,8192,0,8192);
+          for (int hit_num = y+1; hit_num < caesar->Size(); hit_num++){
+            caesar_coincidence_spec->Fill(energy_dc, caesar->GetEnergyDC(caesar->GetCaesarHit(hit_num)));
+          }
           if (pid_kr88->IsInside(objtac_corr, ic_sum)){
+            //make coincidence matrix
+
             int maxpad1 = s800->GetCrdc(0).GetMaxPad();
             int maxpad1_sum = s800->GetCrdc(0).GetMaxPadSum();
             int maxpad2 = s800->GetCrdc(1).GetMaxPad();
@@ -238,6 +177,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
             scatter_angle_kr88_hist->Fill(fabs(scatter_angle));
             if (tcut_kr88->IsInside(corr_time, energy_dc)){
               if (in_kr88->IsInside(xfptac,objtac)){
+                if (energy_dc > ENERGY_THRESHOLD){
+                  energies_in_tcut_kr88.push_back(energy_dc);
+                }
                 TH1 *caesar_energydc_kr88 = GetHistogram(list,"EnergyDC_Kr88_tcut_incut", 8192,0,8192);
                 caesar_energydc_kr88->Fill(energy_dc);
                 bool done = false;
@@ -259,6 +201,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
             }//is inside timecut
           }//is inside pid_kr88
           if (pid_rb->IsInside(objtac_corr, ic_sum)){
+            if (energy_dc > ENERGY_THRESHOLD){
+              energies_in_tcut_rb.push_back(energy_dc);
+            }
             TH2 *caesar_corrtime_energyDC_rb = GetMatrix(list,"EnergyDC_vs_CorrTime_Rb",4000,-2000,2000,4096,0,4096);
             caesar_corrtime_energyDC_rb->Fill(corr_time, energy_dc);
             TH2 *tacxfp_vs_tacobj_gated_rb = GetMatrix(list,"in_beam_gated_rb",4096,0,4096,4096,0,4096);
@@ -305,6 +250,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
             }
           }//inside pid_br_right
           if (pid_rb_right->IsInside(objtac_corr, ic_sum)){
+            if (energy_dc > ENERGY_THRESHOLD){
+              energies_in_tcut_rb_right.push_back(energy_dc);
+            }
             TH2 *caesar_corrtime_energyDC_rb_right = GetMatrix(list,"EnergyDC_vs_CorrTime_rb_right",4000,-2000,2000,4096,0,4096);
             caesar_corrtime_energyDC_rb_right->Fill(corr_time, energy_dc);
             TH2 *tacxfp_vs_tacobj_gated_rb_right = GetMatrix(list,"in_beam_gated_rb_right",4096,0,4096,4096,0,4096);
@@ -317,6 +265,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
             }
           }//inside pid_rb_right
           if (pid_rb_left->IsInside(objtac_corr, ic_sum)){
+            if (energy_dc > ENERGY_THRESHOLD){
+              energies_in_tcut_rb_left.push_back(energy_dc);
+            }
             TH2 *caesar_corrtime_energyDC_rb_left = GetMatrix(list,"EnergyDC_vs_CorrTime_rb_left",4000,-2000,2000,4096,0,4096);
             caesar_corrtime_energyDC_rb_left->Fill(corr_time, energy_dc);
             TH2 *tacxfp_vs_tacobj_gated_rb_left = GetMatrix(list,"in_beam_gated_rb_left",4096,0,4096,4096,0,4096);
@@ -333,10 +284,74 @@ void MakeHistograms(TRuntimeObjects& obj) {
         }//s800 exists
       }//hit has both energy and time
     }//loop over hits
+    if (energies_in_tcut_kr88.size() == 1){
+      TH1 *caesar_mult_one_kr88 = GetHistogram(list,"kr88_mult_one", 8192,0,8192);
+      caesar_mult_one_kr88->Fill(energies_in_tcut_kr88.at(0));
+    }
+    else if (energies_in_tcut_kr88.size() == 2){
+      TH1 *caesar_mult_two_kr88 = GetHistogram(list,"kr88_mult_two", 8192,0,8192);
+      caesar_mult_two_kr88->Fill(energies_in_tcut_kr88.at(0));
+      caesar_mult_two_kr88->Fill(energies_in_tcut_kr88.at(1));
+    }
+    if (energies_in_tcut_rb.size() == 1){
+      TH1 *caesar_mult_one_rb = GetHistogram(list,"rb_mult_one", 8192,0,8192);
+      caesar_mult_one_rb->Fill(energies_in_tcut_rb.at(0));
+    }
+    else if (energies_in_tcut_rb.size() == 2){
+      TH1 *caesar_mult_two_rb = GetHistogram(list,"rb_mult_two", 8192,0,8192);
+      caesar_mult_two_rb->Fill(energies_in_tcut_rb.at(0));
+      caesar_mult_two_rb->Fill(energies_in_tcut_rb.at(1));
+    }
+    if (energies_in_tcut_rb_left.size() == 1){
+      TH1 *caesar_mult_one_rb_left = GetHistogram(list,"rb_left_mult_one", 8192,0,8192);
+      caesar_mult_one_rb_left->Fill(energies_in_tcut_rb_left.at(0));
+    }
+    else if (energies_in_tcut_rb_left.size() == 2){
+      TH1 *caesar_mult_two_rb_left = GetHistogram(list,"rb_left_mult_two", 8192,0,8192);
+      caesar_mult_two_rb_left->Fill(energies_in_tcut_rb_left.at(0));
+      caesar_mult_two_rb_left->Fill(energies_in_tcut_rb_left.at(1));
+    }
+    if (energies_in_tcut_rb_right.size() == 1){
+      TH1 *caesar_mult_one_rb_right = GetHistogram(list,"rb_right_mult_one", 8192,0,8192);
+      caesar_mult_one_rb_right->Fill(energies_in_tcut_rb_right.at(0));
+    }
+    else if (energies_in_tcut_rb_right.size() == 2){
+      TH1 *caesar_mult_two_rb_right = GetHistogram(list,"rb_right_mult_two", 8192,0,8192);
+      caesar_mult_two_rb_right->Fill(energies_in_tcut_rb_right.at(0));
+      caesar_mult_two_rb_right->Fill(energies_in_tcut_rb_right.at(1));
+    }
+
+    for (unsigned int i = 0; i < energies_in_tcut_kr88.size(); i++){
+      for (unsigned int j = i+1; j < energies_in_tcut_kr88.size(); j++){
+        TH2 *kr88_coincidence_spec = GetMatrix(list, "kr88_coincidence", 8192,0,8192,8192,0,8192);
+        kr88_coincidence_spec->Fill(energies_in_tcut_kr88.at(i), energies_in_tcut_kr88.at(j));
+        kr88_coincidence_spec->Fill(energies_in_tcut_kr88.at(j), energies_in_tcut_kr88.at(i));
+      }
+    }
+    for (unsigned int i = 0; i < energies_in_tcut_rb.size(); i++){
+      for (unsigned int j = i+1; j < energies_in_tcut_rb.size(); j++){
+        TH2 *rb_coincidence_spec = GetMatrix(list, "rb_coincidence", 8192,0,8192,8192,0,8192);
+        rb_coincidence_spec->Fill(energies_in_tcut_rb.at(i), energies_in_tcut_rb.at(j));
+        rb_coincidence_spec->Fill(energies_in_tcut_rb.at(j), energies_in_tcut_rb.at(i));
+      }
+    }
+    for (unsigned int i = 0; i < energies_in_tcut_rb_left.size(); i++){
+      for (unsigned int j = i+1; j < energies_in_tcut_rb_left.size(); j++){
+        TH2 *rb_left_coincidence_spec = GetMatrix(list, "rb_left_coincidence", 8192,0,8192,8192,0,8192);
+        rb_left_coincidence_spec->Fill(energies_in_tcut_rb_left.at(i), energies_in_tcut_rb_left.at(j));
+        rb_left_coincidence_spec->Fill(energies_in_tcut_rb_left.at(j), energies_in_tcut_rb_left.at(i));
+      }
+    }
+    for (unsigned int i = 0; i < energies_in_tcut_rb_right.size(); i++){
+      for (unsigned int j = i+1; j < energies_in_tcut_rb_right.size(); j++){
+        TH2 *rb_right_coincidence_spec = GetMatrix(list, "rb_right_coincidence", 8192,0,8192,8192,0,8192);
+        rb_right_coincidence_spec->Fill(energies_in_tcut_rb_right.at(i), energies_in_tcut_rb_right.at(j));
+        rb_right_coincidence_spec->Fill(energies_in_tcut_rb_right.at(j), energies_in_tcut_rb_right.at(i));
+      }
+    }
   }//caesar exists
 
   if(s800) {
-  
     double ic_sum = s800->GetIonChamber().GetSum();
     double objtac_corr = s800->GetCorrTOF_OBJTAC();
     double objtac = s800->GetTof().GetTacOBJ();

@@ -39,6 +39,17 @@ public:
 
   bool IsValid() const { return (fCharge!=-1 && fTime!=-1); }
 
+  TVector3 GetPosition() const; 
+ 
+  double GetDoppler(double beta, TVector3 *track=0) {
+    if(vec==0) {
+      vec = &BeamUnitVec;
+    }
+    double tmp = 0.0;
+    double gamma = 1/(sqrt(1-pow(beta,2)));
+    tmp = fCoreEnergy*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*vec)));
+    return tmp;
+  }
 
 private:
 	 

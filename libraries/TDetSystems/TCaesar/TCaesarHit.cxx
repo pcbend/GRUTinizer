@@ -28,6 +28,6 @@ void TCaesarHit::Print(Option_t *opt) const {
   printf("Det[%03i]\tCharge: %i\n",GetDetectorNumber(),Charge());
 }
 
-
+TVector3 TCaesarHit::GetPosition() const { return TCaesar::GetPosition(this); }
 
 

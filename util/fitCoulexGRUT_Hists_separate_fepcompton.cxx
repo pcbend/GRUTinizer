@@ -123,8 +123,8 @@ int fitCoulex(const char *cfg_file_name){
   //All Variables
   const int MAX_PARS = 10;
   //These angles determine the maximum angle cut that will be used
-  const double START_ANGLE = 3.0;
-  const double FINAL_ANGLE = 3.0;
+  const double START_ANGLE = 1.0;
+  const double FINAL_ANGLE = 3.5;
   const double ANGLE_STEPS = 0.5;
   const int TOTAL_ANGLES = (FINAL_ANGLE-START_ANGLE)/ANGLE_STEPS + 1;
 
@@ -457,7 +457,7 @@ int fitCoulex(const char *cfg_file_name){
     disentangled_can->Write();
 
 
-    TCanvas *residual_with_hists_can = new TCanvas("res_can", "res_can", 800,600);
+    TCanvas *residual_with_hists_can = new TCanvas(Form("res_can_%1.1f",angles[angle_index]),Form("res_can_%1.1f",angles[angle_index]), 800,600);
     residual_with_hists_can->Divide(1,2);
     residual_with_hists_can->cd(1);
     data_hists[angle_index]->SetLineWidth(3);

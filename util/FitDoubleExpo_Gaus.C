@@ -388,13 +388,13 @@ TF1 *FitDoubleExpThreeHist(TH1F *hist_to_fit, TH1F *geant_fep, TH1F *geant_compt
     return NULL;
   }
 
-//for (int i = 4; i < 8; i++){
+fitfunc->FixParameter(1,init[1]);
+for (int i = 4; i < 8; i++){
+  fitfunc->FixParameter(i, init[i]);
+}
+//for (int i = 1; i < 8; i++){
 //  fitfunc->FixParameter(i, init[i]);
 //}
-//  fitfunc->FixParameter(1,init[1]);
-  for (int i = 1; i < 8; i++){
-    fitfunc->FixParameter(i, init[i]);
-  }
 
 //fitfunc->SetParLimits(0, 9e-04, 1.2e-03);
 //fitfunc->SetParLimits(2, 0, 1);
@@ -422,6 +422,8 @@ TF1 *FitDoubleExpThreeHist(TH1F *hist_to_fit, TH1F *geant_fep, TH1F *geant_compt
   hist_to_fit->Fit(fitfunc, "PMEOQ","",gLowX,gUpX);
   fitfunc_to_draw->SetRange(0,4096);
   fitfunc_to_draw->SetParameters(fitfunc->GetParameters());
+  fitfunc_to_draw->SetChisquare(fitfunc->GetChisquare());
+  fitfunc_to_draw->SetParError(0, fitfunc->GetParError(0));
   
   return fitfunc_to_draw;
 }
