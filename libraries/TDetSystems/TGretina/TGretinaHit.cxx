@@ -178,16 +178,6 @@ double TGretinaHit::GetDoppler_dB(double beta, const TVector3 *vec,double Dta){
 //  std::cerr << __PRETTY_FUNCTION__ << " NOT IMPLEMENTED YET" << std::endl;
 //}
 
-bool TGretinaHit::CheckAddback(const TGretinaHit& rhs) const {
-  if(fNumberOfInteractions && rhs.fNumberOfInteractions)
-    return false;
-
-  TVector3 dist= GetPosition() - rhs.GetPosition();
-  double dtime = std::abs(GetTime() - rhs.GetTime());
-
-  return ((dist.Mag()<250.0) && (dtime<20.0));
-}
-
 void TGretinaHit::SortHits(){
   // sets are sorted, so this will sort all properties together.
   //
@@ -237,7 +227,7 @@ void TGretinaHit::SortHits(){
 //       Right now, the "first interaction point" is the one with the highest energy,
 //       and the "second" is the one with the second highest energy.
 //       First and second may be assigned across crystal boundaries.
-void TGretinaHit::AddToSelf(const TGretinaHit& rhs, double& max_energy) {
+void TGretinaHit::AddToSelf(const TGretinaHit& rhs) {
 
   // Stash all interaction points
   std::set<interaction_point> ips;
@@ -248,17 +238,16 @@ void TGretinaHit::AddToSelf(const TGretinaHit& rhs, double& max_energy) {
                                  fInteractionEnergy[i]));
   }
   for(int i=0; i<rhs.fNumberOfInteractions; i++){
-    ips.insert(interaction_point(fSegmentNumber[i],
-                                 fGlobalInteractionPosition[i],
-                                 fLocalInteractionPosition[i],
-                                 fInteractionEnergy[i]));
+    ips.insert(interaction_point(rhs.fSegmentNumber[i],
+                                 rhs.fGlobalInteractionPosition[i],
+                                 rhs.fLocalInteractionPosition[i],
+                                 rhs.fInteractionEnergy[i]));
   }
 
   // Copy other information to self if needed
   double my_core_energy = fCoreEnergy;
   if(fCoreEnergy < rhs.fCoreEnergy) {
     rhs.Copy(*this);
-    max_energy = fCoreEnergy;
     fCoreEnergy += my_core_energy;
   } else {
     fCoreEnergy += rhs.fCoreEnergy;
