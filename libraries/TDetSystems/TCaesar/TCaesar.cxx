@@ -29,7 +29,9 @@ void TCaesar::BuildAddback() const {
   
   std::deque<const TCaesarHit*> hits;
   for(auto& hit : caesar_hits) {
-    hits.push_back(&hit);
+    if (hit.IsValid()){
+      hits.push_back(&hit);
+    }
   }
   std::sort(hits.begin(), hits.end(), [](const TCaesarHit* a, const TCaesarHit* b) {
       return a->GetEnergy() > b->GetEnergy();
