@@ -32,6 +32,8 @@ public:
   double GetEnergy() const; //applies TChannel ENERGYCOEFF to Charge
   double GetTime() const;   //applies TChannel TIMECOEFF to Time()
 
+  void AddEnergy(double eng);
+
   static const TVector3 BeamUnitVec; //!
 
 protected:
@@ -39,6 +41,8 @@ protected:
   Int_t fCharge;
   Int_t fTime;
   long fTimestamp;
+
+  mutable double fEnergy; //!
 
   ClassDef(TDetectorHit,2)
 };

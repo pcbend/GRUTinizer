@@ -1,3 +1,4 @@
+#include <deque>
 #include <fstream>
 #include <string>
 #include <sstream>
@@ -28,6 +29,44 @@ TGretina::~TGretina() {
 Float_t TGretina::crmat[32][4][4][4];
 Float_t TGretina::m_segpos[2][36][3];
 bool    TGretina::fCRMATSet = false;
+
+bool DefaultAddback(const TGretinaHit& one,const TGretinaHit &two) {
+  TVector3 res = one.GetPosition()-two.GetPosition();
+  return ((std::abs(one.GetTime()-two.GetTime()) < 20.0) &&
+          (res.Mag() < 250.0) ) ;
+}
+
+std::function<bool(const TGretinaHit&,const TGretinaHit&)> TGretina::fAddbackCondition = DefaultAddback;
+
+void TGretina::BuildAddback() const {
+  if( addback_hits.size() > 0 ||
+      gretina_hits.size() == 0) {
+    return;
+  }
+
+  
+  std::deque<const TGretinaHit*> hits;
+  for(auto& hit : gretina_hits) {
+    hits.push_back(&hit);
+  }
+  std::sort(hits.begin(), hits.end(), [](const TGretinaHit* a, const TGretinaHit* b) {
+      return a->GetEnergy() > b->GetEnergy();
+    });
+
+  while(hits.size()) {
+    addback_hits.push_back(*hits.front());
+    hits.pop_front();
+    TGretinaHit& new_hit = addback_hits.back();
+    
+    for(int i=hits.size()-1; i>=0; i--) {
+      const TGretinaHit& other_hit = *hits[i];
+      if(fAddbackCondition(new_hit, other_hit)) {
+	new_hit.AddToSelf(other_hit);
+	hits.erase(hits.begin() + i);
+      }
+    }
+  }
+}
 
 void TGretina::SetCRMAT() {
   if(fCRMATSet){
@@ -263,8 +302,8 @@ void TGretina::Print(Option_t *opt) const { }
 
 void TGretina::Clear(Option_t *opt) {
   TDetector::Clear(opt);
-  gretina_hits.clear(); //("TGretinaHit");
-  //addback_hits->Clear(opt);//("TGretinaHit");
+  gretina_hits.clear();
+  addback_hits.clear();
 }
 
 

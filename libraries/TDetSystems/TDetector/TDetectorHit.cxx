@@ -22,6 +22,7 @@ void TDetectorHit::Clear(Option_t *opt) {
   fCharge = -1;
   fTime = -1;
   fTimestamp = -1;
+  fEnergy = sqrt(-1);
 }
 
 void TDetectorHit::Print(Option_t *opt) const { }
@@ -32,17 +33,33 @@ void TDetectorHit::Copy(TObject& obj) const {
   TDetectorHit& hit = (TDetectorHit&)obj;
   hit.fAddress = fAddress;
   hit.fCharge = fCharge;
+  hit.fEnergy = fEnergy;
   hit.fTime = fTime;
   hit.fTimestamp = fTimestamp;
 }
 
 double TDetectorHit::GetEnergy() const {
+  if(!std::isnan(fEnergy))
+    return fEnergy;
   TChannel* chan = TChannel::GetChannel(fAddress);
   if(!chan){
-    return Charge() + gRandom->Uniform();
+    fEnergy = Charge() + gRandom->Uniform();
+    //return Charge() + gRandom->Uniform();
+  } else {
+    fEnergy = chan->CalEnergy(Charge(), fTimestamp);
   }
-  return chan->CalEnergy(Charge(), fTimestamp);
+  return fEnergy;
 }
+
+void TDetectorHit::AddEnergy(double eng) {
+  if(std::isnan(fEnergy))
+    fEnergy=eng;
+  else
+    fEnergy+=eng;
+}
+
+
+
 
 double TDetectorHit::GetTime() const {
   TChannel* chan = TChannel::GetChannel(fAddress);
