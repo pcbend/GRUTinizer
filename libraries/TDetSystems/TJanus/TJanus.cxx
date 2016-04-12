@@ -2,11 +2,16 @@
 
 #include <cassert>
 #include <iostream>
+#include <memory>
 
 #include "TMath.h"
+#include "TRandom.h"
 
 #include "JanusDataFormat.h"
 #include "TNSCLEvent.h"
+#include "TNucleus.h"
+#include "TReaction.h"
+#include "TSRIM.h"
 
 TJanus::TJanus() { }
 
@@ -272,4 +277,57 @@ void TJanus::SetRunStart(unsigned int unix_time) {
   for(auto& hit : janus_hits) {
     hit.SetTimestamp(timestamp_diff + hit.Timestamp());
   }
+}
+
+double TJanus::GetBeta(double betamax, double kr_angle_rad, bool energy_loss, double collision_pos) {
+  // Factors of 1e3 are because TNucleus and TReaction use MeV, while TSRIM uses keV.
+
+  static auto kr = std::make_shared<TNucleus>("78Kr");
+  static auto pb = std::make_shared<TNucleus>("208Pb");
+  static TSRIM srim("kr78_in_pb208");
+
+  double thickness = (0.75 / 11342.0) * 1e4; // (0.75 mg/cm^2) / (11342 mg/cm^3) * (10^4 um/cm)
+
+  double pre_collision_energy_MeV = kr->GetEnergyFromBeta(betamax);
+  if(energy_loss) {
+    pre_collision_energy_MeV = srim.GetAdjustedEnergy(pre_collision_energy_MeV*1e3, thickness*collision_pos)/1e3;
+  }
+
+  TReaction reac(kr, pb, kr, pb, pre_collision_energy_MeV);
+
+  double post_collision_energy_MeV = reac.GetTLab(kr_angle_rad, 2);
+
+  if(energy_loss) {
+    double distance_travelled;
+    if(kr_angle_rad < TMath::Pi()/2) {
+      // Forward scattering, must make it out the front of the target.
+      distance_travelled = thickness*(1-collision_pos)/std::abs(std::cos(kr_angle_rad));
+    } else {
+      // Backward scattering, must make it out the back of the target.
+      distance_travelled = thickness*collision_pos/std::abs(std::cos(kr_angle_rad));
+    }
+    post_collision_energy_MeV = srim.GetAdjustedEnergy(post_collision_energy_MeV*1e3, distance_travelled)/1e3;
+  }
+
+  double beta = kr->GetBetaFromEnergy(post_collision_energy_MeV);
+  return beta;
+}
+
+double TJanus::SimAngle() {
+  static auto kr = std::make_shared<TNucleus>("78Kr");
+  static auto pb = std::make_shared<TNucleus>("208Pb");
+  static TSRIM srim("kr78_in_pb208");
+  double thickness = (0.75 / 11342.0) * 1e4; // (0.75 mg/cm^2) / (11342 mg/cm^3) * (10^4 um/cm)
+
+  double collision_pos = gRandom->Uniform();
+
+  double collision_energy = srim.GetAdjustedEnergy(3.9*78*1e3, thickness*collision_pos)/1e3;
+  double energy_mid = srim.GetAdjustedEnergy(3.9*78*1e3, thickness*0.5)/1e3;
+
+  TReaction reac(kr, pb, kr, pb, collision_energy);
+  TReaction reac_mid(kr, pb, kr, pb, energy_mid);
+
+  double pb_angle_rad = reac.ConvertThetaLab(90 * (3.1415926/180), 2, 3);
+  double kr_angle_rad_recon = reac_mid.ConvertThetaLab(pb_angle_rad, 3, 2);
+  return kr_angle_rad_recon;
 }

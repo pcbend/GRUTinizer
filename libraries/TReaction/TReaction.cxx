@@ -10,14 +10,34 @@
 ClassImp(TReaction)
   /// \endcond
 
-TReaction::TReaction(const char *beam, const char *targ, const char *ejec, const char *reco, double beame, double ex3, bool inverse){
+#ifndef PI
+#define PI (3.14159265358979312e+00)
+#endif
+
+#ifndef R2D
+#define R2D (5.72957795130823229e+01)
+#endif
+
+#ifndef D2R
+#define D2R (1.74532925199432955e-02)
+#endif
+
+TReaction::TReaction(const char *beam, const char *targ, const char *ejec, const char *reco,
+                     double ebeam, double ex3, bool inverse)
+: TReaction(std::make_shared<TNucleus>(beam), std::make_shared<TNucleus>(targ),
+            std::make_shared<TNucleus>(ejec), std::make_shared<TNucleus>(reco),
+            ebeam, ex3, inverse) { }
+
+TReaction::TReaction(std::shared_ptr<TNucleus> beam, std::shared_ptr<TNucleus> targ,
+                     std::shared_ptr<TNucleus> ejec, std::shared_ptr<TNucleus> reco,
+                     double beame, double ex3, bool inverse){
 
   Clear();
   // I THINK INVERSE KINEMATICS NECESSITATES THE BEAM<->TARGET ENTIRELY ?
-  fNuc[0] = new TNucleus(beam);
-  fNuc[1] = new TNucleus(targ);
-  fNuc[2] = new TNucleus(ejec);
-  fNuc[3] = new TNucleus(reco);
+  fNuc[0] = beam;
+  fNuc[1] = targ;
+  fNuc[2] = ejec;
+  fNuc[3] = reco;
 
   for(int i=0;i<4;i++)
     fM[i]=fNuc[i]->GetMass();
@@ -27,10 +47,15 @@ TReaction::TReaction(const char *beam, const char *targ, const char *ejec, const
   fExc = ex3;
   fInverse = inverse;
 
-  if(inverse)
-    SetName(Form("%s(%s,%s)%s",beam,targ,ejec,reco));
-  else
-    SetName(Form("%s(%s,%s)%s",targ,beam,ejec,reco));
+  if(inverse) {
+    SetName(Form("%s(%s,%s)%s",
+                 beam->GetName(), targ->GetName(),
+                 ejec->GetName(), reco->GetName()));
+  } else {
+    SetName(Form("%s(%s,%s)%s",
+                 targ->GetName(), beam->GetName(),
+                 ejec->GetName(), reco->GetName()));
+  }
 
   InitReaction();
 }
@@ -53,8 +78,8 @@ void TReaction::InitReaction(){
   fVLab[1] = 0;                                         // velocity of target in lab
   fGLab[1] = 1;                                         // gamma factor of target
 
-  fS = pow(fM[0],2)+pow(fM[1],2)+2*fELab[0]*fM[1];       // fELab[1] = fM[1]
-  fInvariantMass = sqrt(fS);                                                                                       // √s
+  fS = pow(fM[0],2)+pow(fM[1],2)+2*fELab[0]*fM[1];      // fELab[1] = fM[1]
+  fInvariantMass = sqrt(fS);                            // √s
 
   // CM motion
   fCmE = fInvariantMass;
@@ -72,6 +97,10 @@ void TReaction::InitReaction(){
   gStyle->SetTitleXOffset(1.2);
   gStyle->SetDrawOption("AC");
 
+}
+
+TNucleus* TReaction::GetNucleus(int part) {
+  return fNuc[part].get();
 }
 
 double TReaction::GetTBeam(bool inverse) {

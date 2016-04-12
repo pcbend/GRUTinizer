@@ -56,7 +56,7 @@ GPeak::GPeak(Double_t cent,Double_t xlow,Double_t xhigh,TF1 *bg,Option_t *opt)
   TF1::SetParameter("centroid",cent);
 
   if(bg) {
-    fBGFit.Clear(); 
+    fBGFit.Clear();
     fBGFit.Copy(*bg);
   } else {
     fBGFit = TF1("BGFit",GRootFunctions::StepBG,xlow,xhigh,10);
@@ -90,7 +90,7 @@ GPeak::~GPeak() {
 }
 
 //void GPeak::Fcn(Int_t &npar,Double_t *gin,Double_T &f,Double_t *par,Int_t iflag) {
-  //chisquared calculator 
+  //chisquared calculator
   //
 //  int i=0;
 //  double chisq = 0;
@@ -177,25 +177,25 @@ bool GPeak::InitParams(TH1 *fithist){
   // - par[3]: R:    relative height of skewed gaus to gaus
   // - par[4]: beta: "skewedness" of the skewed gaussin
   // - par[5]: step: size of stepfunction step.
-  
+
   // - par[6]: base bg height.
- 
-  //limits. 
+
+  //limits.
   TF1::SetParLimits(0,0,largesty*2);
   TF1::SetParLimits(1,xlow,xhigh);
   TF1::SetParLimits(2,0.1,xhigh-xlow);
   TF1::SetParLimits(3,0.0,40);
-  TF1::SetParLimits(4,0.01,5); 
+  TF1::SetParLimits(4,0.01,5);
   double step = ((highy-lowy)/largesty)*50;
-  
-  //TF1::SetParLimits(5,step-step*.1,step+.1*step); 
-  TF1::SetParLimits(5,0.0,step+step); 
-  
+
+  //TF1::SetParLimits(5,step-step*.1,step+.1*step);
+  TF1::SetParLimits(5,0.0,step+step);
+
   //double slope  = (yhigh-ylow)/(xhigh-xlow);
   //double offset = yhigh-slope*xhigh;
   double offset = lowy;
-  TF1::SetParLimits(6,offset-0.5*offset,offset+offset); 
-  //TF1::SetParLimits(7,-2*slope,2*slope);                    
+  TF1::SetParLimits(6,offset-0.5*offset,offset+offset);
+  //TF1::SetParLimits(7,-2*slope,2*slope);
 
   //Make initial guesses
   TF1::SetParameter(0,largesty);         //fithist->GetBinContent(bin));
@@ -236,7 +236,7 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
 
   bool verbose = !options.Contains("Q");
 
-  if(fithist->GetSumw2()->fN!=fithist->GetNbinsX()+2) 
+  if(fithist->GetSumw2()->fN!=fithist->GetNbinsX()+2)
     fithist->Sumw2();
 
   TFitResultPtr fitres = fithist->Fit(this,Form("%sLRSME",options.Data()));
@@ -270,7 +270,7 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
 
 
   //Double_t binwidth = fithist->GetBinWidth(GetParameter("centroid"));
-  Double_t width    = TF1::GetParameter("sigma");
+  //Double_t width    = TF1::GetParameter("sigma");
   Double_t xlow,xhigh;
   //Double_t int_low,int_high;
   TF1::GetRange(xlow,xhigh);
@@ -281,7 +281,7 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   //Intgrate the background.
   //GPeak *tmppeak = new GPeak;
   //this->Copy(*tmppeak);
-  
+
   //tmppeak->SetParameter("bg_offset",0.0);
   //tmppeak->SetRange(int_low,int_high);//This will help get the true area of the gaussian 200 ~ infinity in a gaus
   //tmppeak->SetName("tmppeak");
@@ -320,7 +320,7 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
     printf("GetProb():       %.4f\n", TF1::GetProb());*/
     //TF1::Print();
   }
-  
+
   //printf("fithist->GetListOfFunctions()->FindObject(this) = 0x%08x\n",fithist->GetListOfFunctions()->FindObject(GetName()));
   //fflush(stdout);
   Copy(*fithist->GetListOfFunctions()->FindObject(GetName()));
