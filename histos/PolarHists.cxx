@@ -81,8 +81,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
 //    }
   }
 
-  if(!gretina || gretina->Size()<1 || gretina->Size()>(7*4)) {
+  if(!gretina || gretina->Size()<1 ) { //|| gretina->Size()>(7*4)) {
     entry++;
+    //printf("Here\n"); fflush(stdout);
     return;
   }
 
@@ -163,6 +164,28 @@ void MakeHistograms(TRuntimeObjects& obj) {
     histname = "GretinaEnergyXIdCal";
     obj.FillHistogram(histname,200,0,200,hit.GetCrystalId(),
                                8000,0,4000,hit.GetCoreEnergy(0));
+
+    histname = "GretinaCarge0XIdCal";
+    obj.FillHistogram(histname,200,0,200,hit.GetCrystalId(),
+                               8000,0,32000,hit.GetCoreCharge(0));
+    histname = "GretinaCarge1XIdCal";
+    obj.FillHistogram(histname,200,0,200,hit.GetCrystalId(),
+                               8000,0,32000,hit.GetCoreCharge(1));
+    histname = "GretinaCarge2XIdCal";
+    obj.FillHistogram(histname,200,0,200,hit.GetCrystalId(),
+                               8000,0,32000,hit.GetCoreCharge(2));
+    histname = "GretinaCarge3XIdCal";
+    obj.FillHistogram(histname,200,0,200,hit.GetCrystalId(),
+                               8000,0,32000,hit.GetCoreCharge(3));
+
+
+
+
+
+
+
+
+
 
 
     histname = "GretinaEnergyTheta";

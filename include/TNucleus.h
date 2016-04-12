@@ -57,6 +57,8 @@ class TNucleus : public TNamed{
   double GetMass() const       { return fMass; }		// Gets the mass of the nucleus (in MeV)
   const char* GetSymbol() const{ return fSymbol.c_str(); }	// Gets the atomic symbol of the nucleus
 
+  // Returns total kinetic energy in MeV
+  double GetEnergyFromBeta(double beta);
 
   void AddTransition(Double_t energy, Double_t intensity, Double_t energy_uncertainty = 0.0, Double_t intensity_uncertainty = 0.0);
   void AddTransition(TTransition *tran);
@@ -83,10 +85,10 @@ class TNucleus : public TNamed{
    double fMassExcess;					// Mass excess (in MeV)
    std::string fSymbol;					// Atomic symbol (ex. Ba, C, O, N)
    //std::string fName;                                    // Name, whatever user inputs (ex. 9C, 9c);
-   
+
    //JAB
    bool LoadTransitionFile();
-   
+
    ClassDef(TNucleus,1);				// Creates a nucleus with corresponding nuclear information
 };
 

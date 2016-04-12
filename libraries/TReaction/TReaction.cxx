@@ -10,30 +10,30 @@
 ClassImp(TReaction)
   /// \endcond
 
-  TReaction::TReaction(const char *beam, const char *targ, const char *ejec, const char *reco, double beame, double ex3, bool inverse){
+TReaction::TReaction(const char *beam, const char *targ, const char *ejec, const char *reco, double beame, double ex3, bool inverse){
 
-    Clear();
-    // I THINK INVERSE KINEMATICS NECESSITATES THE BEAM<->TARGET ENTIRELY ?
-    fNuc[0] = new TNucleus(beam);
-    fNuc[1] = new TNucleus(targ);
-    fNuc[2] = new TNucleus(ejec);
-    fNuc[3] = new TNucleus(reco);
+  Clear();
+  // I THINK INVERSE KINEMATICS NECESSITATES THE BEAM<->TARGET ENTIRELY ?
+  fNuc[0] = new TNucleus(beam);
+  fNuc[1] = new TNucleus(targ);
+  fNuc[2] = new TNucleus(ejec);
+  fNuc[3] = new TNucleus(reco);
 
-    for(int i=0;i<4;i++)
-      fM[i]=fNuc[i]->GetMass();
+  for(int i=0;i<4;i++)
+    fM[i]=fNuc[i]->GetMass();
 
-    fTBeam = beame;
-    fQVal = (fM[0]+fM[1])-(fM[2]+fM[3])-ex3;  // effective Q value (includes excitation)
-    fExc = ex3;
-    fInverse = inverse;
+  fTBeam = beame;
+  fQVal = (fM[0]+fM[1])-(fM[2]+fM[3])-ex3;  // effective Q value (includes excitation)
+  fExc = ex3;
+  fInverse = inverse;
 
-    if(inverse)
-      SetName(Form("%s(%s,%s)%s",beam,targ,ejec,reco));
-    else
-      SetName(Form("%s(%s,%s)%s",targ,beam,ejec,reco));
+  if(inverse)
+    SetName(Form("%s(%s,%s)%s",beam,targ,ejec,reco));
+  else
+    SetName(Form("%s(%s,%s)%s",targ,beam,ejec,reco));
 
-    InitReaction();
-  }
+  InitReaction();
+}
 
 
 void TReaction::InitReaction(){
@@ -115,7 +115,7 @@ void TReaction::SetCmFrame(double exc){
 double TReaction::GetELabFromThetaCm(double theta_cm, int part){
   if(part==0 || part==1) return fTLab[part];
 
-  return fCmG*(fECm[part] - fCmV*fPCm[part]*cos(theta_cm));
+  return fCmG*(fECm[part] + fCmV*fPCm[part]*cos(theta_cm));
 }
 
 double TReaction::GetTLabFromThetaCm(double theta_cm, int part){
@@ -175,8 +175,12 @@ void TReaction::AnalysisAngDist(double ekin, double theta_lab, int part, double 
 }
 
 double TReaction::AnalysisBeta(double ekin, int part){
-
   return sqrt(pow(ekin,2)+2*fM[part]*ekin)/(ekin+fM[part]);
+}
+
+double TReaction::AnalysisBetaFromThetaLab(double theta, int part) {
+  double ekin = GetTLabFromThetaCm(theta, part);
+  return AnalysisBeta(ekin, part);
 }
 
 // THIS IS ACTUALLY MOTT SCATTERING (RELATIVISTIC RUTHERFORD)
@@ -307,9 +311,24 @@ TGraph *TReaction::ThetaLabVsThetaLab(int parta, int partb) {
   g->GetYaxis()->SetTitle(Form("Theta Lab %s", fNuc[partb]->GetName()));
 
   for(int i=1; i<max_angle; i++) {
-    double theta_lab_a = (i-1)*TMath::DegToRad();
+    double theta_lab_a = i*TMath::DegToRad();
     double theta_lab_b = ConvertThetaLab(theta_lab_a, parta, partb);
-    g->SetPoint(i, theta_lab_a*TMath::RadToDeg(), theta_lab_b*TMath::RadToDeg());
+    g->SetPoint(i-1, theta_lab_a*TMath::RadToDeg(), theta_lab_b*TMath::RadToDeg());
+  }
+
+  return g;
+}
+
+TGraph* TReaction::BetaVsScatteringAngle(int part) {
+  TGraph* g = new TGraph(179);
+  g->SetTitle(Form("Beta %s vs Theta Lab %s", fNuc[part]->GetName(), fNuc[part]->GetName()));
+  g->GetXaxis()->SetTitle(Form("Theta Lab %s", fNuc[part]->GetName()));
+  g->GetYaxis()->SetTitle(Form("Beta %s", fNuc[part]->GetName()));
+
+  for(int i=1; i<180; i++) {
+    double theta_lab = i*TMath::DegToRad();
+    double beta = AnalysisBetaFromThetaLab(theta_lab, part);
+    g->SetPoint(i-1, theta_lab*TMath::RadToDeg(), beta);
   }
 
   return g;

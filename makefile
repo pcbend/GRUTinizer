@@ -7,7 +7,7 @@ PLATFORM:=$(PLATFORM)
 # EDIT THIS SECTION
 
 INCLUDES   = include
-CFLAGS     = -g -std=c++11 -O0 -Wall -Wextra -pedantic -Wno-unused-parameter
+CFLAGS     = -g -std=c++11 -O3 -Wall -Wextra -pedantic -Wno-unused-parameter
 LINKFLAGS_PREFIX  =
 LINKFLAGS_SUFFIX  = -L/opt/X11/lib -lX11 -lXpm -std=c++11
 SRC_SUFFIX = cxx
@@ -49,10 +49,10 @@ LIBRARY_OUTPUT := $(patsubst %,libraries/lib%.so,$(LIBRARY_NAMES))
 
 INCLUDES  := $(addprefix -I$(PWD)/,$(INCLUDES))
 CFLAGS    += $(shell root-config --cflags)
-CFLAGS    += -MMD -MP $(INCLUDES)
-LINKFLAGS += -Llibraries $(addprefix -l,$(LIBRARY_NAMES)) -Wl,-rpath,\$$ORIGIN/../libraries
+CFLAGS    += -MMD -MP $(INCLUDES) -D_GLIBCXX_USE_NANOSLEEP
+LINKFLAGS += -Llibraries $(addprefix -l,$(LIBRARY_NAMES)) -Wl,-rpath,\$$ORIGIN/../libraries -Wl,-rpath-link,.
 LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lPyROOT
-LINKFLAGS := $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX) $(CFLAGS)
+LINKFLAGS := $(CFLAGS) $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX)
 
 ROOT_LIBFLAGS := $(shell root-config --cflags)
 

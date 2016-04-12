@@ -81,12 +81,14 @@ public:
   float GetCorrTOF_OBJ_MESY(int i=0) const;
   
   float GetOBJ_E1Raw_MESY(int i=0) const;
+  float GetOBJ_E1Raw_MESY_Ch15(int i=0) const;
  
   float GetRawOBJ_MESY(int i=0) const;
 
   float GetRawE1_MESY(int i=0) const;
   
   float GetXF_E1Raw_MESY(int i=0) const;
+  float GetXF_E1Raw_MESY_Ch15(int i=0) const;
   
   float GetRawXF_MESY(int i=0) const;
 
@@ -95,6 +97,13 @@ public:
   float MCorrelatedE1() const;
   float MCorrelatedOBJ_E1(bool corrected=true) const;
   float MCorrelatedXFP_E1(bool corrected=true) const;
+
+  float MCorrelatedOBJ_Ch15() const;
+  float MCorrelatedXFP_Ch15() const;
+  float MCorrelatedE1_Ch15() const;
+  float MCorrelatedOBJ_E1_Ch15(bool corrected=true) const;
+  float MCorrelatedXFP_E1_Ch15(bool corrected=true) const;
+
   
 
 private:
