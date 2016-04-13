@@ -59,6 +59,7 @@ class TNucleus : public TNamed{
 
   // Returns total kinetic energy in MeV
   double GetEnergyFromBeta(double beta);
+  double GetBetaFromEnergy(double energy_MeV);
 
   void AddTransition(Double_t energy, Double_t intensity, Double_t energy_uncertainty = 0.0, Double_t intensity_uncertainty = 0.0);
   void AddTransition(TTransition *tran);
