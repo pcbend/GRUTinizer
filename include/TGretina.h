@@ -20,12 +20,13 @@ public:
   virtual void Clear(Option_t *opt = "");
 
   virtual Int_t Size() { return gretina_hits.size(); }
+  virtual Int_t AddbackSize() { BuildAddback(); return addback_hits.size(); }
 
   virtual void InsertHit(const TDetectorHit& hit);
   virtual TDetectorHit& GetHit(int i)            { return gretina_hits.at(i); }
 
   const TGretinaHit& GetGretinaHit(int i) { return gretina_hits.at(i); }
-  //const TGretinaHit& GetAddbackHit(int i) { return *(TGretinaHit*)addback_hits.at(i); }
+  const TGretinaHit& GetAddbackHit(int i) { BuildAddback(); return addback_hits.at(i); }
   void PrintHit(int i){ gretina_hits.at(i).Print(); }
 
   static TVector3 CrystalToGlobal(int cryId,
@@ -38,14 +39,27 @@ public:
   static void DrawEnVsTheta(Double_t Beta=0.1,Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
   static void DrawCoreSummary(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
 
+  
+#if !defined (__CINT__) 
+  static void SetAddbackCondition(std::function<bool(const TGretinaHit&,const TGretinaHit&)> condition) {
+    fAddbackCondition = condition;
+  }
+  static std::function<bool(const TGretinaHit&,const TGretinaHit&)> GetAddbackCondition() {
+    return fAddbackCondition;
+  }
+#endif
 
 
 private:
+  void BuildAddback() const;
+  
+#if !defined (__CINT__) 
+  static std::function<bool(const TGretinaHit&,const TGretinaHit&)> fAddbackCondition;  
+#endif
   virtual int BuildHits(std::vector<TRawEvent>& raw_data);
-  //void BuildAddbackHits();
 
   std::vector<TGretinaHit> gretina_hits;
-  //TClonesArray* addback_hits;//("TGretinaHit");
+  mutable std::vector<TGretinaHit> addback_hits; //!
 
   static Float_t crmat[32][4][4][4];
   static Float_t m_segpos[2][36][3];

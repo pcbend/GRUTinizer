@@ -238,6 +238,10 @@ double TSRIM::GetAdjustedEnergy(double energy_keV,double thickness,double stepsi
     return 0.0;
   }
 
+  if(std::isnan(energy_keV)) {
+    return energy_keV;
+  }
+
   double energy_temp = energy_keV;
   // MAKE XSTEP SMALLER FOR BETTER RESULTS. 1UM SHOULD BE FINE ... UNLESS YOU ARE AT THE BRAGG PEAK ??
   double xstep = stepsize, xtot = 0.0;

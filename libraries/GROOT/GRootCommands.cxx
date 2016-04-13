@@ -26,6 +26,7 @@
 
 #include <GCanvas.h>
 #include <GPeak.h>
+#include <GGaus.h>
 //#include <GRootObjectManager.h>
 #include <TGRUTOptions.h>
 //#include <TGRUTInt.h>
@@ -128,6 +129,28 @@ bool GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
   bool edit = false;
   if(!hist)
     return edit;
+  if(xlow>xhigh)
+    std::swap(xlow,xhigh);
+
+  //std::cout << "here." << std::endl;
+
+  GGaus *mypeak= new GGaus(xlow,xhigh);
+  mypeak->Fit(hist,"Q+");
+  //mypeak->Background()->Draw("SAME");
+  TF1 *bg = new TF1(*mypeak->Background());
+  hist->GetListOfFunctions()->Add(bg);
+  edit = true;
+
+  return edit;
+}
+ 
+/* 
+  
+  
+  
+  bool edit = false;
+  if(!hist)
+    return edit;
   int binx[2];
   double y[2];
   if(xlow>xhigh)
@@ -189,6 +212,8 @@ bool GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
   return edit;
 
 }
+*/
+
 
 bool PhotoPeakFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
   bool edit = false;
