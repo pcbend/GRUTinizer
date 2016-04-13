@@ -173,6 +173,68 @@ void MakeHistograms(TRuntimeObjects& obj) {
     }
     //std::cout << " In gret loop after bank29" << std::endl;
     if(s800) {
+      TVector3 trackvect=s800->ExitTargetVect();
+      TVector3 zAxis(0,0,1);
+      TVector3 NormResPlane = trackvect.Cross(zAxis);
+      TVector3 NormGammaPlane = hit.GetPosition().Cross(zAxis);
+      TVector3 NormDiff = NormResPlane-NormGammaPlane;
+      TVector3 NormCrossNorm = NormResPlane.Cross(NormGammaPlane);
+      double openang = NormResPlane.Angle(NormGammaPlane);
+      
+      double openang_Cos = TMath::ACos(NormResPlane.Dot(NormGammaPlane)/(NormResPlane.Mag()*NormGammaPlane.Mag()));
+      if(NormResPlane.Dot(NormGammaPlane)>0 && (NormResPlane.Mag()*NormGammaPlane.Mag())<0)
+	openang_Cos = 2.0*TMath::Pi() - openang_Cos;
+      if(NormResPlane.Dot(NormGammaPlane)<0 && (NormResPlane.Mag()*NormGammaPlane.Mag())<0)
+	openang_Cos = 2.0*TMath::Pi() - openang_Cos;
+
+      double openang_Dirk = (2.0*TMath::Pi() - s800->Azita())  - TMath::Abs(hit.GetPosition().Phi());
+      
+      if(openang_Dirk<0) openang_Dirk += 2.0*TMath::Pi();
+      dirname = "Checking_OpenAngCalc";
+      histname = "GretinaDopplerVsOpenAng_CheckCalc";
+      obj.FillHistogram(dirname,histname,
+			2000,0,4000,hit.GetDoppler(BETA),
+			1000,0,6.3,openang);
+
+      histname = "GretinaDopplerVsOpenAng_CalcUsingCos";
+      obj.FillHistogram(dirname,histname,
+			2000,0,4000,hit.GetDoppler(BETA),
+			2000,-6.3,6.3,openang_Cos);
+
+      histname = "GretinaDopplerVspenAng_Dirk";
+      obj.FillHistogram(dirname,histname,
+			2000,0,4000,hit.GetDoppler(BETA),
+			1000,0,6.3,openang_Dirk);
+
+
+      histname = "GretinaDopplerVsOpenAng_TrackCorr_CheckCalc";
+      obj.FillHistogram(dirname,histname,
+			2000,0,4000,hit.GetDoppler(BETA,&trackvect),
+			1000,0,6.3,openang);
+
+      histname = "GretinaDopplerVsOpenAng_TrackCorr_CalcUsingCos";
+      obj.FillHistogram(dirname,histname,
+			2000,0,4000,hit.GetDoppler(BETA,&trackvect),
+			2000,-6.3,6.3,openang_Cos);
+
+      histname = "GretinaDopplerVspenAng_TrackCorr_Dirk";
+      obj.FillHistogram(dirname,histname,
+			2000,0,4000,hit.GetDoppler(BETA,&trackvect),
+			1000,0,6.3,openang_Dirk);
+      
+      histname = Form("GretinaVecCorr");
+      obj.FillHistogram(dirname,histname,
+			2000,0,4000,hit.GetDoppler(BETA,&trackvect));
+
+      
+      histname = Form("GretinaDopplerCorr");
+      obj.FillHistogram(dirname,histname,
+			2000,0,4000,hit.GetDoppler(BETA));
+
+
+      
+
+
       dirname = "GretSummTime";
       histname = "Gretina_S800_time";
       obj.FillHistogram(dirname,histname,
@@ -330,7 +392,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
     double openang_Spec = hit.GetPosition().Phi()-trackvect_Spec.Phi();
 
     histname = "GretinaDopplerVsOpenAng";
-    obj.FillHistogram(dirname,histname,
+    obj.FillHistogram(histname,
 		      1000,-3.15,3.15,openang,
 		      2000,0,4000,hit.GetDoppler(BETA));
     if(s800){
@@ -338,6 +400,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
     obj.FillHistogram(dirname,histname,
 		      1000,-0.2,0.2,s800->GetDta(),
 		      2000,0,4000,hit.GetDoppler(BETA));
+
     }
 
     histname = "QuadDoppSummary";

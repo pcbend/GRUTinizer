@@ -67,10 +67,17 @@ int LabelPeaks(TH1 *hist,double sigma,double thresh,Option_t *opt) {
     return n;
   TText *text;
   double *x = pm->GetX();
-  double *y = pm->GetY();
+  //  double *y = pm->GetY();
   for(int i=0;i<n;i++) {
-    y[i] += 20.0;
-    text = new TText(x[i],y[i],Form("%.1f",x[i]));
+    //y[i] += y[i]*0.15;
+    double y = 0;
+    for(int i_x = x[i]-3;i_x<x[i]+3;i_x++){
+      if((hist->GetBinContent(hist->GetXaxis()->FindBin(i_x)))>y){
+	y = hist->GetBinContent(hist->GetXaxis()->FindBin(i_x));
+      }
+    }
+    y+=y*0.1;
+    text = new TText(x[i],y,Form("%.1f",x[i]));
     text->SetTextSize(0.025);
     text->SetTextAngle(90);
     text->SetTextAlign(12);
