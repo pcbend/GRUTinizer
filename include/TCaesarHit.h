@@ -42,6 +42,7 @@ public:
   bool IsValid() const { return (fCharge!=-1 && fTime!=-1); }
 
   TVector3 GetPosition() const; 
+  TVector3 GetPosition(double z_shift) const; 
  
   double GetDoppler(double beta, TVector3 *track=0) {
     if(track==0) {
@@ -50,6 +51,15 @@ public:
     double tmp = 0.0;
     double gamma = 1/(sqrt(1-pow(beta,2)));
     tmp = GetEnergy()*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*track)));
+    return tmp;
+  }
+  double GetDoppler(double beta,  double z_shift,TVector3 *track=0) {
+    if(track==0) {
+      track = (TVector3*)&BeamUnitVec;
+    }
+    double tmp = 0.0;
+    double gamma = 1/(sqrt(1-pow(beta,2)));
+    tmp = GetEnergy()*gamma *(1 - beta*TMath::Cos(GetPosition(z_shift).Angle(*track)));
     return tmp;
   }
 

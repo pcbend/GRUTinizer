@@ -14,7 +14,7 @@
 bool DefaultAddback(const TCaesarHit& one,const TCaesarHit &two) {
   TVector3 res = one.GetPosition()-two.GetPosition();
   return ((std::abs(one.GetTime()-two.GetTime()) < 200.0) &&
-           (res.Mag() < 150.0) ) ;
+           (res.Mag() < 80.0) ) ;
 }
 
 
@@ -486,19 +486,20 @@ TVector3 TCaesar::GetPosition(int ring,int det) {
 
   double shift = GValue::Value("TARGET_SHIFT_X");
   if(!std::isnan(shift)) {
-    x += shift;
+    x -= shift;
   }
 
   shift = GValue::Value("TARGET_SHIFT_Y");
   if(!std::isnan(shift)) {
-    y += shift;
+    y -= shift;
   }
   
   shift = GValue::Value("TARGET_SHIFT_Z");
   if(!std::isnan(shift)) {
-    z += shift;
+    z -= shift;
   }
  
+  //Positions in file are in cm; need to be in mm 
   x*= 10.0;
   y*= 10.0;
   z*= 10.0;
@@ -506,6 +507,21 @@ TVector3 TCaesar::GetPosition(int ring,int det) {
   return TVector3(x,y,z);
 }
 
+//Note: z_shift must be in centimeters
+TVector3 TCaesar::GetPosition(int ring,int det, double z_shift) {
+  double x = detector_positions[ring][det][0];
+  double y = detector_positions[ring][det][1];
+  double z = detector_positions[ring][det][2];
+
+  z -= z_shift;
+   
+  //Positions in file are in cm; need to be in mm 
+  x*= 10.0;
+  y*= 10.0;
+  z*= 10.0;
+
+  return TVector3(x,y,z);
+}
 
 
 

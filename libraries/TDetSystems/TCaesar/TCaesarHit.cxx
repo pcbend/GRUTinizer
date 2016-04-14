@@ -31,7 +31,9 @@ void TCaesarHit::Print(Option_t *opt) const {
 TVector3 TCaesarHit::GetPosition() const {
   return TCaesar::GetPosition(this);
 }
-
+TVector3 TCaesarHit::GetPosition(double z_shift) const {
+  return TCaesar::GetPosition(this, z_shift);
+}
 
 void TCaesarHit::AddToSelf(const TCaesarHit& other) {
 

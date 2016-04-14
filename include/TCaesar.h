@@ -44,8 +44,6 @@ public:
   void SetULM(int ulm) { fUlm = ulm; }
 
 
-  
-  //static TVector3 GetPosition(int detnum, int ring_num, int sector_num);
   int Size() const { return caesar_hits.size(); }
   int AddbackSize() { BuildAddback(); return addback_hits.size(); }
 
@@ -55,7 +53,9 @@ public:
 
 
   static TVector3 GetPosition(const TCaesarHit* hit) { return GetPosition(hit->GetRingNumber(),hit->GetDetectorNumber()); }
+  static TVector3 GetPosition(const TCaesarHit* hit, double z_shift) { return GetPosition(hit->GetRingNumber(),hit->GetDetectorNumber(), z_shift); }
   static TVector3 GetPosition(int ring,int det);
+  static TVector3 GetPosition(int ring,int det, double z_shift);
 
 
   static char const ring_names[]; 
