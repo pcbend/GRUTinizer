@@ -94,7 +94,7 @@ TNucleus::TNucleus(const char *name){
   while(getline(infile,line)) {
     if(line.length() <1)
       continue;
-    //		printf("%s\n",line.c_str());
+//              printf("%s\n",line.c_str());
     std::stringstream ss(line);
     ss>>n; ss>>z; ss>>sym_name; ss>>mass;
     if(strcasecmp(element.c_str(),sym_name.c_str()) == 0) {
@@ -118,7 +118,7 @@ TNucleus::TNucleus(const char *name){
   this->LoadTransitionFile();
 }
 /*
-*/
+ */
 TNucleus::TNucleus(int charge, int neutrons, double mass, const char* symbol){
   // Creates a nucleus with Z, N, mass, and symbol
   //SetMassFile();
@@ -193,7 +193,7 @@ TNucleus::~TNucleus(){
 }
 
 const char* TNucleus::SortName(const char* name){
-  //Names a nucleus based on symbol (ex. 26Na OR Na26). This is to get a nice naming convention.
+//Names a nucleus based on symbol (ex. 26Na OR Na26). This is to get a nice naming convention.
   std::string Name = name;
   //SetMassFile();
   int Number = 0;
@@ -300,6 +300,7 @@ double TNucleus::GetRadius() const{
 }
 
 /*
+<<<<<<< HEAD
    bool TNucleus::SetSourceData() {
 
    std::string name = GetSymbol();
@@ -344,8 +345,54 @@ double TNucleus::GetRadius() const{
 
 printf("Found %d Transitions for %s\n",TransitionList.GetSize(),GetName());
 return true;
+=======
+  bool TNucleus::SetSourceData() {
 
-}
+  std::string name = GetSymbol();
+  if(name.length()==0)
+  return false;
+
+  if(name[0]<='Z' && name[0]>='A')
+  name[0] = name[0]-'A'+'a';
+  name = name + Form("%i",GetA()) + ".sou";
+  std::string path = getenv("GRSISYS");
+  path +=  "/libraries/TGRSIAnalysis/SourceData/";
+  path +=  name;
+
+  printf("path = %s\n",path.c_str());
+  std::ifstream sourcefile;
+  sourcefile.open(path.c_str());
+  if(!sourcefile.is_open()) {
+  printf("unable to set source data for %s.\n",GetName());
+  return false;
+  }
+>>>>>>> 5aa7f5e5225d24f8b01a7ffcc333c50eff387814
+
+  TransitionList.Clear();
+
+  std::string line;
+  int linenumber = 0;
+  while(getline(sourcefile,line)) {
+  linenumber++;
+  int comment = line.find("//");
+  if (comment != std::string::npos)
+  line = line.substr(0, comment);
+  if(line.length()==0)
+  continue;
+  //TGRSITransition *tran = new TGRSITransition;
+  //std::stringstream ss(line);
+  //ss >> tran->fenergy;
+  //ss >> tran->fenergy_uncertainty;
+  //ss >> tran->fintensity;
+  //ss >> tran->fintensity_uncertainty;
+  //TransitionList.Add(tran);
+  //  printf("eng: %.02f\tinten: %.02f\n",((TGRSITransition*)TransitionList.Last())->fenergy,((TGRSITransition*)TransitionList.Last())->fintensity);
+  }
+
+  printf("Found %d Transitions for %s\n",TransitionList.GetSize(),GetName());
+  return true;
+
+  }
 */
 
 
@@ -377,7 +424,8 @@ void TNucleus::AddTransition(TTransition* tran){
    printf("Out of range\n");
    return false;
    }
-   }*/
+   }
+*/
 
 TTransition* TNucleus::GetTransition(Int_t idx){
   TTransition *tran = (TTransition*)TransitionList.At(idx);
@@ -463,41 +511,6 @@ bool TNucleus::LoadTransitionFile(){
    
   return true;
 
-  /*
-  std::stringstream ss1,ssName;
-  std::string fileName1,fileName2,NucName,eat;
-  Double_t En,EnUn,Ints,IntsUn;
-  fileName1 =   std::string(getenv("GRUTSYS")) + "/libraries/SourceData/";
-  ss1 << this->GetSymbol();  ssName << this->GetSymbol();
-  ss1 << this->GetA();       ssName << this->GetA();
-  ssName >> NucName;
-  SetName(NucName.c_str());
-  ss1 << ".sou";
-  ss1 >> fileName2;
-
-  fileName1.append(fileName2);
-
-  ifstream transFile;
-  transFile.open(fileName1.c_str());
-
-  if(!transFile){
-    //std::cout << " *** ERROR : File - " << fileName1
-    //	      << " does not exist!!! Not Loading!! " << std::endl;
-    return false;
-  }
-
-  TransitionList.Clear();
-  while(!(transFile.eof())){
-    transFile >> En >> EnUn >> Ints >> IntsUn;
-    getline(transFile,eat);
-    this->AddTransition(En,Ints,EnUn,IntsUn);
-  }
-
-  transFile.close();
-  std::cout << " File        : " << fileName2 <<  std::endl
-    << " Opened from : " << "libraries/SourceData/" << std::endl;
-  return true;
-  */
 }
 
 double TNucleus::GetEnergyFromBeta(double beta) {
@@ -505,13 +518,8 @@ double TNucleus::GetEnergyFromBeta(double beta) {
   return fMass * (gamma-1);
 }
 
-/*
-TGraph *TNucleus::AssignPoints(std::vector<double> xvalues,std::vector<double> yvalues,TGraph *graph)  {
-  if(!xvalues.size())
-    return graph;
-  if(!graph)
-    graph = new TGraphErrors(); 
-
-
+double TNucleus::GetBetaFromEnergy(double energy_MeV) {
+  double gamma = energy_MeV/fMass + 1;
+  double beta = std::sqrt(1 - 1/(gamma*gamma));
+  return beta;
 }
-*/

@@ -31,6 +31,7 @@ public:
 
   TVector3 CRDCTrack();  // not a finished method
   TVector3 ExitTargetVect(int order=6);
+  Float_t Azita(int order=6);
   float GetAFP() const;
   float GetBFP() const;
   float MapCalc(int calcorder,int parameter,float *input);
@@ -83,14 +84,15 @@ public:
   float GetOBJ_E1Raw_MESY(int i=0) const;
   float GetOBJ_E1Raw_MESY_Ch15(int i=0) const;
  
-  float GetRawOBJ_MESY(int i=0) const;
+  float GetRawOBJ_MESY(unsigned int i=0) const;
 
-  float GetRawE1_MESY(int i=0) const;
+  float GetRawE1_MESY(unsigned int i=0) const;
+  float GetRawE1_MESY_Ch15(unsigned int i=0) const;
   
   float GetXF_E1Raw_MESY(int i=0) const;
   float GetXF_E1Raw_MESY_Ch15(int i=0) const;
   
-  float GetRawXF_MESY(int i=0) const;
+  float GetRawXF_MESY(unsigned int i=0) const;
 
   float MCorrelatedOBJ() const;
   float MCorrelatedXFP() const;

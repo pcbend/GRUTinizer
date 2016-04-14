@@ -101,7 +101,6 @@ bool TChainLoop::Iteration() {
     if(!det->TestBit(TDetector::kUnbuilt)){
       event->AddDetector(det);
     } else {
-      std::cout << " Type deleting = " << det->IsA()->GetName() << std::endl;
       delete det;
     }
   }
