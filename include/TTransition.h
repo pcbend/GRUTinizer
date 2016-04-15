@@ -1,42 +1,59 @@
 #ifndef TTRANSITION_H
 #define TTRANSITION_H
 
+/** \addtogroup Fitting Fitting & Analysis
+ *  @{
+ */
+
 #include <cstdio>
+
+#include "TClass.h"
 #include "TObject.h"
-#include "TString.h"
+
+/////////////////////////////////////////////////////////////////
+///
+/// \class TTransition
+///
+/// This Class contains the information about a nuclear 
+/// transition. These transitions are a part of a TNucleus
+/// and are typically set within the TNucleus framework
+///
+/////////////////////////////////////////////////////////////////
 
 class TTransition : public TObject {
-  friend class TNucleus;
- public:
-  TTransition();
-  virtual ~TTransition();
+   friend class TNucleus;
+   public:
+      TTransition();
+      virtual ~TTransition();
 
-  bool isSortable() const { return true; }
-  Int_t CompareIntensity(const TObject *obj) const;
+      bool IsSortable() const { return true; }
+      int Compare(const TObject* obj) const;
+      int CompareIntensity(const TObject* obj) const;
 
-  void Set(Double_t En,Double_t Intens=-1, Double_t EnUnc = -1, Double_t IntensUnc=-1) { fEnergy = En; fIntensity = Intens; fEnUncertainty = EnUnc; fIntUncertainty = IntensUnc;}
-  void SetEnergy(Double_t En)           { fEnergy = En; }
-  void SetIntensity(Double_t Intensity) { fIntensity = Intensity; }
-  void SetEnUncertainty(Double_t Unc)   { fEnUncertainty = Unc; }
-  void SetIntUncertainty(Double_t Unc)  { fIntUncertainty = Unc; }
+      void SetEnergy(double &tmpenergy) {fEnergy = tmpenergy;}
+      void SetEnergyUncertainty(double &tmperror){ fEngUncertainty = tmperror;}
+      void SetIntensity(double &tmpintens){fIntensity = tmpintens;}
+      void SetIntensityUncertainty(double &tmpinterror){ fIntUncertainty = tmpinterror;}
 
-  Double_t GetEnergy()         const { return fEnergy; }
-  Double_t GetIntensity()      const { return fIntensity; }
-  Double_t GetEnUncertainty()  const { return fEnUncertainty; }
-  Double_t GetIntUncertainty() const { return fIntUncertainty; }
+      double GetEnergy() const {return fEnergy;}
+      double GetEnergyUncertainty() const {return fEngUncertainty;}
+      double GetIntensity() const {return fIntensity;}
+      double GetIntensityUncertainty() const {return fIntUncertainty;}
 
-  void Clear(Option_t *opt="");
-  void Print(Option_t *opt="") const;
+      void Clear(Option_t* opt = "");
+      void Print(Option_t* opt = "") const;
 
-  std::string PrintToString();
-				       
- protected:
-  Double_t fEnergy;
-  Double_t fIntensity;
-  Double_t fEnUncertainty;
-  Double_t fIntUncertainty;
+      std::string PrintToString();
 
-  ClassDef(TTransition,1);
+   private:
+      double fEnergy;           //Energy of the transition
+      double fEngUncertainty;   //Uncertainty in the energy of the transition
+      double fIntensity;        //Intensity of the transition
+      double fIntUncertainty;   //Uncertainty in the intensity
+
+/// \cond CLASSIMP
+   ClassDef(TTransition,0) //Information about a TNucleus transition
+/// \endcond
 };
-
+/*! @} */
 #endif

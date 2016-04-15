@@ -791,12 +791,14 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
     case kKey_f:
        if(!hists.empty() && GetNMarkers()>1) {
          //printf("x low = %.1f\t\txhigh = %.1f\n",fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
-         edited = PhotoPeakFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
+         if(PhotoPeakFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx))
+           edited = true;
        }
        break;
 
     case kKey_g:
-      edited = GausFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
+      if(GausFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx))
+        edited = true;
       break;
 
     //case kKey_G:
@@ -1032,6 +1034,31 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
 	RemoveMarker("all");
       }
       break;
+    case kKey_S:
+
+      if(GetNMarkers()<2){
+	edited = ShowPeaks(hists.data(),hists.size());
+	RemoveMarker("all");
+      } else{
+	double x1 = fMarkers.at(fMarkers.size()-1)->localx;
+	double x2 = fMarkers.at(fMarkers.size()-2)->localx;
+	if(x1>x2)
+	  std::swap(x1,x2);
+	double y1 = fMarkers.at(fMarkers.size()-1)->localy;
+	double y2 = fMarkers.at(fMarkers.size()-2)->localy;
+	if(y1>y2)
+	  std::swap(y1,y2);
+
+	double ymax = hists.at(0)->GetMaximum();
+	double thresh = y1/ymax;
+	double sigma = 1.0;
+	if(sigma>10.0)
+	  sigma = 10.0;
+	edited = ShowPeaks(hists.data(),hists.size(),sigma,thresh);
+	RemoveMarker("all");
+      }
+      break;
+
     case kKey_F10:{
       }
       break;

@@ -287,6 +287,25 @@ bool TS800::ReadMap(std::string filename){
   }
 }
 
+Float_t TS800::Azita(int order){
+  float xsin = TMath::Sin(GetAta(order));
+  float ysin = TMath::Sin(GetBta(order));
+  float azita = 0.0;
+  if(xsin>0 && ysin>0){
+    azita = TMath::ATan(ysin/xsin);
+  } else if(xsin<0 && ysin>0){
+    azita = TMath::Pi()-TMath::ATan(ysin/TMath::Abs(xsin));
+  } else if(xsin<0 && ysin<0){
+    azita = TMath::Pi()+TMath::ATan(TMath::Abs(ysin)/TMath::Abs(xsin));
+  } else if(xsin>0 && ysin<0){
+    azita = 2.0*TMath::Pi()-TMath::ATan(TMath::Abs(ysin)/xsin);
+  } else{
+    azita = 0;
+  }
+  return azita;
+}
+
+
 TVector3 TS800::ExitTargetVect(int order){
   TVector3 track;
   double xsin = 0;
@@ -1152,15 +1171,27 @@ float TS800::GetOBJ_E1Raw_MESY_Ch15(int i) const {
   return sqrt(-1.0);
 }
 
-float TS800::GetRawOBJ_MESY(int i) const {
+float TS800::GetRawOBJ_MESY(unsigned int i) const {
+  if(i>=mtof.fObj.size())
+    return sqrt(-1);
   return (mtof.fObj.at(i));
 }
 
-float TS800::GetRawE1_MESY(int i) const {
+float TS800::GetRawE1_MESY(unsigned int i) const {
+  if(i>=mtof.fE1Up.size())
+    return sqrt(-1);
   return (mtof.fE1Up.at(i));
 }
 
-float TS800::GetRawXF_MESY(int i) const {
+float TS800::GetRawE1_MESY_Ch15(unsigned int i) const {
+  if(i>=mtof.fRef.size())
+    return sqrt(-1);
+  return (mtof.fRef.at(i));
+}
+
+float TS800::GetRawXF_MESY(unsigned int i) const {
+  if(i>=mtof.fXfp.size())
+    return sqrt(-1);
   return (mtof.fXfp.at(i));
 }
 
@@ -1295,7 +1326,6 @@ float TS800::MCorrelatedOBJ_E1(bool corrected) const{
 
 float TS800::MCorrelatedXFP_E1(bool corrected) const{
   if(!(mtof.fE1Up.size()==1)) {
-    std::cout << " In IF " << std::endl;
     mtof.fCorrelatedXFP = -1;
     mtof.fCorrelatedE1  = -1;
   }

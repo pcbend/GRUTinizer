@@ -18,6 +18,14 @@ Double_t GRootFunctions::PolyBg(Double_t *dim, Double_t *par, Int_t order) {
   return result;
 }
 
+Double_t GRootFunctions::LinFit(Double_t *dim, Double_t *par) {
+  return PolyBg(dim,par,1);
+}
+
+Double_t GRootFunctions::QuadFit(Double_t *dim, Double_t *par) {
+  return PolyBg(dim,par,2);
+}
+
 
 Double_t GRootFunctions::StepFunction(Double_t *dim, Double_t *par) {
   //  -dim[0]: channels to fit
