@@ -188,6 +188,11 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
   TVirtualFitter::SetMaxIterations(100000);
 
   bool verbose = !options.Contains("Q");
+  bool selfprint = !options.Contains("no-print");
+  if(!selfprint) {
+    options.ReplaceAll("no-print","");
+  }
+
 
   if(fithist->GetSumw2()->fN!=fithist->GetNbinsX()+2) 
     fithist->Sumw2();
@@ -263,7 +268,8 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
   fArea -= bgArea;
 
   if(!verbose) {
-    Print();/*
+    if(selfprint)
+      Print();/*
     printf("BG Area:         %.02f\n",bgArea);
     printf("GetChisquared(): %.4f\n", TF1::GetChisquare());
     printf("GetNDF():        %i\n",   TF1::GetNDF());
@@ -271,8 +277,6 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
     //TF1::Print();
   }
   
-  //printf("fithist->GetListOfFunctions()->FindObject(this) = 0x%08x\n",fithist->GetListOfFunctions()->FindObject(GetName()));
-  //fflush(stdout);
   Copy(*fithist->GetListOfFunctions()->FindObject(GetName()));
   fithist->GetListOfFunctions()->Add(fBGFit.Clone());
 

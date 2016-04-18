@@ -83,6 +83,12 @@ void TCalibrator::Fit(int order) {
   graph_of_everything.Fit(linfit);
 }
 
+double TCalibrator::GetParameter(int i) {
+  if(linfit) 
+    return linfit->GetParameter(i);
+  return sqrt(-1);
+}
+
 
 TGraph &TCalibrator::MakeCalibrationGraph(double min_fom) { 
   std::vector<double> xvalues;
@@ -105,16 +111,16 @@ TGraph &TCalibrator::MakeCalibrationGraph(double min_fom) {
 std::vector<double> TCalibrator::Calibrate(double min_fom) { std::vector<double> vec; return vec; }
 
 
-void TCalibrator::AddData(TH1 *data,std::string source, double sigma,double threshold,double error) { 
+int TCalibrator::AddData(TH1 *data,std::string source, double sigma,double threshold,double error) { 
   if(!data || !source.length()) 
-    return;
+    return 0;
   TNucleus n(source.c_str());
-  AddData(data,&n,sigma,threshold,error);
+  return AddData(data,&n,sigma,threshold,error);
 }
 
-void TCalibrator::AddData(TH1 *data,TNucleus *source, double sigma,double threshold,double error) { 
+int TCalibrator::AddData(TH1 *data,TNucleus *source, double sigma,double threshold,double error) { 
   if(!data || !source)
-    return;
+    return 0;
 
   int actual_x_max = std::floor(data->GetXaxis()->GetXmax());
   int actual_x_min = std::floor(data->GetXaxis()->GetXmax());
@@ -141,7 +147,9 @@ void TCalibrator::AddData(TH1 *data,TNucleus *source, double sigma,double thresh
   //std::vector<double> data_channels;
   std::map<double,double> datatosource; 
   for(int x=0;x<spectrum.GetNPeaks();x++) {
-    GGaus *fit = GausFit(data,spectrum.GetPositionX()[x]-5,spectrum.GetPositionX()[x]+5);
+    double range = 8*data->GetXaxis()->GetBinWidth(1);
+    printf(DGREEN "\tlow %.02f \t high %.02f" RESET_COLOR "\n",spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range);
+    GGaus *fit = GausFit(data,spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range,"");
     //data_channels
     //data_channels.push_back(fit.GetCentroid());
     datatosource[fit->GetCentroid()] = sqrt(-1);
@@ -150,34 +158,50 @@ void TCalibrator::AddData(TH1 *data,TNucleus *source, double sigma,double thresh
 
     
   double max_err = 0.0000;
+  std::map<std::pair<double,double>, double> source_test;
+  std::map<std::pair<double,double>, double> data_test;
+  
+  for(auto &data_ita: datatosource) {
+    for(auto &data_itb: datatosource) {
+      if(data_ita==data_itb) continue;
+      data_test[std::make_pair(data_ita.first,data_itb.first)] = data_ita.first/data_itb.first;  
+    } 
+  } 
+  bool exitloops=false;
   for(auto source_a:source_energy) {
+    if(exitloops) break;
+    source_test.clear();
+    int last=-1;
     for(auto source_b:source_energy) {
+      if(exitloops) break;
       if(source_a==source_b) continue;
-      int counter2 =0;
-      for(auto &data_ita: datatosource) {
-        for(auto &data_itb: datatosource) {
-          if(data_ita==data_itb) continue;
-          double dratio = data_ita.first/data_itb.first;
-          double sratio = source_a/source_b;
-          if( fabs(dratio-sratio) <=error) {
-            printf(BLUE "\t%i\t%.02f\t%.02f\t" RESET_COLOR "\n",counter2++,dratio,sratio);
-            if(fabs(dratio-sratio)>max_err)
-              max_err = fabs(dratio-sratio);
-            if(std::isnan(data_ita.second))
-              data_ita.second = source_a;
-            if(std::isnan(data_itb.second))
-              data_itb.second = source_b;
-            break;
-          } 
-        }
+      double sratio = source_a/source_b;
+      int counter=0;
+      for(auto data_it : data_test) {
+        if(exitloops) break;
+        counter++;
+        if( fabs(data_it.second-sratio)>error) 
+          continue;
+        if(last>counter)
+          continue;
+        last = counter;
+        if(fabs(data_it.second-sratio)>max_err)
+          max_err = fabs(data_it.second-sratio);
+        if(std::isnan(datatosource[data_it.first.first]))
+          datatosource[data_it.first.first] = source_a;
+        if(std::isnan(datatosource[data_it.first.second]))
+          datatosource[data_it.first.second] = source_b;
+      }
+      if(CheckMap(datatosource)) {
+        exitloops=true;
+        break;
       }
     }
-    printf("\n");
-    if(CheckMap(datatosource))
-      break;
+    PrintMap(datatosource);
+    if(exitloops) break;
     ResetMap(datatosource);
-    Print();
   }
+  Print();
 
   if(CheckMap(datatosource)) {
     all_fits[name].data2source = datatosource;
@@ -185,18 +209,37 @@ void TCalibrator::AddData(TH1 *data,TNucleus *source, double sigma,double thresh
     all_fits[name].max_error   = max_err;
     total_points += datatosource.size();
   }
+  
+  int counter =0;
+  for(auto it : datatosource) {
+    if(!std::isnan(it.second)) counter++;
+  }
+  return counter; //CheckMap(datatosource);
+  
 }
 
 void TCalibrator::ResetMap(std::map<double,double> &inmap) {
-  for(auto &it:inmap) 
+  for(auto &it:inmap) {
     it.second = sqrt(-1);
+  } 
 }
+
+void TCalibrator::PrintMap(std::map<double,double> &inmap) {
+  printf("\tfirst\tsecond\n");
+  int counter=0;
+  for(auto &it:inmap) {
+    printf("%i\t%.01f\t%.01f\n",counter++,it.first,it.second);
+  }
+
+
+}
+
+
 
 bool TCalibrator::CheckMap(std::map<double,double> inmap) {
   for(auto it:inmap) {
-    if(std::isnan(it.second)) {
+    if(std::isnan(it.second)) 
       return false;
-    }
   }
   return true;
 }

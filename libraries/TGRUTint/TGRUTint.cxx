@@ -548,6 +548,13 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   if(!sline.CompareTo("clear")) {
     long result = TRint::ProcessLine(".! clear");
     return result;
+  } else if(!sline.CompareTo("xterm")) {
+    long result = TRint::ProcessLine(".! xterm &");
+    return result;
+  } else if(sline.BeginsWith("vim ")) {
+    sline.ReplaceAll("vim ",".! vim ");
+  } else if(sline.BeginsWith("emacs ")) {
+    sline.ReplaceAll("emacs ",".! emacs -nw ");
   }
 
   long result =  TRint::ProcessLine(sline.Data(),sync,error);

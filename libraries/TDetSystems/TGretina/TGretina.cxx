@@ -50,7 +50,7 @@ void TGretina::BuildAddback() const {
     hits.push_back(&hit);
   }
   std::sort(hits.begin(), hits.end(), [](const TGretinaHit* a, const TGretinaHit* b) {
-      return a->GetEnergy() > b->GetEnergy();
+      return a->GetCoreEnergy() > b->GetCoreEnergy();
     });
 
   while(hits.size()) {
