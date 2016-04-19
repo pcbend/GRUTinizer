@@ -239,7 +239,7 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   if(fithist->GetSumw2()->fN!=fithist->GetNbinsX()+2)
     fithist->Sumw2();
 
-  TFitResultPtr fitres = fithist->Fit(this,Form("%sLRSME",options.Data()));
+  TFitResultPtr fitres = fithist->Fit(this,Form("%sRSME",options.Data()));
 
   //fitres.Get()->Print();
   if(!fitres.Get()->IsValid()) {
@@ -308,8 +308,8 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   //fithist->GetListOfFunctions()->Print();
 
 
-  fArea = this->Integral(xlow,xhigh);
-  double bgArea = fBGFit.Integral(xlow,xhigh);
+  fArea = this->Integral(xlow,xhigh) * fithist->GetBinWidth(1);
+  double bgArea = fBGFit.Integral(xlow,xhigh) * fithist->GetBinWidth(1);
   fArea -= bgArea;
 
   if(!verbose) {
