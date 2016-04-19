@@ -192,7 +192,7 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
   if(fithist->GetSumw2()->fN!=fithist->GetNbinsX()+2) 
     fithist->Sumw2();
 
-  TFitResultPtr fitres = fithist->Fit(this,Form("%sLRSME",options.Data()));
+  TFitResultPtr fitres = fithist->Fit(this,Form("%sRSME",options.Data()));
 
   //fitres.Get()->Print();
   if(!fitres.Get()->IsValid()) {
@@ -201,7 +201,7 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
     //SetParameter(4,0.01);
     //SetParameter(5,0.0);
     fithist->GetListOfFunctions()->Last()->Delete();
-    fitres = fithist->Fit(this,Form("%sLRSME",options.Data())); //,Form("%sRSM",options.Data()))
+    fitres = fithist->Fit(this,Form("%sRSME",options.Data())); //,Form("%sRSM",options.Data()))
     if( fitres.Get()->IsValid() ) {
       printf(DGREEN " refit passed!" RESET_COLOR "\n");
     } else {
