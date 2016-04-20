@@ -127,6 +127,8 @@ void GPeak::Copy(TObject &obj) const {
   ((GPeak&)obj).init_flag = init_flag;
   ((GPeak&)obj).fArea     = fArea;
   ((GPeak&)obj).fDArea    = fDArea;
+  ((GPeak&)obj).fSum      = fSum;
+  ((GPeak&)obj).fDSum     = fDSum;
   ((GPeak&)obj).fChi2     = fChi2;
   ((GPeak&)obj).fNdf      = fNdf;
 
@@ -312,6 +314,10 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   double bgArea = fBGFit.Integral(xlow,xhigh) * fithist->GetBinWidth(1);
   fArea -= bgArea;
 
+  fSum = fithist->Integral(xlow,xhigh) * fithist->GetBinWidth(1);
+  fSum -= bgArea;
+
+
   if(!verbose) {
     Print();/*
     printf("BG Area:         %.02f\n",bgArea);
@@ -352,6 +358,8 @@ void GPeak::Clear(Option_t *opt){
   init_flag = false;
   fArea  = 0.0;
   fDArea = 0.0;
+  fSum   = 0.0;
+  fDSum  = 0.0;
   fChi2  = 0.0;
   fNdf   = 0.0;
 }
@@ -362,6 +370,7 @@ void GPeak::Print(Option_t *opt) const {
   printf("Name: %s \n", this->GetName());
   printf("Centroid:  %1f +/- %1f \n", this->GetParameter("centroid"),this->GetParError(GetParNumber("centroid")));
   printf("Area:      %1f +/- %1f \n", fArea, fDArea);
+  printf("Sum:       %1f +/- %1f \n", fSum, fDSum);
   printf("FWHM:      %1f +/- %1f \n",this->GetFWHM(),this->GetFWHMErr());
   printf("Reso:      %1f%%  \n",this->GetFWHM()/this->GetParameter("centroid")*100.);
   printf("Chi^2/NDF: %1f\n",fChi2/fNdf);
