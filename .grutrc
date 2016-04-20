@@ -2,8 +2,8 @@ Unix.*.Root.MacroPath: .:$(GRUTSYS)/util:$(ROOTSYS)/macros
 #Unix.*.Root.DynamicPath:  .:~/rootlibs:$(ROOTSYS)/lib:$/home/tiguser/packages/SharcAnalysis
 
 #default MakeHistos library
-#GRUT.HistLib: $(GRUTSYS)/libraries/libMakeHistos.so
-GRUT.HistLib: $(GRUTSYS)/libraries/libPolarHists.so
+GRUT.HistLib: $(GRUTSYS)/libraries/libMakeHistos.so
+#GRUT.HistLib: $(GRUTSYS)/libraries/libPolarHists.so
 #GRUT.HistLib: $(GRUTSYS)/libraries/libMakeSegaJanusHistos.so
 GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
 
