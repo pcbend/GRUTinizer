@@ -28,6 +28,7 @@ GPeak::GPeak(Double_t cent,Double_t xlow,Double_t xhigh,Option_t *opt)
 
   TF1::SetRange(xlow,xhigh);
 
+
   fBGFit.SetNpx(1000);
   fBGFit.SetLineStyle(2);
   fBGFit.SetLineColor(kBlack);
@@ -35,6 +36,12 @@ GPeak::GPeak(Double_t cent,Double_t xlow,Double_t xhigh,Option_t *opt)
   SetName(Form("Chan%d_%d_to_%d",(Int_t)(cent),(Int_t)(xlow),(Int_t)(xhigh)));
   InitNames();
   TF1::SetParameter("centroid",cent);
+  
+  SetParent(0);
+  //TF1::SetDirectory(0);
+  fBGFit.SetParent(0);
+  fBGFit.SetBit(TObject::kCanDelete,false);
+  //fBGFit.SetDirectory(0);
 
 }
 
@@ -65,6 +72,11 @@ GPeak::GPeak(Double_t cent,Double_t xlow,Double_t xhigh,TF1 *bg,Option_t *opt)
   fBGFit.SetNpx(1000);
   fBGFit.SetLineStyle(2);
   fBGFit.SetLineColor(kBlack);
+  
+  SetParent(0);
+  //SetDirectory(0);
+  fBGFit.SetParent(0);
+  //fBGFit.SetDirectory(0);
 }
 
 
@@ -77,14 +89,26 @@ GPeak::GPeak()
   fBGFit.SetNpx(1000);
   fBGFit.SetLineStyle(2);
   fBGFit.SetLineColor(kBlack);
+  
+  SetParent(0);
+  //SetDirectory(0);
+  fBGFit.SetParent(0);
+  //fBGFit.SetDirectory(0);
 }
 
 GPeak::GPeak(const GPeak &peak)
   : TF1(peak) {
+  
+  SetParent(0);
+  //SetDirectory(0);
+  fBGFit.SetParent(0);
+  //fBGFit.SetDirectory(0);
   peak.Copy(*this);
 }
 
 GPeak::~GPeak() {
+  //gROOT->RecursiveRemove(&fBGFit);
+  //gROOT->RecursiveRemove(this);
   //if(background)
   //  delete background;
 }
@@ -239,9 +263,13 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   if(fithist->GetSumw2()->fN!=fithist->GetNbinsX()+2)
     fithist->Sumw2();
 
-  TFitResultPtr fitres = fithist->Fit(this,Form("%sLRSME",options.Data()));
+  TFitResultPtr fitres = fithist->Fit(this,Form("%sRSME",options.Data()));
 
   //fitres.Get()->Print();
+  printf("chi^2/NDF = %.02f\n",this->GetChisquare()/(double)this->GetNDF());
+
+  
+  
   if(!fitres.Get()->IsValid()) {
     printf(RED  "fit has failed, trying refit... " RESET_COLOR);
     //SetParameter(3,0.1);
@@ -324,8 +352,10 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   //printf("fithist->GetListOfFunctions()->FindObject(this) = 0x%08x\n",fithist->GetListOfFunctions()->FindObject(GetName()));
   //fflush(stdout);
   Copy(*fithist->GetListOfFunctions()->FindObject(GetName()));
-  fithist->GetListOfFunctions()->Add(fBGFit.Clone());
+  //  fithist->GetListOfFunctions()->Add(&fBGFit); //use to be a clone.
+  fithist->GetListOfFunctions()->Add(fBGFit.Clone()); //use to be a clone.
 
+  SetParent(0); //fithist);
 
   //delete tmppeak;
   return true;
