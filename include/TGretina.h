@@ -1,6 +1,8 @@
 #ifndef TGRETINA_H
 #define TGRETINA_H
 
+#include <functional>
+
 #include <TObject.h>
 #include <TMath.h>
 
@@ -8,6 +10,8 @@
 
 #include "TDetector.h"
 #include "TGretinaHit.h"
+
+
 
 class TGretina : public TDetector {
 
