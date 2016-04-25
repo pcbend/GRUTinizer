@@ -21,6 +21,7 @@
 #include "TChannel.h"
 #include "GValue.h"
 #include "TLegend.h"
+#include "TPaveText.h"
 
 #include "TCaesarHit.h"
 #include "TS800Hit.h"
@@ -69,7 +70,11 @@ void getHistograms(std::vector<TH1F*> &data_hists, std::vector<double> &angles,
     std::stringstream ss;
     ss << "fit_angle_" << temp_angle;
     std::string data_hist_name = ss.str();
-    data_hists.push_back((TH1F*)input_file->Get(data_hist_name.c_str()));
+    input_file->cd("Fits");
+    input_file->Print();
+    std::cout << "Getting histogram: " << data_hist_name << std::endl;
+    std::cout << (TH1F*)gDirectory->Get(data_hist_name.c_str()) << std::endl;
+    data_hists.push_back((TH1F*)gDirectory->Get(data_hist_name.c_str()));
     if (data_hists.at(i)->GetNbinsX() != data_hists.at(i)->GetXaxis()->GetXmax()){
       std::cout << "Number of bins ("<<data_hists.at(i)->GetNbinsX()<<") does not equal x-axis length ("
                 << data_hists.at(i)->GetXaxis()->GetXmax()<<") so should not rebin!" << std::endl;
@@ -465,7 +470,7 @@ int fitCoulex(const char *cfg_file_name){
     data_hists[angle_index]->SetLineColor(kBlue);
     fit_func_hist->SetLineColor(kRed);
     data_hists[angle_index]->Draw("HIST");
-    TLegend leg(0.5,0.5,1.0,1.0);
+    TLegend leg(0.5,0.5,0.8,0.7);
     leg.AddEntry(fit_func_hist, "Fit Function", "l");
     leg.AddEntry(data_hists[angle_index], "Data", "l");
     leg.Draw();
@@ -477,6 +482,23 @@ int fitCoulex(const char *cfg_file_name){
     res_sub_hist->Add(fit_func_hist,-1);
     res_sub_hist->Draw("HIST");
     res_sub_hist->SetTitle("Residuals"); 
+    TPaveText *pt = new TPaveText(0.65,0.15,0.85,0.30, "NDC");
+    TLine *peak_low_ressub = new TLine(peak_low_x, -50, peak_low_x, 50);
+    TLine *peak_high_ressub = new TLine(peak_high_x, -50, peak_high_x, 50);
+    peak_low_ressub->SetLineStyle(3);
+    peak_high_ressub->SetLineStyle(3);
+    peak_low_ressub->SetLineWidth(3);
+    peak_high_ressub->SetLineWidth(3);
+    peak_low_ressub->Draw();
+    peak_high_ressub->Draw();
+
+    int peak_low_bin = res_sub_hist->FindBin(peak_low_x);
+    int peak_high_bin = res_sub_hist->FindBin(peak_high_x);
+    pt->AddText(Form("Residual Sum in Peak: %1.1f",res_sub_hist->Integral(peak_low_bin,peak_high_bin)));
+    pt->AddText(Form("Total Peak Sum: %1.1f",peak_sum.at(angle_index)));
+    pt->Draw();
+
+    
 
 
     residual_with_hists_can->Write();
@@ -489,6 +511,7 @@ int fitCoulex(const char *cfg_file_name){
     delete fit_func_hist;
     delete disentangled_can;
     delete residual_with_hists_can;
+    delete pt;
     if (angle_index % 10 == 0){
       std::cout << " Completed Angle " << angles[angle_index] << std::endl; 
     }

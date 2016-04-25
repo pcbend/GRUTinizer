@@ -124,7 +124,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
         std::string histname;
 
         double energy = hit.GetEnergy();
-        double energy_dc = caesar->GetEnergyDC(hit);
+        //double energy_dc = caesar->GetEnergyDC(hit);
+        double energy_dc = hit.GetDoppler();
 
         TH2 *caesar_det_energy = GetMatrix(list,"Detector_Energy_Summary",200,0,200,4096,0,4096);
         caesar_det_energy->Fill(det+total_det_in_prev_rings[ring],energy);
@@ -136,7 +137,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
         if (s800){
           double corr_time = caesar->GetCorrTime(hit,s800);
           double objtac_corr = s800->GetCorrTOF_OBJTAC();
-          double ic_sum = s800->GetIonChamber().GetSum();
+          double ic_sum = s800->GetIonChamber().GetAve();
           //targ_exit_vec = (pt,theta,phi)
           TVector3 targ_exit_vec = s800->ExitTargetVect();
           double scatter_angle = targ_exit_vec.Theta()*(180.0/TMath::Pi());
@@ -153,7 +154,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
           
           TH2 *caesar_coincidence_spec = GetMatrix(list, "ungated_coincidence", 8192,0,8192,8192,0,8192);
           for (int hit_num = y+1; hit_num < caesar->Size(); hit_num++){
-            caesar_coincidence_spec->Fill(energy_dc, caesar->GetEnergyDC(caesar->GetCaesarHit(hit_num)));
+            //caesar_coincidence_spec->Fill(energy_dc, caesar->GetEnergyDC(caesar->GetCaesarHit(hit_num)));
+            caesar_coincidence_spec->Fill(energy_dc, caesar->GetCaesarHit(hit_num).GetDoppler());
           }
           if (pid_kr88->IsInside(objtac_corr, ic_sum)){
             //make coincidence matrix
@@ -352,7 +354,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
   }//caesar exists
 
   if(s800) {
-    double ic_sum = s800->GetIonChamber().GetSum();
+    double ic_sum = s800->GetIonChamber().GetAve();
     double objtac_corr = s800->GetCorrTOF_OBJTAC();
     double objtac = s800->GetTof().GetTacOBJ();
     double xfptac = s800->GetTof().GetTacXFP();

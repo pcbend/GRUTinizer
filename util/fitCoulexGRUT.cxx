@@ -437,7 +437,7 @@ int fitCoulex(const char *cfg_file_name){
         }
 
         gamma_time = caesar->GetCorrTime(hit,s800);
-        gamma_energy_dc = caesar->GetEnergyDC(hit);
+        gamma_energy_dc = hit.GetDoppler();
         tof_obj_tac = s800->GetTof().GetTacOBJ();
         tof_xfp_tac = s800->GetTof().GetTacXFP();
         tof_obj_tac_corr = s800->GetCorrTOF_OBJTAC();

@@ -29,13 +29,14 @@ public:
   virtual void InsertHit(const TDetectorHit&);
 
   virtual void Print(Option_t* opt="") const; 
+  virtual void PrintAddback(Option_t* opt=""); 
   virtual void Clear(Option_t* opt = "");
 
   virtual TDetectorHit& GetHit(int i);
   //Is there any reason the below are virtual? There is no GetCaesarHit in other
   //classes.
   virtual TCaesarHit&   GetCaesarHit(int i);
-  virtual TCaesarHit&   GetAddbackHit(int i) { BuildAddback(); return addback_hits.at(i); }
+  virtual TCaesarHit&   GetAddbackHit(int i) { BuildAddbackTest(); return addback_hits.at(i); }
   virtual const TCaesarHit& GetCaesarHit(int i) const;
   virtual std::vector<TCaesarHit> GetCaesarHits() const  { return caesar_hits; };
   
@@ -45,10 +46,10 @@ public:
 
 
   int Size() const { return caesar_hits.size(); }
-  int AddbackSize() { BuildAddback(); return addback_hits.size(); }
+  int AddbackSize() { BuildAddbackTest(); return addback_hits.size(); }
 
-  double GetEnergyDC(TCaesarHit hit);
-  double GetEnergyDC(int ring, int det, double energy);
+//double GetEnergyDC(TCaesarHit hit);
+//double GetEnergyDC(int ring, int det, double energy);
   double GetCorrTime(TCaesarHit hit, TS800 *s800);
 
 
@@ -90,6 +91,7 @@ public:
 
 private:
   void BuildAddback() const;
+  void BuildAddbackTest() const;
 #if !defined (__CINT__)
   static std::function<bool(const TCaesarHit&,const TCaesarHit&)> fAddbackCondition;
 #endif
