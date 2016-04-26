@@ -316,6 +316,23 @@ TVector3 TGretinaHit::GetFirstIntPosition() const {
  
   TVector3 offset(xoffset,yoffset,zoffset);
   
+  std::cout << " -----------------" << std::endl;
+  std::cout << "\tX Offset = " << offset.X() <<std::endl;
+  std::cout << "\tY Offset = " << offset.Y() <<std::endl;
+  std::cout << "\tZ Offset = " << offset.Z() <<std::endl;
+  std::cout << "\tZ Offset2 = " << zoffset <<std::endl;
+  std::cout << "\tZ Offset3 = " << GValue::Value("GRETINA_Z_OFFSET") <<std::endl;
+  std::cout << "\tIntPoint = " << GetFirstIntPoint() << std::endl;
+  std::cout << "\tIntPoint = " << GetFirstIntPoint() << std::endl;
+  std::cout << "\tX Int    = " << GetInteractionPosition(GetFirstIntPoint()).X() << std::endl;
+  std::cout << "\tY Int    = " << GetInteractionPosition(GetFirstIntPoint()).Y() << std::endl;
+  std::cout << "\tZ Int    = " << GetInteractionPosition(GetFirstIntPoint()).Z() << std::endl;
+  TVector3 sum;
+  sum = GetInteractionPosition(GetFirstIntPoint())+offset;
+  std::cout << "\tX Sum    = " << sum.X() << std::endl;
+  std::cout << "\tY Sum    = " << sum.Y() << std::endl;
+  std::cout << "\tZ Sum    = " << sum.Z() << std::endl;
+  std::cout << "\t END OF VECTOR SUMMARY " << std::endl;
   if(GetFirstIntPoint()>-1)
      return GetInteractionPosition(GetFirstIntPoint()) + offset;
    return TDetectorHit::BeamUnitVec;
