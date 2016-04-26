@@ -125,10 +125,10 @@ bool RemovePeaks(TH1 **hists,unsigned int nhists) {
 //  TString option = opt;
 //}
 
-bool GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
-  bool edit = false;
+GGaus *GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
+  //bool edit = false;
   if(!hist)
-    return edit;
+    return 0;
   if(xlow>xhigh)
     std::swap(xlow,xhigh);
 
@@ -139,9 +139,9 @@ bool GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
   //mypeak->Background()->Draw("SAME");
   TF1 *bg = new TF1(*mypeak->Background());
   hist->GetListOfFunctions()->Add(bg);
-  edit = true;
+  //edit = true;
 
-  return edit;
+  return mypeak;
 }
  
 /* 
@@ -215,10 +215,10 @@ bool GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
 */
 
 
-bool PhotoPeakFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
-  bool edit = false;
+GPeak *PhotoPeakFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
+  //bool edit = 0;
   if(!hist)
-    return edit;
+    return 0;
   if(xlow>xhigh)
     std::swap(xlow,xhigh);
 
@@ -229,9 +229,9 @@ bool PhotoPeakFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
   //mypeak->Background()->Draw("SAME");
   TF1 *bg = new TF1(*mypeak->Background());
   hist->GetListOfFunctions()->Add(bg);
-  edit = true;
+  //edit = true;
 
-  return edit;
+  return mypeak;
 }
 
 std::string MergeStrings(const std::vector<std::string>& strings, char split) {

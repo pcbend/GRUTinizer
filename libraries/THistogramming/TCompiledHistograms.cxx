@@ -23,7 +23,7 @@ TCompiledHistograms::TCompiledHistograms()
   : libname(""), library(nullptr), func(nullptr),
     last_modified(0), last_checked(0), check_every(5),
     default_directory(0),obj(0) {
-  obj = new TRuntimeObjects(&objects, &variables, &gates, cut_files);
+  obj = new TRuntimeObjects(&objects, &gates, cut_files);
 }
 
 TCompiledHistograms::TCompiledHistograms(std::string input_lib)
@@ -41,7 +41,7 @@ TCompiledHistograms::TCompiledHistograms(std::string input_lib)
   last_checked = time(NULL);
 
 
-  obj = new TRuntimeObjects(&objects, &variables, &gates, cut_files);
+  obj = new TRuntimeObjects(&objects, &gates, cut_files);
 }
 
 TCompiledHistograms::~TCompiledHistograms() {
@@ -112,7 +112,7 @@ void TCompiledHistograms::Write() {
   //  objects.Write();
   TPreserveGDirectory preserve;
   gDirectory->mkdir("variables")->cd();
-  variables.Write();
+  //variables.Write();
 }
 
 void TCompiledHistograms::Load(std::string libname) {
@@ -160,23 +160,6 @@ void TCompiledHistograms::Fill(TUnpackedEvent& detectors) {
 void TCompiledHistograms::AddCutFile(TFile* cut_file) {
   if(cut_file) {
     cut_files.push_back(cut_file);
-  }
-}
-
-void TCompiledHistograms::SetReplaceVariable(const char* name, double value) {
-  GValue* val = (GValue*)variables.FindObject(name);
-  if(val){
-    val->SetValue(value);
-  } else {
-    GValue* val = new GValue(name, value);
-    variables.Add(val);
-  }
-}
-
-void TCompiledHistograms::RemoveVariable(const char* name) {
-  GValue* val = (GValue*)variables.FindObject(name);
-  if(val){
-    variables.Remove(val);
   }
 }
 

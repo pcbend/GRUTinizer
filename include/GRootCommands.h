@@ -9,6 +9,8 @@ class TH2;
 class GH2I;
 class GMarker;
 class TF1;
+class GPeak;
+class GGaus;
 
 #include "TDirectory.h"
 
@@ -18,8 +20,8 @@ int  LabelPeaks(TH1*,double,double,Option_t *opt="");
 bool ShowPeaks(TH1**,unsigned int, double sigma=2.0, double thresh=0.02);
 bool RemovePeaks(TH1**,unsigned int);
 
-bool PhotoPeakFit(TH1*,double,double,Option_t *opt="");
-bool GausFit(TH1*,double,double,Option_t *opt="");
+GPeak *PhotoPeakFit(TH1*,double,double,Option_t *opt="");
+GGaus *GausFit(TH1*,double,double,Option_t *opt="");
 
 std::string MergeStrings(const std::vector<std::string>& strings, char split='\n');
 

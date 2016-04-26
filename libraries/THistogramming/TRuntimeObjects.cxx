@@ -18,20 +18,20 @@
 
 std::map<std::string,TRuntimeObjects*> TRuntimeObjects::fRuntimeMap;
 
-TRuntimeObjects::TRuntimeObjects(TUnpackedEvent *detectors, TList* objects, TList* variables, TList *gates,
+TRuntimeObjects::TRuntimeObjects(TUnpackedEvent *detectors, TList* objects, TList *gates,
                                  std::vector<TFile*>& cut_files,
                                  TDirectory* directory,const char *name)
-  : detectors(detectors), objects(objects), variables(variables), gates(gates),
+  : detectors(detectors), objects(objects), gates(gates),
     cut_files(cut_files),
     directory(directory) {
   SetName(name);
   fRuntimeMap.insert(std::make_pair(name,this));
 }
 
-TRuntimeObjects::TRuntimeObjects(TList* objects, TList* variables, TList *gates,
+TRuntimeObjects::TRuntimeObjects(TList* objects, TList *gates,
                                  std::vector<TFile*>& cut_files,
                                  TDirectory* directory,const char *name)
-  : detectors(0),objects(objects), variables(variables), gates(gates),
+  : detectors(0),objects(objects), gates(gates),
     cut_files(cut_files),
     directory(directory) {
   SetName(name);
@@ -203,10 +203,6 @@ TList& TRuntimeObjects::GetGates() {
   return *gates;
 }
 
-TList& TRuntimeObjects::GetVariables() {
-  return *variables;
-}
-
 TCutG* TRuntimeObjects::GetCut(const std::string& name) {
   for(auto& tfile : cut_files) {
     TObject* obj = tfile->Get(name.c_str());
@@ -221,11 +217,5 @@ TCutG* TRuntimeObjects::GetCut(const std::string& name) {
 }
 
 double TRuntimeObjects::GetVariable(const char* name) {
-  TObject* obj = variables->FindObject(name);
-  if(obj && dynamic_cast<GValue*>(obj)){
-    return ((GValue*)obj)->GetValue();
-  } else {
-    return 0.00;
-    //return std::sqrt(-1);
-  }
+  return GValue::Value(name);
 }
