@@ -3,7 +3,7 @@
 
 #ifndef __CINT__
 
-#define GRUT_RELEASE "0.01 "
+#define GRUT_RELEASE "1.00.00"
 
 #define RESET_COLOR "\033[m"
 #define BLUE       "\033[1;34m"
