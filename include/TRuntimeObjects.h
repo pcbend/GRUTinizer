@@ -24,13 +24,11 @@ public:
   /// Constructor
   TRuntimeObjects(TUnpackedEvent *detectors,
                   TList* objects,
-                  TList* variables,
                   TList* gates,
                   std::vector<TFile*>& cut_files,
                   TDirectory* directory=NULL,
                   const char *name="default");
   TRuntimeObjects(TList* objects,
-                  TList* variables,
                   TList* gates,
                   std::vector<TFile*>& cut_files,
                   TDirectory* directory=NULL,
@@ -46,11 +44,9 @@ public:
 
   TList& GetObjects();
   TList& GetGates();
-  TList& GetVariables();
 
   TList* GetObjectsPtr()    { return objects;   }
   TList* GetGatesPtr()      { return gates;     }
-  TList* GetVariablesPtr()  { return variables; }
 
 
   TH1* FillHistogram(const char* name,
@@ -124,7 +120,6 @@ private:
   static std::map<std::string,TRuntimeObjects*> fRuntimeMap;
   TUnpackedEvent *detectors;
   TList* objects;
-  TList* variables;
   TList* gates;
   std::vector<TFile*>& cut_files;
 
