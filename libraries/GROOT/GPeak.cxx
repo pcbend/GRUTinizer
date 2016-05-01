@@ -265,7 +265,7 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   if(fithist->GetSumw2()->fN!=fithist->GetNbinsX()+2)
     fithist->Sumw2();
 
-  TFitResultPtr fitres = fithist->Fit(this,Form("%sRSME",options.Data()));
+  TFitResultPtr fitres = fithist->Fit(this,Form("%sLRSME",options.Data()));
 
   //fitres.Get()->Print();
   printf("chi^2/NDF = %.02f\n",this->GetChisquare()/(double)this->GetNDF());
@@ -338,12 +338,18 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   //fithist->GetListOfFunctions()->Print();
 
 
-  fArea = this->Integral(xlow,xhigh) * fithist->GetBinWidth(1);
-  double bgArea = fBGFit.Integral(xlow,xhigh) * fithist->GetBinWidth(1);
+  fArea = this->Integral(xlow,xhigh) / fithist->GetBinWidth(1);
+  double bgArea = fBGFit.Integral(xlow,xhigh) / fithist->GetBinWidth(1);
   fArea -= bgArea;
 
-  fSum = fithist->Integral(xlow,xhigh) * fithist->GetBinWidth(1);
+
+  if(xlow>xhigh)
+    std::swap(xlow,xhigh);
+  fSum = fithist->Integral(fithist->GetXaxis()->FindBin(xlow),
+                           fithist->GetXaxis()->FindBin(xhigh)); //* fithist->GetBinWidth(1);
+  printf("sum between markers: %02f\n",fSum);
   fSum -= bgArea;
+  printf("sum after subtraction: %02f\n",fSum);
 
 
   if(!verbose) {
