@@ -78,30 +78,30 @@ CRDC1_X_OFFSET {
   Value: -281.94
 }
 
-CRDC1_Y_OFFSET { 
-  Value: 0.0
-}
-
 CRDC1_X_SLOPE { 
   Value: 2.54
 }
 
+CRDC1_Y_OFFSET { 
+  Value: 124.0
+}
+
 CRDC1_Y_SLOPE { 
-  Value: 1.0
+  Value: -0.107
 }
 
 CRDC2_X_OFFSET { 
   Value: -281.94
 }
 
-CRDC2_Y_OFFSET { 
-  Value: 0.0
-}
-
 CRDC2_X_SLOPE { 
   Value: 2.54
 }
 
+CRDC2_Y_OFFSET { 
+  Value: -139.0
+}
+
 CRDC2_Y_SLOPE { 
-  Value: 
+  Value: 0.115
 }

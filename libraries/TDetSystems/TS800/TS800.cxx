@@ -18,43 +18,10 @@
 #include "TPad.h"
 #include "TROOT.h"
 
-
-std::vector<short> TS800::fmaxcoefficient;                      
-std::vector<std::vector<short> > TS800::forder;                 
-std::vector<std::vector<std::vector<short> > > TS800::fexponent;
-std::vector<std::vector<float> > TS800::fcoefficient;           
-short TS800::fmaxorder;                                         
-float TS800::fbrho;                                             
-int TS800::fmass;                                               
-int TS800::fcharge;                                             
-bool TS800::fMapLoaded;
+#include "TInverseMap.h"
 
 TS800::TS800() {
   Clear();
-}
-
-void TS800::ReadInverseMap(const char *mapfile) {
-  static std::atomic_bool InvMapFileRead(false);
-  std::string filename = mapfile; // TGRUTOptions::Get()->S800InverseMapFile();
-  if(filename.size()==0)
-    filename = TGRUTOptions::Get()->S800InverseMapFile();
-  if(filename.size()==0){
-    fMapLoaded = false;
-    std::cout << "Inverse map file not loaded!!!" << std::endl
-	      << " No File Name Given!!" << std::endl;
-    InvMapFileRead=true;
-  }
-  if(!InvMapFileRead){
-    fMapLoaded = false;
-    //   Quick little mutex to make sure that multiple threads
-    // don't try to read the map file at the same time.
-    static std::mutex inv_map_mutex;
-    std::lock_guard<std::mutex> lock(inv_map_mutex);
-    if(!InvMapFileRead){
-      InvMapFileRead=ReadMap(filename);
-      //std::cout << " SPECTCL INV MAP LOADED!!!" << std::endl;
-    }
-  }
 }
 
 
@@ -65,31 +32,6 @@ void TS800::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 
   TS800& other = (TS800&)obj;
-  other.fAtaTCL1 = fAtaTCL1;
-  other.fYtaTCL1 = fYtaTCL1;
-  other.fBtaTCL1 = fBtaTCL1;
-  other.fDtaTCL1 = fDtaTCL1;
-  other.fAtaTCL2 = fAtaTCL2;
-  other.fYtaTCL2 = fYtaTCL2;
-  other.fBtaTCL2 = fBtaTCL2;
-  other.fDtaTCL2 = fDtaTCL2;
-  other.fAtaTCL3 = fAtaTCL3;
-  other.fYtaTCL3 = fYtaTCL3;
-  other.fBtaTCL3 = fBtaTCL3;
-  other.fDtaTCL3 = fDtaTCL3;
-  other.fAtaTCL4 = fAtaTCL4;
-  other.fYtaTCL4 = fYtaTCL4;
-  other.fBtaTCL4 = fBtaTCL4;
-  other.fDtaTCL4 = fDtaTCL4;
-  other.fAtaTCL5 = fAtaTCL5;
-  other.fYtaTCL5 = fYtaTCL5;
-  other.fBtaTCL5 = fBtaTCL5;
-  other.fDtaTCL5 = fDtaTCL5;
-  other.fAtaTCL6 = fAtaTCL6;
-  other.fYtaTCL6 = fYtaTCL6;
-  other.fBtaTCL6 = fBtaTCL6;
-  other.fDtaTCL6 = fDtaTCL6;
-
   for(int i = 0; i<3; i++){
     scint[i].Copy(other.scint[i]);
   }
@@ -101,191 +43,41 @@ void TS800::Copy(TObject& obj) const {
   crdc2.Copy(other.crdc2);
 }
 
-float TS800::MapCalc(int calcorder,int parameter,float *input){
-  if(fMapLoaded==false){
-    return sqrt(-1);
-  }else{
-    float cumul=0;
-    float multiplicator;
-    for(int index=0; index<fmaxcoefficient[parameter]; index++){
-      if (calcorder < forder[parameter][index]) break;
-      multiplicator = 1;
-      for(int nex=0; nex<6; nex++){
-	if(fexponent[parameter][nex][index] != 0){
-	  multiplicator *= pow(input[nex], fexponent[parameter][nex][index]);
-	}
-      }
-      cumul += multiplicator * fcoefficient[parameter][index];
-    }
-  
-    return cumul;
-  }
-}
 
 Float_t TS800::GetAta(int i){
-  float Shift_ata = 0;
-  if(GValue::Value("ATA_SHIFT"))
-    Shift_ata = GValue::Value("ATA_SHIFT");
-  
-  //std::cout << " ATA Shift = " << Shift_ata << std::endl;
-
-  switch(i){
-  case 1: return (fAtaTCL1+Shift_ata);
-    break;
-  case 2: return (fAtaTCL2+Shift_ata);
-    break;
-  case 3: return (fAtaTCL3+Shift_ata);
-    break;
-  case 4: return (fAtaTCL4+Shift_ata);
-    break;
-  case 5: return (fAtaTCL5+Shift_ata);
-    break;
-  default: return (fAtaTCL6+Shift_ata);
-    break;
+  //float Shift_ata = 0;
+  float ata = TInverseMap::Get()->Ata(i,this);
+  if(!std::isnan(GValue::Value("ATA_SHIFT"))) {
+    ata += GValue::Value("ATA_SHIFT");
   }
+  return ata;
 }
 
 Float_t TS800::GetBta(int i){
-  float Shift_bta = 0;
-  if(GValue::Value("BTA_SHIFT"))
-    Shift_bta = GValue::Value("BTA_SHIFT");
-  
-  switch(i){
-  case 1: return (fBtaTCL1+Shift_bta);
-    break;
-  case 2: return (fBtaTCL2+Shift_bta);
-    break;
-  case 3: return (fBtaTCL3+Shift_bta);
-    break;
-  case 4: return (fBtaTCL4+Shift_bta);
-    break;
-  case 5: return (fBtaTCL5+Shift_bta);
-    break;
-  default: return (fBtaTCL6+Shift_bta);
-    break;
+  float bta = TInverseMap::Get()->Bta(i,this);
+  if(!std::isnan(GValue::Value("BTA_SHIFT"))) {
+   //bta += GValue::Value("BTA_SHIFT");
   }
+  return bta;
 }
 
 Float_t TS800::GetYta(int i){
-  float Shift_yta = 0;
-  if(GValue::Value("YTA_SHIFT"))
-    Shift_yta = GValue::Value("YTA_SHIFT");
-  
-  switch(i){
-  case 1: return (fYtaTCL1+Shift_yta);
-    break;
-  case 2: return (fYtaTCL2+Shift_yta);
-    break;
-  case 3: return (fYtaTCL3+Shift_yta);
-    break;
-  case 4: return (fYtaTCL4+Shift_yta);
-    break;
-  case 5: return (fYtaTCL5+Shift_yta);
-    break;
-  default: return (fYtaTCL6+Shift_yta);
-    break;
+  float yta = TInverseMap::Get()->Yta(i,this);
+  if(!std::isnan(GValue::Value("YTA_SHIFT"))) {
+    yta += GValue::Value("YTA_SHIFT");
   }
+  return yta;
 }
 
 Float_t TS800::GetDta(int i){
-  float Shift_dta = 0;
-  if(GValue::Value("DTA_SHIFT"))
-    Shift_dta = GValue::Value("DTA_SHIFT");
-  if(std::isnan(Shift_dta)) Shift_dta = 0;
-  
-  switch(i){
-  case 1: return (fDtaTCL1+Shift_dta);
-    break;
-  case 2: return (fDtaTCL2+Shift_dta);
-    break;
-  case 3: return (fDtaTCL3+Shift_dta);
-    break;
-  case 4: return (fDtaTCL4+Shift_dta);
-    break;
-  case 5: return (fDtaTCL5+Shift_dta);
-    break;
-  default: return (fDtaTCL6+Shift_dta);
-    break;
+  float dta = TInverseMap::Get()->Dta(i,this);
+  if(!std::isnan(GValue::Value("DTA_SHIFT"))) {
+    dta += GValue::Value("DTA_SHIFT");
   }
+  return dta;
 }
 
 
-bool TS800::ReadMap(std::string filename){
-  //  std::string filename = TGRUTOptions::Get()->S800InverseMapFile();
-  if(!(filename.size())){
-    fMapLoaded = false;
-    return fMapLoaded;
-  }else{
-    
-    fmaxcoefficient.resize(6);
-    forder.resize(6);
-    fexponent.resize(6);
-    fcoefficient.resize(6);
-    for(short i=0;i<6;i++){
-      forder[i].resize(200);
-      fcoefficient[i].resize(200);
-      fexponent[i].resize(6);
-      for(short k=0;k<6;k++){
-	fexponent[i][k].resize(200);
-      }
-    }
-    fmaxorder = 0;
-    FILE* file;
-    char line[80];
-    int index, par, exp[6];
-    int ord;
-    float co;
-    char title[120];
-    char *ret=NULL;
-    file = fopen(filename.c_str(), "r");
-    if(file == NULL){
-      std::cout << "Sorry I couldn't find the map file: " << filename << std::endl;
-      std::cout << "Will continue without the map file" << std::endl;
-      return false;
-    }
-    ret = fgets(title, 120, file);
-    sscanf(title, "S800 inverse map - Brho=%g - M=%d - Q=%d", &fbrho, &fmass, &fcharge);
-    //if(fSett->VLevel()>0)
-    //std::cout << "brho " << fbrho << " mass " << fmass << " charge " << fcharge << std::endl;
-    while(strstr(line, "COEFFICIENT") == NULL)
-      ret = fgets(line, 80, file);
-    par = 0;
-    while(!feof(file)){
-      ret = fgets(line, 80, file);
-      while (strstr(line, "------------------") == NULL){
-	sscanf(line, "%d %g %d %d %d %d %d %d %d", &index, &co, &ord, &exp[0], &exp[1], &exp[2], &exp[3], &exp[4], &exp[5]);
-	if(index > 200){
-	  std::cout << "Too many coefficients in map.  Increase TS800_TRACK_COEFFICIENTS." << std::endl;
-	  break;
-	}
-	if(par > 6){
-	  std::cout << "Too many parameters in map.  Increase TS800_TRACK_PARAMETERS." << std::endl;
-	  break;
-	}
-	fmaxcoefficient[par] = index;
-	forder[par][index-1] = ord;
-	fcoefficient[par][index-1] = co;
-	//std::cout << "max coef " << fmaxcoefficient[par] << " order " << forder[par][index-1] << " coef " << fcoefficient[par][index-1] << std::endl;
-	for(int k=0; k<6; k++){
-	  fexponent[par][k][index-1] = exp[k];
-	  //std::cout << "exp["<<k<<"] " << exp[k] << " fexponent["<<par<<"]["<<k<<"]["<<index-1<<"] " << fexponent[par][k][index-1] << std::endl;
-	}
-	ret = fgets(line, 80, file);
-      }
-      if(ord > fmaxorder)
-	fmaxorder = ord;
-      par++;
-    }
-    if(ret){}
-    //std::cout << "Done reading map from " << filename << "." << std::endl;
-    //std::cout << "Title: " << title << std::endl;
-    //std::cout << "Order: " << fmaxorder << std::endl;
-    fclose(file);
-    fMapLoaded = true;
-    std::cout << " INV MAP LOADED!!!" << std::endl;
-    return fMapLoaded;
-  }
-}
 
 Float_t TS800::Azita(int order){
   float xsin = TMath::Sin(GetAta(order));
@@ -308,24 +100,29 @@ Float_t TS800::Azita(int order){
 
 TVector3 TS800::ExitTargetVect(int order){
   TVector3 track;
-  double xsin = 0;
-  double ysin = 0;
-  xsin = GetAta(order);
-  ysin = GetBta(order);
-  double phi   = 0;
-  double theta = 0;
-
-  xsin = TMath::Sin(xsin);
-  ysin = TMath::Sin(ysin);
+  double sin_ata = 0;
+  double sin_bta = 0;
+  sin_ata = GetAta(order); //* TMath::DegToRad() ;
+  sin_bta = GetBta(order); // * TMath::DegToRad() ;
   
-  if(xsin>0 && ysin>0)      phi = 2.0*TMath::Pi()-TMath::ATan(ysin/xsin);
-  else if(xsin<0 && ysin>0) phi = TMath::Pi()+TMath::ATan(ysin/TMath::Abs(xsin));
-  else if(xsin<0 && ysin<0) phi = TMath::Pi()-TMath::ATan(TMath::Abs(ysin)/TMath::Abs(xsin));
-  else if(xsin>0 && ysin<0) phi = TMath::ATan(TMath::Abs(ysin)/xsin);
+  
+  //double phi   = 0;
+  //double theta = 0;
+
+
+  sin_ata = TMath::Sin(sin_ata);
+  sin_bta = TMath::Sin(sin_bta);
+  /*
+  if(sin_ata>0 && sin_bta>0)      phi = 2.0*TMath::Pi()-TMath::ATan(sin_bta/sin_ata);
+  else if(sin_ata<0 && sin_bta>0) phi = TMath::Pi()+TMath::ATan(sin_bta/TMath::Abs(sin_ata));
+  else if(sin_ata<0 && sin_bta<0) phi = TMath::Pi()-TMath::ATan(TMath::Abs(sin_bta)/TMath::Abs(sin_ata));
+  else if(sin_ata>0 && sin_bta<0) phi = TMath::ATan(TMath::Abs(sin_bta)/sin_ata);
   else                      phi = 0;
 
-  theta = TMath::ASin(TMath::Sqrt(xsin*xsin+ysin*ysin));
-  track.SetPtThetaPhi(1,theta,phi);
+  theta = TMath::ASin(TMath::Sqrt(sin_ata*sin_ata+sin_bta*sin_bta));
+  track.SetMagThetaPhi(1,theta,phi);
+  */
+  track.SetXYZ(sin_ata,sin_bta,1);
   return track;
 }
 
@@ -375,30 +172,6 @@ void TS800::Clear(Option_t* opt){
   trigger.Clear();
   ion.Clear();
 
-  fAtaTCL1 = sqrt(-1);
-  fYtaTCL1 = sqrt(-1);
-  fBtaTCL1 = sqrt(-1);
-  fDtaTCL1 = sqrt(-1);
-  fAtaTCL2 = sqrt(-1);
-  fYtaTCL2 = sqrt(-1);
-  fBtaTCL2 = sqrt(-1);
-  fDtaTCL2 = sqrt(-1);
-  fAtaTCL3 = sqrt(-1);
-  fYtaTCL3 = sqrt(-1);
-  fBtaTCL3 = sqrt(-1);
-  fDtaTCL3 = sqrt(-1);
-  fAtaTCL4 = sqrt(-1);
-  fYtaTCL4 = sqrt(-1);
-  fBtaTCL4 = sqrt(-1);
-  fDtaTCL4 = sqrt(-1);
-  fAtaTCL5 = sqrt(-1);
-  fYtaTCL5 = sqrt(-1);
-  fBtaTCL5 = sqrt(-1);
-  fDtaTCL5 = sqrt(-1);
-  fAtaTCL6 = sqrt(-1);
-  fYtaTCL6 = sqrt(-1);
-  fBtaTCL6 = sqrt(-1);
-  fDtaTCL6 = sqrt(-1);
 
 }
 
@@ -408,20 +181,12 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
   }
   for(auto& event : raw_data) { // should only be one..
     SetTimestamp(event.GetTimestamp());
-    // TGEBEvent* geb = (TGEBEvent*)&event;
-    // SetTimestamp(geb->GetTimestamp());
     int ptr = 0;
-    //    const TRawEvent::GEBS800Header *head = ((const TRawEvent::GEBS800Header*)geb->GetPayload());
     const TRawEvent::GEBS800Header *head = ((const TRawEvent::GEBS800Header*)event.GetPayload());
     ptr += sizeof(TRawEvent::GEBS800Header);
-      //  Here, we are now pointing at the size of the next S800 thing.  Inclusive in shorts.
-      //  std::string buffer = Form("all0x%04x",*((unsigned short*)(geb->GetPayload()+ptr+2)));
-    //printf("head.total_size == %i\n",head->total_size); fflush(stdout);
-    //printf("sizeof(TRawEvent::GEBS800Header) == %i \n",sizeof(TRawEvent::GEBS800Header));
+    //Here, we are now pointing at the size of the next S800 thing.  Inclusive in shorts.
     unsigned short *data = (unsigned short*)(event.GetPayload()+ptr);
-    //printf("\t0x%04x\t0x%04x\t0x%04x\t0x%04x\n",*data,*(data+1),*(data+2),*(data+3));
-    //while(ptr<((head->total_size*2)-2)) {
-    std::string toprint = "all";
+    //std::string toprint = "all";
     size_t x = 0;
     while(x<(head->total_size-sizeof(TRawEvent::GEBS800Header)+16)) {  //total size is inclusive.
       int size             = *(data+x);
@@ -433,13 +198,11 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
       //  printf("head size = %i\n",sizeof(head));
       //  exit(0);
       //}
-      //unsigned short size_in_bytes = (*((unsigned short*)(geb->GetPayload()+ptr))*2);
       int sizeleft = size-2;
       //ptr +=  (*((unsigned short*)(geb->GetPayload()+ptr))*2);
       switch(*dptr) {
       case 0x5801:  //S800 TriggerPacket.
 	HandleTrigPacket(dptr+1,sizeleft);
-
 	break;
       case 0x5802:  // S800 TOF.
 	//event.Print("all0x5802");
@@ -488,54 +251,6 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
     SetEventCounter(head->GetEventNumber());
     //geb->Print(toprint.c_str());
   }
-  //Raytracing(
-  float input[6];
-  input[0] = -GetCrdc(0).GetDispersiveX()/1000.0; // divide to get to units of meters
-  input[1] = -GetAFP(); // this is in radians.
-  input[2] = GetCrdc(0).GetNonDispersiveY()/1000.0;
-  input[3] = GetBFP();
-  //input[2] = GetCrdc(0).GetNonDispersiveY()/1000.0 - 0.033;
-  //input[3] = GetBFP() + 0.034;
-  input[4] = 0;
-  input[5] = 0;
-
-  //printf("-----------------------  --------------------\n");
-  //std::cout << " BFP : " << input[3] << "  " << GetBFP() << std::endl;
-  
-  if(GetCrdc(0).Size()>0 && GetCrdc(1).Size()>0){
-    fAtaTCL1 = MapCalc(1,0,input);
-    fYtaTCL1 = MapCalc(1,1,input);
-    fBtaTCL1 = MapCalc(1,2,input);
-    fDtaTCL1 = MapCalc(1,3,input);
-
-    fAtaTCL2 = MapCalc(2,0,input);
-    fYtaTCL2 = MapCalc(2,1,input);
-    fBtaTCL2 = MapCalc(2,2,input);
-    fDtaTCL2 = MapCalc(2,3,input);
-
-    fAtaTCL3 = MapCalc(3,0,input);
-    fYtaTCL3 = MapCalc(3,1,input);
-    fBtaTCL3 = MapCalc(3,2,input);
-    fDtaTCL3 = MapCalc(3,3,input);
-
-    fAtaTCL4 = MapCalc(4,0,input);
-    fYtaTCL4 = MapCalc(4,1,input);
-    fBtaTCL4 = MapCalc(4,2,input);
-    fDtaTCL4 = MapCalc(4,3,input);
-
-    fAtaTCL5 = MapCalc(5,0,input);
-    fYtaTCL5 = MapCalc(5,1,input);
-    fBtaTCL5 = MapCalc(5,2,input);
-    fDtaTCL5 = MapCalc(5,3,input);
-
-    fAtaTCL6 = MapCalc(6,0,input);
-    fYtaTCL6 = MapCalc(6,1,input);
-    fBtaTCL6 = MapCalc(6,2,input);
-    fDtaTCL6 = MapCalc(6,3,input);
-  }
-  
-
-  //printf("-----------------------\n");
   return 1;
 }
 
@@ -908,180 +623,6 @@ bool TS800::HandleMTDCPacket(unsigned short *data,int size) {
   return true;
 }
 
-/*
-bool TS800::HandleTOFPacket(char *data,unsigned short size) {
-  //some number of times read from both a Phillips 7186H TDC and an Ortec 566 TAC digitized by a Phillips 7164 ADC.
-  if(size<2)
-    return false;
-  for(int i=0;i<size;i+=2) {
-    TTOFHit *tof = (TTOFHit*)time_of_flight->ConstructedAt(time_of_flight->GetEntries());
-    tof->Set(*((unsigned short*)(data+i)));
-  }
-  return true;
-}
-
-bool TS800::HandleFPScintPacket(char *data,unsigned short size) {
-  //Energies and times of the focal plane scintillator, read from a Lecroy 4300B FERA and a Phillips 7186H TDC, should come in pairs.
-  //printf("in handle crdcc.\n");
-  for(int i=0;i<size;i+=4) {
-    unsigned short *temp = ((unsigned short*)(data+i));
-    if(((*(temp+1))&0xf000) != (*temp)&0xf000) {
-      fprintf(stderr,"fp_scint: energy and time do not match.");
-      return false;
-    }
-    TFPScint *hit = (TFPScint*)fp_scint->ConstructedAt(fp_scint->GetEntries());
-    hit->SetCharge(*temp);
-    hit->SetCharge(*(temp+1));
-  }
-  return true;
-}
-
-bool TS800::HandleIonChamberPacket(char *data,unsigned short size) {
-  //Zero suppressed energies from the ionization chamber, read from a Phillips 7164 ADC.
-  //Note, this data is in a "sub-packet".
-  int x =0;
-  if(*(data+2) == 0x5821)
-    x+=4;
-  for(;x<size;x+=2) {
-    unsigned short *temp = ((unsigned short*)(data+x));
-    TIonChamber *ion = (TIonChamber*)ion_chamber->ConstructedAt(ion_chamber->GetEntries());
-    ion->Set(*temp);
-  }
-  return true;
-
-}
-
-bool TS800::HandleCRDCPacket(char *data,unsigned short size) {
-  int ptr = 0;
-  short id      = *((short*)data); ptr += 2;
-  short subsize = *((short*)(data+ptr)); ptr += 2;
-  short subtype = *((short*)(data+ptr)); ptr += 2;
-  short zerobuffer = *((short*)(data+ptr)); ptr += 2;
-  int lastsampe = 0;
-
-  //for(int x=0;x<crdc1->GetSize();x++)
-  //  ((TCrdcPad*)crdc1->At(x))->Clear();
-  //for(int x=0;x<crdc2->GetSize();x++)
-  //  ((TCrdcPad*)crdc2->At(x))->Clear();
-
-  std::map<int,std::map<int,int> > pad;
-
-  for(int x=1;x<subsize;x+=2) {
-    unsigned short word1 = *((unsigned short*)(data+ptr)); ptr += 2;
-    if((word1&0x8000)!=0x8000) { continue; }
-    unsigned short word2 = *((unsigned short*)(data+ptr)); ptr += 2;
-
-    //printf("[%i]\t0x%04x\t0x%04x\n",x,word1,word2);
-    int sample_number    = (word1&(0x7fc0)) >> 6;
-    int channel_number   =  word1&(0x003f);
-    int connector_number = (word2&(0x0c00)) >> 10;
-    int databits         = (word2&(0x03ff));
-
-    int real_channel = (connector_number << 6) + channel_number;
-    pad[real_channel][sample_number] = databits;
-  }
-
-  std::map<int,std::map<int,int> >::iterator it1;
-  std::map<int,int>::iterator it2;
-
-  for(it1=pad.begin();it1!=pad.end();it1++) {
-    //printf("channel[%03i]\n",it1->first);
-    TCrdcPad *crdcpad = 0;
-    if(id==0) {
-      crdcpad = (TCrdcPad*)crdc1->ConstructedAt(crdc1->GetEntries());
-    } else if(id==1) {
-      crdcpad = (TCrdcPad*)crdc2->ConstructedAt(crdc2->GetEntries());
-    }
-    if(crdcpad) {
-      crdcpad->SetChannel(it1->first);
-      for(it2=it1->second.begin();it2!=it1->second.end();it2++) {
-        //printf("\t%i\t%i\n",it2->first,it2->second);
-        crdcpad->SetPoint(it2->first,it2->second);
-      }
-    } else {
-      return false;
-    }
-  }
-
-  unsigned short word1 = *((unsigned short*)(data+ptr)); ptr += 2;
-  unsigned short word2 = *((unsigned short*)(data+ptr)); ptr += 2;
-  if(id==0) {
-    crdc1_charge = word1;
-    crdc1_time   = word2;
-  } else if(id==1) {
-    crdc2_charge = word1;
-    crdc2_time   = word2;
-  } else {
-    return false;
-  }
-  //printf("after crdc: %i | %i     0x%04x\t0x%04x\t\t",crdc1->GetEntries(),crdc2->GetEntries(),word1,word2);
-  //std::cout << " ++++++++++++++++++++++++++++++++++++\n";
-
-  return true;
-}
-
-bool TS800::HandleIntermediatePPACPacket(char *data,unsigned short size) {
-  int ptr = 0;
-  short id      = *((short*)data); ptr += 2;
-  short subsize = *((short*)(data+ptr)); ptr += 2;
-  short subtype = *((short*)(data+ptr)); ptr += 2;
-  short zerobuffer = *((short*)(data+ptr)); ptr += 2;
-  int lastsampe = 0;
-
-  //std::map<int,int> ChargeMap;
-
-  std::map<int,std::map<int,int> > pad;
-
-  for(int x=1;x<subsize;x+=2) {
-    unsigned short word1 = *((unsigned short*)(data+ptr)); ptr += 2;
-    if((word1&0x8000)!=0x8000) { continue; }
-    unsigned short word2 = *((unsigned short*)(data+ptr)); ptr += 2;
-    int sample_number    = (word1&(0x7fc0)) >> 6;
-    int channel_number   =  word1&(0x003f);
-    int connector_number = (word2&(0x0c00)) >> 10;
-    int databits         = (word2&(0x03ff));
-
-    int real_channel = (connector_number << 6) + channel_number;
-    pad[real_channel][sample_number] = databits;
-  }
-
-  std::map<int,std::map<int,int> >::iterator it1;
-  std::map<int,int>::iterator it2;
-
-  for(it1=pad.begin();it1!=pad.end();it1++) {
-    //printf("channel[%03i]\n",it1->first);
-    //printf("\t%i\t%i\n",it2->first,it2->second);
-    TCrdcPad *ppac = 0;
-    if(id==0) {
-      ppac = (TCrdcPad*)ppac1->ConstructedAt(crdc1->GetEntries());
-    } else if(id==1) {
-      ppac = (TCrdcPad*)ppac2->ConstructedAt(crdc2->GetEntries());
-    }
-    if(ppac) {
-      ppac->SetChannel(it1->first);
-      for(it2=it1->second.begin();it2!=it1->second.end();it2++)
-        ppac->SetPoint(it2->first,it2->second);
-    } else {
-      return false;
-    }
-  }
-  unsigned short word1 = *((unsigned short*)(data+ptr)); ptr += 2;
-  unsigned short word2 = *((unsigned short*)(data+ptr)); ptr += 2;
-  if(id==0) {
-    ppac1_charge = word1;
-    ppac1_time   = word2;
-  } else if(id==1) {
-    ppac2_charge = word1;
-    ppac2_time   = word2;
-  } else {
-    return false;
-  }
-  //printf("after crdc: %i | %i     0x%04x\t0x%04x\t\t",crdc1->GetEntries(),crdc2->GetEntries(),word1,word2);
-  //std::cout << " ++++++++++++++++++++++++++++++++++++\n";
-
-  return true;
-}
-*/
 
 void TS800::InsertHit(const TDetectorHit& hit){
   return;

@@ -45,7 +45,7 @@
 #include "TChainLoop.h"
 #include "THistogramLoop.h"
 
-#include "TS800.h"
+#include "TInverseMap.h"
 
 //extern "C" G__value G__getitem(const char* item);
 //#include "FastAllocString.h"
@@ -169,7 +169,8 @@ void TGRUTint::ApplyOptions() {
   TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
 
   if(opt->S800InverseMapFile().length()) {
-    TS800::ReadInverseMap(opt->S800InverseMapFile().c_str());
+    //TS800::ReadInverseMap(opt->S800InverseMapFile().c_str());
+    TInverseMap::Get(opt->S800InverseMapFile().c_str());
   }
 
   std::vector<TFile*> cuts_files;

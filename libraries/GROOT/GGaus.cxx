@@ -228,7 +228,7 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
 
 
   //Double_t binwidth = fithist->GetBinWidth(GetParameter("centroid"));
-  Double_t width    = TF1::GetParameter("sigma");
+  //Double_t width    = TF1::GetParameter("sigma");
   Double_t xlow,xhigh;
   //Double_t int_low,int_high;
   TF1::GetRange(xlow,xhigh);

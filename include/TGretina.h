@@ -23,13 +23,13 @@ public:
   virtual void Print(Option_t *opt = "") const;
   virtual void Clear(Option_t *opt = "");
 
-  virtual Int_t Size() { return gretina_hits.size(); }
+  virtual Int_t Size() const { return gretina_hits.size(); }
   virtual Int_t AddbackSize() { BuildAddback(); return addback_hits.size(); }
 
   virtual void InsertHit(const TDetectorHit& hit);
   virtual TDetectorHit& GetHit(int i)            { return gretina_hits.at(i); }
 
-  const TGretinaHit& GetGretinaHit(int i) { return gretina_hits.at(i); }
+  const TGretinaHit& GetGretinaHit(int i) const { return gretina_hits.at(i); }
   const TGretinaHit& GetAddbackHit(int i) { BuildAddback(); return addback_hits.at(i); }
   void PrintHit(int i){ gretina_hits.at(i).Print(); }
 

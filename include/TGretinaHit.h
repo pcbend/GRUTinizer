@@ -123,7 +123,7 @@ public:
   //void SetPosition(TVector3 &vec) { fCorePosition = vec; }
 
 
-
+  void   SetCoreEnergy(float temp) { fCoreEnergy = temp; }
 
 
 private:

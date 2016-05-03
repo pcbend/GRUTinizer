@@ -298,7 +298,15 @@ void TGretina::BuildAddbackHits(){
 }
 */
 
-void TGretina::Print(Option_t *opt) const { }
+void TGretina::Print(Option_t *opt) const {
+  printf(BLUE "GRETINA: size = %i" RESET_COLOR "\n",Size());
+  for(int x=0;x<Size();x++) {
+    printf(DYELLOW);
+    GetGretinaHit(x).Print(opt);
+    printf(RESET_COLOR);
+  }
+  printf(BLUE "--------------------------------" RESET_COLOR "\n");
+}
 
 void TGretina::Clear(Option_t *opt) {
   TDetector::Clear(opt);
