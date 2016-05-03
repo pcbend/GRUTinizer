@@ -307,7 +307,7 @@ Float_t TS800::Azita(int order){
 
 
 TVector3 TS800::ExitTargetVect(int order){
-  TVector3 track;
+  TVector3 track(0,0,1);
   double xsin = 0;
   double ysin = 0;
   xsin = GetAta(order);
@@ -325,7 +325,7 @@ TVector3 TS800::ExitTargetVect(int order){
   else                      phi = 0;
 
   theta = TMath::ASin(TMath::Sqrt(xsin*xsin+ysin*ysin));
-  track.SetPtThetaPhi(1,theta,phi);
+  track.SetMagThetaPhi(1,theta,phi);
   return track;
 }
 
