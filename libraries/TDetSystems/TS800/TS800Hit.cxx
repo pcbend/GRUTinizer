@@ -664,7 +664,8 @@ float TCrdc::GetNonDispersiveY() {
   // std::cout << " 2 Slope = " << y_slope << std::endl;
   // std::cout << " 2 Offst = " << y_offset << std::endl;
     
-  return ((GetTimeRand()*y_slope+y_offset));
+  //  return ((GetTimeRand()*y_slope+y_offset));
+  return ((time*y_slope+y_offset));
 }
 
 void TCrdc::Print(Option_t *opt) const { }

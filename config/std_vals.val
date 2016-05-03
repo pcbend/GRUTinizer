@@ -103,5 +103,5 @@ CRDC2_Y_OFFSET {
 }
 
 CRDC2_Y_SLOPE { 
-  Value: 0.115
+  Value: 0.1115
 }

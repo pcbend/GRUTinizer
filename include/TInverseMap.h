@@ -16,12 +16,16 @@ class TInverseMap : public TNamed {
     virtual void Print(Option_t *opt="") const; //{ ; }
     virtual void Clear(Option_t *opt="")       { ; }
 
+    float Ata(int degree, double xfp, double afp, double yfp, double bfp) const;
     float Ata(int,const TS800*);
+    float Bta(int degree, double xfp, double afp, double yfp, double bfp) const;
     float Bta(int,const TS800*);
+    float Yta(int degree, double xfp, double afp, double yfp, double bfp) const;
     float Yta(int,const TS800*);
+    float Dta(int degree, double xfp, double afp, double yfp, double bfp) const;
     float Dta(int,const TS800*);
 
-    float MapCalc(int,int,float*);
+    float MapCalc(int,int,float*) const;
 
     int Size() { return fMap.size(); }
 

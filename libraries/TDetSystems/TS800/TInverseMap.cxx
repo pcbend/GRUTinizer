@@ -133,12 +133,55 @@ void TInverseMap::Print(Option_t *opt) const {
 // 
 // We transform S800 angle into GRETINA.
 
+float TInverseMap::Ata(int order, double xfp, double afp, double yfp, double bfp) const {
+  float input[6];
+  input[0]  = - xfp / 1000.0;
+  input[1]  = - afp;
+  input[2]  =   yfp / 1000.0;
+  input[3]  =   bfp;
+  input[4]  =   0.0;
+  input[5]  =   0.0;
+  return MapCalc(order, 0, input);
+}
+
+float TInverseMap::Bta(int order, double xfp, double afp, double yfp, double bfp) const {
+  float input[6];
+  input[0]  = - xfp / 1000.0;
+  input[1]  = - afp;
+  input[2]  =   yfp / 1000.0;
+  input[3]  =   bfp;
+  input[4]  =   0.0;
+  input[5]  =   0.0;
+  return MapCalc(order, 2, input);
+}
+
+float TInverseMap::Yta(int order, double xfp, double afp, double yfp, double bfp) const {
+  float input[6];
+  input[0]  = - xfp / 1000.0;
+  input[1]  = - afp;
+  input[2]  =   yfp / 1000.0;
+  input[3]  =   bfp;
+  input[4]  =   0.0;
+  input[5]  =   0.0;
+  return MapCalc(order, 1, input);
+}
+
+float TInverseMap::Dta(int order, double xfp, double afp, double yfp, double bfp) const {
+  float input[6];
+  input[0]  = - xfp / 1000.0;
+  input[1]  = - afp;
+  input[2]  =   yfp / 1000.0;
+  input[3]  =   bfp;
+  input[4]  =   0.0;
+  input[5]  =   0.0;
+  return MapCalc(order, 3, input);
+}
 
 float TInverseMap::Ata(int order, const TS800 *s800) { 
   float input[6];
-  input[0]  = - s800->GetCrdc(0).GetDispersiveX()    / 1000.0;
+  input[0]  = - s800->GetXFP()    / 1000.0;
   input[1]  = - s800->GetAFP();
-  input[2]  =   s800->GetCrdc(0).GetNonDispersiveY() / 1000.0;
+  input[2]  =   s800->GetYFP() / 1000.0;
   input[3]  =   s800->GetBFP();
   input[4]  =   0.0;
   input[5]  =   0.0;
@@ -148,9 +191,9 @@ float TInverseMap::Ata(int order, const TS800 *s800) {
 
 float TInverseMap::Bta(int order, const TS800 *s800) { 
   float input[6];
-  input[0]  = - s800->GetCrdc(0).GetDispersiveX()    / 1000.0;
+  input[0]  = - s800->GetXFP() / 1000.0;
   input[1]  = - s800->GetAFP();
-  input[2]  =   s800->GetCrdc(0).GetNonDispersiveY() / 1000.0;
+  input[2]  =   s800->GetYFP() / 1000.0;
   input[3]  =   s800->GetBFP();
   input[4]  =   0.0;
   input[5]  =   0.0;
@@ -160,9 +203,9 @@ float TInverseMap::Bta(int order, const TS800 *s800) {
 
 float TInverseMap::Yta(int order, const TS800 *s800) { 
   float input[6];
-  input[0]  = - s800->GetCrdc(0).GetDispersiveX()    / 1000.0;
+  input[0]  = - s800->GetXFP() / 1000.0;
   input[1]  = - s800->GetAFP();
-  input[2]  =   s800->GetCrdc(0).GetNonDispersiveY() / 1000.0;
+  input[2]  =   s800->GetYFP() / 1000.0;
   input[3]  =   s800->GetBFP();
   input[4]  =   0.0;
   input[5]  =   0.0;
@@ -173,9 +216,9 @@ float TInverseMap::Yta(int order, const TS800 *s800) {
 
 float TInverseMap::Dta(int order, const TS800 *s800) { 
   float input[6];
-  input[0]  = - s800->GetCrdc(0).GetDispersiveX()    / 1000.0;
+  input[0]  = - s800->GetXFP() / 1000.0;
   input[1]  = - s800->GetAFP();
-  input[2]  =   s800->GetCrdc(0).GetNonDispersiveY() / 1000.0;
+  input[2]  =   s800->GetYFP() / 1000.0;
   input[3]  =   s800->GetBFP();
   input[4]  =   0.0;
   input[5]  =   0.0;
@@ -183,7 +226,7 @@ float TInverseMap::Dta(int order, const TS800 *s800) {
   return MapCalc(order,par,input);
 }
 
-float TInverseMap::MapCalc(int order,int par,float *input) { 
+float TInverseMap::MapCalc(int order,int par,float *input) const { 
   float cumul         = 0.0;
   float multiplicator = 0.0;
   std::vector<InvMapRow> vec = fMap.at(par);

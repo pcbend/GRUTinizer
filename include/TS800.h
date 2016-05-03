@@ -30,13 +30,16 @@ public:
   TVector3 CRDCTrack();  // not a finished method
   TVector3 ExitTargetVect(int order=6);
   Float_t Azita(int order=6);
-  float GetAFP() const;
-  float GetBFP() const;
 
-  Float_t GetAta(int i=6);
-  Float_t GetYta(int i=6);
-  Float_t GetBta(int i=6);
-  Float_t GetDta(int i=6);
+  float GetXFP(int i=0) const; // x position in the first(second) CRDC (mm)
+  float GetYFP(int i=0) const; // y position in the first(second) CRDC (mm)
+  float GetAFP() const; // x-angle in the focal plane (rad)
+  float GetBFP() const; // y-angle in the focal plane (rad)
+
+  Float_t GetAta(int i=6); // x-angle at the target (rad)
+  Float_t GetYta(int i=6); // y-offset at the target (mm)
+  Float_t GetBta(int i=6); // y-angle at the target (rad)
+  Float_t GetDta(int i=6); // dE/E of outgoing particle, relative to the central b-rho
 
   virtual void Copy(TObject& obj)        const;
   virtual void Print(Option_t *opt = "") const {;}

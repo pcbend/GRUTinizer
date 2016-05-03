@@ -123,7 +123,7 @@ TVector3 TS800::ExitTargetVect(int order){
   track.SetMagThetaPhi(1,theta,phi);
   */
   track.SetXYZ(sin_ata,sin_bta,1);
-  return track;
+  return track; 
 }
 
 TVector3 TS800::CRDCTrack(){
@@ -135,6 +135,24 @@ TVector3 TS800::CRDCTrack(){
   return track;
 }
 
+float TS800::GetXFP(int i) const {
+  return GetCrdc(i).GetDispersiveX();
+}
+
+float TS800::GetYFP(int i) const {
+  float ypos = GetCrdc(i).GetNonDispersiveY();
+
+  // // Bit 2 in registr is coincidence event.
+  // // These have a timing offset, which corresponds to a spatial offset.
+  // if(trigger.GetRegistr() & 2) {
+  //   double slope = GValue::Value( (i==0) ? "CRDC1_Y_SLOPE" : "CRDC2_Y_SLOPE" );
+  //   double coinc_timediff = 10;
+  //   ypos -= slope*coinc_timediff;
+  // }
+
+  return ypos;
+}
+
 float TS800::GetAFP() const{
   /*  if (GetCrdc(0).GetId() == -1 || GetCrdc(1).GetId() == -1){
     return sqrt(-1);
@@ -142,19 +160,19 @@ float TS800::GetAFP() const{
   if(GetCrdc(0).Size()==0||GetCrdc(1).Size()==0){
     return sqrt(-1);
   }
-  float AFP = TMath::ATan((GetCrdc(1).GetDispersiveX()-GetCrdc(0).GetDispersiveX())/1073.0);
+  float AFP = TMath::ATan((GetXFP(1)-GetXFP(0))/1073.0);
   return AFP;
 
 }
 
 float TS800::GetBFP() const{
-  /*if (GetCrdc(0).GetId() == -1 || GetCrdc(1).GetId() == -1){
+  /*if (GetCrdc(0).GetId() == -1 || GetCrdc(1).GetId() == -1) {
     return sqrt(-1);
     }*/
   if(GetCrdc(0).Size()==0||GetCrdc(1).Size()==0){
     return sqrt(-1);
   }
-  float BFP = TMath::ATan((GetCrdc(1).GetNonDispersiveY()-GetCrdc(0).GetNonDispersiveY())/1073.0);
+  float BFP = TMath::ATan((GetYFP(1)-GetYFP(0))/1073.0);
   return BFP;
 }
 
