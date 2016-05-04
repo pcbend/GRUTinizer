@@ -181,7 +181,7 @@ double TGretinaHit::GetDoppler(const TS800 *s800,int EngRange) {
   double gamma = 1.0/(sqrt(1.-beta*beta));
   double dp_p = gamma/(1.+gamma) * s800->GetDta();
   beta *=(1.+dp_p/(gamma*gamma));
-  TVector3 track(TMath::Sin(s800->GetAta()),TMath::Sin(s800->GetBta()),1);
+  TVector3 track(TMath::Sin(s800->GetAta()),-TMath::Sin(s800->GetBta()),1);
   if(EngRange>-1)
     return GetDoppler(EngRange,beta,&track);
   return GetDoppler(beta,&track);
