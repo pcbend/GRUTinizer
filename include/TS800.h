@@ -36,10 +36,10 @@ public:
   float GetAFP() const; // x-angle in the focal plane (rad)
   float GetBFP() const; // y-angle in the focal plane (rad)
 
-  Float_t GetAta(int i=6); // x-angle at the target (rad)
-  Float_t GetYta(int i=6); // y-offset at the target (mm)
-  Float_t GetBta(int i=6); // y-angle at the target (rad)
-  Float_t GetDta(int i=6); // dE/E of outgoing particle, relative to the central b-rho
+  Float_t GetAta(int i=6) const; // x-angle at the target (rad)
+  Float_t GetYta(int i=6) const; // y-offset at the target (mm)
+  Float_t GetBta(int i=6) const; // y-angle at the target (rad)
+  Float_t GetDta(int i=6) const; // dE/E of outgoing particle, relative to the central b-rho
 
   virtual void Copy(TObject& obj)        const;
   virtual void Print(Option_t *opt = "") const {;}

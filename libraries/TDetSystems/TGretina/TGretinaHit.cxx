@@ -8,6 +8,7 @@
 #include "GValue.h"
 #include "TGEBEvent.h"
 #include "TGretina.h"
+#include "TS800.h"
 
 struct interaction_point {
   interaction_point(int segnum, TVector3 pos,TVector3 loc,float energy,float fraction=100.0)
@@ -171,8 +172,20 @@ double TGretinaHit::GetDoppler_dB(double beta, const TVector3 *vec,double Dta){
   return tmp;
 }
 
-
-
+double TGretinaHit::GetDoppler(const TS800 *s800,int EngRange) {
+  if(!s800 || Size()<1)
+    return 0.0;
+  double beta  = GValue::Value("BETA");
+  if(std::isnan(beta))
+    return 0.0;
+  double gamma = 1.0/(sqrt(1.-beta*beta));
+  double dp_p = gamma/(1.+gamma) * s800->GetDta();
+  beta *=(1.+dp_p/(gamma*gamma));
+  TVector3 track(TMath::Sin(s800->GetAta()),TMath::Sin(s800->GetBta()),1);
+  if(EngRange>-1)
+    return GetDoppler(EngRange,beta,&track);
+  return GetDoppler(beta,&track);
+}
 
 //TVector3 TGretinaHit::GetCrystalPosition(int i) const {
 //  std::cerr << __PRETTY_FUNCTION__ << " NOT IMPLEMENTED YET" << std::endl;

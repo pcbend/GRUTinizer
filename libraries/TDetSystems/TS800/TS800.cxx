@@ -44,7 +44,7 @@ void TS800::Copy(TObject& obj) const {
 }
 
 
-Float_t TS800::GetAta(int i){
+Float_t TS800::GetAta(int i) const {
   //float Shift_ata = 0;
   float ata = TInverseMap::Get()->Ata(i,this);
   if(!std::isnan(GValue::Value("ATA_SHIFT"))) {
@@ -53,7 +53,7 @@ Float_t TS800::GetAta(int i){
   return ata;
 }
 
-Float_t TS800::GetBta(int i){
+Float_t TS800::GetBta(int i) const {
   float bta = TInverseMap::Get()->Bta(i,this);
   if(!std::isnan(GValue::Value("BTA_SHIFT"))) {
    //bta += GValue::Value("BTA_SHIFT");
@@ -61,7 +61,7 @@ Float_t TS800::GetBta(int i){
   return bta;
 }
 
-Float_t TS800::GetYta(int i){
+Float_t TS800::GetYta(int i) const {
   float yta = TInverseMap::Get()->Yta(i,this);
   if(!std::isnan(GValue::Value("YTA_SHIFT"))) {
     yta += GValue::Value("YTA_SHIFT");
@@ -69,7 +69,7 @@ Float_t TS800::GetYta(int i){
   return yta;
 }
 
-Float_t TS800::GetDta(int i){
+Float_t TS800::GetDta(int i) const {
   float dta = TInverseMap::Get()->Dta(i,this);
   if(!std::isnan(GValue::Value("DTA_SHIFT"))) {
     dta += GValue::Value("DTA_SHIFT");
@@ -106,23 +106,25 @@ TVector3 TS800::ExitTargetVect(int order){
   sin_bta = GetBta(order); // * TMath::DegToRad() ;
   
   
-  //double phi   = 0;
-  //double theta = 0;
 
 
   sin_ata = TMath::Sin(sin_ata);
   sin_bta = TMath::Sin(sin_bta);
-  /*
-  if(sin_ata>0 && sin_bta>0)      phi = 2.0*TMath::Pi()-TMath::ATan(sin_bta/sin_ata);
-  else if(sin_ata<0 && sin_bta>0) phi = TMath::Pi()+TMath::ATan(sin_bta/TMath::Abs(sin_ata));
-  else if(sin_ata<0 && sin_bta<0) phi = TMath::Pi()-TMath::ATan(TMath::Abs(sin_bta)/TMath::Abs(sin_ata));
-  else if(sin_ata>0 && sin_bta<0) phi = TMath::ATan(TMath::Abs(sin_bta)/sin_ata);
-  else                      phi = 0;
 
-  theta = TMath::ASin(TMath::Sqrt(sin_ata*sin_ata+sin_bta*sin_bta));
-  track.SetMagThetaPhi(1,theta,phi);
-  */
-  track.SetXYZ(sin_ata,sin_bta,1);
+  // double phi   = 0;
+  // double theta = 0;
+  
+  // if(sin_ata>0 && sin_bta>0)      phi = 2.0*TMath::Pi()-TMath::ATan(sin_bta/sin_ata);
+  // else if(sin_ata<0 && sin_bta>0) phi = TMath::Pi()+TMath::ATan(sin_bta/TMath::Abs(sin_ata));
+  // else if(sin_ata<0 && sin_bta<0) phi = TMath::Pi()-TMath::ATan(TMath::Abs(sin_bta)/TMath::Abs(sin_ata));
+  // else if(sin_ata>0 && sin_bta<0) phi = TMath::ATan(TMath::Abs(sin_bta)/sin_ata);
+  // else                      phi = 0;
+
+  // theta = TMath::ASin(TMath::Sqrt(sin_ata*sin_ata+sin_bta*sin_bta));
+  // track.SetMagThetaPhi(1,theta,phi);
+
+  // Why a minus sign?
+  track.SetXYZ(sin_ata,-sin_bta,1);
   return track; 
 }
 

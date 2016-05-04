@@ -179,7 +179,7 @@ float TInverseMap::Dta(int order, double xfp, double afp, double yfp, double bfp
 
 float TInverseMap::Ata(int order, const TS800 *s800) { 
   float input[6];
-  input[0]  = - s800->GetXFP()    / 1000.0;
+  input[0]  = - s800->GetXFP() / 1000.0;
   input[1]  = - s800->GetAFP();
   input[2]  =   s800->GetYFP() / 1000.0;
   input[3]  =   s800->GetBFP();
