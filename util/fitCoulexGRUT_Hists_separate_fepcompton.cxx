@@ -195,10 +195,8 @@ int fitCoulex(const char *cfg_file_name){
     return -1;
   }
 
-
-
   num_geant_files = cfg->GetValue("NUM_GEANT_FILES", 0);
-  if (num_geant_files != 2){
+  if (num_geant_files != 2 && num_geant_files != 1){
     std::cout << "ERROR: Failed to get correct number of geant files from cfg file: " << cfg_file_name << std::endl;
     return -1;
   }
@@ -249,7 +247,7 @@ int fitCoulex(const char *cfg_file_name){
   }
 
   num_pars = cfg->GetValue("NUM_PARS",0);
-  if (num_pars == 0 || num_pars > MAX_PARS || num_pars != 8){
+  if (num_pars != 7 && num_pars != 8){
     std::cout << "ERROR: Bad NUM_PARS Value : " << num_pars << std::endl;
     return -1;
   }
@@ -316,6 +314,7 @@ int fitCoulex(const char *cfg_file_name){
   std::cout << "Getting data histograms.." << std::endl;
   getHistograms(data_hists, angles, input_file, START_ANGLE, FINAL_ANGLE,ANGLE_STEPS, 
                 data_low_x, data_high_x, kev_per_bin);
+  std::cout << "Done getting histograms." << std::endl;
   
   ////////////////////////////////////////////////////
   //Now Starting Fitting Routine
@@ -332,24 +331,38 @@ int fitCoulex(const char *cfg_file_name){
   TF1 *used_fit_function = new TF1("double_expo_fit", 
                                    "[0]*([1]*TMath::Exp([2]*x)+[3]*TMath::Exp([4]*x))", data_low_x,data_high_x);
 
-  used_fit_function->SetParameter(1,init_pars[4]);
-  used_fit_function->SetParameter(2,init_pars[5]);
-  used_fit_function->SetParameter(3,init_pars[6]);
-  used_fit_function->SetParameter(4,init_pars[7]);
+  //Setting parameters for double exponential!
+  if (num_geant_files ==1){
+    used_fit_function->SetParameter(1,init_pars[3]);
+    used_fit_function->SetParameter(2,init_pars[4]);
+    used_fit_function->SetParameter(3,init_pars[5]);
+    used_fit_function->SetParameter(4,init_pars[6]);
+  }
+  if (num_geant_files ==2){
+    used_fit_function->SetParameter(1,init_pars[4]);
+    used_fit_function->SetParameter(2,init_pars[5]);
+    used_fit_function->SetParameter(3,init_pars[6]);
+    used_fit_function->SetParameter(4,init_pars[7]);
+  }
 
   TFile *out_hist_file = new TFile("output_fit_hists.root","recreate");
+
   for (int angle_index = 0; angle_index < TOTAL_ANGLES; angle_index++){
     peak_sum[angle_index] = 0;
     TF1 *fit_func = 0;
-  
-
-    fit_func = FitDoubleExpThreeHist(data_hists.at(angle_index), geant_hists.at(0), geant_hists.at(1), geant_hists.at(2), fit_low_x, fit_high_x, init_pars);
+    if (num_geant_files == 1){
+      fit_func = FitDoubleExpTwoHist(data_hists.at(angle_index), geant_hists.at(0), geant_hists.at(1), fit_low_x, fit_high_x, init_pars);
+    }
+    else if (num_geant_files == 2){
+      fit_func = FitDoubleExpThreeHist(data_hists.at(angle_index), geant_hists.at(0), geant_hists.at(1), geant_hists.at(2), fit_low_x, fit_high_x, init_pars);
+    }
+    else {
+      std::cout << "Unknown reason for num_geant_files = " << num_geant_files << std::endl;
+    }
     GH1D *fit_func_hist = new GH1D(*fit_func, 512,0,8192);
     TSpline3 *fit_func_spline = new TSpline3(fit_func_hist);
-
     std::cout << "Parameters from Fit Function are: " << std::endl;
     fit_func->Print();
-    
     data_hists.at(angle_index)->SetTitle(Form("Fit to %s with Scatter Cut (< %3.3f)", isotope_name.c_str(),angles.at(angle_index)));
     data_hists.at(angle_index)->GetXaxis()->SetTitle("Energy (keV)");
     data_hists.at(angle_index)->GetYaxis()->SetTitle(Form("Counts / %d keV", kev_per_bin));
@@ -359,14 +372,17 @@ int fitCoulex(const char *cfg_file_name){
 
     hist_constant[angle_index][0] = fit_func->GetParameter(0);
     hist_constant[angle_index][1] = fit_func->GetParameter(1);
-    hist_constant[angle_index][2] = fit_func->GetParameter(2);
+    hist_constant[angle_index][2] = 0;
+    if (num_geant_files == 2){
+      hist_constant[angle_index][2] = fit_func->GetParameter(2);
+    }
     //Now we get residuals
     double res_sum = 0;
     double res_sum_in_peak = 0;
 
     int start_bin = data_hists[angle_index]->FindBin(fit_low_x);
     int end_bin = data_hists[angle_index]->FindBin(fit_high_x);
-    used_fit_function->SetParameter(0, fit_func->GetParameter(3));//set double exponential scaling factor
+    used_fit_function->SetParameter(0, fit_func->GetParameter(num_geant_files+1));//set double exponential scaling factor
     
     for (int bin = start_bin; bin < end_bin; bin++){
       bin_centers[bin-start_bin] = data_hists.at(angle_index)->GetBinCenter(bin);
@@ -376,14 +392,19 @@ int fitCoulex(const char *cfg_file_name){
       normed_residuals[bin-start_bin] = residuals[bin-start_bin]/TMath::Sqrt(data_hists[angle_index]->GetBinContent(bin));
 
       if (bin_centers[bin-start_bin] >= peak_low_x  && bin_centers[bin-start_bin] <= peak_high_x){
-        TH1D geant_compton_hist1 = *((TH1D*)geant_hists.at(1)->Clone("geant_compton_hist1"));
-        TH1D geant_compton_hist2 = *((TH1D*)geant_hists.at(3)->Clone("geant_compton_hist2"));
+        TH1D geant_compton_hist1;
+        geant_compton_hist1 = *((TH1D*)geant_hists.at(1)->Clone("geant_compton_hist1"));
         geant_compton_hist1.Scale(hist_constant[angle_index][1]*hist_constant[angle_index][0]);
-        geant_compton_hist2.Scale(hist_constant[angle_index][2]);
+
         peak_sum[angle_index] += (fit_func->Eval(bin_centers[bin-start_bin])
                                   - used_fit_function->Eval(bin_centers[bin-start_bin]) 
-                                  - geant_compton_hist1.GetBinContent(bin)
-                                  - geant_compton_hist2.GetBinContent(bin));
+                                  - geant_compton_hist1.GetBinContent(bin));
+        if (num_geant_files == 2){
+          TH1D geant_compton_hist2;
+          geant_compton_hist2 = *((TH1D*)geant_hists.at(3)->Clone("geant_compton_hist2"));
+          geant_compton_hist2.Scale(hist_constant[angle_index][2]);
+          peak_sum[angle_index] -= geant_compton_hist2.GetBinContent(bin);
+        }
         res_sum_in_peak += residuals[bin-start_bin];
       }
     }//bin loop
@@ -394,8 +415,11 @@ int fitCoulex(const char *cfg_file_name){
     TGraph *norm_residual_plot = new TGraph(num_res_points, &bin_centers[0], &normed_residuals[0]);
     norm_residual_plot->SetName(Form("norm_res_plot_angle_%f", angles.at(angle_index)));
 
-    out_file <<  angles[angle_index] <<"\t"<<hist_constant[angle_index][0] << "\t" << hist_constant[angle_index][1] <<  "\t" 
-             << hist_constant[angle_index][2] << "\t" << fit_error[angle_index] << "\t" 
+    out_file <<  angles[angle_index] <<"\t"<<hist_constant[angle_index][0] << "\t" << hist_constant[angle_index][1] <<  "\t";
+    if (num_geant_files == 2){
+      out_file << hist_constant[angle_index][2] << "\t" ;
+    }
+    out_file << fit_error[angle_index] << "\t" 
              << chi_squared[angle_index] << "\t" << res_sum << "\t" << res_sum_in_peak 
              << "\t" << peak_sum[angle_index] << "\t" << std::endl;
 
@@ -425,13 +449,17 @@ int fitCoulex(const char *cfg_file_name){
 
     geant_hists.at(0)->SetLineColor(kGreen+2);
     geant_hists.at(1)->SetLineColor(kRed);
-    geant_hists.at(2)->SetLineColor(kMagenta);
+    if (num_geant_files ==2 ){
+      geant_hists.at(2)->SetLineColor(kMagenta);
+    }
     used_fit_function->SetLineColor(kBlack);
     fit_func_spline->SetLineColor(kCyan+2);
 
     geant_hists.at(0)->SetLineWidth(2);
     geant_hists.at(1)->SetLineWidth(2);
-    geant_hists.at(2)->SetLineWidth(2);
+    if (num_geant_files ==2 ){
+      geant_hists.at(2)->SetLineWidth(2);
+    }
     used_fit_function->SetLineWidth(2);
     fit_func_spline->SetLineWidth(2);
 
@@ -443,9 +471,13 @@ int fitCoulex(const char *cfg_file_name){
     compton_hist.Scale(hist_constant[angle_index][1]*hist_constant[angle_index][0]);
     compton_hist.Draw("same");
 
-    TH1D second_2plus_hist = *((TH1D*)geant_hists.at(2)->Clone("second_2plus_hist"));
-    second_2plus_hist.Scale(hist_constant[angle_index][2]);
-    second_2plus_hist.Draw("same");
+    TH1D second_2plus_hist;
+    if (num_geant_files ==2 ){
+      geant_hists.at(2)->SetLineWidth(2);
+      second_2plus_hist = *((TH1D*)geant_hists.at(2)->Clone("second_2plus_hist"));
+      second_2plus_hist.Scale(hist_constant[angle_index][2]);
+      second_2plus_hist.Draw("same");
+    }
     if (!used_fit_function){
       std::cout << "Fit function doesn't exist." << std::endl;
     }
@@ -498,11 +530,7 @@ int fitCoulex(const char *cfg_file_name){
     pt->AddText(Form("Total Peak Sum: %1.1f",peak_sum.at(angle_index)));
     pt->Draw();
 
-    
-
-
     residual_with_hists_can->Write();
-
 
     delete residual_plot;
     delete norm_residual_plot;
