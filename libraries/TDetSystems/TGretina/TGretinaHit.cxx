@@ -1,5 +1,6 @@
 #include "TGretinaHit.h"
 
+#include <algorithm>
 #include <cmath>
 #include <set>
 
@@ -21,7 +22,15 @@ struct interaction_point {
   float energy_fraction;
 
   bool operator<(const interaction_point& other) const {
-    return energy > other.energy;
+    if (energy != other.energy) {
+      return energy > other.energy;
+    }
+
+    if(segnum == other.segnum) {
+      return energy_fraction > other.energy_fraction;
+    }
+
+    return segnum < other.segnum;
   }
 };
 
@@ -82,6 +91,8 @@ TVector3 TGretinaHit::GetSegmentPosition()  const { if(fSegmentNumber.size())
 
 void TGretinaHit::BuildFrom(TSmartBuffer& buf){
   const TRawEvent::GEBBankType1& raw = *(const TRawEvent::GEBBankType1*)buf.GetData();
+
+  //std::cout << "GretinaHit: " << raw << std::endl;
   //SetAddress(kDetectorSystems::GRETINA, 1, raw.crystal_id);
   //                     HOLE          CRYSTAL     SEGMENT
   //SetAddress(kDetectorSystems::GRETINA, 1, raw.crystal_id);
@@ -134,9 +145,9 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
       second_interaction_value = seg_ener;
     }
   }
-  //Print("all");
+
   SortHits();
-  //Print("all");
+  //  Print("all");
 
 }
 
@@ -199,13 +210,13 @@ void TGretinaHit::SortHits(){
   //    to that segment!
   //
 
-  std::set<interaction_point> ips;
+  std::vector<interaction_point> ips;
   for(int i=0; i<fNumberOfInteractions; i++){
-    ips.insert(interaction_point(fSegmentNumber[i],
-                                 fGlobalInteractionPosition[i],
-                                 fLocalInteractionPosition[i],
-                                 fInteractionEnergy[i]));
-                                 //fInteractionFraction[i]));
+    ips.push_back(interaction_point(fSegmentNumber[i],
+				    fGlobalInteractionPosition[i],
+				    fLocalInteractionPosition[i],
+				    fInteractionEnergy[i],
+				    fInteractionFraction[i]));
   }
   //printf("ips.size() == %i\n",ips.size());
   // Fill all interaction points
@@ -217,6 +228,9 @@ void TGretinaHit::SortHits(){
   fInteractionFraction.clear();
   //
   fNumberOfInteractions = 0;
+
+  std::sort(ips.begin(), ips.end());
+  
   for(auto& point : ips){
     if(fNumberOfInteractions >= MAXHPGESEGMENTS){
       break;
@@ -392,10 +406,10 @@ void TGretinaHit::Print(Option_t *opt) const {
 
   if(!strcmp(opt,"all")) {
     for(int i=0;i<fNumberOfInteractions;i++) {
-      printf("\t\tSeg[%02i]\tEng: % 4.2f / % 4.2f  \t(R,T,P) % 3.2f % 3.2f % 3.2f\n",fSegmentNumber[i],fInteractionEnergy[i],fInteractionFraction[i],
-                                                                          fGlobalInteractionPosition[i].Mag(),
-                                                                          fGlobalInteractionPosition[i].Theta()*TMath::RadToDeg(),
-                                                                          fGlobalInteractionPosition[i].Phi()*TMath::RadToDeg() ); fflush(stdout);
+      printf("\t\tSeg[%02i]\tEng: % 4.2f / % 4.2f  \t(X,Y,Z) % 3.2f % 3.2f % 3.2f\n",fSegmentNumber[i],fInteractionEnergy[i],fInteractionFraction[i],
+                                                                          fLocalInteractionPosition[i].X(),
+                                                                          fLocalInteractionPosition[i].Y(),
+                                                                          fLocalInteractionPosition[i].Z() ); fflush(stdout);
       //std::cout << "\t\tSe[" << i << "]Seg Num:      \t" << fSegmentNumber[i]     << std::endl
       //          << "\t\t[" << i << "]Seg Eng:      \t" << fInteractionEnergy[i] << std::endl
       //                   << "\t\t[" << i << "]Seg Pos(R,T,P)\t" << fGlobalInteractionPosition[i].Mag()
