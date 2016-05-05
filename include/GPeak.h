@@ -70,7 +70,7 @@ class GPeak : public TF1 {
     bool init_flag;
 
     TF1 fBGFit;
-    TF1 fBGHist;
+    //    TF1 fBGHist;
 
   ClassDef(GPeak,3)
 };

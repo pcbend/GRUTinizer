@@ -60,11 +60,11 @@ class TTrigger : public TDetectorHit {
     void SetExternalSource2(short sou)  { fexternalsource2=sou; }
     void SetSecondarySource(short sou)  { fsecondarysource=sou; }
 
-    unsigned short GetRegistr() { return fregistr; }
-    short GetS800Source()       { return fs800source; }
-    short GetExternalSource1()  { return fexternalsource1; }
-    short GetExternalSource2()  { return fexternalsource2; }
-    short GetSecondarySource()  { return fsecondarysource; }
+    unsigned short GetRegistr() const { return fregistr; }
+    short GetS800Source()       const { return fs800source; }
+    short GetExternalSource1()  const { return fexternalsource1; }
+    short GetExternalSource2()  const { return fexternalsource2; }
+    short GetSecondarySource()  const { return fsecondarysource; }
 
     virtual void Copy(TObject &)         const;
     virtual void Print(Option_t *opt="") const;

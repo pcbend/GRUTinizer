@@ -572,7 +572,7 @@ float TCrdc::GetDispersiveX() const{
 //  return (wchansum*x_slope+x_offset);
 //}
 
-  float TCrdc::GetDispersiveX() const{
+float TCrdc::GetDispersiveX() const{
   int maxpad = GetMaxPad();
   if (maxpad ==-1){
     return sqrt(-1);
@@ -663,8 +663,11 @@ float TCrdc::GetNonDispersiveY() {
   // std::cout << " ------------------ "  << std::endl;
   // std::cout << " 2 Slope = " << y_slope << std::endl;
   // std::cout << " 2 Offst = " << y_offset << std::endl;
-
-  return ((GetTimeRand()*y_slope+y_offset));
+    
+  //  return ((GetTimeRand()*y_slope+y_offset));
+  float tmp = ((float)time)*y_slope+y_offset;
+  //printf("fId[%i]:  %.05f * %.03f + %.05f = %.05f\n",fId,y_slope,(float)time,y_offset,tmp);
+  return tmp;
 }
 
 void TCrdc::Print(Option_t *opt) const { }

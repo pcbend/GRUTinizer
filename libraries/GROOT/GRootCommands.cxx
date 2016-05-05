@@ -135,7 +135,9 @@ GGaus *GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
   //std::cout << "here." << std::endl;
 
   GGaus *mypeak= new GGaus(xlow,xhigh);
-  mypeak->Fit(hist,"Q+");
+  std::string options = opt;
+  options.append("Q+");
+  mypeak->Fit(hist,options.c_str());
   //mypeak->Background()->Draw("SAME");
   TF1 *bg = new TF1(*mypeak->Background());
   hist->GetListOfFunctions()->Add(bg);
@@ -225,7 +227,9 @@ GPeak *PhotoPeakFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
   //std::cout << "here." << std::endl;
 
   GPeak *mypeak= new GPeak((xlow+xhigh)/2.0,xlow,xhigh);
-  mypeak->Fit(hist,"Q+");
+  std::string options = opt;
+  options.append("Q+");
+  mypeak->Fit(hist,options.c_str());
   //mypeak->Background()->Draw("SAME");
   TF1 *bg = new TF1(*mypeak->Background());
   hist->GetListOfFunctions()->Add(bg);
