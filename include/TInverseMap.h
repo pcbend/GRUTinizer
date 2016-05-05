@@ -29,6 +29,8 @@ class TInverseMap : public TNamed {
 
     int Size() { return fMap.size(); }
 
+    
+
   private:
     TInverseMap(const char* filename);
     static TInverseMap *fInverseMap;

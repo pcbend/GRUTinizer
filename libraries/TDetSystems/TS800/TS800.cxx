@@ -48,7 +48,7 @@ Float_t TS800::GetAta(int i) const {
   //float Shift_ata = 0;
   float ata = TInverseMap::Get()->Ata(i,this);
   if(!std::isnan(GValue::Value("ATA_SHIFT"))) {
-    ata += GValue::Value("ATA_SHIFT");
+    ata -= GValue::Value("ATA_SHIFT") *TMath::DegToRad();
   }
   return ata;
 }
@@ -56,7 +56,7 @@ Float_t TS800::GetAta(int i) const {
 Float_t TS800::GetBta(int i) const {
   float bta = TInverseMap::Get()->Bta(i,this);
   if(!std::isnan(GValue::Value("BTA_SHIFT"))) {
-   //bta += GValue::Value("BTA_SHIFT");
+   bta -= GValue::Value("BTA_SHIFT") *TMath::DegToRad();
   }
   return bta;
 }
@@ -77,6 +77,12 @@ Float_t TS800::GetDta(int i) const {
   return dta;
 }
 
+float TS800::AdjustedBeta(float beta) const {
+  double gamma = 1.0/(sqrt(1.-beta*beta));
+  double dp_p = gamma/(1.+gamma) * GetDta();
+  beta *=(1.+dp_p/(gamma*gamma));
+  return beta;
+}
 
 
 Float_t TS800::Azita(int order){
@@ -95,6 +101,14 @@ Float_t TS800::Azita(int order){
     azita = 0;
   }
   return azita;
+}
+
+TVector3 TS800::Track() const {
+  //TVector3 track(0,0,1);  // set to input beam trajectory 
+  //track.RotateY(GetAta(3));
+  //track.Rotate( GetBta(3),-track.Cross(TVector3(0,1,0)) );
+  TVector3 track(TMath::Sin(GetAta()),-TMath::Sin(GetBta()),1);
+  return track.Unit();
 }
 
 
@@ -123,7 +137,6 @@ TVector3 TS800::ExitTargetVect(int order){
   // theta = TMath::ASin(TMath::Sqrt(sin_ata*sin_ata+sin_bta*sin_bta));
   // track.SetMagThetaPhi(1,theta,phi);
 
-  // Why a minus sign?
   track.SetXYZ(sin_ata,-sin_bta,1);
   return track; 
 }
@@ -156,9 +169,9 @@ float TS800::GetYFP(int i) const {
 }
 
 float TS800::GetAFP() const{
-  /*  if (GetCrdc(0).GetId() == -1 || GetCrdc(1).GetId() == -1){
-    return sqrt(-1);
-    }*/
+   /*  if (GetCrdc(0).GetId() == -1 || GetCrdc(1).GetId() == -1){
+     return sqrt(-1);
+  }*/
   if(GetCrdc(0).Size()==0||GetCrdc(1).Size()==0){
     return sqrt(-1);
   }

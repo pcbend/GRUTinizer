@@ -31,6 +31,8 @@ public:
   TVector3 ExitTargetVect(int order=6);
   Float_t Azita(int order=6);
 
+  TVector3 Track() const; 
+
   float GetXFP(int i=0) const; // x position in the first(second) CRDC (mm)
   float GetYFP(int i=0) const; // y position in the first(second) CRDC (mm)
   float GetAFP() const; // x-angle in the focal plane (rad)
@@ -40,6 +42,8 @@ public:
   Float_t GetYta(int i=6) const; // y-offset at the target (mm)
   Float_t GetBta(int i=6) const; // y-angle at the target (rad)
   Float_t GetDta(int i=6) const; // dE/E of outgoing particle, relative to the central b-rho
+
+  float AdjustedBeta(float) const;
 
   virtual void Copy(TObject& obj)        const;
   virtual void Print(Option_t *opt = "") const {;}
