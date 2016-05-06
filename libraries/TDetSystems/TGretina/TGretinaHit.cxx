@@ -183,15 +183,17 @@ double TGretinaHit::GetDoppler_dB(double beta, const TVector3 *vec,double Dta){
   return tmp;
 }
 
-double TGretinaHit::GetDoppler(const TS800 *s800,int EngRange) {
+double TGretinaHit::GetDoppler(const TS800 *s800,bool doDTAcorr,int EngRange) {
   if(!s800 || Size()<1)
     return 0.0;
   double beta  = GValue::Value("BETA");
   if(std::isnan(beta))
     return 0.0;
-  double gamma = 1.0/(sqrt(1.-beta*beta));
-  double dp_p = gamma/(1.+gamma) * s800->GetDta();
-  beta *=(1.+dp_p/(gamma*gamma));
+  if(doDTAcorr){
+    double gamma = 1.0/(sqrt(1.-beta*beta));
+    double dp_p = gamma/(1.+gamma) * s800->GetDta();
+    beta *=(1.+dp_p/(gamma*gamma));
+  }
   TVector3 track = s800->Track();  //(TMath::Sin(s800->GetAta()),-TMath::Sin(s800->GetBta()),1);
   if(EngRange>-1)
     return GetDoppler(EngRange,beta,&track);

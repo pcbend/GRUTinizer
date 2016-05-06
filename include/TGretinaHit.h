@@ -79,7 +79,7 @@ public:
     tmp = fCoreEnergy*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*vec)));
     return tmp;
   } 
-  double GetDoppler(const TS800 *s800,int EngRange=-1);
+  double GetDoppler(const TS800 *s800,bool doDTAcorr=false,int EngRange=-1);
   double GetDoppler(int EngRange, double beta,const TVector3 *vec=0) {
     if(Size()<1)
       return 0.0;

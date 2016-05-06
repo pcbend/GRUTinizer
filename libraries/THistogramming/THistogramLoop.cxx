@@ -81,6 +81,7 @@ void THistogramLoop::OpenFile() {
 }
 
 void THistogramLoop::CloseFile() {
+  /*
   if(output_file){
     {
       TPreserveGDirectory preserve;
@@ -89,7 +90,10 @@ void THistogramLoop::CloseFile() {
     }
 
     compiled_histograms.SetDefaultDirectory(NULL);
+  */
+  Write();
 
+  if(output_file){
     output_file->Close();
     output_file = 0;
     output_filename = "last.root";
@@ -100,13 +104,15 @@ void THistogramLoop::Write() {
   TPreserveGDirectory preserve;
   if(output_file){
     output_file->cd();
-  }
-  compiled_histograms.Write();
-  if(GValue::Size()) {
-    GValue::Get()->Write();
-  }
-  if(TChannel::Size()) {
-    TChannel::Get()->Write();
+    compiled_histograms.Write();
+    if(GValue::Size()) {
+      GValue::Get()->Write();
+      printf(BLUE "\t%i GValues written to file %s" RESET_COLOR "\n",GValue::Size(),gDirectory->GetName());
+    }
+    if(TChannel::Size()) {
+      TChannel::Get()->Write();
+      printf(BLUE "\t%i TChannels written to file %s" RESET_COLOR "\n",TChannel::Size(),gDirectory->GetName());
+    }
   }
 }
 
