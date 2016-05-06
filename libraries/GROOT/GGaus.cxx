@@ -105,6 +105,8 @@ void GGaus::Copy(TObject &obj) const {
   ((GGaus&)obj).init_flag = init_flag;
   ((GGaus&)obj).fArea     = fArea;
   ((GGaus&)obj).fDArea    = fDArea;
+  ((GGaus&)obj).fSum     = fSum;
+  ((GGaus&)obj).fDSum    = fDSum;
   ((GGaus&)obj).fChi2     = fChi2;
   ((GGaus&)obj).fNdf      = fNdf;
 
@@ -263,13 +265,20 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
   //fithist->GetListOfFunctions()->Print();
 
 
-  fArea = this->Integral(xlow,xhigh);
-  double bgArea = fBGFit.Integral(xlow,xhigh);
+  fArea = this->Integral(xlow,xhigh) / fithist->GetBinWidth(1);
+  double bgArea = fBGFit.Integral(xlow,xhigh) / fithist->GetBinWidth(1);;
   fArea -= bgArea;
 
+
+  if(xlow>xhigh)
+    std::swap(xlow,xhigh);
+  fSum = fithist->Integral(fithist->GetXaxis()->FindBin(xlow),
+                           fithist->GetXaxis()->FindBin(xhigh)); //* fithist->GetBinWidth(1);
+  fSum -= bgArea;
+
+
   if(!verbose) {
-    if(selfprint)
-      Print();/*
+    Print();/*
     printf("BG Area:         %.02f\n",bgArea);
     printf("GetChisquared(): %.4f\n", TF1::GetChisquare());
     printf("GetNDF():        %i\n",   TF1::GetNDF());
@@ -294,6 +303,8 @@ void GGaus::Clear(Option_t *opt){
   init_flag = false;
   fArea  = 0.0;
   fDArea = 0.0;
+  fSum   = 0.0;
+  fDSum  = 0.0;
   fChi2  = 0.0;
   fNdf   = 0.0;
 }
@@ -304,6 +315,7 @@ void GGaus::Print(Option_t *opt) const {
   printf("Name: %s \n", this->GetName());
   printf("Centroid:  %1f +/- %1f \n", this->GetParameter("centroid"),this->GetParError(GetParNumber("centroid")));
   printf("Area:      %1f +/- %1f \n", fArea, fDArea);
+  printf("Sum:       %1f +/- %1f \n", fSum, fDSum);
   printf("FWHM:      %1f +/- %1f \n",this->GetFWHM(),this->GetFWHMErr());
   printf("Reso:      %1f%%  \n",this->GetFWHM()/this->GetParameter("centroid")*100.);
   printf("Chi^2/NDF: %1f\n",fChi2/fNdf);
