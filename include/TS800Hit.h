@@ -165,6 +165,9 @@ class TCrdc : public TDetectorHit {
 
   private:
     virtual int Charge() const { return 0; }
+
+    bool IsGoodSample(int i) const;
+    
     short fId;
     std::vector<int> channel;
     std::vector<int> sample;
