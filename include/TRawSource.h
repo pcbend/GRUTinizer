@@ -287,6 +287,9 @@ class TRawFileIn : public TRawFile {
 public:
   TRawFileIn(const char* filename, kFileType file_type = kFileType::UNKNOWN_FILETYPE)
     : TRawFile(filename, file_type) { }
+
+  TRawEvent PrintNext(Option_t *opt="all") { TRawEvent event; this->Read(&event); event.Print(opt); return event; }
+
   ClassDef(TRawFileIn,0)
 };
 

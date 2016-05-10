@@ -280,22 +280,7 @@ int TCrdc::GetMaxPad() const {
 
     }*/
 
-    bool good = false;
-    if (i == 0 && data.size()>1) {
-      if(channel.at(i) == channel.at(i+1))
-        good = true;
-    }
-    else if(i == data.size()-1 && data.size()>2) {
-      if(channel.at(i) == channel.at(i-1))
-        good = true;
-    } else if(data.size()>2) {
-      if((channel.at(i) == channel.at(i-1)) ||
-         (channel.at(i) == channel.at(i+1)))
-        good = true;
-    }
-
-    if(!good){
-//      std::cout << "i = " << i << "\t continued" << std::endl; 
+    if(!IsGoodSample(i)) {
       continue;
     }
 
@@ -572,6 +557,20 @@ float TCrdc::GetDispersiveX() const{
 //  return (wchansum*x_slope+x_offset);
 //}
 
+bool TCrdc::IsGoodSample(int i) const {
+  if (i == 0 && data.size()>1) {
+    return channel.at(i) == channel.at(i+1);
+    
+  } else if(i == (int)data.size()-1 && data.size()>2) {
+    return channel.at(i) == channel.at(i-1);
+    
+  } else if(data.size()>2) {
+    return (channel.at(i) == channel.at(i-1) ||
+	    (channel.at(i) == channel.at(i+1)));
+  }
+  return false;
+}
+
 float TCrdc::GetDispersiveX() const{
   int maxpad = GetMaxPad();
   if (maxpad ==-1){
@@ -597,7 +596,6 @@ float TCrdc::GetDispersiveX() const{
   const int NUM_PADS = 224;
   int lowpad = maxpad - GRAVITY_WIDTH/2;
   int highpad = lowpad + GRAVITY_WIDTH;
-  double datasum = 0;
   if (lowpad < 0){
     lowpad = 0;
   }
@@ -605,26 +603,16 @@ float TCrdc::GetDispersiveX() const{
     highpad = NUM_PADS-1;
   }
 
+
+  double datasum = 0;
+  double weighted_sum = 0;
   for(int i=0;i<Size();i++) {
 
-    if((channel.at(i) < lowpad)||(channel.at(i)>highpad))
-      continue;
-    bool good = false;
-    if (i == 0 && data.size()>1) {
-      if(channel.at(i) == channel.at(i+1))
-        good = true;
-    }
-    else if(i == (int)data.size()-1 && data.size()>2) {
-      if(channel.at(i) == channel.at(i-1))
-        good = true;
-    } else if(data.size()>2) {
-      if((channel.at(i) == channel.at(i-1)) ||
-         (channel.at(i) == channel.at(i+1)))
-        good = true;
-    }
-    if(!good){
+    if((channel.at(i) < lowpad)||(channel.at(i)>highpad) ||
+       !IsGoodSample(i)) {
       continue;
     }
+    
     TChannel *c = TChannel::GetChannel(Address(i));
     double cal_data;
     if (c){
@@ -633,16 +621,14 @@ float TCrdc::GetDispersiveX() const{
     else{
       cal_data = (double)GetData(i);
     }
-    datamap[channel.at(i)] += cal_data;
+    
     datasum += cal_data;
+    weighted_sum += channel.at(i)*cal_data;
   }
 
-  std::map<int,double>::iterator it;
-  double wchansum = 0.0;
-  for(it=datamap.begin();it!=datamap.end();it++) {
-    wchansum += it->first*(it->second/datasum);
-  }
-  return (wchansum*x_slope+x_offset);
+  // + 0.5 so that we take the middle of the pad, not the left edge.
+  double mean_chan = weighted_sum/datasum + 0.5;
+  return (mean_chan*x_slope+x_offset);
 }
 
 

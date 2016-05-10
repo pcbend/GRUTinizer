@@ -42,7 +42,7 @@ public:
 
 
 private:
-
+  #ifndef __CINT__
   struct SingleFit {
     double max_error;
     std::string nucleus;
@@ -50,13 +50,15 @@ private:
     TGraph graph;
   };
 
+  std::map<std::string,SingleFit> all_fits;
+  #endif
+
   TGraph graph_of_everything;
   TF1    *linfit;
 
   int fit_order;
   int total_points;
 
-  std::map<std::string,SingleFit> all_fits;
 
   void ResetMap(std::map<double,double> &inmap);
   void PrintMap(std::map<double,double> &inmap);
