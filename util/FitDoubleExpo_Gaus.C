@@ -48,11 +48,13 @@ class twoHistHolder{
         return (leftDiff*binContentLeft+rightDiff*binContentRight);
       }
       std::cout << "FAILED IN HISTVALUE!" << std::endl;
+      std::cout << "x = " << x << "\t curBinX = " << curBinX 
+                << "\t nextBinX = " << nextBinX << "\t prevBinX = " << prevBinX << std::endl;
       return m_hist->GetBinContent(binNum);
     }
 
     virtual double operator() (double *x, double *par){
-      return histValue(hist1, x[0])*par[0]+histValue(hist2,x[0])*par[1];
+      return par[0]*(histValue(hist1, x[0])*+histValue(hist2,x[0])*par[1]);
     }
 };
 class threeHistHolder{
@@ -116,7 +118,7 @@ public:
     int binNum = m_hist->GetXaxis()->FindBin(x); //gHist->GetBin() does not respect rebinning.
 
     int nBins = m_hist->GetNbinsX();
-    int kevPerBin = m_hist->GetXaxis()->GetXmax()/nBins;
+    int kevPerBin = m_hist->GetXaxis()->GetBinWidth(1);   //m_hist->GetXaxis()->GetXmax()/nBins;
     int curBinX = m_hist->GetBinCenter(binNum);
     int nextBinX = m_hist->GetBinCenter(binNum+1);
     int prevBinX = m_hist->GetBinCenter(binNum-1);
@@ -328,6 +330,7 @@ TF1 *FitDoubleExpTwoHist(TH1F *hist_to_fit, TH1F *geant_hist1, TH1F *geant_hist2
 
   DoubleExpTwoHist* deh2 = new DoubleExpTwoHist(geant_hist1,geant_hist2);
   TF1* fitfunc = new TF1("double_exp_two_hist",deh2, 0, 1, 7,"DoubleExpTwoHist");
+  TF1* fitfunc_to_draw = new TF1("double_exp_two_hist_test",deh2, 0, 1, 7,"DoubleExpTwoHist");
 
 
   if (init==NULL){
@@ -335,6 +338,7 @@ TF1 *FitDoubleExpTwoHist(TH1F *hist_to_fit, TH1F *geant_hist1, TH1F *geant_hist2
     return NULL;
   }
 
+  fitfunc->FixParameter(1,1);
   for (int i = 3; i < 7; i++){
     fitfunc->FixParameter(i, init[i]);
   }
@@ -360,9 +364,12 @@ TF1 *FitDoubleExpTwoHist(TH1F *hist_to_fit, TH1F *geant_hist1, TH1F *geant_hist2
   fitfunc->SetParName(4, "Exp.Decay.Const     ");
   fitfunc->SetParName(5, "2nd Exp. Intercept   ");
   fitfunc->SetParName(6, "2nd Exp. Decay Const ");
-
-  hist_to_fit->Fit(fitfunc, "PRMEQ", "");
-  return fitfunc;
+  hist_to_fit->Fit(fitfunc, "PMEOQ", "", gLowX,gUpX);
+  fitfunc_to_draw->SetRange(0,4096);
+  fitfunc_to_draw->SetParameters(fitfunc->GetParameters());
+  fitfunc_to_draw->SetChisquare(fitfunc->GetChisquare());
+  fitfunc_to_draw->SetParError(0,fitfunc->GetParError(0));
+  return fitfunc_to_draw;
 }
 
 //Geant_hist1 should be the full energy peak for the main peak you want to fit
@@ -388,13 +395,16 @@ TF1 *FitDoubleExpThreeHist(TH1F *hist_to_fit, TH1F *geant_fep, TH1F *geant_compt
     return NULL;
   }
 
-  fitfunc->FixParameter(1,init[1]);
-  for (int i = 4; i < 8; i++){
+//fitfunc->FixParameter(1,init[1]);
+//for (int i = 4; i < 8; i++){
+//  fitfunc->FixParameter(i, init[i]);
+//}
+  for (int i = 1; i < 8; i++){
     fitfunc->FixParameter(i, init[i]);
   }
 
 //fitfunc->SetParLimits(0, 9e-04, 1.2e-03);
-  fitfunc->SetParLimits(2, 0, 1);
+//fitfunc->SetParLimits(2, 0, 1);
 //fitfunc->SetParLimits(2, 1.0e-04, 2.5e-04);
 //fitfunc->SetParLimits(3, 0.5, 1.5);
 
@@ -416,9 +426,11 @@ TF1 *FitDoubleExpThreeHist(TH1F *hist_to_fit, TH1F *geant_fep, TH1F *geant_compt
   fitfunc->SetParName(7, "2nd Exp. Decay Const  ");
 
   //hist_to_fit->Fit(fitfunc, "PRMEQ");
-  hist_to_fit->Fit(fitfunc, "PMENQ","",gLowX,gUpX);
-  fitfunc_to_draw->SetParameters(fitfunc->GetParameters());
+  hist_to_fit->Fit(fitfunc, "PMEOQ","",gLowX,gUpX);
   fitfunc_to_draw->SetRange(0,4096);
+  fitfunc_to_draw->SetParameters(fitfunc->GetParameters());
+  fitfunc_to_draw->SetChisquare(fitfunc->GetChisquare());
+  fitfunc_to_draw->SetParError(0, fitfunc->GetParError(0));
   
   return fitfunc_to_draw;
 }

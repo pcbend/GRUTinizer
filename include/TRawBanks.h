@@ -14,8 +14,8 @@
 #define MAX_INTPTS 16
 #define MAX_PWID   256
 #define MAX_LABRID 16
-#define MQDC_ID 10
-#define MTDC_ID 20
+#define MQDC_ID 161
+#define MTDC_ID 177
 
 // Simulation
 #define MAX_SIM_GAMMAS 10

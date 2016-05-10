@@ -33,6 +33,7 @@ public:
   double GetTime() const;   //applies TChannel TIMECOEFF to Time()
 
   void AddEnergy(double eng);
+  void SetEnergy(double eng) { fEnergy = eng; }
 
   static const TVector3 BeamUnitVec; //!
 
