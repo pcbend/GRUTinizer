@@ -8,6 +8,7 @@
 #include "TGretSim.h"
 #include "TJanus.h"
 #include "TMode3.h"
+#include "TNSCLScalers.h"
 #include "TPhosWall.h"
 #include "TS800.h"
 #include "TS800Sim.h"
@@ -32,7 +33,7 @@ void TUnpackedEvent::Build() {
     case kDetectorSystems::GRETINA:
       GetDetector<TGretina>(true)->Build(raw_data);
       break;
-    
+
     case kDetectorSystems::GRETINA_SIM:
       GetDetector<TGretSim>(true)->Build(raw_data);
       break;
@@ -75,6 +76,10 @@ void TUnpackedEvent::Build() {
 
     case kDetectorSystems::PHOSWALL:
       GetDetector<TPhosWall>(true)->Build(raw_data);
+      break;
+
+    case kDetectorSystems::NSCLSCALERS:
+      GetDetector<TNSCLScalers>(true)->Build(raw_data);
       break;
 
     default:

@@ -11,6 +11,7 @@
 
 #pragma link C++ class TSmartBuffer+;
 #pragma link C++ class TRawEvent+;
+#pragma link C++ class std::vector<TRawEvent>+;
 
 #pragma link C++ class TRawEventSource+;
 #pragma link C++ class TRawEventByteSource+;

@@ -159,7 +159,7 @@ void TUnpackingLoop::HandleGEBMode3(TGEBEvent& event, kDetectorSystems system){
 
 void TUnpackingLoop::HandleNSCLPeriodicScalers(TNSCLEvent& event){
   TUnpackedEvent* scaler_event = new TUnpackedEvent;
-  scaler_event->AddRawData(event, kDetectorSystems::S800SCALER);
+  scaler_event->AddRawData(event, kDetectorSystems::NSCLSCALERS);
   scaler_event->Build();
   scaler_event->SetRunStart(fRunStart);
   output_queue.Push(scaler_event);
