@@ -6,14 +6,32 @@
 #include "GH2I.h"
 #include "GH2D.h"
 
+#include "TF1.h"
+
 #include "TFrame.h"
 //#include "TROOT.h"
 //#include "TSystem.h"
 
-GH1D::GH1D(const TH1D& source)
+GH1D::GH1D(const TH1& source)
   : parent(NULL), projection_axis(-1) {
   source.Copy(*this);
 }
+
+
+GH1D::GH1D(const TF1& function,Int_t nbinsx,Double_t xlow,Double_t xup) :
+  TH1D(Form("%s_hist",function.GetName()),Form("%s_hist",function.GetName()),nbinsx, xlow, xup), parent(NULL), projection_axis(-1) {
+
+  TF1 *f = (TF1*)function.Clone();
+  f->SetRange(xlow,xup);
+
+  for(int i=0;i<nbinsx;i++) {
+    double x = GetBinCenter(i);
+    Fill(x,f->Eval(x));
+  }
+  f->Delete();
+}
+
+
 
 /*
 GH1D::GH1D(const TH1 *source)
@@ -84,19 +102,27 @@ TH1 *GH1D::DrawNormalized(Option_t *opt,Double_t norm) const {
 
 
 
-GH1D* GH1D::GetPrevious() const {
+GH1D* GH1D::GetPrevious(bool DrawEmpty) const {
   if(parent.GetObject() && parent.GetObject()->InheritsFrom(GH2Base::Class())) {
     GH2D* gpar = (GH2D*)parent.GetObject();
-    return gpar->GetPrevious(this);
+    int first = GetXaxis()->GetFirst();
+    int last =  GetXaxis()->GetLast();
+    GH1D *prev = gpar->GetPrevious(this,DrawEmpty);
+    prev->GetXaxis()->SetRange(first,last);
+    return prev; //gpar->GetPrevious(this,DrawEmpty);
   } else {
     return NULL;
   }
 }
 
-GH1D* GH1D::GetNext() const {
+GH1D* GH1D::GetNext(bool DrawEmpty) const {
   if(parent.GetObject() && parent.GetObject()->InheritsFrom(GH2Base::Class())) {
     GH2D* gpar = (GH2D*)parent.GetObject();
-    return gpar->GetNext(this);
+    int first = GetXaxis()->GetFirst();
+    int last =  GetXaxis()->GetLast();
+    GH1D *next = gpar->GetNext(this,DrawEmpty);
+    next->GetXaxis()->SetRange(first,last);
+    return next; //gpar->GetNext(this,DrawEmpty);
   } else {
     return NULL;
   }
@@ -142,6 +168,7 @@ GH1D* GH1D::Project_Background(double value_low, double value_high,
       int bin_high    = gpar->GetXaxis()->FindBin(value_high);
       int bg_bin_low  = gpar->GetXaxis()->FindBin(bg_value_low);
       int bg_bin_high = gpar->GetXaxis()->FindBin(bg_value_high);
+
       return gpar->ProjectionY_Background(bin_low, bin_high,
                                           bg_bin_low, bg_bin_high,
                                           mode);
@@ -150,6 +177,7 @@ GH1D* GH1D::Project_Background(double value_low, double value_high,
       int bin_high    = gpar->GetYaxis()->FindBin(value_high);
       int bg_bin_low  = gpar->GetYaxis()->FindBin(bg_value_low);
       int bg_bin_high = gpar->GetYaxis()->FindBin(bg_value_high);
+
       return gpar->ProjectionX_Background(bin_low, bin_high,
                                           bg_bin_low, bg_bin_high,
                                           mode);
@@ -158,3 +186,24 @@ GH1D* GH1D::Project_Background(double value_low, double value_high,
     return NULL;
   }
 }
+
+GH1D *GH1D::Project(int bins) {
+  GH1D *proj = 0;
+  double ymax = GetMinimum();
+  double ymin = GetMaximum();
+  if(bins==-1) {
+    bins = abs(ymax-ymin);
+    if(bins<1)
+      bins=100;
+  }
+  proj = new GH1D(Form("%s_y_axis_projection",GetName()),
+                  Form("%s_y_axis_projection",GetName()),
+                  bins,ymin,ymax);
+  for(int x=0;x<GetNbinsX();x++) {
+    if(GetBinContent(x)!=0)
+      proj->Fill(GetBinContent(x));
+  }
+
+  return proj;
+}
+

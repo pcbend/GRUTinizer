@@ -6,6 +6,8 @@
 
 #include "GH2I.h"
 
+class TF1;
+
 class GH1D : public TH1D {
 public:
   GH1D() : TH1D(), parent(NULL), projection_axis(-1) { }
@@ -18,7 +20,9 @@ public:
   GH1D(const char* name, const char* title, Int_t nbinsx, Double_t xlow, Double_t xup)
     : TH1D(name, title, nbinsx, xlow, xup), parent(NULL), projection_axis(-1) { }
 
-  GH1D(const TH1D& source);
+  GH1D(const TF1& function,Int_t nbinsx,Double_t xlow,Double_t xup);
+
+  GH1D(const TH1& source);
   //GH1D(const TH1 *source);
   //virtual void SetOption(Option_t* option=" ");
 
@@ -35,10 +39,10 @@ public:
   TH1 *DrawCopy(Option_t *opt="") const;
   TH1 *DrawNormalized(Option_t *opt="",Double_t norm=1) const;
 
+  GH1D* Project(int bins=-1);
 
-
-  GH1D* GetPrevious() const;
-  GH1D* GetNext() const;
+  GH1D* GetPrevious(bool DrawEmpty=false) const;
+  GH1D* GetNext(bool DrawEmpty=false) const;
 
   GH1D* Project(double bin_low, double bin_high) const;
   GH1D* Project_Background(double bin_low, double bin_high,

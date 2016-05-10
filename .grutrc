@@ -25,6 +25,9 @@ Canvas.ShowToolBar: true
 Canvas.UseScreenFactor: true
 Canvas.ShowGuideLines: false
 
+Root.Fitter: Fumili2
+
+
 
 Gui.IconPath:      $(GRUTSYS)/icons:$(ROOTSYS)/icons
 #$(ROOTSYS)/etc/root.mimes

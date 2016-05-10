@@ -6,6 +6,7 @@
 #include <TRandom.h>
 
 #include "GValue.h"
+#include "TGEBEvent.h"
 #include "TGretina.h"
 
 struct interaction_point {
@@ -68,7 +69,18 @@ const char *TGretinaHit::GetName() const {
   return channel->GetName();
 }
 
-void TGretinaHit::BuildFrom(const TRawEvent::GEBBankType1& raw){
+
+TVector3 TGretinaHit::GetCrystalPosition()  const { return TGretina::GetCrystalPosition(fCrystalId); }
+TVector3 TGretinaHit::GetSegmentPosition()  const { if(fSegmentNumber.size()) 
+                                                    return TGretina::GetSegmentPosition(fCrystalId,fSegmentNumber.at(0));
+                                                  else
+                                                    return TGretina::GetSegmentPosition(fCrystalId,0);
+                                                }
+
+
+
+void TGretinaHit::BuildFrom(TSmartBuffer& buf){
+  const TRawEvent::GEBBankType1& raw = *(const TRawEvent::GEBBankType1*)buf.GetData();
   //SetAddress(kDetectorSystems::GRETINA, 1, raw.crystal_id);
   //                     HOLE          CRYSTAL     SEGMENT
   //SetAddress(kDetectorSystems::GRETINA, 1, raw.crystal_id);
@@ -166,16 +178,6 @@ double TGretinaHit::GetDoppler_dB(double beta, const TVector3 *vec,double Dta){
 //  std::cerr << __PRETTY_FUNCTION__ << " NOT IMPLEMENTED YET" << std::endl;
 //}
 
-bool TGretinaHit::CheckAddback(const TGretinaHit& rhs) const {
-  if(fNumberOfInteractions && rhs.fNumberOfInteractions)
-    return false;
-
-  TVector3 dist= GetPosition() - rhs.GetPosition();
-  double dtime = std::abs(GetTime() - rhs.GetTime());
-
-  return ((dist.Mag()<250.0) && (dtime<20.0));
-}
-
 void TGretinaHit::SortHits(){
   // sets are sorted, so this will sort all properties together.
   //
@@ -225,7 +227,7 @@ void TGretinaHit::SortHits(){
 //       Right now, the "first interaction point" is the one with the highest energy,
 //       and the "second" is the one with the second highest energy.
 //       First and second may be assigned across crystal boundaries.
-void TGretinaHit::AddToSelf(const TGretinaHit& rhs, double& max_energy) {
+void TGretinaHit::AddToSelf(const TGretinaHit& rhs) {
 
   // Stash all interaction points
   std::set<interaction_point> ips;
@@ -236,17 +238,16 @@ void TGretinaHit::AddToSelf(const TGretinaHit& rhs, double& max_energy) {
                                  fInteractionEnergy[i]));
   }
   for(int i=0; i<rhs.fNumberOfInteractions; i++){
-    ips.insert(interaction_point(fSegmentNumber[i],
-                                 fGlobalInteractionPosition[i],
-                                 fLocalInteractionPosition[i],
-                                 fInteractionEnergy[i]));
+    ips.insert(interaction_point(rhs.fSegmentNumber[i],
+                                 rhs.fGlobalInteractionPosition[i],
+                                 rhs.fLocalInteractionPosition[i],
+                                 rhs.fInteractionEnergy[i]));
   }
 
   // Copy other information to self if needed
   double my_core_energy = fCoreEnergy;
   if(fCoreEnergy < rhs.fCoreEnergy) {
     rhs.Copy(*this);
-    max_energy = fCoreEnergy;
     fCoreEnergy += my_core_energy;
   } else {
     fCoreEnergy += rhs.fCoreEnergy;
@@ -315,6 +316,25 @@ TVector3 TGretinaHit::GetFirstIntPosition() const {
  
   TVector3 offset(xoffset,yoffset,zoffset);
   
+  // if(offset.Z()!=0.1){
+  //   std::cout << " -----------------" << std::endl;
+  //   std::cout << "\tX Offset = " << offset.X() <<std::endl;
+  //   std::cout << "\tY Offset = " << offset.Y() <<std::endl;
+  //   std::cout << "\tZ Offset = " << offset.Z() <<std::endl;
+  //   std::cout << "\tZ Offset2 = " << zoffset <<std::endl;
+  //   std::cout << "\tZ Offset3 = " << GValue::Value("GRETINA_Z_OFFSET") <<std::endl;
+  //   std::cout << "\tIntPoint = " << GetFirstIntPoint() << std::endl;
+  //   std::cout << "\tIntPoint = " << GetFirstIntPoint() << std::endl;
+  //   std::cout << "\tX Int    = " << GetInteractionPosition(GetFirstIntPoint()).X() << std::endl;
+  //   std::cout << "\tY Int    = " << GetInteractionPosition(GetFirstIntPoint()).Y() << std::endl;
+  //   std::cout << "\tZ Int    = " << GetInteractionPosition(GetFirstIntPoint()).Z() << std::endl;
+  //   TVector3 sum;
+  //   sum = GetInteractionPosition(GetFirstIntPoint())+offset;
+  //   std::cout << "\tX Sum    = " << sum.X() << std::endl;
+  //   std::cout << "\tY Sum    = " << sum.Y() << std::endl;
+  //   std::cout << "\tZ Sum    = " << sum.Z() << std::endl;
+  //   std::cout << "\t END OF VECTOR SUMMARY " << std::endl;
+  //}
   if(GetFirstIntPoint()>-1)
      return GetInteractionPosition(GetFirstIntPoint()) + offset;
    return TDetectorHit::BeamUnitVec;

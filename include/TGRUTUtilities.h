@@ -2,7 +2,8 @@
 #define __TGRUTUTILITIES_H_
 
 #include <string>
-#include <TGRUTTypes.h>
+
+#include "TGRUTTypes.h"
 
 bool file_exists(const char *filename);
 

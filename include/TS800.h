@@ -17,7 +17,7 @@ public:
   TS800();
   virtual ~TS800();
 
-  static void ReadInverseMap(const char *);
+  static void ReadInverseMap(const char *mapfile="");
 
   //////////////////////////////////////////////
   virtual void InsertHit(const TDetectorHit&);
@@ -30,15 +30,16 @@ public:
   Long_t GetTimestamp()    { return Timestamp(); }
 
   TVector3 CRDCTrack();  // not a finished method
-  TVector3 ExitTargetVect_Spec(int order=6);
+  TVector3 ExitTargetVect(int order=6);
+  Float_t Azita(int order=6);
   float GetAFP() const;
   float GetBFP() const;
-  float MapCalc_SpecTCL(int calcorder,int parameter,float *input);
+  float MapCalc(int calcorder,int parameter,float *input);
 
-  Float_t GetAta_Spec(int i=6);
-  Float_t GetYta_Spec(int i=6);
-  Float_t GetBta_Spec(int i=6);
-  Float_t GetDta_Spec(int i=6);
+  Float_t GetAta(int i=6);
+  Float_t GetYta(int i=6);
+  Float_t GetBta(int i=6);
+  Float_t GetDta(int i=6);
 
   //bool InvMapLoaded()      { return fMapLoaded; }
 
@@ -46,7 +47,8 @@ public:
   //virtual void Print(Option_t *opt = "") const;
   virtual void Clear(Option_t* opt = "");
 
-  TCrdc         &GetCrdc(int x=0)  const { return (TCrdc&)crdc[x];   }
+  TCrdc         &GetCrdc(int x=0)  const { if(x==0) return (TCrdc&)crdc1;
+                                           else return (TCrdc&)crdc2;}
   TTof          &GetTof()          const { return (TTof&)tof;        }
   TMTof         &GetMTof()         const { return (TMTof&)mtof;        }
   TIonChamber   &GetIonChamber()   const { return (TIonChamber&)ion; }
@@ -80,20 +82,30 @@ public:
   float GetCorrTOF_OBJ_MESY(int i=0) const;
   
   float GetOBJ_E1Raw_MESY(int i=0) const;
+  float GetOBJ_E1Raw_MESY_Ch15(int i=0) const;
  
-  float GetRawOBJ_MESY(int i=0) const;
+  float GetRawOBJ_MESY(unsigned int i=0) const;
 
-  float GetRawE1_MESY(int i=0) const;
+  float GetRawE1_MESY(unsigned int i=0) const;
+  float GetRawE1_MESY_Ch15(unsigned int i=0) const;
   
   float GetXF_E1Raw_MESY(int i=0) const;
+  float GetXF_E1Raw_MESY_Ch15(int i=0) const;
   
-  float GetRawXF_MESY(int i=0) const;
+  float GetRawXF_MESY(unsigned int i=0) const;
 
   float MCorrelatedOBJ() const;
   float MCorrelatedXFP() const;
   float MCorrelatedE1() const;
   float MCorrelatedOBJ_E1(bool corrected=true) const;
-  float MCorrelatedXFP_E1() const;
+  float MCorrelatedXFP_E1(bool corrected=true) const;
+
+  float MCorrelatedOBJ_Ch15() const;
+  float MCorrelatedXFP_Ch15() const;
+  float MCorrelatedE1_Ch15() const;
+  float MCorrelatedOBJ_E1_Ch15(bool corrected=true) const;
+  float MCorrelatedXFP_E1_Ch15(bool corrected=true) const;
+
   
 
 private:
@@ -107,10 +119,11 @@ private:
   static float fbrho;                                             //!
   static int fmass;                                               //!
   static int fcharge;                                             //!
+  static bool fMapLoaded;                                         //!
   //---------------------
 
-  static bool ReadMap_SpecTCL(std::string);
-  virtual int  BuildHits();
+  static bool ReadMap(std::string filename);
+  virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 
   bool HandleTrigPacket(unsigned short*,int);     //!
   bool HandleTOFPacket(unsigned short*,int);      //!
@@ -124,7 +137,8 @@ private:
   TTof         tof;
   TMTof        mtof;
   TIonChamber  ion;
-  TCrdc        crdc[2];
+  TCrdc        crdc1;
+  TCrdc        crdc2;
   //THodoscope   hodo[32];
   //TMultiHitTof multi_tof;
   

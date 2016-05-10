@@ -1,5 +1,4 @@
 #include "TArgonne.h"
-
 #include "TGEBEvent.h"
 
 TArgonne::TArgonne(){
@@ -15,7 +14,6 @@ void TArgonne::Copy(TObject& obj) const {
 
   TArgonne& detector = (TArgonne&)obj;
   detector.anl_hits = anl_hits;
-  detector.raw_data.clear();
 }
 
 void TArgonne::InsertHit(const TDetectorHit& hit){
@@ -23,11 +21,12 @@ void TArgonne::InsertHit(const TDetectorHit& hit){
   fSize++;
 }
 
-int TArgonne::BuildHits(){
+int TArgonne::BuildHits(std::vector<TRawEvent>& raw_data){
   for(auto& event : raw_data){
     SetTimestamp(event.GetTimestamp());
     TArgonneHit hit;
-    hit.BuildFrom(event.GetPayloadBuffer());
+    auto buf = event.GetPayloadBuffer();
+    hit.BuildFrom(buf);
     hit.SetTimestamp(event.GetTimestamp());
     InsertHit(hit);
   }
@@ -38,5 +37,4 @@ void TArgonne::Print(Option_t *opt) const { }
 
 void TArgonne::Clear(Option_t *opt) {
   anl_hits.clear();
-  raw_data.clear();
 }

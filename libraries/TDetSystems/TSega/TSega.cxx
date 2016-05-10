@@ -18,7 +18,6 @@ void TSega::Copy(TObject& obj) const {
 
   TSega& sega = (TSega&)obj;
   sega.sega_hits = sega_hits;
-  sega.raw_data.clear();
 }
 
 void TSega::Clear(Option_t* opt){
@@ -48,7 +47,7 @@ TDetectorHit& TSega::GetHit(int i){
   return sega_hits.at(i);
 }
 
-int TSega::BuildHits() {
+int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
   for(auto& event : raw_data){
     TNSCLEvent& nscl = (TNSCLEvent&)event;
 
@@ -115,7 +114,7 @@ int TSega::BuildHits() {
 }
 
 TVector3 TSega::GetSegmentPosition(int detnum, int segnum) {
-  if(detnum < 0 || detnum > 15 ||
+  if(detnum < 1 || detnum > 16 ||
      segnum < 1 || segnum > 32){
     return TVector3(std::sqrt(-1),std::sqrt(-1),std::sqrt(-1));
   }
@@ -208,4 +207,16 @@ void TSega::LoadDetectorPositions() {
 void TSega::InsertHit(const TDetectorHit& hit) {
   sega_hits.emplace_back((TSegaHit&)hit);
   fSize++;
+}
+
+void TSega::SetRunStart(unsigned int unix_time) {
+  // Wed Jan 27 22:57:09 2016
+  unsigned int previous = fRunStart==0 ? 1453953429 : fRunStart;
+  int tdiff = unix_time - previous;
+  long timestamp_diff = (1e9) * tdiff;
+
+  fTimestamp += timestamp_diff;
+  for(auto& hit : sega_hits) {
+    hit.SetTimestamp(timestamp_diff + hit.Timestamp());
+  }
 }

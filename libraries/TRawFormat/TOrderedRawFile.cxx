@@ -24,8 +24,8 @@ int TOrderedRawFile::GetEvent(TRawEvent& event) {
   event = event_queue.begin()->second;
   event_queue.erase(event_queue.begin());
 
-  // If timestamp == -1 (usually scalers), pass it through automatically.
-  if(curr_timestamp == -1){
+  // If timestamp == +-1 (usually scalers), pass it through automatically.
+  if(curr_timestamp == -1 || curr_timestamp == 1){
     return event.GetTotalSize();
   }
 

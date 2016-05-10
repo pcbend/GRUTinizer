@@ -14,7 +14,7 @@ class TArgonneHit : public TDetectorHit {
     virtual void Print(Option_t *opt = "") const;
     virtual void Clear(Option_t *opt = "");
 
-    void     BuildFrom(TSmartBuffer buf);
+    void     BuildFrom(TSmartBuffer& buf);
 
 
     Long_t   GetLED()       const { return led; }

@@ -17,7 +17,6 @@ void TMode3::Copy(TObject& obj) const {
   TMode3& mode3 = (TMode3&)obj;
   mode3.mode3_hits = mode3_hits;
   //mode3_hits->Copy(*mode3.mode3_hits);
-  mode3.raw_data.clear();
 }
 
 void TMode3::InsertHit(const TDetectorHit& hit){
@@ -27,11 +26,12 @@ void TMode3::InsertHit(const TDetectorHit& hit){
   fSize++;
 }
 
-int TMode3::BuildHits(){
+int TMode3::BuildHits(std::vector<TRawEvent>& raw_data){
   for(auto& event : raw_data){
     SetTimestamp(event.GetTimestamp());
     TMode3Hit hit;
-    hit.BuildFrom(event.GetPayloadBuffer());
+    TSmartBuffer buf = event.GetPayloadBuffer();
+    hit.BuildFrom(buf);
     hit.SetTimestamp(event.GetTimestamp());
     InsertHit(hit);
   }
@@ -43,5 +43,4 @@ void TMode3::Print(Option_t *opt) const { }
 void TMode3::Clear(Option_t *opt) {
   //TDetector::Clear(opt);
   mode3_hits.clear(); //->Clear(opt);//("TMode3Hit");
-  raw_data.clear();
 }

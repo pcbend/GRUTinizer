@@ -80,9 +80,14 @@ void THistogramLoop::OpenFile() {
 
 void THistogramLoop::CloseFile() {
   if(output_file){
-    TPreserveGDirectory preserve;
-    output_file->cd();
-    compiled_histograms.Write();
+    {
+      TPreserveGDirectory preserve;
+      output_file->cd();
+      compiled_histograms.Write();
+    }
+
+    compiled_histograms.SetDefaultDirectory(NULL);
+
     output_file->Close();
     output_file = 0;
     output_filename = "last.root";
@@ -105,17 +110,17 @@ std::string THistogramLoop::GetLibraryName() const {
   return compiled_histograms.GetLibraryName();
 }
 
-void THistogramLoop::SetReplaceVariable(const char* name, double value) {
-  compiled_histograms.SetReplaceVariable(name, value);
-}
+// void THistogramLoop::SetReplaceVariable(const char* name, double value) {
+//   compiled_histograms.SetReplaceVariable(name, value);
+// }
 
-void THistogramLoop::RemoveVariable(const char* name) {
-  compiled_histograms.RemoveVariable(name);
-}
+// void THistogramLoop::RemoveVariable(const char* name) {
+//   compiled_histograms.RemoveVariable(name);
+// }
 
-TList* THistogramLoop::GetVariables() {
-  return compiled_histograms.GetVariables();
-}
+// TList* THistogramLoop::GetVariables() {
+//   return compiled_histograms.GetVariables();
+// }
 
 TList* THistogramLoop::GetObjects() {
   return compiled_histograms.GetObjects();
@@ -131,6 +136,10 @@ void THistogramLoop::SetOutputFilename(const std::string& name){
 
 std::string THistogramLoop::GetOutputFilename() const {
   return output_filename;
+}
+
+void THistogramLoop::AddCutFile(TFile* cut_file) {
+  compiled_histograms.AddCutFile(cut_file);
 }
 
 void THistogramLoop::cd(Option_t* opt) {

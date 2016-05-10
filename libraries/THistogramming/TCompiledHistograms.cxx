@@ -9,11 +9,12 @@
 #include "TH1.h"
 #include "TFile.h"
 #include "TDirectory.h"
-#include "GRootCommands.h"
+#include "TObject.h"
 #include "TROOT.h"
 #include "TKey.h"
 
 #include "GValue.h"
+#include "GRootCommands.h"
 #include "TPreserveGDirectory.h"
 
 typedef void* __attribute__((__may_alias__)) void_alias;
@@ -22,7 +23,7 @@ TCompiledHistograms::TCompiledHistograms()
   : libname(""), library(nullptr), func(nullptr),
     last_modified(0), last_checked(0), check_every(5),
     default_directory(0),obj(0) {
-  obj = new TRuntimeObjects(&objects, &variables, &gates);
+  obj = new TRuntimeObjects(&objects, &gates, cut_files);
 }
 
 TCompiledHistograms::TCompiledHistograms(std::string input_lib)
@@ -32,19 +33,21 @@ TCompiledHistograms::TCompiledHistograms(std::string input_lib)
   // Casting required to keep gcc from complaining.
   *(void_alias*)(&func) = library->GetSymbol("MakeHistograms");
 
-  std::cout << "library: " << library
-            << "\tfunc: " << func << std::endl;
-  std::cout << "libname: " << input_lib << std::endl;
+  if(!func){
+    std::cout << "Could not find MakeHistograms() inside "
+              <<"\"" << input_lib << "\"" << std::endl;
+  }
   last_modified = get_timestamp();
   last_checked = time(NULL);
 
-  
-  obj = new TRuntimeObjects(&objects, &variables, &gates);
+
+  obj = new TRuntimeObjects(&objects, &gates, cut_files);
 }
 
 TCompiledHistograms::~TCompiledHistograms() {
-  if(obj)
+  if(obj) {
     delete obj;
+  }
   obj=0;
 }
 
@@ -57,7 +60,7 @@ void TCompiledHistograms::ClearHistograms() {
     if(obj->InheritsFrom(TH1::Class())){
       TH1* hist = (TH1*)obj;
       hist->Reset();
-    } 
+    }
     else if(obj->InheritsFrom(TDirectory::Class())){
       TDirectory* dir = (TDirectory*)obj;
       TIter dirnext(dir->GetList());
@@ -69,7 +72,7 @@ void TCompiledHistograms::ClearHistograms() {
 	}
       }
     }
-    
+
   }
   std::cout << "ended " << std::endl;
 }
@@ -103,13 +106,13 @@ void TCompiledHistograms::Write() {
     }
     else obj->Write();
   }
-  
+
 
 
   //  objects.Write();
   TPreserveGDirectory preserve;
   gDirectory->mkdir("variables")->cd();
-  variables.Write();
+  //variables.Write();
 }
 
 void TCompiledHistograms::Load(std::string libname) {
@@ -147,31 +150,28 @@ void TCompiledHistograms::Fill(TUnpackedEvent& detectors) {
 
   TPreserveGDirectory preserve;
   default_directory->cd();
-  
+
   if(obj) {
-  obj->SetDetectors(&detectors);
-  //TRuntimeObjects obj(detectors, &objects, &variables, &gates);
-  func(*obj);
+    obj->SetDetectors(&detectors);
+    func(*obj);
   }
 }
 
-//TList* TCompiledHistograms::GetVariables() {
-//  return &variables;
-//}
-
-void TCompiledHistograms::SetReplaceVariable(const char* name, double value) {
-  GValue* val = (GValue*)variables.FindObject(name);
-  if(val){
-    val->SetValue(value);
-  } else {
-    GValue* val = new GValue(name, value);
-    variables.Add(val);
+void TCompiledHistograms::AddCutFile(TFile* cut_file) {
+  if(cut_file) {
+    cut_files.push_back(cut_file);
   }
 }
 
-void TCompiledHistograms::RemoveVariable(const char* name) {
-  GValue* val = (GValue*)variables.FindObject(name);
-  if(val){
-    variables.Remove(val);
+void TCompiledHistograms::SetDefaultDirectory(TDirectory* dir) {
+  default_directory = dir;
+
+  TObject* obj = NULL;
+  TIter next(&objects);
+  while((obj = next())) {
+    TH1* hist = dynamic_cast<TH1*>(obj);
+    if(hist) {
+      hist->SetDirectory(dir);
+    }
   }
 }

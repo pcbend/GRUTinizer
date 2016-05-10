@@ -152,6 +152,7 @@ class TCrdc : public TDetectorHit {
     float GetDispersiveX() const;     
     float GetNonDispersiveY();  
     int GetMaxPad() const;
+    int GetMaxPadSum() const;
 
     virtual void Copy(TObject&) const;
     virtual void Print(Option_t *opt="") const;
@@ -160,7 +161,7 @@ class TCrdc : public TDetectorHit {
     virtual void DrawChannels(Option_t *opt="",bool calibrate=true) const;
     virtual void DrawHit(Option_t *opt="") const;
 
-    int Sum() const { int result; for(unsigned int x=0;x<data.size();x++) result +=data[x]; return result; }
+    int Sum() const { int result = 0; for(unsigned int x=0;x<data.size();x++) result +=data[x]; return result; }
 
   private:
     virtual int Charge() const { return 0; }
@@ -223,6 +224,7 @@ class TIonChamber : public TDetectorHit {
     int Size() const { return fChan.size(); }
     float GetdE();
     float GetSum();
+    float GetAve();
     float GetdECorr(TCrdc*);
 
     int  Address(int i) const { return TDetectorHit::Address() + GetChannel(i); }
@@ -370,6 +372,9 @@ class TMTof : public TDetectorHit {
     mutable int fCorrelatedXFP;   //!
     mutable int fCorrelatedOBJ;   //!
     mutable int fCorrelatedE1;    //!
+    mutable int fCorrelatedXFP_Ch15;   //!
+    mutable int fCorrelatedOBJ_Ch15;   //!
+    mutable int fCorrelatedE1_Ch15;    //!
 
 
     std::vector<unsigned short> fE1Up;         // Channel 0

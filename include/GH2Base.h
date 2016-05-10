@@ -41,7 +41,7 @@ public:
                               int lastbackground_bin = -1,
                               kBackgroundSubtraction mode = kRegionBackground);
 
-  GH1D* SummaryProject(int binnum);
+  //GH1D* SummaryProject(int binnum);
 
   GH1D* ProjectionX_Background(int firstbin = 0,
                                int lastbin = -1,
@@ -52,12 +52,12 @@ public:
   GH1D* GH2ProjectionX(const char* name="_px",
                     int firstbin = 0,
                     int lastbin = -1,
-                    Option_t* option=""); // *MENU*
+                    Option_t* option="",bool KeepEmpty=false); // *MENU*
 
   GH1D* GH2ProjectionY(const char* name="_py",
                     int firstbin = 0,
                     int lastbin = -1,
-                    Option_t* option=""); // *MENU*
+                    Option_t* option="",bool KeepEmpty=false); // *MENU*
   
   GH1D* ProjectionY_Background(int firstbin = 0,
                                int lastbin = -1,
@@ -65,16 +65,16 @@ public:
                                int lastbackground_bin = -1,
                                kBackgroundSubtraction mode = kRegionBackground); // *MENU*
 
-  GH1D* GetPrevious(const GH1D* curr);
-  GH1D* GetPrevSummary(const GH1D* curr);
-  GH1D* GetNext(const GH1D* curr);
-  GH1D* GetNextSummary(const GH1D* curr);
+  GH1D* GetPrevious(const GH1D* curr,bool DrawEmpty=true);
+  GH1D* GetPrevSummary(const GH1D* curr,bool DrawEmpty=false);
+  GH1D* GetNext(const GH1D* curr,bool DrawEmpty=true);
+  GH1D* GetNextSummary(const GH1D* curr,bool DrawEmpty=false);
 
   TList* GetProjections() { return fProjections; }
   TList* GetSummaryProjections() { return fSummaryProjections; }
 
   void SetSummary(bool is_summary = true) { fIsSummary = is_summary; }
-  bool GetSummmary() const { return fIsSummary; }
+  bool GetSummary() const { return fIsSummary; }
 
   void SetSummaryDirection(kDirection dir) { fSummaryDirection = dir; }
   kDirection GetSummaryDirection() const { return fSummaryDirection; }

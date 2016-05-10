@@ -3,9 +3,12 @@
 #include <iostream>
 
 #include "TClass.h"
+#include "TCutG.h"
+#include "TFile.h"
 #include "TH1.h"
 #include "TH2.h"
 #include "TDirectoryFile.h"
+#include "TProfile.h"
 
 #include "GH1D.h"
 #include "GH2D.h"
@@ -16,16 +19,22 @@
 
 std::map<std::string,TRuntimeObjects*> TRuntimeObjects::fRuntimeMap;
 
-TRuntimeObjects::TRuntimeObjects(TUnpackedEvent *detectors, TList* objects, TList* variables, TList *gates,
+TRuntimeObjects::TRuntimeObjects(TUnpackedEvent *detectors, TList* objects, TList *gates,
+                                 std::vector<TFile*>& cut_files,
                                  TDirectory* directory,const char *name)
-  : detectors(detectors), objects(objects), variables(variables), gates(gates), directory(directory) {
+  : detectors(detectors), objects(objects), gates(gates),
+    cut_files(cut_files),
+    directory(directory) {
   SetName(name);
   fRuntimeMap.insert(std::make_pair(name,this));
 }
 
-TRuntimeObjects::TRuntimeObjects(TList* objects, TList* variables, TList *gates,
+TRuntimeObjects::TRuntimeObjects(TList* objects, TList *gates,
+                                 std::vector<TFile*>& cut_files,
                                  TDirectory* directory,const char *name)
-  : detectors(0),objects(objects), variables(variables), gates(gates), directory(directory) {
+  : detectors(0),objects(objects), gates(gates),
+    cut_files(cut_files),
+    directory(directory) {
   SetName(name);
   fRuntimeMap.insert(std::make_pair(name,this));
 }
@@ -38,7 +47,8 @@ TH1* TRuntimeObjects::FillHistogram(const char* name,
     hist = new TH1I(name,name,bins,low,high);
     GetObjects().Add(hist);
   }
-  hist->Fill(value);
+  if(!(std::isnan(value)))
+    hist->Fill(value);
   return hist;
 }
 
@@ -52,8 +62,25 @@ TH2* TRuntimeObjects::FillHistogram(const char* name,
                             Ybins, Ylow, Yhigh);
     GetObjects().Add(hist);
   }
-  hist->Fill(Xvalue, Yvalue);
+  if(!(std::isnan(Xvalue)))
+    if(!(std::isnan(Yvalue)))
+      hist->Fill(Xvalue, Yvalue);
   return hist;
+}
+
+TProfile* TRuntimeObjects::FillProfileHist(const char* name,
+					   int Xbins, double Xlow, double Xhigh, double Xvalue,
+					   double Yvalue){
+  TProfile* prof = (TProfile*)GetObjects().FindObject(name);
+  if(!prof){
+    prof = new TProfile(name,name,
+			Xbins,Xlow,Xhigh);
+    GetObjects().Add(prof);
+  }
+  if(!(std::isnan(Xvalue)))
+    if(!(std::isnan(Yvalue)))
+      prof->Fill(Xvalue,Yvalue);
+  return prof;
 }
 
 TH2* TRuntimeObjects::FillHistogramSym(const char* name,
@@ -66,8 +93,13 @@ TH2* TRuntimeObjects::FillHistogramSym(const char* name,
                             Ybins, Ylow, Yhigh);
     GetObjects().Add(hist);
   }
-  hist->Fill(Xvalue, Yvalue);
-  hist->Fill(Yvalue, Xvalue);
+  
+  if(!(std::isnan(Xvalue))){
+    if(!(std::isnan(Yvalue))){
+      hist->Fill(Xvalue, Yvalue);
+      hist->Fill(Yvalue, Xvalue);
+    }
+  }
   return hist;
 }
 
@@ -87,8 +119,9 @@ TDirectory* TRuntimeObjects::FillHistogram(const char* dirname,const char* name,
 		    bins, low, high);
     dir->Add(hist);
   }
-
-  hist->Fill(value);
+  
+  if(!(std::isnan(value)))
+    hist->Fill(value);
   dir->cd("../");
   //return hist;
   return dir;
@@ -139,7 +172,9 @@ TDirectory* TRuntimeObjects::FillHistogram(const char* dirname,const char* name,
     dir->Add(hist);
   }
 
-  hist->Fill(Xvalue, Yvalue);
+  if(!(std::isnan(Xvalue)))
+    if(!(std::isnan(Yvalue)))
+      hist->Fill(Xvalue, Yvalue);
   dir->cd("../");
   //return hist;
   return dir;/*
@@ -152,6 +187,31 @@ TDirectory* TRuntimeObjects::FillHistogram(const char* dirname,const char* name,
   }
   hist->Fill(Xvalue, Yvalue);
   return hist;*/
+}
+
+
+TDirectory* TRuntimeObjects::FillProfileHist(const char* dirname,const char* name,
+					     int Xbins, double Xlow, double Xhigh, double Xvalue,
+					     double Yvalue){
+
+  TDirectory *dir = (TDirectory*)GetObjects().FindObject(dirname);
+  if(!dir){
+    dir = new TDirectory(dirname,dirname);
+    GetObjects().Add(dir);
+  }
+  dir->cd();
+  TProfile *prof = (TProfile*)dir->FindObject(name);
+  if(!prof){
+    prof = new TProfile(name,name,
+			Xbins,Xlow,Xhigh);
+   dir->Add(prof);
+  }
+
+  if(!(std::isnan(Xvalue)))
+    if(!(std::isnan(Yvalue)))
+      prof->Fill(Xvalue,Yvalue);
+  dir->cd("../");
+  return dir;
 }
 
 TDirectory* TRuntimeObjects::FillHistogramSym(const char* dirname,const char* name,
@@ -170,8 +230,12 @@ TDirectory* TRuntimeObjects::FillHistogramSym(const char* dirname,const char* na
                             Ybins, Ylow, Yhigh);
     dir->Add(hist);
   }
-  hist->Fill(Xvalue, Yvalue);
-  hist->Fill(Yvalue, Xvalue);
+  if(!(std::isnan(Xvalue))){
+    if(!(std::isnan(Yvalue))){
+      hist->Fill(Xvalue, Yvalue);
+      hist->Fill(Yvalue, Xvalue);
+    }
+  }
   dir->cd("../");
   //return hist;
   return dir;/*
@@ -195,31 +259,19 @@ TList& TRuntimeObjects::GetGates() {
   return *gates;
 }
 
-TList& TRuntimeObjects::GetVariables() {
-  return *variables;
-}
-
 TCutG* TRuntimeObjects::GetCut(const std::string& name) {
-  /*
-  TIter next(cuts);
-  TObject* obj;
-  while((obj = next())){
-    TCutG* cut = dynamic_cast<TCutG*>(obj);
-    if(cut &&
-       obj->GetName() == name){
-      return (TCutG*)obj;
+  for(auto& tfile : cut_files) {
+    TObject* obj = tfile->Get(name.c_str());
+    if(obj) {
+      TCutG* cut = dynamic_cast<TCutG*>(obj);
+      if(cut) {
+        return cut;
+      }
     }
   }
-  */
   return NULL;
 }
 
 double TRuntimeObjects::GetVariable(const char* name) {
-  TObject* obj = variables->FindObject(name);
-  if(obj && dynamic_cast<GValue*>(obj)){
-    return ((GValue*)obj)->GetValue();
-  } else {
-    return 0.00;
-    //return std::sqrt(-1);
-  }
+  return GValue::Value(name);
 }

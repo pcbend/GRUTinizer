@@ -26,7 +26,7 @@ public:
   void PrintHit(int i){ anl_hits.at(i).Print(); }
 
 private:
-  virtual int BuildHits();
+  virtual int BuildHits(std::vector<TRawEvent>& raw_data);
 
   std::vector<TArgonneHit> anl_hits;
 

@@ -2,11 +2,16 @@
 
 #include <cassert>
 #include <iostream>
+#include <memory>
 
 #include "TMath.h"
+#include "TRandom.h"
 
 #include "JanusDataFormat.h"
 #include "TNSCLEvent.h"
+#include "TNucleus.h"
+#include "TReaction.h"
+#include "TSRIM.h"
 
 TJanus::TJanus() { }
 
@@ -17,7 +22,6 @@ void TJanus::Copy(TObject& obj) const {
 
   TJanus& janus = (TJanus&)obj;
   janus.janus_hits = janus_hits;
-  janus.raw_data.clear();
 }
 
 void TJanus::Clear(Option_t* opt){
@@ -26,7 +30,7 @@ void TJanus::Clear(Option_t* opt){
   janus_hits.clear();
 }
 
-int TJanus::BuildHits(){
+int TJanus::BuildHits(std::vector<TRawEvent>& raw_data){
   for(auto& event : raw_data){
     TNSCLEvent& nscl = (TNSCLEvent&)event;
     SetTimestamp(nscl.GetTimestamp());
@@ -50,10 +54,14 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   const VMUSB_Header* vmusb_header = (VMUSB_Header*)data;
   data += sizeof(VMUSB_Header);
 
+  // This value should ALWAYS be zero, because that corresponds to the i1 trigger of the VMUSB.
+  // If it is not, it is a malformed event.
+  stack_triggered = vmusb_header->stack();
+
   // vmusb_header.size() returns the number of 16-bit words in the payload.
   // Each adc entry is a 32-bit word.
-  // 3 additional 16-bit words for the timestamp
-  int num_packets = vmusb_header->size()/2 - 3;
+  // 6 additional 16-bit words for the timestamp (2 48-bit numbers)
+  num_packets = vmusb_header->size()/2 - 3;
 
   const VME_Timestamp* vme_timestamp = (VME_Timestamp*)(data + num_packets*sizeof(CAEN_DataPacket));
   long timestamp = vme_timestamp->ts1() * 20;
@@ -257,4 +265,69 @@ void TJanus::Print(Option_t *opt) const {
   }
   printf("---------------------------\n");
 
+}
+
+void TJanus::SetRunStart(unsigned int unix_time) {
+  // Wed Jan 27 22:57:09 2016
+  unsigned int previous = fRunStart==0 ? 1453953429 : fRunStart;
+  int tdiff = unix_time - previous;
+  long timestamp_diff = (1e9) * tdiff;
+
+  fTimestamp += timestamp_diff;
+  for(auto& hit : janus_hits) {
+    hit.SetTimestamp(timestamp_diff + hit.Timestamp());
+  }
+}
+
+double TJanus::GetBeta(double betamax, double kr_angle_rad, bool energy_loss, double collision_pos) {
+  // Factors of 1e3 are because TNucleus and TReaction use MeV, while TSRIM uses keV.
+
+  static auto kr = std::make_shared<TNucleus>("78Kr");
+  static auto pb = std::make_shared<TNucleus>("208Pb");
+  static TSRIM srim("kr78_in_pb208");
+
+  double thickness = (0.75 / 11342.0) * 1e4; // (0.75 mg/cm^2) / (11342 mg/cm^3) * (10^4 um/cm)
+
+  double pre_collision_energy_MeV = kr->GetEnergyFromBeta(betamax);
+  if(energy_loss) {
+    pre_collision_energy_MeV = srim.GetAdjustedEnergy(pre_collision_energy_MeV*1e3, thickness*collision_pos)/1e3;
+  }
+
+  TReaction reac(kr, pb, kr, pb, pre_collision_energy_MeV);
+
+  double post_collision_energy_MeV = reac.GetTLab(kr_angle_rad, 2);
+
+  if(energy_loss) {
+    double distance_travelled;
+    if(kr_angle_rad < TMath::Pi()/2) {
+      // Forward scattering, must make it out the front of the target.
+      distance_travelled = thickness*(1-collision_pos)/std::abs(std::cos(kr_angle_rad));
+    } else {
+      // Backward scattering, must make it out the back of the target.
+      distance_travelled = thickness*collision_pos/std::abs(std::cos(kr_angle_rad));
+    }
+    post_collision_energy_MeV = srim.GetAdjustedEnergy(post_collision_energy_MeV*1e3, distance_travelled)/1e3;
+  }
+
+  double beta = kr->GetBetaFromEnergy(post_collision_energy_MeV);
+  return beta;
+}
+
+double TJanus::SimAngle() {
+  static auto kr = std::make_shared<TNucleus>("78Kr");
+  static auto pb = std::make_shared<TNucleus>("208Pb");
+  static TSRIM srim("kr78_in_pb208");
+  double thickness = (0.75 / 11342.0) * 1e4; // (0.75 mg/cm^2) / (11342 mg/cm^3) * (10^4 um/cm)
+
+  double collision_pos = gRandom->Uniform();
+
+  double collision_energy = srim.GetAdjustedEnergy(3.9*78*1e3, thickness*collision_pos)/1e3;
+  double energy_mid = srim.GetAdjustedEnergy(3.9*78*1e3, thickness*0.5)/1e3;
+
+  TReaction reac(kr, pb, kr, pb, collision_energy);
+  TReaction reac_mid(kr, pb, kr, pb, energy_mid);
+
+  double pb_angle_rad = reac.ConvertThetaLab(90 * (3.1415926/180), 2, 3);
+  double kr_angle_rad_recon = reac_mid.ConvertThetaLab(pb_angle_rad, 3, 2);
+  return kr_angle_rad_recon;
 }

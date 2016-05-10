@@ -24,13 +24,13 @@ TArgonneHit::~TArgonneHit() {
 
 
 
-void TArgonneHit::BuildFrom(TSmartBuffer buf){
+void TArgonneHit::BuildFrom(TSmartBuffer& buf){
   Clear();
 
   bool read_waveform = TGRUTOptions::Get()->ExtractWaves();
   if (read_waveform) {
     throw std::invalid_argument(
-      "void TArgonneHit::BuildFrom(TSmartBuffer buf) :: Waveforms not supported in GEBArgonne data.");
+      "void TArgonneHit::BuildFrom(TSmartBuffer& buf) :: Waveforms not supported in GEBArgonne data.");
   }
 
   // Extract header data. Header format should stay constant pending FW updates
@@ -49,7 +49,7 @@ void TArgonneHit::BuildFrom(TSmartBuffer buf){
   switch( static_cast<TRawEvent::ArgonneType>(header->GetHeaderType()) ) {
   case TRawEvent::ArgonneType::LEDv10: {
     throw std::invalid_argument(
-      "void TArgonneHit::BuildFrom(TSmartBuffer buf) :: ArgonneType::LEDv10 is not implemented.");
+      "void TArgonneHit::BuildFrom(TSmartBuffer& buf) :: ArgonneType::LEDv10 is not implemented.");
     break;
   }
   case TRawEvent::ArgonneType::LEDv11: {

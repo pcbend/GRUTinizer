@@ -21,13 +21,15 @@ public:
   std::string GetLibraryName() const;
   void ClearHistograms();
 
+  void AddCutFile(TFile* cut_file);
+
   void Write();
 
   virtual void ClearQueue();
 
-  void SetReplaceVariable(const char* name, double value);
-  void RemoveVariable(const char* name);
-  TList* GetVariables();
+  // void SetReplaceVariable(const char* name, double value);
+  // void RemoveVariable(const char* name);
+  // TList* GetVariables();
 
   TList* GetObjects();
   TList* GetGates();

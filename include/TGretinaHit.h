@@ -10,10 +10,12 @@
 
 #include <cmath>
 
-#include "TGEBEvent.h"
+//#include "TGEBEvent.h"
 #include "TDetectorHit.h"
 
 #define MAXHPGESEGMENTS 36
+
+class TSmartBuffer;
 
 class TGretinaHit : public TDetectorHit {
 
@@ -23,7 +25,7 @@ public:
 
   void Copy(TObject& obj) const;
 
-  void BuildFrom(const TRawEvent::GEBBankType1& raw);
+  void BuildFrom(TSmartBuffer& raw);
 
   Long_t   GetTimestamp()       const { return fTimeStamp; }
   Double_t GetTime()            const { return (double)fTimeStamp - (double)fWalkCorrection; }
@@ -38,7 +40,7 @@ public:
 
   const char *GetName() const;
 
-
+  Int_t GetPad() const { return fPad; }
 
   void  Print(Option_t *opt="") const;
   void  Clear(Option_t *opt="");
@@ -108,11 +110,15 @@ public:
   //TVector3 GetCrystalPosition(int i)     const { return TVector3(0,0,1): }
   TVector3 GetPosition()                  const { return GetFirstIntPosition(); }
 
+  TVector3 GetCrystalPosition()           const; 
+  TVector3 GetSegmentPosition()           const; 
+                                                
+
+
   TVector3 GetFirstIntPosition() const;
   TVector3 GetSecondIntPosition() const;
 
-  bool CheckAddback(const TGretinaHit&) const;
-  void AddToSelf(const TGretinaHit& other, double& max_energy);
+  void AddToSelf(const TGretinaHit& other);
 
   //void SetPosition(TVector3 &vec) { fCorePosition = vec; }
 
