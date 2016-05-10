@@ -21,14 +21,14 @@ GH1D::GH1D(const TH1& source)
 GH1D::GH1D(const TF1& function,Int_t nbinsx,Double_t xlow,Double_t xup) :
   TH1D(Form("%s_hist",function.GetName()),Form("%s_hist",function.GetName()),nbinsx, xlow, xup), parent(NULL), projection_axis(-1) {
 
-  TF1 *f = (TF1*)function.Clone();
-  f->SetRange(xlow,xup);
+  //TF1 *f = (TF1*)function.Clone();
+  //f->SetRange(xlow,xup);
 
   for(int i=0;i<nbinsx;i++) {
     double x = GetBinCenter(i);
-    Fill(x,f->Eval(x));
+    Fill(x,function.Eval(x));
   }
-  f->Delete();
+  //f->Delete();
 }
 
 
