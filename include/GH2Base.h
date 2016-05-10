@@ -2,6 +2,7 @@
 #define GH2BASE__H
 
 #include <cstdio>
+#include <iostream>
 #include <map>
 
 #include <TNamed.h>
@@ -79,6 +80,52 @@ public:
   void SetSummaryDirection(kDirection dir) { fSummaryDirection = dir; }
   kDirection GetSummaryDirection() const { return fSummaryDirection; }
 
+
+  class iterator {
+  public:
+  iterator(GH2Base* mat, bool at_end = false)
+    : mat(mat), first(mat->GetNext(NULL)), curr(at_end ? NULL : first) { }
+
+    GH1D& operator*() const {
+      return *curr;
+    }
+    GH1D* operator->() const {
+      return curr;
+    }
+
+    // prefix increment
+    iterator& operator++() {
+      curr = mat->GetNext(curr);
+      if(curr==first) { curr = 0; }
+     return *this;
+    }
+
+    // postfix increment
+    iterator operator++(int) {
+      iterator current = *this;
+      ++(*this);
+      return current;
+    }
+
+    bool operator==(const iterator& b) const {
+      return (mat==b.mat &&
+  	      first==b.first &&
+  	      curr==b.curr);
+    }
+    bool operator!=(const iterator& b) const {
+      return !(*this == b);
+    }
+
+  private:
+    GH2Base* mat;
+    GH1D* first;
+    GH1D* curr;
+  };
+
+  iterator begin() { return iterator(this, false); }
+  iterator end() { return iterator(this, true); }
+
+
 private:
   void Init();
   TList* fProjections;
@@ -87,7 +134,7 @@ private:
   bool fIsSummary;
   kDirection fSummaryDirection;
 
-  ClassDef(GH2Base,1)
+  ClassDef(GH2Base,1);
 };
 
 #endif

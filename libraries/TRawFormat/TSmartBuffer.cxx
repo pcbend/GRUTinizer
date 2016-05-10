@@ -1,10 +1,15 @@
 #include "TSmartBuffer.h"
-#include "TString.h"
-#include "TRegexp.h"
-#include "Globals.h"
 
 #include <algorithm>
+#include <iomanip>
 #include <iostream>
+#include <sstream>
+
+#include "TString.h"
+#include "TPRegexp.h"
+#include "TObjArray.h"
+#include "TObjString.h"
+#include "Globals.h"
 
 TSmartBuffer::TSmartBuffer()
   : fAllocatedLocation(NULL), fData(NULL), fSize(0),
@@ -89,53 +94,66 @@ void TSmartBuffer::Advance(size_t dist) {
 
 void TSmartBuffer::Print(Option_t* opt) const {
   TString options(opt);
-  TRegexp regexp("0x[0-9a-f][0-9a-f][0-9a-f][0-9a-f]");
   //TRegexp regexp2("0x[0-9a-f][0-9a-f][0-9a-f][0-9a-f]");
   if(!options.Contains("bodyonly")) {
     std::cout << "TSmartBuffer allocated at " << (void*)fAllocatedLocation << ", "
               << "currently pointed at " << (void*)fData << ", "
-              << "with a size of " << fSize << "bytes."
+              << "with a size of " << fSize << " bytes."
               << std::endl;
   }
   if(fReferenceCount){
     std::cout << "There are " << *fReferenceCount << " TSmartBuffers sharing this C-buffer"
               << std::endl;
 
+    // Find all regexes in the option string
+    std::vector<TPRegexp> highlight_regexes;
+    {
+      TPRegexp regexp("0x[0-9a-f?*]{1,4}");
+      TObjArray* all_matches = regexp.MatchS(options);
+      TIter iter(all_matches);
+      while(TObject* obj = iter()) {
+        TString tstring = ((TObjString*)obj)->GetString();
+        options.ReplaceAll(tstring, "");
+
+        // Convert bash-style wildcard to regex.
+        tstring.ReplaceAll("?", "[0-9a-f]");
+        tstring.ReplaceAll("*", "[0-9a-f]*");
+        tstring.Append("$");
+        highlight_regexes.push_back(tstring);
+      }
+      delete all_matches;
+    }
+
     // Full hexdump of the buffer contents
     //TString highlight_string = options(regexp);
-    std::vector<TString> highlight_strings;
-    while(options.Contains(regexp)) {
-      highlight_strings.push_back(options(regexp));
-      options.ReplaceAll(highlight_strings.back(),"");
-    }
-    //unsigned short highlight = 0;
-    std::vector<unsigned short> highlight;
-    if(highlight_strings.size()) { //Length()) {
-      //highlight = strtol(highlight_string.Data(),0,0);
-      for(unsigned int j=0;j<highlight_strings.size();j++) {
-        highlight.push_back(strtol(highlight_strings.at(j).Data(),0,0));
-      }
-    }
     if(options.Contains("all")){
-      printf("\t");
+      std::cout << "\t";
       for(unsigned int x=0; x<GetSize()-1; x+=2) {
         if((x%16 == 0) &&
            (x!=GetSize())){
-          printf("\n\t");
+          std::cout << "\n\t";
         }
-        unsigned int value = *(unsigned short*)(GetData()+x);
-        //if(highlight>0 && highlight==value) {printf(DRED);}
-        bool found = false;
-        for(unsigned int j=0;j<highlight.size();j++) {
-          if(highlight.at(j) == value)
-            found = true;
-        }
-        if(found) {printf(DRED);}
-        printf("0x%04x  ",value);
-        if(found) {printf(RESET_COLOR);}
-        //if(highlight>0 && highlight==value) {printf(RESET_COLOR);}
 
+        unsigned int value = *(unsigned short*)(GetData()+x);
+        std::stringstream stream;
+        stream << "0x"
+               << std::hex << std::setfill('0') << std::setw(4) << value;
+        TString value_to_print = stream.str();
+
+        bool needs_highlight = false;
+        for(auto& regex : highlight_regexes) {
+          if(regex.Match(value_to_print)) {
+            needs_highlight = true;
+            break;
+          }
+        }
+
+        if(needs_highlight) { std::cout << DRED; }
+        std::cout << value_to_print << "  ";
+        if(needs_highlight) { std::cout << RESET_COLOR; }
       }
+
+
       if(GetSize()%2 == 1){
         printf("0x%02x ", *(unsigned char*)(GetData()+GetSize()-1));
       }

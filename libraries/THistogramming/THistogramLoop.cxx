@@ -5,6 +5,8 @@
 #include "TGRUTint.h"
 #include "TGRUTOptions.h"
 #include "TPreserveGDirectory.h"
+#include "GValue.h"
+#include "TChannel.h"
 
 THistogramLoop * THistogramLoop::Get(std::string name) {
   if(name.length()==0)
@@ -100,6 +102,12 @@ void THistogramLoop::Write() {
     output_file->cd();
   }
   compiled_histograms.Write();
+  if(GValue::Size()) {
+    GValue::Get()->Write();
+  }
+  if(TChannel::Size()) {
+    TChannel::Get()->Write();
+  }
 }
 
 void THistogramLoop::LoadLibrary(std::string library) {
