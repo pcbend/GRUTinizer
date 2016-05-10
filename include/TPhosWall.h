@@ -7,6 +7,7 @@
 #include "TDetector.h"
 #include "TGEBEvent.h"
 #include "TPhosWallHit.h"
+#include "TNucleus.h"
 
 #define MAXPIXEL 256
 
