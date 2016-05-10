@@ -24,62 +24,73 @@ TUnpackedEvent::~TUnpackedEvent() {
 }
 
 void TUnpackedEvent::Build() {
-  for(auto det : detectors) {
-    det->Build();
+  for(auto& item : raw_data_map) {
+    kDetectorSystems detector = item.first;
+    std::vector<TRawEvent>& raw_data = item.second;
+
+    switch(detector){
+    case kDetectorSystems::GRETINA:
+      GetDetector<TGretina>(true)->Build(raw_data);
+      break;
+    
+    case kDetectorSystems::GRETINA_SIM:
+      GetDetector<TGretSim>(true)->Build(raw_data);
+      break;
+
+    case kDetectorSystems::MODE3:
+      GetDetector<TMode3>(true)->Build(raw_data);
+      break;
+
+    case kDetectorSystems::S800:
+      GetDetector<TS800>(true)->Build(raw_data);
+      break;
+
+    case kDetectorSystems::S800_SIM:
+      GetDetector<TS800Sim>(true)->Build(raw_data);
+      break;
+
+    case kDetectorSystems::S800SCALER:
+      GetDetector<TS800Scaler>(true)->Build(raw_data);
+      break;
+
+    case kDetectorSystems::BANK29:
+      GetDetector<TBank29>(true)->Build(raw_data);
+      break;
+
+    case kDetectorSystems::SEGA:
+      GetDetector<TSega>(true)->Build(raw_data);
+      break;
+
+    case kDetectorSystems::JANUS:
+      GetDetector<TJanus>(true)->Build(raw_data);
+      break;
+
+    case kDetectorSystems::FASTSCINT:
+      GetDetector<TFastScint>(true)->Build(raw_data);
+      break;
+
+    case kDetectorSystems::CAESAR:
+      GetDetector<TCaesar>(true)->Build(raw_data);
+      break;
+
+    case kDetectorSystems::PHOSWALL:
+      GetDetector<TPhosWall>(true)->Build(raw_data);
+      break;
+
+    default:
+      break;
+    }
   }
+
+  raw_data_map.clear();
 }
 
 void TUnpackedEvent::AddRawData(const TRawEvent& event, kDetectorSystems detector) {
-  switch(detector){
-  case kDetectorSystems::GRETINA:
-    GetDetector<TGretina>(true)->AddRawData(event);
-    break;
-    
-  case kDetectorSystems::GRETINA_SIM:
-    GetDetector<TGretSim>(true)->AddRawData(event);
-    break;
+  raw_data_map[detector].push_back(event);
+}
 
-  case kDetectorSystems::MODE3:
-    GetDetector<TMode3>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::S800:
-    GetDetector<TS800>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::S800_SIM:
-    GetDetector<TS800Sim>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::S800SCALER:
-    GetDetector<TS800Scaler>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::BANK29:
-    GetDetector<TBank29>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::SEGA:
-    GetDetector<TSega>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::JANUS:
-    GetDetector<TJanus>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::FASTSCINT:
-    GetDetector<TFastScint>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::CAESAR:
-    GetDetector<TCaesar>(true)->AddRawData(event);
-    break;
-
-  case kDetectorSystems::PHOSWALL:
-    GetDetector<TPhosWall>(true)->AddRawData(event);
-    break;
-
-  default:
-    break;
+void TUnpackedEvent::SetRunStart(unsigned int unix_time){
+  for(auto det : detectors){
+    det->SetRunStart(unix_time);
   }
 }

@@ -75,6 +75,7 @@ private:
   int fRawFilesOpened;
 
   bool fIsTabComplete;
+  bool fAllowedToTerminate;
 
   TChain* fChain;
   TDataLoop* fDataLoop;

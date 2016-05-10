@@ -22,14 +22,26 @@
 #include <TH1.h>
 #include <TPython.h>
 #include <TTimer.h>
+#include <TF1.h>
 
 #include <GCanvas.h>
 #include <GPeak.h>
+#include <GGaus.h>
 //#include <GRootObjectManager.h>
 #include <TGRUTOptions.h>
 //#include <TGRUTInt.h>
+#include <GrutNotifier.h>
 
-TChain *gChain = NULL;
+TChain *gChain = new TChain("EventTree");//NULL;
+
+class TempThing{
+public:
+  TempThing() {
+    gChain->SetNotify(GrutNotifier::Get());
+  }
+} temp_thing;
+  
+
 
 void Help()     { printf("This is helpful information.\n"); }
 
@@ -56,9 +68,17 @@ int LabelPeaks(TH1 *hist,double sigma,double thresh,Option_t *opt) {
     return n;
   TText *text;
   double *x = pm->GetX();
-  double *y = pm->GetY();
+  //  double *y = pm->GetY();
   for(int i=0;i<n;i++) {
-    text = new TText(x[i],y[i],Form("%.1f",x[i]));
+    //y[i] += y[i]*0.15;
+    double y = 0;
+    for(int i_x = x[i]-3;i_x<x[i]+3;i_x++){
+      if((hist->GetBinContent(hist->GetXaxis()->FindBin(i_x)))>y){
+	y = hist->GetBinContent(hist->GetXaxis()->FindBin(i_x));
+      }
+    }
+    y+=y*0.1;
+    text = new TText(x[i],y,Form("%.1f",x[i]));
     text->SetTextSize(0.025);
     text->SetTextAngle(90);
     text->SetTextAlign(12);
@@ -73,9 +93,7 @@ int LabelPeaks(TH1 *hist,double sigma,double thresh,Option_t *opt) {
 }
 
 
-bool ShowPeaks(TH1 **hists,unsigned int nhists) {
-  double sigma  = 2.0;
-  double thresh = 0.02;
+bool ShowPeaks(TH1 **hists,unsigned int nhists,double sigma,double thresh) {
   int num_found = 0;
   for(unsigned int i=0;i<nhists;i++) {
     if(TObject *obj = hists[i]->GetListOfFunctions()->FindObject("PeakLabels")) {
@@ -107,7 +125,31 @@ bool RemovePeaks(TH1 **hists,unsigned int nhists) {
 //  TString option = opt;
 //}
 
-bool GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
+GGaus *GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
+  //bool edit = false;
+  if(!hist)
+    return 0;
+  if(xlow>xhigh)
+    std::swap(xlow,xhigh);
+
+  //std::cout << "here." << std::endl;
+
+  GGaus *mypeak= new GGaus(xlow,xhigh);
+  std::string options = opt;
+  options.append("Q+");
+  mypeak->Fit(hist,options.c_str());
+  //mypeak->Background()->Draw("SAME");
+  TF1 *bg = new TF1(*mypeak->Background());
+  hist->GetListOfFunctions()->Add(bg);
+  //edit = true;
+
+  return mypeak;
+}
+ 
+/* 
+  
+  
+  
   bool edit = false;
   if(!hist)
     return edit;
@@ -159,32 +201,41 @@ bool GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
   printf(GREEN "FWHM      : % 4.02f +/- %.02f" RESET_COLOR "\n",TMath::Abs(param[2]*2.35),TMath::Abs(error[2]*2.35));
   printf(GREEN "Resolution: %.02f %%" RESET_COLOR "\n",TMath::Abs(param[2]*2.35)/param[1]*100.0);
 
-
-
-
-
-
   edit = true;
-
+  
+  TIter it(hist->GetListOfFunctions());
+  while(TObject *obj=it.Next()) {
+    if(!hist->InheritsFrom(TF1::Class()))
+      continue;
+    ((TF1*)obj)->Draw("same");
+  }
+  
+  
   return edit;
 
 }
+*/
 
-bool PhotoPeakFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
-  bool edit = false;
+
+GPeak *PhotoPeakFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
+  //bool edit = 0;
   if(!hist)
-    return edit;
+    return 0;
   if(xlow>xhigh)
     std::swap(xlow,xhigh);
 
+  //std::cout << "here." << std::endl;
+
   GPeak *mypeak= new GPeak((xlow+xhigh)/2.0,xlow,xhigh);
-  mypeak->Fit(hist,"Q+");
+  std::string options = opt;
+  options.append("Q+");
+  mypeak->Fit(hist,options.c_str());
   //mypeak->Background()->Draw("SAME");
   TF1 *bg = new TF1(*mypeak->Background());
   hist->GetListOfFunctions()->Add(bg);
-  edit = true;
+  //edit = true;
 
-  return edit;
+  return mypeak;
 }
 
 std::string MergeStrings(const std::vector<std::string>& strings, char split) {
@@ -208,17 +259,51 @@ TH1 *GrabHist(int i)  {
   if(!gPad)
     return hist;
   TIter iter(gPad->GetListOfPrimitives());
+  int j=0;
   while(TObject *obj = iter.Next()) {
     if(obj->InheritsFrom(TH1::Class())) {
-      hist = (TH1*)obj;
-      break;
+      if(j==i) {
+        hist = (TH1*)obj;
+        break;
+      }
+      j++;
     }
   }
   return hist;
 }
-  
-  
-void StartGUI() { 
+
+TF1 *GrabFit(int i)  {
+  //return the histogram from the current canvas, pad i.
+  TH1 *hist = 0;
+  TF1 *fit = 0;
+  if(!gPad)
+    return fit;
+  TIter iter(gPad->GetListOfPrimitives());
+  int j=0;
+  while(TObject *obj = iter.Next()) {
+    if(obj->InheritsFrom(TH1::Class())) {
+      hist = (TH1*)obj;
+      TIter iter2(hist->GetListOfFunctions());
+      while(TObject *obj2 = iter2.Next()){
+	if(obj2->InheritsFrom(TF1::Class())){
+	  if(j==i) {
+	    fit=(TF1*)obj2;
+	    return fit;
+	  }
+	  j++;
+	}
+      }
+    }
+  }
+  return fit;
+}
+
+
+namespace {
+  bool gui_is_running = false;
+}
+
+void StartGUI() {
   std::string   script_filename = Form("%s/pygui/grut-view.py",getenv("GRUTSYS"));
   std::ifstream script(script_filename);
   std::string   script_text((std::istreambuf_iterator<char>(script)),
@@ -228,28 +313,32 @@ void StartGUI() {
   TTimer* gui_timer = new TTimer("TPython::Exec(\"update()\");", 10, true);
   gui_timer->TurnOn();
 
-  TGRUTOptions::Get()->SetStartGUI();
+  gui_is_running = true;
   for(int i=0;i<gROOT->GetListOfFiles()->GetSize();i++) {
     TPython::Bind((TFile*)gROOT->GetListOfFiles()->At(i),"tdir");
     gROOT->ProcessLine("TPython::Exec(\"window.AddDirectory(tdir)\");");
   }
-} 
-  
-  
-  
+}
+
+bool GUIIsRunning() {
+  return gui_is_running;
+}
+
+
+
 TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
- TH2 *toreturn = 0; 
+ TH2 *toreturn = 0;
  if(!mat)
     return toreturn;
  //int dim = mat->GetDimension();
- int xmax = mat->GetXaxis()->GetNbins()+1; 
- int ymax = mat->GetYaxis()->GetNbins()+1; 
+ int xmax = mat->GetXaxis()->GetNbins()+1;
+ int ymax = mat->GetYaxis()->GetNbins()+1;
  /*
  switch(dim) {
    case 3:
-     xmax = mat->GetXaxis()->GetNbins()+1; 
-     ymax = mat->GetYaxis()->GetNbins()+1; 
-     zmax = mat->GetZaxis()->GetNbins()+1; 
+     xmax = mat->GetXaxis()->GetNbins()+1;
+     ymax = mat->GetYaxis()->GetNbins()+1;
+     zmax = mat->GetZaxis()->GetNbins()+1;
      break;
    case 2:
      if(axis>3) {
@@ -257,8 +346,8 @@ TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
                __PRETTY_FUNCTION__,mat->GetName())
        return toreturn;
      }
-     xmax = mat->GetXaxis()->GetNbins()+1; 
-     ymax = mat->GetYaxis()->GetNbins()+1; 
+     xmax = mat->GetXaxis()->GetNbins()+1;
+     ymax = mat->GetYaxis()->GetNbins()+1;
      break;
    case 1:
      if(axis!=1) {
@@ -266,7 +355,7 @@ TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
                __PRETTY_FUNCTION__,mat->GetName())
        return toreturn;
      }
-     xmax = mat->GetXaxis()->GetNbins()+1; 
+     xmax = mat->GetXaxis()->GetNbins()+1;
      break;
  };
  */
@@ -287,3 +376,10 @@ TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
    }
   return toreturn;
 }
+
+
+
+
+
+
+

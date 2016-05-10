@@ -1,4 +1,4 @@
-//TChannel.h TGRUTUtilities.h TPresetCanvas.h
+//TChannel.h TGRUTUtilities.h TPresetCanvas.h TCalibrator.h
 #ifdef __CINT__
 
 #pragma link off all globals;
@@ -7,6 +7,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class TChannel-;
+#pragma link C++ class TCalibrator+;
 
 #pragma link C++ class TPresetPad+;
 #pragma link C++ class TPresetCanvas-;

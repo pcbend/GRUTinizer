@@ -80,9 +80,10 @@ class TCutTab(object):
 
     def AddDirectory(self, tdir):
         gchain = ROOT.gChain
-        if not gchain:
+        # If the chain doesn't exist, or if it is empty.
+        if not gchain or gchain.GetEntries()==0:
             return
-        
+
         for branch in gchain.GetListOfBranches():
             cls_name = branch.GetName()
             cls = getattr(ROOT, cls_name)
@@ -111,7 +112,7 @@ class TCutTab(object):
         else:
             parent = det_type
             self.detector_classes[det_type].AddGate(cut)
-            
+
         self.tree.insert(parent, 'end', full_name, text=name, values='2D Cut',
                          image = self.main.icons['tcutg'])
 
@@ -128,7 +129,7 @@ class TCutTab(object):
             return
 
         ROOT.gROOT.GetListOfSpecials().Remove(cutg)
-        
+
         cutg.SetName(self._increment_name())
         for prim in ROOT.gPad.GetListOfPrimitives():
             if isinstance(prim, ROOT.TH2):

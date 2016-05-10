@@ -17,10 +17,11 @@ public:
 
   bool ShouldExit() { return fShouldExit; }
   const std::vector<std::string>& RawInputFiles()   { return input_raw_files;   }
-        std::vector<std::string>& GetRawInputFiles()   { return input_raw_files;   }
+  const std::vector<std::string>& GetRawInputFiles(){ return input_raw_files;   }
   const std::vector<std::string>& RootInputFiles()  { return input_root_files;  }
   const std::vector<std::string>& CalInputFiles()   { return input_cal_files;   }
   const std::vector<std::string>& ValInputFiles()   { return input_val_files;   }
+  const std::vector<std::string>& CutsInputFiles()  { return input_cuts_files;   }
   const std::vector<std::string>& WinInputFiles()   { return input_win_files;   }
   const std::vector<std::string>& MacroInputFiles() { return input_macro_files; }
   const std::vector<std::string>& GuiSaveSetFiles() { return input_gui_hist_files; }

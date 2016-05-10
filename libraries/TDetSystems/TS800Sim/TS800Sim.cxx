@@ -17,19 +17,17 @@ void TS800Sim::Copy(TObject& obj) const {
 
   TS800Sim& s800sim = (TS800Sim&)obj;
   s800sim.s800sim_hits = s800sim_hits; 
-  s800sim.raw_data.clear();
 }
 
 void TS800Sim::InsertHit(const TDetectorHit& hit){
   s800sim_hits.emplace_back((TS800SimHit&)hit);
 }
 
-int TS800Sim::BuildHits(){
+int TS800Sim::BuildHits(std::vector<TRawEvent>& raw_data){
   for(auto& event : raw_data){
     TGEBEvent& geb = (TGEBEvent&)event;
     BuildFrom(geb);
   }
-  raw_data.clear();
   return 0;
 }
 
@@ -38,7 +36,6 @@ void TS800Sim::Print(Option_t *opt) const { }
 void TS800Sim::Clear(Option_t *opt) {
   TDetector::Clear(opt);
   s800sim_hits.clear(); 
-  raw_data.clear();
 }
 
 void TS800Sim::BuildFrom(TGEBEvent &event){

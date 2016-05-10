@@ -46,6 +46,7 @@ TChainLoop::~TChainLoop() {
 int TChainLoop::SetupChain() {
   if(!input_chain)
     return 0;
+
   TObjArray *array = input_chain->GetListOfBranches();
   for(int x=0;x<array->GetSize();x++) {
     TBranch *b = (TBranch*)array->At(x);
@@ -68,17 +69,21 @@ std::string TChainLoop::Status() {
 }
 
 
-void TChainLoop::Restart() { 
+void TChainLoop::Restart() {
   std::lock_guard<std::mutex> lock(restart_mutex);
-  fEntriesRead = 0; 
+  fEntriesRead = 0;
   return;
+}
+
+void TChainLoop::OnEnd() {
+  if(hist_loop){
+    hist_loop->SendStop();
+  }
 }
 
 bool TChainLoop::Iteration() {
   if(fEntriesRead >= fEntriesTotal){
     if(fSelfStopping) {
-      if(hist_loop)
-        hist_loop->SendStop();
       return false;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -92,7 +97,12 @@ bool TChainLoop::Iteration() {
 
   TUnpackedEvent* event = new TUnpackedEvent;
   for(auto& elem : det_map){
-    event->AddDetector(*elem.second);
+    TDetector* det = *elem.second;
+    if(!det->TestBit(TDetector::kUnbuilt)){
+      event->AddDetector(det);
+    } else {
+      delete det;
+    }
   }
 
   if(hist_loop){

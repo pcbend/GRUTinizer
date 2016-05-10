@@ -13,13 +13,13 @@ GValue *GValue::fDefaultValue = new GValue("GValue",sqrt(-1));
 std::map<std::string,GValue*> GValue::fValueVector;
 
 GValue::GValue()
-  : fValue(0.00) { }
+  : fValue(0.00), fPriority(kUnset) { }
 
-GValue::GValue(const char *name,double value)
-  : TNamed(name,name), fValue(value) { }
+GValue::GValue(const char *name,double value, EPriority priority)
+  : TNamed(name,name), fValue(value), fPriority(priority) { }
 
 GValue::GValue(const char *name)
-  : TNamed(name,name), fValue(0.00) { }
+  : TNamed(name,name), fValue(0.00), fPriority(kUnset) { }
 
 GValue::GValue(const GValue &val)
   : TNamed(val) {
@@ -29,6 +29,7 @@ GValue::GValue(const GValue &val)
 void GValue::Copy(TObject &obj) const {
   TNamed::Copy(obj);
   ((GValue&)obj).fValue = fValue;
+  ((GValue&)obj).fPriority = fPriority;
 }
 
 double GValue::Value(std::string name) {
@@ -37,13 +38,16 @@ double GValue::Value(std::string name) {
   return fValueVector.at(name)->GetValue();
 }
 
-void GValue::SetReplaceValue(std::string name, double value) {
+void GValue::SetReplaceValue(std::string name, double value,
+			     EPriority priority) {
   GValue* gvalue = FindValue(name);
   if(!gvalue) {
-    gvalue = new GValue(name.c_str());
+    gvalue = new GValue(name.c_str(), value, priority);
     AddValue(gvalue);
+  } else if (priority <= gvalue->fPriority) {
+    gvalue->SetValue(value);
+    gvalue->fPriority = priority;
   }
-  gvalue->SetValue(value);
 }
 
 GValue* GValue::FindValue(std::string name){
@@ -57,43 +61,55 @@ GValue* GValue::FindValue(std::string name){
 }
 
 bool GValue::AppendValue(GValue *oldvalue) {
-  if(strlen(this->GetName()))
-     oldvalue->SetName(this->GetName());
-  if(this->GetValue() != -1)
-     oldvalue->SetValue(this->GetValue());
-  if(strlen(this->GetInfo()))
-     oldvalue->SetInfo(this->GetInfo());
-  return true;
+  if(fPriority <= oldvalue->fPriority){
+    if(strlen(this->GetName())) {
+      oldvalue->SetName(this->GetName());
+    }
+  
+    if(this->GetValue() != -1) {
+      oldvalue->SetValue(this->GetValue());
+      oldvalue->fPriority = fPriority;
+    }
+  
+    if(strlen(this->GetInfo())) {
+      oldvalue->SetInfo(this->GetInfo());
+    }
+    return true;
+  }
+  
+  return false;
 }
 
 bool GValue::ReplaceValue(GValue *oldvalue){
-  this->Copy(*oldvalue);
-  return true;
+  if(fPriority <= oldvalue->fPriority){
+    this->Copy(*oldvalue);
+    return true;
+  } else {
+    return false;
+  }
 }
 
-bool GValue::AddValue(GValue* value,Option_t *opt) {
+bool GValue::AddValue(GValue* value, Option_t *opt) {
   if(!value)
      return false;
   TString option(opt);
 
   std::string temp_string = value->GetName();
 
-  if(GValue::FindValue(value->GetName())) {
-     if(option.Contains("overwrite",TString::kIgnoreCase)) {
-       GValue *oldvalue = FindValue(value->GetName());
-       value->ReplaceValue(oldvalue);
-       return true;
-     } else {
-       fprintf(stderr,"%s: Trying to add a value that already exists!\n",__PRETTY_FUNCTION__);
-       return false;
-     }
-  } else if(temp_string.compare("") == 0) { //default value, get rid of it and ignore;
-     delete value;
-     value = 0;
+  GValue* oldvalue = GValue::FindValue(value->GetName());
+  if(oldvalue) {
+    value->ReplaceValue(oldvalue);
+    delete value;
+    return true;
+  } else if(temp_string.compare("") == 0) {
+    //default value, get rid of it and ignore;
+    delete value;
+    value = 0;
+    return false;
   } else {
     fValueVector[temp_string] = value;   //.push_back(value);
+    return true;
   }
-  return true;
 }
 
 
@@ -170,7 +186,7 @@ int GValue::ReadValFile(const char* filename,Option_t *opt) {
   infile.read(buffer.data(),(int)length);
   sbuffer.assign(buffer.data());
 
-  int values_found = ParseInputData(sbuffer,opt);
+  int values_found = ParseInputData(sbuffer,kValFile,opt);
 //if(values_found) {
 //  //fFileNames.push_back(std::string(filename);;
 //  fValueData = sbuffer; //.push_back(std::string((const char*)buffer);
@@ -184,7 +200,7 @@ int GValue::ReadValFile(const char* filename,Option_t *opt) {
 //  Value :
 //  Info  :
 //}
-int GValue::ParseInputData(std::string input,Option_t *opt) {
+int GValue::ParseInputData(std::string input, EPriority priority, Option_t *opt) {
   std::istringstream infile(input);
   GValue *value = 0;
   std::string line;
@@ -254,6 +270,7 @@ int GValue::ParseInputData(std::string input,Option_t *opt) {
           value->SetName(line.c_str());
         } else if(type.compare("VALUE")==0) {
           value->SetValue(std::atof(line.c_str()));
+	  value->fPriority = priority;
         } else if(type.compare("INFO")==0) {
           value->SetInfo(line.c_str());
         }
@@ -286,12 +303,19 @@ void GValue::Streamer(TBuffer &R__b) {
      Version_t R__v = R__b.ReadVersion(&R__s,&R__c);
      TNamed::Streamer(R__b);
      if(R__v>1) { }
-     { TString R__str; R__str.Streamer(R__b); ParseInputData(R__str.Data()); }
+     {
+       TString R__str;
+       R__str.Streamer(R__b);
+       ParseInputData(R__str.Data(),kRootFile);
+     }
      R__b.CheckByteCount(R__s,R__c,GValue::IsA());
   } else {
      R__c = R__b.WriteVersion(GValue::IsA(),true);
      TNamed::Streamer(R__b);
-     { TString R__str = GValue::WriteToBuffer(); R__str.Streamer(R__b);}
+     {
+       TString R__str = GValue::WriteToBuffer();
+       R__str.Streamer(R__b);
+     }
      R__b.SetByteCount(R__c,true);
   }
 }

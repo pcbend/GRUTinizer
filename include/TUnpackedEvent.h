@@ -24,11 +24,13 @@ public:
   void AddRawData(const TRawEvent& event, kDetectorSystems detector);
 
   void Build();
+  void SetRunStart(unsigned int unix_time);
 
   int Size() { return detectors.size(); }
 
 private:
   std::vector<TDetector*> detectors;
+  std::map<kDetectorSystems, std::vector<TRawEvent> > raw_data_map;
 };
 
 #ifndef __CINT__

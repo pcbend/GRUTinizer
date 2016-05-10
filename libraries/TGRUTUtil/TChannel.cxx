@@ -1,18 +1,19 @@
+#include "TChannel.h"
 
-#include <TChannel.h>
-#include <TRandom.h>
-
-#include <utility>
-#include <cmath>
 #include <algorithm>
+#include <cmath>
+#include <iomanip>
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <utility>
 
+#include "TRandom.h"
 
 std::map<unsigned int,TChannel*> TChannel::fChannelMap;
 TChannel *TChannel::fDefaultChannel = new TChannel("TChannel",0xffffffff);
 std::string TChannel::fChannelData;
+std::vector<double> TChannel::empty_vec;
 
 ClassImp(TChannel)
 
@@ -40,40 +41,66 @@ TChannel::TChannel(const TChannel& rhs)
 
 TChannel::~TChannel() { }
 
-void TChannel::Print(Option_t *opt) const {
-  printf("%s:  {\n",GetName());
-  printf("Address: \t0x%08x\n",address);
-  printf("Number:  \t%i\n",number);
-  printf("Info:    \t%s\n",info.c_str());
-  printf("EnergyCoeff:  ");
-  for(auto &i : energy_coeff) { printf("\t%.04f",i); }
-  printf("\n");
-  printf("TimeCoeff: ");
-  for(auto &i : time_coeff) { printf("\t%.04f",i); }
-  printf("\n");
-  printf("EfficienyCoeff:");
+std::ostream& operator<<(std::ostream& out, const TChannel& chan) {
+  // Print out the standard stuff
+  out << chan.GetName() << ":  {\n"
+      << "   Address:\t0x" << std::hex << std::setfill('0') << std::setw(8) << chan.address << std::dec << "\n"
+      << "   Number:\t" << chan.number << "\n"
+      << "   Info:\t" << chan.info << "\n"
+      << "   System:\t" << chan.system << "\n"
+      << "   Position:\t" << chan.array_position << "\n"
+      << "   Subposition:\t" << chan.array_subposition << "\n"
+      << "   Segment:\t" << chan.segment << "\n"
+      << "   Collected_Charge:\t" << chan.collected_charge << "\n"
+      << "   Pedestal:\t" << chan.pedestal << "\n";
 
-  for(auto &i : efficiency_coeff) { printf("\t%.04f",i); }
-  printf("\n}\n-----------------------------------\n");
-  return;
+  // Print out each energy coefficient
+  for(auto& start_coeff : chan.energy_coeff) {
+    out << "   EnergyCoeff";
+    if(start_coeff.start_time != -DBL_MAX) {
+      out << "[" << start_coeff.start_time << "]";
+    }
+    out << ":";
+    for(double coef : start_coeff.coefficients) {
+      out << "\t" << coef;
+    }
+    out << "\n";
+  }
+
+  // Print out each time coefficient
+  for(auto& start_coeff : chan.time_coeff) {
+    out << "   TimeCoeff";
+    if(start_coeff.start_time != -DBL_MAX) {
+      out << "[" << start_coeff.start_time << "]";
+    }
+    out << ":";
+    for(double coef : start_coeff.coefficients) {
+      out << "\t" << coef;
+    }
+    out << "\n";
+  }
+
+  // Print out each efficiency coefficient
+  out << "   EfficiencyCoeff:";
+  for(double coef : chan.efficiency_coeff) {
+    out << "\t" << coef;
+  }
+  out << "\n";
+
+  // Close out the rest
+  out << "}\n-----------------------------------\n";
+
+  return out;
+}
+
+void TChannel::Print(Option_t *opt) const {
+  std::cout << *this;
 }
 
 std::string TChannel::PrintToString(Option_t *opt) const {
-  std::string output;
-  output.append(Form("%s:  {\n",GetName()));
-  output.append(Form("Address: \t0x%08x\n",address));
-  output.append(Form("Number:  \t%i\n",number));
-  output.append(Form("Info:    \t%s\n",info.c_str()));
-  output.append(Form("EnergyCoeff:  "));
-  for(auto &i : energy_coeff) { output.append(Form("\t%.06f",i)); }
-  output.append("\n");
-  output.append(Form("TimeCoeff:  "));
-  for(auto &i : time_coeff) { output.append(Form("\t%.06f",i)); }
-  output.append("\n");
-  output.append("EfficienyCoeff:");
-  for(auto &i : efficiency_coeff) { output.append(Form("\t%.06f",i)); }
-  output.append("\n}\n-----------------------------------\n");
-  return output;
+  std::stringstream output;
+  output << *this;
+  return output.str();
 }
 
 void TChannel::Copy(TObject &rhs) const {
@@ -81,10 +108,15 @@ void TChannel::Copy(TObject &rhs) const {
   ((TChannel&)rhs).address = address;
   ((TChannel&)rhs).number  = number;
   ((TChannel&)rhs).info    = info;
+  ((TChannel&)rhs).system    = system;
+  ((TChannel&)rhs).array_position    = array_position;
+  ((TChannel&)rhs).array_subposition    = array_subposition;
+  ((TChannel&)rhs).collected_charge    = collected_charge;
+  ((TChannel&)rhs).segment    = segment;
   ((TChannel&)rhs).energy_coeff = energy_coeff;
   ((TChannel&)rhs).time_coeff = time_coeff;
   ((TChannel&)rhs).efficiency_coeff = efficiency_coeff;
-  return;
+  ((TChannel&)rhs).pedestal = pedestal;
 }
 
 void TChannel::Clear(Option_t *opt) {
@@ -92,10 +124,13 @@ void TChannel::Clear(Option_t *opt) {
   address         = 0xffffffff;
   number          = -1;
   info.clear();
-  time_coeff.clear();
-  energy_coeff.clear();
-  efficiency_coeff.clear();
-  fMnemonic.Clear();
+  ClearCalibrations();
+  array_position = -1;
+  segment = -1;
+  system = "";
+  array_subposition = "";
+  collected_charge = "";
+  pedestal = 0;
 }
 
 //void TChannel::Compare(const TObject &rhs) const { }
@@ -210,66 +245,130 @@ int TChannel::DeleteAllChannels()  {
 
 
 void TChannel::trim(std::string * line, const std::string & trimChars) {
-   //Removes the the string "trimCars" from  the string 'line'
+   //Removes the the string "trimCars" from the start or end of 'line'
   if(line->length() == 0)
     return;
+
   std::size_t found = line->find_first_not_of(trimChars);
   if(found != std::string::npos)
     *line = line->substr(found, line->length());
+
   found = line->find_last_not_of(trimChars);
   if(found != std::string::npos)
     *line = line->substr(0, found + 1);
-  return;
 }
 
-
-void TChannel::DestroyCalibrations() {
-  DestroyEnergyCoeff();
-  DestroyEfficiencyCoeff();
-  DestroyTimeCoeff();
-  return;
+void TChannel::ClearCalibrations() {
+  ClearEnergyCoeff();
+  ClearEfficiencyCoeff();
+  ClearTimeCoeff();
 }
 
-double TChannel::CalEnergy(int charge) {
-  if(charge==0)
-    return 0.000;
-  double dcharge = (double)charge + gRandom->Uniform();
-  return CalEnergy(dcharge);
-}
-
-double TChannel::CalEnergy(double charge) {
-  if(energy_coeff.size()==0)
-     return charge;
-  double cal_chg = 0.000;
-  // Evaluate the polynomial
-  for(int i=energy_coeff.size()-1; i>=0; i--){
-    double coef = energy_coeff[i];
-    cal_chg *= charge;
-    cal_chg += coef;
+const std::vector<double>& TChannel::GetEnergyCoeff(double timestamp) const {
+  for(auto& coeff_time : energy_coeff){
+    if(timestamp >= coeff_time.start_time) {
+      return coeff_time.coefficients;
+    }
   }
-  return cal_chg;
-}
-double TChannel::CalTime(int time) {
-  if(time==0){
-    return 0.000;
-  }
-  double dtime = (double)time + gRandom->Uniform();
-  return CalTime(dtime);
-}
-double TChannel::CalTime(double time) {
-  if(time_coeff.size()==0){
-     return time;
-  }
-  double cal_time = 0.000;
-  // Evaluate the polynomial
-  for(int i=time_coeff.size()-1; i>=0; i--){
-    double coef = time_coeff[i];
-    cal_time *= time;
-    cal_time += coef;
-  }
-  return cal_time;
+  // Should never reach here, but just in case.
+  return empty_vec;
 }
 
+void TChannel::ClearEnergyCoeff() {
+  energy_coeff.clear();
+  energy_coeff.push_back({std::vector<double>(), -DBL_MAX});
+}
+
+void TChannel::SetEnergyCoeff(std::vector<double> coeff, double timestamp) {
+  std::vector<double>* found = NULL;
+  for(auto& ec : energy_coeff) {
+    if(ec.start_time == timestamp){
+      found = &ec.coefficients;
+    }
+  }
+
+  if(found){
+    *found = std::move(coeff);
+  } else {
+    energy_coeff.push_back({std::move(coeff), timestamp});
+    std::sort(energy_coeff.begin(), energy_coeff.end());
+  }
+}
+
+double TChannel::CalEnergy(int charge, double timestamp) const {
+  return Calibrate(charge-pedestal, GetEnergyCoeff(timestamp));
+}
+
+double TChannel::CalEnergy(double charge, double timestamp) const {
+  return Calibrate(charge-pedestal, GetEnergyCoeff(timestamp));
+}
+
+const std::vector<double>& TChannel::GetTimeCoeff(double timestamp) const {
+  for(auto& tc : time_coeff) {
+    if(timestamp >= tc.start_time) {
+      return tc.coefficients;
+    }
+  }
+  // Should never reach here, but just in case.
+  return empty_vec;
+}
+
+void TChannel::ClearTimeCoeff() {
+  time_coeff.clear();
+  time_coeff.push_back({std::vector<double>(), -DBL_MAX});
+}
+
+void TChannel::SetTimeCoeff(std::vector<double> coeff, double timestamp) {
+  std::vector<double>* found = NULL;
+  for(auto& tc : time_coeff) {
+    if(tc.start_time == timestamp){
+      found = &tc.coefficients;
+    }
+  }
+
+  if(found){
+    *found = std::move(coeff);
+  } else {
+    time_coeff.push_back({std::move(coeff), timestamp});
+    std::sort(time_coeff.begin(), time_coeff.end());
+  }
+}
+
+
+double TChannel::CalTime(int time, double timestamp) const {
+  return Calibrate(time, GetTimeCoeff(timestamp));
+}
+
+double TChannel::CalTime(double time, double timestamp) const {
+  return Calibrate(time, GetTimeCoeff(timestamp));
+}
+
+void TChannel::ClearEfficiencyCoeff() {
+  efficiency_coeff.clear();
+}
+
+double TChannel::Calibrate(int value, const std::vector<double>& coeff) {
+  if(value==0){
+    return 0;
+  }
+
+  double dvalue = value + gRandom->Uniform();
+  return Calibrate(dvalue, coeff);
+}
+
+double TChannel::Calibrate(double value, const std::vector<double>& coeff) {
+  if(coeff.size() == 0){
+    return value;
+  }
+
+  // Evaluate the polynomial using Horner's Method
+  double cal_value = 0;
+  for(int i=coeff.size()-1; i>=0; i--){
+    cal_value *= value;
+    cal_value += coeff[i];
+  }
+  return cal_value;
+}
 
 int TChannel::ReadCalFile(const char* filename,Option_t *opt) {
   std::string infilename = filename;
@@ -372,15 +471,17 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
     }
     if(line.length()==0)
       continue;
+
     size_t openbrace  = line.find("{");
     size_t closebrace = line.find("}");
     size_t colon      = line.find(":");
 
     //=============================================//
     if(openbrace  == std::string::npos &&
-      closebrace == std::string::npos &&
-      colon      == std::string::npos)
+       closebrace == std::string::npos &&
+       colon      == std::string::npos) {
       continue;
+    }
     //=============================================//
     if(closebrace != std::string::npos) {
       brace_open = false;
@@ -408,60 +509,98 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
     //=============================================//
     if(brace_open) {
       if(colon != std::string::npos) {
+        // Type is everything up to the colon
         std::string type = line.substr(0,colon);
+        trim(&type);
+        for(unsigned int i=0; i<type.length(); i++){
+          type[i] = toupper(type[i]);
+        }
+
+        // The payload is everything after the colon
         line = line.substr(colon+1,line.length());
         trim(&line);
         std::istringstream ss(line);
-        int j=0;
-        while(type[j]) {
-           char  c = *(type.c_str()+j);
-           c = toupper(c);
-           type[j++] = c;
-        }
-        if(type.compare("NAME")==0) {
+
+        if(type == "NAME") {
           channel->SetName(line.c_str());
-        } else if(type.compare("ADDRESS")==0) {
+
+        } else if(type == "ADDRESS") {
           unsigned int add = 0; ss >> add;
           if(add==0) {
-            std::stringstream newss;
-            newss << std::hex << line;
+            std::stringstream newss(line);
+            newss << std::hex;
             newss >> add;
           }
           channel->SetAddress(add);
-        } else if(type.compare("NUMBER")==0) {
-          int num; ss>>num;
+
+        } else if(type == "NUMBER") {
+          int num = 0; ss >> num;
           channel->SetNumber(num);
-        } else if(type.compare("INFO")==0) {
+
+        } else if(type == "INFO") {
           channel->SetInfo(line.c_str());
-        } else if((type.compare("ENERGYCOEFF")==0) ||
-                  (type.compare("ENGCOEFF")==0)) {
-          channel->DestroyEnergyCoeff();
-          std::string text;
-          while(ss >> text) {
-            channel->AddEnergyCoeff(std::atof(text.c_str()));
-          }
-        } else if((type.compare("TIMECOEFF")==0)) {
-          channel->DestroyTimeCoeff();
-          std::string text;
-          while(ss >> text) {
-            channel->AddTimeCoeff(std::atof(text.c_str()));
-          } 
-        } else if((type.compare("EFFICIENCEYCOEFF")==0) ||
-                  (type.compare("EFFCOEFF")==0)) {
-          channel->DestroyEfficiencyCoeff();
-          std::string text;
-          while(ss >> text) {
-            channel->AddEfficiencyCoeff(std::atof(text.c_str()));
-          }
+
+        } else if(type.find("ENERGYCOEFF")==0 ||
+                  type.find("ENGCOEFF")==0) {
+          channel->SetEnergyCoeff(ParseListOfDoubles(ss),
+                                  ParseStartTime(type));
+
+        } else if(type == "PEDESTAL") {
+          int val = 0; ss >> val;
+          channel->SetPedestal(val);
+
+        } else if(type.find("TIMECOEFF")==0) {
+          channel->SetTimeCoeff(ParseListOfDoubles(ss),
+                                ParseStartTime(type));
+
+        } else if((type == "EFFICIENCEYCOEFF") ||
+                  (type == "EFFCOEFF")) {
+          channel->efficiency_coeff = ParseListOfDoubles(ss);
+
+        } else if(type == "SYSTEM") {
+          channel->system = line;
+
+        } else if(type == "POSITION") {
+          ss >> channel->array_position;
+
+        } else if(type == "SUBPOSITION") {
+          channel->array_subposition = line;
+
+        } else if(type == "COLLECTED_CHARGE") {
+          channel->collected_charge = line;
+
+        } else if(type == "SEGMENT") {
+          ss >> channel->segment;
         }
       }
     }
   }
+
   if(!strcmp(opt,"debug"))
      printf("parsed %i lines,\n",linenumber);
+
   return newchannels;
 }
 
+std::vector<double> TChannel::ParseListOfDoubles(std::istream& ss) {
+  std::vector<double> output;
+  std::string text;
+  while(ss >> text) {
+    output.push_back(std::atof(text.c_str()));
+  }
+  return output;
+}
+
+double TChannel::ParseStartTime(const std::string& type) {
+  size_t open_bracket = type.find("[");
+  size_t close_bracket = type.find("]");
+  if(open_bracket == std::string::npos ||
+     close_bracket == std::string::npos) {
+    return -DBL_MAX;
+  }
+
+  return std::atof(type.c_str() + open_bracket + 1);
+}
 
 void TChannel::Streamer(TBuffer &R__b) {
   this->SetBit(kCanDelete);
@@ -472,7 +611,7 @@ void TChannel::Streamer(TBuffer &R__b) {
      TNamed::Streamer(R__b);
      if(R__v>1) { }
      { TString R__str; R__str.Streamer(R__b); fChannelData.assign(R__str.Data()); }
-     ParseInputData(fChannelData,"debug");
+     ParseInputData(fChannelData);
      R__b.CheckByteCount(R__s,R__c,TChannel::IsA());
   } else {
      R__c = R__b.WriteVersion(TChannel::IsA(),true);
@@ -483,7 +622,7 @@ void TChannel::Streamer(TBuffer &R__b) {
   }
 }
 
-void TChannel::MNEMONIC::Unpack(std::string name) {
+void TChannel::UnpackMnemonic(std::string name) {
   if(name.length()<9) {
     return;
   }
@@ -493,17 +632,8 @@ void TChannel::MNEMONIC::Unpack(std::string name) {
 
   buf.clear(); buf.assign(name,3,2);
   array_position = (uint16_t)atoi(buf.c_str());
-  arraysubposition.assign(name,5,1);
-  collectedcharge.assign(name,6,1);
+  array_subposition.assign(name,5,1);
+  collected_charge.assign(name,6,1);
   buf.clear(); buf.assign(name,7,2);
   segment = (uint16_t)atoi(buf.c_str());
-  return;
-}
-
-void TChannel::MNEMONIC::Clear(Option_t* opt){
-  array_position = -1;
-  segment = -1;
-  system = "";
-  arraysubposition = "";
-  collectedcharge = "";
 }

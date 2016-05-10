@@ -1,15 +1,28 @@
 #ifndef _TCHANNEL__H_
 #define _TCHANNEL__H_
 
+#include <cfloat>
+#include <iostream>
+#include <string>
+#include <map>
 
-#include<string>
-#include<map>
-
-#include<TNamed.h>
-#include<TList.h>
+#include <TNamed.h>
+#include <TList.h>
 
 class TChannel : public TNamed {
 public:
+  static bool AlphaSort(const TChannel&,const TChannel&);
+  static TChannel* GetChannel(unsigned int);
+  static TChannel* Get(unsigned int=0xffffffff);
+  static TChannel* FindChannel(std::string);
+  static bool AddChannel(TChannel*,Option_t *opt="");
+  static bool RemoveChannel(TChannel&);
+  static int DeleteAllChannels();
+  static int Size() { return fChannelMap.size(); }
+  static int ReadCalFile(const char* filename="",Option_t *opt="replace");
+  static int WriteCalFile(std::string filename="",Option_t *opt="");
+
+
   TChannel();
   TChannel(const char*);
   TChannel(const char*,unsigned int);
@@ -21,106 +34,102 @@ public:
   std::string PrintToString(Option_t *opt="") const;
   void Copy(TObject&)       const;
   void Clear(Option_t *opt ="");
-  //int  Compare(const TObject*) const;
-  static bool AlphaSort(const TChannel&,const TChannel&);
 
-private:
+
+  unsigned int GetAddress() const          { return address; }
+  const char*  GetName() const             { return TNamed::GetName(); }
+  const char*  GetInfo() const             { return info.c_str(); }
+  int          GetNumber() const           { return number; }
+  int          GetArrayPosition() const    { return array_position; }
+  int          GetSegment() const          { return segment; }
+  const char*  GetSystem() const           { return system.c_str(); }
+  const char*  GetArraySubposition() const { return array_subposition.c_str(); }
+  const char*  GetCollectedCharge() const  { return collected_charge.c_str(); }
+  double       GetPedestal() const         { return pedestal; }
+
+
+  void SetAddress(unsigned int temp) { address = temp; }
+  void SetName(const char *temp)     {
+    TNamed::SetNameTitle(temp,temp);
+    UnpackMnemonic(temp);
+  }
+  void SetInfo(const char *temp) { info.assign(temp); }
+  void SetNumber(int temp) { number = temp; }
+  void SetPedestal(int value) { pedestal = value; }
+
+  void ClearCalibrations();
+
+  void SetEnergyCoeff(std::vector<double> coeff, double timestamp=-DBL_MAX);
+  const std::vector<double>& GetEnergyCoeff(double timestamp=-DBL_MAX) const;
+  void ClearEnergyCoeff();
+  double CalEnergy(int charge, double timestamp=-DBL_MAX) const;
+  double CalEnergy(double charge, double timestamp=-DBL_MAX) const;
+
+  void SetTimeCoeff(std::vector<double> tmp, double timestamp=-DBL_MAX);
+  const std::vector<double>& GetTimeCoeff(double timestamp=-DBL_MAX) const;
+  void ClearTimeCoeff();
+  double CalTime(int tdc, double timestamp=-DBL_MAX) const;
+  double CalTime(double tdc, double timestamp=-DBL_MAX) const;
+
+  void SetEfficiencyCoeff(std::vector<double> tmp) { efficiency_coeff = tmp; }
+  std::vector<double> GetEfficiencyCoeff() const { return efficiency_coeff; }
+  void AddEfficiencyCoeff(double tmp) { efficiency_coeff.push_back(tmp); }
+  void ClearEfficiencyCoeff();
+
+
+  bool AppendChannel(TChannel*);
+  bool ReplaceChannel(TChannel*);
+
+  friend std::ostream& operator<<(std::ostream& out, const TChannel& chan);
+
+//private:
+public:
+  static int  ParseInputData(std::string &input,Option_t *opt="");
+  static int  WriteToBuffer(Option_t *opt="");
+  static void trim(std::string *, const std::string &trimChars=" \f\n\r\t\v");
+  static std::vector<double> ParseListOfDoubles(std::istream& ss);
+
+  static double Calibrate(int value, const std::vector<double>& coeff);
+  static double Calibrate(double value, const std::vector<double>& coeff);
+  static double ParseStartTime(const std::string& type);
+
+  static std::vector<double> empty_vec; //!
+
   unsigned int address;
   int          number;
   std::string  info;
-  std::vector<double> energy_coeff;
-  std::vector<double> time_coeff;
+
+  std::string system;
+  int array_position;
+  std::string array_subposition;
+  std::string collected_charge;
+  int segment;
+
+  // For backwards compatibility, unpack the name
+  //  into the system/array_position/arraysubposition/collectedcharge/segment.
+  void UnpackMnemonic(std::string name);
+
+  struct CoefficientTimes {
+    std::vector<double> coefficients;
+    double start_time;
+
+    bool operator<(const CoefficientTimes& other) const {
+      return start_time > other.start_time;
+    }
+  };
+
+  std::vector<CoefficientTimes> energy_coeff;
+  std::vector<CoefficientTimes> time_coeff;
   std::vector<double> efficiency_coeff;
+  int pedestal;
   //name and title held by TNamed.
 
   //static std::vector<std::string> fFileNames;
   static std::string fChannelData;
-
-public:
-  void SetEnergyCoeff(std::vector<double> tmp)    { energy_coeff    = tmp; }
-  void SetTimeCoeff(std::vector<double> tmp)    { time_coeff    = tmp; }
-  void SetEfficiencyCoeff(std::vector<double> tmp) { efficiency_coeff = tmp; }
-
-
-private:
   static std::map<unsigned int,TChannel*> fChannelMap;
-  struct MNEMONIC {
-    std::string system;
-    int array_position;
-    std::string arraysubposition;
-    std::string collectedcharge;
-    int segment;
-
-    void Unpack(std::string name);
-    void Clear(Option_t* opt = "");
-  };
-  MNEMONIC fMnemonic;
-
-public:
-  static TChannel* GetChannel(unsigned int);
-  static TChannel* Get(unsigned int=0xffffffff);
-  static TChannel* FindChannel(std::string);
-  static bool      AddChannel(TChannel*,Option_t *opt="");
-  static bool      RemoveChannel(TChannel&);
-  bool      AppendChannel(TChannel*);
-  bool      ReplaceChannel(TChannel*);
-
-  static int       DeleteAllChannels();
-  static int       Size() { return fChannelMap.size(); }
-
-
   static TChannel *fDefaultChannel;
 
-public:
-  void SetAddress(unsigned int temp) { address = temp;           }
-  void SetName(const char *temp)     {
-    TNamed::SetNameTitle(temp,temp);
-    fMnemonic.Unpack(temp);
-  }
-  void SetInfo(const char *temp)     { info.assign(temp); }
-  void SetNumber(int temp)           { number = temp;           }
-
-  unsigned int GetAddress() const { return address;           }
-  const char*  GetName()    const { return TNamed::GetName(); }
-  const char*  GetInfo()    const { return info.c_str();      }
-  int          GetNumber()  const { return number;            }
-  int GetArrayPosition() const { return fMnemonic.array_position; }
-  int GetSegment() const { return fMnemonic.segment; }
-  const char* GetSystem() const { return fMnemonic.system.c_str(); }
-  const char* GetArraySubposition() const { return fMnemonic.arraysubposition.c_str(); }
-  const char* GetCollectedCharge() const { return fMnemonic.collectedcharge.c_str(); }
-
-  std::vector<double> GetEnergyCoeff()    const { return energy_coeff; }
-  void                AddEnergyCoeff(double  tmp)    { energy_coeff.push_back(tmp); }
-  std::vector<double> GetTimeCoeff()    const { return time_coeff; }
-  void                AddTimeCoeff(double  tmp)    { time_coeff.push_back(tmp); }
-  std::vector<double> GetEfficiencyCoeff() const { return efficiency_coeff; }
-  void                AddEfficiencyCoeff(double  tmp) { efficiency_coeff.push_back(tmp); }
-
-  void DestroyEnergyCoeff()    { energy_coeff.clear(); }
-  void DestroyTimeCoeff()    { time_coeff.clear(); }
-  void DestroyEfficiencyCoeff() { efficiency_coeff.clear(); }
-
-  void DestroyCalibrations();
-
-  double CalEnergy(int);
-  double CalEnergy(double);
-  double CalTime(int);
-  double CalTime(double);
-
-  //double CalEfficiency(int);
-  //double CalEfficiency(double) const;
-
-public:
-  static int ReadCalFile(const char* filename="",Option_t *opt="replace");
-  static int WriteCalFile(std::string filename="",Option_t *opt="");
-
-private:
-  static int  ParseInputData(std::string &input,Option_t *opt="");
-  static int  WriteToBuffer(Option_t *opt="");
-  static void trim(std::string *, const std::string &trimChars=" \f\n\r\t\v");
-
-  ClassDef(TChannel,1);
+  ClassDef(TChannel,2);
 };
 
 #endif

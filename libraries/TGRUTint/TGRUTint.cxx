@@ -32,6 +32,7 @@
 #include "TOrderedRawFile.h"
 #include "TRawSource.h"
 #include "TMultiRawFile.h"
+#include "TSequentialRawFile.h"
 
 #include "GrutNotifier.h"
 #include "TGRUTUtilities.h"
@@ -43,6 +44,8 @@
 #include "TWriteLoop.h"
 #include "TChainLoop.h"
 #include "THistogramLoop.h"
+
+#include "TInverseMap.h"
 
 //extern "C" G__value G__getitem(const char* item);
 //#include "FastAllocString.h"
@@ -71,7 +74,8 @@ TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions
 
 TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t noLogo,const char *appClassName)
   :TRint(appClassName, &argc, argv, options, numOptions,noLogo),
-   main_thread_id(std::this_thread::get_id()), fIsTabComplete(false){
+   main_thread_id(std::this_thread::get_id()), fIsTabComplete(false),
+   fAllowedToTerminate(true) {
 
   fGRUTEnv = gEnv;
   GetSignalHandler()->Remove();
@@ -164,15 +168,22 @@ void TGRUTint::ApplyOptions() {
 
   TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
 
+  if(opt->S800InverseMapFile().length()) {
+    //TS800::ReadInverseMap(opt->S800InverseMapFile().c_str());
+    TInverseMap::Get(opt->S800InverseMapFile().c_str());
+  }
 
-  //next, if given a root file and NOT told to sort it..
-  if(opt->RootInputFiles().size()){
-    for(unsigned int x=0;x<opt->RootInputFiles().size();x++) {
-      OpenRootFile(opt->RootInputFiles().at(x));
-      // this we creat and populate gChain if able.
-      //   TChannels from the root file will be loaded as file is opened.
-      //   GValues from the root file will be loaded as file is opened.
-    }
+  std::vector<TFile*> cuts_files;
+  for(auto filename : opt->CutsInputFiles()) {
+    TFile* tfile = OpenRootFile(filename);
+    cuts_files.push_back(tfile);
+  }
+
+  for(auto filename : opt->RootInputFiles()) {
+    OpenRootFile(filename);
+    // this will populate gChain if able.
+    //   TChannels from the root file will be loaded as file is opened.
+    //   GValues from the root file will be loaded as file is opened.
   }
 
   //if I am passed any calibrations, lets load those, this
@@ -193,28 +204,49 @@ void TGRUTint::ApplyOptions() {
     StartGUI();
   }
 
+  bool missing_file = false;
+  for(auto& filename : opt->RawInputFiles()) {
+    if(!file_exists(filename.c_str())) {
+      missing_file = true;
+      std::cerr << "File not found: " << filename << std::endl;
+    }
+  }
+
   //next most important thing, if given a raw file && NOT told to not sort!
   if((opt->InputRing().length() || opt->RawInputFiles().size())
-     && opt->SortRaw()) {
+     && !missing_file && opt->SortRaw()) {
 
-    // Open a ring, multiple files, or a single file, as requested.
     TRawEventSource* source = NULL;
     if(opt->InputRing().length()) {
+      // Open a source from a ring.
       source = new TRawEventRingSource(opt->InputRing(),
                                        opt->DefaultFileType());
+
     } else if(opt->RawInputFiles().size() > 1 && opt->SortMultiple()){
+      // Open multiple files, read from all at the same time.
       TMultiRawFile* multi_source = new TMultiRawFile();
       for(auto& filename : opt->RawInputFiles()){
         multi_source->AddFile(new TRawFileIn(filename.c_str()));
       }
       source = multi_source;
+
+    } else if(opt->RawInputFiles().size() > 1 && !opt->SortMultiple()){
+      // Open multiple files, read from each one at a a time.
+      TSequentialRawFile* seq_source = new TSequentialRawFile();
+      for(auto& filename : opt->RawInputFiles()){
+        seq_source->Add(new TRawFileIn(filename.c_str()));
+      }
+      source = seq_source;
+
     } else {
+      // Open a single file.
       std::string filename = opt->RawInputFiles().at(0);
-      source = new TRawFileIn(filename.c_str());
+      if(file_exists(filename.c_str())){
+        source = new TRawFileIn(filename.c_str());
+      }
     }
 
     if(opt->TimeSortInput()){
-      std::cout << "\n\nI am time sorted\n\n" << std::endl;
       TOrderedRawFile* ordered_source = new TOrderedRawFile(source);
       ordered_source->SetDepth(opt->TimeSortDepth());
       source = ordered_source;
@@ -264,9 +296,13 @@ void TGRUTint::ApplyOptions() {
     woop->Connect(uoop1);
     //woop->Connect(uoop2);
 
-    if(TGRUTOptions::Get()->MakeHistos()){
+    if(opt->MakeHistos()){
       fHistogramLoop = THistogramLoop::Get("5_hist_loop");
       fHistogramLoop->SetOutputFilename(histoutfile);
+      for(auto cut_file : cuts_files) {
+        fHistogramLoop->AddCutFile(cut_file);
+      }
+
       woop->AttachHistogramLoop(fHistogramLoop);
       fHistogramLoop->Resume();
     }
@@ -281,7 +317,7 @@ void TGRUTint::ApplyOptions() {
 
   //next, if given a root file and told to sort it.
   //TChainLoop* coop = NULL;
-  if(gChain && (opt->MakeHistos() || opt->SortRoot()) ){
+  if(gChain->GetListOfBranches() &&  (opt->MakeHistos() || opt->SortRoot()) ){
     printf("Attempting to sort root files.\n");
     fChainLoop = TChainLoop::Get("1_chain_loop",gChain);
     if(!opt->ExitAfterSorting()){
@@ -302,6 +338,9 @@ void TGRUTint::ApplyOptions() {
       }
     }
     fHistogramLoop->SetOutputFilename(histoutfile);
+    for(auto cut_file : cuts_files) {
+      fHistogramLoop->AddCutFile(cut_file);
+    }
     fChainLoop->AttachHistogramLoop(fHistogramLoop);
     fHistogramLoop->Resume();
     fChainLoop->Resume();
@@ -314,18 +353,20 @@ void TGRUTint::ApplyOptions() {
   if(opt->ExitAfterSorting()){
     while(StoppableThread::AnyThreadRunning()){
       std::this_thread::sleep_for(std::chrono::seconds(1));
+
+      // We need to process events in case a different thread is asking for a file to be opened.
+      // However, if there is no stdin, ProcessEvents() will call Terminate().
+      // This prevents the terminate from taking effect while in this context.
+      fAllowedToTerminate = false;
       gSystem->ProcessEvents();
+      fAllowedToTerminate = true;
+
       std::cout << "\r" << StoppableThread::AnyThreadStatus() << std::flush;
-      // if(fDataLoop) {
-      //   std::cout << "\r" << fDataLoop->Status() << std::flush;
-      // }
-      // if(coop){
-      //   std::cout << "\r" << coop->Status() << std::flush;
-      // }
     }
     std::cout << std::endl;
 
-    this->Terminate();
+    int exit_status = missing_file ? 1 : 0;
+    this->Terminate(exit_status);
   }
 }
 
@@ -370,10 +411,11 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
 
       // If EventTree exists, add the file to the chain.
       if(file->FindObjectAny("EventTree")) {
-        if(!gChain) {
-          gChain = new TChain("EventTree");
-          gChain->SetNotify(GrutNotifier::Get());
+        if(!gChain) { // Should never go in here!!
+	  gChain = new TChain("EventTree");
+	  gChain->SetNotify(GrutNotifier::Get());
         }
+        printf("file %s added to gChain.\n",file->GetName());
         gChain->Add(file->GetName());
       }
 
@@ -397,7 +439,7 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
   }
 
   // Pass the TFile to the python GUI.
-  if(file && TGRUTOptions::Get()->StartGUI()){
+  if(file && GUIIsRunning()){
     TPython::Bind(file,"tdir");
     ProcessLine("TPython::Exec(\"window.AddDirectory(tdir)\");");
   }
@@ -405,7 +447,7 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
 }
 
 void TGRUTint::LoadTCutG(TCutG* cutg) {
-  if(TGRUTOptions::Get()->StartGUI()) {
+  if(GUIIsRunning()) {
     TPython::Bind(cutg, "cutg");
     ProcessLine("TPython::Exec(\"window.LoadCutG(cutg)\");");
   }
@@ -507,6 +549,13 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   if(!sline.CompareTo("clear")) {
     long result = TRint::ProcessLine(".! clear");
     return result;
+  } else if(!sline.CompareTo("xterm")) {
+    long result = TRint::ProcessLine(".! xterm &");
+    return result;
+  } else if(sline.BeginsWith("vim ")) {
+    sline.ReplaceAll("vim ",".! vim ");
+  } else if(sline.BeginsWith("emacs ")) {
+    sline.ReplaceAll("emacs ",".! emacs -nw ");
   }
 
   long result =  TRint::ProcessLine(sline.Data(),sync,error);
@@ -516,9 +565,12 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
 
 
 void TGRUTint::Terminate(Int_t status){
+  if(!fAllowedToTerminate){
+    return;
+  }
   StoppableThread::StopAllClean();
 
-  //if(TGRUTOptions::Get()->StartGUI()){
+  //if(GUIIsRunning()){
   //  TPython::Exec("on_close()");
   //}
 

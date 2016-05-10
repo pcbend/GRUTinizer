@@ -7,6 +7,7 @@
 #include <TString.h>
 
 #include "TDataLoop.h"
+#include "TChainLoop.h"
 
 std::map<std::string,StoppableThread*> StoppableThread::fthreadmap;
 bool StoppableThread::status_thread_on = false;
@@ -20,12 +21,9 @@ StoppableThread::StoppableThread(std::string name)
   //TODO: check if a thread already exists and delete?
   fthreadmap.insert(std::make_pair(fname,this));
   thread = std::thread(&StoppableThread::Loop, this);
-  if(!status_thread_on)
+  if(!status_thread_on) {
     start_status_thread();
-  //items_in  = 0;
-  //items_out = 0;
-  //rate      = 0;
-
+  }
 }
 
 
@@ -97,10 +95,11 @@ std::string StoppableThread::Status() {
 void StoppableThread::StopAllClean() {
   std::cout << "Stopping each TDataLoop" << std::endl;
   for(auto& elem : fthreadmap){
-    TDataLoop* thread = dynamic_cast<TDataLoop*>(elem.second);
-    if(thread){
+    TDataLoop* data_loop = dynamic_cast<TDataLoop*>(elem.second);
+    TChainLoop* chain_loop = dynamic_cast<TChainLoop*>(elem.second);
+    if(data_loop || chain_loop){
       std::cout << "Stopping thread " << elem.first << std::endl;
-      thread->Stop();
+      elem.second->Stop();
     }
   }
 
@@ -187,6 +186,8 @@ void StoppableThread::Loop() {
       break;
     }
   }
+
+  OnEnd();
 }
 
 void StoppableThread::Print() {

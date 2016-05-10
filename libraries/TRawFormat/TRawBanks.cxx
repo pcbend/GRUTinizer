@@ -1,5 +1,7 @@
 #include "TRawEvent.h"
 
+#include <ctime>
+
 std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBInteractionPoint &fSeg) {
    std::streamsize ss = std::cout.precision();
    return os << "HPGeSegment[" << std::setw(3) << fSeg.seg << "]\t("
@@ -52,7 +54,7 @@ std::ostream& operator<<(std::ostream& os, const TRawEvent::G4SimPacket &packet)
   os << " Type : " << std::hex << packet.head.GetType() << std::endl;
   os << " Num  : " << packet.head.GetNum() << std::endl;
   os << " Full : " << packet.head.GetFull() << std::endl;
-  
+
   for(int i = 0; i< packet.head.GetNum(); i++){
       os << " --- Gamma Summary ---" << std::endl;
       os << " > Gamma En   : " << packet.data[i].GetEn() << std::endl;
@@ -237,5 +239,16 @@ std::ostream& operator<<(std::ostream& os, const TRawEvent::TNSCLFragmentHeader&
             << "\tSource ID: " << head.sourceid << "\n"
             << "\tPayload Size: " << head.payload_size << "\n"
             << "\tBarrier: " << head.barrier << "\n"
+            << std::flush;
+}
+
+std::ostream& operator<<(std::ostream& os, const TRawEvent::TNSCLBeginRun& begin) {
+  time_t time = begin.unix_time;
+  return os << "Begin of run " << begin.run_number << "\n"
+            << "\tTime Offset: " << begin.time_offset << "\n"
+            << "\tStart time: " << begin.unix_time << "\n"
+            << "\tStart time: " << std::hex << "0x" << begin.unix_time << std::dec << "\n"
+            << "\tStart time: " << std::ctime(&time) << "\n"
+            << "\tTitle: " << begin.title << "\n"
             << std::flush;
 }

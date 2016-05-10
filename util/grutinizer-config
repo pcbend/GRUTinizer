@@ -48,7 +48,7 @@ libdir=$GRUTSYS/libraries
 incdir=$GRUTSYS/include
 #utildir=$GRUTSYS/etc
 
-grutlibs="-lTGRUTUtil -lTRawFormat -lGROOT -lTNSCLFormat -lTGEBFormat -lTGRUTUtil -lTNucleus"
+grutlibs="-lTGRUTUtil -lTRawFormat -lGROOT -lTNSCLFormat -lTGEBFormat -lTGRUTUtil -lTNucleus -lTKinematics -lTReaction -lTSRIM"
 detlibs="-lTSega -lTDetector  -lTGretina -lTJanus -lTPhosWall -lTS800 -lTFastScint -lTCaesar -lTS800Sim -lTGretSim"
 grutmore="-lTGRUTint -lTLoops -lTHistogramming "
 
@@ -57,7 +57,7 @@ cflags="-std=c++0x -I$incdir"
 
 
 usage="\
-Usage: grut-config [--version] [--cflags] [--libs] [--all-libs] [--help]"
+Usage: grut-config [--version] [--cflags] [--libs] [--all-libs] [--libdir] [--root] [--help]"
 
 if test $# -eq 0; then
   echo "${usage}" 1>&2
@@ -126,6 +126,14 @@ while test $# -gt 0; do
       fi
       rootout="yes"
       out="$out `root-config --cflags --glibs` -lPhysics -lSpectrum -lPyROOT"
+      ;;
+    --libdir)
+        if test "x$libdirout" = "xyes" ; then
+            shift
+            continue
+        fi
+        libdirout="yes"
+        out="$out $libdir "
       ;;
     --help)
       ### Print a helpful message...

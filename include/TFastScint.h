@@ -15,12 +15,15 @@ public:
 
   void Copy(TObject& obj) const;
 
+  virtual void Print(Option_t* opt = "") const;
   virtual void Clear(Option_t* opt = "");
 
   virtual void InsertHit(const TDetectorHit&);
-  virtual TFastScintHit*    GetLaBrHit(int i);
+  virtual TFastScintHit GetLaBrHit(int i) const;
   virtual TDetectorHit& GetHit(int i);
-  virtual int Size();
+          TFastScintHit* FindHit(int);
+  virtual int Size() const;
+  virtual int GoodSize() const;
 
   int GetDetNumberIn_fs_hits(Int_t det);
   
@@ -41,7 +44,7 @@ public:
   int GetTrigTime()	      { return trig_time; }
 
 private:
-  virtual int  BuildHits();
+  virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 
   int Build_From(TNSCLEvent &event,bool Zero_Suppress = false);
 

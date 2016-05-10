@@ -188,21 +188,41 @@ Int_t TSegaHit::Charge() const {
   }
 }
 
-double TSegaHit::GetDCEnergy(double beta, TVector3 particle_dir) const {
-  TVector3 pos = GetPosition();
-  double dc_angle = pos.Angle(particle_dir);
-  double cos_angle = std::cos(dc_angle);
-  double gamma = 1/std::sqrt(1.0 - beta*beta);
-  double dc_en = gamma * (1 - beta*cos_angle) * GetEnergy();
+double TSegaHit::GetDoppler(double beta,const TVector3& particle_vec, const TVector3& sega_offset) const {
+  if(GetNumSegments()<1) {
+    return std::sqrt(-1);
+  }
 
+  double gamma = 1/(sqrt(1-pow(beta,2)));
+  TVector3 pos = GetPosition() + sega_offset;
+  double cos_angle = TMath::Cos(pos.Angle(particle_vec));
+  double dc_en = GetEnergy()*gamma *(1 - beta*cos_angle);
   return dc_en;
 }
 
-double TSegaHit::GetDoppler(double beta,const TVector3& vec) {
-  if(GetNumSegments()<1)
+double TSegaHit::GetTraceHeight() const {
+  if(fTrace.size() < 20){
     return std::sqrt(-1);
+  }
+
+  double low = 0;
+  double high = 0;
+  for(unsigned int i=0; i<10; i++){
+    low += fTrace[i];
+    high += fTrace[fTrace.size()-i-1];
+  }
+
+  return (high-low)/10;
+}
+
+double TSegaHit::GetTraceHeightDoppler(double beta,const TVector3& vec) const {
+  if(GetNumSegments()<1) {
+    return std::sqrt(-1);
+  }
 
   double gamma = 1/(sqrt(1-pow(beta,2)));
-  double tmp = GetEnergy()*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(vec)));
-  return tmp;
+  TVector3 pos = GetPosition();
+  double cos_angle = TMath::Cos(pos.Angle(vec));
+  double dc_en = GetTraceHeight()*gamma *(1 - beta*cos_angle);
+  return dc_en;
 }

@@ -30,6 +30,15 @@ void TFastScintHit::Clear(Option_t* opt) {
   //fTime    = -1;
   //fEnergy  = -1;
 }
+
+void TFastScintHit::Print(Option_t *opt) const {
+  printf("LaBrHit[%i]:   chg[%04i] -> %.02f  |  time[%04i] -> %.02f \n",
+          fChannel,Charge(),GetEnergy(),GetTime(),GetTime());
+}
+
+
+
+
 /*
 
 void TFastScintHit::SetEnergy(){

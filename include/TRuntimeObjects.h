@@ -12,6 +12,8 @@
 
 class TH1;
 class TH2;
+class TFile;
+class TProfile;
 
 /// Object passed to the online histograms.
 /**
@@ -23,13 +25,13 @@ public:
   /// Constructor
   TRuntimeObjects(TUnpackedEvent *detectors,
                   TList* objects,
-                  TList* variables,
                   TList* gates,
+                  std::vector<TFile*>& cut_files,
                   TDirectory* directory=NULL,
                   const char *name="default");
   TRuntimeObjects(TList* objects,
-                  TList* variables,
                   TList* gates,
+                  std::vector<TFile*>& cut_files,
                   TDirectory* directory=NULL,
                   const char *name="default");
 
@@ -43,32 +45,92 @@ public:
 
   TList& GetObjects();
   TList& GetGates();
-  TList& GetVariables();
 
   TList* GetObjectsPtr()    { return objects;   }
   TList* GetGatesPtr()      { return gates;     }
-  TList* GetVariablesPtr()  { return variables; }
 
 
-  TH1* FillHistogram(std::string name,
+  TH1* FillHistogram(const char* name,
                      int bins, double low, double high, double value);
-  TH2* FillHistogram(std::string name,
+  TH2* FillHistogram(const char* name,
                      int Xbins, double Xlow, double Xhigh, double Xvalue,
                      int Ybins, double Ylow, double Yhigh, double Yvalue);
-  TH2* FillHistogramSym(std::string name,
+  TProfile* FillProfileHist(const char* name,
+			    int Xbins, double Xlow, double Xhigh, double Xvalue,
+			    double Yvalue);
+  TH2* FillHistogramSym(const char* name,
+			int Xbins, double Xlow, double Xhigh, double Xvalue,
+			int Ybins, double Ylow, double Yhigh, double Yvalue);
+
+
+  TH1* FillHistogram(const std::string& name,
+                     int bins, double low, double high, double value){
+    return FillHistogram(name.c_str(),
+                         bins, low, high, value);
+  }
+  TH2* FillHistogram(const std::string& name,
                      int Xbins, double Xlow, double Xhigh, double Xvalue,
-                     int Ybins, double Ylow, double Yhigh, double Yvalue);
+                     int Ybins, double Ylow, double Yhigh, double Yvalue) {
+    return FillHistogram(name.c_str(),
+                         Xbins, Xlow, Xhigh, Xvalue,
+                         Ybins, Ylow, Yhigh, Yvalue);
+  }
+  TProfile* FillProfileHist(const std::string& name,
+			    int Xbins, double Xlow, double Xhigh, double Xvalue,
+			    double Yvalue) {
+    return FillProfileHist(name.c_str(),
+			   Xbins, Xlow, Xhigh, Xvalue,
+			   Yvalue);
+  }
+  TH2* FillHistogramSym(const std::string& name,
+                        int Xbins, double Xlow, double Xhigh, double Xvalue,
+                        int Ybins, double Ylow, double Yhigh, double Yvalue) {
+    return FillHistogramSym(name.c_str(),
+                            Xbins, Xlow, Xhigh, Xvalue,
+                            Ybins, Ylow, Yhigh, Yvalue);
+  }
   //---------------------------------------------------------------------
-  TDirectory* FillHistogram(std::string dirname,std::string name,
+  TDirectory* FillHistogram(const char* dirname,const char* name,
 		     int bins, double low, double high, double value);
-  TDirectory* FillHistogram(std::string dirname,std::string name,
+  TDirectory* FillHistogram(const char* dirname,const char* name,
                      int Xbins, double Xlow, double Xhigh, double Xvalue,
                      int Ybins, double Ylow, double Yhigh, double Yvalue);
-  TDirectory* FillHistogramSym(std::string dirname,std::string name,
+  TDirectory* FillProfileHist(const char* dirname,const char* name,
+			      int Xbins, double Xlow, double Xhigh, double Xvalue,
+			      double Yvalue);
+  TDirectory* FillHistogramSym(const char* dirname,const char* name,
                      int Xbins, double Xlow, double Xhigh, double Xvalue,
                      int Ybins, double Ylow, double Yhigh, double Yvalue);
-  
-  
+
+
+  TDirectory* FillHistogram(const std::string& dirname,const std::string& name,
+                            int bins, double low, double high, double value) {
+    return FillHistogram(dirname.c_str(), name.c_str(),
+                         bins, low, high, value);
+  }
+  TDirectory* FillHistogram(const std::string& dirname,const std::string& name,
+                            int Xbins, double Xlow, double Xhigh, double Xvalue,
+                            int Ybins, double Ylow, double Yhigh, double Yvalue) {
+    return FillHistogram(dirname.c_str(), name.c_str(),
+                         Xbins, Xlow, Xhigh, Xvalue,
+                         Ybins, Ylow, Yhigh, Yvalue);
+  }
+  TDirectory* FillProfileHist(const std::string& dirname,const std::string& name,
+			      int Xbins, double Xlow, double Xhigh, double Xvalue,
+			      double Yvalue) {
+    return FillProfileHist(dirname.c_str(), name.c_str(),
+			   Xbins, Xlow, Xhigh, Xvalue,
+			   Yvalue);
+  }
+  TDirectory* FillHistogramSym(const std::string& dirname,const std::string& name,
+                               int Xbins, double Xlow, double Xhigh, double Xvalue,
+                               int Ybins, double Ylow, double Yhigh, double Yvalue) {
+    return FillHistogramSym(dirname.c_str(), name.c_str(),
+                            Xbins, Xlow, Xhigh, Xvalue,
+                            Ybins, Ylow, Yhigh, Yvalue);
+  }
+
+
   double GetVariable(const char* name);
 
   static TRuntimeObjects *Get(std::string name="default") { if(fRuntimeMap.count(name)) return fRuntimeMap.at(name); return 0; }
@@ -79,9 +141,11 @@ private:
   static std::map<std::string,TRuntimeObjects*> fRuntimeMap;
   TUnpackedEvent *detectors;
   TList* objects;
-  TList* variables;
   TList* gates;
+  std::vector<TFile*>& cut_files;
+
   TDirectory* directory;
+
 
 
   ClassDef(TRuntimeObjects, 0);

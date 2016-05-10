@@ -1,8 +1,10 @@
+#include "GrutNotifier.h"
 
-#include "GrutNotifier.h" 
+#include <iostream>
+
 #include "GValue.h"
-
 #include "TFile.h"
+#include "TGRUTOptions.h"
 
 GrutNotifier *GrutNotifier::fGrutNotifier = 0;
 
@@ -18,14 +20,14 @@ GrutNotifier::~GrutNotifier() { }
 
 
 bool GrutNotifier::Notify() {
-  //printf("%s I am notifing!\n",__PRETTY_FUNCTION__);
-  //if(gChain) {
-  //  printf("gChain:       0x%08x\n",gChain);
-  //  printf("current file: %s\n",gChain->GetCurrentFile()->GetName());
-  //}
+  // Loads the GValues from the current file of the chain.
+  // Does not overwrite parameters set by hand, or by a .val file.
   TFile *f = gChain->GetCurrentFile();
   f->Get("GValue");
+
+  for(auto& callback : callbacks){
+    callback();
+  }
+
   return true;
 }
-
-

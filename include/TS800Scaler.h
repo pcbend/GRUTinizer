@@ -17,8 +17,8 @@ public:
   virtual void Print(Option_t *opt) const;
   virtual void Clear(Option_t *opt);
 
-  int Size()           { return scalers.size(); }
-  int GetScaler(int i) { return scalers.at(i);  }
+  int Size()           const { return scalers.size(); }
+  int GetScaler(int i) const { return scalers.at(i);  }
 
   // These functions are needed to satisfy TDetector's requirements.
   // They have no meaning here, and should never be called.
@@ -27,7 +27,7 @@ public:
 
 private:
   std::vector<int> scalers;
-  virtual int BuildHits();
+  virtual int BuildHits(std::vector<TRawEvent>& raw_data);
 
   int interval_start;
   int interval_end;

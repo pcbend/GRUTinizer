@@ -8,9 +8,9 @@ public:
   TFastScintHit();
   TFastScintHit(const TDetectorHit&);
 
-
-  void Clear(Option_t* opt = "");
-  void Copy(TObject& obj) const;
+  virtual void Print(Option_t* opt = "") const;
+  virtual void Clear(Option_t* opt = "");
+  virtual void Copy(TObject& obj) const;
 
   //void SetCharge(int chg)    { fCharge  = chg;  }
   void SetChannel(int chan)  { fChannel = chan; }

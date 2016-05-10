@@ -93,7 +93,7 @@ GH1D* GH2Base::Projection_Background(int axis,
 GH1D* GH2Base::GH2ProjectionX(const char* name,
                               int firstbin,
                               int lastbin,
-                              Option_t* option) {
+                              Option_t* option,bool KeepEmpty) {
   std::string title;
   double xlow  = GetTH2()->GetYaxis()->GetBinLowEdge(firstbin);
   double xhigh = GetTH2()->GetYaxis()->GetBinUpEdge(lastbin);
@@ -125,9 +125,11 @@ GH1D* GH2Base::GH2ProjectionX(const char* name,
   output->SetDirectory(0);
 
   if(fIsSummary){
-    fSummaryProjections->Add(output);
+    if(KeepEmpty || output->Integral()>0)
+      fSummaryProjections->Add(output);
   } else {
-    fProjections->Add(output);
+    if(KeepEmpty || output->Integral()>0)
+      fProjections->Add(output);
   }
   return output;
 }
@@ -146,7 +148,7 @@ GH1D* GH2Base::ProjectionX_Background(int firstbin,
 GH1D* GH2Base::GH2ProjectionY(const char* name,
                        int firstbin,
                        int lastbin,
-                       Option_t* option) {
+                       Option_t* option, bool KeepEmpty) {
   std::string title;
   double ylow  = GetTH2()->GetXaxis()->GetBinLowEdge(firstbin);
   double yhigh = GetTH2()->GetXaxis()->GetBinUpEdge(lastbin);
@@ -178,9 +180,11 @@ GH1D* GH2Base::GH2ProjectionY(const char* name,
   output->SetDirectory(0);
 
   if(fIsSummary){
-    fSummaryProjections->Add(output);
+    if(KeepEmpty || output->Integral()>0)
+      fSummaryProjections->Add(output);
   } else {
-    fProjections->Add(output);
+    if(KeepEmpty || output->Integral()>0)
+      fProjections->Add(output);
   }
   return output;
 }
@@ -196,9 +200,9 @@ GH1D* GH2Base::ProjectionY_Background(int firstbin,
 }
 
 
-GH1D* GH2Base::GetPrevious(const GH1D* curr) {
+GH1D* GH2Base::GetPrevious(const GH1D* curr,bool DrawEmpty) {
   if(fIsSummary){
-    return GetPrevSummary(curr);
+    return GetPrevSummary(curr, false);
   }
 
   TObjLink* link = fProjections->FirstLink();
@@ -219,9 +223,9 @@ GH1D* GH2Base::GetPrevious(const GH1D* curr) {
   }
 }
 
-GH1D* GH2Base::GetNext(const GH1D* curr) {
+GH1D* GH2Base::GetNext(const GH1D* curr,bool DrawEmpty) {
   if(fIsSummary){
-    return GetNextSummary(curr);
+    return GetNextSummary(curr,false);
   }
 
   TObjLink* link = fProjections->FirstLink();
@@ -242,11 +246,15 @@ GH1D* GH2Base::GetNext(const GH1D* curr) {
   }
 }
 
-GH1D* GH2Base::GetNextSummary(const GH1D* curr) {
-  std::string name = curr->GetName();
-  size_t underscore_pos = name.rfind('_');
-  int binnum = std::atoi(name.c_str() + underscore_pos + 1);
-  binnum++;
+GH1D* GH2Base::GetNextSummary(const GH1D* curr,bool DrawEmpty) {
+  int binnum=1;
+  std::string name;
+  if(curr) {
+   name = curr->GetName();
+   size_t underscore_pos = name.rfind('_');
+   binnum = std::atoi(name.c_str() + underscore_pos + 1);
+   binnum++;
+  }
 
   int max_binnum;
   if(fSummaryDirection == kXDirection){
@@ -259,14 +267,61 @@ GH1D* GH2Base::GetNextSummary(const GH1D* curr) {
     binnum = 1;
   }
 
-  return SummaryProject(binnum);
+  int start_bin = binnum;
+  switch(fSummaryDirection) {
+    case kXDirection: 
+      while(true) {
+        std::string hist_name = Form("%s_%d",GetTH2()->GetName(),binnum);
+	GH1D* g = (GH1D*)fSummaryProjections->FindObject(hist_name.c_str());
+	if(g && g->Integral() > 0) {
+	  return g;
+	}
+	
+        g = GH2ProjectionY(hist_name.c_str(),binnum,binnum,"",DrawEmpty);
+        if(g && g->Integral()>0)
+          return g;
+        binnum++;
+        if(binnum==start_bin) {
+          break;
+        } else if(binnum >max_binnum) {
+          binnum=1;
+        }
+      }
+      break;
+    case kYDirection: 
+      while(true) {
+        std::string hist_name = Form("%s_%d",GetTH2()->GetName(),binnum);
+	
+	GH1D* g = (GH1D*)fSummaryProjections->FindObject(hist_name.c_str());
+	if(g && g->Integral() > 0) {
+	  return g;
+	}
+	
+        g = GH2ProjectionX(hist_name.c_str(),binnum,binnum,"",DrawEmpty);
+        if(g && g->Integral()>0)
+          return g;
+        binnum++;
+        if(binnum==start_bin) {
+          break;
+        } else if(binnum >max_binnum) {
+          binnum=1;
+        }
+      }
+      break;
+  }
+  return 0;
+  //return SummaryProject(binnum);
 }
 
-GH1D* GH2Base::GetPrevSummary(const GH1D* curr) {
-  std::string name = curr->GetName();
-  size_t underscore_pos = name.rfind('_');
-  int binnum = std::atoi(name.c_str() + underscore_pos + 1);
-  binnum--;
+GH1D* GH2Base::GetPrevSummary(const GH1D* curr,bool DrawEmpty) {
+  int binnum=1;
+  std::string name;
+  if(curr) {
+    name = curr->GetName();
+    size_t underscore_pos = name.rfind('_');
+    binnum = std::atoi(name.c_str() + underscore_pos + 1);
+    binnum--;
+  }
 
   int max_binnum;
   if(fSummaryDirection == kXDirection){
@@ -279,25 +334,80 @@ GH1D* GH2Base::GetPrevSummary(const GH1D* curr) {
     binnum = max_binnum;
   }
 
-  return SummaryProject(binnum);
-}
-
-GH1D* GH2Base::SummaryProject(int binnum) {
   std::string hist_name = Form("%s_%d",GetTH2()->GetName(),binnum);
   TObject* obj = fSummaryProjections->FindObject(hist_name.c_str());
   if(obj) {
     return (GH1D*)obj;
   }
 
+  int start_bin = binnum;
+  switch(fSummaryDirection) {
+    case kXDirection: 
+      while(true) {
+        std::string hist_name = Form("%s_%d",GetTH2()->GetName(),binnum);
+        GH1D *g = GH2ProjectionY(hist_name.c_str(),binnum,binnum,"",DrawEmpty);
+        if(g && g->Integral()>0)
+          return g;
+        binnum--;
+        if(binnum==start_bin) {
+          break;
+        } else if(binnum <=0) {
+          binnum=max_binnum;
+        }
+      }
+      break;
+    case kYDirection: 
+      while(true) {
+        std::string hist_name = Form("%s_%d",GetTH2()->GetName(),binnum);
+        GH1D *g = GH2ProjectionX(hist_name.c_str(),binnum,binnum,"",DrawEmpty);
+        if(g && g->Integral()>0)
+          return g;
+        binnum--;
+        if(binnum==start_bin) {
+          break;
+        } else if(binnum <=0) {
+          binnum=max_binnum;
+        }
+      }
+      break;
+  }
+  return 0;
+  //return SummaryProject(binnum);
+}
+
+
+/*
+GH1D* GH2Base::SummaryProject(int binnum,bool DrawEmpty) {
+  std::string hist_name = Form("%s_%d",GetTH2()->GetName(),binnum);
+  TObject* obj = fSummaryProjections->FindObject(hist_name.c_str());
+  if(obj) {
+    return (GH1D*)obj;
+  }
+  
+  int start_bin = binnum;
+  int max_binnum;
+
   switch(fSummaryDirection) {
     case kXDirection:
+      max_binnum = GetTH2()->GetXaxis()->GetNbins();
+      while(true) {
+        GH1D *g = GH2ProjectionY(hist_name.c_str(),binnum,binnum,DrawEmpty);
+        if(g && g->Integral()>0)
+          return g;
+        else if(binnum<
+      }
       return GH2ProjectionY(hist_name.c_str(), binnum, binnum);
     case kYDirection:
+      max_binnum = GetTH2()->GetYaxis()->GetNbins();
       return GH2ProjectionX(hist_name.c_str(), binnum, binnum);
   }
 
   return NULL;
 }
+*/
+
+
+
 /*
 void GH2I::Streamer(TBuffer &b) {
   if(b.IsReading()) {
@@ -332,8 +442,15 @@ void GH2I::Streamer(TBuffer &b) {
 */
 
 
-
-
-
-
-
+/*
+GH2Base::iterator& GH2Base::iterator::operator++() {
+  curr = mat->GetNext(curr);
+  std::cout << "Incrementing: curr=" << curr << ", first=" << first << std::endl;
+  std::cout << "First's name = " << first->GetName() << std::endl;
+  if(curr==first) {
+    curr = 0;
+    std::cout << "Found the beginning" << std::endl;
+  }
+  return *this;
+}
+*/

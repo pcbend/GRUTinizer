@@ -1,12 +1,15 @@
 #include "TGretinaHit.h"
 
+#include <algorithm>
 #include <cmath>
 #include <set>
 
 #include <TRandom.h>
 
 #include "GValue.h"
+#include "TGEBEvent.h"
 #include "TGretina.h"
+#include "TS800.h"
 
 struct interaction_point {
   interaction_point(int segnum, TVector3 pos,TVector3 loc,float energy,float fraction=100.0)
@@ -19,7 +22,15 @@ struct interaction_point {
   float energy_fraction;
 
   bool operator<(const interaction_point& other) const {
-    return energy > other.energy;
+    if (energy != other.energy) {
+      return energy > other.energy;
+    }
+
+    if(segnum == other.segnum) {
+      return energy_fraction > other.energy_fraction;
+    }
+
+    return segnum < other.segnum;
   }
 };
 
@@ -68,7 +79,20 @@ const char *TGretinaHit::GetName() const {
   return channel->GetName();
 }
 
-void TGretinaHit::BuildFrom(const TRawEvent::GEBBankType1& raw){
+
+TVector3 TGretinaHit::GetCrystalPosition()  const { return TGretina::GetCrystalPosition(fCrystalId); }
+TVector3 TGretinaHit::GetSegmentPosition()  const { if(fSegmentNumber.size()) 
+                                                    return TGretina::GetSegmentPosition(fCrystalId,fSegmentNumber.at(0));
+                                                  else
+                                                    return TGretina::GetSegmentPosition(fCrystalId,0);
+                                                }
+
+
+
+void TGretinaHit::BuildFrom(TSmartBuffer& buf){
+  const TRawEvent::GEBBankType1& raw = *(const TRawEvent::GEBBankType1*)buf.GetData();
+
+  //std::cout << "GretinaHit: " << raw << std::endl;
   //SetAddress(kDetectorSystems::GRETINA, 1, raw.crystal_id);
   //                     HOLE          CRYSTAL     SEGMENT
   //SetAddress(kDetectorSystems::GRETINA, 1, raw.crystal_id);
@@ -121,9 +145,9 @@ void TGretinaHit::BuildFrom(const TRawEvent::GEBBankType1& raw){
       second_interaction_value = seg_ener;
     }
   }
-  //Print("all");
+
   SortHits();
-  //Print("all");
+  //  Print("all");
 
 }
 
@@ -159,22 +183,24 @@ double TGretinaHit::GetDoppler_dB(double beta, const TVector3 *vec,double Dta){
   return tmp;
 }
 
-
-
+double TGretinaHit::GetDoppler(const TS800 *s800,int EngRange) {
+  if(!s800 || Size()<1)
+    return 0.0;
+  double beta  = GValue::Value("BETA");
+  if(std::isnan(beta))
+    return 0.0;
+  double gamma = 1.0/(sqrt(1.-beta*beta));
+  double dp_p = gamma/(1.+gamma) * s800->GetDta();
+  beta *=(1.+dp_p/(gamma*gamma));
+  TVector3 track = s800->Track();  //(TMath::Sin(s800->GetAta()),-TMath::Sin(s800->GetBta()),1);
+  if(EngRange>-1)
+    return GetDoppler(EngRange,beta,&track);
+  return GetDoppler(beta,&track);
+}
 
 //TVector3 TGretinaHit::GetCrystalPosition(int i) const {
 //  std::cerr << __PRETTY_FUNCTION__ << " NOT IMPLEMENTED YET" << std::endl;
 //}
-
-bool TGretinaHit::CheckAddback(const TGretinaHit& rhs) const {
-  if(fNumberOfInteractions && rhs.fNumberOfInteractions)
-    return false;
-
-  TVector3 dist= GetPosition() - rhs.GetPosition();
-  double dtime = std::abs(GetTime() - rhs.GetTime());
-
-  return ((dist.Mag()<250.0) && (dtime<20.0));
-}
 
 void TGretinaHit::SortHits(){
   // sets are sorted, so this will sort all properties together.
@@ -184,13 +210,13 @@ void TGretinaHit::SortHits(){
   //    to that segment!
   //
 
-  std::set<interaction_point> ips;
+  std::vector<interaction_point> ips;
   for(int i=0; i<fNumberOfInteractions; i++){
-    ips.insert(interaction_point(fSegmentNumber[i],
-                                 fGlobalInteractionPosition[i],
-                                 fLocalInteractionPosition[i],
-                                 fInteractionEnergy[i]));
-                                 //fInteractionFraction[i]));
+    ips.push_back(interaction_point(fSegmentNumber[i],
+				    fGlobalInteractionPosition[i],
+				    fLocalInteractionPosition[i],
+				    fInteractionEnergy[i],
+				    fInteractionFraction[i]));
   }
   //printf("ips.size() == %i\n",ips.size());
   // Fill all interaction points
@@ -202,6 +228,9 @@ void TGretinaHit::SortHits(){
   fInteractionFraction.clear();
   //
   fNumberOfInteractions = 0;
+
+  std::sort(ips.begin(), ips.end());
+  
   for(auto& point : ips){
     if(fNumberOfInteractions >= MAXHPGESEGMENTS){
       break;
@@ -225,7 +254,7 @@ void TGretinaHit::SortHits(){
 //       Right now, the "first interaction point" is the one with the highest energy,
 //       and the "second" is the one with the second highest energy.
 //       First and second may be assigned across crystal boundaries.
-void TGretinaHit::AddToSelf(const TGretinaHit& rhs, double& max_energy) {
+void TGretinaHit::AddToSelf(const TGretinaHit& rhs) {
 
   // Stash all interaction points
   std::set<interaction_point> ips;
@@ -236,17 +265,16 @@ void TGretinaHit::AddToSelf(const TGretinaHit& rhs, double& max_energy) {
                                  fInteractionEnergy[i]));
   }
   for(int i=0; i<rhs.fNumberOfInteractions; i++){
-    ips.insert(interaction_point(fSegmentNumber[i],
-                                 fGlobalInteractionPosition[i],
-                                 fLocalInteractionPosition[i],
-                                 fInteractionEnergy[i]));
+    ips.insert(interaction_point(rhs.fSegmentNumber[i],
+                                 rhs.fGlobalInteractionPosition[i],
+                                 rhs.fLocalInteractionPosition[i],
+                                 rhs.fInteractionEnergy[i]));
   }
 
   // Copy other information to self if needed
   double my_core_energy = fCoreEnergy;
   if(fCoreEnergy < rhs.fCoreEnergy) {
     rhs.Copy(*this);
-    max_energy = fCoreEnergy;
     fCoreEnergy += my_core_energy;
   } else {
     fCoreEnergy += rhs.fCoreEnergy;
@@ -315,6 +343,25 @@ TVector3 TGretinaHit::GetFirstIntPosition() const {
  
   TVector3 offset(xoffset,yoffset,zoffset);
   
+  // if(offset.Z()!=0.1){
+  //   std::cout << " -----------------" << std::endl;
+  //   std::cout << "\tX Offset = " << offset.X() <<std::endl;
+  //   std::cout << "\tY Offset = " << offset.Y() <<std::endl;
+  //   std::cout << "\tZ Offset = " << offset.Z() <<std::endl;
+  //   std::cout << "\tZ Offset2 = " << zoffset <<std::endl;
+  //   std::cout << "\tZ Offset3 = " << GValue::Value("GRETINA_Z_OFFSET") <<std::endl;
+  //   std::cout << "\tIntPoint = " << GetFirstIntPoint() << std::endl;
+  //   std::cout << "\tIntPoint = " << GetFirstIntPoint() << std::endl;
+  //   std::cout << "\tX Int    = " << GetInteractionPosition(GetFirstIntPoint()).X() << std::endl;
+  //   std::cout << "\tY Int    = " << GetInteractionPosition(GetFirstIntPoint()).Y() << std::endl;
+  //   std::cout << "\tZ Int    = " << GetInteractionPosition(GetFirstIntPoint()).Z() << std::endl;
+  //   TVector3 sum;
+  //   sum = GetInteractionPosition(GetFirstIntPoint())+offset;
+  //   std::cout << "\tX Sum    = " << sum.X() << std::endl;
+  //   std::cout << "\tY Sum    = " << sum.Y() << std::endl;
+  //   std::cout << "\tZ Sum    = " << sum.Z() << std::endl;
+  //   std::cout << "\t END OF VECTOR SUMMARY " << std::endl;
+  //}
   if(GetFirstIntPoint()>-1)
      return GetInteractionPosition(GetFirstIntPoint()) + offset;
    return TDetectorHit::BeamUnitVec;
@@ -359,10 +406,10 @@ void TGretinaHit::Print(Option_t *opt) const {
 
   if(!strcmp(opt,"all")) {
     for(int i=0;i<fNumberOfInteractions;i++) {
-      printf("\t\tSeg[%02i]\tEng: % 4.2f / % 4.2f  \t(R,T,P) % 3.2f % 3.2f % 3.2f\n",fSegmentNumber[i],fInteractionEnergy[i],fInteractionFraction[i],
-                                                                          fGlobalInteractionPosition[i].Mag(),
-                                                                          fGlobalInteractionPosition[i].Theta()*TMath::RadToDeg(),
-                                                                          fGlobalInteractionPosition[i].Phi()*TMath::RadToDeg() ); fflush(stdout);
+      printf("\t\tSeg[%02i]\tEng: % 4.2f / % 4.2f  \t(X,Y,Z) % 3.2f % 3.2f % 3.2f\n",fSegmentNumber[i],fInteractionEnergy[i],fInteractionFraction[i],
+                                                                          fLocalInteractionPosition[i].X(),
+                                                                          fLocalInteractionPosition[i].Y(),
+                                                                          fLocalInteractionPosition[i].Z() ); fflush(stdout);
       //std::cout << "\t\tSe[" << i << "]Seg Num:      \t" << fSegmentNumber[i]     << std::endl
       //          << "\t\t[" << i << "]Seg Eng:      \t" << fInteractionEnergy[i] << std::endl
       //                   << "\t\t[" << i << "]Seg Pos(R,T,P)\t" << fGlobalInteractionPosition[i].Mag()

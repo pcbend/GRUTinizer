@@ -24,7 +24,7 @@ void TFastScint::Copy(TObject& obj) const {
   //fs_hits->Copy(*fs.fs_hits);
   fs.fs_hits = fs_hits;
   fs.trig_time = trig_time;
-  fs.raw_data.clear();
+  //fs.raw_data.clear();
 }
 
 void TFastScint::Clear(Option_t* opt){
@@ -38,7 +38,17 @@ void TFastScint::Clear(Option_t* opt){
   trig_time = -1;
 }
 
-int TFastScint::BuildHits(){
+void TFastScint::Print(Option_t *opt) const { 
+  printf("TFastScint @  %lu \n",Timestamp());
+  for(int x=0;x<Size();x++) {
+    printf("\t");
+    GetLaBrHit(x).Print();
+  }
+}
+
+
+
+int TFastScint::BuildHits(std::vector<TRawEvent>& raw_data){
   for(auto& event : raw_data){
     TNSCLEvent& nscl = (TNSCLEvent&)event;
     SetTimestamp(nscl.GetTimestamp());
@@ -53,23 +63,44 @@ void TFastScint::InsertHit(const TDetectorHit& hit){
   fs_hits.push_back((TFastScintHit)hit);
 }
 
-int TFastScint::Size(){
+int TFastScint::Size() const {
   return fs_hits.size(); //->GetEntries();
 }
 
-TFastScintHit* TFastScint::GetLaBrHit(int i){
-  return &fs_hits.at(i);
+
+int TFastScint::GoodSize() const {
+  int size=0;
+  for(int i =0;i<Size();i++) {
+    if(fs_hits[i].Charge()>100)
+      size++;
+  }
+
+  return  size; // fs_hits.size(); //->GetEntries();
+}
+
+TFastScintHit TFastScint::GetLaBrHit(int i) const {
+  const TFastScintHit hit = fs_hits.at(i);
+  return hit;
 }
 
 int TFastScint::GetDetNumberIn_fs_hits(Int_t det){
   int detNumber = -1;
   for(int i_hit = 0; i_hit < Size(); i_hit++){
-    TFastScintHit* temp_hit = GetLaBrHit(i_hit);
-    if(temp_hit->GetChannel()==det)
+    TFastScintHit& temp_hit = fs_hits.at(i_hit);
+    if(temp_hit.GetChannel()==det)
       detNumber=i_hit;
   }
   return detNumber;
 }
+
+TFastScintHit *TFastScint::FindHit(int channelnumber) {
+  for(int i=0;i<Size();i++) {
+    if(fs_hits.at(i).GetChannel()==channelnumber)
+      return &fs_hits[i];
+  }
+  return 0;
+}
+
 
 TDetectorHit& TFastScint::GetHit(int i){
   return fs_hits.at(i);
@@ -78,13 +109,12 @@ TDetectorHit& TFastScint::GetHit(int i){
 // This is where the unpacking happens:
 int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
   bool DEBUG = false;
-
-
+  Zero_Suppress = true;
   bool isQ = false;
   bool isT = false;
 
   Int_t words_processed = 0;
-  Int_t detNumber = -1;
+  //Int_t detNumber = -1;
 
   // Payload size in 32 bit words.
   Int_t PayloadSize = event.GetPayloadSize()/4.0;
@@ -99,6 +129,7 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
   data+=2;
 
   if(DEBUG){
+    std::cout << "===========================================================================================>" << std::endl;
     event.Print("all");
     std::cout << " Payload Size : " << PayloadSize << std::endl;
   }
@@ -111,111 +142,137 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
     if(Mword->isHeader()){ // Header
       const TRawEvent::Mesy_Header* Mhead = (TRawEvent::Mesy_Header*)Mword;
       if(Mhead->isQDC()){
-	isQ = true; isT = false;
+        isQ = true; isT = false;
       }
       else if(Mhead->isTDC()){
-	isQ = false; isT = true;
+        isQ = false; isT = true;
       }
-      else std::cout << " *** Error -- Not QDC or TDC *** " << std::endl;
+      else std::cout << " *** Error -- Not QDC or TDC *** " << std::endl; 
+
     }// end if is header
     else if(Mword->isData()){ // Data
       if(isQ){ // QDC:
-	// NOTE -> we do it this way bc QDC should always come first!!!!
-	TFastScintHit hit;
-	const TRawEvent::M_QDC_Data* Mq = (TRawEvent::M_QDC_Data*)Mword;
-	hit.SetChannel(Mq->Chan());
-	hit.SetTime(-1);
-        hit.SetAddress((12<<28) + hit.GetChannel());
-
-	if(Mq->isOOR()) hit.SetCharge(5000);
-
-	else            hit.SetCharge(Mq->Charge());
-
-	//hit.SetEnergy();
-
-	if(Zero_Suppress){
-	  if(Mq->Charge()>0){
-	    InsertHit(hit);
+        // NOTE -> we do it this way bc QDC should always come first!!!!
+        const TRawEvent::M_QDC_Data* Mq = (TRawEvent::M_QDC_Data*)Mword;
+        TFastScintHit *hit = FindHit(Mq->Chan());
+	if(!hit){
+	  TFastScintHit qdc_hit;
+	  qdc_hit.SetChannel(Mq->Chan());
+	  qdc_hit.SetTime(-1);
+	  qdc_hit.SetAddress((12<<28) + qdc_hit.GetChannel());
+	  
+	  if(Mq->isOOR()) qdc_hit.SetCharge(5000);
+	  else            qdc_hit.SetCharge(Mq->Charge());
+	  
+	  //hit.SetEnergy();
+	  
+	  if(Zero_Suppress){
+	    if(Mq->Charge()>0){
+	      InsertHit(qdc_hit);
+	    }
 	  }
-	}
-	else{
-	  InsertHit(hit);
+	  else{
+	    InsertHit(qdc_hit);
+	  }
+	} else{
+	  if(Mq->isOOR()) hit->SetCharge(5000);
+	  else            hit->SetCharge(Mq->Charge());
 	}
 
-	if(DEBUG){
-	  std::cout << " QDC Q : " << std::hex << Mq->Charge() << std::endl;
-	  std::cout << " QDC ch: " << std::dec << Mq->Chan() << std::endl;
-	  std::cout << " QDC Ov: " << Mq->isOOR() << std::endl;
-	}
+        // if(DEBUG){
+        //   std::cout << " QDC Q : " << std::hex << Mq->Charge() << std::endl;
+        //   std::cout << " QDC ch: " << std::dec << Mq->Chan() << std::endl;
+        //   std::cout << " QDC Ov: " << Mq->isOOR() << std::endl;
+        // }
       } // end if isQ
       else if(isT){ // TDC
-	const TRawEvent::M_TDC_Data* Mt = (TRawEvent::M_TDC_Data*)Mword;
+        const TRawEvent::M_TDC_Data* Mt = (TRawEvent::M_TDC_Data*)Mword;
 
-	detNumber = -1;
-	detNumber = GetDetNumberIn_fs_hits(Int_t(Mt->Chan()));
-    
-        if(Mt->isTrig()){  
-          SetTrigTime(Mt->Time());
-          continue;
+        //detNumber = -1;
+        //detNumber = GetDetNumberIn_fs_hits(Int_t(Mt->Chan()));
 
-	if(detNumber!=-1){
-	  TFastScintHit *qdc_hit = GetLaBrHit(detNumber);
+        TFastScintHit *hit = FindHit(Mt->Chan());
+        if(!hit) {
+          TFastScintHit tdc_hit;
+          tdc_hit.SetTime(Mt->Time());
+          tdc_hit.SetCharge(-1);
+	  
+          tdc_hit.SetChannel(Mt->Chan());
+          tdc_hit.SetAddress((12<<28) + tdc_hit.GetChannel());
+	  
+          if(Zero_Suppress){
+            if(Mt->Time()>0){
+              InsertHit(tdc_hit);
+            }
+          }
+          else {
+	    //hit->SetTime(Mt->Time());
+	    InsertHit(tdc_hit);
+          }
+          if(DEBUG){
+            std::cout << " TDC t : " << std::hex << Mt->Time() << std::endl;
+            std::cout << " TDC ch: " << std::dec << Mt->Chan() << std::endl;
+            std::cout << " TDC Tr: " << Mt->isTrig() << std::endl;
+          }
+        } else {
+	  TFastScintHit *qdc_hit = hit;
 	  if(qdc_hit->GetChannel()==Mt->Chan()){
 	    qdc_hit->SetTime(Mt->Time());
-
+	    
+	    
 	    if(DEBUG){
 	      std::cout << " TDC ch         : " << Mt->Chan() << std::endl;
 	      std::cout << " TDC for QDC ch : " << qdc_hit->GetChannel() << std::endl;
 	      std::cout << " TDC time       : " << Mt->Time() << std::endl;
+	      std::cout << " QDC Charge     : " << qdc_hit->Charge() << std::endl;
+	      std::cout << " Time Check     : " << qdc_hit->Time() << std::endl;
 	    }
 	  }
 	  else{ // should never be here.
 	    std::cout << " *** Found a Channel but it didnt match ?? *** " << std::endl;
 	  }
 	}
-	else{ // No Matching QDC
-	  TFastScintHit tdc_hit;
-	  tdc_hit.SetTime(Mt->Time());
-	  tdc_hit.SetCharge(-1);
-
-          //tdc_hit.SetEnergy();
-
-	  //if(Mt->isTrig())  tdc_hit.SetChannel(-10);
-	  tdc_hit.SetChannel(Mt->Chan());
-          tdc_hit.SetAddress((12<<28) + tdc_hit.GetChannel());
-
-	  if(Zero_Suppress){
-	    if(Mt->Time()>0){
-	      InsertHit(tdc_hit);
-	    }
-	  }
-	  else
-	    InsertHit(tdc_hit);
-
-	  if(DEBUG){
-	    std::cout << " TDC t : " << std::hex << Mt->Time() << std::endl;
-	    std::cout << " TDC ch: " << std::dec << Mt->Chan() << std::endl;
-	    std::cout << " TDC Tr: " << Mt->isTrig() << std::endl;
-	  }
+	if(Mt->isTrig()){  
+	  SetTrigTime(Mt->Time());
+	  continue;
 	}
+	
       } // end elif isT	
 
       else{ // If not QDC or TDC
 
-	std::cout << " *** Not TDC or QDC **** " << std::endl;
+        std::cout << " *** Not TDC or QDC **** " << std::endl;
       }
     }// end elif is data
     else if(Mword->isETS()){
       if(DEBUG)
-	std::cout << " ETS " << std::endl;
+        std::cout << " ETS " << std::endl;
     }//end elif ets
     else if(Mword->isFILL()){
       if(DEBUG)
-	std::cout << " Filler " << std::endl;
-    }// end elif isfill
-    else if(Mword->isEOE()){
-      if(DEBUG) std::cout << " EOE " << std::endl;
-    }// end elif eoe    
+        std::cout << " Filler " << std::endl;
+      else if(Mword->isEOE()){
+        if(DEBUG) std::cout << " EOE " << std::endl;
+      }// end elif eoe    
+    }
   }// end for
+
+  if(Zero_Suppress) {
+    std::vector<TFastScintHit>::iterator it;
+    for(it=fs_hits.begin();it!=fs_hits.end();) {
+      if( (it->Charge()<100) || (it->Time()<0) ) {
+        it = fs_hits.erase(it);
+      } else {
+        it++;
+      }
+    }
+  }
+
+  // TFastScintHit *CheckHit = FindHit(3);
+  // std::cout << " ------- Double Check Here -----------" << std::endl;
+  // std::cout << " Channel = " << CheckHit->GetChannel() << std::endl;
+  // std::cout << " Time = " << CheckHit->GetTime() << std::endl;
+  // std::cout << " Energy = " << CheckHit->GetEnergy() << std::endl;
+  
   return 0;
 }

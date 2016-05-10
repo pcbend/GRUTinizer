@@ -18,30 +18,12 @@
 #include "TPad.h"
 #include "TROOT.h"
 
-std::vector<short> TS800::fmaxcoefficient;                      
-std::vector<std::vector<short> > TS800::forder;                 
-std::vector<std::vector<std::vector<short> > > TS800::fexponent;
-std::vector<std::vector<float> > TS800::fcoefficient;           
-short TS800::fmaxorder;                                         
-float TS800::fbrho;                                             
-int TS800::fmass;                                               
-int TS800::fcharge;                                             
+#include "TInverseMap.h"
 
 TS800::TS800() {
   Clear();
-  static std::atomic_bool InvMapFileRead(false);
-  if(!InvMapFileRead){
-    //   Quick little mutex to make sure that multiple threads
-    // don't try to read the map file at the same time.
-    static std::mutex inv_map_mutex;
-    std::lock_guard<std::mutex> lock(inv_map_mutex);
-    if(!InvMapFileRead){
-      InvMapFileRead=true;
-      ReadMap_SpecTCL();
-      std::cout << " SPECTCL INV MAP LOADED!!!" << std::endl;
-    }
-  }
 }
+
 
 TS800::~TS800(){
 }
@@ -50,31 +32,6 @@ void TS800::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 
   TS800& other = (TS800&)obj;
-  other.fAtaTCL1 = fAtaTCL1;
-  other.fYtaTCL1 = fYtaTCL1;
-  other.fBtaTCL1 = fBtaTCL1;
-  other.fDtaTCL1 = fDtaTCL1;
-  other.fAtaTCL2 = fAtaTCL2;
-  other.fYtaTCL2 = fYtaTCL2;
-  other.fBtaTCL2 = fBtaTCL2;
-  other.fDtaTCL2 = fDtaTCL2;
-  other.fAtaTCL3 = fAtaTCL3;
-  other.fYtaTCL3 = fYtaTCL3;
-  other.fBtaTCL3 = fBtaTCL3;
-  other.fDtaTCL3 = fDtaTCL3;
-  other.fAtaTCL4 = fAtaTCL4;
-  other.fYtaTCL4 = fYtaTCL4;
-  other.fBtaTCL4 = fBtaTCL4;
-  other.fDtaTCL4 = fDtaTCL4;
-  other.fAtaTCL5 = fAtaTCL5;
-  other.fYtaTCL5 = fYtaTCL5;
-  other.fBtaTCL5 = fBtaTCL5;
-  other.fDtaTCL5 = fDtaTCL5;
-  other.fAtaTCL6 = fAtaTCL6;
-  other.fYtaTCL6 = fYtaTCL6;
-  other.fBtaTCL6 = fBtaTCL6;
-  other.fDtaTCL6 = fDtaTCL6;
-
   for(int i = 0; i<3; i++){
     scint[i].Copy(other.scint[i]);
   }
@@ -82,209 +39,109 @@ void TS800::Copy(TObject& obj) const {
   tof.Copy(other.tof);
   mtof.Copy(other.mtof);
   ion.Copy(other.ion);
-  for(int i=0; i<2; i++){
-    crdc[i].Copy(other.crdc[i]);
-  }
+  crdc1.Copy(other.crdc1);
+  crdc2.Copy(other.crdc2);
 }
 
-float TS800::MapCalc_SpecTCL(int calcorder,int parameter,float *input){
-  float cumul=0;
-  float multiplicator;
-  for(int index=0; index<fmaxcoefficient[parameter]; index++){
-    if (calcorder < forder[parameter][index]) break;
-    multiplicator = 1;
-    for(int nex=0; nex<6; nex++){
-      if(fexponent[parameter][nex][index] != 0){
-	multiplicator *= pow(input[nex], fexponent[parameter][nex][index]);
-      }
-    }
-    cumul += multiplicator * fcoefficient[parameter][index];
+
+Float_t TS800::GetAta(int i) const {
+  //float Shift_ata = 0;
+  float ata = TInverseMap::Get()->Ata(i,this);
+  if(!std::isnan(GValue::Value("ATA_SHIFT"))) {
+    ata -= GValue::Value("ATA_SHIFT") *TMath::DegToRad();
   }
-  
-  return cumul;
+  return ata;
 }
 
-Float_t TS800::GetAta_Spec(int i){
-  float Shift_ata = 0;
-  if(GValue::FindValue("ATA_SHIFT"))
-    Shift_ata = GValue::FindValue("ATA_SHIFT")->GetValue();
-  
-  switch(i){
-  case 1: return (fAtaTCL1+Shift_ata);
-    break;
-  case 2: return (fAtaTCL2+Shift_ata);
-    break;
-  case 3: return (fAtaTCL3+Shift_ata);
-    break;
-  case 4: return (fAtaTCL4+Shift_ata);
-    break;
-  case 5: return (fAtaTCL5+Shift_ata);
-    break;
-  default: return (fAtaTCL6+Shift_ata);
-    break;
+Float_t TS800::GetBta(int i) const {
+  float bta = TInverseMap::Get()->Bta(i,this);
+  if(!std::isnan(GValue::Value("BTA_SHIFT"))) {
+   bta -= GValue::Value("BTA_SHIFT") *TMath::DegToRad();
   }
+  return bta;
 }
 
-Float_t TS800::GetBta_Spec(int i){
-  float Shift_bta = 0;
-  if(GValue::FindValue("BTA_SHIFT"))
-    Shift_bta = GValue::FindValue("BTA_SHIFT")->GetValue();
-  
-  switch(i){
-  case 1: return (fBtaTCL1+Shift_bta);
-    break;
-  case 2: return (fBtaTCL2+Shift_bta);
-    break;
-  case 3: return (fBtaTCL3+Shift_bta);
-    break;
-  case 4: return (fBtaTCL4+Shift_bta);
-    break;
-  case 5: return (fBtaTCL5+Shift_bta);
-    break;
-  default: return (fBtaTCL6+Shift_bta);
-    break;
+Float_t TS800::GetYta(int i) const {
+  float yta = TInverseMap::Get()->Yta(i,this);
+  if(!std::isnan(GValue::Value("YTA_SHIFT"))) {
+    yta += GValue::Value("YTA_SHIFT");
   }
+  return yta;
 }
 
-Float_t TS800::GetYta_Spec(int i){
-  float Shift_yta = 0;
-  if(GValue::FindValue("YTA_SHIFT"))
-    Shift_yta = GValue::FindValue("YTA_SHIFT")->GetValue();
-  
-  switch(i){
-  case 1: return (fYtaTCL1+Shift_yta);
-    break;
-  case 2: return (fYtaTCL2+Shift_yta);
-    break;
-  case 3: return (fYtaTCL3+Shift_yta);
-    break;
-  case 4: return (fYtaTCL4+Shift_yta);
-    break;
-  case 5: return (fYtaTCL5+Shift_yta);
-    break;
-  default: return (fYtaTCL6+Shift_yta);
-    break;
+Float_t TS800::GetDta(int i) const {
+  float dta = TInverseMap::Get()->Dta(i,this);
+  if(!std::isnan(GValue::Value("DTA_SHIFT"))) {
+    dta += GValue::Value("DTA_SHIFT");
   }
+  return dta;
 }
 
-Float_t TS800::GetDta_Spec(int i){
-  float Shift_dta = 0;
-  if(GValue::FindValue("DTA_SHIFT"))
-    Shift_dta = GValue::FindValue("DTA_SHIFT")->GetValue();
-  
-  switch(i){
-  case 1: return (fDtaTCL1+Shift_dta);
-    break;
-  case 2: return (fDtaTCL2+Shift_dta);
-    break;
-  case 3: return (fDtaTCL3+Shift_dta);
-    break;
-  case 4: return (fDtaTCL4+Shift_dta);
-    break;
-  case 5: return (fDtaTCL5+Shift_dta);
-    break;
-  default: return (fDtaTCL6+Shift_dta);
-    break;
-  }
+float TS800::AdjustedBeta(float beta) const {
+  double gamma = 1.0/(sqrt(1.-beta*beta));
+  double dp_p = gamma/(1.+gamma) * GetDta();
+  beta *=(1.+dp_p/(gamma*gamma));
+  return beta;
 }
 
-void TS800::ReadMap_SpecTCL(){
-  std::string filename = TGRUTOptions::Get()->S800InverseMapFile();
-  fmaxcoefficient.resize(6);
-  forder.resize(6);
-  fexponent.resize(6);
-  fcoefficient.resize(6);
-  for(short i=0;i<6;i++){
-    forder[i].resize(200);
-    fcoefficient[i].resize(200);
-    fexponent[i].resize(6);
-    for(short k=0;k<6;k++){
-      fexponent[i][k].resize(200);
-    }
+
+Float_t TS800::Azita(int order){
+  float xsin = TMath::Sin(GetAta(order));
+  float ysin = TMath::Sin(GetBta(order));
+  float azita = 0.0;
+  if(xsin>0 && ysin>0){
+    azita = TMath::ATan(ysin/xsin);
+  } else if(xsin<0 && ysin>0){
+    azita = TMath::Pi()-TMath::ATan(ysin/TMath::Abs(xsin));
+  } else if(xsin<0 && ysin<0){
+    azita = TMath::Pi()+TMath::ATan(TMath::Abs(ysin)/TMath::Abs(xsin));
+  } else if(xsin>0 && ysin<0){
+    azita = 2.0*TMath::Pi()-TMath::ATan(TMath::Abs(ysin)/xsin);
+  } else{
+    azita = 0;
   }
-  fmaxorder = 0;
-  FILE* file;
-  char line[80];
-  int index, par, exp[6];
-  int ord;
-  float co;
-  char title[120];
-  char *ret=NULL;
-  file = fopen(filename.c_str(), "r");
-  if(file == NULL){
-    std::cout << "Sorry I couldn't find the map file: " << filename << std::endl;
-    std::cout << "Will continue without the map file" << std::endl;
-    return;
-  }
-  ret = fgets(title, 120, file);
-  sscanf(title, "S800 inverse map - Brho=%g - M=%d - Q=%d", &fbrho, &fmass, &fcharge);
-  //if(fSett->VLevel()>0)
-  //std::cout << "brho " << fbrho << " mass " << fmass << " charge " << fcharge << std::endl;
-  while(strstr(line, "COEFFICIENT") == NULL)
-    ret = fgets(line, 80, file);
-  par = 0;
-  while(!feof(file)){
-    ret = fgets(line, 80, file);
-    while (strstr(line, "------------------") == NULL){
-      sscanf(line, "%d %g %d %d %d %d %d %d %d", &index, &co, &ord, &exp[0], &exp[1], &exp[2], &exp[3], &exp[4], &exp[5]);
-      if(index > 200){
-	std::cout << "Too many coefficients in map.  Increase TS800_TRACK_COEFFICIENTS." << std::endl;
-	break;
-      }
-      if(par > 6){
-	std::cout << "Too many parameters in map.  Increase TS800_TRACK_PARAMETERS." << std::endl;
-	break;
-      }
-      fmaxcoefficient[par] = index;
-      forder[par][index-1] = ord;
-      fcoefficient[par][index-1] = co;
-      //std::cout << "max coef " << fmaxcoefficient[par] << " order " << forder[par][index-1] << " coef " << fcoefficient[par][index-1] << std::endl;
-      for(int k=0; k<6; k++){
-	fexponent[par][k][index-1] = exp[k];
-	//std::cout << "exp["<<k<<"] " << exp[k] << " fexponent["<<par<<"]["<<k<<"]["<<index-1<<"] " << fexponent[par][k][index-1] << std::endl;
-      }
-      ret = fgets(line, 80, file);
-    }
-    if(ord > fmaxorder)
-      fmaxorder = ord;
-    par++;
-  }
-  //std::cout << "Done reading map from " << filename << "." << std::endl;
-  //std::cout << "Title: " << title << std::endl;
-  //std::cout << "Order: " << fmaxorder << std::endl;
-  fclose(file);
+  return azita;
 }
 
-TVector3 TS800::ExitTargetVect_Spec(int order){
+TVector3 TS800::Track() const {
+  //TVector3 track(0,0,1);  // set to input beam trajectory 
+  //track.RotateY(GetAta(3));
+  //track.Rotate( GetBta(3),-track.Cross(TVector3(0,1,0)) );
+  TVector3 track(TMath::Sin(GetAta()),-TMath::Sin(GetBta()),1);
+  return track.Unit();
+}
+
+
+TVector3 TS800::ExitTargetVect(int order){
   TVector3 track;
-  double xsin = 0;
-  double ysin = 0;
-  xsin = GetAta_Spec(order);
-  ysin = GetBta_Spec(order);
-  double phi   = 0;
-  double theta = 0;
-
-  xsin = TMath::Sin(xsin);
-  ysin = TMath::Sin(ysin);
+  double sin_ata = 0;
+  double sin_bta = 0;
+  sin_ata = GetAta(order); //* TMath::DegToRad() ;
+  sin_bta = GetBta(order); // * TMath::DegToRad() ;
   
-  if(xsin>0 && ysin>0)      phi = 2.0*TMath::Pi()-TMath::ATan(ysin/xsin);
-  else if(xsin<0 && ysin>0) phi = TMath::Pi()+TMath::ATan(ysin/TMath::Abs(xsin));
-  else if(xsin<0 && ysin<0) phi = TMath::Pi()-TMath::ATan(TMath::Abs(ysin)/TMath::Abs(xsin));
-  else if(xsin>0 && ysin<0) phi = TMath::ATan(TMath::Abs(ysin)/xsin);
-  else                      phi = 0;
+  
 
-  theta = TMath::ASin(TMath::Sqrt(xsin*xsin+ysin*ysin));
-  track.SetPtThetaPhi(1,theta,phi);
-  return track;
+
+  sin_ata = TMath::Sin(sin_ata);
+  sin_bta = TMath::Sin(sin_bta);
+
+  // double phi   = 0;
+  // double theta = 0;
+  
+  // if(sin_ata>0 && sin_bta>0)      phi = 2.0*TMath::Pi()-TMath::ATan(sin_bta/sin_ata);
+  // else if(sin_ata<0 && sin_bta>0) phi = TMath::Pi()+TMath::ATan(sin_bta/TMath::Abs(sin_ata));
+  // else if(sin_ata<0 && sin_bta<0) phi = TMath::Pi()-TMath::ATan(TMath::Abs(sin_bta)/TMath::Abs(sin_ata));
+  // else if(sin_ata>0 && sin_bta<0) phi = TMath::ATan(TMath::Abs(sin_bta)/sin_ata);
+  // else                      phi = 0;
+
+  // theta = TMath::ASin(TMath::Sqrt(sin_ata*sin_ata+sin_bta*sin_bta));
+  // track.SetMagThetaPhi(1,theta,phi);
+
+  track.SetXYZ(sin_ata,-sin_bta,1);
+  return track; 
 }
 
 TVector3 TS800::CRDCTrack(){
-  /*TVector3 crdc1,crdc2;
-
-  crdc1.SetXYZ(crdc[0].GetDispersiveX(),crdc[0].GetNonDispersiveY(),0);
-  crdc2.SetXYZ(crdc[1].GetDispersiveX(),crdc[1].GetNonDispersiveY(),1000);
-
-  TVector3 track = crdc2-crdc1;*/
   TVector3 track;
   track.SetTheta(TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1073.0)); // rad
   track.SetPhi(TMath::ATan((GetCrdc(0).GetNonDispersiveY()-GetCrdc(1).GetNonDispersiveY())/1073.0)); // rad
@@ -293,28 +150,52 @@ TVector3 TS800::CRDCTrack(){
   return track;
 }
 
+float TS800::GetXFP(int i) const {
+  return GetCrdc(i).GetDispersiveX();
+}
+
+float TS800::GetYFP(int i) const {
+  float ypos = GetCrdc(i).GetNonDispersiveY();
+
+  // // Bit 2 in registr is coincidence event.
+  // // These have a timing offset, which corresponds to a spatial offset.
+  // if(trigger.GetRegistr() & 2) {
+  //   double slope = GValue::Value( (i==0) ? "CRDC1_Y_SLOPE" : "CRDC2_Y_SLOPE" );
+  //   double coinc_timediff = 10;
+  //   ypos -= slope*coinc_timediff;
+  // }
+
+  return ypos;
+}
+
 float TS800::GetAFP() const{
-  if (GetCrdc(0).GetId() == -1 || GetCrdc(1).GetId() == -1){
+   /*  if (GetCrdc(0).GetId() == -1 || GetCrdc(1).GetId() == -1){
+     return sqrt(-1);
+  }*/
+  if(GetCrdc(0).Size()==0||GetCrdc(1).Size()==0){
     return sqrt(-1);
   }
-  float AFP = TMath::ATan((GetCrdc(1).GetDispersiveX()-GetCrdc(0).GetDispersiveX())/1073.0);
+  float AFP = TMath::ATan((GetXFP(1)-GetXFP(0))/1073.0);
   return AFP;
 
 }
 
 float TS800::GetBFP() const{
-  if (GetCrdc(0).GetId() == -1 || GetCrdc(1).GetId() == -1){
+  /*if (GetCrdc(0).GetId() == -1 || GetCrdc(1).GetId() == -1) {
+    return sqrt(-1);
+    }*/
+  if(GetCrdc(0).Size()==0||GetCrdc(1).Size()==0){
     return sqrt(-1);
   }
-  float BFP = TMath::ATan((GetCrdc(1).GetNonDispersiveY()-GetCrdc(0).GetNonDispersiveY())/1073.0);
+  float BFP = TMath::ATan((GetYFP(1)-GetYFP(0))/1073.0);
   return BFP;
 }
 
 void TS800::Clear(Option_t* opt){
   TDetector::Clear(opt);
-  crdc[0].Clear();
-  crdc[1].Clear();
-
+  crdc1.Clear();
+  crdc2.Clear();
+  
   scint[0].Clear();
   scint[1].Clear();
   scint[2].Clear();
@@ -324,53 +205,21 @@ void TS800::Clear(Option_t* opt){
   trigger.Clear();
   ion.Clear();
 
-  fAtaTCL1 = sqrt(-1);
-  fYtaTCL1 = sqrt(-1);
-  fBtaTCL1 = sqrt(-1);
-  fDtaTCL1 = sqrt(-1);
-  fAtaTCL2 = sqrt(-1);
-  fYtaTCL2 = sqrt(-1);
-  fBtaTCL2 = sqrt(-1);
-  fDtaTCL2 = sqrt(-1);
-  fAtaTCL3 = sqrt(-1);
-  fYtaTCL3 = sqrt(-1);
-  fBtaTCL3 = sqrt(-1);
-  fDtaTCL3 = sqrt(-1);
-  fAtaTCL4 = sqrt(-1);
-  fYtaTCL4 = sqrt(-1);
-  fBtaTCL4 = sqrt(-1);
-  fDtaTCL4 = sqrt(-1);
-  fAtaTCL5 = sqrt(-1);
-  fYtaTCL5 = sqrt(-1);
-  fBtaTCL5 = sqrt(-1);
-  fDtaTCL5 = sqrt(-1);
-  fAtaTCL6 = sqrt(-1);
-  fYtaTCL6 = sqrt(-1);
-  fBtaTCL6 = sqrt(-1);
-  fDtaTCL6 = sqrt(-1);
 
 }
 
-int TS800::BuildHits(){
+int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
   if(raw_data.size() != 1){
     std::cout << "Data buffers: " << raw_data.size() << std::endl;
   }
   for(auto& event : raw_data) { // should only be one..
     SetTimestamp(event.GetTimestamp());
-    // TGEBEvent* geb = (TGEBEvent*)&event;
-    // SetTimestamp(geb->GetTimestamp());
     int ptr = 0;
-    //    const TRawEvent::GEBS800Header *head = ((const TRawEvent::GEBS800Header*)geb->GetPayload());
     const TRawEvent::GEBS800Header *head = ((const TRawEvent::GEBS800Header*)event.GetPayload());
     ptr += sizeof(TRawEvent::GEBS800Header);
-      //  Here, we are now pointing at the size of the next S800 thing.  Inclusive in shorts.
-      //  std::string buffer = Form("all0x%04x",*((unsigned short*)(geb->GetPayload()+ptr+2)));
-    //printf("head.total_size == %i\n",head->total_size); fflush(stdout);
-    //printf("sizeof(TRawEvent::GEBS800Header) == %i \n",sizeof(TRawEvent::GEBS800Header));
+    //Here, we are now pointing at the size of the next S800 thing.  Inclusive in shorts.
     unsigned short *data = (unsigned short*)(event.GetPayload()+ptr);
-    //printf("\t0x%04x\t0x%04x\t0x%04x\t0x%04x\n",*data,*(data+1),*(data+2),*(data+3));
-    //while(ptr<((head->total_size*2)-2)) {
-    std::string toprint = "all";
+    //std::string toprint = "all";
     size_t x = 0;
     while(x<(head->total_size-sizeof(TRawEvent::GEBS800Header)+16)) {  //total size is inclusive.
       int size             = *(data+x);
@@ -382,13 +231,11 @@ int TS800::BuildHits(){
       //  printf("head size = %i\n",sizeof(head));
       //  exit(0);
       //}
-      //unsigned short size_in_bytes = (*((unsigned short*)(geb->GetPayload()+ptr))*2);
       int sizeleft = size-2;
       //ptr +=  (*((unsigned short*)(geb->GetPayload()+ptr))*2);
       switch(*dptr) {
       case 0x5801:  //S800 TriggerPacket.
 	HandleTrigPacket(dptr+1,sizeleft);
-
 	break;
       case 0x5802:  // S800 TOF.
 	//event.Print("all0x5802");
@@ -437,52 +284,7 @@ int TS800::BuildHits(){
     SetEventCounter(head->GetEventNumber());
     //geb->Print(toprint.c_str());
   }
-  //Raytracing(
-  float input[6];
-  input[0] = -GetCrdc(0).GetDispersiveX()/1000.0; // divide to get to units of meters
-  input[1] = -GetAFP(); // this is in radians.
-  input[2] = GetCrdc(0).GetNonDispersiveY()/1000.0;
-  input[3] = GetBFP();
-  //input[2] = GetCrdc(0).GetNonDispersiveY()/1000.0 - 0.033;
-  //input[3] = GetBFP() + 0.034;
-  input[4] = 0;
-  input[5] = 0;
-
-  //printf("-----------------------  --------------------\n");
-  //std::cout << " BFP : " << input[3] << "  " << GetBFP() << std::endl;
-  
-  fAtaTCL1 = MapCalc_SpecTCL(1,0,input);
-  fYtaTCL1 = MapCalc_SpecTCL(1,1,input);
-  fBtaTCL1 = MapCalc_SpecTCL(1,2,input);
-  fDtaTCL1 = MapCalc_SpecTCL(1,3,input);
-
-  fAtaTCL2 = MapCalc_SpecTCL(2,0,input);
-  fYtaTCL2 = MapCalc_SpecTCL(2,1,input);
-  fBtaTCL2 = MapCalc_SpecTCL(2,2,input);
-  fDtaTCL2 = MapCalc_SpecTCL(2,3,input);
-
-  fAtaTCL3 = MapCalc_SpecTCL(3,0,input);
-  fYtaTCL3 = MapCalc_SpecTCL(3,1,input);
-  fBtaTCL3 = MapCalc_SpecTCL(3,2,input);
-  fDtaTCL3 = MapCalc_SpecTCL(3,3,input);
-
-  fAtaTCL4 = MapCalc_SpecTCL(4,0,input);
-  fYtaTCL4 = MapCalc_SpecTCL(4,1,input);
-  fBtaTCL4 = MapCalc_SpecTCL(4,2,input);
-  fDtaTCL4 = MapCalc_SpecTCL(4,3,input);
-
-  fAtaTCL5 = MapCalc_SpecTCL(5,0,input);
-  fYtaTCL5 = MapCalc_SpecTCL(5,1,input);
-  fBtaTCL5 = MapCalc_SpecTCL(5,2,input);
-  fDtaTCL5 = MapCalc_SpecTCL(5,3,input);
-
-  fAtaTCL6 = MapCalc_SpecTCL(6,0,input);
-  fYtaTCL6 = MapCalc_SpecTCL(6,1,input);
-  fBtaTCL6 = MapCalc_SpecTCL(6,2,input);
-  fDtaTCL6 = MapCalc_SpecTCL(6,3,input);
-
-  //printf("-----------------------\n");
-  return 0;
+  return 1;
 }
 
 bool TS800::HandleTrigPacket(unsigned short *data,int size) {
@@ -552,8 +354,11 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
   //std::cout << " In Handle CRDC " << std::endl;
 
   TCrdc *current_crdc=0;
-  if((*data)<3)
-    current_crdc = &crdc[*data];
+  if((*data)<3){
+    if(*data==0) current_crdc = &crdc1;
+    else if(*data==1) current_crdc = &crdc2;
+    else return false;
+  }
   if(!current_crdc)
     return false;
 
@@ -577,31 +382,37 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
   current_crdc->SetAddress((0x58<<24) + (1<<16) + (current_crdc->GetId() <<8) + 0);
 
   std::map<int,std::map<int,int> > pad;
-  //for(;x<subsize;x+=2) {
+
+  // This is deliberately different from SpecTcl,
+  //   in how it handles multiple word2 occurring in a row.
+  // We talked to Daniel, and this is when it has read out
+  //   the same sample/channel on multiple connectors.
+  // Therefore, in this case, we should use the same word1 (top bit set)
+  //   with all the word2 (top bit unset) instances that follow.
+  unsigned short word1 = 0;
   while(x<subsize){
-    unsigned short word1 = *(data+x); x++;
-    //std::cout << std::hex << " word 1 " << word1 << std::endl;
-    if((word1&0x8000)!=0x8000) { continue; }
-    unsigned short word2 = *(data+x);
-    //std::cout << std::hex << " word 2 " << word2 << std::endl;
+    unsigned short current_word = *(data+x); x++;
+    // Remember the header.
+    if(current_word & 0x8000) {
+      word1 = current_word;
+    } else if (word1 != 0) {
+      // Not a header, so it is
+      unsigned short word2 = current_word;
+      int sample_number    = (word1&(0x7fc0)) >> 6;
+      int channel_number   =  word1&(0x003f);
+      int connector_number = (word2&(0x0c00)) >> 10;
+      int databits         = (word2&(0x03ff));
+      int real_channel = (connector_number << 6) + channel_number;
 
-
-    int sample_number    = (word1&(0x7fc0)) >> 6;
-    int channel_number   =  word1&(0x003f);
-    int connector_number = (word2&(0x0c00)) >> 10;
-    int databits         = (word2&(0x03ff));
-    int real_channel = (connector_number << 6) + channel_number;
-
-
-
-    /*std::cout << " sample Number    : " << std::dec << sample_number << std::endl;
-    std::cout << " channel Number   : " << std::dec << channel_number << std::endl;
-    std::cout << " connector Number : " << std::dec << connector_number << std::endl;
-    std::cout << " data bits        : " << std::dec << databits << std::endl;
-    std::cout << " real channel     : " << std::dec << real_channel << std::endl;
-    std::dec;
-    */
-    pad[real_channel][sample_number] = databits;
+      /*std::cout << " sample Number    : " << std::dec << sample_number << std::endl;
+        std::cout << " channel Number   : " << std::dec << channel_number << std::endl;
+        std::cout << " connector Number : " << std::dec << connector_number << std::endl;
+        std::cout << " data bits        : " << std::dec << databits << std::endl;
+        std::cout << " real channel     : " << std::dec << real_channel << std::endl;
+        std::dec;
+      */
+      pad[real_channel][sample_number] = databits;
+    }
   }
   x+=1;
   std::map<int,std::map<int,int> >::iterator it1;
@@ -845,180 +656,6 @@ bool TS800::HandleMTDCPacket(unsigned short *data,int size) {
   return true;
 }
 
-/*
-bool TS800::HandleTOFPacket(char *data,unsigned short size) {
-  //some number of times read from both a Phillips 7186H TDC and an Ortec 566 TAC digitized by a Phillips 7164 ADC.
-  if(size<2)
-    return false;
-  for(int i=0;i<size;i+=2) {
-    TTOFHit *tof = (TTOFHit*)time_of_flight->ConstructedAt(time_of_flight->GetEntries());
-    tof->Set(*((unsigned short*)(data+i)));
-  }
-  return true;
-}
-
-bool TS800::HandleFPScintPacket(char *data,unsigned short size) {
-  //Energies and times of the focal plane scintillator, read from a Lecroy 4300B FERA and a Phillips 7186H TDC, should come in pairs.
-  //printf("in handle crdcc.\n");
-  for(int i=0;i<size;i+=4) {
-    unsigned short *temp = ((unsigned short*)(data+i));
-    if(((*(temp+1))&0xf000) != (*temp)&0xf000) {
-      fprintf(stderr,"fp_scint: energy and time do not match.");
-      return false;
-    }
-    TFPScint *hit = (TFPScint*)fp_scint->ConstructedAt(fp_scint->GetEntries());
-    hit->SetCharge(*temp);
-    hit->SetCharge(*(temp+1));
-  }
-  return true;
-}
-
-bool TS800::HandleIonChamberPacket(char *data,unsigned short size) {
-  //Zero suppressed energies from the ionization chamber, read from a Phillips 7164 ADC.
-  //Note, this data is in a "sub-packet".
-  int x =0;
-  if(*(data+2) == 0x5821)
-    x+=4;
-  for(;x<size;x+=2) {
-    unsigned short *temp = ((unsigned short*)(data+x));
-    TIonChamber *ion = (TIonChamber*)ion_chamber->ConstructedAt(ion_chamber->GetEntries());
-    ion->Set(*temp);
-  }
-  return true;
-
-}
-
-bool TS800::HandleCRDCPacket(char *data,unsigned short size) {
-  int ptr = 0;
-  short id      = *((short*)data); ptr += 2;
-  short subsize = *((short*)(data+ptr)); ptr += 2;
-  short subtype = *((short*)(data+ptr)); ptr += 2;
-  short zerobuffer = *((short*)(data+ptr)); ptr += 2;
-  int lastsampe = 0;
-
-  //for(int x=0;x<crdc1->GetSize();x++)
-  //  ((TCrdcPad*)crdc1->At(x))->Clear();
-  //for(int x=0;x<crdc2->GetSize();x++)
-  //  ((TCrdcPad*)crdc2->At(x))->Clear();
-
-  std::map<int,std::map<int,int> > pad;
-
-  for(int x=1;x<subsize;x+=2) {
-    unsigned short word1 = *((unsigned short*)(data+ptr)); ptr += 2;
-    if((word1&0x8000)!=0x8000) { continue; }
-    unsigned short word2 = *((unsigned short*)(data+ptr)); ptr += 2;
-
-    //printf("[%i]\t0x%04x\t0x%04x\n",x,word1,word2);
-    int sample_number    = (word1&(0x7fc0)) >> 6;
-    int channel_number   =  word1&(0x003f);
-    int connector_number = (word2&(0x0c00)) >> 10;
-    int databits         = (word2&(0x03ff));
-
-    int real_channel = (connector_number << 6) + channel_number;
-    pad[real_channel][sample_number] = databits;
-  }
-
-  std::map<int,std::map<int,int> >::iterator it1;
-  std::map<int,int>::iterator it2;
-
-  for(it1=pad.begin();it1!=pad.end();it1++) {
-    //printf("channel[%03i]\n",it1->first);
-    TCrdcPad *crdcpad = 0;
-    if(id==0) {
-      crdcpad = (TCrdcPad*)crdc1->ConstructedAt(crdc1->GetEntries());
-    } else if(id==1) {
-      crdcpad = (TCrdcPad*)crdc2->ConstructedAt(crdc2->GetEntries());
-    }
-    if(crdcpad) {
-      crdcpad->SetChannel(it1->first);
-      for(it2=it1->second.begin();it2!=it1->second.end();it2++) {
-        //printf("\t%i\t%i\n",it2->first,it2->second);
-        crdcpad->SetPoint(it2->first,it2->second);
-      }
-    } else {
-      return false;
-    }
-  }
-
-  unsigned short word1 = *((unsigned short*)(data+ptr)); ptr += 2;
-  unsigned short word2 = *((unsigned short*)(data+ptr)); ptr += 2;
-  if(id==0) {
-    crdc1_charge = word1;
-    crdc1_time   = word2;
-  } else if(id==1) {
-    crdc2_charge = word1;
-    crdc2_time   = word2;
-  } else {
-    return false;
-  }
-  //printf("after crdc: %i | %i     0x%04x\t0x%04x\t\t",crdc1->GetEntries(),crdc2->GetEntries(),word1,word2);
-  //std::cout << " ++++++++++++++++++++++++++++++++++++\n";
-
-  return true;
-}
-
-bool TS800::HandleIntermediatePPACPacket(char *data,unsigned short size) {
-  int ptr = 0;
-  short id      = *((short*)data); ptr += 2;
-  short subsize = *((short*)(data+ptr)); ptr += 2;
-  short subtype = *((short*)(data+ptr)); ptr += 2;
-  short zerobuffer = *((short*)(data+ptr)); ptr += 2;
-  int lastsampe = 0;
-
-  //std::map<int,int> ChargeMap;
-
-  std::map<int,std::map<int,int> > pad;
-
-  for(int x=1;x<subsize;x+=2) {
-    unsigned short word1 = *((unsigned short*)(data+ptr)); ptr += 2;
-    if((word1&0x8000)!=0x8000) { continue; }
-    unsigned short word2 = *((unsigned short*)(data+ptr)); ptr += 2;
-    int sample_number    = (word1&(0x7fc0)) >> 6;
-    int channel_number   =  word1&(0x003f);
-    int connector_number = (word2&(0x0c00)) >> 10;
-    int databits         = (word2&(0x03ff));
-
-    int real_channel = (connector_number << 6) + channel_number;
-    pad[real_channel][sample_number] = databits;
-  }
-
-  std::map<int,std::map<int,int> >::iterator it1;
-  std::map<int,int>::iterator it2;
-
-  for(it1=pad.begin();it1!=pad.end();it1++) {
-    //printf("channel[%03i]\n",it1->first);
-    //printf("\t%i\t%i\n",it2->first,it2->second);
-    TCrdcPad *ppac = 0;
-    if(id==0) {
-      ppac = (TCrdcPad*)ppac1->ConstructedAt(crdc1->GetEntries());
-    } else if(id==1) {
-      ppac = (TCrdcPad*)ppac2->ConstructedAt(crdc2->GetEntries());
-    }
-    if(ppac) {
-      ppac->SetChannel(it1->first);
-      for(it2=it1->second.begin();it2!=it1->second.end();it2++)
-        ppac->SetPoint(it2->first,it2->second);
-    } else {
-      return false;
-    }
-  }
-  unsigned short word1 = *((unsigned short*)(data+ptr)); ptr += 2;
-  unsigned short word2 = *((unsigned short*)(data+ptr)); ptr += 2;
-  if(id==0) {
-    ppac1_charge = word1;
-    ppac1_time   = word2;
-  } else if(id==1) {
-    ppac2_charge = word1;
-    ppac2_time   = word2;
-  } else {
-    return false;
-  }
-  //printf("after crdc: %i | %i     0x%04x\t0x%04x\t\t",crdc1->GetEntries(),crdc2->GetEntries(),word1,word2);
-  //std::cout << " ++++++++++++++++++++++++++++++++++++\n";
-
-  return true;
-}
-*/
 
 void TS800::InsertHit(const TDetectorHit& hit){
   return;
@@ -1030,19 +667,31 @@ TDetectorHit& TS800::GetHit(int i){
 }
 
 float TS800::GetTofE1_TAC(float c1,float c2)  const {
-  if (GetCrdc(0).GetId() == -1) {
+  /*if (GetCrdc(0).GetId() == -1) {
     return sqrt(-1);
-  }
-  return GetTof().GetTacOBJ() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+    }*/
+  /*----------------*\
+  | AFP returns nan  |
+  | if both crdc's   |
+  | are not present  |
+  \*----------------*/
+
+  if(GetTof().GetTacOBJ()>-1)
+    return GetTof().GetTacOBJ() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+  return sqrt(-1);
+
 }
 
 
 float TS800::GetTofE1_TDC(float c1,float c2)  const {
-  if (GetCrdc(0).GetId() == -1) {
-    return sqrt(-1);
-  }
-
-  return GetTof().GetOBJ() - GetScint().GetTimeUp() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+  /*----------------*\
+  | AFP returns nan  |
+  | if both crdc's   |
+  | are not present  |
+  \*----------------*/
+  if(GetTof().GetOBJ()>-1)
+    return GetTof().GetOBJ() - GetScint().GetTimeUp() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+  return sqrt(-1);
 }
 
 float TS800::GetTofE1_MTDC(float c1,float c2,int i) const {
@@ -1061,6 +710,449 @@ float TS800::GetTofE1_MTDC(float c1,float c2,int i) const {
      return result.at(i);
    return sqrt(-1.0);
 }
+
+float TS800::GetOBJRaw_TAC() const {
+  return (GetTof().GetTacOBJ());
+}
+
+float TS800::GetOBJ_E1Raw() const {
+  return (GetTof().GetOBJ() - GetScint().GetTimeUp()); // Time in OBJ - Time in E1
+}
+
+float TS800::GetOBJ_E1Raw_MESY(int i) const {
+  std::vector<float> result;
+  for(unsigned int x=0;x<mtof.fObj.size();x++) {
+    for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
+      result.push_back( mtof.fObj.at(x) - mtof.fE1Up.at(y));
+      }
+    }
+
+  if(result.size()>(unsigned int)i)
+    return result.at(i);
+  return sqrt(-1.0);
+}
+
+float TS800::GetOBJ_E1Raw_MESY_Ch15(int i) const {
+  std::vector<float> result;
+  for(unsigned int x=0;x<mtof.fObj.size();x++) {
+    for(unsigned int y=0;y<mtof.fRef.size();y++) {
+      result.push_back( mtof.fObj.at(x) - mtof.fRef.at(y));
+      }
+    }
+
+  if(result.size()>(unsigned int)i)
+    return result.at(i);
+  return sqrt(-1.0);
+}
+
+float TS800::GetRawOBJ_MESY(unsigned int i) const {
+  if(i>=mtof.fObj.size())
+    return sqrt(-1);
+  return (mtof.fObj.at(i));
+}
+
+float TS800::GetRawE1_MESY(unsigned int i) const {
+  if(i>=mtof.fE1Up.size())
+    return sqrt(-1);
+  return (mtof.fE1Up.at(i));
+}
+
+float TS800::GetRawE1_MESY_Ch15(unsigned int i) const {
+  if(i>=mtof.fRef.size())
+    return sqrt(-1);
+  return (mtof.fRef.at(i));
+}
+
+float TS800::GetRawXF_MESY(unsigned int i) const {
+  if(i>=mtof.fXfp.size())
+    return sqrt(-1);
+  return (mtof.fXfp.at(i));
+}
+
+float TS800::GetXFRaw_TAC() const {
+  return (GetTof().GetTacXFP());
+}
+float TS800::GetXF_E1Raw() const {
+  return (GetTof().GetXFP() - GetScint().GetTimeUp()); // Time in XF - Time in E1
+}
+
+float TS800::GetXF_E1Raw_MESY(int i) const {
+  std::vector<float> result;
+  for(unsigned int x=0;x<mtof.fXfp.size();x++) {
+    for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
+      result.push_back( mtof.fXfp.at(x) - mtof.fE1Up.at(y));
+    }
+  }
+  if(result.size()>(unsigned int)i)
+    return result.at(i);
+  return sqrt(-1.0);
+}
+
+float TS800::GetXF_E1Raw_MESY_Ch15(int i) const {
+  std::vector<float> result;
+  for(unsigned int x=0;x<mtof.fXfp.size();x++) {
+    for(unsigned int y=0;y<mtof.fRef.size();y++) {
+      result.push_back( mtof.fXfp.at(x) - mtof.fRef.at(y));
+    }
+  }
+  if(result.size()>(unsigned int)i)
+    return result.at(i);
+  return sqrt(-1.0);
+}
+
+float TS800::MCorrelatedOBJ() const{
+  if(mtof.fCorrelatedOBJ>-1) return mtof.fObj.at(mtof.fCorrelatedOBJ);
+  else return 0;
+}
+
+float TS800::MCorrelatedXFP() const{
+  if(mtof.fCorrelatedXFP>-1) return mtof.fXfp.at(mtof.fCorrelatedXFP);
+  else return 0;
+}
+
+float TS800::MCorrelatedE1() const{
+  if(mtof.fCorrelatedE1>-1) return mtof.fE1Up.at(mtof.fCorrelatedE1);
+  else return 0;
+}
+
+float TS800::MCorrelatedOBJ_E1(bool corrected) const{
+  if(!(mtof.fE1Up.size()==1)) {
+    mtof.fCorrelatedOBJ = -1;
+    mtof.fCorrelatedE1  = -1;
+  }
+  else if(mtof.fCorrelatedOBJ>-1 && mtof.fCorrelatedE1>-1){
+    double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+    if(corrected==false){
+      afp_cor = 0;
+      xfp_cor = 0;
+    }
+    return (mtof.fObj.at(mtof.fCorrelatedOBJ)-mtof.fE1Up.at(mtof.fCorrelatedE1) + 
+	    afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+  }
+  else if(mtof.fCorrelatedE1>-1){
+      double OBJLow  = GValue::Value("MOBJ_CORR_LOW");
+    double OBJHigh = GValue::Value("MOBJ_CORR_HIGH");
+    
+    double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+    if(corrected==false){
+      afp_cor = 0;
+      xfp_cor = 0;
+    }
+
+    if(std::isnan(afp_cor)) return 0;
+    if(std::isnan(xfp_cor)) return 0;
+    if(std::isnan(OBJLow))  return 0;
+    if(std::isnan(OBJHigh)) return 0;
+
+    std::vector<float> val2;
+    float val;
+      for(unsigned int y=0;y<mtof.fObj.size();y++) {
+      val = (mtof.fObj.at(y) - mtof.fE1Up.at(mtof.fCorrelatedE1) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX()) ;
+      if(val<OBJHigh && val>OBJLow){
+	val2.push_back(val);      
+	mtof.fCorrelatedOBJ=y;
+      }
+    }
+    if(val2.size()==1)
+      return val2.at(0);
+    mtof.fCorrelatedOBJ =-1;
+  }
+  else{
+    double OBJLow  = GValue::Value("MOBJ_CORR_LOW");
+    double OBJHigh = GValue::Value("MOBJ_CORR_HIGH");
+    
+    double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+    
+    if(corrected==false){
+      afp_cor = 0;
+      xfp_cor = 0;
+    }
+
+    if(std::isnan(afp_cor))  return 0;
+    if(std::isnan(xfp_cor))  return 0;
+    if(std::isnan(OBJLow))   return 0;
+    if(std::isnan(OBJHigh))  return 0;
+    
+    std::vector<float> val2;
+    float val;
+    for(unsigned int x=0;x<mtof.fE1Up.size();x++) {
+      for(unsigned int y=0;y<mtof.fObj.size();y++) {
+	val = (mtof.fObj.at(y) - mtof.fE1Up.at(x) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+	if(val<OBJHigh && val>OBJLow){
+	  val2.push_back(val);      
+	  mtof.fCorrelatedOBJ=y;
+	  mtof.fCorrelatedE1=x;
+	}
+      }
+    }
+    
+    if(val2.size()==1)
+      return val2.at(0);
+    mtof.fCorrelatedOBJ =-1;
+    mtof.fCorrelatedE1  =-1;
+  }
+
+  return 0;
+}
+
+float TS800::MCorrelatedXFP_E1(bool corrected) const{
+  if(!(mtof.fE1Up.size()==1)) {
+    mtof.fCorrelatedXFP = -1;
+    mtof.fCorrelatedE1  = -1;
+  }
+  else if(mtof.fCorrelatedXFP>-1 && mtof.fCorrelatedE1>-1)  {    
+    double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+    if(corrected==false){
+      afp_cor = 0;
+      xfp_cor = 0;
+    }
+    
+    return (mtof.fXfp.at(mtof.fCorrelatedXFP)-mtof.fE1Up.at(mtof.fCorrelatedE1) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+  }
+  else if(mtof.fCorrelatedE1>-1){
+    double XFLow = GValue::Value("MXF_CORR_LOW");
+    double XFHigh = GValue::Value("MXF_CORR_HIGH");
+    double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+    if(corrected==false){
+      afp_cor = 0;
+      xfp_cor = 0;
+    }
+
+    if(std::isnan(afp_cor)) return 0;
+    if(std::isnan(xfp_cor)) return 0;
+    if(std::isnan(XFLow))   return 0;
+    if(std::isnan(XFHigh))  return 0;
+
+    std::vector<float> val2;
+    float val;
+    for(unsigned int y=0;y<mtof.fXfp.size();y++) {
+      val = (mtof.fXfp.at(y) - mtof.fE1Up.at(mtof.fCorrelatedE1) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+      if(val<XFHigh && val>XFLow){
+	val2.push_back(val);      
+	mtof.fCorrelatedXFP=y;
+      }
+    }
+    if(val2.size()==1)
+      return val2.at(0);
+    mtof.fCorrelatedXFP =-1;
+  }
+  else{
+    double XFLow = GValue::Value("MXF_CORR_LOW");
+    double XFHigh = GValue::Value("MXF_CORR_HIGH");
+    double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+    if(corrected==false){
+      afp_cor = 0;
+      xfp_cor = 0;
+    }
+
+    if(std::isnan(afp_cor)) return 0;
+    if(std::isnan(xfp_cor)) return 0;
+    if(std::isnan(XFLow))   return 0;
+    if(std::isnan(XFHigh))  return 0;
+
+    std::vector<float> val2;
+    float val;
+    for(unsigned int x=0;x<mtof.fE1Up.size();x++) {
+      for(unsigned int y=0;y<mtof.fXfp.size();y++) {
+	val = (mtof.fXfp.at(y) - mtof.fE1Up.at(x) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+	if(val<XFHigh && val>XFLow){
+	  val2.push_back(val);      
+	  mtof.fCorrelatedXFP=y;
+	  mtof.fCorrelatedE1=x;
+	}
+      }
+    }
+    if(val2.size()==1)
+      return val2.at(0);
+    mtof.fCorrelatedXFP =-1;
+    mtof.fCorrelatedE1  =-1;
+  }
+  return 0;
+}
+
+
+float TS800::MCorrelatedOBJ_Ch15() const{
+  if(mtof.fCorrelatedOBJ_Ch15>-1) return mtof.fObj.at(mtof.fCorrelatedOBJ_Ch15);
+  else return 0;
+}
+
+float TS800::MCorrelatedXFP_Ch15() const{
+  if(mtof.fCorrelatedXFP_Ch15>-1) return mtof.fXfp.at(mtof.fCorrelatedXFP_Ch15);
+  else return 0;
+}
+
+float TS800::MCorrelatedE1_Ch15() const{
+  if(mtof.fCorrelatedE1_Ch15>-1) return mtof.fRef.at(mtof.fCorrelatedE1_Ch15);
+  else return 0;
+}
+
+float TS800::MCorrelatedOBJ_E1_Ch15(bool corrected) const{
+  if(!(mtof.fRef.size()==1)) {
+    mtof.fCorrelatedOBJ_Ch15 = -1;
+    mtof.fCorrelatedE1_Ch15  = -1;
+  }
+  else if(mtof.fCorrelatedOBJ_Ch15>-1 && mtof.fCorrelatedE1_Ch15>-1){
+    double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+    if(corrected==false){
+      afp_cor = 0;
+      xfp_cor = 0;
+    }
+    return (mtof.fObj.at(mtof.fCorrelatedOBJ_Ch15)-mtof.fRef.at(mtof.fCorrelatedE1_Ch15) + 
+	    afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+  }
+  else if(mtof.fCorrelatedE1_Ch15>-1){
+    double OBJLow  = GValue::Value("MOBJ_CORR_LOW_CH15");
+    double OBJHigh = GValue::Value("MOBJ_CORR_HIGH_CH15");
+    
+    double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+    if(corrected==false){
+      afp_cor = 0;
+      xfp_cor = 0;
+    }
+
+    if(std::isnan(afp_cor)) return 0;
+    if(std::isnan(xfp_cor)) return 0;
+    if(std::isnan(OBJLow))  return 0;
+    if(std::isnan(OBJHigh)) return 0;
+
+    std::vector<float> val2;
+    float val;
+      for(unsigned int y=0;y<mtof.fObj.size();y++) {
+      val = (mtof.fObj.at(y) - mtof.fRef.at(mtof.fCorrelatedE1_Ch15) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX()) ;
+      if(val<OBJHigh && val>OBJLow){
+	val2.push_back(val);      
+	mtof.fCorrelatedOBJ_Ch15=y;
+      }
+    }
+    if(val2.size()==1)
+      return val2.at(0);
+    mtof.fCorrelatedOBJ_Ch15 =-1;
+  }
+  else{
+    double OBJLow  = GValue::Value("MOBJ_CORR_LOW_CH15");
+    double OBJHigh = GValue::Value("MOBJ_CORR_HIGH_CH15");
+    
+    double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+    
+    if(corrected==false){
+      afp_cor = 0;
+      xfp_cor = 0;
+    }
+
+    if(std::isnan(afp_cor))  return 0;
+    if(std::isnan(xfp_cor))  return 0;
+    if(std::isnan(OBJLow))   return 0;
+    if(std::isnan(OBJHigh))  return 0;
+    
+    std::vector<float> val2;
+    float val;
+    for(unsigned int x=0;x<mtof.fRef.size();x++) {
+      for(unsigned int y=0;y<mtof.fObj.size();y++) {
+	val = (mtof.fObj.at(y) - mtof.fRef.at(x) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+	if(val<OBJHigh && val>OBJLow){
+	  val2.push_back(val);      
+	  mtof.fCorrelatedOBJ_Ch15=y;
+	  mtof.fCorrelatedE1_Ch15=x;
+	}
+      }
+    }
+    
+    if(val2.size()==1)
+      return val2.at(0);
+    mtof.fCorrelatedOBJ_Ch15 =-1;
+    mtof.fCorrelatedE1_Ch15  =-1;
+  }
+
+  return 0;
+}
+
+float TS800::MCorrelatedXFP_E1_Ch15(bool corrected) const{
+  if(!(mtof.fRef.size()==1)) {
+    mtof.fCorrelatedXFP_Ch15 = -1;
+    mtof.fCorrelatedE1_Ch15  = -1;
+  }
+  else if(mtof.fCorrelatedXFP_Ch15>-1 && mtof.fCorrelatedE1_Ch15>-1)  {
+    double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+    if(corrected==false){
+      afp_cor = 0;
+      xfp_cor = 0;
+    }
+    
+    return (mtof.fXfp.at(mtof.fCorrelatedXFP_Ch15)-mtof.fRef.at(mtof.fCorrelatedE1_Ch15) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+  }
+  else if(mtof.fCorrelatedE1_Ch15>-1){
+    double XFLow = GValue::Value("MXF_CORR_LOW_CH15");
+    double XFHigh = GValue::Value("MXF_CORR_HIGH_CH15");
+    double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+    if(corrected==false){
+      afp_cor = 0;
+      xfp_cor = 0;
+    }
+
+    if(std::isnan(afp_cor)) return 0;
+    if(std::isnan(xfp_cor)) return 0;
+    if(std::isnan(XFLow))   return 0;
+    if(std::isnan(XFHigh))  return 0;
+
+    std::vector<float> val2;
+    float val;
+    for(unsigned int y=0;y<mtof.fXfp.size();y++) {
+      val = (mtof.fXfp.at(y) - mtof.fRef.at(mtof.fCorrelatedE1_Ch15) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+      if(val<XFHigh && val>XFLow){
+	val2.push_back(val);      
+	mtof.fCorrelatedXFP_Ch15=y;
+      }
+    }
+    if(val2.size()==1)
+      return val2.at(0);
+    mtof.fCorrelatedXFP_Ch15 =-1;
+  }
+  else{
+    double XFLow = GValue::Value("MXF_CORR_LOW_CH15");
+    double XFHigh = GValue::Value("MXF_CORR_HIGH_CH15");
+    double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+    if(corrected==false){
+      afp_cor = 0;
+      xfp_cor = 0;
+    }
+
+    if(std::isnan(afp_cor)) return 0;
+    if(std::isnan(xfp_cor)) return 0;
+    if(std::isnan(XFLow))   return 0;
+    if(std::isnan(XFHigh))  return 0;
+
+    std::vector<float> val2;
+    float val;
+    for(unsigned int x=0;x<mtof.fRef.size();x++) {
+      for(unsigned int y=0;y<mtof.fXfp.size();y++) {
+	val = (mtof.fXfp.at(y) - mtof.fRef.at(x) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+	if(val<XFHigh && val>XFLow){
+	  val2.push_back(val);      
+	  mtof.fCorrelatedXFP_Ch15=y;
+	  mtof.fCorrelatedE1_Ch15=x;
+	}
+      }
+    }
+    if(val2.size()==1)
+      return val2.at(0);
+    mtof.fCorrelatedXFP_Ch15 =-1;
+    mtof.fCorrelatedE1_Ch15  =-1;
+  }
+  return 0;
+}
+
 
 float TS800::GetCorrTOF_OBJTAC() const {
   double afp_cor = GValue::Value("OBJTAC_TOF_CORR_AFP");
@@ -1110,15 +1202,15 @@ void TS800::DrawPID(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) 
     if(!OptString.Contains("Tune"))
       gPad->GetCanvas()->Clear();
   }
-  
+
   std::string name = Form("%s_PID",Class()->GetName()); //_%s",opt);
   std::string title = Form("%s PID AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJTAC_TOF_CORR_AFP"),GValue::Value("OBJTAC_TOF_CORR_XFP")); //_%s",opt);
   GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
   if(!h)
     h = new GH2I(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJTAC()",4096,0,4096,4000,0,4000);
   chain->Project(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJTAC()","","colz",nentries);
-  h->GetXaxis()->SetTitle("Corrected TOF (objtac)");  
-  h->GetYaxis()->SetTitle("Ion Chamber Energy loss (arb. units)");  
+  h->GetXaxis()->SetTitle("Corrected TOF (objtac)");
+  h->GetYaxis()->SetTitle("Ion Chamber Energy loss (arb. units)");
   h->Draw("colz");
 }
 
@@ -1135,21 +1227,21 @@ void TS800::DrawAFP(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) 
     if(!OptString.Contains("Tune"))
       gPad->GetCanvas()->Clear();
   }
-  
+
   std::string name = Form("%s_AFP",Class()->GetName()); //_%s",opt);
   std::string title = Form("%s AFP AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJTAC_TOF_CORR_AFP"),GValue::Value("OBJTAC_TOF_CORR_XFP")); //_%s",opt);
   GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
   if(!h)
     h = new GH2I(name.c_str(),title.c_str(),2048,0,2048,4000,-0.1,0.1);
   chain->Project(name.c_str(),"GetAFP():GetCorrTOF_OBJTAC()","","colz",nentries);
-  h->GetXaxis()->SetTitle("Corrected TOF (objtac)");  
-  h->GetYaxis()->SetTitle("Corrected AFP (objtac)");  
+  h->GetXaxis()->SetTitle("Corrected TOF (objtac)");
+  h->GetYaxis()->SetTitle("Corrected AFP (objtac)");
   h->Draw("colz");
 }
 
 
 void TS800::DrawDispX(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) {
-  
+
   TString OptString = opt;
 
   if(!chain)
@@ -1162,7 +1254,7 @@ void TS800::DrawDispX(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain
     if(!OptString.Contains("Tune"))
        gPad->GetCanvas()->Clear();
   }
-  
+
   std::string name = Form("%s_DispX",Class()->GetName()); //_%s",opt);
   std::string title = Form("%s DispX AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJTAC_TOF_CORR_AFP"),GValue::Value("OBJTAC_TOF_CORR_XFP")); //_%s",opt);
   GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
@@ -1170,8 +1262,8 @@ void TS800::DrawDispX(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain
     h = new GH2I(name.c_str(),title.c_str(),4096,-2047,2048,4000,-300,300);
   h->SetTitle(title.c_str());
   chain->Project(name.c_str(),"GetCrdc(0)->GetDispersiveX():GetCorrTOF_OBJTAC()","","colz",nentries);
-  h->GetXaxis()->SetTitle("Corrected TOF (objtac)");  
-  h->GetYaxis()->SetTitle("Dispersive X (objtac)");  
+  h->GetXaxis()->SetTitle("Corrected TOF (objtac)");
+  h->GetYaxis()->SetTitle("Dispersive X (objtac)");
   h->Draw("colz");
 }
 
@@ -1191,7 +1283,7 @@ void TS800::DrawPID_Tune(Long_t nentries,TChain *chain){
 
   gPad->GetCanvas()->cd(2);
   DrawAFP("","Tune",nentries);
-  
+
   gPad->GetCanvas()->cd(3);
   DrawPID("","Tune",nentries);
 
@@ -1210,15 +1302,15 @@ void TS800::DrawPID_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TCha
     if(!OptString.Contains("Tune"))
       gPad->GetCanvas()->Clear();
   }
-  
+
   std::string name = Form("%s_PID",Class()->GetName()); //_%s",opt);
   std::string title = Form("%s PID AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJ_MTOF_CORR_AFP"),GValue::Value("OBJ_MTOF_CORR_XFP")); //_%s",opt);
   GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
   if(!h)
     h = new GH2I(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJ_MESY()",4096,-4096,4096,4000,-4000,4000);
   chain->Project(name.c_str(),Form("GetIonChamber()->GetSum():GetCorrTOF_OBJ_MESY(%i)",i),"","colz",nentries);
-  h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");  
-  h->GetYaxis()->SetTitle("Ion Chamber Energy loss (arb. units)");  
+  h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");
+  h->GetYaxis()->SetTitle("Ion Chamber Energy loss (arb. units)");
   h->Draw("colz");
 }
 
@@ -1235,21 +1327,21 @@ void TS800::DrawAFP_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TCha
     if(!OptString.Contains("Tune"))
       gPad->GetCanvas()->Clear();
   }
-  
+
   std::string name = Form("%s_AFP",Class()->GetName()); //_%s",opt);
   std::string title = Form("%s AFP AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJ_MTOF_CORR_AFP"),GValue::Value("OBJ_MTOF_CORR_XFP")); //_%s",opt);
   GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
   if(!h)
     h = new GH2I(name.c_str(),title.c_str(),2048,-4096,2048,4000,-0.1,0.1);
   chain->Project(name.c_str(),Form("GetAFP():GetCorrTOF_OBJ_MESY(%i)",i),"","colz",nentries);
-  h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");  
-  h->GetYaxis()->SetTitle("Corrected AFP (Mesy)");  
+  h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");
+  h->GetYaxis()->SetTitle("Corrected AFP (Mesy)");
   h->Draw("colz");
 }
 
 
 void TS800::DrawDispX_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TChain *chain) {
-  
+
   TString OptString = opt;
 
   if(!chain)
@@ -1262,7 +1354,7 @@ void TS800::DrawDispX_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TC
     if(!OptString.Contains("Tune"))
        gPad->GetCanvas()->Clear();
   }
-  
+
   std::string name = Form("%s_DispX",Class()->GetName()); //_%s",opt);
   std::string title = Form("%s DispX AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJ_MTOF_CORR_AFP"),GValue::Value("OBJ_MTOF_CORR_XFP")); //_%s",opt);
   GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
@@ -1270,8 +1362,8 @@ void TS800::DrawDispX_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TC
     h = new GH2I(name.c_str(),title.c_str(),4096,-4096,4096,4000,-300,300);
   h->SetTitle(title.c_str());
   chain->Project(name.c_str(),Form("GetCrdc(0)->GetDispersiveX():GetCorrTOF_OBJ_MESY(%i)",i),"","colz",nentries);
-  h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");  
-  h->GetYaxis()->SetTitle("Dispersive X (Mesy)");  
+  h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");
+  h->GetYaxis()->SetTitle("Dispersive X (Mesy)");
   h->Draw("colz");
 }
 
@@ -1291,10 +1383,9 @@ void TS800::DrawPID_Mesy_Tune(Long_t nentries,int i,TChain *chain){
 
   gPad->GetCanvas()->cd(2);
   DrawAFP_Mesy("","Tune",nentries,i);
-  
+
   gPad->GetCanvas()->cd(3);
   DrawPID_Mesy("","Tune",nentries,i);
 
 
 }
-

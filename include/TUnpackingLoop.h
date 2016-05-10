@@ -66,6 +66,7 @@ private:
   TUnpackedEvent* fOutputEvent;
   ThreadsafeQueue<TUnpackedEvent*> output_queue;
 
+  unsigned int fRunStart;
 };
 
 #endif /* _TUNPACKLOOP_H_ */
