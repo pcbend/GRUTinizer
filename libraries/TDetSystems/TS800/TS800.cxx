@@ -104,15 +104,16 @@ Float_t TS800::Azita(int order){
   return azita;
 }
 
-TVector3 TS800::Track() const {
+TVector3 TS800::Track(double sata,double sbta) const {
   //TVector3 track(0,0,1);  // set to input beam trajectory 
   //track.RotateY(GetAta(3));
   //track.Rotate( GetBta(3),-track.Cross(TVector3(0,1,0)) );
   //  TVector3 track(TMath::Sin(GetAta()),-TMath::Sin(GetBta()),1);
+  double ata = TMath::Sin(GetAta()+sata);
+  double bta = TMath::Sin(GetBta()+sbta);
+  TVector3 track(ata,-bta,sqrt(1-ata*ata-bta*bta));
   
-  TVector3 track(TMath::Sin(GetAta()),-TMath::Sin(GetBta()),TMath::Sqrt(1.0-TMath::Sin(GetAta())*TMath::Sin(GetAta()) - TMath::Sin(GetBta())*TMath::Sin(GetBta())));
-  
-  return track.Unit();
+  return track; //.Unit();
 }
 
 
