@@ -1,6 +1,8 @@
 #include "GH1D.h"
 
 #include <iostream>
+#include <fstream>
+#include <cstring>
 
 #include "TVirtualPad.h"
 #include "GH2I.h"
@@ -31,6 +33,22 @@ GH1D::GH1D(const TF1& function,Int_t nbinsx,Double_t xlow,Double_t xup) :
   f->Delete();
 }
 
+bool GH1D::WriteDatFile(const char *outFile){
+  if(strlen(outFile)<1) return 0;
+
+  std::ofstream out;
+  out.open(outFile);
+  
+  if(!(out.is_open())) return 0;
+  
+  for(int i=0;i<GetNbinsX();i++){
+    out << GetXaxis()->GetBinCenter(i) << "\t" << GetBinContent(i) << std::endl;
+  }
+  out << std::endl;
+  out.close();
+
+  return 1;
+}
 
 
 /*
