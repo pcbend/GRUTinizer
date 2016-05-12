@@ -47,6 +47,8 @@
 
 #include "TInverseMap.h"
 
+#include "TTreeSource.h"
+
 //extern "C" G__value G__getitem(const char* item);
 //#include "FastAllocString.h"
 //char* G__valuemonitor(G__value buf, G__FastAllocString& temp);
@@ -211,6 +213,8 @@ void TGRUTint::ApplyOptions() {
       std::cerr << "File not found: " << filename << std::endl;
     }
   }
+
+  //TRCNPTreeSource<int> tst;
 
   //next most important thing, if given a raw file && NOT told to not sort!
   if((opt->InputRing().length() || opt->RawInputFiles().size())
