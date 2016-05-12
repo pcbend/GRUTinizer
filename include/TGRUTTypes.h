@@ -34,7 +34,6 @@ enum kFileType {
   ANL_RAW = 4,
   ROOT_DATA = 256,
   ROOT_MACRO = 257,
-  ROOT_TTREE = 258,
   CALIBRATED = 512,
   GVALUE     = 513,
   PRESETWINDOW = 514,

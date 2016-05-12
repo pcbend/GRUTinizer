@@ -2,12 +2,12 @@
 #define _TTREESOURCE_H_
 
 #include <vector>
+#include <cassert>
 
 #include "TObject.h"
 #include "TRawEvent.h"
 #include "TRawSource.h"
 #include "TChain.h"
-#include "TTree.h"
 
 templateClassImp(TTreeSource)
 
@@ -26,7 +26,7 @@ public:
   TTreeSource(const std::vector<char*>& filenames, const char* treename, const char* eventclassname, kFileType file_type, Args&&... args)
     : fChain(treename), fCurrentEntry(0) {
 
-    assert(file_type == kFileType::ROOT_TTREE);
+    assert(file_type == kFileType::ROOT_DATA);
     fFileType = file_type;
 
 
@@ -62,17 +62,18 @@ private:
   virtual int GetEvent(TRawEvent& event) {
     event.SetFileType(fFileType);
 
-    fEvent = new T(*fEvent); // copy construct a new object from the old
-    fChain.GetEntry(fCurrentEntry); // fill the new object with current event data
-    TSmartBuffer eventbuffer(reinterpret_cast<char*>(fEvent),sizeof(fEvent));
+    // copy construct a new object from the old
+    fEvent = new T(*fEvent);
+    // fill the new object with current event data
+    fChain.GetEntry(fCurrentEntry);
+    // create a small memory buffer to hold the pointer to the current entry
+    char* ptrbytes = (char*)malloc(sizeof(fEvent));
+    memcpy(ptrbytes, &fEvent, sizeof(fEvent));
+    TSmartBuffer eventbuffer(ptrbytes,sizeof(fEvent));
     // set the pointer address into the buffer
     event.SetData(eventbuffer);
     // set the timestamp of the ttree event
     event.SetFragmentTimestamp(fEvent->GetTimestamp());
-    // save only the pointer of this object into the TRawEvent SmartBuffer
-    //memcpy(event.GetBody(),&fEvent,sizeof(fEvent));
-    //event.GetBody().SetBuffer(&fEvent,sizeof(fEvent))
-    //eventbuffer.SetBuffer();
 
     fCurrentEntry++;
     //fEvent = nullptr;
