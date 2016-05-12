@@ -28,7 +28,8 @@
 #pragma link C++ class TOrderedRawFile+;
 #pragma link C++ class TSequentialRawFile+;
 
-#pragma link C++ class TTreeSource<int>+;
+#pragma link C++ class EventType+; // to be removed
+#pragma link C++ class TTreeSource<EventType>+;
 
 #pragma link C++ enum TRawEvent::ArgonneType;
 

@@ -60,10 +60,19 @@ protected:
 private:
   TTreeSource() {;}
   virtual int GetEvent(TRawEvent& event) {
+    event.SetFileType(fFileType);
+
     fEvent = new T(*fEvent); // copy construct a new object from the old
     fChain.GetEntry(fCurrentEntry); // fill the new object with current event data
-
-    // save the pointer of this object into the TRawEvents SmartBuffer
+    TSmartBuffer eventbuffer(reinterpret_cast<char*>(fEvent),sizeof(fEvent));
+    // set the pointer address into the buffer
+    event.SetData(eventbuffer);
+    // set the timestamp of the ttree event
+    event.SetFragmentTimestamp(fEvent->GetTimestamp());
+    // save only the pointer of this object into the TRawEvent SmartBuffer
+    //memcpy(event.GetBody(),&fEvent,sizeof(fEvent));
+    //event.GetBody().SetBuffer(&fEvent,sizeof(fEvent))
+    //eventbuffer.SetBuffer();
 
     fCurrentEntry++;
     //fEvent = nullptr;
@@ -79,7 +88,15 @@ private:
   ClassDef(TTreeSource,0);
 };
 
-
+/* Prototype example, to be removed */
+class EventType : public TObject {
+public:
+  EventType(){;}
+  virtual ~EventType(){;}
+  long GetTimestamp() {return fTimestamp;}
+  long fTimestamp;
+  ClassDef(EventType,0);
+};
 
 /* template<typename T, typename... Args> TTreeSource<T> make_ttree_source(const char* filename, const char* treename, Args&&... args) */
 /* { */
