@@ -1,10 +1,6 @@
 #ifndef _TTREESOURCE_H_
 #define _TTREESOURCE_H_
 
-#ifndef __CINT__
-#   include <mutex>
-#endif
-
 #include <vector>
 
 #include "TObject.h"
@@ -18,10 +14,9 @@ templateClassImp(TTreeSource)
 template <typename T>
 class TTreeSource : public TRawEventSource {
 public:
-  TTreeSource() {;}
 
-  TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type)
-    : TTreeSource<T>({filename},treename,eventclassname,file_type) { ; }
+  /* TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type) */
+  /*   : TTreeSource<T>({filename},treename,eventclassname,file_type) { ; } */
 
   template<typename... Args>
   TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type, Args&&... args)
@@ -63,6 +58,7 @@ protected:
   void SetFileSize(long file_size) { fFileSize = file_size; }
 
 private:
+  TTreeSource() {;}
   virtual int GetEvent(TRawEvent& event) {
     fEvent = new T(*fEvent); // copy construct a new object from the old
     fChain.GetEntry(fCurrentEntry); // fill the new object with current event data
@@ -83,6 +79,15 @@ private:
   ClassDef(TTreeSource,0);
 };
 
+
+
+/* template<typename T, typename... Args> TTreeSource<T> make_ttree_source(const char* filename, const char* treename, Args&&... args) */
+/* { */
+
+/* } */
+/* make_ttree_source<BranchType>("./rootfilename.root","treename","branchname"); */
+/* make_ttree_source<BranchType1,BranchType2>("./rootfilename.root","treename","branch1name","branch2name"); */
+/* make_ttree_source<BranchType1,BranchType2>("./rootfilename.root","treename","branch1name", ... ,"branch2name", ...); */
 
 
 #endif
