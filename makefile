@@ -101,7 +101,7 @@ bin:
 	@mkdir -p $@
 
 include/GVersion.h: .git/HEAD .git/index
-	$(call run_and_test,util/gen_version.sh,$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR))
+	$(call run_and_test,util/gen_version.sh,$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 libraries/lib%.so: .build/histos/%.o
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
@@ -148,6 +148,7 @@ clean:
 	@-$(RM) -rf bin
 	@-$(RM) -f $(LIBRARY_OUTPUT)
 	@-$(RM) -f libraries/*.so
+	@-$(RM) -f include/GVersion.h
 
 cleaner: clean
 	@printf "\nEven more clean up\n\n"

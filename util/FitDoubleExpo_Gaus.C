@@ -36,7 +36,7 @@ class twoHistHolder{
         double binContentRight = m_hist->GetBinContent(binNum);
         return (leftDiff*binContentLeft+rightDiff*binContentRight);
       }
-      
+
       else if (x > curBinX && x < nextBinX){
         double leftDiff = x - curBinX;
         double rightDiff = nextBinX - x;
@@ -48,7 +48,7 @@ class twoHistHolder{
         return (leftDiff*binContentLeft+rightDiff*binContentRight);
       }
       std::cout << "FAILED IN HISTVALUE!" << std::endl;
-      std::cout << "x = " << x << "\t curBinX = " << curBinX 
+      std::cout << "x = " << x << "\t curBinX = " << curBinX
                 << "\t nextBinX = " << nextBinX << "\t prevBinX = " << prevBinX << std::endl;
       return m_hist->GetBinContent(binNum);
     }
@@ -88,7 +88,7 @@ class threeHistHolder{
         double binContentRight = m_hist->GetBinContent(binNum);
         return (leftDiff*binContentLeft+rightDiff*binContentRight);
       }
-      
+
       else if (x > curBinX && x < nextBinX){
         double leftDiff = x - curBinX;
         double rightDiff = nextBinX - x;
@@ -105,7 +105,7 @@ class threeHistHolder{
 
     virtual double operator() (double *x, double *par){
       //return histValue(hist1, x[0])*par[0]+histValue(hist2,x[0])*par[1] + histValue(hist3,x[0])*par[2];
-      //Testing varying compton and FEP More consistently 
+      //Testing varying compton and FEP More consistently
       return par[0]*(histValue(hist1, x[0])+histValue(hist2,x[0])*par[1]) + histValue(hist3,x[0])*par[2];
     }
 };
@@ -117,7 +117,7 @@ public:
   double histValue(double x){
     int binNum = m_hist->GetXaxis()->FindBin(x); //gHist->GetBin() does not respect rebinning.
 
-    int nBins = m_hist->GetNbinsX();
+    //int nBins = m_hist->GetNbinsX();
     int kevPerBin = m_hist->GetXaxis()->GetBinWidth(1);   //m_hist->GetXaxis()->GetXmax()/nBins;
     int curBinX = m_hist->GetBinCenter(binNum);
     int nextBinX = m_hist->GetBinCenter(binNum+1);
@@ -133,7 +133,7 @@ public:
       double binContentRight = m_hist->GetBinContent(binNum);
       return (leftDiff*binContentLeft+rightDiff*binContentRight);
     }
-    
+
     else if (x > curBinX && x < nextBinX){
       double leftDiff = x - curBinX;
       double rightDiff = nextBinX - x;
@@ -204,7 +204,7 @@ class DoubleExpTwoHist : twoHistHolder{
               par[2]*(par[3]*TMath::Exp(par[4]*x[0])+par[5]*TMath::Exp(par[6]*x[0]))
              );
     }
-  
+
 };
 class DoubleExpThreeHist : threeHistHolder{
   /*
@@ -220,14 +220,14 @@ class DoubleExpThreeHist : threeHistHolder{
   public:
     DoubleExpThreeHist(TH1 *hist1, TH1 *hist2, TH1 *hist3): threeHistHolder(hist1,hist2,hist3){}
     virtual double operator()(double *x, double *par){
-    //return (par[0]*histValue(hist1, x[0])+par[1]*histValue(hist2,x[0]) + 
+    //return (par[0]*histValue(hist1, x[0])+par[1]*histValue(hist2,x[0]) +
     //        par[2]*histValue(hist3,x[0]) + par[3]*(par[4]*TMath::Exp(par[5]*x[0])+
     //        par[6]*TMath::Exp(par[7]*x[0])));
-      return (par[0]*(histValue(hist1, x[0])+par[1]*histValue(hist2,x[0])) + 
+      return (par[0]*(histValue(hist1, x[0])+par[1]*histValue(hist2,x[0])) +
               par[2]*histValue(hist3,x[0]) + par[3]*(par[4]*TMath::Exp(par[5]*x[0])+
               par[6]*TMath::Exp(par[7]*x[0])));
     }
-  
+
 };
 class DoubleExpHistNoScale : histHolder{
   /*
@@ -241,7 +241,7 @@ class DoubleExpHistNoScale : histHolder{
 public:
   DoubleExpHistNoScale(TH1* hist) : histHolder(hist) {}
   virtual double operator() (double* x, double* par){
-    return (par[0]*histValue(x[0]) + 
+    return (par[0]*histValue(x[0]) +
 	    par[1]*TMath::Exp(par[2]*x[0]) +
             par[3]*TMath::Exp(par[4]*x[0])
             );
@@ -318,7 +318,7 @@ TF1* FitDoubleExpHist(TH1F *hist, TH1F* fitting, Double_t gLowX, Double_t gUpX, 
   return fitfunc;
 }
 
-TF1 *FitDoubleExpTwoHist(TH1F *hist_to_fit, TH1F *geant_hist1, TH1F *geant_hist2, 
+TF1 *FitDoubleExpTwoHist(TH1F *hist_to_fit, TH1F *geant_hist1, TH1F *geant_hist2,
                          Double_t gLowX, Double_t gUpX, Double_t *init=NULL){
   if(gLowX > gUpX){
     std::cout << "Your range is illogical" << std::endl;
@@ -375,7 +375,7 @@ TF1 *FitDoubleExpTwoHist(TH1F *hist_to_fit, TH1F *geant_hist1, TH1F *geant_hist2
 //Geant_hist1 should be the full energy peak for the main peak you want to fit
 //Geant_hist2 should be hte compton background for the main peak
 //Geant_hist3 should be a second two-plus state or some contaminant peak
-TF1 *FitDoubleExpThreeHist(TH1F *hist_to_fit, TH1F *geant_fep, TH1F *geant_compton, 
+TF1 *FitDoubleExpThreeHist(TH1F *hist_to_fit, TH1F *geant_fep, TH1F *geant_compton,
                            TH1F *geant_2ndpeak, Double_t gLowX, Double_t gUpX, Double_t *init=NULL){
   if(gLowX > gUpX){
     std::cout << "Your range is illogical" << std::endl;
@@ -431,6 +431,6 @@ TF1 *FitDoubleExpThreeHist(TH1F *hist_to_fit, TH1F *geant_fep, TH1F *geant_compt
   fitfunc_to_draw->SetParameters(fitfunc->GetParameters());
   fitfunc_to_draw->SetChisquare(fitfunc->GetChisquare());
   fitfunc_to_draw->SetParError(0, fitfunc->GetParError(0));
-  
+
   return fitfunc_to_draw;
 }

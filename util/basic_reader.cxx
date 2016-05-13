@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
   if(argc >2)
     print = atoi(argv[2]);
   printf("printing %i fragment.\n",print);
-  
+
   bool foundone =false;
 
   int count = 1;
@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
     switch(event.GetEventType()) {
       case 1:
         if(count==print) {
-          event.Print("all"); 
+          event.Print("all");
           foundone = true;
 
           TSmartBuffer buf = event.GetPayloadBuffer();
@@ -59,23 +59,11 @@ int main(int argc, char **argv) {
         break;
 
     };
-    if(exitloop) 
+    if(exitloop)
       break;
 
   }
+  (void)foundone; // Stop g++ from complaining that it isn't used.
   printf("\n done.\n\n");
   return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
