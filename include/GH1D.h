@@ -39,6 +39,8 @@ public:
   TH1 *DrawCopy(Option_t *opt="") const;
   TH1 *DrawNormalized(Option_t *opt="",Double_t norm=1) const;
 
+  bool WriteDatFile(const char *outFile);
+  
   GH1D* Project(int bins=-1);
 
   GH1D* GetPrevious(bool DrawEmpty=false) const;
