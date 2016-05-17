@@ -12,7 +12,7 @@
 
 #pragma link C++ class TNSCLEvent+;
 #pragma link C++ class TNSCLFragment+;
-#pragma link C++ class TNSCLScaler+;
+#pragma link C++ class TRawNSCLScalers+;
 #pragma link C++ class TNSCLBuiltRingItem+;
 
 

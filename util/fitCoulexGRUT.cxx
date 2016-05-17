@@ -24,6 +24,8 @@
 #include "TCaesar.h"
 #include "TS800.h"
 
+#include "TInverseMap.h"
+
 //This program takes as input a config file containing:
 //    -  directory containing necessary input root tree files (INPUT_DIR)
 //    -  number of parameters to use in the fit (NUM_PARS)
@@ -335,7 +337,8 @@ int fitCoulex(const char *cfg_file_name){
   //Finished parsing cfg file
   ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  TS800::ReadInverseMap(inverse_map_file_name.c_str());
+  //TS800::ReadInverseMap(inverse_map_file_name.c_str());
+  TInverseMap::Get(inverse_map_file_name.c_str());
   TCaesar *caesar = 0;
   TS800   *s800   = 0;
   //TODO: I Should probably make a CONFIG class that stores all these parameters as simple

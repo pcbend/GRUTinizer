@@ -1,4 +1,4 @@
-// TS800.h TS800Hit.h TS800Scaler.h
+// TS800.h TS800Hit.h TS800Scaler.h TInverseMap.h
 
 #ifdef __CINT__
 
@@ -27,6 +27,7 @@
 #pragma link C++ class THodoHit+;
 
 
+#pragma link C++ class TInverseMap+;
 #pragma link C++ class TS800Hit+;
 #pragma link C++ class TS800+;
 #pragma link C++ class TS800Scaler+;

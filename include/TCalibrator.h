@@ -29,18 +29,20 @@ public:
   TGraph& MakeCalibrationGraph(double min_figure_of_merit = 0.001);
   std::vector<double> Calibrate(double min_figure_of_merit = 0.001);
 
-  void AddData(TH1* source_data, std::string source,
+  int AddData(TH1* source_data, std::string source,
                double sigma=2.0,double threshold=0.05,double error=0.001);
  
-  void AddData(TH1* source_data, TNucleus* source,
+  int AddData(TH1* source_data, TNucleus* source,
                double sigma=2.0,double threshold=0.05,double error=0.001);
 
   void UpdateTChannel(TChannel* channel);
 
   void Fit(int order=1); 
+  double GetParameter(int i=0);
+
 
 private:
-
+  #ifndef __CINT__
   struct SingleFit {
     double max_error;
     std::string nucleus;
@@ -48,15 +50,18 @@ private:
     TGraph graph;
   };
 
+  std::map<std::string,SingleFit> all_fits;
+  #endif
+
   TGraph graph_of_everything;
   TF1    *linfit;
 
   int fit_order;
   int total_points;
 
-  std::map<std::string,SingleFit> all_fits;
 
   void ResetMap(std::map<double,double> &inmap);
+  void PrintMap(std::map<double,double> &inmap);
   bool CheckMap(std::map<double,double> inmap);
 
   ClassDef(TCalibrator,1)

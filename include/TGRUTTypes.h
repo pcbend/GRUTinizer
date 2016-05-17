@@ -23,7 +23,9 @@ enum kDetectorSystems {
 
   CAESAR = 80,
 
-  PHOSWALL = 17
+  PHOSWALL = 17,
+
+  NSCLSCALERS = 100
 };
 
 extern std::map<std::string, kDetectorSystems> detector_system_map;

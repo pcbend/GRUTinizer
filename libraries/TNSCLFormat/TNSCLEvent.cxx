@@ -89,36 +89,36 @@ Int_t TNSCLEvent::GetPayloadSize() const {
 }
 
 // Seconds since the previous scaler read
-Int_t TNSCLScaler::GetIntervalStartOffset(){
+Int_t TRawNSCLScalers::GetIntervalStartOffset(){
   return *(Int_t*)(GetPayload() + 0);
 }
 
 // Seconds since beginning of run
-Int_t TNSCLScaler::GetIntervalEndOffset(){
+Int_t TRawNSCLScalers::GetIntervalEndOffset(){
   return *(Int_t*)(GetPayload() + 4);
 }
 
 // Time when writing to disk
-time_t TNSCLScaler::GetUnixTime(){
+time_t TRawNSCLScalers::GetUnixTime(){
   return *(Int_t*)(GetPayload() + 8);
 }
 
 // Interval (seconds) between each scaler packet
-Int_t TNSCLScaler::GetIntervalDivisor(){
+Int_t TRawNSCLScalers::GetIntervalDivisor(){
   return *(Int_t*)(GetPayload() + 12);
 }
 
 // Number of integers to follow.
-Int_t TNSCLScaler::GetScalerCount(){
+Int_t TRawNSCLScalers::GetScalerCount(){
   return *(Int_t*)(GetPayload() + 16);
 }
 
 // Are the scalers reset after each read
-Int_t TNSCLScaler::IsIncremental(){
+Int_t TRawNSCLScalers::IsIncremental(){
   return *(Int_t*)(GetPayload() + 20);
 }
 
-Int_t TNSCLScaler::GetScalerValue(size_t scaler_num){
+Int_t TRawNSCLScalers::GetScalerValue(size_t scaler_num){
   assert(scaler_num < size_t(GetScalerCount()));
 
   return *(Int_t*)(GetPayload() + 24 + 4*scaler_num);

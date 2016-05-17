@@ -13,7 +13,9 @@
 #include "TReaction.h"
 #include "TSRIM.h"
 
-TJanus::TJanus() { }
+TJanus::TJanus() {
+  Clear();
+}
 
 TJanus::~TJanus(){ }
 
@@ -28,15 +30,20 @@ void TJanus::Clear(Option_t* opt){
   TDetector::Clear(opt);
 
   janus_hits.clear();
+  stack_triggered = -1;
+  num_packets = -1;
+  total_bytes = -1;
 }
 
 int TJanus::BuildHits(std::vector<TRawEvent>& raw_data){
+  assert(raw_data.size() == 1);
+
   for(auto& event : raw_data){
     TNSCLEvent& nscl = (TNSCLEvent&)event;
     SetTimestamp(nscl.GetTimestamp());
     Build_VMUSB_Read(nscl.GetPayloadBuffer());
   }
-  return janus_hits.size();
+  return janus_hits.size() + janus_channels.size();
 }
 
 TJanusHit& TJanus::GetJanusHit(int i){
@@ -54,6 +61,8 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   const VMUSB_Header* vmusb_header = (VMUSB_Header*)data;
   data += sizeof(VMUSB_Header);
 
+  total_bytes = buf.GetSize();
+
   // This value should ALWAYS be zero, because that corresponds to the i1 trigger of the VMUSB.
   // If it is not, it is a malformed event.
   stack_triggered = vmusb_header->stack();
@@ -66,9 +75,10 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   const VME_Timestamp* vme_timestamp = (VME_Timestamp*)(data + num_packets*sizeof(CAEN_DataPacket));
   long timestamp = vme_timestamp->ts1() * 20;
 
-  // std::cout << "JANUS timestamp at " << timestamp << std::endl;
+  // std::cout << "----------- TS = " << timestamp << " ---------------" << std::endl;
 
-  //buf.Print("all");
+  // buf.Print("all");
+  std::cout << *vmusb_header << std::endl;
 
   std::map<unsigned int,TJanusHit> front_hits;
   std::map<unsigned int,TJanusHit> back_hits;
@@ -76,6 +86,7 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
     const CAEN_DataPacket* packet = (CAEN_DataPacket*)data;
     data += sizeof(CAEN_DataPacket);
 
+    std::cout << *packet << std::endl;
 
     if(!packet->IsValid()){
       continue;
@@ -98,11 +109,11 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
     static int lines_displayed = 0;
     if(!chan){
       if(lines_displayed < 1000) {
-        // std::cout << "Unknown analog (slot, channel): ("
-        //           << adc_cardnum << ", " << packet->channel_num()
-        //           << "), address = 0x"
-        //           << std::hex << address << std::dec
-        //           << std::endl;
+        std::cout << "Unknown analog (slot, channel): ("
+                  << adc_cardnum << ", " << packet->channel_num()
+                  << "), address = 0x"
+                  << std::hex << address << std::dec
+                  << std::endl;
       } else if(lines_displayed==1000){
         std::cout << "I'm going to stop telling you that the channel was unknown,"
                   << " you should probably stop the program." << std::endl;
@@ -125,10 +136,22 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
       hit->SetTDCOverflowBit(packet->overflow());
       hit->SetTDCUnderflowBit(packet->underflow());
       hit->SetTime(packet->adcvalue());
+
+      // //if(packet->adcvalue() > 150 && packet->adcvalue() < 4000) {
+      //   int channel_number = (adc_cardnum-5)*32 + packet->channel_num();
+      //   std::cout << "TDC, channel=" << channel_number << "\tvalue=" << packet->adcvalue()
+      //             << std::endl;
+      //   //}
     } else {
       hit->SetADCOverflowBit(packet->overflow());
       hit->SetADCUnderflowBit(packet->underflow());
       hit->SetCharge(packet->adcvalue());
+
+      // //if(packet->adcvalue() > 150 && packet->adcvalue() < 4000) {
+      //   int channel_number = (adc_cardnum-5)*32 + packet->channel_num();
+      //   std::cout << "ADC, channel=" << channel_number << "\tvalue=" << packet->adcvalue()
+      //             << std::endl;
+      //   //}
     }
   }
 
@@ -139,6 +162,13 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   for(auto& elem : back_hits){
     TJanusHit& hit = elem.second;
     janus_channels.emplace_back(hit);
+
+    // if(hit.Time() > 50 && hit.Time() < 4000) {
+    //   std::cout << "address: 0x" << std::hex << hit.Address() << std::dec
+    //             << "\tvalue: " << hit.Time()
+    //             << "\tvalue: " << janus_channels.back().Time()
+    //             << std::endl;
+    // }
   }
 
   // Find all fronts with a reasonable TDC value
@@ -146,9 +176,11 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   int max_charge = -1;
   for(auto& elem : front_hits){
     TJanusHit& hit = elem.second;
-    // if(hit.Time() > 200 && hit.Time() < 3900 &&
+    // if(hit.Time() > 50 && hit.Time() < 3900 &&
     //    hit.Charge() > max_charge){
-    if(hit.Charge() > max_charge){
+    if(hit.Charge() > max_charge &&
+       hit.GetDetnum() >= 0 &&
+       hit.GetDetnum() < 2){
       best_front = elem.first;
       max_charge = hit.Charge();
     }
@@ -159,9 +191,11 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   max_charge = -1;
   for(auto& elem : back_hits){
     TJanusHit& hit = elem.second;
-    // if(hit.Time() > 200 && hit.Time() < 3900 &&
+    // if(hit.Time() > 50 && hit.Time() < 3900 &&
     //    hit.Charge() > max_charge) {
-    if(hit.Charge() > max_charge) {
+    if(hit.Charge() > max_charge &&
+       hit.GetDetnum() >= 0 &&
+       hit.GetDetnum() < 2){
       best_back = elem.first;
       max_charge = hit.Charge();
     }
@@ -181,6 +215,15 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
     hit.GetBackHit().SetCharge(back.Charge());
     hit.GetBackHit().SetTime(back.Time());
     hit.GetBackHit().SetTimestamp(back.Timestamp());
+
+    // std::cout << "Front chan: " << hit.GetFrontChannel() << ", ADC=" << front.Charge() << ", TDC=" << front.Time()
+    //           << "\tBack chan: " << hit.GetBackChannel() << ", ADC=" << back.Charge() << ", TDC=" << back.Time()
+    //           << std::endl;
+
+    // std::cout << "Back hit is channel: " << hit.GetBackChannel()
+    //           << " with TDC = " << hit.GetBackHit().Time()
+    //           << ", ADC = " << hit.GetBackHit().Charge()
+    //           << std::endl;
 
   } //else {
 //   static bool message_displayed = false;
