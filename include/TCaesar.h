@@ -88,6 +88,7 @@ public:
     return fAddbackCondition;
   }
 #endif
+//  void AddHit(TCaesarHit &hit);
 
 private:
   void BuildAddback() const;
