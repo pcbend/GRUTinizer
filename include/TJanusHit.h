@@ -6,6 +6,7 @@
 class TJanusHit : public TDetectorHit {
 public:
   TJanusHit() { }
+  TJanusHit(const TJanusHit& hit);
 
   int GetDetnum() const;
 

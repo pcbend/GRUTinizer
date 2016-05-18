@@ -85,7 +85,7 @@ run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  
                 rm -f $(2).log $(2).error
 endif
 
-all: $(EXECUTABLES) $(LIBRARY_OUTPUT) bin/grutinizer-config $(HISTOGRAM_SO) extras
+all: include/GVersion.h $(EXECUTABLES) $(LIBRARY_OUTPUT) bin/grutinizer-config $(HISTOGRAM_SO) extras
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
 
 docs:
@@ -102,6 +102,9 @@ bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) bin
 
 bin lib:
 	@mkdir -p $@
+
+include/GVersion.h: .git/HEAD .git/index
+	$(call run_and_test,util/gen_version.sh,$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 lib/lib%.so: .build/histos/%.o | lib
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
@@ -158,7 +161,7 @@ $(foreach lib,$(LIBRARY_DIRS),$(eval $(call library_template,$(lib))))
 
 clean:
 	@printf "\n$(WARN_COLOR)Cleaning up$(NO_COLOR)\n\n"
-	@-$(RM) -rf .build bin lib
+	@-$(RM) -rf .build bin lib include/GVersion.h
 
 cleaner: clean
 	@printf "\nEven more clean up\n\n"
