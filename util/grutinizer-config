@@ -44,11 +44,11 @@ if [ -z "$GRUTSYS" ]; then
 fi
 
 bindir=$GRUTSYS/bin
-libdir=$GRUTSYS/libraries
+libdir=$GRUTSYS/lib
 incdir=$GRUTSYS/include
 #utildir=$GRUTSYS/etc
 
-grutlibs="-lTGRUTUtil -lTRawFormat -lGROOT -lTNSCLFormat -lTGEBFormat -lTGRUTUtil -lTNucleus -lTKinematics -lTReaction -lTSRIM"
+grutlibs="-lTGRUTUtil -lTRawFormat -lGROOT -lTNSCLFormat -lTGEBFormat -lTGRUTUtil -lTNucleus -lTKinematics -lTReaction -lTSRIM -lTNSCLScalers"
 detlibs="-lTSega -lTDetector  -lTGretina -lTJanus -lTPhosWall -lTS800 -lTFastScint -lTCaesar -lTS800Sim -lTGretSim"
 grutmore="-lTGRUTint -lTLoops -lTHistogramming "
 

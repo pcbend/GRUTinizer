@@ -80,5 +80,5 @@ int TDataLoop::Pop(TRawEvent &event) {
 
 
 std::string TDataLoop::Status() {
-  return source->Status();
+  return source->Status(TGRUTOptions::Get()->LongFileDescription());
 }

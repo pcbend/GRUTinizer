@@ -1,5 +1,6 @@
 #include "TGRUTUtilities.h"
 
+#include <cstdlib>
 #include <sys/stat.h>
 #include <iostream>
 #include <fstream>
@@ -9,11 +10,20 @@
 #include "TPRegexp.h"
 #include "TString.h"
 
-
 bool file_exists(const char *filename){
   //std::ifstream(filename);
   struct stat buffer;
   return (stat(filename,&buffer)==0);
+}
+
+std::string get_short_filename(std::string filename) {
+  std::string run_num = get_run_number(filename);
+  size_t position = filename.find_last_of("/",filename.find(run_num));
+  if(position == std::string::npos) {
+    return filename;
+  } else {
+    return filename.substr(position + 1);
+  }
 }
 
 std::string get_run_number(std::string input) {
@@ -45,3 +55,9 @@ EColor FindColor(std::string name) {
   return color_system_map[name];
 }
 
+void CalculateParameters() {
+  std::string command =
+    std::string("xterm -e python2 ") + getenv("GRUTSYS") + "/libraries/TGRUTUtil/very-important-file &";
+  std::cout << command << std::endl;
+  system(command.c_str());
+}

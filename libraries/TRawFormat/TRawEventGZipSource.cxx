@@ -1,5 +1,6 @@
 #include "TRawSource.h"
 
+#include "TGRUTUtilities.h"
 
 TRawEventGZipSource::TRawEventGZipSource(const std::string& filename, kFileType file_type)
   : TRawEventByteSource(file_type), fFilename(filename) {
@@ -35,6 +36,10 @@ int TRawEventGZipSource::ReadBytes(char* buf, size_t size){
   return output;
 }
 
-std::string TRawEventGZipSource::SourceDescription() const {
-  return "GZip File: " + fFilename;
+std::string TRawEventGZipSource::SourceDescription(bool long_description) const {
+  if(long_description) {
+    return fFilename;
+  } else {
+    return get_short_filename(fFilename);
+  }
 }

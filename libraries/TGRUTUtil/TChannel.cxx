@@ -417,7 +417,7 @@ int TChannel::WriteCalFile(std::string outfilename,Option_t *opt) {
   //}
   int count =0;
   if(outfilename.length()>0) {
-    ofstream calout;
+    std::ofstream calout;
     calout.open(outfilename.c_str());
     for(auto &iter : chanvec) {
       calout << iter.PrintToString(opt);

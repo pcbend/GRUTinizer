@@ -87,9 +87,6 @@ TRawEventSource* TRawEventSource::EventSource(const char* filename,
     source = new TRawEventBZipSource(filename, file_type);
   } else if (hasSuffix(filename,".gz")){
     source = new TRawEventGZipSource(filename, file_type);
-  // If it is an in-progress file, open it that way
-  } else if (is_online) {
-    source = new TRawEventOnlineFileSource(filename, file_type);
   // Otherwise, open it as a normal file.
   } else {
     source = new TRawEventFileSource(filename, file_type);
@@ -120,9 +117,9 @@ void TRawEventByteSource::Reset() {
   fCurrentBuffer = TSmartBuffer();
 }
 
-std::string TRawEventByteSource::Status() const {
+std::string TRawEventByteSource::Status(bool long_description) const {
   return Form("%s: %s %8.2f MB given %s / %s %8.2f MB total %s  => %s %3.02f MB/s processed %s",
-              SourceDescription().c_str(),
+              SourceDescription(long_description).c_str(),
               DCYAN, GetBytesGiven()/1e6, RESET_COLOR,
               BLUE,  GetFileSize()/1e6, RESET_COLOR,
               GREEN, GetAverageRate()/1e6, RESET_COLOR);
@@ -247,6 +244,6 @@ int TRawEventPipeSource::ReadBytes(char* buf, size_t size){
   return output;
 }
 
-std::string TRawEventPipeSource::SourceDescription() const {
+std::string TRawEventPipeSource::SourceDescription(bool /*long_description*/) const {
   return "Pipe: " + fCommand;
 }

@@ -472,7 +472,7 @@ bool TNucleus::LoadTransitionFile(){
   filename.append(std::to_string(this->GetA()));
   filename.append(".sou");
 
-  ifstream transfile;
+  std::ifstream transfile;
   transfile.open(filename.c_str());
   if(!transfile.is_open()) {
     //printf("failed: %s\n",filename.c_str());
