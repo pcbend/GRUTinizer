@@ -262,6 +262,7 @@ int TCrdc::GetMaxPad() const {
   if(!data.size())
     return -1.0;
 
+  //std::cout << " Data has size? = " << data.size() << std::endl;
  std::map<int,double> sum; 
 
 //  temp = data.at(0);
@@ -573,9 +574,11 @@ bool TCrdc::IsGoodSample(int i) const {
 
 float TCrdc::GetDispersiveX() const{
   int maxpad = GetMaxPad();
+  //std::cout << " Before Max Pad Return " << std::endl;
   if (maxpad ==-1){
     return sqrt(-1);
   }
+  //std::cout << " After Max Pad Return " << std::endl;
 
   float x_slope = sqrt(-1);
   float x_offset = sqrt(-1);
@@ -645,6 +648,11 @@ float TCrdc::GetNonDispersiveY() {
     y_slope = GValue::Value("CRDC2_Y_SLOPE");
     y_offset = GValue::Value("CRDC2_Y_OFFSET");
   }
+
+  if(std::isnan(y_slope))
+    y_slope = 1.0;
+  if(std::isnan(y_offset))
+    y_offset = 0.0;
 
   // std::cout << " ------------------ "  << std::endl;
   // std::cout << " 2 Slope = " << y_slope << std::endl;
