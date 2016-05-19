@@ -16,6 +16,7 @@ class TGrandRaidenHit : public TDetectorHit {
 
     void     BuildFrom(TSmartBuffer& buf);
 
+    Int_t test;
 
     // Long_t   GetLED()       const { return led; }
     // Long_t   GetCFD()       const { return cfd; }

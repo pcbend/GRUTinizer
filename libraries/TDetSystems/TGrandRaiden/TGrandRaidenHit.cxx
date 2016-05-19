@@ -1,10 +1,11 @@
 #include "TGrandRaidenHit.h"
-
 #include "TGRUTOptions.h"
+#include "rootalyze.h"
+#include "TSmartBuffer.h"
 
 ClassImp(TGrandRaidenHit)
 
-TGrandRaidenHit::TGrandRaidenHit(){
+TGrandRaidenHit::TGrandRaidenHit() : test(0) {
 
 }
 
@@ -18,8 +19,11 @@ TGrandRaidenHit::~TGrandRaidenHit() {
 void TGrandRaidenHit::BuildFrom(TSmartBuffer& buf){
   Clear();
 
-  //auto header = (TRawEvent::GEBGrandRaidenHead*)buf.GetData();
-  //buf.Advance(sizeof(TRawEvent::GEBGrandRaidenHead));
+  auto event = reinterpret_cast<const RCNPEvent*>(buf.GetData());
+  buf.Advance(sizeof(event));
+
+  cout << "TGrandRaidenHit::BuildFrom" << endl;
+  test = 1;
 
 }
 

@@ -9,6 +9,8 @@
 #include "TRawSource.h"
 #include "TChain.h"
 
+#include "rootalyze.h"
+
 templateClassImp(TTreeSource)
 
 template <typename T>
