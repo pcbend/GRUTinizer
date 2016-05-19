@@ -21,7 +21,8 @@ enum kDetectorSystems {
   FASTSCINT =4,
   CAESAR = 80,
   PHOSWALL = 17,
-  ANL = 14
+  ANL = 14,
+  GRAND_RAIDEN = 50
 };
 
 extern std::map<std::string, kDetectorSystems> detector_system_map;

@@ -15,6 +15,7 @@
 #include "TSega.h"
 #include "TFastScint.h"
 #include "TArgonne.h"
+#include "TGrandRaiden.h"
 
 TUnpackedEvent::TUnpackedEvent() { }
 
@@ -33,7 +34,7 @@ void TUnpackedEvent::Build() {
     case kDetectorSystems::GRETINA:
       GetDetector<TGretina>(true)->Build(raw_data);
       break;
-    
+
     case kDetectorSystems::GRETINA_SIM:
       GetDetector<TGretSim>(true)->Build(raw_data);
       break;
@@ -81,6 +82,11 @@ void TUnpackedEvent::Build() {
     case kDetectorSystems::ANL:
       GetDetector<TArgonne>(true)->Build(raw_data);
       break;
+
+    case kDetectorSystems::GRAND_RAIDEN:
+      GetDetector<TGrandRaiden>(true)->Build(raw_data);
+      break;
+
 
     default:
       break;
