@@ -19,12 +19,18 @@ TGrandRaidenHit::~TGrandRaidenHit() {
 void TGrandRaidenHit::BuildFrom(TSmartBuffer& buf){
   Clear();
 
-  auto event = reinterpret_cast<const RCNPEvent*>(buf.GetData());
-  buf.Advance(sizeof(event));
+  //char* ptrbytes = (char*)calloc(1,sizeof(RCNPEvent*));
+  //auto buffer = buf.GetData();
+  //memcpy(&ptrbytes, &buffer, sizeof(RCNPEvent*));
+  //TSmartBuffer temp(std::move(buf));
 
-  cout << "TGrandRaidenHit::BuildFrom" << endl;
+  auto event = const_cast<RCNPEvent*>((const RCNPEvent*)buf.GetData());
+
+  //std::cout << event->GR_ADC() << std::endl;
   test = 1;
-
+  buf.Advance(sizeof(event));
+  //buf.Clear();
+  //if (event) delete event;
 }
 
 

@@ -20,28 +20,47 @@ public:
   /* TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type) */
   /*   : TTreeSource<T>({filename},treename,eventclassname,file_type) { ; } */
 
-  template<typename... Args>
-  TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type, Args&&... args)
-    : TTreeSource<T>({filename},treename,eventclassname,file_type,std::forward<Args>(args)...) { ; }
+  // template<typename... Args>
+  // TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type, Args&&... args)
+  //   : TTreeSource<T>({filename},treename,eventclassname,file_type,std::forward<Args>(args)...) { ; }
 
-  template<typename... Args>
-  TTreeSource(const std::vector<char*>& filenames, const char* treename, const char* eventclassname, kFileType file_type, Args&&... args)
+  // template<typename... Args>
+  // TTreeSource(const std::vector<char*>& filenames, const char* treename, const char* eventclassname, kFileType file_type, Args&&... args)
+
+  // template<typename... Args>
+  // TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type, Args&&... args)
+  //   : fChain(treename), fCurrentEntry(0) {
+
+  //   assert(file_type == kFileType::ROOT_DATA);
+
+  //   fFileType = file_type;
+
+  //   fChain.Add(filename);
+
+  //   fFileSize =  fChain.GetEntries()*sizeof(T);
+
+  //   if (sizeof...(Args) > 0) {
+  //     fEvent = new T(std::forward<Args>(args)...);
+  //   } else {
+  //     fEvent = new T();
+  //   }
+  //   fChain.SetBranchAddress(eventclassname, &fEvent);
+  // }
+  TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type)
     : fChain(treename), fCurrentEntry(0) {
 
     assert(file_type == kFileType::ROOT_DATA);
+
     fFileType = file_type;
 
+    fChain.Add(filename);
 
-    for (auto fn : filenames) {
-      fChain.Add(fn);
-    }
-    fFileSize =  fChain.GetEntries()*sizeof(T);
+    fNumEvents = fChain.GetEntries();
 
-    if (sizeof...(Args) > 0) {
-      fEvent = new T(std::forward<Args>(args)...);
-    } else {
-      fEvent = new T();
-    }
+    fFileSize =  fNumEvents*sizeof(T);
+
+    fEvent = new T();
+
     fChain.SetBranchAddress(eventclassname, &fEvent);
   }
 
@@ -64,50 +83,37 @@ private:
   virtual int GetEvent(TRawEvent& event) {
     event.SetFileType(fFileType);
 
+    // if there are no more events, signal termination
+    if (fCurrentEntry == fNumEvents) { return -1; }
     // copy construct a new object from the old
-    fEvent = new T(*fEvent);
+    fEvent = new T();
     // fill the new object with current event data
     fChain.GetEntry(fCurrentEntry);
     // create a small memory buffer to hold the pointer to the current entry
-    char* ptrbytes = (char*)malloc(sizeof(fEvent));
-    memcpy(ptrbytes, &fEvent, sizeof(fEvent));
+    char* ptrbytes = (char*)calloc(1,sizeof(fEvent));
+    // copy the address stored in fEvent into the temporary buffer
+    memcpy(&ptrbytes, &fEvent, sizeof(fEvent));
+    // prepare the events smart buffer payload
     TSmartBuffer eventbuffer(ptrbytes,sizeof(fEvent));
     // set the pointer address into the buffer
     event.SetData(eventbuffer);
     // set the timestamp of the ttree event
+    fEvent->SetTimestamp(fNumEvents - fCurrentEntry);
     event.SetFragmentTimestamp(fEvent->GetTimestamp());
-
+    // increment the event count
     fCurrentEntry++;
     //fEvent = nullptr;
-    return sizeof(*fEvent);
+    return sizeof(fEvent);
   }
 
   TChain fChain;
   kFileType fFileType;
+  long fNumEvents;
   long fFileSize;
   T* fEvent;
   long fCurrentEntry;
 
   ClassDef(TTreeSource,0);
 };
-
-/* Prototype example, to be removed */
-class EventType : public TObject {
-public:
-  EventType(){;}
-  virtual ~EventType(){;}
-  long GetTimestamp() {return fTimestamp;}
-  long fTimestamp;
-  ClassDef(EventType,0);
-};
-
-/* template<typename T, typename... Args> TTreeSource<T> make_ttree_source(const char* filename, const char* treename, Args&&... args) */
-/* { */
-
-/* } */
-/* make_ttree_source<BranchType>("./rootfilename.root","treename","branchname"); */
-/* make_ttree_source<BranchType1,BranchType2>("./rootfilename.root","treename","branch1name","branch2name"); */
-/* make_ttree_source<BranchType1,BranchType2>("./rootfilename.root","treename","branch1name", ... ,"branch2name", ...); */
-
 
 #endif

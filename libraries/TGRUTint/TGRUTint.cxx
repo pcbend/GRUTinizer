@@ -178,12 +178,13 @@ void TGRUTint::ApplyOptions() {
     TFile* tfile = OpenRootFile(filename);
     cuts_files.push_back(tfile);
   }
-
-  for(auto filename : opt->RootInputFiles()) {
-    OpenRootFile(filename);
-    // this will populate gChain if able.
-    //   TChannels from the root file will be loaded as file is opened.
-    //   GValues from the root file will be loaded as file is opened.
+  if (!opt->TreeSource()) {
+    for(auto filename : opt->RootInputFiles()) {
+      OpenRootFile(filename);
+      // this will populate gChain if able.
+      //   TChannels from the root file will be loaded as file is opened.
+      //   GValues from the root file will be loaded as file is opened.
+    }
   }
 
   //if I am passed any calibrations, lets load those, this
@@ -212,10 +213,10 @@ void TGRUTint::ApplyOptions() {
     }
   }
 
-  //TRCNPTreeSource<int> tst;
 
   //next most important thing, if given a raw file && NOT told to not sort!
-  if((opt->InputRing().length() || opt->RawInputFiles().size())
+  if((opt->InputRing().length() || opt->RawInputFiles().size()
+      || (opt->RootInputFiles().size() && opt->TreeSource()))
      && !missing_file && opt->SortRaw()) {
 
     TRawEventSource* source = NULL;

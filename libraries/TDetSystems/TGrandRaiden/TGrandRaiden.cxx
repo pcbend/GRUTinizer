@@ -25,7 +25,7 @@ int TGrandRaiden::BuildHits(std::vector<TRawEvent>& raw_data){
   for(auto& event : raw_data){
     SetTimestamp(event.GetTimestamp());
     TGrandRaidenHit hit;
-    auto buf = event.GetPayloadBuffer();
+    auto buf = event.GetBuffer();
     hit.BuildFrom(buf);
     hit.SetTimestamp(event.GetTimestamp());
     InsertHit(hit);

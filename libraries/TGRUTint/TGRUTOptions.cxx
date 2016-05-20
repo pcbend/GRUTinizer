@@ -87,6 +87,13 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .description("Input file(s)");
   parser.option("o output", &output_file)
     .description("Root output file");
+
+
+  parser.option("T tree-source", &fTreeSource)
+    .description("Input TTree source.")
+    .default_value(false);
+
+
   parser.option("hist-output",&output_histogram_file)
     .description("Output file for histograms");
   parser.option("r ring",&input_ring)
