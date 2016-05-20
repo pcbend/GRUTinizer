@@ -7,6 +7,8 @@ class TTree;
 class TH1;
 class TH2;
 class GH2I;
+class GH2D;
+class GH1D;
 class GMarker;
 class TF1;
 class GPeak;
@@ -24,6 +26,8 @@ GPeak *PhotoPeakFit(TH1*,double,double,Option_t *opt="");
 GGaus *GausFit(TH1*,double,double,Option_t *opt="");
 
 std::string MergeStrings(const std::vector<std::string>& strings, char split='\n');
+
+bool GetProjection(GH2D *hist,double low, double high, double bg_low=0,double bg_high=0);
 
 //bool PeakFit(TH1*,Double_t,Double_t,Option_t *opt="");
 
