@@ -17,6 +17,10 @@
 //For easy parsing of detector positions
 #include <fstream>
 
+#ifndef __CINT__
+#include <functional>
+#endif
+
 class TCaesar : public TDetector {
 
 

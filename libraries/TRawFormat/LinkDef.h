@@ -20,7 +20,6 @@
 #pragma link C++ class TRawEventPipeSource+;
 #pragma link C++ class TRawEventBZipSource+;
 #pragma link C++ class TRawEventRingSource+;
-#pragma link C++ class TRawEventOnlineFileSource+;
 
 #pragma link C++ class TRawFile+;
 #pragma link C++ class TRawFileIn+;

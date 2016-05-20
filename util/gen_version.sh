@@ -6,6 +6,7 @@ include_file="$script_dir"/../include/GVersion.h
 release_commit=$(git describe --abbrev=0 --match="v*")
 release_num=$(echo "$release_commit" | sed -e 's/v//')
 release_time=$(git show -s --format=%ai "$release_commit" | tail -n 1)
+release_name=$(git rev-parse "$release_commit" | xargs git cat-file -p | tail -n1)
 
 git_commit=$(git describe)
 git_branch=$(git branch | sed -n '/\* /s///p')
@@ -17,6 +18,7 @@ read -r -d '' file_contents <<EOF
 
 #define GRUT_RELEASE "$release_num"
 #define GRUT_RELEASE_TIME "$release_time"
+#define GRUT_RELEASE_NAME "$release_name"
 
 #define GRUT_GIT_COMMIT "$git_commit"
 #define GRUT_GIT_BRANCH "$git_branch"

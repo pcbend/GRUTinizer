@@ -53,10 +53,10 @@ public:
   }
 #endif
 
+  const std::vector<TGretinaHit> &GetAllHits() const { return gretina_hits; }
 
 private:
   void BuildAddback() const;
-  
 #if !defined (__CINT__) 
   static std::function<bool(const TGretinaHit&,const TGretinaHit&)> fAddbackCondition;  
 #endif

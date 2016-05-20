@@ -114,6 +114,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("build-window", &fBuildWindow)
     .description("Build window, timestamp units")
     .default_value(1000);
+  parser.option("long-file-description", &fLongFileDescription)
+    .description("Show full path to file in status messages")
+    .default_value(false);
   parser.option("f format",&default_file_format)
     .description("File format of raw data.  Allowed options are \"EVT\" and \"GEB\"."
                  "If unspecified, will be guessed from the filename.");
