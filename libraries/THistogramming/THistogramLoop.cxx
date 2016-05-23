@@ -59,7 +59,9 @@ bool THistogramLoop::Iteration() {
       OpenFile();
     }
 
+
     compiled_histograms.Fill(*event);
+
     delete event;
   }
   if(stopsent && input_queue.Size()<1) {
