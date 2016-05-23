@@ -43,8 +43,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
   for(int y=0;y<cagra->Size();y++) {
     TArgonneHit hit = cagra->GetArgonneHit(y);
 
-
     if(hit.GetBoardID() == 113) {
+      cout << hit.GetLED() << endl;
       stream.str("");
       stream << "Crystal" << hit.GetChannel();
       float Energy = ((hit.GetPostE() - hit.GetPreE())/350.0);

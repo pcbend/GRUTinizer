@@ -33,8 +33,4 @@ private:
   ClassDef(TGrandRaiden,1);
 };
 
-
-
-
-
 #endif

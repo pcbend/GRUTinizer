@@ -112,7 +112,7 @@ private:
   long fFileSize;
   T* fEvent;
   long fCurrentEntry;
-
+  
   ClassDef(TTreeSource,0);
 };
 

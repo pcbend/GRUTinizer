@@ -5,8 +5,8 @@
 
 ClassImp(TGrandRaidenHit)
 
-TGrandRaidenHit::TGrandRaidenHit() : test(0) {
-
+TGrandRaidenHit::TGrandRaidenHit() {
+  memset(&ADC[0],0,sizeof(Double_t));
 }
 
 TGrandRaidenHit::~TGrandRaidenHit() {
@@ -19,15 +19,26 @@ TGrandRaidenHit::~TGrandRaidenHit() {
 void TGrandRaidenHit::BuildFrom(TSmartBuffer& buf){
   Clear();
 
+  // method 1
   //char* ptrbytes = (char*)calloc(1,sizeof(RCNPEvent*));
   //auto buffer = buf.GetData();
   //memcpy(&ptrbytes, &buffer, sizeof(RCNPEvent*));
+
+  // method 2
   //TSmartBuffer temp(std::move(buf));
 
+  // method 3
   auto event = const_cast<RCNPEvent*>((const RCNPEvent*)buf.GetData());
+  auto adc = event->GR_ADC();
+  if (adc != nullptr) {
+    std::copy(adc->begin(),adc->end(),&ADC[0]);
+  }
+
+  // for (int i=0; i<4; i++) {
+  //   std::cout << ADC[i] << " ";
+  // } std::cout << std::endl;
 
   //std::cout << event->GR_ADC() << std::endl;
-  test = 1;
   buf.Advance(sizeof(event));
   //buf.Clear();
   //if (event) delete event;
