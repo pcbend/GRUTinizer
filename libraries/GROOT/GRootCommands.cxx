@@ -82,6 +82,9 @@ bool GetProjection(GH2D *hist,double low, double high, double bg_low,double bg_h
   }else{
     Proj_x->SetTitle(Form("Projection with Gate From [%.01f,%.01f] NO background",low,high));
   }
+  Proj_x->GetXaxis()->SetTitle("Energy [keV]");
+  Proj_x->GetYaxis()->SetTitle("Counts ");
+  
 
 
   double Grace = 300;
@@ -128,6 +131,8 @@ bool GetProjection(GH2D *hist,double low, double high, double bg_low,double bg_h
   }else{
     Proj_gated->SetTitle(Form("Gate From [%.01f,%.01f] NO Background",low,high));
   }
+  Proj_gated->GetXaxis()->SetTitle("Energy [keV]");
+  Proj_gated->GetYaxis()->SetTitle("Counts");
  
   C_projections->cd(2);
   Proj_gated->Draw();

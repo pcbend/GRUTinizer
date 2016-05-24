@@ -111,6 +111,7 @@ TDirectory* TRuntimeObjects::FillHistogram(const char* dirname,const char* name,
 					   int bins, double low, double high, double value,
                                            double weight){
 
+  
   TDirectory *dir = (TDirectory*)GetObjects().FindObject(dirname);
   if(!dir){
     dir = new TDirectory(dirname,dirname);
