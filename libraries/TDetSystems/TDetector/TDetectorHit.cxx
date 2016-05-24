@@ -39,16 +39,17 @@ void TDetectorHit::Copy(TObject& obj) const {
 }
 
 double TDetectorHit::GetEnergy() const {
-  if(!std::isnan(fEnergy))
-    return fEnergy;
+  //if(!std::isnan(fEnergy))
+  //  return fEnergy;
+  double energy;
   TChannel* chan = TChannel::GetChannel(fAddress);
   if(!chan){
-    fEnergy = Charge() + gRandom->Uniform();
+    energy = Charge() + gRandom->Uniform();
     //return Charge() + gRandom->Uniform();
   } else {
-    fEnergy = chan->CalEnergy(Charge(), fTimestamp);
+    energy = chan->CalEnergy(Charge(), fTimestamp);
   }
-  return fEnergy;
+  return energy;
 }
 
 void TDetectorHit::AddEnergy(double eng) {
