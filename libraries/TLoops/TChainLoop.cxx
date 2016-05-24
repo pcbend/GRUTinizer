@@ -101,9 +101,11 @@ bool TChainLoop::Iteration() {
     if(!det->TestBit(TDetector::kUnbuilt)){
       event->AddDetector(det);
     } else {
-      std::cout << det->IsA()->GetName() << " was not present in this event (TS=" 
-        << det->Timestamp() << ")"
-        << std::endl;
+      if(det->Timestamp()!=-1){
+	std::cout << det->IsA()->GetName() << " was not present in this event (TS=" 
+		  << det->Timestamp() << ")"
+		  << std::endl;
+      }
       delete det;
     }
   }
