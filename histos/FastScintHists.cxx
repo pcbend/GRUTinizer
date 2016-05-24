@@ -109,6 +109,22 @@ void MakeHistograms(TRuntimeObjects& obj) {
       //obj.FillHistogram(dirname,histname,4000,0,4000,hit.GetEnergy(),
       //                           4000,0,4000,hit2.GetEnergy());
 
+      if(abs(hit.GetEnergy() - gamma1) < tol1){
+         dirname = "coincidence_energy_gated";
+         histname = Form("%5.1f_in_channel_%i__dtime_vs_energy_in_channel_%i",gamma1,hit.GetChannel(),hit2.GetChannel());
+         obj.FillHistogram(dirname,histname,4000,-2000,2000,hit.GetTime() - hit2.GetTime(),
+                                            4000,0,4000,hit2.GetEnergy());
+
+      }//end if correct energy in first detector
+
+      if(abs(hit2.GetEnergy() - gamma1) < tol1){
+         dirname = "coincidence_energy_gated";
+         histname = Form("%5.1f_in_channel_%i__dtime_vs_energy_in_channel_%i",gamma1,hit2.GetChannel(),hit.GetChannel());
+         obj.FillHistogram(dirname,histname,4000,-2000,2000,hit2.GetTime() - hit.GetTime(),
+                                            4000,0,4000,hit.GetEnergy());
+
+      }//end if correct energy in second detector
+
       if((abs(hit.GetEnergy() - gamma1) < tol1) && (abs(hit2.GetEnergy() - gamma2) < tol2)){
 
          dirname = "coincidence_energy_gated";
@@ -117,11 +133,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
          histname = "dtime_vs_eventnum";
          obj.FillHistogram(dirname,histname,4000,-2000,2000,hit.GetTime() - hit2.GetTime(),
-                                             20000000/200000,0,20000000, eventnum);
+                                            20000000/200000,0,20000000, eventnum);
 
 
-
-      }//end if coincidence with correct energies   
+      }//end if correct energies in two coincident detectros   
 
     }//end for loop over j
   }//end for loop over i
