@@ -45,6 +45,15 @@ public:
 
   void  Print(Option_t *opt="") const;
   void  Clear(Option_t *opt="");
+  Int_t Compare(const TObject *obj) const { 
+    TGretinaHit *other = (TGretinaHit*)obj;
+    if(this->GetCoreEnergy()>other->GetCoreEnergy())
+      return -1;
+    else if(this->GetCoreEnergy()<other->GetCoreEnergy())
+      return 1;  //sort largest to smallest.
+    return 0;
+  }
+  
   Int_t Size() const { return fNumberOfInteractions; }//fSegmentNumber.size(); }
 
   double GetX() const { return GetPosition().X(); }
@@ -91,9 +100,6 @@ public:
     tmp = GetCoreEnergy(EngRange)*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*vec)));
     return tmp;
   }
-
-
-
 
 
 

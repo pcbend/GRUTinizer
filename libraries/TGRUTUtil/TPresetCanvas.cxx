@@ -211,7 +211,7 @@ int TPresetCanvas::ReadWinFile(const char* filename,Option_t *opt) {
 int TPresetCanvas::WriteWinFile(std::string outfilename,Option_t *opt) {
   int count =0;
   if(outfilename.length()>0) {
-    ofstream winout;
+    std::ofstream winout;
     winout.open(outfilename.c_str());
     for(auto &iter : fPadMap) {
       winout << iter.second.PrintString(opt);

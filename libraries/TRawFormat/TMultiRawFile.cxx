@@ -75,20 +75,20 @@ void TMultiRawFile::Reset() {
   }
 }
 
-std::string TMultiRawFile::SourceDescription() const{
+std::string TMultiRawFile::SourceDescription(bool long_description) const{
   std::lock_guard<std::mutex> lock(fFileListMutex);
 
   std::stringstream ss;
   ss << "Multi file: ";
   int i=0;
   for(auto& file : fFileList){
-    ss << i << " = (" << file->SourceDescription() << ") ";
+    ss << i << " = (" << file->SourceDescription(long_description) << ") ";
     i++;
   }
   return ss.str();
 }
 
-std::string TMultiRawFile::Status() const{
+std::string TMultiRawFile::Status(bool long_description) const{
   std::lock_guard<std::mutex> lock(fFileListMutex);
 
   std::stringstream ss;
@@ -101,7 +101,7 @@ std::string TMultiRawFile::Status() const{
 
   size_t max_length = 0;
   for(auto& file : fFileList){
-    max_length = std::max(max_length, file->SourceDescription().length());
+    max_length = std::max(max_length, file->SourceDescription(long_description).length());
   }
 
   for(auto& file : fFileList){

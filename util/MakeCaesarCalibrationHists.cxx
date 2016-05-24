@@ -45,7 +45,7 @@ int main(int argc, char *argv[]){
   std::vector<std::string> input_file_names;
   std::vector<TFile*> files;
   std::string line;
-  ifstream input_file;
+  std::ifstream input_file;
 
   TH1D* output_hists[NUM_FILES][N_RINGS][MAX_DETS];
   TFile *out_file = new TFile(argv[2], "recreate");
