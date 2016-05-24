@@ -8,6 +8,8 @@ public:
   TJanusHit() { }
   TJanusHit(const TJanusHit& hit);
 
+  TJanusHit& operator=(const TJanusHit& hit);
+
   int GetDetnum() const;
 
   void Clear(Option_t* opt = "");

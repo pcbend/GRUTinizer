@@ -255,21 +255,27 @@ static void SwapMode3Head(GEBMode3Head &head);
 
 //typedef struct {
 struct GEBMode3Data {
-  UShort_t led_middle;
-  UShort_t led_low;
-  UShort_t energy_low;
-  UShort_t led_high;
-  UShort_t cfd_low;
-  UShort_t energy_high;
-  UShort_t cfd_high;
-  UShort_t cfd_middle;
-  UShort_t cfd_pt1_high;
-  UShort_t cfd_pt1_low;
-  UShort_t cfd_pt2_high;
-  UShort_t cfd_pt2_low;
-  Long_t GetLed() const;
-  Long_t GetCfd() const;
+  UShort_t led_middle;    
+  UShort_t led_low;       
+  UShort_t energy_low;    
+  UShort_t led_high;      
+  UShort_t cfd_low;       
+  UShort_t energy_high;   
+  UShort_t cfd_high;      
+  UShort_t cfd_middle;    
+  UShort_t cfd_pt1_high;  
+  UShort_t cfd_pt1_low;   
+  UShort_t cfd_pt2_high;  
+  UShort_t cfd_pt2_low;   
+  Long_t GetLed() const;  
+  Long_t GetCfd() const;  
+  UShort_t GetDeltaT1() const;
+  UShort_t GetDeltaT2() const;
+
   Int_t  GetEnergy(GEBMode3Head&) const;
+  Int_t  GetEnergy0(GEBMode3Head&) const;
+  Int_t  GetEnergy1(GEBMode3Head&) const;
+  Int_t  GetEnergy2(GEBMode3Head&) const;
 }__attribute__((__packed__));
 
 friend std::ostream& operator<<(std::ostream& os, const GEBMode3Data &data);

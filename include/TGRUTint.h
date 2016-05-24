@@ -66,7 +66,7 @@ public:
 private:
   Long_t DelayedProcessLine(std::string message);
 
-  //TTimer* fGuiTimer;
+  TTimer* fKeepAliveTimer;
 #ifndef __CINT__
   std::thread::id main_thread_id;
 #endif
