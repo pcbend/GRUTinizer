@@ -1,8 +1,10 @@
 #ifndef _TTREESOURCE_H_
 #define _TTREESOURCE_H_
 
-#include <vector>
+#include <queue>
 #include <cassert>
+#include <fstream>
+#include <sstream>
 
 #include "TObject.h"
 #include "TRawEvent.h"
@@ -62,6 +64,8 @@ public:
     fEvent = new T();
 
     fChain.SetBranchAddress(eventclassname, &fEvent);
+
+    LoadFakeTimestamps();
   }
 
   ~TTreeSource() {;}
@@ -77,6 +81,24 @@ public:
 
 protected:
   void SetFileSize(long file_size) { fFileSize = file_size; }
+  void LoadFakeTimestamps() {
+
+    std::string line; std::stringstream stream; ULong_t ts;
+    ifstream file ("/projects/ceclub/sullivan/cagragr/GRUTinizer/timestamps.dat");
+    if (file.is_open())
+    {
+      while ( getline (file,line) )
+      {
+	stream << line;
+	stream >> ts;
+	timestamps.push(ts);
+	stream.str("");
+	stream.clear();
+	//std::cout << ts << std::endl;
+      }
+      file.close();
+    }
+  }
 
 private:
   TTreeSource() {;}
@@ -98,7 +120,13 @@ private:
     // set the pointer address into the buffer
     event.SetData(eventbuffer);
     // set the timestamp of the ttree event
-    fEvent->SetTimestamp(fNumEvents - fCurrentEntry);
+    if (timestamps.size()==0) {
+      std::cout << "End of time stamps" << std::endl;
+      return -1;
+    }
+    fEvent->SetTimestamp(timestamps.front()+1);
+    timestamps.pop();
+
     event.SetFragmentTimestamp(fEvent->GetTimestamp());
     // increment the event count
     fCurrentEntry++;
@@ -112,7 +140,8 @@ private:
   long fFileSize;
   T* fEvent;
   long fCurrentEntry;
-  
+  queue<Long_t> timestamps;
+
   ClassDef(TTreeSource,0);
 };
 

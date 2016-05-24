@@ -33,6 +33,7 @@ void TGrandRaidenHit::BuildFrom(TSmartBuffer& buf){
   if (adc != nullptr) {
     std::copy(adc->begin(),adc->end(),&ADC[0]);
   }
+  Timestamp = event->GetTimestamp();
 
   // for (int i=0; i<4; i++) {
   //   std::cout << ADC[i] << " ";

@@ -7,7 +7,7 @@ PLATFORM:=$(PLATFORM)
 # EDIT THIS SECTION
 
 GRANAPATH = ../GRAnalyzer/analyzer
-GRANALYZER = $(realpath $(GRANAPATH))
+GRANALYZER = $(realpath $(GRANAPATH)/../lib)
 INCLUDES   = include $(GRANAPATH)/include
 CFLAGS     = -g -std=c++11 -O3 -Wall -Wextra -pedantic -Wno-unused-parameter
 LINKFLAGS_PREFIX  =

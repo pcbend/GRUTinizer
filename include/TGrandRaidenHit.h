@@ -20,6 +20,7 @@ class TGrandRaidenHit : public TDetectorHit {
     Double_t* GetADC() { return &ADC[0]; }
     Double_t GetADC(const Int_t& i) const { return ADC[i]; }
     //void SetADC(Int_t chan, const Double_t& val) { ADC[chan] = val; }
+    Long_t Timestamp;
 
 
   private:
