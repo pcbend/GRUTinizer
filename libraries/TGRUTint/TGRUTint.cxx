@@ -74,7 +74,7 @@ TGRUTint *TGRUTint::instance(int argc,char** argv, void *options, int numOptions
 
 TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t noLogo,const char *appClassName)
   :TRint(appClassName, &argc, argv, options, numOptions,noLogo),
-   main_thread_id(std::this_thread::get_id()), fIsTabComplete(false),
+   fKeepAliveTimer(NULL), main_thread_id(std::this_thread::get_id()), fIsTabComplete(false),
    fAllowedToTerminate(true) {
 
   fGRUTEnv = gEnv;
@@ -94,7 +94,11 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
 }
 
 
-TGRUTint::~TGRUTint() { }
+TGRUTint::~TGRUTint() {
+  if(fKeepAliveTimer) {
+    delete fKeepAliveTimer;
+  }
+}
 
 
 void TGRUTint::Init() {
@@ -108,29 +112,12 @@ void TGRUTint::Init() {
   std::string grutpath = getenv("GRUTSYS");
   gInterpreter->AddIncludePath(Form("%s/include",grutpath.c_str()));
 
-  LoadDetectorClasses();
-
   ApplyOptions();
 }
 
 void TGRUTint::SplashPopNWait(bool flag) {
   //PopupLogo(false);
   //WaitLogo();
-}
-
-void TGRUTint::LoadDetectorClasses() {
-  if(!gROOT->LoadClass("TGretina") ||
-     !gROOT->LoadClass("TGretinaHit") ||
-     !gROOT->LoadClass("std::vector<TGretinaHit>") ||
-     !gROOT->LoadClass("TS800") ||
-
-     !gROOT->LoadClass("TSega") ||
-     !gROOT->LoadClass("TJanus")
-    //gROOT->LoadClass("TPhosWall",false);
-  ){
-    std::cout << "Could not load all GRUT classes" << std::endl;
-  }
-
 }
 
 
@@ -164,6 +151,9 @@ void TGRUTint::ApplyOptions() {
   if(!false) { //this can be change to something like, if(!ClassicRoot)
      LoadGRootGraphics();
   }
+
+  fKeepAliveTimer = new TTimer("",1000);
+  fKeepAliveTimer->Start();
 
 
   TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
@@ -586,6 +576,7 @@ void TGRUTint::Terminate(Int_t status){
     fflush(stdout);
   }
 
+  TChannel::DeleteAllChannels();
   TRint::Terminate(status);
 }
 

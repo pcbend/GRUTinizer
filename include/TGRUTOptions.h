@@ -59,6 +59,8 @@ public:
   std::string GenerateOutputFilename(const std::string& filename);
   std::string GenerateOutputFilename(const std::vector<std::string>& filename);
 
+  bool LongFileDescription() const { return fLongFileDescription; }
+
 
   void SetStartGUI(bool flag=true) { fStartGui=flag; }
 
@@ -104,6 +106,8 @@ private:
   int fBuildWindow;
 
   bool fShouldExit;
+
+  bool fLongFileDescription;
 
   ClassDef(TGRUTOptions,0);
 };
