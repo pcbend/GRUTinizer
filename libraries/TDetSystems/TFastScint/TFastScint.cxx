@@ -40,7 +40,7 @@ void TFastScint::Clear(Option_t* opt){
 
 void TFastScint::Print(Option_t *opt) const { 
   printf("TFastScint @  %lu \n",Timestamp());
-  for(int x=0;x<Size();x++) {
+  for(unsigned int x=0;x<Size();x++) {
     printf("\t");
     GetLaBrHit(x).Print();
   }
@@ -54,7 +54,7 @@ int TFastScint::BuildHits(std::vector<TRawEvent>& raw_data){
     SetTimestamp(nscl.GetTimestamp());
     errors+=Build_From(nscl,true);
   }
-  return Size();
+  return (int)Size();
 }
 
 void TFastScint::InsertHit(const TDetectorHit& hit){
@@ -63,14 +63,14 @@ void TFastScint::InsertHit(const TDetectorHit& hit){
   fs_hits.push_back((TFastScintHit)hit);
 }
 
-int TFastScint::Size() const {
+unsigned int TFastScint::Size() const {
   return fs_hits.size(); //->GetEntries();
 }
 
 
 int TFastScint::GoodSize() const {
   int size=0;
-  for(int i =0;i<Size();i++) {
+  for(unsigned int i =0;i<Size();i++) {
     if(fs_hits[i].Charge()>100)
       size++;
   }
@@ -85,7 +85,7 @@ TFastScintHit TFastScint::GetLaBrHit(int i) const {
 
 int TFastScint::GetDetNumberIn_fs_hits(Int_t det){
   int detNumber = -1;
-  for(int i_hit = 0; i_hit < Size(); i_hit++){
+  for(unsigned int i_hit = 0; i_hit < Size(); i_hit++){
     TFastScintHit& temp_hit = fs_hits.at(i_hit);
     if(temp_hit.GetChannel()==det)
       detNumber=i_hit;
@@ -94,7 +94,7 @@ int TFastScint::GetDetNumberIn_fs_hits(Int_t det){
 }
 
 TFastScintHit *TFastScint::FindHit(int channelnumber) {
-  for(int i=0;i<Size();i++) {
+  for(unsigned int i=0;i<Size();i++) {
     if(fs_hits.at(i).GetChannel()==channelnumber)
       return &fs_hits[i];
   }

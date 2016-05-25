@@ -49,7 +49,7 @@ public:
   void SetULM(int ulm) { fUlm = ulm; }
 
 
-  int Size() const { return caesar_hits.size(); }
+  unsigned int Size() const { return caesar_hits.size(); }
   int AddbackSize() { BuildAddbackTest(); return addback_hits.size(); }
 
 //double GetEnergyDC(TCaesarHit hit);
