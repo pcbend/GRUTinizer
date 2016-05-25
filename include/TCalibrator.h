@@ -40,18 +40,19 @@ public:
   void Fit(int order=1); 
   double GetParameter(int i=0);
 
-
-private:
-  #ifndef __CINT__
+#ifndef __CINT__
   struct SingleFit {
     double max_error;
     std::string nucleus;
     std::map<double,double> data2source;
     TGraph graph;
   };
+#endif
 
+private:
+#ifndef __CINT__
   std::map<std::string,SingleFit> all_fits;
-  #endif
+#endif
 
   TGraph graph_of_everything;
   TF1    *linfit;

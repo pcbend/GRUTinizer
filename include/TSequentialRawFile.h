@@ -11,8 +11,8 @@ public:
   void Add(TRawEventSource* infile);
   virtual void Reset();
 
-  virtual std::string SourceDescription() const;
-  virtual std::string Status() const;
+  virtual std::string SourceDescription(bool long_description = false) const;
+  virtual std::string Status(bool long_description = false) const;
   virtual int GetLastErrno() const;
   virtual std::string GetLastError() const;
 

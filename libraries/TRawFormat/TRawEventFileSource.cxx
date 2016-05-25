@@ -1,5 +1,7 @@
 #include "TRawSource.h"
 
+#include "TGRUTUtilities.h"
+
 //#include "FileSize.h"
 
 TRawEventFileSource::TRawEventFileSource(const std::string& filename, kFileType file_type)
@@ -38,6 +40,10 @@ int TRawEventFileSource::ReadBytes(char* buf, size_t size){
   return output;
 }
 
-std::string TRawEventFileSource::SourceDescription() const {
-  return "File: " + fFilename;
+std::string TRawEventFileSource::SourceDescription(bool long_description) const {
+  if(long_description) {
+    return fFilename;
+  } else {
+    return get_short_filename(fFilename);
+  }
 }

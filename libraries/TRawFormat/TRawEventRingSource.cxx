@@ -28,6 +28,6 @@ TRawEventRingSource::TRawEventRingSource(const std::string& ringname, kFileType 
   : TRawEventPipeSource(generate_ring_command(ringname), file_type),
     fRingName(ringname) { }
 
-std::string TRawEventRingSource::SourceDescription() const {
+std::string TRawEventRingSource::SourceDescription(bool /*long_description*/) const {
   return "Ring: " + fRingName;
 }

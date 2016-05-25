@@ -10,6 +10,11 @@ TJanusHit::TJanusHit(const TJanusHit& hit) {
   hit.Copy(*this);
 }
 
+TJanusHit& TJanusHit::operator=(const TJanusHit& hit) {
+  hit.Copy(*this);
+  return *this;
+}
+
 void TJanusHit::Copy(TObject& obj) const {
   TDetectorHit::Copy(obj);
 
