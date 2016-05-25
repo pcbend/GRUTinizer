@@ -28,6 +28,8 @@ public:
 
   int Size() { return detectors.size(); }
 
+  std::map<kDetectorSystems, std::vector<TRawEvent> >& GetRawData() { return raw_data_map; }
+
 private:
   std::vector<TDetector*> detectors;
   std::map<kDetectorSystems, std::vector<TRawEvent> > raw_data_map;
