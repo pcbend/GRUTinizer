@@ -53,15 +53,13 @@ public:
   void LoadRawFile(std::string filename);
 
   void LoadTCutG(TCutG* cutg);
+  TList *GetListOfRawFiles() { return &fOpenedRawFiles; }
 
-public:
   void DelayedProcessLine_Action();
 
-
- protected:
-   void RunMacroFile(const std::string& filename);
-   void SplashPopNWait(bool flag);
-   void CreateDataLoop();
+protected:
+  void RunMacroFile(const std::string& filename);
+  void SplashPopNWait(bool flag);
 
 private:
   Long_t DelayedProcessLine(std::string message);
@@ -77,7 +75,6 @@ private:
   bool fIsTabComplete;
   bool fAllowedToTerminate;
 
-  TChain* fChain;
   TDataLoop* fDataLoop;
   TChainLoop* fChainLoop;
   THistogramLoop* fHistogramLoop;
@@ -86,10 +83,6 @@ private:
   void ApplyOptions();
   void LoadGRootGraphics();
 
-public:
-  TList *GetListOfRawFiles() { return &fOpenedRawFiles; }
-
-private:
   TList fOpenedRawFiles;
 
   ClassDef(TGRUTint,0);

@@ -7,55 +7,40 @@
 
 #include <pwd.h>
 
-#include <Getline.h>
-#include <TClass.h>
-#include <TFile.h>
-#include <TInterpreter.h>
-#include <TPython.h>
-#include <TROOT.h>
-#include <TString.h>
-#include <TTree.h>
-#include <TUnixSystem.h>
+#include "Getline.h"
+#include "TClass.h"
+#include "TCutG.h"
+#include "TFile.h"
+#include "TInterpreter.h"
+#include "TMethodCall.h"
+#include "TPython.h"
+#include "TROOT.h"
+#include "TString.h"
+#include "TThread.h"
+#include "TTree.h"
+#include "TUnixSystem.h"
+#include "TVirtualPad.h"
 
-#include <TCutG.h>
-#include <TThread.h>
-#include <TMethodCall.h>
-#include <TVirtualPad.h>
-
+#include "GRootCommands.h"
 #include "GRootGuiFactory.h"
-
-#include "TChannel.h"
 #include "GValue.h"
+#include "GrutNotifier.h"
+#include "TBuildingLoop.h"
+#include "TChainLoop.h"
+#include "TChannel.h"
+#include "TDataLoop.h"
 #include "TDetectorEnv.h"
-
 #include "TGRUTOptions.h"
+#include "TGRUTUtilities.h"
+#include "THistogramLoop.h"
+#include "TInverseMap.h"
+#include "TMultiRawFile.h"
 #include "TOrderedRawFile.h"
 #include "TRawSource.h"
-#include "TMultiRawFile.h"
 #include "TSequentialRawFile.h"
-
-#include "GrutNotifier.h"
-#include "TGRUTUtilities.h"
-#include "GRootCommands.h"
-
-#include "TDataLoop.h"
-#include "TBuildingLoop.h"
+#include "TTerminalLoop.h"
 #include "TUnpackingLoop.h"
 #include "TWriteLoop.h"
-#include "TChainLoop.h"
-#include "THistogramLoop.h"
-
-#include "TInverseMap.h"
-
-//extern "C" G__value G__getitem(const char* item);
-//#include "FastAllocString.h"
-//char* G__valuemonitor(G__value buf, G__FastAllocString& temp);
-
-//extern void PopupLogo(bool);
-//extern void WaitLogo();
-
-
-//TChain *gChain = NULL;
 
 ClassImp(TGRUTint)
 
@@ -82,7 +67,6 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
   TGRUTInterruptHandler *ih = new TGRUTInterruptHandler();
   ih->Add();
 
-  fChain = 0;
   fRootFilesOpened = 0;
   fRawFilesOpened  = 0;
   fHistogramLoop = 0;
@@ -249,19 +233,15 @@ void TGRUTint::ApplyOptions() {
       fDataLoop->SetSelfStopping(false);
     }
 
-    fDataLoop->Resume();
 
 
-    TBuildingLoop *boop = TBuildingLoop::Get("2_build_loop",fDataLoop);
-    boop->SetBuildWindow(opt->BuildWindow());
-    boop->Resume();
-    TUnpackingLoop *uoop1 = TUnpackingLoop::Get("3_unpack1",boop);
-    uoop1->Resume();
-    //TUnpackingLoop *uoop2 = TUnpackingLoop::Get("unpack2",boop);
-    //uoop2->Resume();
-    // TUnpackingLoop *uoop3 = TUnpackingLoop::Get("unpack3",boop);
-    // uoop3->Resume();
+    TBuildingLoop* build_loop = TBuildingLoop::Get("2_build_loop");
+    build_loop->SetBuildWindow(opt->BuildWindow());
+    build_loop->InputQueue() = fDataLoop->OutputQueue();
 
+    TUnpackingLoop* unpack_loop = TUnpackingLoop::Get("3_unpack1");
+    unpack_loop->InputQueue() = build_loop->OutputQueue();
+    auto current_queue = &unpack_loop->OutputQueue();
 
     // Determine output file names
     std::string rootoutfile = "temp_tree.root";
@@ -282,9 +262,9 @@ void TGRUTint::ApplyOptions() {
       histoutfile = opt->OutputHistogramFile();
     }
 
-    TWriteLoop* woop = TWriteLoop::Get("4_write_loop", rootoutfile);
-    woop->Connect(uoop1);
-    //woop->Connect(uoop2);
+    TWriteLoop* write_loop = TWriteLoop::Get("4_write_loop", rootoutfile);
+    write_loop->InputQueue() = *current_queue;
+    current_queue = &write_loop->OutputQueue();
 
     if(opt->MakeHistos()){
       fHistogramLoop = THistogramLoop::Get("5_hist_loop");
@@ -292,11 +272,22 @@ void TGRUTint::ApplyOptions() {
       for(auto cut_file : cuts_files) {
         fHistogramLoop->AddCutFile(cut_file);
       }
+      fHistogramLoop->InputQueue() = *current_queue;
+      current_queue = &fHistogramLoop->OutputQueue();
+    }
 
-      woop->AttachHistogramLoop(fHistogramLoop);
+    TTerminalLoop* terminal_loop = TTerminalLoop::Get("6_terminal_loop");
+    terminal_loop->InputQueue() = *current_queue;
+
+    fDataLoop->Resume();
+    build_loop->Resume();
+    unpack_loop->Resume();
+    write_loop->Resume();
+    if(fHistogramLoop) {
       fHistogramLoop->Resume();
     }
-    woop->Resume();
+    terminal_loop->Resume();
+
   } else if(opt->RawInputFiles().size() && !opt->SortRaw()) {
     //ok now, if told not to sort open any raw files as _data# (rootish like??)
     for(unsigned int x=0;x<opt->RawInputFiles().size();x++) {
@@ -306,13 +297,13 @@ void TGRUTint::ApplyOptions() {
 
 
   //next, if given a root file and told to sort it.
-  //TChainLoop* coop = NULL;
   if(gChain->GetListOfBranches() &&  (opt->MakeHistos() || opt->SortRoot()) ){
     printf("Attempting to sort root files.\n");
     fChainLoop = TChainLoop::Get("1_chain_loop",gChain);
     if(!opt->ExitAfterSorting()){
       fChainLoop->SetSelfStopping(false);
     }
+
     fHistogramLoop = THistogramLoop::Get("2_hist_loop");
     gChain->GetEntry(0);
     std::string histoutfile = "hist" + get_run_number(gChain->GetCurrentFile()->GetName()) + ".root";
@@ -331,9 +322,14 @@ void TGRUTint::ApplyOptions() {
     for(auto cut_file : cuts_files) {
       fHistogramLoop->AddCutFile(cut_file);
     }
-    fChainLoop->AttachHistogramLoop(fHistogramLoop);
+    fHistogramLoop->InputQueue() = fChainLoop->OutputQueue();
+
+    TTerminalLoop* terminal_loop = TTerminalLoop::Get("6_terminal_loop");
+    terminal_loop->InputQueue() = fHistogramLoop->OutputQueue();
+
     fHistogramLoop->Resume();
     fChainLoop->Resume();
+    terminal_loop->Resume();
   }
 
   for(auto& filename : opt->MacroInputFiles()){

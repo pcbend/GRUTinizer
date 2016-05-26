@@ -4,14 +4,13 @@
 #ifndef __CINT__
 #include <atomic>
 #include <condition_variable>
+#include <memory>
 #include <thread>
 #endif
 
 #include <cstdlib>
 #include <iostream>
 #include <map>
-
-#include <TNamed.h>
 
 #include "StoppableThread.h"
 #include "ThreadsafeQueue.h"
@@ -24,19 +23,21 @@ public:
   static TDataLoop *Get(std::string name="", TRawEventSource* source=0);
   virtual ~TDataLoop();
 
+#ifndef __CINT__
+  std::shared_ptr<ThreadsafeQueue<TRawEvent> >& OutputQueue() { return output_queue; }
+#endif
+
   const TRawEventSource& GetSource() const { return *source; }
 
   std::string Status();
   virtual void ClearQueue();
 
-  //protected:
-  bool Iteration();
+  virtual bool Iteration();
+  virtual void OnEnd();
 
-  int Pop(TRawEvent &event);
-
-  size_t GetItemsPushed()  { return output_queue.ItemsPushed(); }
-  size_t GetItemsPopped()  { return output_queue.ItemsPopped(); }
-  size_t GetItemsCurrent() { return output_queue.Size();        }
+  size_t GetItemsPushed()  { return output_queue->ItemsPushed(); }
+  size_t GetItemsPopped()  { return output_queue->ItemsPopped(); }
+  size_t GetItemsCurrent() { return output_queue->Size();        }
   size_t GetRate()         { return 0; }
 
   void ReplaceSource(TRawEventSource* new_source);
@@ -47,17 +48,16 @@ public:
 
 private:
   TDataLoop(std::string name,TRawEventSource* source);
-  //ThreadsafeQueue<TRawEvent>& output_queue,std::string name="");
   TDataLoop();
   TDataLoop(const TDataLoop& other);
   TDataLoop& operator=(const TDataLoop& other);
 
-  ThreadsafeQueue<TRawEvent> output_queue;
   TRawEventSource* source;
 
   bool fSelfStopping;
 
 #ifndef __CINT__
+  std::shared_ptr<ThreadsafeQueue<TRawEvent> > output_queue;
   std::mutex source_mutex;
 #endif
 

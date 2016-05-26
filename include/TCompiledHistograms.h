@@ -30,11 +30,6 @@ public:
 
   std::string GetLibraryName() const { return libname; }
 
-  //TList* GetVariables();
-  // void SetReplaceVariable(const char* name, double value);
-  // void RemoveVariable(const char* name);
-  //TList* GetVariables() { return &variables; }
-
   void SetDefaultDirectory(TDirectory* dir);
   TDirectory* GetDefaultDirectory() { return default_directory; }
 
@@ -66,7 +61,6 @@ private:
 
   TList objects;
   TList gates;
-//  TList variables;
   std::vector<TFile*> cut_files;
 
   TDirectory* default_directory;
