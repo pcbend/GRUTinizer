@@ -266,13 +266,13 @@ GH1D* GH2Base::GetNextSummary(const GH1D* curr,bool DrawEmpty) {
   if(binnum > max_binnum){
     binnum = 1;
   }
-
+  GH1D *g =0;
   int start_bin = binnum;
   switch(fSummaryDirection) {
     case kXDirection: 
       while(true) {
         std::string hist_name = Form("%s_%d",GetTH2()->GetName(),binnum);
-	GH1D* g = (GH1D*)fSummaryProjections->FindObject(hist_name.c_str());
+	g = (GH1D*)fSummaryProjections->FindObject(hist_name.c_str());
 	if(g && g->Integral() > 0) {
 	  return g;
 	}
@@ -292,7 +292,7 @@ GH1D* GH2Base::GetNextSummary(const GH1D* curr,bool DrawEmpty) {
       while(true) {
         std::string hist_name = Form("%s_%d",GetTH2()->GetName(),binnum);
 	
-	GH1D* g = (GH1D*)fSummaryProjections->FindObject(hist_name.c_str());
+	g = (GH1D*)fSummaryProjections->FindObject(hist_name.c_str());
 	if(g && g->Integral() > 0) {
 	  return g;
 	}
@@ -309,7 +309,7 @@ GH1D* GH2Base::GetNextSummary(const GH1D* curr,bool DrawEmpty) {
       }
       break;
   }
-  return 0;
+  return g;
   //return SummaryProject(binnum);
 }
 
