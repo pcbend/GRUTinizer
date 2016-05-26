@@ -33,36 +33,44 @@ TCalibrator::~TCalibrator() {
 void TCalibrator::Copy(TObject &obj) const { }
 
 void TCalibrator::Print(Option_t *opt) const {
-  for(auto it:all_fits) {
-    printf("Calibration for %s\tmax error: %.04f\n",it.first.c_str(),it.second.max_error);
-    int counter = 0;
-    printf("\t\t energy\tchannel\n");
-    for(auto it2:it.second.data2source) {
-      printf("\t%i\t%.1f\t%.1f\n",counter++,it2.second,it2.first);
-    }
-    printf("------------------\n");
-  } 
-  if(linfit) linfit->Print();
+  int counter=0;
+  printf("\t\t energy\tcent\tarea\tnuc\tintensity\n");
+  for(auto it:fPeaks) {
+    printf("%i:\t%.02f\t%.02f\t%.02f\t%s\t%.04f\n",counter++,it.energy,it.centroid,it.area,it.nucleus.c_str(),it.intensity);
+  }
+  printf("-------------------------------\n");
+
+  //for(auto it:all_fits) {
+    //printf("Calibration for %s\tmax error: %.04f\n",it.first.c_str(),it.second.max_error);
+    //int counter = 0;
+    //printf("\t\t energy\tchannel\n");
+    //for(auto it2:it.second.data2source) {
+    //  printf("\t%i\t%.1f\t%.1f\n",counter++,it2.second,it2.first);
+    //}
+    //printf("------------------\n");
+  //} 
+  //if(linfit) linfit->Print();
 }
 
 void TCalibrator::Clear(Option_t *opt) { 
   graph_of_everything.Clear(opt);
-  all_fits.clear();
+  //all_fits.clear();
   total_points=0;
 }
 
 void TCalibrator::Draw(Option_t *opt) { 
-  if((graph_of_everything.GetN()<1) &&
-     (all_fits.size()>0))
-    MakeCalibrationGraph();
+  //if((graph_of_everything.GetN()<1) &&
+  //    (all_fits.size()>0))
+  MakeCalibrationGraph();
   Fit();
   graph_of_everything.Draw("AC*");
 }
 
 void TCalibrator::Fit(int order) {
-  if((graph_of_everything.GetN()<1) &&
-     (all_fits.size()>0))
-    MakeCalibrationGraph();
+  
+  //if((graph_of_everything.GetN()<1) &&
+  //    (all_fits.size()>0))
+  MakeCalibrationGraph();
   if(graph_of_everything.GetN()<1)
     return;
   if(order==1) {
@@ -81,6 +89,7 @@ void TCalibrator::Fit(int order) {
     linfit->SetParName(2,"C");
   }
   graph_of_everything.Fit(linfit);
+  
 }
 
 double TCalibrator::GetParameter(int i) {
@@ -96,15 +105,13 @@ TGraph &TCalibrator::MakeCalibrationGraph(double min_fom) {
   //std::vector<double> xerrors;
   //std::vector<double> yerrors;
 
-  for(auto it:all_fits) {
-    for(auto it2:it.second.data2source) {
-      xvalues.push_back(it2.first);
-      yvalues.push_back(it2.second);
-    }
+  for(auto it:fPeaks) {
+    xvalues.push_back(it.centroid);
+    yvalues.push_back(it.energy);
   }  
   graph_of_everything.Clear();
   graph_of_everything = TGraph(xvalues.size(),xvalues.data(),yvalues.data());
- 
+
   return graph_of_everything; 
 }
 
@@ -112,110 +119,71 @@ std::vector<double> TCalibrator::Calibrate(double min_fom) { std::vector<double>
 
 
 int TCalibrator::AddData(TH1 *data,std::string source, double sigma,double threshold,double error) { 
-  if(!data || !source.length()) 
+  if(!data || !source.length()) { 
+    printf("data not added. data = %p \t source = %s\n",(void*)data,source.c_str());
     return 0;
+  }
   TNucleus n(source.c_str());
   return AddData(data,&n,sigma,threshold,error);
 }
 
 int TCalibrator::AddData(TH1 *data,TNucleus *source, double sigma,double threshold,double error) { 
-  if(!data || !source)
+  if(!data || !source) {
+    printf("data not added. data = %p \t source = %p\n",(void*)data,(void*)source);
     return 0;
-
+  }
   int actual_x_max = std::floor(data->GetXaxis()->GetXmax());
   int actual_x_min = std::floor(data->GetXaxis()->GetXmax());
   int displayed_x_max = std::floor(data->GetXaxis()->GetBinUpEdge(data->GetXaxis()->GetLast()));
   int displayed_x_min = std::floor(data->GetXaxis()->GetBinLowEdge(data->GetXaxis()->GetFirst()));
-  
+
   std::string name;
   if((actual_x_max==displayed_x_max) && (actual_x_min==displayed_x_min))
     name = source->GetName();
   else
     name = Form("%s_%i_%i",source->GetName(),displayed_x_min,displayed_x_max);
 
-  
-  
   TIter iter(source->GetTransitionList());
   std::vector<double> source_energy;
+  std::map<double,double> src_eng_int;
   while(TTransition *transition = (TTransition*)iter.Next()) {
     source_energy.push_back(transition->GetEnergy());
+    src_eng_int[transition->GetEnergy()] = transition->GetIntensity();
   }
   std::sort(source_energy.begin(),source_energy.end());
 
   TSpectrum spectrum;
   spectrum.Search(data,sigma,"",threshold);
-  //std::vector<double> data_channels;
-  std::map<double,double> datatosource; 
+  std::vector<double> data_channels;
+  std::map<double,double> peak_area;; 
+  //std::vector<double> data;
   for(int x=0;x<spectrum.GetNPeaks();x++) {
     double range = 8*data->GetXaxis()->GetBinWidth(1);
     printf(DGREEN "\tlow %.02f \t high %.02f" RESET_COLOR "\n",spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range);
     GGaus *fit = GausFit(data,spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range,"");
     //data_channels
     //data_channels.push_back(fit.GetCentroid());
-    datatosource[fit->GetCentroid()] = sqrt(-1);
+    //datatosource[fit->GetCentroid()] = sqrt(-1);
+    data_channels.push_back(fit->GetCentroid());
     data->GetListOfFunctions()->Remove(fit);
+    peak_area[fit->GetCentroid()] = fit->GetSum();
   }
 
-    
-  double max_err = 0.0000;
-  std::map<std::pair<double,double>, double> source_test;
-  std::map<std::pair<double,double>, double> data_test;
-  
-  for(auto &data_ita: datatosource) {
-    for(auto &data_itb: datatosource) {
-      if(data_ita==data_itb) continue;
-      data_test[std::make_pair(data_ita.first,data_itb.first)] = data_ita.first/data_itb.first;  
-    } 
-  } 
-  bool exitloops=false;
-  for(auto source_a:source_energy) {
-    if(exitloops) break;
-    source_test.clear();
-    int last=-1;
-    for(auto source_b:source_energy) {
-      if(exitloops) break;
-      if(source_a==source_b) continue;
-      double sratio = source_a/source_b;
-      int counter=0;
-      for(auto data_it : data_test) {
-        if(exitloops) break;
-        counter++;
-        if( fabs(data_it.second-sratio)>error) 
-          continue;
-        if(last>counter)
-          continue;
-        last = counter;
-        if(fabs(data_it.second-sratio)>max_err)
-          max_err = fabs(data_it.second-sratio);
-        if(std::isnan(datatosource[data_it.first.first]))
-          datatosource[data_it.first.first] = source_a;
-        if(std::isnan(datatosource[data_it.first.second]))
-          datatosource[data_it.first.second] = source_b;
-      }
-      if(CheckMap(datatosource)) {
-        exitloops=true;
-        break;
-      }
-    }
-    PrintMap(datatosource);
-    if(exitloops) break;
-    ResetMap(datatosource);
+
+  std::map<double,double> datatosource = Match(data_channels,source_energy);; 
+
+  PrintMap(datatosource);
+  for(auto it : datatosource) {
+    AddPeak(it.first,it.second,source->GetName(),peak_area.at(it.first),src_eng_int[it.second]);
   }
+  
   Print();
-
-  if(CheckMap(datatosource)) {
-    all_fits[name].data2source = datatosource;
-    all_fits[name].nucleus     = source->GetName();
-    all_fits[name].max_error   = max_err;
-    total_points += datatosource.size();
-  }
-  
   int counter =0;
   for(auto it : datatosource) {
     if(!std::isnan(it.second)) counter++;
   }
   return counter; //CheckMap(datatosource);
-  
+
 }
 
 void TCalibrator::ResetMap(std::map<double,double> &inmap) {
@@ -234,7 +202,127 @@ void TCalibrator::PrintMap(std::map<double,double> &inmap) {
 
 }
 
+std::map<double,double> TCalibrator::Match(std::vector<double> peaks,std::vector<double> source) {
+  std::map<double,double> map;  
+  std::sort(peaks.begin(),peaks.end());
+  std::sort(source.begin(),source.end());
 
+  //for(auto s : source) 
+  //  printf(" s = %.02f\n",s);
+
+
+  //unsigned int ssize = source.size();
+  double max_err = 0.005;
+  std::vector<double> pused;
+  for(unsigned int i=0;i<peaks.size();i++)  { pused.push_back(1.); }
+  std::vector<double> sused;
+  for(unsigned int i=0;i<source.size();i++)  { sused.push_back(1.); }
+
+  struct point { 
+    double x1;
+    double x2;
+    double y1;
+    double y2;
+    double slope() const {return (y2-y1)/(x2-x1);}
+    void   print() const { printf("(%.2f - %.2f)/(%.2f - %.2f) = %.4f\n",y2,y1,x2,x1,slope()); }
+    bool operator<(const point& other) const { return slope()<other.slope(); }
+  };
+
+  std::vector<point> points;
+
+  for(unsigned int s1=0;s1<source.size();s1++) {
+    for(unsigned int s2=s1+1;s2<source.size();s2++) {
+      double sratio = source.at(s1)/source.at(s2);
+      for(unsigned int p1=0;p1<peaks.size();p1++) {
+        for(unsigned int p2=p1+1;p2<peaks.size();p2++) {
+      
+          double pratio = peaks.at(p1)/peaks.at(p2);
+          double diff = fabs(pratio-sratio);
+            if(diff<sused.at(s1) && diff<pused.at(p1) ) {
+              map[peaks.at(p1)] = source.at(s1);
+              pused[p1] = diff;
+              sused[s1] = diff;
+            }
+            if(diff<sused.at(s2) && diff<pused.at(p2) ) {
+              map[peaks.at(p2)] = source.at(s2);
+              pused[p2] = diff;
+              sused[s2] = diff;
+            }
+        }
+      }
+    }
+  }
+
+  //PrintMap(map);
+
+
+  max_err = 0.05;
+  
+  for(std::map<double,double>::iterator mit1=map.begin();mit1!=map.end();mit1++) {
+    for(std::map<double,double>::iterator mit2=mit1;mit2!=map.end();mit2++) {
+      if(mit1==mit2) continue;
+      point pt;
+      if(mit2->second>mit1->second &&
+         mit2->first>mit1->first) {
+        pt.x1 = mit1->first;
+        pt.y1 = mit1->second;
+        pt.x2 = mit2->first;
+        pt.y2 = mit2->second;
+        points.push_back(pt);
+      }
+    }
+  }
+  
+  //printf("points.size() = %i\n",points.size());
+  std::sort(points.begin(),points.end());
+
+  auto is_nearby = [&](const point& a, const point& b) {
+    return std::abs(a.slope() - b.slope())/a.slope() < max_err;
+  };
+
+  auto count_nearby = [&](const point& p) {
+    return std::count_if(points.begin(), points.end(),
+        [&](const point& p_other) { return is_nearby(p,p_other); }
+        );
+  };
+
+  point best_slope = *std::max_element(points.begin(), points.end(),
+      [&](const point& a, const point& b) {
+        return count_nearby(a) < count_nearby(b);
+      }
+    );
+
+  //for(auto p : points) {
+  //  p.print();
+  //  std::cout << count_nearby(p) << std::endl;
+  //}
+
+  //std::cout << "-----------------" << std::endl;
+  //best_slope.print();
+  //double bs = best_slope.slope();
+  //std::cout << count_nearby(best_slope) << std::endl;
+  //std::cout << "-----------------" << std::endl;
+
+  for(auto it = points.begin(); it!=points.end();) {
+    if(is_nearby(*it, best_slope)) {
+      it++;
+    } else {
+      it = points.erase(it);
+    }
+  }
+  map.clear();
+  for(auto it = points.begin(); it!=points.end();it++) {
+    map[it->x1] = it->y1;
+    map[it->x2] = it->y2;
+  }
+
+  //for(auto p : peaks) {
+  //  printf("%.02f -> %.02f\n",p,bs*p);
+  //}
+
+  //PrintMap(map);
+  return map;
+}
 
 bool TCalibrator::CheckMap(std::map<double,double> inmap) {
   for(auto it:inmap) {
@@ -249,3 +337,13 @@ bool TCalibrator::CheckMap(std::map<double,double> inmap) {
 void TCalibrator::UpdateTChannel(TChannel *channel) { } 
 
 
+void TCalibrator::AddPeak(double cent,double eng,std::string nuc,double a,double inten) {
+  Peak p;
+  p.centroid = cent;
+  p.energy   = eng;
+  p.nucleus  = nuc;
+  p.area     = a;
+  p.intensity = inten;
+  fPeaks.push_back(p);
+  return;
+}

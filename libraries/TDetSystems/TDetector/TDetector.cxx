@@ -53,9 +53,9 @@ int TDetector::Compare(const TObject& obj) const {
 
 int TDetector::Build(std::vector<TRawEvent>& raw_data){
   int output = BuildHits(raw_data);
-  if(output>0){
-    SetBit(kUnbuilt,0);
-  }
+  //if(output>0){
+  SetBit(kUnbuilt,0);  // if we called build on it, assume it is built whether or not it actually made any hits.  pcb.
+  //}
   return output;
 }
 

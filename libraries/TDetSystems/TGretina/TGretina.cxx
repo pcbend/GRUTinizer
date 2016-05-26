@@ -32,8 +32,8 @@ bool    TGretina::fCRMATSet = false;
 
 bool DefaultAddback(const TGretinaHit& one,const TGretinaHit &two) {
   TVector3 res = one.GetPosition()-two.GetPosition();
-  return ((std::abs(one.GetTime()-two.GetTime()) < 20.0) &&
-          (res.Mag() < 250.0) ) ;
+  return ((std::abs(one.GetTime()-two.GetTime()) < 44.0) &&
+          (res.Mag() < 140.0) ) ;
 }
 
 std::function<bool(const TGretinaHit&,const TGretinaHit&)> TGretina::fAddbackCondition = DefaultAddback;

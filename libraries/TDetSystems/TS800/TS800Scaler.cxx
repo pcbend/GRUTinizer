@@ -58,7 +58,7 @@ int TS800Scaler::BuildHits(std::vector<TRawEvent>& raw_data) {
     unix_time      = *(data+ptr); ptr++;
     num_scalers    = *(data+ptr); ptr++;
     for(int x=0;x<num_scalers;x++)
-      scalers.push_back(*(data+ptr));
+      scalers.push_back(*(data+ptr+x));
   }
   return Size();
 }

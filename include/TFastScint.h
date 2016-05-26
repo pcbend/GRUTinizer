@@ -22,7 +22,7 @@ public:
   virtual TFastScintHit GetLaBrHit(int i) const;
   virtual TDetectorHit& GetHit(int i);
           TFastScintHit* FindHit(int);
-  virtual int Size() const;
+  virtual unsigned int Size() const;
   virtual int GoodSize() const;
 
   int GetDetNumberIn_fs_hits(Int_t det);
