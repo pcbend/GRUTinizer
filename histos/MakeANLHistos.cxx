@@ -19,7 +19,7 @@
 //#include "GValue.h"
 
 #define PRINT(x) std::cout << #x" = " << x << std::endl
-#define STR(x) #x << " = " << x
+#define STR(x) #x << " = " <<() x
 
 using namespace std;
 
@@ -43,14 +43,25 @@ void MakeHistograms(TRuntimeObjects& obj) {
   for(int y=0;y<cagra->Size();y++) {
     TArgonneHit hit = cagra->GetArgonneHit(y);
 
+
+
+//cout << hit.GetBoardID() << " " << hit.GetChannel() << endl;
+
+    stream.str("");
+    stream << "PostE_BoardID" << hit.GetBoardID()  << "Chan" << hit.GetChannel();
+    obj.FillHistogram(stream.str(),10000,0,0,hit.GetPostE());
+    //stream.str("");
+    //stream << "LED_BoardID" << hit.GetBoardID()  << "Chan" << hit.GetChannel();
+    //obj.FillHistogram(stream.str(),10000,0,0,hit.GetLED());
+
+
     if(hit.GetBoardID() == 113) {
-      cout << hit.GetLED() << endl;
+      //cout << hit.GetLED() << endl;
       stream.str("");
       stream << "Crystal" << hit.GetChannel();
       float Energy = ((hit.GetPostE() - hit.GetPreE())/350.0);
       obj.FillHistogram(stream.str(),10000,0,20000,Energy);
     }
-
 
 
 
