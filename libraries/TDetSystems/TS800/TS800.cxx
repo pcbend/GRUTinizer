@@ -111,9 +111,11 @@ TVector3 TS800::Track(double sata,double sbta) const {
   //  TVector3 track(TMath::Sin(GetAta()),-TMath::Sin(GetBta()),1);
   double ata = TMath::Sin(GetAta()+sata);
   double bta = TMath::Sin(GetBta()+sbta);
+
   TVector3 track(ata,-bta,sqrt(1-ata*ata-bta*bta));
+  //TVector3 track(ata,-bta,1.0);
   
-  return track; //.Unit();
+  return track;//.Unit();
 }
 
 
@@ -833,7 +835,7 @@ float TS800::MCorrelatedOBJ_E1(bool corrected) const{
 	    afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
   }
   else if(mtof.fCorrelatedE1>-1){
-      double OBJLow  = GValue::Value("MOBJ_CORR_LOW");
+    double OBJLow  = GValue::Value("MOBJ_CORR_LOW");
     double OBJHigh = GValue::Value("MOBJ_CORR_HIGH");
     
     double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");

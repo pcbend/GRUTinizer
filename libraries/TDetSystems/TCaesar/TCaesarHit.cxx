@@ -2,6 +2,8 @@
 
 #include "TCaesar.h"
 
+
+const int TCaesarHit::TOTAL_DET_IN_PREV_RINGS[10] = {0,10,24,48,72,96,120,144,168,182};
 TCaesarHit::TCaesarHit(const TCaesarHit &hit) {
   hit.Copy(*this);
 }
@@ -45,6 +47,9 @@ TVector3 TCaesarHit::GetPosition(double z_shift) const {
   return TCaesar::GetPosition(this, z_shift);
 }
 
+int TCaesarHit::GetAbsoluteDetectorNumber() const {
+  return GetDetectorNumber()+TOTAL_DET_IN_PREV_RINGS[GetRingNumber()];
+}
 void TCaesarHit::AddToSelf(const TCaesarHit& other) {
 
 //  std::cout << "INSIDE ADD TO SELF" << std::endl;

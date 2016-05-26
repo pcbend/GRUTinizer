@@ -1176,6 +1176,8 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       //for(unsigned int i=0;i<hists.size();i++)
       //  hists.at(i)->GetListOfFunctions()->Delete();
       RemovePeaks(hists.data(),hists.size());
+      for(auto h : hists)
+        h->GetSumw2()->Set(0);
       edited = true;
       break;
     case kKey_o:

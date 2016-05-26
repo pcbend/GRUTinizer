@@ -48,6 +48,11 @@ bool DefaultAddbackTest(const TCaesarHit& one,const TCaesarHit &two){
   int poss_neigh_ring = two.GetRingNumber();
   int poss_neigh_det  = two.GetDetectorNumber();
   int num_neighbors_total = TCaesar::num_neighbors[ring][det];
+
+  
+//std::cout << "For ring = " << ring << "\tdet = " << det << std::endl;
+//std::cout << "poss_neigh_ring = " <<  poss_neigh_ring << "\tposs_neigh_det = " << poss_neigh_det << std::endl;
+//std::cout << "num_neighbors_total = " << num_neighbors_total << std::endl;
   for (int neigh = 0; neigh < num_neighbors_total; neigh++){
     int neigh_ring = TCaesar::neighbors[ring][det][neigh][0]; 
     int neigh_det  = TCaesar::neighbors[ring][det][neigh][1]; 
@@ -93,12 +98,20 @@ void TCaesar::BuildAddback() const {
   }
 }
 
+//void TCaesar::AddHit(TCaesarHit &hit){
+//  caesar_hits.push_back(hit);
+//}
 void TCaesar::BuildAddbackTest() const {
   if( addback_hits.size() > 0 ||
       caesar_hits.size() == 0) {
+//  std::cout << "SOMETHING IS MISSING!" << std::endl;
+//  std::cout << "caesar_hits.size()  = " << caesar_hits.size() << std::endl;
+//  std::cout << "addback_hits.size()  = " << addback_hits.size() << std::endl;
     return;
   }
 
+//std::cout << "\n\n\n\n";
+//std::cout << "============ INSIDE BUILD ADDBACK TEST ========================" << std::endl;
   
   std::deque<const TCaesarHit*> hits;
   for(auto& hit : caesar_hits) {
@@ -111,6 +124,7 @@ void TCaesar::BuildAddbackTest() const {
     });
 
   std::vector<int> neighbor_positions;
+//std::cout << "NUMBER OF HITS TO CHECK = " << hits.size() << std::endl;;
   while(hits.size()) {
     addback_hits.push_back(*hits.front());
     hits.pop_front();
@@ -126,6 +140,7 @@ void TCaesar::BuildAddbackTest() const {
       }
     }//loop over hits to possibly addback
     //Now do a switch based on number of neighbors!
+//  std::cout << "Number of neighbors: " << neighbor_positions.size() << std::endl; 
     switch(neighbor_positions.size()){
       //No neighbors!
       case 0:  

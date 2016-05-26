@@ -22,6 +22,7 @@ public:
   virtual void Print(Option_t *opt = "") const;
   virtual void Clear(Option_t *opt = "");
   virtual void Draw(Option_t *option="");
+        UInt_t Size() const { return fPeaks.size(); }
 
   int GetFitOrder() const { return fit_order; }
   void SetFitOrder(int order) { fit_order = order; }
@@ -40,26 +41,38 @@ public:
   void Fit(int order=1); 
   double GetParameter(int i=0);
 
-#ifndef __CINT__
-  struct SingleFit {
-    double max_error;
+  struct Peak {
+    double centroid;
+    double energy;
+    double area;
+    double intensity;
     std::string nucleus;
-    std::map<double,double> data2source;
-    TGraph graph;
   };
+
+  void AddPeak(double cent,double eng,std::string nuc,double a=0.0,double inten=0.0);
+  Peak GetPeak(UInt_t i) const { return fPeaks.at(i); }
+  
+#ifndef __CINT__
+  //struct SingleFit {
+  //  double max_error;
+  //  std::string nucleus;
+  //  std::map<double,double> data2source;
+  //  TGraph graph;
+  //};
 #endif
 
 private:
 #ifndef __CINT__
-  std::map<std::string,SingleFit> all_fits;
+  //std::map<std::string,SingleFit> all_fits;
+  std::map<double,double> Match(std::vector<double>,std::vector<double>); 
 #endif
+  std::vector<Peak> fPeaks;
 
   TGraph graph_of_everything;
   TF1    *linfit;
 
   int fit_order;
   int total_points;
-
 
   void ResetMap(std::map<double,double> &inmap);
   void PrintMap(std::map<double,double> &inmap);

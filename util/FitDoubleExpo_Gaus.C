@@ -338,7 +338,7 @@ TF1 *FitDoubleExpTwoHist(TH1F *hist_to_fit, TH1F *geant_hist1, TH1F *geant_hist2
     return NULL;
   }
 
-  fitfunc->FixParameter(1,1);
+  fitfunc->FixParameter(1,init[1]);
   for (int i = 3; i < 7; i++){
     fitfunc->FixParameter(i, init[i]);
   }
@@ -346,9 +346,9 @@ TF1 *FitDoubleExpTwoHist(TH1F *hist_to_fit, TH1F *geant_hist1, TH1F *geant_hist2
 //std::cout << "Setting par limit 0" << std::endl;
 //fitfunc->SetParLimits(0, 1e-05, 1.0);
 //std::cout << "Setting par limit 1" << std::endl;
-//fitfunc->SetParLimits(1, 1.5e-04, 2.5e-04);
+  fitfunc->SetParLimits(0, 0, 1);
 //std::cout << "Setting par limit 2" << std::endl;
-//fitfunc->SetParLimits(2, 0.2,2);
+  fitfunc->SetParLimits(2, 0.2,2);
 
   fitfunc->SetRange(gLowX, gUpX);
   fitfunc->SetLineColor(4);
@@ -395,16 +395,16 @@ TF1 *FitDoubleExpThreeHist(TH1F *hist_to_fit, TH1F *geant_fep, TH1F *geant_compt
     return NULL;
   }
 
-//fitfunc->FixParameter(1,init[1]);
-//for (int i = 4; i < 8; i++){
-//  fitfunc->FixParameter(i, init[i]);
-//}
-  for (int i = 1; i < 8; i++){
+  fitfunc->FixParameter(1,init[1]);
+  for (int i = 4; i < 8; i++){
     fitfunc->FixParameter(i, init[i]);
   }
+//for (int i = 1; i < 8; i++){
+//  fitfunc->FixParameter(i, init[i]);
+//}
 
 //fitfunc->SetParLimits(0, 9e-04, 1.2e-03);
-//fitfunc->SetParLimits(2, 0, 1);
+  fitfunc->SetParLimits(2, 0, 1);
 //fitfunc->SetParLimits(2, 1.0e-04, 2.5e-04);
 //fitfunc->SetParLimits(3, 0.5, 1.5);
 

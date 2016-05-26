@@ -27,6 +27,8 @@
 #include <GCanvas.h>
 #include <GPeak.h>
 #include <GGaus.h>
+#include <GH2D.h>
+#include <GH1D.h>
 //#include <GRootObjectManager.h>
 #include <TGRUTOptions.h>
 //#include <TGRUTInt.h>
@@ -48,6 +50,94 @@ void Help()     { printf("This is helpful information.\n"); }
 void Commands() { printf("this is a list of useful commands.\n");}
 
 void Prompt() { Getlinem(EGetLineMode::kInit,((TRint*)gApplication)->GetPrompt()); }
+
+
+bool GetProjection(GH2D *hist,double low, double high, double bg_low,double bg_high){
+  if(!hist) return 0;
+  GCanvas *C_projections = 0;
+  GCanvas *C_gammagamma  = 0;
+  if(gROOT->GetListOfCanvases()->FindObject("C_projections"))
+    C_projections = (GCanvas*)gROOT->GetListOfCanvases()->FindObject("C_projections");
+  else{
+    C_projections = new GCanvas("C_projections","Projection Canvas",0,0,1450,600);
+    C_projections->Divide(2,1);
+  }
+
+  if(gROOT->GetListOfCanvases()->FindObject("C_gammagamma"))
+    C_gammagamma = (GCanvas*)gROOT->GetListOfCanvases()->FindObject("C_gammagamma");
+  else
+    C_gammagamma = new GCanvas("C_gammagamma","Gamma-Gamma Canvas",1700,0,650,650);
+
+  C_gammagamma->cd();
+  hist->Draw();
+  
+  C_projections->cd(1);
+  GH1D *Proj_x = hist->ProjectionX("Gamma_Gamma_xProjection");
+  
+  GH1D *Proj_x_Clone = (GH1D*)Proj_x->Clone();
+  GH1D *Proj_gated = 0;
+
+  if(bg_high>0 && bg_low>0){
+    Proj_x->SetTitle(Form("Projection with Gate From [%.01f,%.01f] and Background [%.01f,%.01f]",low,high,bg_low,bg_high));
+  }else{
+    Proj_x->SetTitle(Form("Projection with Gate From [%.01f,%.01f] NO background",low,high));
+  }
+  Proj_x->GetXaxis()->SetTitle("Energy [keV]");
+  Proj_x->GetYaxis()->SetTitle("Counts ");
+  
+
+
+  double Grace = 300;
+  double ZoomHigh = high+Grace;
+  double ZoomLow  = low-Grace;
+  if(bg_high>0 && bg_high>high)
+    ZoomHigh = bg_high+Grace;
+  if(bg_low>0 && bg_low<low)
+    ZoomLow = bg_low-Grace;
+
+  Proj_x->GetXaxis()->SetRangeUser(ZoomLow,ZoomHigh);
+  Proj_x->Draw();
+  double Projx_Max = Proj_x->GetMaximum();
+  double Projx_Min = Proj_x->GetMinimum();
+ 
+  TLine *CutLow  = new TLine(low,Projx_Min,low,Projx_Max);
+  TLine *CutHigh = new TLine(high,Projx_Min,high,Projx_Max);
+  TLine *BGLow   = new TLine(bg_low,Projx_Min,bg_low,Projx_Max);
+  TLine *BGHigh  = new TLine(bg_high,Projx_Min,bg_high,Projx_Max);
+  CutLow->SetLineColor(kRed);
+  CutHigh->SetLineColor(kRed);
+  CutLow->SetLineWidth(2);
+  CutHigh->SetLineWidth(2);
+  BGLow->SetLineColor(kBlue);
+  BGHigh->SetLineColor(kBlue);
+  BGLow->SetLineWidth(2);
+  BGHigh->SetLineWidth(2);
+  BGLow->SetLineStyle(kDashed);
+  BGHigh->SetLineStyle(kDashed);
+  CutLow->Draw("same");
+  CutHigh->Draw("same");
+  if(bg_low>0 && bg_high>0){
+    BGHigh->Draw("same");
+    BGLow->Draw("same");
+    Proj_gated = Proj_x_Clone->Project_Background(low,high,
+						  bg_low,bg_high,
+						  kRegionBackground);
+  }else{
+    Proj_gated = Proj_x_Clone->Project(low,high);
+  }
+ 
+  if(bg_high>0 && bg_low>0){
+    Proj_gated->SetTitle(Form("Gate From [%.01f,%.01f] with Background [%.01f,%.01f]",low,high,bg_low,bg_high));
+  }else{
+    Proj_gated->SetTitle(Form("Gate From [%.01f,%.01f] NO Background",low,high));
+  }
+  Proj_gated->GetXaxis()->SetTitle("Energy [keV]");
+  Proj_gated->GetYaxis()->SetTitle("Counts");
+ 
+  C_projections->cd(2);
+  Proj_gated->Draw();
+  return 1;
+}
 
 int LabelPeaks(TH1 *hist,double sigma,double thresh,Option_t *opt) {
   TSpectrum::StaticSearch(hist,sigma,"Qnodraw",thresh);
@@ -93,6 +183,7 @@ int LabelPeaks(TH1 *hist,double sigma,double thresh,Option_t *opt) {
 }
 
 
+
 bool ShowPeaks(TH1 **hists,unsigned int nhists,double sigma,double thresh) {
   int num_found = 0;
   for(unsigned int i=0;i<nhists;i++) {
@@ -133,7 +224,7 @@ GGaus *GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
     std::swap(xlow,xhigh);
 
   //std::cout << "here." << std::endl;
-
+  
   GGaus *mypeak= new GGaus(xlow,xhigh);
   std::string options = opt;
   options.append("Q+");

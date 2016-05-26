@@ -32,8 +32,8 @@ bool    TGretina::fCRMATSet = false;
 
 bool DefaultAddback(const TGretinaHit& one,const TGretinaHit &two) {
   TVector3 res = one.GetPosition()-two.GetPosition();
-  return ((std::abs(one.GetTime()-two.GetTime()) < 20.0) &&
-          (res.Mag() < 250.0) ) ;
+  return ((std::abs(one.GetTime()-two.GetTime()) < 44.0) &&
+          (res.Mag() < 140.0) ) ;
 }
 
 std::function<bool(const TGretinaHit&,const TGretinaHit&)> TGretina::fAddbackCondition = DefaultAddback;
@@ -159,25 +159,7 @@ void TGretina::SetSegmentCRMAT() {
     m_segpos[(type+1)%2][seg][2] = z;
     seg++;
   }
-  /*
-  for(int type=0;type<2;type++) {
-    for(int seg=0;seg<NUMSEG;seg++) {
-      int rtval,segread;
-      rtval=fscanf(infile, "%d %lf %lf %lf",  ///CHANGE ME TO A SS!!
-                   &segread,
-                   m_segpos[(type+1)%2][seg][0],
-                   m_segpos[(type+1)%2][seg][1],
-                   m_segpos[(type+1)%2][seg][2]);
-      if((seg+1)!=segread) {
-        fprintf(stderr,"%s: seg[%i] read but seg[%i] expected.\n",__PRETTY_FUNCTION__,segread,seg+1);
-      }
-      if(rtval==EOF) {
-        fprintf(stderr,"%s: unexpected EOF.\n",__PRETTY_FUNCTION__);
-        break;
-      }
-    }
-  }
-  */
+  
   infile.close();
   //fclose(infile);
 }

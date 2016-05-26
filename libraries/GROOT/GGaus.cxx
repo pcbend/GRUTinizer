@@ -157,7 +157,7 @@ bool GGaus::InitParams(TH1 *fithist){
   //limits. 
   TF1::SetParLimits(0,0,largesty*2);
   TF1::SetParLimits(1,xlow,xhigh);
-  TF1::SetParLimits(2,0.1,xhigh-xlow);
+  TF1::SetParLimits(2,0,xhigh-xlow);
   //TF1::SetParLimits(3,0.0,40);
   //TF1::SetParLimits(4,0.01,5); 
 
@@ -194,7 +194,7 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
   if(!selfprint) {
     options.ReplaceAll("no-print","");
   }
-
+ 
 
   if(fithist->GetSumw2()->fN!=fithist->GetNbinsX()+2) 
     fithist->Sumw2();
