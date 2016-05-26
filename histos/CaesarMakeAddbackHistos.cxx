@@ -19,6 +19,7 @@
 #include "GValue.h"
 #include "TFile.h"
 #include "TCutG.h"
+#include "TPreserveGDirectory.h"
 
 int evt_ctr = 0;
 int omitted_det = -1;
@@ -48,8 +49,10 @@ TCutG *tcut = 0;
 //  return mat;
 //}
 
+
 void initializeKr88Cuts(TFile * &cut_file, TCutG* &pid, TCutG* &tcut, 
                         TCutG* &in) {
+    TPreserveGDirectory a;
     cut_file = new TFile("/mnt/analysis/pecan-gade/elman/Kr88/cut_files/kr88_cuts.root","Read");
     pid = (TCutG*)cut_file->Get("large2_pid_kr88");
     tcut = (TCutG*)cut_file->Get("full_tcut");
@@ -59,6 +62,7 @@ void initializeKr88Cuts(TFile * &cut_file, TCutG* &pid, TCutG* &tcut,
 
 void initializeKr90Cuts(TFile * &cut_file, TCutG* &pid, TCutG* &tcut, 
                     TCutG* &in){
+    TPreserveGDirectory a;
     cut_file = new TFile("/mnt/analysis/pecan-gade/elman/Kr90/cut_files/kr90_cuts.root","Read");
     pid = (TCutG*)cut_file->Get("kr90_mid");
     tcut = (TCutG*)cut_file->Get("tcut");
@@ -395,6 +399,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
                       192, 0, 192, addback_mult);
   }//caesar exists
 
+  if(caesar) { caesar->Clear(); }
 
   if(numobj!=list->GetSize())
     list->Sort();
