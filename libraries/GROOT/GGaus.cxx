@@ -194,7 +194,7 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
   if(!selfprint) {
     options.ReplaceAll("no-print","");
   }
-
+ 
 
   if(fithist->GetSumw2()->fN!=fithist->GetNbinsX()+2) 
     fithist->Sumw2();

@@ -64,7 +64,8 @@ void TGretinaHit::Copy(TObject &rhs) const {
 
 Float_t TGretinaHit::GetCoreEnergy(int i) const {
   float charge = (float)GetCoreCharge(i) + gRandom->Uniform();
-  TChannel *channel = TChannel::GetChannel(GetAddress()+i);
+  //board_id=; //card  number : 0x0030  information not available here.
+  TChannel *channel = TChannel::GetChannel(GetAddress()+(i<<4));
   //printf("GetAddress() + i = 0x%08x\n",GetAddress()+i); 
   if(!channel)
     return charge;
@@ -111,7 +112,7 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
   int board_id = ((fCrystalId/4) << 8) ;  //hole  number : 0x1f00
 //    board_id =                       ;  //card  number : 0x0030  information not available here.
       board_id = ((fCrystalId%4) << 6) ;  //x-tal number : 0x00c0
-//    board_id =                       ;  //chan  number : 0x000f  information not available here.
+      board_id = 9;                       //chan  number : 0x000f  information not available here(assume core).
   fAddress = (1<<24) + board_id;
 
 
