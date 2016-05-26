@@ -35,8 +35,10 @@ void TCaesarHit::Print(Option_t *opt) const {
   TVector3 pos = GetPosition();
   std::cout << "Ring["<<GetRingNumber()<<"]\tDet["<<GetDetectorNumber()<<"]\tPos["
             <<pos.X()<<","<<pos.Y()<<","<<pos.Z()<<"]\tTime["<<GetTime()<<"]\tHits Contained["
-            <<GetNumHitsContained()<<"]\tGarbage["<<is_garbage_addback<<"]\tEnergy["
-            <<GetDoppler(0.341) << "]" <<std::endl;
+            <<GetNumHitsContained()<<"]\tGarbage["<<is_garbage_addback
+            <<"]\tEnergy[" << Charge() << "]" << std::endl;
+            //<<"]\tEnergy["
+            //<<GetDoppler(0.341) << "]" <<std::endl;
             
 }
 
