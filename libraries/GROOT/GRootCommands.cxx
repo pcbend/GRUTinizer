@@ -224,7 +224,7 @@ GGaus *GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
     std::swap(xlow,xhigh);
 
   //std::cout << "here." << std::endl;
-
+  
   GGaus *mypeak= new GGaus(xlow,xhigh);
   std::string options = opt;
   options.append("Q+");

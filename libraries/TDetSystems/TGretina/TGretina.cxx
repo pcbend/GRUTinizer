@@ -159,25 +159,7 @@ void TGretina::SetSegmentCRMAT() {
     m_segpos[(type+1)%2][seg][2] = z;
     seg++;
   }
-  /*
-  for(int type=0;type<2;type++) {
-    for(int seg=0;seg<NUMSEG;seg++) {
-      int rtval,segread;
-      rtval=fscanf(infile, "%d %lf %lf %lf",  ///CHANGE ME TO A SS!!
-                   &segread,
-                   m_segpos[(type+1)%2][seg][0],
-                   m_segpos[(type+1)%2][seg][1],
-                   m_segpos[(type+1)%2][seg][2]);
-      if((seg+1)!=segread) {
-        fprintf(stderr,"%s: seg[%i] read but seg[%i] expected.\n",__PRETTY_FUNCTION__,segread,seg+1);
-      }
-      if(rtval==EOF) {
-        fprintf(stderr,"%s: unexpected EOF.\n",__PRETTY_FUNCTION__);
-        break;
-      }
-    }
-  }
-  */
+  
   infile.close();
   //fclose(infile);
 }
