@@ -37,7 +37,7 @@ void HandleJanusBuf(TNSCLEvent& event) {
     const CAEN_DataPacket* packet = (CAEN_DataPacket*)data;
     data += sizeof(CAEN_DataPacket);
 
-    //std::cout << *packet << std::endl;
+    std::cout << *packet << std::endl;
 
     switch(packet->entry_type()) {
       case CAEN_DataPacket::Invalid:
@@ -51,7 +51,7 @@ void HandleJanusBuf(TNSCLEvent& event) {
       case CAEN_DataPacket::End:
         std::cout << "Num channels: " << num_per_module << std::endl;
         num_per_module = 0;
-        std::cout << *packet << std::endl;
+        //std::cout << *packet << std::endl;
         break;
 
       case CAEN_DataPacket::Event:
@@ -101,13 +101,18 @@ int main(int argc, char** argv) {
   while(filein.Read(&raw_event)>0) {
     TNSCLEvent& event = (TNSCLEvent&)raw_event;
     if(event.GetEventType() == kNSCLEventType::PHYSICS_EVENT) {
-
-      TNSCLBuiltRingItem built(event);
-      for(unsigned int i=0; i<built.NumFragments(); i++) {
-        TNSCLFragment& fragment = built.GetFragment(i);
-        int source_id = fragment.GetFragmentSourceID();
-        if(source_id == 4) {
-          HandleJanusBuf(fragment.GetNSCLEvent());
+      if(event.IsBuiltData()) {
+        TNSCLBuiltRingItem built(event);
+        for(unsigned int i=0; i<built.NumFragments(); i++) {
+          TNSCLFragment& fragment = built.GetFragment(i);
+          int source_id = fragment.GetFragmentSourceID();
+          if(source_id == 4) {
+            HandleJanusBuf(fragment.GetNSCLEvent());
+          }
+        }
+      } else {
+        if(event.GetSourceID() == 4) {
+          HandleJanusBuf(event);
         }
       }
     }
