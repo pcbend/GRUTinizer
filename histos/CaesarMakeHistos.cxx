@@ -41,7 +41,8 @@ void initializeKr88Cuts(TFile * &cut_file, TCutG* &pid_kr88, TCutG* &tcut_kr88,
 //    pid_kr88 = (TCutG*)cut_file->Get("pid_kr88_large");
     pid_rb = (TCutG*)cut_file->Get("pid_rb_large");
     pid_br = (TCutG*)cut_file->Get("pid_br_large");
-    tcut_kr88 = (TCutG*)cut_file->Get("tcut_widest_03_17_2016");
+//    tcut_kr88 = (TCutG*)cut_file->Get("tcut_widest_03_17_2016");
+    tcut_kr88 = (TCutG*)cut_file->Get("full_tcut");
     in_kr88 = (TCutG*)cut_file->Get("in_kr88_large");
 
     pid_rb_left = (TCutG*)cut_file->Get("pid_rb_left");
@@ -135,9 +136,22 @@ void MakeHistograms(TRuntimeObjects& obj) {
           TVector3 targ_exit_vec = s800->ExitTargetVect();
           double scatter_angle = targ_exit_vec.Theta()*(180.0/TMath::Pi());
 
+          double crdc_1_y = s800->GetCrdc(0).GetNonDispersiveY();
+          double crdc_2_y = s800->GetCrdc(1).GetNonDispersiveY();
+          double crdc_1_x = s800->GetCrdc(0).GetDispersiveX();
+          double crdc_2_x = s800->GetCrdc(1).GetDispersiveX();
           histname = "ScatterAngle";
           obj.FillHistogram(dirname, histname, 18000,0,180, fabs(scatter_angle));
                                                
+          histname = "CRDC1_Y";
+          obj.FillHistogram(dirname, histname, 2000,-200,200, crdc_1_y);
+          histname = "CRDC2_Y";
+          obj.FillHistogram(dirname, histname, 2000,-200,200, crdc_2_y);
+          histname = "CRDC2_X";
+          obj.FillHistogram(dirname, histname, 2000,-200,200, crdc_2_x);
+          histname = "CRDC1_X";
+          obj.FillHistogram(dirname, histname, 2000,-200,200, crdc_1_x);
+
 
           double objtac = s800->GetTof().GetTacOBJ();
           double xfptac = s800->GetTof().GetTacXFP();
@@ -182,6 +196,16 @@ void MakeHistograms(TRuntimeObjects& obj) {
                             N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, objtac);
             histname = "ScatterAngleKr88";
             obj.FillHistogram(dirname, histname, 18000,0,180, fabs(scatter_angle));
+
+            histname = "CRDC1_Y_Kr88";
+            obj.FillHistogram(dirname, histname, 2000,-200,200, crdc_1_y);
+            histname = "CRDC2_Y_Kr88";
+            obj.FillHistogram(dirname, histname, 2000,-200,200, crdc_2_y);
+            histname = "CRDC2_X_Kr88";
+            obj.FillHistogram(dirname, histname, 2000,-200,200, crdc_2_x);
+            histname = "CRDC1_X_Kr88";
+            obj.FillHistogram(dirname, histname, 2000,-200,200, crdc_1_x);
+
 
             if (tcut_kr88->IsInside(corr_time, energy_dc)){
               if (in_kr88->IsInside(xfptac,objtac)){
