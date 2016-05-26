@@ -34,9 +34,9 @@ void TCalibrator::Copy(TObject &obj) const { }
 
 void TCalibrator::Print(Option_t *opt) const {
   int counter=0;
-  printf("\t\t energy\tcent\tarea\tnuc\n");
+  printf("\t\t energy\tcent\tarea\tnuc\tintensity\n");
   for(auto it:fPeaks) {
-    printf("%i:\t%.02f\t%.02f\t%.02f\t%s\n",counter++,it.energy,it.centroid,it.area,it.nucleus.c_str());
+    printf("%i:\t%.02f\t%.02f\t%.02f\t%s\t%.04f\n",counter++,it.energy,it.centroid,it.area,it.nucleus.c_str(),it.intensity);
   }
   printf("-------------------------------\n");
 
@@ -145,8 +145,10 @@ int TCalibrator::AddData(TH1 *data,TNucleus *source, double sigma,double thresho
 
   TIter iter(source->GetTransitionList());
   std::vector<double> source_energy;
+  std::map<double,double> src_eng_int;
   while(TTransition *transition = (TTransition*)iter.Next()) {
     source_energy.push_back(transition->GetEnergy());
+    src_eng_int[transition->GetEnergy()] = transition->GetIntensity();
   }
   std::sort(source_energy.begin(),source_energy.end());
 
@@ -172,7 +174,7 @@ int TCalibrator::AddData(TH1 *data,TNucleus *source, double sigma,double thresho
 
   PrintMap(datatosource);
   for(auto it : datatosource) {
-    AddPeak(it.first,it.second,source->GetName(),peak_area.at(it.first));
+    AddPeak(it.first,it.second,source->GetName(),peak_area.at(it.first),src_eng_int[it.second]);
   }
   
   Print();
