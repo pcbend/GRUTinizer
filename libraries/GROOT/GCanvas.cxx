@@ -854,6 +854,8 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       for(unsigned int i=0;i<hists.size();i++) {
         hists.at(i)->GetListOfFunctions()->Clear();
       }
+      for(unsigned int ii=0;ii<hists.size();ii++)
+        hists[ii]->Sumw2(false);
       RemovePeaks(hists.data(),hists.size());
       edited = true;
       break;
