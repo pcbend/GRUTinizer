@@ -60,7 +60,7 @@ int TCAGRA::BuildHits(std::vector<TRawEvent>& raw_data){
       continue;
     }
 
-    int detnum = chan->GetArrayPosition(); // crystal number
+    int detnum = chan->GetArrayPosition(); // clover number
     int segnum = chan->GetSegment(); // segment number
 
     // Get a hit, make it if it does not exist
@@ -79,12 +79,12 @@ int TCAGRA::BuildHits(std::vector<TRawEvent>& raw_data){
 
     if(segnum==0){
       hit->SetAddress(address);
-      hit->SetTimestamp(anl.GetLED());
+      hit->SetTimestamp(event.GetTimestamp());
       hit->SetCharge(anl.GetEnergy());
     } else {
       TCAGRASegmentHit& seg = hit->MakeSegmentByAddress(address);
       seg.SetCharge(anl.GetEnergy());
-      seg.SetTimestamp(anl.GetLED());
+      seg.SetTimestamp(event.GetTimestamp());
     }
   }
 
@@ -96,14 +96,15 @@ int TCAGRA::BuildHits(std::vector<TRawEvent>& raw_data){
   //InsertHit(hit);
   return Size();
 }
-TVector3 TCAGRA::GetSegmentPosition(int detnum, int segnum) {
-  if(detnum < 1 || detnum > 16 ||
-     segnum < 1 || segnum > 32){
+TVector3 TCAGRA::GetSegmentPosition(int detnum, char subpos, int segnum) {
+  if(detnum < 1 || detnum > 16 || segnum < 0 || segnum > 2 ||
+     subpos < 0x41 || subpos > 0x44){
     return TVector3(std::sqrt(-1),std::sqrt(-1),std::sqrt(-1));
   }
   LoadDetectorPositions();
 
-  int index = detnum*100+segnum;
+  int index = (detnum << 16) + (((int)subpos) << 8) + segnum;
+
   if (detector_positions.count(index)>0) {
     return detector_positions.at(index);
   } else {
@@ -153,15 +154,17 @@ void TCAGRA::LoadDetectorPositions() {
   std::string line;
   while (std::getline(infile,line)) {
     //Parse the line
-    int nclover, ncrystal;
+    int nclover, nsegment;
+    char ncrystal;
     double x,y,z;
-    int extracted = sscanf(line.c_str(),"clover.%02d.%01d.vec: %lf %lf %lf",
-                           &nclover,&ncrystal,&x,&y,&z);
-    if (extracted!=5) {
+    int extracted = sscanf(line.c_str(),"clover.%02d.%c.%01d.vec: %lf %lf %lf",
+                           &nclover,&ncrystal,&nsegment,&x,&y,&z);
+    if (extracted!=6) {
       continue;
     }
 
-    int index = nclover*100 + ncrystal;
+    int index = (nclover << 16) + (((int)ncrystal) << 8) + nsegment;
+
 
     //Pack into the vector of transformations.
     TVector3 vec = TVector3(x,y,z);

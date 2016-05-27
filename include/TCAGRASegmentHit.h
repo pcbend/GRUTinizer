@@ -14,6 +14,7 @@ public:
   virtual Int_t Charge() const;
 
   int GetDetnum() const;
+  char GetLeaf() const;
   int GetSegnum() const;
 
   int GetBoardID() const;

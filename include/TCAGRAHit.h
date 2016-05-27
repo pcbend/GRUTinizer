@@ -17,6 +17,7 @@ class TCAGRAHit : public TDetectorHit {
     virtual Int_t Charge() const;
 
     int GetDetnum() const;
+    char GetLeaf() const;
     int GetMainSegnum() const;
 
     bool HasCore() const;
@@ -36,7 +37,7 @@ class TCAGRAHit : public TDetectorHit {
     int GetBoardID() const;
     int GetChannel() const;
 
-    TVector3 GetPosition(bool apply_array_offset = false) const;
+    TVector3 GetPosition(bool apply_array_offset = false) const; // modified from true
 
     double GetDoppler(double beta,
                       const TVector3& particle_vec = TVector3(0,0,1),

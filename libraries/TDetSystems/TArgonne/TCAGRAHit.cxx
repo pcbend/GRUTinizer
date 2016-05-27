@@ -53,6 +53,26 @@ int TCAGRAHit::GetDetnum() const {
 
   return output;
 }
+char TCAGRAHit::GetLeaf() const {
+  TChannel* chan = TChannel::GetChannel(fAddress);
+  char output = (char)-1;
+  if(chan && fAddress!=-1){
+    output = *chan->GetArraySubposition();
+  } else if(fSegments.size()) {
+    output = fSegments[0].GetLeaf();
+  } else {
+    // std::cout << "Unknown address: " << std::hex << fAddress << std::dec
+    //           << std::endl;
+    output = (char)-1;
+  }
+
+  if(output == -1 && chan){
+    // std::cout << "Chan with det=-1: " << chan->GetName() << std::endl;
+    // std::cout << "address: " << fAddress << std::endl;
+  }
+
+  return output;
+}
 // int TCAGRAHit::GetCrate() const {
 //   return (fAddress&0x00ff0000)>>16;
 // }
@@ -91,7 +111,7 @@ int TCAGRAHit::GetMainSegnum() const {
 }
 
 TVector3 TCAGRAHit::GetPosition(bool apply_array_offset) const {
-  TVector3 array_pos = TCAGRA::GetSegmentPosition(GetDetnum(), GetMainSegnum());
+  TVector3 array_pos = TCAGRA::GetSegmentPosition(GetDetnum(), GetLeaf(), GetMainSegnum());
   if(apply_array_offset){
     array_pos += TVector3(GValue::Value("Cagra_X_offset"),
                           GValue::Value("Cagra_Y_offset"),

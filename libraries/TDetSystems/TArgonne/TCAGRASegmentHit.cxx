@@ -29,6 +29,16 @@ int TCAGRASegmentHit::GetDetnum() const {
     return -1;
   }
 }
+char TCAGRASegmentHit::GetLeaf() const {
+  TChannel* chan = TChannel::GetChannel(fAddress);
+  if(chan){
+    return *chan->GetArraySubposition();
+  } else {
+    std::cout << "Unknown address: " << std::hex << fAddress << std::dec
+              << std::endl;
+    return (char)-1;
+  }
+}
 
 int TCAGRASegmentHit::GetSegnum() const {
   TChannel* chan = TChannel::GetChannel(fAddress);

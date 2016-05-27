@@ -42,7 +42,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
 
   for(int y=0;y<cagra->Size();y++) {
-    TCAGRAHit hit = cagra->GetCAGRAHit(y);
+    //auto hit = cagra->GetCAGRAHit(y);
 
 
 
@@ -66,6 +66,14 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     for (auto& hit : *cagra) {
       if (hit.GetBoardID() == 0x71) {
+        /*
+        cout << "Clover: " << hit.GetDetnum()
+             << " Leaf: " << hit.GetLeaf()
+             << " Segment: " << hit.GetMainSegnum()
+             << " Theta: "<< hit.GetPosition().Theta()*180/TMath::Pi()
+             << endl;
+        */
+        //hit.GetPosition().Print();
         stream.str("");
         stream << "Crystal" << hit.GetChannel();
         obj.FillHistogram(stream.str(),10000,0,20000,hit.Charge());
