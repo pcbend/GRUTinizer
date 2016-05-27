@@ -1,6 +1,6 @@
-#include "TCAGRAHit.h"
+#include "TCagraHit.h"
 
-#include "TCAGRA.h"
+#include "TCagra.h"
 
 #include <algorithm>
 #include <iostream>
@@ -12,28 +12,28 @@
 
 #include "TGRUTOptions.h"
 
-ClassImp(TCAGRAHit)
+ClassImp(TCagraHit)
 
-TCAGRAHit::TCAGRAHit(){
-
-}
-
-TCAGRAHit::~TCAGRAHit() {
+TCagraHit::TCagraHit(){
 
 }
-void TCAGRAHit::Copy(TObject& obj) const {
+
+TCagraHit::~TCagraHit() {
+
+}
+void TCagraHit::Copy(TObject& obj) const {
   TDetectorHit::Copy(obj);
 }
-void TCAGRAHit::Print(Option_t *opt) const {
+void TCagraHit::Print(Option_t *opt) const {
 }
-void TCAGRAHit::Clear(Option_t *opt) {
+void TCagraHit::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
 }
-bool TCAGRAHit::HasCore() const {
+bool TCagraHit::HasCore() const {
   return fCharge != -1;
 }
 
-int TCAGRAHit::GetDetnum() const {
+int TCagraHit::GetDetnum() const {
   TChannel* chan = TChannel::GetChannel(fAddress);
   int output = -1;
   if(chan && fAddress!=-1){
@@ -53,7 +53,7 @@ int TCAGRAHit::GetDetnum() const {
 
   return output;
 }
-char TCAGRAHit::GetLeaf() const {
+char TCagraHit::GetLeaf() const {
   TChannel* chan = TChannel::GetChannel(fAddress);
   char output = (char)-1;
   if(chan && fAddress!=-1){
@@ -73,19 +73,19 @@ char TCAGRAHit::GetLeaf() const {
 
   return output;
 }
-// int TCAGRAHit::GetCrate() const {
+// int TCagraHit::GetCrate() const {
 //   return (fAddress&0x00ff0000)>>16;
 // }
 
-int TCAGRAHit::GetBoardID() const {
+int TCagraHit::GetBoardID() const {
   return (fAddress&0x0000ff00)>>8;
 }
 
-int TCAGRAHit::GetChannel() const {
+int TCagraHit::GetChannel() const {
   return (fAddress&0x000000ff)>>0;
 }
 
-TCAGRASegmentHit& TCAGRAHit::MakeSegmentByAddress(unsigned int address){
+TCagraSegmentHit& TCagraHit::MakeSegmentByAddress(unsigned int address){
   // for(auto& segment : fSegments){
   //   if(segment.Address() == address){
   //     return segment;
@@ -93,12 +93,12 @@ TCAGRASegmentHit& TCAGRAHit::MakeSegmentByAddress(unsigned int address){
   // }
 
   fSegments.emplace_back();
-  TCAGRASegmentHit& output = fSegments.back();
+  TCagraSegmentHit& output = fSegments.back();
   output.SetAddress(address);
   return output;
 }
 
-int TCAGRAHit::GetMainSegnum() const {
+int TCagraHit::GetMainSegnum() const {
   int output = 0;
   double max_energy = -9e99;
   for(auto& segment : fSegments){
@@ -110,8 +110,8 @@ int TCAGRAHit::GetMainSegnum() const {
   return output;
 }
 
-TVector3 TCAGRAHit::GetPosition(bool apply_array_offset) const {
-  TVector3 array_pos = TCAGRA::GetSegmentPosition(GetDetnum(), GetLeaf(), GetMainSegnum());
+TVector3 TCagraHit::GetPosition(bool apply_array_offset) const {
+  TVector3 array_pos = TCagra::GetSegmentPosition(GetDetnum(), GetLeaf(), GetMainSegnum());
   if(apply_array_offset){
     array_pos += TVector3(GValue::Value("Cagra_X_offset"),
                           GValue::Value("Cagra_Y_offset"),
@@ -120,7 +120,7 @@ TVector3 TCAGRAHit::GetPosition(bool apply_array_offset) const {
   return array_pos;
 }
 
-double TCAGRAHit::GetDoppler(double beta,const TVector3& particle_vec, const TVector3& offset) const {
+double TCagraHit::GetDoppler(double beta,const TVector3& particle_vec, const TVector3& offset) const {
   if(GetNumSegments()<1) {
     return std::sqrt(-1);
   }
@@ -132,7 +132,7 @@ double TCAGRAHit::GetDoppler(double beta,const TVector3& particle_vec, const TVe
   return dc_en;
 }
 
-Int_t TCAGRAHit::Charge() const {
+Int_t TCagraHit::Charge() const {
   if(fCharge > 30000) {
     return fCharge - 32768;
   } else {

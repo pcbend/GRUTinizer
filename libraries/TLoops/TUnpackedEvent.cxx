@@ -14,7 +14,7 @@
 #include "TS800Scaler.h"
 #include "TSega.h"
 #include "TFastScint.h"
-#include "TCAGRA.h"
+#include "TCagra.h"
 #include "TGrandRaiden.h"
 
 TUnpackedEvent::TUnpackedEvent() { }
@@ -80,7 +80,7 @@ void TUnpackedEvent::Build() {
       break;
 
     case kDetectorSystems::ANL:
-      GetDetector<TCAGRA>(true)->Build(raw_data);
+      GetDetector<TCagra>(true)->Build(raw_data);
       break;
 
     case kDetectorSystems::GRAND_RAIDEN:

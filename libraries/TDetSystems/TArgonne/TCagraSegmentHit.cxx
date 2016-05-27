@@ -1,25 +1,25 @@
-#include "TCAGRASegmentHit.h"
+#include "TCagraSegmentHit.h"
 
 #include <algorithm>
 #include <iostream>
 
-void TCAGRASegmentHit::Copy(TObject& obj) const{
+void TCagraSegmentHit::Copy(TObject& obj) const{
   TDetectorHit::Copy(obj);
 
-  TCAGRASegmentHit& cagra = (TCAGRASegmentHit&)obj;
+  TCagraSegmentHit& cagra = (TCagraSegmentHit&)obj;
 }
 
-void TCAGRASegmentHit::Clear(Option_t *opt) {
+void TCagraSegmentHit::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
 }
 
-void TCAGRASegmentHit::Print(Option_t *opt) const {
-  std::cout << "TCAGRASegmentHit:\n"
+void TCagraSegmentHit::Print(Option_t *opt) const {
+  std::cout << "TCagraSegmentHit:\n"
             << "\tCharge: " << Charge() << "\n"
             << std::flush;
 }
 
-int TCAGRASegmentHit::GetDetnum() const {
+int TCagraSegmentHit::GetDetnum() const {
   TChannel* chan = TChannel::GetChannel(fAddress);
   if(chan){
     return chan->GetArrayPosition();
@@ -29,7 +29,7 @@ int TCAGRASegmentHit::GetDetnum() const {
     return -1;
   }
 }
-char TCAGRASegmentHit::GetLeaf() const {
+char TCagraSegmentHit::GetLeaf() const {
   TChannel* chan = TChannel::GetChannel(fAddress);
   if(chan){
     return *chan->GetArraySubposition();
@@ -40,7 +40,7 @@ char TCAGRASegmentHit::GetLeaf() const {
   }
 }
 
-int TCAGRASegmentHit::GetSegnum() const {
+int TCagraSegmentHit::GetSegnum() const {
   TChannel* chan = TChannel::GetChannel(fAddress);
   if(chan){
     return chan->GetSegment();
@@ -49,19 +49,19 @@ int TCAGRASegmentHit::GetSegnum() const {
   }
 }
 
-// int TCAGRASegmentHit::GetCrate() const {
+// int TCagraSegmentHit::GetCrate() const {
 //   return (fAddress&0x00ff0000)>>16;
 // }
 
-int TCAGRASegmentHit::GetBoardID() const {
+int TCagraSegmentHit::GetBoardID() const {
   return (fAddress&0x0000ff00)>>8;
 }
 
-int TCAGRASegmentHit::GetChannel() const {
+int TCagraSegmentHit::GetChannel() const {
   return (fAddress&0x000000ff)>>0;
 }
 
-Int_t TCAGRASegmentHit::Charge() const {
+Int_t TCagraSegmentHit::Charge() const {
   if(fCharge > 30000) {
     return fCharge - 32768;
   } else {

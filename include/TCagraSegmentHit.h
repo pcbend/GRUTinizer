@@ -1,11 +1,11 @@
-#ifndef _TCAGRASEGMENTHIT_H_
-#define _TCAGRASEGMENTHIT_H_
+#ifndef _TCagraSEGMENTHIT_H_
+#define _TCagraSEGMENTHIT_H_
 
 #include "TDetectorHit.h"
 
-class TCAGRASegmentHit : public TDetectorHit {
+class TCagraSegmentHit : public TDetectorHit {
 public:
-  TCAGRASegmentHit() { }
+  TCagraSegmentHit() { }
 
   virtual void Copy(TObject&) const;
   virtual void Clear(Option_t *opt = "");
@@ -22,7 +22,7 @@ public:
 
 private:
 
-  ClassDef(TCAGRASegmentHit,1);
+  ClassDef(TCagraSegmentHit,1);
 };
 
-#endif /* _TCAGRASEGMENTHIT_H_ */
+#endif /* _TCagraSEGMENTHIT_H_ */

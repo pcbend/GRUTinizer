@@ -1,13 +1,13 @@
-#ifndef TCAGRAHIT_H
-#define TCAGRAHIT_H
+#ifndef TCagraHIT_H
+#define TCagraHIT_H
 
 #include "TDetectorHit.h"
-#include "TCAGRASegmentHit.h"
+#include "TCagraSegmentHit.h"
 
-class TCAGRAHit : public TDetectorHit {
+class TCagraHit : public TDetectorHit {
   public:
-    TCAGRAHit();
-    ~TCAGRAHit();
+    TCagraHit();
+    ~TCagraHit();
 
     virtual void Copy(TObject& obj) const;
     virtual void Print(Option_t *opt = "") const;
@@ -23,7 +23,7 @@ class TCAGRAHit : public TDetectorHit {
     bool HasCore() const;
 
     unsigned int GetNumSegments() const { return fSegments.size(); }
-    TCAGRASegmentHit& GetSegment(int i) { return fSegments.at(i); }
+    TCagraSegmentHit& GetSegment(int i) { return fSegments.at(i); }
     unsigned long GetSegmentTimestamp() {
         if(fSegments.size()){
             return fSegments[0].Timestamp();
@@ -32,7 +32,7 @@ class TCAGRAHit : public TDetectorHit {
         }
     }
 
-    TCAGRASegmentHit& MakeSegmentByAddress(unsigned int address);
+    TCagraSegmentHit& MakeSegmentByAddress(unsigned int address);
 
     int GetBoardID() const;
     int GetChannel() const;
@@ -45,10 +45,10 @@ class TCAGRAHit : public TDetectorHit {
 
 
   private:
-    std::vector<TCAGRASegmentHit> fSegments;
+    std::vector<TCagraSegmentHit> fSegments;
 
 
-  ClassDef(TCAGRAHit,1);
+  ClassDef(TCagraHit,1);
 };
 
 

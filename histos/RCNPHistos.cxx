@@ -13,7 +13,7 @@
 #include <TRandom.h>
 #include <TObject.h>
 
-#include "TCAGRA.h"
+#include "TCagra.h"
 #include "TGrandRaiden.h"
 
 //#include "TChannel.h"
@@ -33,7 +33,7 @@ stringstream stream;
 //   or else bad things will happen.
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
-  auto cagra = obj.GetDetector<TCAGRA>();
+  auto cagra = obj.GetDetector<TCagra>();
   auto gr = obj.GetDetector<TGrandRaiden>();
 
   TList *list = &(obj.GetObjects());
@@ -58,7 +58,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   /*
   for(int y=0;y<cagra->Size();y++) {
-    TCAGRAHit hit = cagra->GetCAGRAHit(y);
+    TCagraHit hit = cagra->GetCagraHit(y);
 
     if(hit.GetBoardID() == 113) {
 
