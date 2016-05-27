@@ -686,6 +686,12 @@ void MakeUpstream78KrPlots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_h
                       100, -4, 4, j_hit.GetPosition().X(),
                       100, -4, 4, j_hit.GetPosition().Y());
 
+    obj.FillHistogram("upstream",Form("janus_ringnum_%s", cutname.c_str()),
+                      40, -5, 35, j_hit.GetRing());
+
+    obj.FillHistogram("upstream",Form("janus_sectornum_%s", cutname.c_str()),
+                      40, -5, 35, j_hit.GetSector());
+
     // Scan along beta
     for(int beta_i = 0; beta_i<150; beta_i++) {
       double beta = 0.0 + beta_i*((0.15-0.00)/150);
