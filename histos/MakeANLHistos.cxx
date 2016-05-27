@@ -13,7 +13,7 @@
 #include <TRandom.h>
 #include <TObject.h>
 
-#include "TArgonne.h"
+#include "TCAGRA.h"
 
 //#include "TChannel.h"
 //#include "GValue.h"
@@ -32,7 +32,7 @@ stringstream stream;
 //   or else bad things will happen.
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
-  TArgonne *cagra = obj.GetDetector<TArgonne>();
+  TCAGRA *cagra = obj.GetDetector<TCAGRA>();
 
   TList *list = &(obj.GetObjects());
   int numobj = list->GetSize();
@@ -40,27 +40,36 @@ void MakeHistograms(TRuntimeObjects& obj) {
   if(!cagra)
     return;
 
+
   for(int y=0;y<cagra->Size();y++) {
-    TArgonneHit hit = cagra->GetArgonneHit(y);
+    TCAGRAHit hit = cagra->GetCAGRAHit(y);
 
 
 
-//cout << hit.GetBoardID() << " " << hit.GetChannel() << endl;
 
-    stream.str("");
-    stream << "PostE_BoardID" << hit.GetBoardID()  << "Chan" << hit.GetChannel();
-    obj.FillHistogram(stream.str(),10000,0,0,hit.GetPostE());
+    //stream.str("");
+    //stream << "PostE_BoardID" << hit.GetBoardID()  << "Chan" << hit.GetChannel();
+    //obj.FillHistogram(stream.str(),10000,0,0,hit.GetPostE());
+
     //stream.str("");
     //stream << "LED_BoardID" << hit.GetBoardID()  << "Chan" << hit.GetChannel();
     //obj.FillHistogram(stream.str(),10000,0,0,hit.GetLED());
 
 
-    if(hit.GetBoardID() == 113) {
-      //cout << hit.GetLED() << endl;
-      stream.str("");
-      stream << "Crystal" << hit.GetChannel();
-      float Energy = ((hit.GetPostE() - hit.GetPreE())/350.0);
-      obj.FillHistogram(stream.str(),10000,0,20000,Energy);
+    // if(hit.GetBoardID() == 113) {
+    //   //cout << hit.GetLED() << endl;
+    //   stream.str("");
+    //   stream << "Crystal" << hit.GetChannel();
+    //   float Energy = ((hit.GetPostE() - hit.GetPreE())/350.0);
+    //   obj.FillHistogram(stream.str(),10000,0,20000,Energy);
+    // }
+
+    for (auto& hit : *cagra) {
+      if (hit.GetBoardID() == 0x71) {
+        stream.str("");
+        stream << "Crystal" << hit.GetChannel();
+        obj.FillHistogram(stream.str(),10000,0,20000,hit.Charge());
+      }
     }
 
 
@@ -74,6 +83,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
     //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
   }
+
 
 
 
