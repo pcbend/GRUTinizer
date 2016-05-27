@@ -11,6 +11,7 @@
 #include <sstream>
 #include "TRandom.h"
 
+#include "TPreserveGDirectory.h"
 #include "TObject.h"
 #include "TCaesar.h"
 #include "TS800.h"
@@ -31,6 +32,7 @@ const int ENERGY_THRESHOLD = 300;
 const int TOTAL_ANGLES = (FINAL_ANGLE-START_ANGLE)/ANGLE_STEPS + 1;
 
 std::vector<double> angles;
+std::vector<double> energies_singles;
 
 
 bool init_called = false;
@@ -57,30 +59,48 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   static TCutG *InBeam_Mid = 0;
   if(!InBeam_Mid) {
+    TDirectory *cur = gDirectory;
     TFile fcut("/mnt/analysis/pecan-2015/longfellow/e10002/newmid.root");
     InBeam_Mid = (TCutG*)fcut.Get("InBeam_Mid");
+    cur->cd();
   }
   static TCutG *InBeam_Top = 0;
   if(!InBeam_Top) {
+    TPreserveGDirectory Preserve;
     TFile fcut("/mnt/analysis/pecan-2015/longfellow/e10002/newtop.root");
     InBeam_Top = (TCutG*)fcut.Get("Inbeam_top");
   }
   static TCutG *InBeam_btwnTopMid = 0;
   if(!InBeam_btwnTopMid) {
+    TPreserveGDirectory Preserve;
     TFile fcut("/mnt/analysis/pecan-2015/longfellow/e10002/newbetween.root");
     InBeam_btwnTopMid = (TCutG*)fcut.Get("between");
   }
   static TCutG *al23blob = 0;
   if(!al23blob) {
+    TPreserveGDirectory Preserve;
     TFile fcut("/mnt/analysis/pecan-2015/longfellow/e10002/al23blob.root");
     al23blob = (TCutG*)fcut.Get("al23blob");
   }
   static TCutG *si24blob = 0;
   if(!si24blob) {
+    TPreserveGDirectory Preserve;
     TFile fcut("/mnt/analysis/pecan-2015/longfellow/e10002/si24blob.root");
     si24blob = (TCutG*)fcut.Get("si24blob");
   }
 
+  static TCutG *newal23blob = 0;
+  if(!newal23blob) {
+    TPreserveGDirectory Preserve;
+    TFile fcut("/mnt/analysis/pecan-2015/longfellow/e10002/newal23blob.root");
+    newal23blob = (TCutG*)fcut.Get("newal23blob");
+  }
+  static TCutG *newsi24blob = 0;
+  if(!newsi24blob) {
+    TPreserveGDirectory Preserve;
+    TFile fcut("/mnt/analysis/pecan-2015/longfellow/e10002/newsi24blob.root");
+    newsi24blob = (TCutG*)fcut.Get("newsi24blob");
+  }
 
   // Stuff for interactive gates!
   TList *gates = &(obj.GetGates());
@@ -142,6 +162,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	double afp = s800->GetAFP();
 	double xfp_focalplane = s800->GetXFP(0);
 
+        double corr_time = caesar->GetCorrTime(hit,s800);
+        obj.FillHistogram("Caesar","GetCorrTime_vs_GetDoppler",2000,0,2000,corr_time,
+                                                               2000,0,4000,hit.GetDoppler());
+
 	std::string dirname  = "PID";
 
         std::string histname = "IncomingPID";
@@ -169,42 +193,189 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	  obj.FillHistogram(dirname,histname,
 			    1000,-500,2500,objtac_corr,
 			    1000,-100,4000,ic_sum); 
-	}
+	}//end if in mid cut
   
         if(InBeam_Top->IsInside(objtac,xfptac)){
 	  histname = "IC_vs_OBJTOF_PID_InBeam_Top";
 	  obj.FillHistogram(dirname,histname,
 			    1000,-500,2500,objtac_corr,
 			    1000,-100,4000,ic_sum); 
-	}
+	}//end if in top cut
     
         if(InBeam_btwnTopMid->IsInside(objtac,xfptac)){
 	  histname = "IC_vs_OBJTOF_PID_InBeam_btwnTopMid";
 	  obj.FillHistogram(dirname,histname,
 			    1000,-500,2500,objtac_corr,
 			    1000,-100,4000,ic_sum); 
-	}
 
-        if(al23blob->IsInside(objtac_corr,ic_sum)){
+	}//end if in between cut 
+         
+
+        if(al23blob->IsInside(objtac_corr,ic_sum) && InBeam_btwnTopMid->IsInside(objtac,xfptac)){
+
 	  histname = "Gamma_Gated_al23blob";
 	  obj.FillHistogram("GATED",histname,
 				1000,0,4000,hit.GetDoppler());
-          obj.FillHistogram("s800","CRDC1Y_Gated_al23blob",10000,-5000,5000,s800->GetCrdc(0).GetNonDispersiveY());
-	  obj.FillHistogram("s800","CRDC2Y_Gated_al23blob",10000,-5000,5000,s800->GetCrdc(1).GetNonDispersiveY());
-	}
+          obj.FillHistogram("s800","CRDC1Y_Gated_al23blob",
+			    10000,-5000,5000,s800->GetCrdc(0).GetNonDispersiveY());
+	  obj.FillHistogram("s800","CRDC2Y_Gated_al23blob",
+			    10000,-5000,5000,s800->GetCrdc(1).GetNonDispersiveY());
+	  
+          obj.FillHistogram("s800","CRDC1X_Gated_al23blob",
+			    800,-400,400,s800->GetCrdc(0).GetDispersiveX());
+	  obj.FillHistogram("s800","CRDC2X_Gated_al23blob",
+			    800,-400,400,s800->GetCrdc(1).GetDispersiveX());
 
-        if(si24blob->IsInside(objtac_corr,ic_sum)){
+          dirname = "InverseMap_GATED";
+     
+          histname = "S800_YTA_Gated_al23blob";
+          obj.FillHistogram(dirname,histname,
+			    1000,-50,50,s800->GetYta());
+      
+          histname = "S800_DTA_Gated_al23blob";
+          obj.FillHistogram(dirname,histname,
+			    1000,-0.2,0.2,s800->GetDta());
+      
+          histname = "ATA_vs_BTA_Gated_al23blob";
+          obj.FillHistogram(dirname,histname,
+			    1000,-0.2,0.2,s800->GetAta(),
+			    1000,-0.2,0.2,s800->GetBta());
+
+          histname = "FindBeta_al23blob";
+	      for(int beta_i=0;beta_i<300;beta_i++){
+		double beta_use = 0.2+(0.3/300.0)*double(beta_i);
+		obj.FillHistogram("GATED",histname,
+				  300,0.2,0.499,beta_use,
+				  1000,0,4000,hit.GetDoppler(beta_use));		
+	      }
+	}//end if inside al23blob and inside between incomingPID
+
+        if(si24blob->IsInside(objtac_corr,ic_sum) && InBeam_Top->IsInside(objtac,xfptac)){
 	  histname = "Gamma_Gated_si24blob";
 	  obj.FillHistogram("GATED",histname,
 				1000,0,4000,hit.GetDoppler());
           obj.FillHistogram("s800","CRDC1Y_Gated_si24blob",10000,-5000,5000,s800->GetCrdc(0).GetNonDispersiveY());
 	  obj.FillHistogram("s800","CRDC2Y_Gated_si24blob",10000,-5000,5000,s800->GetCrdc(1).GetNonDispersiveY());
-	}
+          obj.FillHistogram("s800","CRDC1X_Gated_si24blob",800,-400,400,s800->GetCrdc(0).GetDispersiveX());
+	  obj.FillHistogram("s800","CRDC2X_Gated_si24blob",800,-400,400,s800->GetCrdc(1).GetDispersiveX());
+
+          dirname = "InverseMap_GATED";
+     
+          histname = "S800_YTA_Gated_si24blob";
+          obj.FillHistogram(dirname,histname,
+			    1000,-50,50,s800->GetYta());
+      
+          histname = "S800_DTA_Gated_si24blob";
+          obj.FillHistogram(dirname,histname,
+			    1000,-0.2,0.2,s800->GetDta());
+      
+          histname = "ATA_vs_BTA_Gated_si24blob";
+          obj.FillHistogram(dirname,histname,
+			    1000,-0.2,0.2,s800->GetAta(),
+			    1000,-0.2,0.2,s800->GetBta());
+     
+          histname = "FindBeta_si24blob";
+	      for(int beta_i=0;beta_i<300;beta_i++){
+		double beta_use = 0.2+(0.3/300.0)*double(beta_i);
+		obj.FillHistogram("GATED",histname,
+				  300,0.2,0.499,beta_use,
+				  1000,0,4000,hit.GetDoppler(beta_use));		
+	      }
+	}//end if inside si24blob and inside top incomingPID
+
+        if(newal23blob->IsInside(objtac_corr,ic_sum) && InBeam_btwnTopMid->IsInside(objtac,xfptac)){
+
+	  histname = "Gamma_Gated_newal23blob";
+	  obj.FillHistogram("GATED",histname,
+				1000,0,4000,hit.GetDoppler());
+          obj.FillHistogram("s800","CRDC1Y_Gated_newal23blob",
+			    10000,-5000,5000,s800->GetCrdc(0).GetNonDispersiveY());
+	  obj.FillHistogram("s800","CRDC2Y_Gated_newal23blob",
+			    10000,-5000,5000,s800->GetCrdc(1).GetNonDispersiveY());
+	  
+          obj.FillHistogram("s800","CRDC1X_Gated_newal23blob",
+			    800,-400,400,s800->GetCrdc(0).GetDispersiveX());
+	  obj.FillHistogram("s800","CRDC2X_Gated_newal23blob",
+			    800,-400,400,s800->GetCrdc(1).GetDispersiveX());
+
+          dirname = "InverseMap_GATED";
+     
+          histname = "S800_YTA_Gated_newal23blob";
+          obj.FillHistogram(dirname,histname,
+			    1000,-50,50,s800->GetYta());
+      
+          histname = "S800_DTA_Gated_newal23blob";
+          obj.FillHistogram(dirname,histname,
+			    1000,-0.2,0.2,s800->GetDta());
+      
+          histname = "ATA_vs_BTA_Gated_newal23blob";
+          obj.FillHistogram(dirname,histname,
+			    1000,-0.2,0.2,s800->GetAta(),
+			    1000,-0.2,0.2,s800->GetBta());
+
+          histname = "FindBeta_newal23blob";
+	      for(int beta_i=0;beta_i<300;beta_i++){
+		double beta_use = 0.2+(0.3/300.0)*double(beta_i);
+		obj.FillHistogram("GATED",histname,
+				  300,0.2,0.499,beta_use,
+				  1000,0,4000,hit.GetDoppler(beta_use));		
+	      }
+	}//end if inside newal23blob and inside between incomingPID
+
+        if(newsi24blob->IsInside(objtac_corr,ic_sum) && InBeam_Top->IsInside(objtac,xfptac)){
+	  histname = "Gamma_Gated_newsi24blob";
+	  obj.FillHistogram("GATED",histname,
+				1000,0,4000,hit.GetDoppler());
+          obj.FillHistogram("s800","CRDC1Y_Gated_newsi24blob",10000,-5000,5000,s800->GetCrdc(0).GetNonDispersiveY());
+	  obj.FillHistogram("s800","CRDC2Y_Gated_newsi24blob",10000,-5000,5000,s800->GetCrdc(1).GetNonDispersiveY());
+          obj.FillHistogram("s800","CRDC1X_Gated_newsi24blob",800,-400,400,s800->GetCrdc(0).GetDispersiveX());
+	  obj.FillHistogram("s800","CRDC2X_Gated_newsi24blob",800,-400,400,s800->GetCrdc(1).GetDispersiveX());
+
+          dirname = "InverseMap_GATED";
+     
+          histname = "S800_YTA_Gated_newsi24blob";
+          obj.FillHistogram(dirname,histname,
+			    1000,-50,50,s800->GetYta());
+      
+          histname = "S800_DTA_Gated_newsi24blob";
+          obj.FillHistogram(dirname,histname,
+			    1000,-0.2,0.2,s800->GetDta());
+      
+          histname = "ATA_vs_BTA_Gated_newsi24blob";
+          obj.FillHistogram(dirname,histname,
+			    1000,-0.2,0.2,s800->GetAta(),
+			    1000,-0.2,0.2,s800->GetBta());
+     
+          histname = "FindBeta_newsi24blob";
+	      for(int beta_i=0;beta_i<300;beta_i++){
+		double beta_use = 0.2+(0.3/300.0)*double(beta_i);
+		obj.FillHistogram("GATED",histname,
+				  300,0.2,0.499,beta_use,
+				  1000,0,4000,hit.GetDoppler(beta_use));		
+	      }
+	}//end if inside newsi24blob and inside top incomingPID
     
 	obj.FillHistogram("s800","CRDC1Y",10000,-5000,5000,s800->GetCrdc(0).GetNonDispersiveY());
 	obj.FillHistogram("s800","CRDC2Y",10000,-5000,5000,s800->GetCrdc(1).GetNonDispersiveY());
+        obj.FillHistogram("s800","CRDC1X",800,-400,400,s800->GetCrdc(0).GetDispersiveX());
+        obj.FillHistogram("s800","CRDC2X",800,-400,400,s800->GetCrdc(1).GetDispersiveX());
 
 	obj.FillHistogram("s800","TrigBit",5,0,5,s800->GetTrigger().GetRegistr());
+
+        dirname = "InverseMap";
+     
+        histname = "S800_YTA";
+        obj.FillHistogram(dirname,histname,
+			  1000,-50,50,s800->GetYta());
+      
+        histname = "S800_DTA";
+        obj.FillHistogram(dirname,histname,
+			  1000,-0.2,0.2,s800->GetDta());
+      
+        histname = "ATA_vs_BTA";
+        obj.FillHistogram(dirname,histname,
+			  1000,-0.2,0.2,s800->GetAta(),
+			  1000,-0.2,0.2,s800->GetBta());
 
 
 	if(haspids) {
@@ -240,9 +411,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
 		double beta_use = 0.2+(0.3/300.0)*double(beta_i);
 		obj.FillHistogram(dirname,histname,
 				  300,0.2,0.5,beta_use,
-				  1000,0,4000,hit.GetDoppler(beta_use));
-		
+				  1000,0,4000,hit.GetDoppler(beta_use));		
 	      }
+
 	      histname = Form("Gamma_%s",mygate->GetName());
 	      obj.FillHistogram(dirname,histname,
 				1000,0,4000,hit.GetDoppler());
@@ -276,7 +447,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     }// end of caesar hit loop.
     obj.FillHistogram("Caesar","Multiplicity",300,0,300,valid_counter);
-  } // i have a valid caesar event.
+  } // I have a valid caesar event.
 
   if(numobj!=list->GetSize())
     list->Sort();
