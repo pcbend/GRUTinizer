@@ -75,8 +75,12 @@ void MakeHistograms(TRuntimeObjects& obj) {
         */
         //hit.GetPosition().Print();
         stream.str("");
-        stream << "Crystal" << hit.GetChannel();
+        stream << "Leaf" << hit.GetChannel();
         obj.FillHistogram(stream.str(),10000,0,20000,hit.Charge());
+        stream.str("");
+        stream << "CalLeaf" << hit.GetChannel();
+        obj.FillHistogram(stream.str(),10000,0,20000,hit.GetEnergy());
+
       }
     }
 
