@@ -1,20 +1,16 @@
-#ifndef TARGONNEHIT_H
-#define TARGONNEHIT_H
+#ifndef TANLEVENT_H
+#define TANLEVENT_H
 
-#include "TDetector.h"
-#include "TDetectorHit.h"
+#include "TObject.h"
 
-class TArgonneHit : public TDetectorHit {
+#include "TSmartBuffer.h"
+
+
+class TANLEvent : public TObject {
   public:
-    TArgonneHit();
-    ~TArgonneHit();
+    TANLEvent(TSmartBuffer& buf);
+    ~TANLEvent();
 
-    virtual void Copy(TObject& obj) const;
-    //virtual void Compare(TObject &obj) const;
-    virtual void Print(Option_t *opt = "") const;
-    virtual void Clear(Option_t *opt = "");
-
-    void     BuildFrom(TSmartBuffer& buf);
 
 
     Long_t   GetLED()       const { return led; }
@@ -38,6 +34,9 @@ class TArgonneHit : public TDetectorHit {
     UShort_t PileUpOnlyFlag() const { return ((flags & 0x4000)>>14); }
     UShort_t PileUpFlag() const { return ((flags & 0x8000)>>15); }
 
+    // TODO: add to input calibrations file for second order corrections
+    //       e.g. pole zero etc.
+    double   GetEnergy() const { return ((GetPostE() - GetPreE())/350.0); }
 
   private:
 
@@ -61,7 +60,7 @@ class TArgonneHit : public TDetectorHit {
     //UShort_t base_sample;
     //UShort_t peak_sample;
 
-  ClassDef(TArgonneHit,1);
+  ClassDef(TANLEvent,0);
 };
 
 

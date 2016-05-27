@@ -1,5 +1,7 @@
 #include "TRawSource.h"
 
+#include "TTreeSource.h"
+
 #include <cassert>
 
 #include "TString.h"
@@ -87,6 +89,8 @@ TRawEventSource* TRawEventSource::EventSource(const char* filename,
     source = new TRawEventBZipSource(filename, file_type);
   } else if (hasSuffix(filename,".gz")){
     source = new TRawEventGZipSource(filename, file_type);
+  } else if (hasSuffix(filename,".root")){
+    source = new TTreeSource<RCNPEvent>(filename,"rcnptree","rcnpevent", file_type);
   // If it is an in-progress file, open it that way
   } else if (is_online) {
     source = new TRawEventOnlineFileSource(filename, file_type);

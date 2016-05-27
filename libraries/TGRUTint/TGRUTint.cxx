@@ -178,12 +178,13 @@ void TGRUTint::ApplyOptions() {
     TFile* tfile = OpenRootFile(filename);
     cuts_files.push_back(tfile);
   }
-
-  for(auto filename : opt->RootInputFiles()) {
-    OpenRootFile(filename);
-    // this will populate gChain if able.
-    //   TChannels from the root file will be loaded as file is opened.
-    //   GValues from the root file will be loaded as file is opened.
+  if (!opt->TreeSource()) {
+    for(auto filename : opt->RootInputFiles()) {
+      OpenRootFile(filename);
+      // this will populate gChain if able.
+      //   TChannels from the root file will be loaded as file is opened.
+      //   GValues from the root file will be loaded as file is opened.
+    }
   }
 
   //if I am passed any calibrations, lets load those, this
@@ -212,8 +213,10 @@ void TGRUTint::ApplyOptions() {
     }
   }
 
+
   //next most important thing, if given a raw file && NOT told to not sort!
-  if((opt->InputRing().length() || opt->RawInputFiles().size())
+  if((opt->InputRing().length() || opt->RawInputFiles().size()
+      || (opt->RootInputFiles().size() && opt->TreeSource()))
      && !missing_file && opt->SortRaw()) {
 
     TRawEventSource* source = NULL;
@@ -222,27 +225,51 @@ void TGRUTint::ApplyOptions() {
       source = new TRawEventRingSource(opt->InputRing(),
                                        opt->DefaultFileType());
 
-    } else if(opt->RawInputFiles().size() > 1 && opt->SortMultiple()){
+    } else if(opt->SortMultiple() && (
+                opt->RawInputFiles().size() > 1 ||
+                opt->RootInputFiles().size() > 1 ||
+                (opt->RawInputFiles().size() > 0 && opt->RootInputFiles().size() > 0))
+      ){
       // Open multiple files, read from all at the same time.
       TMultiRawFile* multi_source = new TMultiRawFile();
       for(auto& filename : opt->RawInputFiles()){
         multi_source->AddFile(new TRawFileIn(filename.c_str()));
       }
+      // using rootfiles as source for sorting
+      for(auto& filename : opt->RootInputFiles()){
+        multi_source->AddFile(filename.c_str());
+      }
       source = multi_source;
 
-    } else if(opt->RawInputFiles().size() > 1 && !opt->SortMultiple()){
+    } else if(!opt->SortMultiple() && (
+                opt->RawInputFiles().size() > 1 ||
+                opt->RootInputFiles().size() > 1 ||
+                (opt->RawInputFiles().size() > 0 && opt->RootInputFiles().size() > 0))
+      ){
       // Open multiple files, read from each one at a a time.
       TSequentialRawFile* seq_source = new TSequentialRawFile();
       for(auto& filename : opt->RawInputFiles()){
         seq_source->Add(new TRawFileIn(filename.c_str()));
       }
+      // using rootfiles as source for sorting
+      for(auto& filename : opt->RootInputFiles()){
+        seq_source->Add(TRawEventSource::EventSource(filename.c_str()));
+      }
       source = seq_source;
 
     } else {
       // Open a single file.
-      std::string filename = opt->RawInputFiles().at(0);
-      if(file_exists(filename.c_str())){
-        source = new TRawFileIn(filename.c_str());
+      if (opt->RawInputFiles().size()) {
+        std::string filename = opt->RawInputFiles().at(0);
+        if(file_exists(filename.c_str())){
+          source = new TRawFileIn(filename.c_str());
+        }
+      }
+      else if (opt->RootInputFiles().size()) {
+        std::string filename = opt->RootInputFiles().at(0);
+        if(file_exists(filename.c_str())){
+          source = TRawEventSource::EventSource(filename.c_str());
+        }
       }
     }
 

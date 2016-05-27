@@ -61,15 +61,18 @@ bool TUnpackingLoop::Iteration(){
       }
       break;
 
-    case kFileType::ANL_RAW:
-    case kFileType::GRETINA_MODE2:
-    case kFileType::GRETINA_MODE3:
-    {
+      case kFileType::ANL_RAW:
+      case kFileType::GRETINA_MODE2:
+      case kFileType::GRETINA_MODE3:
+      {
         TGEBEvent geb_event(raw_event);
         HandleGEBData(geb_event);
       }
-        break;
-
+      break;
+      case kFileType::ROOT_DATA:
+      {
+        fOutputEvent->AddRawData(raw_event, kDetectorSystems::GRAND_RAIDEN);
+      }
       default:
         break;
     }

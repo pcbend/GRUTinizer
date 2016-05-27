@@ -45,6 +45,7 @@ TRawEvent &TRawEvent::operator=(const TRawEvent &rhs) {
   fEventHeader = rhs.fEventHeader;
   fBody        = rhs.fBody;
   fFileType    = rhs.fFileType;
+  fTimestamp   = rhs.fTimestamp;
   return *this;
 }
 
