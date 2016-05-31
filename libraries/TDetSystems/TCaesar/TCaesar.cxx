@@ -120,8 +120,26 @@ void TCaesar::BuildAddbackTest() const {
     }
   }
   std::sort(hits.begin(), hits.end(), [](const TCaesarHit* a, const TCaesarHit* b) {
-      return a->GetEnergy() > b->GetEnergy();
-    });
+      //a->Print();
+      //fflush(stdout);
+      //b->Print();
+      //fflush(stdout);
+      //std::cout << "a->GetEnergy \t" << a->GetEnergy() << std::endl;
+      //std::cout << "b->GetEnergy \t" << b->GetEnergy() << std::endl;
+      TChannel *ca = TChannel::GetChannel(a->Address()); 
+      TChannel *cb = TChannel::GetChannel(b->Address()); 
+      if(!ca && !cb) {
+        return a->Address()<b->Address();
+      }
+      if(!ca) {
+        return true;
+      }
+      if(!cb) {
+        return false;
+      }
+
+      return (ca->CalEnergy(static_cast<double>(a->Charge())) > cb->CalEnergy(static_cast<double>(b->Charge())));
+  });
 
   std::vector<int> neighbor_positions;
 //std::cout << "NUMBER OF HITS TO CHECK = " << hits.size() << std::endl;;
