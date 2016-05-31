@@ -18,11 +18,13 @@
 #include "TSysEvtHandler.h"
 #include "TSystem.h"
 
-class TRawFileIn;
-class TDataLoop;
-class TChainLoop;
-class THistogramLoop;
 class TCutG;
+
+class TChainLoop;
+class TDataLoop;
+class THistogramLoop;
+class TRawEventSource;
+class TRawFileIn;
 
 extern TChain *gChain;
 
@@ -75,15 +77,20 @@ private:
   bool fIsTabComplete;
   bool fAllowedToTerminate;
 
-  TDataLoop* fDataLoop;
-  TChainLoop* fChainLoop;
-  THistogramLoop* fHistogramLoop;
-
   void Init();
   void ApplyOptions();
   void LoadGRootGraphics();
 
   TList fOpenedRawFiles;
+
+  // Data processing objects/methods
+  void SetupPipeline();
+  TRawEventSource* OpenRawSource();
+
+  TDataLoop* fDataLoop;
+  TChainLoop* fChainLoop;
+  THistogramLoop* fHistogramLoop;
+
 
   ClassDef(TGRUTint,0);
 };
