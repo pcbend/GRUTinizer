@@ -190,8 +190,8 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
   TVirtualFitter::SetMaxIterations(100000);
 
   bool verbose = !options.Contains("Q");
-  bool selfprint = !options.Contains("no-print");
-  if(!selfprint) {
+  bool noprint =  options.Contains("no-print");
+  if(noprint) {
     options.ReplaceAll("no-print","");
   }
  
@@ -203,16 +203,19 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
 
   //fitres.Get()->Print();
   if(!fitres.Get()->IsValid()) {
-    printf(RED  "fit has failed, trying refit... " RESET_COLOR);
+    if(!verbose)
+      printf(RED  "fit has failed, trying refit... " RESET_COLOR);
     //SetParameter(3,0.1);
     //SetParameter(4,0.01);
     //SetParameter(5,0.0);
     fithist->GetListOfFunctions()->Last()->Delete();
     fitres = fithist->Fit(this,Form("%sRSME",options.Data())); //,Form("%sRSM",options.Data()))
     if( fitres.Get()->IsValid() ) {
-      printf(DGREEN " refit passed!" RESET_COLOR "\n");
+      if(!verbose && !noprint)
+        printf(DGREEN " refit passed!" RESET_COLOR "\n");
     } else {
-      printf(DRED " refit also failed :( " RESET_COLOR "\n");
+      if(!verbose && !noprint)
+        printf(DRED " refit also failed :( " RESET_COLOR "\n");
     }
   }
 
@@ -277,7 +280,7 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
   fSum -= bgArea;
 
 
-  if(!verbose) {
+  if(!verbose && !noprint) {
     Print();/*
     printf("BG Area:         %.02f\n",bgArea);
     printf("GetChisquared(): %.4f\n", TF1::GetChisquare());

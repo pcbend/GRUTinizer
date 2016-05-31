@@ -9,6 +9,7 @@
 
 #include <TH1.h>
 #include <TSpectrum.h>
+#include <TLinearFitter.h>
 
 #include <TChannel.h>
 #include <TNucleus.h>
@@ -16,8 +17,11 @@
 
 #include <GRootFunctions.h>
 #include <GRootCommands.h>
+#include <GCanvas.h>
 #include <GGaus.h>
 #include <Globals.h>
+
+#include "combinations.h"
 
 ClassImp(TCalibrator)
 
@@ -61,8 +65,11 @@ void TCalibrator::Clear(Option_t *opt) {
 void TCalibrator::Draw(Option_t *opt) { 
   //if((graph_of_everything.GetN()<1) &&
   //    (all_fits.size()>0))
-  MakeCalibrationGraph();
-  Fit();
+  //MakeCalibrationGraph();
+  //Fit();
+  TString option(opt);
+  if(option.Contains("new",TString::kIgnoreCase))
+    new GCanvas;
   graph_of_everything.Draw("AC*");
 }
 
@@ -70,6 +77,7 @@ void TCalibrator::Fit(int order) {
   
   //if((graph_of_everything.GetN()<1) &&
   //    (all_fits.size()>0))
+  Print();
   MakeCalibrationGraph();
   if(graph_of_everything.GetN()<1)
     return;
@@ -99,7 +107,7 @@ double TCalibrator::GetParameter(int i) {
 }
 
 
-TGraph &TCalibrator::MakeCalibrationGraph(double min_fom) { 
+TGraph &TCalibrator::MakeCalibrationGraph(double min_fom) {
   std::vector<double> xvalues;
   std::vector<double> yvalues;
   //std::vector<double> xerrors;
@@ -159,8 +167,8 @@ int TCalibrator::AddData(TH1 *data,TNucleus *source, double sigma,double thresho
   //std::vector<double> data;
   for(int x=0;x<spectrum.GetNPeaks();x++) {
     double range = 8*data->GetXaxis()->GetBinWidth(1);
-    printf(DGREEN "\tlow %.02f \t high %.02f" RESET_COLOR "\n",spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range);
-    GGaus *fit = GausFit(data,spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range,"");
+    //printf(DGREEN "\tlow %.02f \t high %.02f" RESET_COLOR "\n",spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range);
+    GGaus *fit = GausFit(data,spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range,"no-print");
     //data_channels
     //data_channels.push_back(fit.GetCentroid());
     //datatosource[fit->GetCentroid()] = sqrt(-1);
@@ -172,12 +180,12 @@ int TCalibrator::AddData(TH1 *data,TNucleus *source, double sigma,double thresho
 
   std::map<double,double> datatosource = Match(data_channels,source_energy);; 
 
-  PrintMap(datatosource);
+  //PrintMap(datatosource);
   for(auto it : datatosource) {
     AddPeak(it.first,it.second,source->GetName(),peak_area.at(it.first),src_eng_int[it.second]);
   }
   
-  Print();
+  //Print();
   int counter =0;
   for(auto it : datatosource) {
     if(!std::isnan(it.second)) counter++;
@@ -207,121 +215,223 @@ std::map<double,double> TCalibrator::Match(std::vector<double> peaks,std::vector
   std::sort(peaks.begin(),peaks.end());
   std::sort(source.begin(),source.end());
 
-  //for(auto s : source) 
-  //  printf(" s = %.02f\n",s);
+  // Peaks are the fitted points.
+  // source are the known values
 
+  std::vector<bool> filled(source.size());
+  std::fill(filled.begin(), filled.begin() + peaks.size(), true);
 
-  //unsigned int ssize = source.size();
-  double max_err = 0.005;
-  std::vector<double> pused;
-  for(unsigned int i=0;i<peaks.size();i++)  { pused.push_back(1.); }
-  std::vector<double> sused;
-  for(unsigned int i=0;i<source.size();i++)  { sused.push_back(1.); }
+  //std::cout << "Num peaks: " << peaks.size() << std::endl;
+  //std::cout << "Num source: " << source.size() << std::endl;
 
-  struct point { 
-    double x1;
-    double x2;
-    double y1;
-    double y2;
-    double slope() const {return (y2-y1)/(x2-x1);}
-    void   print() const { printf("(%.2f - %.2f)/(%.2f - %.2f) = %.4f\n",y2,y1,x2,x1,slope()); }
-    bool operator<(const point& other) const { return slope()<other.slope(); }
-  };
+  TLinearFitter fitter(1, "1 ++ x");
+  
+  for(size_t num_data_points = peaks.size(); num_data_points > 0; num_data_points--) {
+    double best_chi2 = DBL_MAX;
+    for(auto peak_values : combinations(peaks, num_data_points)) {
+      // Add a (0,0) point to the calibration.
+      peak_values.push_back(0);
+      for(auto source_values : combinations(source, num_data_points)) {
+	source_values.push_back(0);
 
-  std::vector<point> points;
-
-  for(unsigned int s1=0;s1<source.size();s1++) {
-    for(unsigned int s2=s1+1;s2<source.size();s2++) {
-      double sratio = source.at(s1)/source.at(s2);
-      for(unsigned int p1=0;p1<peaks.size();p1++) {
-        for(unsigned int p2=p1+1;p2<peaks.size();p2++) {
-      
-          double pratio = peaks.at(p1)/peaks.at(p2);
-          double diff = fabs(pratio-sratio);
-            if(diff<sused.at(s1) && diff<pused.at(p1) ) {
-              map[peaks.at(p1)] = source.at(s1);
-              pused[p1] = diff;
-              sused[s1] = diff;
-            }
-            if(diff<sused.at(s2) && diff<pused.at(p2) ) {
-              map[peaks.at(p2)] = source.at(s2);
-              pused[p2] = diff;
-              sused[s2] = diff;
-            }
+        if(peaks.size()>3) {
+          double max_err = 0.01; 
+          double pratio = peak_values.front()/peak_values.at(peak_values.size()-2);
+          double sratio = source_values.front()/source_values.at(source_values.size()-2);
+          //std::cout << "ratio: " << pratio << " - " << sratio << " = " << std::abs(pratio-sratio) << std::endl;
+          if(std::abs(pratio-sratio)>max_err) {
+            //std::cout << "skipping" << std::endl;
+            continue;
+          }
         }
+	
+        fitter.ClearPoints();
+	fitter.AssignData(source_values.size(), 1, peak_values.data(), source_values.data());
+	fitter.Eval();
+
+	if(fitter.GetChisquare() < best_chi2) {
+	  map.clear();
+	  for(size_t i = 0; i<num_data_points; i++) {
+	    map[peak_values[i]] = source_values[i];
+	  }
+	  best_chi2 = fitter.GetChisquare();
+	}
+
       }
+    }
+
+    // Remove one peak value from the best fit, make sure that we reproduce (0,0) intercept.
+    if(map.size() > 2) {
+      std::vector<double> peak_values;
+      std::vector<double> source_values;
+      for(auto& item : map) {
+	peak_values.push_back(item.first);
+	source_values.push_back(item.second);
+      }
+
+      for(size_t skipped_point = 0; skipped_point<source_values.size(); skipped_point++) {
+	std::swap(peak_values[skipped_point], peak_values.back());
+	std::swap(source_values[skipped_point], source_values.back());
+
+	fitter.ClearPoints();
+	fitter.AssignData(source_values.size()-1, 1, peak_values.data(), source_values.data());
+	fitter.Eval();
+	
+	if(std::abs(fitter.GetParameter(0)) > 10) {
+	  map.clear();
+	  break;
+	}
+	
+	std::swap(peak_values[skipped_point], peak_values.back());
+	std::swap(source_values[skipped_point], source_values.back());
+      }
+    }
+    
+    if(map.size()) {
+      return map;
     }
   }
 
-  //PrintMap(map);
-
-
-  max_err = 0.05;
-  
-  for(std::map<double,double>::iterator mit1=map.begin();mit1!=map.end();mit1++) {
-    for(std::map<double,double>::iterator mit2=mit1;mit2!=map.end();mit2++) {
-      if(mit1==mit2) continue;
-      point pt;
-      if(mit2->second>mit1->second &&
-         mit2->first>mit1->first) {
-        pt.x1 = mit1->first;
-        pt.y1 = mit1->second;
-        pt.x2 = mit2->first;
-        pt.y2 = mit2->second;
-        points.push_back(pt);
-      }
-    }
-  }
-  
-  //printf("points.size() = %i\n",points.size());
-  std::sort(points.begin(),points.end());
-
-  auto is_nearby = [&](const point& a, const point& b) {
-    return std::abs(a.slope() - b.slope())/a.slope() < max_err;
-  };
-
-  auto count_nearby = [&](const point& p) {
-    return std::count_if(points.begin(), points.end(),
-        [&](const point& p_other) { return is_nearby(p,p_other); }
-        );
-  };
-
-  point best_slope = *std::max_element(points.begin(), points.end(),
-      [&](const point& a, const point& b) {
-        return count_nearby(a) < count_nearby(b);
-      }
-    );
-
-  //for(auto p : points) {
-  //  p.print();
-  //  std::cout << count_nearby(p) << std::endl;
-  //}
-
-  //std::cout << "-----------------" << std::endl;
-  //best_slope.print();
-  //double bs = best_slope.slope();
-  //std::cout << count_nearby(best_slope) << std::endl;
-  //std::cout << "-----------------" << std::endl;
-
-  for(auto it = points.begin(); it!=points.end();) {
-    if(is_nearby(*it, best_slope)) {
-      it++;
-    } else {
-      it = points.erase(it);
-    }
-  }
   map.clear();
-  for(auto it = points.begin(); it!=points.end();it++) {
-    map[it->x1] = it->y1;
-    map[it->x2] = it->y2;
-  }
-
-  //for(auto p : peaks) {
-  //  printf("%.02f -> %.02f\n",p,bs*p);
-  //}
-
-  //PrintMap(map);
   return map;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // //for(auto s : source) 
+  // //  printf(" s = %.02f\n",s);
+
+
+  // //unsigned int ssize = source.size();
+  // double max_err = 0.01;
+  // std::vector<double> pused;
+  // for(unsigned int i=0;i<peaks.size();i++)  { pused.push_back(100.); }
+  // std::vector<double> sused;
+  // for(unsigned int i=0;i<source.size();i++)  { sused.push_back(100.); }
+
+  // struct point { 
+  //   double x1;
+  //   double x2;
+  //   double y1;
+  //   double y2;
+  //   double slope() const {return (y2-y1)/(x2-x1);}
+  //   void   print() const { printf("(%.2f - %.2f)/(%.2f - %.2f) = %.4f\n",y2,y1,x2,x1,slope()); }
+  //   bool operator<(const point& other) const { return slope()<other.slope(); }
+  // };
+
+  // std::vector<point> points;
+
+  // printf("-------------------------------\n");
+  // for(unsigned int s1=0;s1<source.size();s1++) {
+  //   for(unsigned int s2=s1+1;s2<source.size();s2++) {
+  //     double sratio = source.at(s1)/source.at(s2);
+  //     for(unsigned int p1=0;p1<peaks.size();p1++) {
+  //       for(unsigned int p2=p1+1;p2<peaks.size();p2++) {
+      
+  //         double pratio = peaks.at(p1)/peaks.at(p2);
+  //         double diff = fabs(pratio *1/(fabs(peaks.at(p1)-peaks.at(p2)))
+  //                           -sratio*1/(fabs(source.at(s1)-source.at(s2)))) ;
+  //           if(diff<sused.at(s1) && diff<pused.at(p1) ) {
+  //             printf("1]  %.02f/%.02f - %.02f/%.02f  = %f  | old = %f \n" ,
+  //                    peaks.at(p1),peaks.at(p2),source.at(s1),source.at(s2),
+  //                    diff,pused.at(p1));
+  //             map[peaks.at(p1)] = source.at(s1);
+  //             pused[p1] = diff;
+  //             sused[s1] = diff;
+  //           }
+  //           if(diff<sused.at(s2) && diff<pused.at(p2) ) {
+  //             printf("2]  %.02f/%.02f - %.02f/%.02f  = %f  | old = %f \n" ,
+  //                    peaks.at(p1),peaks.at(p2),source.at(s1),source.at(s2),
+  //                    diff,pused.at(p2));
+  //             map[peaks.at(p2)] = source.at(s2);
+  //             pused[p2] = diff;
+  //             sused[s2] = diff;
+  //           }
+  //       }
+  //     }
+  //   }
+  // }
+  // printf("-------------------------------\n");
+
+  // PrintMap(map);
+
+
+  // max_err = 0.05;
+  
+  // for(std::map<double,double>::iterator mit1=map.begin();mit1!=map.end();mit1++) {
+  //   for(std::map<double,double>::iterator mit2=mit1;mit2!=map.end();mit2++) {
+  //     if(mit1==mit2) continue;
+  //     point pt;
+  //     if(mit2->second>mit1->second &&
+  //        mit2->first>mit1->first) {
+  //       pt.x1 = mit1->first;
+  //       pt.y1 = mit1->second;
+  //       pt.x2 = mit2->first;
+  //       pt.y2 = mit2->second;
+  //       points.push_back(pt);
+  //     }
+  //   }
+  // }
+  
+  // //printf("points.size() = %i\n",points.size());
+  // std::sort(points.begin(),points.end());
+
+  // auto is_nearby = [&](const point& a, const point& b) {
+  //   return std::abs(a.slope() - b.slope())/a.slope() < max_err;
+  // };
+
+  // auto count_nearby = [&](const point& p) {
+  //   return std::count_if(points.begin(), points.end(),
+  //       [&](const point& p_other) { return is_nearby(p,p_other); }
+  //       );
+  // };
+
+  // point best_slope = *std::max_element(points.begin(), points.end(),
+  //     [&](const point& a, const point& b) {
+  //       return count_nearby(a) < count_nearby(b);
+  //     }
+  //   );
+
+  // //for(auto p : points) {
+  // //  p.print();
+  // //  std::cout << count_nearby(p) << std::endl;
+  // //}
+
+  // //std::cout << "-----------------" << std::endl;
+  // //best_slope.print();
+  // //double bs = best_slope.slope();
+  // //std::cout << count_nearby(best_slope) << std::endl;
+  // //std::cout << "-----------------" << std::endl;
+
+  // for(auto it = points.begin(); it!=points.end();) {
+  //   if(is_nearby(*it, best_slope)) {
+  //     it++;
+  //   } else {
+  //     it = points.erase(it);
+  //   }
+  // }
+  // map.clear();
+  // for(auto it = points.begin(); it!=points.end();it++) {
+  //   map[it->x1] = it->y1;
+  //   map[it->x2] = it->y2;
+  // }
+
+  // //for(auto p : peaks) {
+  // //  printf("%.02f -> %.02f\n",p,bs*p);
+  // //}
+
+  // //PrintMap(map);
+  // return map;
 }
 
 bool TCalibrator::CheckMap(std::map<double,double> inmap) {

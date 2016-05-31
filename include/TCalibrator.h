@@ -51,7 +51,9 @@ public:
 
   void AddPeak(double cent,double eng,std::string nuc,double a=0.0,double inten=0.0);
   Peak GetPeak(UInt_t i) const { return fPeaks.at(i); }
-  
+ 
+  TGraph *Graph() { return &graph_of_everything; }
+
 #ifndef __CINT__
   //struct SingleFit {
   //  double max_error;
