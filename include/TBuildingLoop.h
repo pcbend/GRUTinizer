@@ -21,7 +21,7 @@ public:
 
   bool Iteration();
 
-  //virtual void ClearQueue();
+  virtual void ClearQueue();
 
   size_t GetItemsPushed()  { return output_queue->ItemsPushed(); }
   size_t GetItemsPopped()  { return output_queue->ItemsPopped(); }

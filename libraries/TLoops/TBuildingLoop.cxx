@@ -28,12 +28,17 @@ TBuildingLoop::TBuildingLoop(std::string name)
 
 TBuildingLoop::~TBuildingLoop() { }
 
-// void TBuildingLoop::ClearQueue() {
-//   std::vector<TRawEvent> event;
-//   while(output_queue->Size()){
-//     output_queue->Pop(event);
-//   }
-// }
+void TBuildingLoop::ClearQueue() {
+  TRawEvent single_event;
+  while(input_queue->Size()) {
+    input_queue->Pop(single_event);
+  }
+
+  std::vector<TRawEvent> event;
+  while(output_queue->Size()){
+    output_queue->Pop(event);
+  }
+}
 
 bool TBuildingLoop::Iteration(){
   TRawEvent event;

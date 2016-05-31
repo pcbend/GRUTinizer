@@ -16,6 +16,8 @@ public:
   std::shared_ptr<ThreadsafeQueue<TUnpackedEvent*> >& InputQueue() { return input_queue; }
 #endif
 
+  virtual void ClearQueue();
+
   virtual size_t GetItemsPopped() { return 0; }
   virtual size_t GetItemsPushed() { return 0; }
   virtual size_t GetItemsCurrent() { return 0; }

@@ -60,6 +60,24 @@ TWriteLoop::~TWriteLoop() {
   }
 }
 
+void TWriteLoop::ClearQueue() {
+  while(input_queue->Size()){
+    TUnpackedEvent* event = NULL;
+    input_queue->Pop(event);
+    if(event){
+      delete event;
+    }
+  }
+
+  while(output_queue->Size()){
+    TUnpackedEvent* event = NULL;
+    output_queue->Pop(event);
+    if(event){
+      delete event;
+    }
+  }
+}
+
 bool TWriteLoop::Iteration() {
   TUnpackedEvent* event = NULL;
   input_queue->Pop(event);

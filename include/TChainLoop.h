@@ -32,6 +32,7 @@ public:
   size_t GetRate()         { return 0; }
 
   virtual std::string Status();
+  virtual void ClearQueue();
 
   virtual void OnEnd();
 

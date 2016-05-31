@@ -37,8 +37,16 @@ TChainLoop::TChainLoop(std::string name, TChain *chain)
   SetupChain();
 }
 
-TChainLoop::~TChainLoop() {
+TChainLoop::~TChainLoop() { }
 
+void TChainLoop::ClearQueue() {
+  while(output_queue->Size()){
+    TUnpackedEvent* event = NULL;
+    output_queue->Pop(event);
+    if(event){
+      delete event;
+    }
+  }
 }
 
 int TChainLoop::SetupChain() {

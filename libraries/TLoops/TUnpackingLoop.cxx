@@ -84,15 +84,20 @@ bool TUnpackingLoop::Iteration(){
   return true;
 }
 
-// void TUnpackingLoop::ClearQueue() {
-//   while(output_queue->Size()){
-//     TUnpackedEvent* event = NULL;
-//     output_queue->Pop(event);
-//     if(event){
-//       delete event;
-//     }
-//   }
-// }
+void TUnpackingLoop::ClearQueue() {
+  std::vector<TRawEvent> raw_event;
+  while(input_queue->Size()) {
+    input_queue->Pop(raw_event);
+  }
+
+  while(output_queue->Size()){
+    TUnpackedEvent* event = NULL;
+    output_queue->Pop(event);
+    if(event){
+      delete event;
+    }
+  }
+}
 
 void TUnpackingLoop::HandleNSCLData(TNSCLEvent& event) {
   switch(event.GetEventType()) {

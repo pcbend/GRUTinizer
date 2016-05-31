@@ -19,6 +19,8 @@ TTerminalLoop::TTerminalLoop(std::string name)
   : StoppableThread(name),
     input_queue(std::make_shared<ThreadsafeQueue<TUnpackedEvent*> >()) { }
 
+
+
 bool TTerminalLoop::Iteration() {
   TUnpackedEvent* event = NULL;
   input_queue->Pop(event);
@@ -31,5 +33,15 @@ bool TTerminalLoop::Iteration() {
   } else {
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     return true;
+  }
+}
+
+void TTerminalLoop::ClearQueue() {
+  while(input_queue->Size()){
+    TUnpackedEvent* event = NULL;
+    input_queue->Pop(event);
+    if(event){
+      delete event;
+    }
   }
 }

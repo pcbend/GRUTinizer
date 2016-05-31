@@ -31,7 +31,7 @@ public:
 
   void Write();
 
-  //virtual void ClearQueue();
+  virtual void ClearQueue();
 
   TList* GetObjects();
   TList* GetGates();

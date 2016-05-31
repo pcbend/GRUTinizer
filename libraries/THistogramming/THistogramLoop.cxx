@@ -29,15 +29,23 @@ THistogramLoop::~THistogramLoop() {
   CloseFile();
 }
 
-// void THistogramLoop::ClearQueue() {
-//   while(input_queue->Size()){
-//     TUnpackedEvent* event = NULL;
-//     input_queue->Pop(event);
-//     if(event){
-//       delete event;
-//     }
-//   }
-// }
+void THistogramLoop::ClearQueue() {
+  while(input_queue->Size()){
+    TUnpackedEvent* event = NULL;
+    input_queue->Pop(event);
+    if(event){
+      delete event;
+    }
+  }
+
+  while(output_queue->Size()){
+    TUnpackedEvent* event = NULL;
+    output_queue->Pop(event);
+    if(event){
+      delete event;
+    }
+  }
+}
 
 bool THistogramLoop::Iteration() {
   TUnpackedEvent* event = NULL;

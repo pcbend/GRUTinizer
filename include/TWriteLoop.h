@@ -21,6 +21,8 @@ public:
   std::shared_ptr<ThreadsafeQueue<TUnpackedEvent*> >& OutputQueue() { return output_queue; }
 #endif
 
+  virtual void ClearQueue();
+
   void Write();
 
   size_t GetItemsPushed()  { return items_handled; }
