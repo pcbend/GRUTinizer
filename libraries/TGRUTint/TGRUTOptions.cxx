@@ -7,6 +7,7 @@
 #include "TEnv.h"
 
 #include "ArgParser.h"
+#include "DynamicLibrary.h"
 #include "TGRUTUtilities.h"
 
 TGRUTOptions* TGRUTOptions::Get(int argc, char** argv){
@@ -222,7 +223,15 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename) const{
   } else if (ext == "hist") {
     return kFileType::GUI_HIST_FILE;
   } else if (ext == "so") {
-    return kFileType::COMPILED_HISTOGRAMS;
+    DynamicLibrary lib(filename);
+    if(lib.GetSymbol("MakeHistograms")) {
+      return kFileType::COMPILED_HISTOGRAMS;
+    } else if (lib.GetSymbol("FilterCondition")) {
+      return kFileType::COMPILED_FILTER;
+    } else {
+      std::cerr << filename << " did not contain MakeHistograms() or FilterCondition()" << std::endl;
+      return kFileType::UNKNOWN_FILETYPE;
+    }
   } else if (ext == "info") {
     return kFileType::CONFIG_FILE;
   } else if (ext == "inv") {
@@ -268,6 +277,10 @@ bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
 
     case kFileType::COMPILED_HISTOGRAMS:
       compiled_histogram_file = filename;
+      return true;
+
+    case kFileType::COMPILED_FILTER:
+      compiled_filter_file = filename;
       return true;
 
     case kFileType::S800_INVMAP:

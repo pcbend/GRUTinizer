@@ -11,7 +11,6 @@
 #include "TList.h"
 
 #include "DynamicLibrary.h"
-#include "TDetector.h"
 #include "TRuntimeObjects.h"
 
 #include "TUnpackedEvent.h"
@@ -22,7 +21,6 @@ class TCompiledHistograms : public TObject {
 public:
   TCompiledHistograms();
   TCompiledHistograms(std::string libname);
-  ~TCompiledHistograms();
 
   void Load(std::string libname);
   void Fill(TUnpackedEvent& detectors);
@@ -65,7 +63,7 @@ private:
 
   TDirectory* default_directory;
 
-  TRuntimeObjects *obj;
+  TRuntimeObjects obj;
 
   ClassDef(TCompiledHistograms, 0);
 };

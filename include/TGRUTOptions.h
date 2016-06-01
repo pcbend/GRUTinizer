@@ -31,6 +31,7 @@ public:
   const std::string& S800InverseMapFile()           { return s800_inverse_map_file; }
   std::string InputRing() { return input_ring; }
   std::string CompiledHistogramFile() { return compiled_histogram_file; }
+  std::string CompiledFilterFile() { return compiled_filter_file; }
 
   const std::vector<std::string>& OptionFiles() { return options_file; }
 
@@ -84,6 +85,7 @@ private:
 
   std::string detector_environment;
   std::string compiled_histogram_file;
+  std::string compiled_filter_file;
   std::string s800_inverse_map_file;
 
   std::vector<std::string> options_file;

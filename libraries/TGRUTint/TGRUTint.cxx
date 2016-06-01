@@ -30,6 +30,7 @@
 #include "TChannel.h"
 #include "TDataLoop.h"
 #include "TDetectorEnv.h"
+#include "TFilterLoop.h"
 #include "TGRUTOptions.h"
 #include "TGRUTUtilities.h"
 #include "THistogramLoop.h"
@@ -344,6 +345,8 @@ TRawFileIn *TGRUTint::OpenRawFile(const std::string& filename) {
 void TGRUTint::SetupPipeline() {
   TGRUTOptions* opt = TGRUTOptions::Get();
 
+  // Determining which parts of the pipeline need to be set up.
+
   bool missing_raw_file = false;
   for(auto& filename : opt->RawInputFiles()) {
     if(!file_exists(filename.c_str())) {
@@ -352,16 +355,21 @@ void TGRUTint::SetupPipeline() {
     }
   }
 
-  // Determining all the parameters of what we will do.
-
   bool has_input_ring = opt->InputRing().length();
   bool has_raw_file = opt->RawInputFiles().size();
   bool self_stopping = opt->ExitAfterSorting();
   bool sort_raw = ( (has_input_ring || has_raw_file) &&
                     !missing_raw_file && opt->SortRaw() );
 
+  bool has_explicit_root_output = opt->OutputFile().length();
+  bool filter_data = opt->CompiledFilterFile().length();
+
   bool has_input_tree = gChain->GetListOfBranches();
-  bool sort_tree = has_input_tree && (opt->MakeHistos() || opt->SortRoot());
+  bool sort_tree = has_input_tree && (opt->MakeHistos() || opt->SortRoot() ||
+                                      (has_explicit_root_output && filter_data));
+
+  bool write_root_tree = sort_raw || (sort_tree && filter_data && has_explicit_root_output);
+  bool write_histograms = opt->MakeHistos() || sort_tree;
 
   std::string output_root_file = "temp_tree.root";
   if(opt->OutputFile().length()) {
@@ -413,7 +421,7 @@ void TGRUTint::SetupPipeline() {
     return;
   }
 
-  std::shared_ptr<ThreadsafeQueue<TUnpackedEvent*> >* current_queue = NULL;
+  std::shared_ptr<ThreadsafeQueue<TUnpackedEvent*> > current_queue = nullptr;
 
   //next most important thing, if given a raw file && NOT told to not sort!
   if(sort_raw) {
@@ -427,34 +435,38 @@ void TGRUTint::SetupPipeline() {
 
     TUnpackingLoop* unpack_loop = TUnpackingLoop::Get("3_unpack");
     unpack_loop->InputQueue() = build_loop->OutputQueue();
-    current_queue = &unpack_loop->OutputQueue();
+    current_queue = unpack_loop->OutputQueue();
 
   } else if(sort_tree) {
     fChainLoop = TChainLoop::Get("1_chain_loop",gChain);
     fChainLoop->SetSelfStopping(self_stopping);
-    current_queue = &fChainLoop->OutputQueue();
+    current_queue = fChainLoop->OutputQueue();
   }
 
-  bool write_root_tree = sort_raw;
+  if(filter_data) {
+    TFilterLoop* filter_loop = TFilterLoop::Get("4_filter_loop");
+    filter_loop->InputQueue() = current_queue;
+    current_queue = filter_loop->OutputQueue();
+  }
+
   if(write_root_tree) {
-    TWriteLoop* write_loop = TWriteLoop::Get("4_write_loop", output_root_file);
-    write_loop->InputQueue() = *current_queue;
-    current_queue = &write_loop->OutputQueue();
+    TWriteLoop* write_loop = TWriteLoop::Get("5_write_loop", output_root_file);
+    write_loop->InputQueue() = current_queue;
+    current_queue = write_loop->OutputQueue();
   }
 
-  bool write_histograms = opt->MakeHistos() || sort_tree;
   if(write_histograms) {
-    fHistogramLoop = THistogramLoop::Get("5_hist_loop");
+    fHistogramLoop = THistogramLoop::Get("6_hist_loop");
     fHistogramLoop->SetOutputFilename(output_hist_file);
     for(auto cut_file : cuts_files) {
       fHistogramLoop->AddCutFile(cut_file);
     }
-    fHistogramLoop->InputQueue() = *current_queue;
-    current_queue = &fHistogramLoop->OutputQueue();
+    fHistogramLoop->InputQueue() = current_queue;
+    current_queue = fHistogramLoop->OutputQueue();
   }
 
-  TTerminalLoop* terminal_loop = TTerminalLoop::Get("6_terminal_loop");
-  terminal_loop->InputQueue() = *current_queue;
+  TTerminalLoop* terminal_loop = TTerminalLoop::Get("7_terminal_loop");
+  terminal_loop->InputQueue() = current_queue;
 
   StoppableThread::ResumeAll();
 }

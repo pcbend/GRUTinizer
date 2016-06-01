@@ -1,4 +1,4 @@
-// TDataLoop.h TBuildingLoop.h TUnpackingLoop.h StoppableThread.h TWriteLoop.h TChainLoop.h TTerminalLoop.h
+// TDataLoop.h TBuildingLoop.h TUnpackingLoop.h StoppableThread.h TWriteLoop.h TChainLoop.h TTerminalLoop.h TFilterLoop.h
 
 #ifdef __CINT__
 
@@ -16,5 +16,6 @@
 #pragma link C++ class TWriteLoop+;
 #pragma link C++ class TChainLoop+;
 #pragma link C++ class TTerminalLoop+;
+#pragma link C++ class TFilterLoop+;
 
 #endif
