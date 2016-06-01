@@ -14,6 +14,7 @@
 #include <TObject.h>
 
 #include "TCagra.h"
+#include "TGrandRaiden.h"
 
 //#include "TChannel.h"
 //#include "GValue.h"
@@ -27,76 +28,54 @@ using namespace std;
 string name;
 stringstream stream;
 
+int debugctr =0;
+int totalctr=0;
+
 // extern "C" is needed to prevent name mangling.
 // The function signature must be exactly as shown here,
 //   or else bad things will happen.
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
-  TCagra *cagra = obj.GetDetector<TCagra>();
+  TCagra* cagra = obj.GetDetector<TCagra>();
+  TGrandRaiden* gr = obj.GetDetector<TGrandRaiden>();
 
   TList *list = &(obj.GetObjects());
   int numobj = list->GetSize();
 
-  if(!cagra)
-    return;
+  // totalctr++;
+  // if (cagra && gr) {
+  //   cout << "Coincidence" << endl;
+  //   debugctr=0;
+  // } else {
+  //   cout << "Single" << endl;
+  //   debugctr+=1;
+  // }
+  // if (debugctr>1e3){
+  //   cout << totalctr << endl;
+  //   exit(1);
+  // }
+  if(cagra) {
 
-
-  for(int y=0;y<cagra->Size();y++) {
-    //auto hit = cagra->GetCagraHit(y);
-
-
-
-
-    //stream.str("");
-    //stream << "PostE_BoardID" << hit.GetBoardID()  << "Chan" << hit.GetChannel();
-    //obj.FillHistogram(stream.str(),10000,0,0,hit.GetPostE());
-
-    //stream.str("");
-    //stream << "LED_BoardID" << hit.GetBoardID()  << "Chan" << hit.GetChannel();
-    //obj.FillHistogram(stream.str(),10000,0,0,hit.GetLED());
-
-
-    // if(hit.GetBoardID() == 113) {
-    //   //cout << hit.GetLED() << endl;
-    //   stream.str("");
-    //   stream << "Crystal" << hit.GetChannel();
-    //   float Energy = ((hit.GetPostE() - hit.GetPreE())/350.0);
-    //   obj.FillHistogram(stream.str(),10000,0,20000,Energy);
-    // }
-
+    //cout << "Size: " << cagra->Size() << endl;
     for (auto& hit : *cagra) {
+
+      //cout << "  "<<hit.Timestamp() << " " << endl;
+      stream.str("");
+      stream << "PostE_BoardID" << hit.GetBoardID()  << "_Chan" << hit.GetChannel();
+      obj.FillHistogram(stream.str(),10000,0,0,hit.Charge());
+
+
       if (hit.GetBoardID() == 0x71) {
-        /*
-        cout << "Clover: " << hit.GetDetnum()
-             << " Leaf: " << hit.GetLeaf()
-             << " Segment: " << hit.GetMainSegnum()
-             << " Theta: "<< hit.GetPosition().Theta()*180/TMath::Pi()
-             << endl;
-        */
-        //hit.GetPosition().Print();
+
         stream.str("");
         stream << "Leaf" << hit.GetChannel();
         obj.FillHistogram(stream.str(),10000,0,20000,hit.Charge());
         stream.str("");
         stream << "CalLeaf" << hit.GetChannel();
         obj.FillHistogram(stream.str(),10000,0,20000,hit.GetEnergy());
-
       }
     }
-
-
-
-    // PRINT(hit.GetBoardID());
-    // if (hit.GetChannel() > 2) PRINT(hit.GetChannel());
-    // PRINT(hit.GetLED());
-    // PRINT(hit.GetPostE());
-    // PRINT(hit.GetPreE());
-    // PRINT((hit.GetPostE() - hit.GetPreE())/350.0);
-    //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
   }
-
-
 
 
   if(numobj!=list->GetSize())

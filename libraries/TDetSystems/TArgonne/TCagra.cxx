@@ -61,12 +61,13 @@ int TCagra::BuildHits(std::vector<TRawEvent>& raw_data){
     }
 
     int detnum = chan->GetArrayPosition(); // clover number
+    char leaf = *chan->GetArraySubposition(); // clover number
     int segnum = chan->GetSegment(); // segment number
 
     // Get a hit, make it if it does not exist
     TCagraHit* hit = NULL;
     for(auto& ihit : cagra_hits){
-      if(ihit.GetDetnum() == detnum){
+      if(ihit.GetDetnum() == detnum && ihit.GetLeaf() == leaf){
         hit = &ihit;
         break;
       }
@@ -140,7 +141,7 @@ void TCagra::LoadDetectorPositions() {
   loaded = true;
 
   //std::string filename = std::string(getenv("GRUTSYS")) + "/../config/SeGA_rotations.txt";
-  std::string filename = std::string(getenv("GRUTSYS")) + "/config/Cagra_positions.txt";
+  std::string filename = std::string(getenv("GRUTSYS")) + "/config/CAGRA_positions.txt";
 
   //Read the locations from file.
   std::ifstream infile(filename);
