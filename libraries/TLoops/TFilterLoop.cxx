@@ -1,6 +1,8 @@
 #include "TFilterLoop.h"
 
+#include "MakeUnique.h"
 #include "TGRUTOptions.h"
+#include "TRawFileOut.h"
 
 TFilterLoop* TFilterLoop::Get(std::string name) {
   if(name.length()==0)
@@ -14,7 +16,8 @@ TFilterLoop* TFilterLoop::Get(std::string name) {
 TFilterLoop::TFilterLoop(std::string name)
   : StoppableThread(name),
     input_queue(std::make_shared<ThreadsafeQueue<TUnpackedEvent*> >()),
-    output_queue(std::make_shared<ThreadsafeQueue<TUnpackedEvent*> >()) {
+    output_queue(std::make_shared<ThreadsafeQueue<TUnpackedEvent*> >()),
+    filtered_output(nullptr) {
 
   LoadLib(TGRUTOptions::Get()->CompiledFilterFile());
 }
@@ -44,11 +47,7 @@ bool TFilterLoop::Iteration() {
   input_queue->Pop(event);
 
   if(event) {
-    if(compiled_filter.MatchesCondition(*event)) {
-      output_queue->Push(event);
-    } else {
-      delete event;
-    }
+    HandleEvent(event);
     return true;
   } else if(input_queue->IsFinished()) {
     output_queue->SetFinished();
@@ -57,6 +56,24 @@ bool TFilterLoop::Iteration() {
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     return true;
   }
+}
+
+void TFilterLoop::HandleEvent(TUnpackedEvent* event) {
+  if(compiled_filter.MatchesCondition(*event)) {
+    if(filtered_output) {
+      filtered_output->Write(*event);
+    }
+    // No need to keep the raw data around after writing it to disk,
+    //   can save on RAM at this point.
+    event->ClearRawData();
+    output_queue->Push(event);
+  } else {
+    delete event;
+  }
+}
+
+void TFilterLoop::OpenRawOutputFile(const std::string& output_filename) {
+  filtered_output = make_unique<TRawFileOut>(output_filename);
 }
 
 void TFilterLoop::AddCutFile(TFile* cut_file) {

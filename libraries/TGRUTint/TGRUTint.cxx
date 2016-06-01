@@ -363,6 +363,7 @@ void TGRUTint::SetupPipeline() {
 
   bool has_explicit_root_output = opt->OutputFile().length();
   bool filter_data = opt->CompiledFilterFile().length();
+  bool raw_filtered_output = opt->OutputFilteredFile().length();
 
   bool has_input_tree = gChain->GetListOfBranches();
   bool sort_tree = has_input_tree && (opt->MakeHistos() || opt->SortRoot() ||
@@ -445,6 +446,9 @@ void TGRUTint::SetupPipeline() {
 
   if(filter_data) {
     TFilterLoop* filter_loop = TFilterLoop::Get("4_filter_loop");
+    if(raw_filtered_output) {
+      filter_loop->OpenRawOutputFile(opt->OutputFilteredFile());
+    }
     filter_loop->InputQueue() = current_queue;
     current_queue = filter_loop->OutputQueue();
   }

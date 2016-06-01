@@ -1,6 +1,9 @@
 #ifndef _TFILTERLOOP_H_
 #define _TFILTERLOOP_H_
 
+#ifndef __CINT__
+#include <memory>
+#endif
 #include <string>
 
 #include "StoppableThread.h"
@@ -8,6 +11,7 @@
 #include "ThreadsafeQueue.h"
 
 class TFile;
+class TRawFileOut;
 
 class TFilterLoop : public StoppableThread {
 public:
@@ -22,6 +26,8 @@ public:
 
   void LoadLibrary(std::string library);
   std::string GetLibraryName() const;
+
+  void OpenRawOutputFile(const std::string& output_filename);
 
   void AddCutFile(TFile* cut_file);
 
@@ -39,6 +45,8 @@ protected:
 private:
   TFilterLoop(std::string name);
 
+  void HandleEvent(TUnpackedEvent* event);
+
   TCompiledFilter compiled_filter;
 
   std::string output_filename;
@@ -46,6 +54,7 @@ private:
 #ifndef __CINT__
   std::shared_ptr<ThreadsafeQueue<TUnpackedEvent*> > input_queue;
   std::shared_ptr<ThreadsafeQueue<TUnpackedEvent*> > output_queue;
+  std::unique_ptr<TRawFileOut> filtered_output;
 #endif
 
   ClassDef(TFilterLoop,0);
