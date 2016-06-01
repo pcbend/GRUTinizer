@@ -87,6 +87,13 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .description("Input file(s)");
   parser.option("o output", &output_file)
     .description("Root output file");
+
+
+  parser.option("T tree-source", &fTreeSource)
+    .description("Input TTree source.")
+    .default_value(false);
+
+
   parser.option("hist-output",&output_histogram_file)
     .description("Output file for histograms");
   parser.option("r ring",&input_ring)
@@ -230,6 +237,8 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename) const{
     return kFileType::PRESETWINDOW;
   } else if (ext == "cuts") {
     return kFileType::CUTS_FILE;
+  } else if (ext.find("gtd")!=std::string::npos) {
+    return kFileType::ANL_RAW;
   } else {
     return kFileType::UNKNOWN_FILETYPE;
   }
@@ -238,6 +247,7 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename) const{
 bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
   switch(DetermineFileType(filename)){
     case kFileType::NSCL_EVT:
+    case kFileType::ANL_RAW:
     case kFileType::GRETINA_MODE2:
     case kFileType::GRETINA_MODE3:
       input_raw_files.push_back(filename);

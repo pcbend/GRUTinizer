@@ -15,6 +15,8 @@
 #include "TS800Scaler.h"
 #include "TSega.h"
 #include "TFastScint.h"
+#include "TCagra.h"
+#include "TGrandRaiden.h"
 
 TUnpackedEvent::TUnpackedEvent() { }
 
@@ -80,6 +82,14 @@ void TUnpackedEvent::Build() {
 
     case kDetectorSystems::NSCLSCALERS:
       GetDetector<TNSCLScalers>(true)->Build(raw_data);
+      break;
+
+    case kDetectorSystems::ANL:
+      GetDetector<TCagra>(true)->Build(raw_data);
+      break;
+
+    case kDetectorSystems::GRAND_RAIDEN:
+      GetDetector<TGrandRaiden>(true)->Build(raw_data);
       break;
 
     default:

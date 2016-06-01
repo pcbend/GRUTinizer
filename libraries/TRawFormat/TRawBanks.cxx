@@ -70,9 +70,16 @@ std::ostream& operator<<(std::ostream& os, const TRawEvent::G4SimPacket &packet)
 
 
 UShort_t TRawEvent:: SwapShort(UShort_t datum) {
-  UShort_t temp = 0;
-  temp = (datum&0x00ff);
-  return (temp<<8) + (datum>>8);
+        UShort_t temp = 0;
+        temp = (datum&0x00ff);
+        return (temp<<8) + (datum>>8);
+}
+UInt_t TRawEvent::SwapInt(UInt_t datum) {
+        UInt_t t1 = 0, t2 = 0, t3 = 0;
+        t1 = (datum&0x000000ff);
+        t2 = (datum&0x0000ff00);
+        t3 = (datum&0x00ff0000);
+        return (t1<<24) + (t2<<8) + (t3>>8) + (datum>>24);
 }
 
 void TRawEvent::SwapMode3Head(TRawEvent::GEBMode3Head &head) {
@@ -121,6 +128,87 @@ std::ostream& operator<<(std ::ostream& os, const TRawEvent::GEBMode3Data &data)
      << "Energy High         : " << std::hex << "0x" << data.energy_high << std::dec << "\n";
   return os;
 }
+
+UShort_t TRawEvent::GEBArgonneHead::GetGA() const { return  ((GA_packetlength & 0xf800) >> 11); }
+UShort_t TRawEvent::GEBArgonneHead::GetLength() const { return (GA_packetlength & 0x7ff); }
+UShort_t TRawEvent::GEBArgonneHead::GetBoardID() const { return ((ud_channel & 0xfff0) >> 4); }
+UShort_t TRawEvent::GEBArgonneHead::GetChannel() const { return (ud_channel & 0xf); }
+UInt_t   TRawEvent::GEBArgonneHead::GetHeaderType() const { return (hdrlength_evttype_hdrtype & 0xf); }
+UShort_t TRawEvent::GEBArgonneHead::GetEventType() const { return ((hdrlength_evttype_hdrtype & 0x380) >> 7); }
+UShort_t TRawEvent::GEBArgonneHead::GetHeaderLength() const { return ((hdrlength_evttype_hdrtype & 0xfc00) >> 10); }
+ULong_t  TRawEvent::GEBArgonneHead::GetLED() const { return (((ULong_t)led_high) << 32) + ((ULong_t)led_low); }
+
+ULong_t  TRawEvent::GEBArgonneLEDv11::GetPreviousLED() const { return (((ULong_t)led_high_prev) << 16) + ((ULong_t)led_low_prev); }
+UInt_t   TRawEvent::GEBArgonneLEDv11::GetBaseline() const { return ((sampled_baseline & 0x00FFFFFF) >> 0); }
+UInt_t   TRawEvent::GEBArgonneLEDv11::GetPreRiseE() const { return (postrise_sum_low_prerise_sum & 0xffffff); }
+UInt_t   TRawEvent::GEBArgonneLEDv11::GetPostRiseE() const { return ((postrise_sum_low_prerise_sum & 0xff000000)>>24) + (((UInt_t)postrise_sum_high) << 8); }
+ULong_t  TRawEvent::GEBArgonneLEDv11::GetPeakTimestamp() const { return ((ULong_t)timestamp_peak_low) + (((ULong_t)timestamp_peak_high)<<16); }
+UShort_t TRawEvent::GEBArgonneLEDv11::GetPostRiseSampleBegin() const { return (postrise_begin_sample & 0x3fff); }
+UShort_t TRawEvent::GEBArgonneLEDv11::GetPostRiseSampleEnd() const { return (postrise_end_sample & 0x3fff); }
+UShort_t TRawEvent::GEBArgonneLEDv11::GetPreRiseSampleBegin() const { return (prerise_begin_sample & 0x3fff); }
+UShort_t TRawEvent::GEBArgonneLEDv11::GetPreRiseSampleEnd() const { return (prerise_end_sample & 0x3fff); }
+UShort_t TRawEvent::GEBArgonneLEDv11::GetBaseSample() const { return (base_sample & 0x3fff); }
+UShort_t TRawEvent::GEBArgonneLEDv11::GetPeakSample() const { return (peak_sample & 0x3fff); }
+UShort_t TRawEvent::GEBArgonneLEDv11::ExternalDiscFlag() const { return ((flags & 0x100)>>8); }
+UShort_t TRawEvent::GEBArgonneLEDv11::PeakValidFlag() const { return ((flags & 0x200)>>9); }
+UShort_t TRawEvent::GEBArgonneLEDv11::OffsetFlag() const { return ((flags & 0x400)>>10); }
+UShort_t TRawEvent::GEBArgonneLEDv11::SyncErrorFlag() const { return ((flags & 0x1000)>>12); }
+UShort_t TRawEvent::GEBArgonneLEDv11::GeneralErrorFlag() const { return ((flags & 0x2000)>>13); }
+UShort_t TRawEvent::GEBArgonneLEDv11::PileUpOnlyFlag() const { return ((flags & 0x4000)>>14); }
+UShort_t TRawEvent::GEBArgonneLEDv11::PileUpFlag() const { return ((flags & 0x8000)>>15); }
+
+void TRawEvent::SwapArgonneHead(TRawEvent::GEBArgonneHead& header) {
+        header.GA_packetlength = SwapShort(header.GA_packetlength);
+        header.ud_channel = SwapShort(header.ud_channel);
+        header.led_low = SwapInt(header.led_low);
+        header.hdrlength_evttype_hdrtype = SwapShort(header.hdrlength_evttype_hdrtype);
+        header.led_high = SwapShort(header.led_high);
+}
+void TRawEvent::SwapArgonneLEDv11(TRawEvent::GEBArgonneLEDv11& data) {
+        data.led_low_prev = SwapShort(data.led_low_prev);
+        data.flags = SwapShort(data.flags);
+        data.led_high_prev = SwapInt(data.led_high_prev);
+        data.sampled_baseline = SwapInt(data.sampled_baseline);
+        data.postrise_sum_low_prerise_sum = SwapInt(data.postrise_sum_low_prerise_sum);
+        data.timestamp_peak_low = SwapShort(data.timestamp_peak_low);
+        data.postrise_sum_high = SwapShort(data.postrise_sum_high);
+        data.timestamp_peak_high = SwapInt(data.timestamp_peak_high);
+        data.postrise_end_sample = SwapShort(data.postrise_end_sample);
+        data.postrise_begin_sample = SwapShort(data.postrise_begin_sample);
+        data.prerise_end_sample = SwapShort(data.prerise_end_sample);
+        data.prerise_begin_sample = SwapShort(data.prerise_begin_sample);
+        data.base_sample = SwapShort(data.base_sample);
+        data.peak_sample = SwapShort(data.peak_sample);
+}
+
+#define STR(x) "\t GEBArgonne "<< #x <<": " << x
+std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBArgonneHead& header) {
+        return os << "-- Argonne header packet -- \n"
+                << STR(header.GA_packetlength) << "\n"
+                << STR(header.ud_channel) << "\n"
+                << STR(header.led_low) << "\n"
+                << STR(header.hdrlength_evttype_hdrtype) << "\n"
+                << STR(header.led_high) << std::endl;
+}
+std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBArgonneLEDv11& data) {
+        return os << "-- Argonne LEDv11 data packet --"
+                << STR(data.led_low_prev) << "\n"
+                << STR(data.flags) << "\n"
+                << STR(data.led_high_prev) << "\n"
+                << STR(data.sampled_baseline) << "\n"
+                << STR(data._blank_) << "\n"
+                << STR(data.postrise_sum_low_prerise_sum) << "\n"
+                << STR(data.timestamp_peak_low) << "\n"
+                << STR(data.postrise_sum_high) << "\n"
+                << STR(data.timestamp_peak_high) << "\n"
+                << STR(data.postrise_end_sample) << "\n"
+                << STR(data.postrise_begin_sample) << "\n"
+                << STR(data.prerise_end_sample) << "\n"
+                << STR(data.prerise_begin_sample) << "\n"
+                << STR(data.base_sample) << "\n"
+                << STR(data.peak_sample) << std::endl;
+}
+#undef STR
 
 std::ostream& operator<<(std::ostream& os,const TRawEvent::GEBS800Header &head) {
   return os << "-- S800 Header \"packet\" -- \n"

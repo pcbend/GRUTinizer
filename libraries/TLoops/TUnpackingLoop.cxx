@@ -59,16 +59,20 @@ bool TUnpackingLoop::Iteration(){
         TNSCLEvent nscl_event(raw_event);
         HandleNSCLData(nscl_event);
       }
-        break;
+      break;
 
+      case kFileType::ANL_RAW:
       case kFileType::GRETINA_MODE2:
       case kFileType::GRETINA_MODE3:
       {
         TGEBEvent geb_event(raw_event);
         HandleGEBData(geb_event);
       }
-        break;
-
+      break;
+      case kFileType::ROOT_DATA:
+      {
+        fOutputEvent->AddRawData(raw_event, kDetectorSystems::GRAND_RAIDEN);
+      }
       default:
         break;
     }
@@ -203,6 +207,9 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
       fOutputEvent->AddRawData(event,kDetectorSystems::GRETINA_SIM);
       //event.Print("all");
       //exit(1);
+      break;
+    case 14:
+      fOutputEvent->AddRawData(event, kDetectorSystems::ANL);
       break;
     case 17: //PWall Mode2 equivlant.
       fOutputEvent->AddRawData(event, kDetectorSystems::PHOSWALL);
