@@ -2,6 +2,8 @@
 
 #include <iomanip>
 #include <sstream>
+#include <thread>
+#include <chrono>
 
 #include "Globals.h"
 
@@ -58,7 +60,13 @@ int TMultiRawFile::GetEvent(TRawEvent& outevent){
   int bytes_read = next.file->Read(next.next_event);
   if(bytes_read > 0){
     fFileEvents.insert(next);
-  } else {
+  } else if (!TGRUTOptions::Get()->ExitAfterSorting()) {
+    // if online (not exiting immediately) and no bytes were read from source
+    while (bytes_read <= 0) { // stall until source provides next event
+      std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+      bytes_read = next.file->Read(next.next_event);
+    }
+  } else { // otherwise delete the source from the file list
     std::lock_guard<std::mutex> lock(fFileListMutex);
     delete output.file;
     fFileList.erase(output.file);

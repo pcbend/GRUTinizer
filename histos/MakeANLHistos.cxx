@@ -28,14 +28,15 @@ using namespace std;
 string name;
 stringstream stream;
 
-int debugctr =0;
-int totalctr=0;
 
 // extern "C" is needed to prevent name mangling.
 // The function signature must be exactly as shown here,
 //   or else bad things will happen.
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
+
+
+
   TCagra* cagra = obj.GetDetector<TCagra>();
   TGrandRaiden* gr = obj.GetDetector<TGrandRaiden>();
 
@@ -43,11 +44,31 @@ void MakeHistograms(TRuntimeObjects& obj) {
   int numobj = list->GetSize();
 
   // totalctr++;
-  // if (cagra && gr) {
-  //   cout << "Coincidence" << endl;
+  if (cagra && gr) {
+    obj.FillHistogram("nCoin",10,-1,1,0);
+  }
+
+  if (gr) {
+    for (auto& hit : *gr) {
+      auto adc = hit.GetADC();
+      for (int i=0; i<4; i++) {
+        stream.str(""); stream << "GR_ADC" << i;
+        obj.FillHistogram(stream.str().c_str(), 1000,0,1000, adc[i]);
+      }
+    }
+  }
+  //   cout << "  GR TS: " << gr->Timestamp() << " " << gr->Size() << endl;
+  //   cout << "  CAGRA TS: " << cagra->Timestamp() << " " << cagra->Size() << endl;
   //   debugctr=0;
   // } else {
-  //   cout << "Single" << endl;
+  //   cout << "Single ";
+  //   if (cagra) {
+  //     cout << "Cagra" << endl;
+  //     cout << cagra->Timestamp() << endl;
+  //   } else if (gr) {
+  //     cout << "Grand Raiden" << endl;
+  //     cout << gr->Timestamp() << endl;
+  //   }
   //   debugctr+=1;
   // }
   // if (debugctr>1e3){
@@ -59,11 +80,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
     //cout << "Size: " << cagra->Size() << endl;
     for (auto& hit : *cagra) {
 
-      //cout << "  "<<hit.Timestamp() << " " << endl;
+      //cout << hit.Timestamp() << endl;
       stream.str("");
       stream << "PostE_BoardID" << hit.GetBoardID()  << "_Chan" << hit.GetChannel();
       obj.FillHistogram(stream.str(),10000,0,0,hit.Charge());
-
 
       if (hit.GetBoardID() == 0x71) {
 

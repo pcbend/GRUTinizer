@@ -24,6 +24,9 @@ public:
 
   const TGrandRaidenHit& GetGrandRaidenHit(int i) { return GRHits.at(i); }
   void PrintHit(int i){ GRHits.at(i).Print(); }
+  // Allows for looping over all hits with for(auto& hit : gr) { }
+  std::vector<TGrandRaidenHit>::iterator begin() { return GRHits.begin(); }
+  std::vector<TGrandRaidenHit>::iterator end() { return GRHits.end(); }
 
 private:
   virtual int BuildHits(std::vector<TRawEvent>& raw_data);

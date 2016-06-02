@@ -114,7 +114,7 @@ private:
     // create a small memory buffer to hold the pointer to the current entry
     char* ptrbytes = (char*)calloc(1,sizeof(fEvent));
     // copy the address stored in fEvent into the temporary buffer
-    memcpy(&ptrbytes, &fEvent, sizeof(fEvent));
+    *reinterpret_cast<RCNPEvent**>(ptrbytes) = fEvent;
     // prepare the events smart buffer payload
     TSmartBuffer eventbuffer(ptrbytes,sizeof(fEvent));
     // set the pointer address into the buffer
