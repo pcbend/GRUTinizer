@@ -28,6 +28,7 @@ public:
   void SetFitOrder(int order) { fit_order = order; }
 
   TGraph& MakeCalibrationGraph(double min_figure_of_merit = 0.001);
+  TGraphErrors &MakeEffGraph(double secondsi=3600.,double bq=100000.,Option_t *opt="draw"); 
   std::vector<double> Calibrate(double min_figure_of_merit = 0.001);
 
   int AddData(TH1* source_data, std::string source,
@@ -39,7 +40,8 @@ public:
   void UpdateTChannel(TChannel* channel);
 
   void Fit(int order=1); 
-  double GetParameter(int i=0);
+  double GetParameter(int i=0) const;
+  double GetEffParameter(int i=0) const;
 
   struct Peak {
     double centroid;
@@ -52,7 +54,12 @@ public:
   void AddPeak(double cent,double eng,std::string nuc,double a=0.0,double inten=0.0);
   Peak GetPeak(UInt_t i) const { return fPeaks.at(i); }
  
-  TGraph *Graph() { return &graph_of_everything; }
+  TGraph *FitGraph() { return &fit_graph; }
+  TGraph *EffGraph() { return &eff_graph; }
+  TF1 *LinFit() { return linfit; }
+  TF1 *EffFit() { return efffit; }
+  
+  std::string PrintEfficency(const char *filenamei="");
 
 #ifndef __CINT__
   //struct SingleFit {
@@ -70,11 +77,15 @@ private:
 #endif
   std::vector<Peak> fPeaks;
 
-  TGraph graph_of_everything;
+  TGraph fit_graph;
+  TGraphErrors eff_graph;
   TF1    *linfit;
+  TF1    *efffit;
 
   int fit_order;
   int total_points;
+
+  double eff_par[4];
 
   void ResetMap(std::map<double,double> &inmap);
   void PrintMap(std::map<double,double> &inmap);

@@ -6,10 +6,12 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <fstream>
 
 #include <TH1.h>
 #include <TSpectrum.h>
 #include <TLinearFitter.h>
+#include <TGraphErrors.h>
 
 #include <TChannel.h>
 #include <TNucleus.h>
@@ -27,20 +29,26 @@ ClassImp(TCalibrator)
 
 TCalibrator::TCalibrator() { 
   linfit=0;
+  efffit=0;
   Clear(); 
 }
 
 TCalibrator::~TCalibrator() { 
   if(linfit) delete linfit;
+  if(efffit) delete efffit;
 }
 
 void TCalibrator::Copy(TObject &obj) const { }
 
 void TCalibrator::Print(Option_t *opt) const {
   int counter=0;
-  printf("\t\t energy\tcent\tarea\tnuc\tintensity\n");
+  printf("\t%2senergy%10scent%10scalc%10sarea%7snuc%8sintensity\n","","","","","","");
   for(auto it:fPeaks) {
-    printf("%i:\t%.02f\t%.02f\t%.02f\t%s\t%.04f\n",counter++,it.energy,it.centroid,it.area,it.nucleus.c_str(),it.intensity);
+    double caleng = it.centroid*GetParameter(1)+GetParameter(0);
+    double pdiff  = std::abs(caleng-it.energy)/it.energy;
+    printf("%i:\t%7.02f%16.02f%8.2f%3s[%%%3.2f]%16.02f%8s%16.04f\n",
+            counter++,it.energy,it.centroid,caleng,"",pdiff*100.,
+            it.area,it.nucleus.c_str(),it.intensity);
   }
   printf("-------------------------------\n");
 
@@ -56,9 +64,81 @@ void TCalibrator::Print(Option_t *opt) const {
   //if(linfit) linfit->Print();
 }
 
+
+std::string TCalibrator::PrintEfficency(const char *filename) {
+  std::string toprint;
+  std::string file = filename;
+  int counter=1;
+  toprint.append("line\teng\tcounts\tt1/2\tactivity\n");
+  toprint.append("--------------------------------------\n");
+  for(auto it:fPeaks) {
+    toprint.append(Form("%i\t%.02f\t%.02f\t%i\t%.02f\n",
+                         counter++,it.energy,it.area,100, (it.intensity/100)*1e5 ));
+  }
+  toprint.append("--------------------------------------\n");
+ 
+  if(file.length()) {
+    std::ofstream ofile;
+    ofile.open(file.c_str());
+    ofile << toprint ;
+    ofile.close();
+  }
+  printf("%s\n",toprint.c_str());
+  return toprint;
+}
+
+TGraphErrors &TCalibrator::MakeEffGraph(double seconds,double bq,Option_t *opt) {
+  //this currently assumes it only has 152Eu data.
+  //one day it may be smarter, but today is not that day.
+  TString option(opt);
+  TString fitopt;
+  if(option.Contains("Q")) {
+    fitopt.Append("Q");
+    option.ReplaceAll("Q","");
+  }
+  std::vector<double> energy;
+  std::vector<double> error_e;
+  std::vector<double> observed;
+  std::vector<double> error_o;
+  for(auto it:fPeaks) {
+    //TNucleus n(it.nucleus.c_str());
+    energy.push_back(it.energy);
+    error_e.push_back(0.0);
+    observed.push_back((it.area/seconds)/ ((it.intensity/100)*bq) );
+    error_o.push_back( observed.back() * (sqrt(it.area)/it.area) );
+  }
+  
+  eff_graph.Clear();
+  eff_graph = TGraphErrors(fPeaks.size(),energy.data(),observed.data(),error_e.data(),error_o.data());
+  
+  if(efffit)
+    efffit->Delete();
+  static int counter=0;
+  efffit = new TF1(Form("eff_fit_%i",counter++),GRootFunctions::GammaEff,0,1500,4); 
+  eff_graph.Fit(efffit,fitopt.Data());
+
+  if(option.Contains("draw",TString::kIgnoreCase)) {
+    TVirtualPad *current = gPad;
+    new GCanvas;
+    eff_graph.Draw("AP");
+    if(current)
+      current->cd();
+  }
+  for(unsigned int  i=0;i<energy.size();i++) {
+    printf("[%.1f] Observed  = %.04f  | Calculated = %.04f  |  per diff = %.2f\n",
+            energy.at(i),observed.at(i),efffit->Eval(energy.at(i)),
+            (std::abs(observed.at(i)-efffit->Eval(energy.at(i)))/observed.at(i))*100.   );
+  }
+  return eff_graph;
+}
+
 void TCalibrator::Clear(Option_t *opt) { 
-  graph_of_everything.Clear(opt);
+  fit_graph.Clear(opt);
+  eff_graph.Clear(opt);
   //all_fits.clear();
+  
+  for(int i=0;i<4;i++) eff_par[i]=0.;
+  
   total_points=0;
 }
 
@@ -70,16 +150,15 @@ void TCalibrator::Draw(Option_t *opt) {
   TString option(opt);
   if(option.Contains("new",TString::kIgnoreCase))
     new GCanvas;
-  graph_of_everything.Draw("AC*");
+  fit_graph.Draw("AP");
 }
 
 void TCalibrator::Fit(int order) {
   
   //if((graph_of_everything.GetN()<1) &&
   //    (all_fits.size()>0))
-  Print();
   MakeCalibrationGraph();
-  if(graph_of_everything.GetN()<1)
+  if(fit_graph.GetN()<1)
     return;
   if(order==1) {
     linfit = new TF1("linfit",GRootFunctions::LinFit,0,1,2);
@@ -96,13 +175,20 @@ void TCalibrator::Fit(int order) {
     linfit->SetParName(1,"B");
     linfit->SetParName(2,"C");
   }
-  graph_of_everything.Fit(linfit);
+  fit_graph.Fit(linfit);
+  Print();
   
 }
 
-double TCalibrator::GetParameter(int i) {
+double TCalibrator::GetParameter(int i) const {
   if(linfit) 
     return linfit->GetParameter(i);
+  return sqrt(-1);
+}
+
+double TCalibrator::GetEffParameter(int i) const {
+  if(efffit) 
+    return efffit->GetParameter(i);
   return sqrt(-1);
 }
 
@@ -117,10 +203,10 @@ TGraph &TCalibrator::MakeCalibrationGraph(double min_fom) {
     xvalues.push_back(it.centroid);
     yvalues.push_back(it.energy);
   }  
-  graph_of_everything.Clear();
-  graph_of_everything = TGraph(xvalues.size(),xvalues.data(),yvalues.data());
+  fit_graph.Clear();
+  fit_graph = TGraph(xvalues.size(),xvalues.data(),yvalues.data());
 
-  return graph_of_everything; 
+  return fit_graph; 
 }
 
 std::vector<double> TCalibrator::Calibrate(double min_fom) { std::vector<double> vec; return vec; }

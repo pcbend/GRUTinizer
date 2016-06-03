@@ -159,7 +159,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     histname = "GretinaEnergyXId";
     obj.FillHistogram(histname,200,0,200,hit.GetCrystalId(),
-                               8000,0,4000,hit.GetCoreEnergy(0));
+                               8000,0,4000,hit.GetCoreEnergy());
 
     histname = "GretinaEnergyXIdCal";
     obj.FillHistogram(histname,200,0,200,hit.GetCrystalId(),

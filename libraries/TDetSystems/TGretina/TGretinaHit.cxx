@@ -111,8 +111,8 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
   //fAddress = (1<<24) + ( raw.board_id );
   int board_id = ((fCrystalId/4) << 8) ;  //hole  number : 0x1f00
 //    board_id =                       ;  //card  number : 0x0030  information not available here.
-      board_id = ((fCrystalId%4) << 6) ;  //x-tal number : 0x00c0
-      board_id = 9;                       //chan  number : 0x000f  information not available here(assume core).
+      board_id += ((fCrystalId%4) << 6) ;  //x-tal number : 0x00c0
+      board_id += 9;                       //chan  number : 0x000f  information not available here(assume core).
   fAddress = (1<<24) + board_id;
 
 
