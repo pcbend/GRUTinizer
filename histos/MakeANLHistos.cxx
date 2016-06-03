@@ -43,9 +43,29 @@ void MakeHistograms(TRuntimeObjects& obj) {
   TList *list = &(obj.GetObjects());
   int numobj = list->GetSize();
 
-  // totalctr++;
   if (cagra && gr) {
-    obj.FillHistogram("nCoin",10,-1,1,0);
+    int totalhits = 0;
+    for (auto& hit : *gr) { totalhits++; }
+    for (int i=0; i < totalhits; i++) {
+      obj.FillHistogram("nCoin",4,0,1,0);
+    }
+
+    static int ncoin = 0;
+    ncoin+=totalhits;
+    //cout << "Coin: " << ncoin << endl;
+  } else if (gr) {
+    for (auto& hit : *gr) {
+      cout <<"Single GR: " << hit.Timestamp << endl;
+    }
+  }
+
+
+  if (gr) {
+    int totalhits = 0;
+    for (auto& hit : *gr) { totalhits++; }
+    static int ncoin = 0;
+    ncoin+=totalhits;
+    //cout << "GR only: " << ncoin << endl;
   }
 
   if (gr) {

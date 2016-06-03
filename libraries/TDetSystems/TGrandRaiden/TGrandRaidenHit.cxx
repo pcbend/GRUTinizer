@@ -1,6 +1,6 @@
 #include "TGrandRaidenHit.h"
 #include "TGRUTOptions.h"
-#include "rootalyze.h"
+#include "RCNPEvent.h"
 #include "TSmartBuffer.h"
 
 ClassImp(TGrandRaidenHit)

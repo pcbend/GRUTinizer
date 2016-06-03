@@ -11,7 +11,7 @@
 #include "TRawSource.h"
 #include "TChain.h"
 
-#include "rootalyze.h"
+#include "RCNPEvent.h"
 
 templateClassImp(TTreeSource)
 
@@ -124,9 +124,8 @@ private:
       std::cout << "End of time stamps" << std::endl;
       return -1;
     }
-    fEvent->SetTimestamp(timestamps.front()+1);
+    fEvent->SetTimestamp(timestamps.front());
     timestamps.pop();
-
     event.SetFragmentTimestamp(fEvent->GetTimestamp());
     // increment the event count
     fCurrentEntry++;

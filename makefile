@@ -8,7 +8,7 @@ PLATFORM:=$(PLATFORM)
 
 GRANAPATH = ../GRAnalyzer/analyzer
 GRANALYZER = $(realpath $(GRANAPATH)/../lib)
-INCLUDES   = include $(GRANAPATH)/include
+INCLUDES   = include $(GRANAPATH)/include $(GRANAPATH)/libRCNPEvent/include
 CFLAGS     = -g -std=c++11 -O3 -Wall -Wextra -pedantic -Wno-unused-parameter
 LINKFLAGS_PREFIX  =
 LINKFLAGS_SUFFIX  = -L/opt/X11/lib -lX11 -lXpm -std=c++11 -L$(GRANALYZER) -Wl,-rpath,$(GRANALYZER) -lRCNPEvent
