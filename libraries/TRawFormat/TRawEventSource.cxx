@@ -17,7 +17,7 @@ int TRawEventSource::Read(TRawEvent& event){
     int result = GetEvent(event);
     if(result > 0){
       UpdateByteThroughput(event.GetTotalSize());
-    } else if (result < 0) {
+    } else if (result < 0 && TGRUTOptions::Get()->ExitAfterSorting()) {
       fIsFinished = true;
     }
     return result;
