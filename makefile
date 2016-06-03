@@ -54,7 +54,7 @@ INCLUDES  := $(addprefix -I$(PWD)/,$(INCLUDES))
 CFLAGS    += $(shell root-config --cflags)
 CFLAGS    += -MMD -MP $(INCLUDES)
 LINKFLAGS += -Llib $(addprefix -l,$(LIBRARY_NAMES)) -Wl,-rpath,\$$ORIGIN/../lib
-LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lPyROOT
+LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lPyROOT -lMinuit
 LINKFLAGS := $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX) $(CFLAGS)
 
 ROOT_LIBFLAGS := $(shell root-config --cflags)
@@ -85,13 +85,13 @@ run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  
                 rm -f $(2).log $(2).error
 endif
 
-all: include/GVersion.h $(EXECUTABLES) $(LIBRARY_OUTPUT) bin/grutinizer-config $(HISTOGRAM_SO) extras
+all: include/GVersion.h $(EXECUTABLES) $(LIBRARY_OUTPUT) bin/grutinizer-config bin/gadd_fast.py $(HISTOGRAM_SO) extras
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
 
 docs:
 	doxygen doxygen.config
 
-bin/grutinizer-config: util/grutinizer-config | bin
+bin/%: util/% | bin
 	@ln -sf ../$< $@
 
 bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT) bin
