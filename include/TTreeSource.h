@@ -114,7 +114,7 @@ private:
     // create a small memory buffer to hold the pointer to the current entry
     char* ptrbytes = (char*)calloc(1,sizeof(fEvent));
     // copy the address stored in fEvent into the temporary buffer
-    *reinterpret_cast<RCNPEvent**>(ptrbytes) = fEvent;
+    *reinterpret_cast<T**>(ptrbytes) = fEvent;
     // prepare the events smart buffer payload
     TSmartBuffer eventbuffer(ptrbytes,sizeof(fEvent));
     // set the pointer address into the buffer
@@ -125,8 +125,9 @@ private:
       return -1;
     }
     fEvent->SetTimestamp(timestamps.front());
+    event.SetFragmentTimestamp(timestamps.front());
     timestamps.pop();
-    event.SetFragmentTimestamp(fEvent->GetTimestamp());
+
     // increment the event count
     fCurrentEntry++;
     //fEvent = nullptr;

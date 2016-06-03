@@ -16,6 +16,8 @@
 #include "TCagra.h"
 #include "TGrandRaiden.h"
 
+#define BAD_NUM -441441
+
 //#include "TChannel.h"
 //#include "GValue.h"
 
@@ -55,7 +57,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
     //cout << "Coin: " << ncoin << endl;
   } else if (gr) {
     for (auto& hit : *gr) {
-      cout <<"Single GR: " << hit.Timestamp << endl;
+      //cout <<"Single GR: " << hit.Timestamp << endl;
     }
   }
 
@@ -71,30 +73,24 @@ void MakeHistograms(TRuntimeObjects& obj) {
   if (gr) {
     for (auto& hit : *gr) {
       auto adc = hit.GetADC();
-      for (int i=0; i<4; i++) {
-        stream.str(""); stream << "GR_ADC" << i;
-        obj.FillHistogram(stream.str().c_str(), 1000,0,1000, adc[i]);
+      if (adc) {
+        for (int i=0; i<4; i++) {
+          stream.str(""); stream << "GR_ADC" << i;
+          obj.FillHistogram(stream.str().c_str(), 1000,0,1000, adc[i]);
+        }
+        auto rf = hit.GetRF();
+        if (rf != BAD_NUM) {
+          obj.FillHistogram("GR_RF",1000,0,0,rf);
+
+          auto first = TMath::Sqrt(adc[0]*adc[1]);
+          auto second = TMath::Sqrt(adc[2]*adc[3]);
+          obj.FillHistogram("pid_1",500,0,0,rf,500,0,0,first);
+          obj.FillHistogram("pid_2",500,0,0,rf,500,0,0,second);
+        }
       }
     }
   }
-  //   cout << "  GR TS: " << gr->Timestamp() << " " << gr->Size() << endl;
-  //   cout << "  CAGRA TS: " << cagra->Timestamp() << " " << cagra->Size() << endl;
-  //   debugctr=0;
-  // } else {
-  //   cout << "Single ";
-  //   if (cagra) {
-  //     cout << "Cagra" << endl;
-  //     cout << cagra->Timestamp() << endl;
-  //   } else if (gr) {
-  //     cout << "Grand Raiden" << endl;
-  //     cout << gr->Timestamp() << endl;
-  //   }
-  //   debugctr+=1;
-  // }
-  // if (debugctr>1e3){
-  //   cout << totalctr << endl;
-  //   exit(1);
-  // }
+
   if(cagra) {
 
     //cout << "Size: " << cagra->Size() << endl;

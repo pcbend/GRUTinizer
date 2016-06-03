@@ -19,13 +19,14 @@ class TGrandRaidenHit : public TDetectorHit {
 
     Double_t* GetADC() { return &ADC[0]; }
     Double_t GetADC(const Int_t& i) const { return ADC[i]; }
+    const Double_t& GetRF() { return RF; }
     //void SetADC(Int_t chan, const Double_t& val) { ADC[chan] = val; }
     Long_t Timestamp;
 
 
   private:
     Double_t ADC[4];
-
+    Double_t RF;
 
   ClassDef(TGrandRaidenHit,1);
 };

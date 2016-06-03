@@ -26,6 +26,7 @@ void TGrandRaidenHit::BuildFrom(TSmartBuffer& buf){
     std::copy(adc->begin(),adc->end(),&ADC[0]);
   }
   Timestamp = event->GetTimestamp();
+  RF = event->GR_RF(0);
 
   buf.Advance(sizeof(event));
   if (event) delete event;
