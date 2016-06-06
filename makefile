@@ -6,12 +6,22 @@
 PLATFORM:=$(PLATFORM)
 # EDIT THIS SECTION
 
-GRANAPATH = ../GRAnalyzer/analyzer
+# MAKE_PID := $(shell echo $$PPID)
+# MAKECMD  := $(shell ps T | grep "^\s*$(MAKE_PID).*$(MAKE)")
+# JOB_FLAG := $(filter -j%, $(subst -j ,-j,$(MAKECMD)))
+# THREADS  := $(subst -j,,$(JOB_FLAG))
+# ifeq ($(strip $(THREADS)),)
+# THREADS  := 1
+# endif
+
+
+GRANAPATH = ./GRAnalyzer/analyzer
 GRANALYZER = $(realpath $(GRANAPATH)/../lib)
+GRLINKFLAGS = -L$(GRANALYZER) -Wl,-rpath,$(GRANALYZER) -lRCNPEvent -lGRAnalyzer -L$(realpath $(GRANAPATH)/lib) -lpacklib -lm -lgfortran -lnsl
 INCLUDES   = include $(GRANAPATH)/include $(GRANAPATH)/libRCNPEvent/include $(GRANAPATH)/libGRAnalyzer/include
 CFLAGS     = -g -std=c++11 -O3 -Wall -Wextra -pedantic -Wno-unused-parameter -D`uname -m` -D`uname -s` -DLinux86 -Df2cFortran -DUSE_PAW
 LINKFLAGS_PREFIX  =
-LINKFLAGS_SUFFIX  = -L/opt/X11/lib -lX11 -lXpm -std=c++11 -L$(GRANALYZER) -Wl,-rpath,$(GRANALYZER) -lRCNPEvent -lGRAnalyzer -L$(realpath $(GRANAPATH)/lib) -lpacklib -lm -lgfortran -lnsl
+LINKFLAGS_SUFFIX  = -L/opt/X11/lib -lX11 -lXpm -std=c++11
 SRC_SUFFIX = cxx
 
 # EVERYTHING PAST HERE SHOULD WORK AUTOMATICALLY
@@ -84,7 +94,7 @@ run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  
                 rm -f $(2).log $(2).error
 endif
 
-all: include/GVersion.h $(EXECUTABLES) $(LIBRARY_OUTPUT) bin/grutinizer-config bin/gadd_fast.py $(HISTOGRAM_SO)
+all: include/GVersion.h libGRAnalyzer $(EXECUTABLES) $(LIBRARY_OUTPUT) bin/grutinizer-config bin/gadd_fast.py $(HISTOGRAM_SO)
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
 
 docs:
@@ -93,11 +103,11 @@ docs:
 bin/%: util/% | bin
 	@ln -sf ../$< $@
 
-bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT) bin
-	$(call run_and_test,$(CPP) $^ -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
+bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT) libGRAnalyzer bin
+	$(call run_and_test,$(CPP) $^ -o $@ $(LINKFLAGS) $(GRLINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
-bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) bin
-	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
+bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) libGRAnalyzer bin
+	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS) $(GRLINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 bin:
 	@mkdir -p $@
@@ -107,6 +117,9 @@ include/GVersion.h: .git/HEAD .git/index
 
 libraries/lib%.so: .build/histos/%.o
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
+
+libGRAnalyzer:
+	$(MAKE) -C GRAnalyzer
 
 # Functions for determining the files included in a library.
 # All src files in the library directory are included.
@@ -150,6 +163,7 @@ clean:
 	@-$(RM) -rf bin
 	@-$(RM) -f $(LIBRARY_OUTPUT)
 	@-$(RM) -f libraries/*.so
+	@-$(MAKE) clean -C GRAnalyzer
 
 cleaner: clean
 	@printf "\nEven more clean up\n\n"
