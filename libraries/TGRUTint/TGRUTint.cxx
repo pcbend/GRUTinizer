@@ -127,10 +127,10 @@ bool TGRUTInterruptHandler::Notify() {
   static int timespressed  = 0;
   timespressed++;
   if(timespressed>3) {
-    printf("\n" DRED BG_WHITE  "   No you shutup! " RESET_COLOR "\n");
+    printf("\n" DRED BG_WHITE  "   No you shutup! " RESET_COLOR "\n"); fflush(stdout);
     exit(1);
   }
-  printf("\n" DRED BG_WHITE  "   Control-c was pressed.   " RESET_COLOR "\n");
+  printf("\n" DRED BG_WHITE  "   Control-c was pressed.   " RESET_COLOR "\n"); fflush(stdout);
   TGRUTint::instance()->Terminate();
   return true;
 }
@@ -380,7 +380,11 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
       const char* command = Form("TFile* _file%i = (TFile*)%luL",
                                  fRootFilesOpened,
                                  (unsigned long)file);
-      ProcessLine(command);
+      //if(!StoppableThread::AnyThreadRunning() && !TGRUTOptions::Get()->ExitAfterSorting()) {
+      //if(!fHistogramLoop && !TGRUTOptions::Get()->ExitAfterSorting()) {
+        TRint::ProcessLine(command);
+	//ProcessLine(command);
+      //}
       fRootFilesOpened++;
     } else {
       std::cout << "Could not create " << filename << std::endl;
@@ -395,7 +399,11 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
                                  is_online ? "online" : "file",
                                  fRootFilesOpened,
                                  (unsigned long)file);
-      ProcessLine(command);
+      //if(!StoppableThread::AnyThreadRunning() && !TGRUTOptions::Get()->ExitAfterSorting()) {
+      //if(!fHistogramLoop && !TGRUTOptions::Get()->ExitAfterSorting()) {
+        TRint::ProcessLine(command);
+	//ProcessLine(command);
+      //}
       std::cout << "\tfile " << BLUE << file->GetName() << RESET_COLOR
                 <<  " opened as " << BLUE <<  "_file" << fRootFilesOpened << RESET_COLOR <<  std::endl;
 
@@ -521,7 +529,9 @@ Int_t TGRUTint::TabCompletionHook(char* buf, int* pLoc, std::ostream& out){
 Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   // If you print while fIsTabComplete is true, you will break tab complete.
   // Any diagnostic print statements should be done after this if statement.
+
   sync = false;
+  
   if(fIsTabComplete){
     long res = TRint::ProcessLine(line, sync, error);
     return res;
@@ -555,7 +565,9 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
 
 
 void TGRUTint::Terminate(Int_t status){
+  //std::cout << "Trying to terminate..." << std::endl;
   if(!fAllowedToTerminate){
+    //std::cout << "SQUASHED!" << std::endl;
     return;
   }
   StoppableThread::StopAllClean();
