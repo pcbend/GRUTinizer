@@ -10,6 +10,7 @@
 #include "TRawEvent.h"
 #include "TRawSource.h"
 #include "TChain.h"
+#include "TFile.h"
 
 #include "RCNPEvent.h"
 
@@ -59,7 +60,7 @@ public:
 
     fNumEvents = fChain.GetEntries();
 
-    fFileSize =  fNumEvents*sizeof(T);
+    fFileSize =  fNumEvents*sizeof(T*);
 
     fEvent = new T();
 
@@ -70,8 +71,14 @@ public:
 
   ~TTreeSource() {;}
 
-  virtual std::string Status() const {return std::string("");}
-  virtual std::string SourceDescription() const {return std::string("");}
+  virtual std::string Status() const {
+    return Form("%s: %s %8.2f MB given %s / %s %8.2f MB total %s  => %s %3.02f MB/s processed %s",
+                SourceDescription().c_str(),
+                DCYAN, GetBytesGiven()/1e6, RESET_COLOR,
+                BLUE,  GetFileSize()/1e6, RESET_COLOR,
+                GREEN, GetAverageRate()/1e6, RESET_COLOR);
+  }
+  virtual std::string SourceDescription() const {return "File: "+std::string(fChain.GetCurrentFile()->GetName());}
 
 
   kFileType GetFileType() const { return fFileType; }
