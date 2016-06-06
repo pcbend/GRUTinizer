@@ -62,11 +62,6 @@ bool TDataLoop::Iteration() {
     output_queue.Push(evt);
     return true;
   } else {
-    static TRawEventSource* source_ptr = NULL;
-    if(source_ptr != source){
-      std::cout << "Finished reading source" << std::endl;
-      source_ptr = source;
-    }
     // Nothing returned this time, but I might get something next time.
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     return true;
