@@ -6,15 +6,6 @@
 PLATFORM:=$(PLATFORM)
 # EDIT THIS SECTION
 
-# MAKE_PID := $(shell echo $$PPID)
-# MAKECMD  := $(shell ps T | grep "^\s*$(MAKE_PID).*$(MAKE)")
-# JOB_FLAG := $(filter -j%, $(subst -j ,-j,$(MAKECMD)))
-# THREADS  := $(subst -j,,$(JOB_FLAG))
-# ifeq ($(strip $(THREADS)),)
-# THREADS  := 1
-# endif
-
-
 GRANAPATH = ./GRAnalyzer/analyzer
 GRANALYZER = $(realpath $(GRANAPATH)/../lib)
 GRLINKFLAGS = -L$(GRANALYZER) -Wl,-rpath,$(GRANALYZER) -lRCNPEvent -lGRAnalyzer -L$(realpath $(GRANAPATH)/lib) -lpacklib -lm -lgfortran -lnsl
