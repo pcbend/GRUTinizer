@@ -50,7 +50,7 @@ public:
   //   fChain.SetBranchAddress(eventclassname, &fEvent);
   // }
   TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type)
-    : fChain(treename), fCurrentEntry(0) {
+    : fChain(treename), fEvent(0), fCurrentEntry(0) {
 
     assert(file_type == kFileType::ROOT_DATA);
 
@@ -61,8 +61,6 @@ public:
     fNumEvents = fChain.GetEntries();
 
     fFileSize =  fNumEvents*sizeof(T*);
-
-    fEvent = new T();
 
     fChain.SetBranchAddress(eventclassname, &fEvent);
 
