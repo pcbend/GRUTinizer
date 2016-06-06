@@ -8,10 +8,10 @@ PLATFORM:=$(PLATFORM)
 
 GRANAPATH = ../GRAnalyzer/analyzer
 GRANALYZER = $(realpath $(GRANAPATH)/../lib)
-INCLUDES   = include $(GRANAPATH)/include $(GRANAPATH)/libRCNPEvent/include
-CFLAGS     = -g -std=c++11 -O3 -Wall -Wextra -pedantic -Wno-unused-parameter
+INCLUDES   = include $(GRANAPATH)/include $(GRANAPATH)/libRCNPEvent/include $(GRANAPATH)/libGRAnalyzer/include
+CFLAGS     = -g -std=c++11 -O3 -Wall -Wextra -pedantic -Wno-unused-parameter -D`uname -m` -D`uname -s` -DLinux86 -Df2cFortran -DUSE_PAW
 LINKFLAGS_PREFIX  =
-LINKFLAGS_SUFFIX  = -L/opt/X11/lib -lX11 -lXpm -std=c++11 -L$(GRANALYZER) -Wl,-rpath,$(GRANALYZER) -lRCNPEvent
+LINKFLAGS_SUFFIX  = -L/opt/X11/lib -lX11 -lXpm -std=c++11 -L$(GRANALYZER) -Wl,-rpath,$(GRANALYZER) -lRCNPEvent -lGRAnalyzer -L$(realpath $(GRANAPATH)/lib) -lpacklib -lm -lgfortran -lnsl
 SRC_SUFFIX = cxx
 
 # EVERYTHING PAST HERE SHOULD WORK AUTOMATICALLY
