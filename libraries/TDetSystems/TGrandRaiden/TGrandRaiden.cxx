@@ -1,5 +1,5 @@
 #include "TGrandRaiden.h"
-#include "TRawEvent.h"
+#include "TRCNPEvent.h"
 
 TGrandRaiden::TGrandRaiden(){
   Clear();
@@ -23,11 +23,12 @@ void TGrandRaiden::InsertHit(const TDetectorHit& hit){
 
 int TGrandRaiden::BuildHits(std::vector<TRawEvent>& raw_data){
   for(auto& event : raw_data){
-    SetTimestamp(event.GetTimestamp());
+    auto rcnp_evt = (TRCNPEvent&)event;
+    SetTimestamp(rcnp_evt.GetTimestamp());
     TGrandRaidenHit hit;
-    auto buf = event.GetBuffer();
-    hit.BuildFrom(buf);
-    hit.SetTimestamp(event.GetTimestamp());
+    //auto buf = rcnp_evt.GetBuffer();
+    //hit.BuildFrom(buf);
+    hit.SetTimestamp(rcnp_evt.GetTimestamp());
     InsertHit(hit);
   }
   return Size();

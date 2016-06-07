@@ -10,6 +10,8 @@
 
 #include "TGEBEvent.h"
 #include "TNSCLEvent.h"
+#include "TRCNPEvent.h"
+#include "RCNPEvent.h"
 
 ClassImp(TRawEvent)
 
@@ -117,6 +119,8 @@ Long_t TRawEvent::GetTimestamp() const {
    case GRETINA_MODE2:
    case GRETINA_MODE3:
      return ((TGEBEvent*)this)->GetTimestamp();
+   case RCNP_BLD:
+    return ((TRCNPEvent*)this)->event->GetTimestamp();
 
    default:
      ;

@@ -9,6 +9,7 @@
 #include "TGEBEvent.h"
 #include "TGRUTOptions.h"
 #include "TNSCLEvent.h"
+#include "TRCNPEvent.h"
 
 #include "TBuildingLoop.h"
 #include "TDetectorEnv.h"
@@ -69,10 +70,18 @@ bool TUnpackingLoop::Iteration(){
         HandleGEBData(geb_event);
       }
       break;
+      case kFileType::RCNP_BLD:
+      {
+        //TRCNPEvent& evt = (TRCNPEvent&)raw_event;
+        fOutputEvent->AddRawData(raw_event, kDetectorSystems::GRAND_RAIDEN);
+        //consider adding HandleRCNPData
+      }
+      break;
       case kFileType::ROOT_DATA:
       {
         fOutputEvent->AddRawData(raw_event, kDetectorSystems::GRAND_RAIDEN);
       }
+      break;
       default:
         break;
     }

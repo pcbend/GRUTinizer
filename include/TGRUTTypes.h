@@ -38,6 +38,7 @@ enum kFileType {
   GRETINA_MODE2 = 2,
   GRETINA_MODE3 = 3,
   ANL_RAW = 4,
+  RCNP_BLD = 50,
   ROOT_DATA = 256,
   ROOT_MACRO = 257,
   CALIBRATED = 512,
