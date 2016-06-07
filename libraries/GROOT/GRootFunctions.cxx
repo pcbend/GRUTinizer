@@ -180,10 +180,14 @@ Double_t GRootFunctions::LanGausHighRes(Double_t *x, Double_t *pars){ // 5x more
 }
 
 
+Double_t GRootFunctions::GammaEff(Double_t *x,Double_t *par) {
+  // LOG(EFF) = A0 + A1*LOG(E) + A2*LOG(E)^2 + A3/E^2 
 
+  double logE = TMath::Log10(x[0]);
+  double temp =  par[0] + par[1]*logE + par[2]*logE*logE +par[3]/(x[0]*x[0]);
+  return pow(10,temp);
 
-
-
+}
 
 
 

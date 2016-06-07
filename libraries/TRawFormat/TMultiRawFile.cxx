@@ -47,6 +47,18 @@ int TMultiRawFile::GetEvent(TRawEvent& outevent){
     return -1;
   }
 
+  static TRawEventSource* stalled_source = nullptr;
+  if (stalled_source) {
+    FileEvent next;
+    int bytes_read = stalled_source->Read(next.next_event);
+    if (bytes_read > 0) {
+      next.file = stalled_source;
+      fFileEvents.insert(next);
+      stalled_source = nullptr;
+    }
+    return -1;
+  }
+
   // Pop the event, place in output
   FileEvent output = *fFileEvents.begin();
   fFileEvents.erase(fFileEvents.begin());
@@ -58,7 +70,9 @@ int TMultiRawFile::GetEvent(TRawEvent& outevent){
   int bytes_read = next.file->Read(next.next_event);
   if(bytes_read > 0){
     fFileEvents.insert(next);
-  } else {
+  } else if (!TGRUTOptions::Get()->ExitAfterSorting()) {
+    stalled_source = next.file;
+  } else { // otherwise delete the source from the file list
     std::lock_guard<std::mutex> lock(fFileListMutex);
     delete output.file;
     fFileList.erase(output.file);
