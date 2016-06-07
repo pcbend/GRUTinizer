@@ -47,7 +47,7 @@ class GPopup : public TGTransientFrame  {
     virtual ~GPopup();
     virtual void CloseWindow();
     //bool ProcessMessage(Long_t,Long_t,Long_t);
-  private:  
+  private:
     TGTextButton *fButton1,*fButton2;
   ClassDef(GPopup,0)
 };
@@ -108,15 +108,14 @@ private:
   std::vector<TH1*> FindAllHists();
 
 public:
-  //void HandleKeyPress(int event,int x,int y,TObject *obj);
   bool HandleArrowKeyPress(Event_t *event,UInt_t *keysym);
   bool HandleKeyboardPress(Event_t *event,UInt_t *keysym);
   bool HandleMousePress(Int_t event,Int_t x,Int_t y);
   bool HandleMouseShiftPress(Int_t event,Int_t x,Int_t y);
   bool HandleMouseControlPress(Int_t event,Int_t x,Int_t y);
 
-  //private:
-
+private:
+  bool ProcessNonHistKeyboardPress(Event_t* event, UInt_t* keysym);
   bool Process1DArrowKeyPress(Event_t *event,UInt_t *keysym);
   bool Process1DKeyboardPress(Event_t *event,UInt_t *keysym);
   bool Process1DMousePress(Int_t event,Int_t x,Int_t y);
