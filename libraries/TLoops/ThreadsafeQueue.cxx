@@ -4,6 +4,7 @@
 
 #include "TUnpackedEvent.h"
 
+#include "RCNPEvent.h"
 template<>
 int ThreadsafeQueue<TRawEvent>::ObjectSize(TRawEvent& event){
   return event.GetTotalSize();
@@ -22,4 +23,9 @@ int ThreadsafeQueue<std::vector<TDetector*> >::ObjectSize(std::vector<TDetector*
 template<>
 int ThreadsafeQueue<TUnpackedEvent*>::ObjectSize(TUnpackedEvent*& event) {
   return event->Size();
+}
+
+template<>
+int ThreadsafeQueue<RCNPEvent>::ObjectSize(RCNPEvent& event) {
+  return event.data.size();
 }

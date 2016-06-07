@@ -1,18 +1,25 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
-
+#include <sstream>
 #include "GRUTinizerInterface.h"
 #include "ThreadsafeQueue.h"
 #include "RCNPEvent.h"
 
+using namespace std;
 /* main */
 int main()
 {
+    const char* filename = "./datatest/run1001.bld";
     ThreadsafeQueue<RCNPEvent> gr_queue;
-    std::thread grloop(StartGRAnalyzer,"./datatest/run6106.bld",[&](RCNPEvent* event){
+    stringstream stream; stream.str(""); stream << "cat " << filename;
+    std::thread grloop(StartGRAnalyzer,stream.str().c_str(),[&](RCNPEvent* event){
         gr_queue.Push(*event);
     });
+    RCNPEvent data;
+    while (gr_queue.Pop(data,0)) {
+
+    }
     grloop.join();
 
     return 0;
