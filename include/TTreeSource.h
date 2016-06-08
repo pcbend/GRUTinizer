@@ -121,9 +121,9 @@ private:
     // copy the address stored in fEvent into the temporary buffer
     *reinterpret_cast<T**>(ptrbytes) = fEvent;
     // prepare the events smart buffer payload
-    TSmartBuffer eventbuffer(ptrbytes,sizeof(fEvent));
+    auto eventbuffer = new TSmartBuffer(ptrbytes,sizeof(fEvent));
     // set the pointer address into the buffer
-    event.SetData(eventbuffer);
+    event.SetData(*eventbuffer);
     // set the timestamp of the ttree event
     if (timestamps.size()==0) {
       std::cout << "End of time stamps" << std::endl;

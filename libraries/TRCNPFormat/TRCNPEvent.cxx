@@ -6,7 +6,7 @@
 
 ClassImp(TRCNPEvent)
 
-TRCNPEvent::TRCNPEvent() { }
+TRCNPEvent::TRCNPEvent() : event(nullptr) { }
 
 TRCNPEvent::TRCNPEvent(const TRawEvent &raw) {
   raw.Copy(*this);

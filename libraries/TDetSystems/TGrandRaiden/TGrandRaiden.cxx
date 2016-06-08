@@ -23,13 +23,22 @@ void TGrandRaiden::InsertHit(const TDetectorHit& hit){
 
 int TGrandRaiden::BuildHits(std::vector<TRawEvent>& raw_data){
   for(auto& event : raw_data){
-    auto rcnp_evt = (TRCNPEvent&)event;
-    SetTimestamp(rcnp_evt.GetTimestamp());
+    SetTimestamp(event.GetTimestamp());
     TGrandRaidenHit hit;
-    //auto buf = rcnp_evt.GetBuffer();
-    //hit.BuildFrom(buf);
-    hit.SetTimestamp(rcnp_evt.GetTimestamp());
+    auto buf = event.GetBuffer();
+    hit.BuildFrom(buf);
+    hit.SetTimestamp(event.GetTimestamp());
     InsertHit(hit);
+
+    //auto rcnp_evt = (TRCNPEvent&)event;
+    //std::cout << std::hex << (long)rcnp_evt.event << std::endl;
+    //std::cin.get();
+    // SetTimestamp(rcnp_evt.GetTimestamp());
+    // TGrandRaidenHit hit;
+    // //auto buf = rcnp_evt.GetBuffer();
+    // //hit.BuildFrom(buf);
+    // hit.SetTimestamp(rcnp_evt.GetTimestamp());
+    // InsertHit(hit);
   }
   return Size();
 }

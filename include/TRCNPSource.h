@@ -6,9 +6,11 @@
 #include <fstream>
 #include <sstream>
 #include <queue>
+#include <stdexcept>
 
 #ifndef __CINT__
 #include <thread>
+#include <future>
 #include <functional>
 #endif
 
@@ -32,8 +34,8 @@ public:
     assert(file_type == kFileType::RCNP_BLD);
 
 #ifndef __CINT__
-    std::thread grloop(StartGRAnalyzer,Command,[&](RCNPEvent* event){
-        gr_queue.Push(*event);
+    fFuture = std::async(std::launch::async,StartGRAnalyzer,Command,[&](RCNPEvent* event){
+        rcnp_queue.Push(event);
     });
 #endif
 
@@ -44,13 +46,13 @@ public:
   ~TRCNPSource() {;}
 
   virtual std::string Status() const {
-    return Form("%s: %s %8.2f MB given %s / %s %8.2f MB total %s  => %s %3.02f MB/s processed %s",
+    return Form("%s: %s %8.2f MB given %s / %s  Unknown MB total %s  => %s %3.02f MB/s processed %s",
                 SourceDescription().c_str(),
                 DCYAN, GetBytesGiven()/1e6, RESET_COLOR,
-                BLUE,  GetFileSize()/1e6, RESET_COLOR,
+                BLUE, RESET_COLOR,
                 GREEN, GetAverageRate()/1e6, RESET_COLOR);
   }
-  virtual std::string SourceDescription() const {return "File: "+std::string("RCNP_BLD: ")+std::string(fCommand);}
+  virtual std::string SourceDescription() const {return "File: "+std::string("RCNP_BLD: ")+fCommand;}
 
 
   kFileType GetFileType() const { return fFileType; }
@@ -82,38 +84,67 @@ protected:
 private:
   TRCNPSource() {;}
   virtual int GetEvent(TRawEvent& event) {
-    TRCNPEvent rcnp_evt;
-    rcnp_evt.event = new RCNPEvent;
-    if (gr_queue.Pop(*rcnp_evt.event,0) == -1 ){
+
+    // TRCNPEvent* rcnp_evt = new TRCNPEvent;
+    RCNPEvent* rcnp;// = new RCNPEvent;
+
+    // Try to get event from RCNP event queue
+    if (rcnp_queue.Pop(rcnp,200) == -1 ){
+#ifndef __CINT__
+      // if offline
+      if (TGRUTOptions::Get()->ExitAfterSorting()) {
+        auto status = fFuture.wait_for(std::chrono::milliseconds(0));
+        // check if RCNP analyzer is done
+        if (status == std::future_status::ready) {
+          std::cout << "RCNP analyzer thread finished ##" << std::endl;
+          return -1;
+        } else {
+          std::cout << "RCNP analyzer still running, awaiting data.." << std::endl;
+          // try again to pop an event
+          if (rcnp_queue.Pop(rcnp,1000) == -1) {
+            // if it failed again check if the RCNP analyzer is done now
+            status = fFuture.wait_for(std::chrono::milliseconds(1000));
+            if (status == std::future_status::ready) {
+              return -1;
+            } else {
+              throw std::runtime_error("TRCNPSource::GetEvent GRAnalyzer loop is hung.");
+            }
+          }
+        }
+      } else {
         return -1;
+      }
+#endif
     }
 
-    event = rcnp_evt;
+
+    // event = *rcnp_evt;
     event.SetFileType(fFileType);
 
-    // if there are no more events, signal termination
-    //if (fCurrentEntry == fNumEvents) { return -1; }
-
-
+    char* ptrbytes = (char*)calloc(1,sizeof(rcnp));
+    *reinterpret_cast<RCNPEvent**>(ptrbytes) = rcnp;
+    auto eventbuffer = new TSmartBuffer(ptrbytes,sizeof(rcnp));
+    event.SetData(*eventbuffer);
 
     // set the timestamp of the ttree event
     if (timestamps.size()==0) {
       std::cout << "End of time stamps" << std::endl;
       return -1;
     }
+    rcnp->SetTimestamp(timestamps.front());
     event.SetFragmentTimestamp(timestamps.front());
     timestamps.pop();
 
-    // increment the event count
-    //fCurrentEntry++;
-    //fEvent = nullptr;
-    return sizeof(*rcnp_evt.event);
+    return sizeof(rcnp);
   }
 
-  const char* fCommand;
+  const std::string fCommand;
   kFileType fFileType;
   long fFileSize;
-  ThreadsafeQueue<RCNPEvent> gr_queue;
+  #ifndef __CINT__
+  std::future<void> fFuture;
+  #endif
+  ThreadsafeQueue<RCNPEvent*> rcnp_queue;
 
   std::queue<Long_t> timestamps;
 

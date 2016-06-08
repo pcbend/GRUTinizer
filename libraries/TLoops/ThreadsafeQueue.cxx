@@ -29,3 +29,8 @@ template<>
 int ThreadsafeQueue<RCNPEvent>::ObjectSize(RCNPEvent& event) {
   return event.data.size();
 }
+
+template<>
+int ThreadsafeQueue<RCNPEvent*>::ObjectSize(RCNPEvent*& event) {
+  return event->data.size();
+}

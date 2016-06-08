@@ -30,6 +30,19 @@ void TGrandRaidenHit::BuildFrom(TSmartBuffer& buf){
 
   // buf.Advance(sizeof(event));
   // if (event) delete event;
+
+
+  auto event = *reinterpret_cast<RCNPEvent**>(const_cast<char*>(buf.GetData()));
+  auto adc = event->GR_ADC();
+  if (adc != nullptr) {
+    std::copy(adc->begin(),adc->end(),&ADC[0]);
+  }
+  Timestamp = event->GetTimestamp();
+  RF = event->GR_RF(0);
+
+  buf.Advance(sizeof(event));
+  if (event) delete event;
+
 }
 
 

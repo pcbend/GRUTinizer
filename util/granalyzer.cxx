@@ -11,7 +11,7 @@ using namespace std;
 int main()
 {
     const char* filename = "./datatest/run1001.bld";
-    ThreadsafeQueue<RCNPEvent> gr_queue;
+    ThreadsafeQueue<RCNPEvent> gr_queue(500000);
     stringstream stream; stream.str(""); stream << "cat " << filename;
     std::thread grloop(StartGRAnalyzer,stream.str().c_str(),[&](RCNPEvent* event){
         gr_queue.Push(*event);
