@@ -23,7 +23,11 @@
 #include "TRCNPEvent.h"
 #include "RCNPEvent.h"
 #include "ThreadsafeQueue.h"
+
+#ifndef __CINT__
 #include "GRUTinizerInterface.h"
+extern atomic<int> stop_rcnp_signal;
+#endif
 
 class TRCNPSource : public TRawEventSource {
 public:
@@ -34,7 +38,7 @@ public:
     assert(file_type == kFileType::RCNP_BLD);
 
 #ifndef __CINT__
-    fFuture = std::async(std::launch::async,StartGRAnalyzer,Command,[&](RCNPEvent* event){
+    fFuture = std::async(std::launch::async,StartGRAnalyzer,Command,&stop_rcnp_signal,[&](RCNPEvent* event){
         rcnp_queue.Push(event);
     });
 #endif
