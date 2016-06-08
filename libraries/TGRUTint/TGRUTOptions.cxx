@@ -92,6 +92,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("T tree-source", &fTreeSource)
     .description("Input TTree source.")
     .default_value(false);
+  parser.option("R save-rcnp-tree", &fSaveRCNPTree)
+    .description("Save ROOT tree from raw RCNP analyzer data.")
+    .default_value(false);
 
 
   parser.option("hist-output",&output_histogram_file)

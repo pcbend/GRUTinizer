@@ -46,6 +46,7 @@ public:
   bool MakeHistos()         const { return fMakeHistos; }
   bool SortMultiple()       const { return fSortMultiple; }
   bool TreeSource()         const { return fTreeSource; }
+  bool SaveRCNPTree()       const { return fSaveRCNPTree; }
 
   bool IsOnline()           const { return fIsOnline; }
 
@@ -99,13 +100,13 @@ private:
   bool fMakeHistos;
   bool fSortMultiple;
   bool fTreeSource;
-
   bool fTimeSortInput;
   int fTimeSortDepth;
-
   int fBuildWindow;
-
   bool fShouldExit;
+
+
+  bool fSaveRCNPTree;
 
   ClassDef(TGRUTOptions,0);
 };

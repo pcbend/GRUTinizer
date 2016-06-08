@@ -40,7 +40,7 @@ public:
 #ifndef __CINT__
     fFuture = std::async(std::launch::async,StartGRAnalyzer,Command,&stop_rcnp_signal,[&](RCNPEvent* event){
         rcnp_queue.Push(event);
-    });
+      }, TGRUTOptions::Get()->SaveRCNPTree());
 #endif
 
     LoadFakeTimestamps();
