@@ -5,3 +5,4 @@ for linkey in "${GRANAFILES[@]}"; do
 	echo "ln -s GRAnalyzer/$linkey $linkey"
 	ln -s "GRAnalyzer/$linkey" "$linkey"
 done
+source thisgrut.sh
