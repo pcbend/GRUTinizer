@@ -1,3 +1,4 @@
+#ifdef RCNP
 #ifndef _TTREESOURCE_H_
 #define _TTREESOURCE_H_
 
@@ -20,35 +21,6 @@ template <typename T>
 class TTreeSource : public TRawEventSource {
 public:
 
-  /* TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type) */
-  /*   : TTreeSource<T>({filename},treename,eventclassname,file_type) { ; } */
-
-  // template<typename... Args>
-  // TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type, Args&&... args)
-  //   : TTreeSource<T>({filename},treename,eventclassname,file_type,std::forward<Args>(args)...) { ; }
-
-  // template<typename... Args>
-  // TTreeSource(const std::vector<char*>& filenames, const char* treename, const char* eventclassname, kFileType file_type, Args&&... args)
-
-  // template<typename... Args>
-  // TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type, Args&&... args)
-  //   : fChain(treename), fCurrentEntry(0) {
-
-  //   assert(file_type == kFileType::ROOT_DATA);
-
-  //   fFileType = file_type;
-
-  //   fChain.Add(filename);
-
-  //   fFileSize =  fChain.GetEntries()*sizeof(T);
-
-  //   if (sizeof...(Args) > 0) {
-  //     fEvent = new T(std::forward<Args>(args)...);
-  //   } else {
-  //     fEvent = new T();
-  //   }
-  //   fChain.SetBranchAddress(eventclassname, &fEvent);
-  // }
   TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type)
     : fChain(treename), fEvent(0), fCurrentEntry(0) {
 
@@ -151,3 +123,59 @@ private:
 };
 
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+#else // if RCNP is not defined
+
+
+#ifndef _TTREESOURCE_H_
+#define _TTREESOURCE_H_
+#include "TObject.h"
+#include "TRawEvent.h"
+#include "TRawSource.h"
+templateClassImp(TTreeSource)
+template <typename T>
+class TTreeSource : public TRawEventSource {
+public:
+  TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type) {;}
+  ~TTreeSource() {;}
+  virtual std::string Status() const { return ""; }
+  virtual std::string SourceDescription() const {return ""; }
+  kFileType GetFileType() const { return kFileType::UNKNOWN_FILETYPE; }
+  long GetFileSize() const { return 0; }
+  virtual void Reset() {;}
+protected:
+  void SetFileSize(long file_size) { ; }
+private:
+  TTreeSource() {;}
+  virtual int GetEvent(TRawEvent& event) { event.SetFragmentTimestamp(0); return -1; }
+  ClassDef(TTreeSource,0);
+};
+// ---------------------
+class RCNPEvent : public TObject {
+public:
+  RCNPEvent() {;}
+  virtual ~RCNPEvent() {;}
+  void Clear() {;}
+  long GetTimestamp() { return 0; }
+  void SetTimestamp(const long& ts) { ; }
+private:
+public:
+  ClassDef(RCNPEvent,1);
+};
+// ---------------------
+#endif
+
+
+#endif // RCNP

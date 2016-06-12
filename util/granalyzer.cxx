@@ -1,3 +1,4 @@
+#ifdef RCNP
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -39,3 +40,7 @@ int main()
 //     std::cout << gr_queue.Size() << std::endl;
 // }
 // grloop.join();
+
+#else
+int main() { return 0; }
+#endif
