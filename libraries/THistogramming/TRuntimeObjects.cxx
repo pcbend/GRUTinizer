@@ -45,7 +45,7 @@ TH1* TRuntimeObjects::FillHistogram(const char* name,
                                     double weight){
   TH1* hist = (TH1*) GetObjects().FindObject(name);
   if(!hist){
-    hist = new TH1I(name,name,bins,low,high);
+    hist = new GH1D(name,name,bins,low,high);
     GetObjects().Add(hist);
   }
   if(!(std::isnan(value))) {
@@ -120,7 +120,7 @@ TDirectory* TRuntimeObjects::FillHistogram(const char* dirname,const char* name,
   dir->cd();
   TH1* hist = (TH1*)dir->FindObject(name);
   if(!hist){
-    hist = new TH1I(name,name,
+    hist = new GH1D(name,name,
 		    bins, low, high);
     dir->Add(hist);
   }
