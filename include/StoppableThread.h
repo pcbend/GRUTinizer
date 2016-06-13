@@ -43,10 +43,10 @@ public:
   //protected:
   virtual bool Iteration() = 0;
 
-  virtual size_t GetItemsPopped()   = 0; //{ return items_in; }
-  virtual size_t GetItemsPushed()   = 0; //{ return items_out; }
-  virtual size_t GetItemsCurrent()  = 0; //{ return items_in; }
-  virtual size_t GetRate()          = 0; //{ return rate; }
+  virtual size_t GetItemsPopped()   = 0;
+  virtual size_t GetItemsPushed()   = 0;
+  virtual size_t GetItemsCurrent()  = 0;
+  virtual size_t GetRate()          = 0;
 
   static int GetNThreads();
 

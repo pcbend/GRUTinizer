@@ -255,20 +255,20 @@ static void SwapMode3Head(GEBMode3Head &head);
 
 //typedef struct {
 struct GEBMode3Data {
-  UShort_t led_middle;    
-  UShort_t led_low;       
-  UShort_t energy_low;    
-  UShort_t led_high;      
-  UShort_t cfd_low;       
-  UShort_t energy_high;   
-  UShort_t cfd_high;      
-  UShort_t cfd_middle;    
-  UShort_t cfd_pt1_high;  
-  UShort_t cfd_pt1_low;   
-  UShort_t cfd_pt2_high;  
-  UShort_t cfd_pt2_low;   
-  Long_t GetLed() const;  
-  Long_t GetCfd() const;  
+  UShort_t led_middle;
+  UShort_t led_low;
+  UShort_t energy_low;
+  UShort_t led_high;
+  UShort_t cfd_low;
+  UShort_t energy_high;
+  UShort_t cfd_high;
+  UShort_t cfd_middle;
+  UShort_t cfd_pt1_high;
+  UShort_t cfd_pt1_low;
+  UShort_t cfd_pt2_high;
+  UShort_t cfd_pt2_low;
+  Long_t GetLed() const;
+  Long_t GetCfd() const;
   UShort_t GetDeltaT1() const;
   UShort_t GetDeltaT2() const;
 
@@ -382,8 +382,6 @@ typedef struct RawHeader {
   Int_t datum2;
 } __attribute__((__packed__)) RawHeader;
 
-
-
 typedef struct GEBHeader : public RawHeader {
   Int_t type()      { return datum1; } //Int_t  type; //int32_t
   Int_t size()      { return datum2; } //int32_t
@@ -398,6 +396,13 @@ typedef struct EVTHeader : public RawHeader {
 } __attribute__((__packed__)) EVTHeader;
 
 friend std::ostream& operator<<(std::ostream& os, const RawHeader &head);
+
+typedef struct NSCLBodyHeader {
+  int body_header_size;
+  long timestamp;
+  int sourceid;
+  int barrier;
+} __attribute__((__packed__)) NSCLBodyHeader;
 
 typedef struct TNSCLFragmentHeader {
   long timestamp;

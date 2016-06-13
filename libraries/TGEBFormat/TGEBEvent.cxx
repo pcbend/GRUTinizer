@@ -18,7 +18,11 @@ Long_t TGEBEvent::GetTimestamp() const {
 }
 
 const char* TGEBEvent::GetPayload() const {
-  return fBody.GetData() + sizeof(Long_t);
+  if(fTimestamp != -1) {
+    return fBody.GetData();
+  } else {
+    return fBody.GetData() + sizeof(Long_t);
+  }
 }
 
 TSmartBuffer TGEBEvent::GetPayloadBuffer() const {

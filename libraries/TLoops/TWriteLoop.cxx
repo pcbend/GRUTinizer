@@ -1,5 +1,8 @@
 #include "TWriteLoop.h"
 
+#include <chrono>
+#include <thread>
+
 #include "TFile.h"
 #include "TThread.h"
 
@@ -7,11 +10,6 @@
 #include "TChannel.h"
 #include "THistogramLoop.h"
 #include "TS800.h"
-
-#include <chrono>
-#include <thread>
-
-//#include "TPreserveGDirectory.h"
 
 TWriteLoop* TWriteLoop::Get(std::string name, std::string output_filename){
   if(name.length()==0){
@@ -31,8 +29,10 @@ TWriteLoop* TWriteLoop::Get(std::string name, std::string output_filename){
 
 TWriteLoop::TWriteLoop(std::string name, std::string output_filename)
   : StoppableThread(name),
-    hist_loop(0), output_file(NULL), event_tree(NULL),
-    items_handled(0) {
+    output_file(NULL), event_tree(NULL),
+    items_handled(0),
+    input_queue(std::make_shared<ThreadsafeQueue<TUnpackedEvent*> >()),
+    output_queue(std::make_shared<ThreadsafeQueue<TUnpackedEvent*> >()) {
 
   if(output_filename != "/dev/null"){
     //TPreserveGDirectory preserve;
@@ -60,41 +60,39 @@ TWriteLoop::~TWriteLoop() {
   }
 }
 
-void TWriteLoop::Connect(TUnpackingLoop* input_queue){
-  if(input_queue){
-    std::lock_guard<std::mutex> lock(input_queue_mutex);
-    input_queues.push_back(input_queue);
+void TWriteLoop::ClearQueue() {
+  while(input_queue->Size()){
+    TUnpackedEvent* event = NULL;
+    input_queue->Pop(event);
+    if(event){
+      delete event;
+    }
+  }
+
+  while(output_queue->Size()){
+    TUnpackedEvent* event = NULL;
+    output_queue->Pop(event);
+    if(event){
+      delete event;
+    }
   }
 }
 
 bool TWriteLoop::Iteration() {
   TUnpackedEvent* event = NULL;
+  input_queue->Pop(event);
 
-  bool handled_event = false;
-  bool living_parent = false;
-
-  {
-    std::lock_guard<std::mutex> lock(input_queue_mutex);
-    for(auto& queue : input_queues){
-      int size = queue->Pop(event,0);
-      if(size >= 0) {
-        WriteEvent(event);
-        items_handled++;
-	handled_event = true;
-	living_parent = true;
-      } else if (queue->IsRunning()){
-	living_parent = true;
-      }
-    }
-  }
-
-  if(!handled_event){
+  if(event) {
+    WriteEvent(*event);
+    output_queue->Push(event);
+    return true;
+  } else if(input_queue->IsFinished()) {
+    output_queue->SetFinished();
+    return false;
+  } else {
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    return true;
   }
-  if(!living_parent && hist_loop)
-    hist_loop->SendStop();
-
-  return living_parent || (input_queues.size()==0);
 }
 
 void TWriteLoop::Write() {
@@ -143,7 +141,7 @@ void TWriteLoop::AddBranch(TClass* cls){
   }
 }
 
-void TWriteLoop::WriteEvent(TUnpackedEvent* event) {
+void TWriteLoop::WriteEvent(TUnpackedEvent& event) {
   if(event_tree){
     // Clear pointers from previous writes.
     for(auto& elem : det_map){
@@ -151,7 +149,7 @@ void TWriteLoop::WriteEvent(TUnpackedEvent* event) {
     }
 
     // Load current events
-    for(auto det : event->GetDetectors()) {
+    for(auto det : event.GetDetectors()) {
       TClass* cls = det->IsA();
       try{
         *det_map.at(cls) = det;
@@ -164,9 +162,4 @@ void TWriteLoop::WriteEvent(TUnpackedEvent* event) {
     // Fill
     event_tree->Fill();
   }
-
-  if(hist_loop)
-    hist_loop->Push(event);
-  else
-    delete event;
 }
