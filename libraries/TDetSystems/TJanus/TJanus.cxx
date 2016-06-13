@@ -306,7 +306,7 @@ void TJanus::InsertHit(const TDetectorHit& hit) {
 void TJanus::Print(Option_t *opt) const {
   printf("TJanus @ %lu\n",Timestamp());
   printf(" Size: %i\n",Size());
-  for(int i=0;i<Size();i++) {
+  for(unsigned int i=0;i<Size();i++) {
     printf("\t"); janus_hits.at(i).Print(); printf("\n");
   }
   printf("---------------------------\n");

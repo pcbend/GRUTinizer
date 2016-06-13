@@ -38,13 +38,13 @@ void MakeHistograms(TRuntimeObjects& obj) {
   histname = "Multiplicity";
   obj.FillHistogram(histname,20,0,20,fast->Size());
 
-  for(int i=0;i<fast->Size();i++) {
+  for(unsigned int i=0;i<fast->Size();i++) {
     TFastScintHit hit = fast->GetLaBrHit(i);
-    
+
     histname = "Multiplicity_detId";
     obj.FillHistogram(histname,20,0,20,hit.GetChannel(),
                                20,0,20,fast->Size());
-  
+
     histname = "ChannelCharge";
     obj.FillHistogram(histname,4000,0,4000,hit.Charge(),
         20,0,20,hit.GetChannel());
@@ -64,22 +64,22 @@ void MakeHistograms(TRuntimeObjects& obj) {
     histname = "ChannelTime-Calibrated";
     obj.FillHistogram(histname,64100,-100,64000,hit.GetTime(),
                                20,0,20,hit.GetChannel());
-    
+
     histname = Form("ChannelTime-Calibrated_mult%02i",fast->Size());
     obj.FillHistogram(histname,64100,-100,64000,hit.GetTime(),
                                20,0,20,hit.GetChannel());
-   
 
 
-    for(int j=0;j<fast->Size();j++) {
-      if(i==j) 
+
+    for(unsigned int j=0;j<fast->Size();j++) {
+      if(i==j)
         continue;
       TFastScintHit hit2 = fast->GetLaBrHit(j);
       histname = "gamma_gamma";
       std::string dirname = "energy_mat";
       obj.FillHistogram(dirname,histname,4000,0,4000,hit.GetEnergy(),
                                  4000,0,4000,hit2.GetEnergy());
-      
+
       histname = Form("gamma_gamma_mult%i",fast->Size());
       obj.FillHistogram(dirname,histname,4000,0,4000,hit.GetEnergy(),
                                  4000,0,4000,hit2.GetEnergy());
@@ -88,11 +88,11 @@ void MakeHistograms(TRuntimeObjects& obj) {
       histname = "time_time";
       obj.FillHistogram(dirname,histname,4000,0,4000,hit.GetTime(),
                                  4000,0,4000,hit2.GetTime());
-      
+
       histname = Form("time_time_multi%i",fast->Size());
       obj.FillHistogram(dirname,histname,4000,0,4000,hit.GetTime(),
                                  4000,0,4000,hit2.GetTime());
-      
+
       histname = "dtime_all";
       obj.FillHistogram(dirname,histname,4000,-2000,2000,hit.GetTime() - hit2.GetTime());
 
@@ -100,7 +100,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       obj.FillHistogram(dirname,histname,4000,-2000,2000,hit.GetTime() - hit2.GetTime());
 
       dirname = "energy_mat";
-      histname = Form("eng%i_eng%i",hit.GetChannel(),hit2.GetChannel());    
+      histname = Form("eng%i_eng%i",hit.GetChannel(),hit2.GetChannel());
       obj.FillHistogram(dirname,histname,4000,0,4000,hit.GetEnergy(),
                                  4000,0,4000,hit2.GetEnergy());
 
