@@ -1,3 +1,5 @@
+#ifdef RCNP
+
 #include "TGrandRaidenHit.h"
 #include "TGRUTOptions.h"
 #include "RCNPEvent.h"
@@ -12,8 +14,6 @@ TGrandRaidenHit::TGrandRaidenHit() {
 TGrandRaidenHit::~TGrandRaidenHit() {
 
 }
-
-
 
 
 void TGrandRaidenHit::BuildFrom(TSmartBuffer& buf){
@@ -63,3 +63,45 @@ void TGrandRaidenHit::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#else
+
+
+#include "TGrandRaidenHit.h"
+
+ClassImp(TGrandRaidenHit)
+
+TGrandRaidenHit::TGrandRaidenHit() {
+  memset(&ADC[0],0,sizeof(Double_t));
+}
+
+TGrandRaidenHit::~TGrandRaidenHit() { ; }
+
+void TGrandRaidenHit::BuildFrom(TSmartBuffer& buf){
+  Clear();
+}
+
+void TGrandRaidenHit::Copy(TObject& obj) const {
+  TDetectorHit::Copy(obj);
+}
+
+void TGrandRaidenHit::Print(Option_t *opt) const { ; }
+
+void TGrandRaidenHit::Clear(Option_t *opt) {
+  TDetectorHit::Clear(opt);
+}
+
+#endif

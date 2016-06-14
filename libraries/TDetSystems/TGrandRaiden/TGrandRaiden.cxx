@@ -1,5 +1,5 @@
 #include "TGrandRaiden.h"
-#include "TRCNPEvent.h"
+#include "TRawEvent.h"
 
 TGrandRaiden::TGrandRaiden(){
   Clear();

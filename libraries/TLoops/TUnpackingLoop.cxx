@@ -9,7 +9,6 @@
 #include "TGEBEvent.h"
 #include "TGRUTOptions.h"
 #include "TNSCLEvent.h"
-#include "TRCNPEvent.h"
 
 #include "TBuildingLoop.h"
 #include "TDetectorEnv.h"

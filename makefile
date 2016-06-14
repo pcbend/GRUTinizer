@@ -2,14 +2,10 @@
 .SECONDARY:
 .SECONDEXPANSION:
 
-
 PLATFORM:=$(PLATFORM)
 # EDIT THIS SECTION
 
-GRANAPATH = ./GRAnalyzer/analyzer
-GRANALYZER = $(realpath $(GRANAPATH)/../lib)
-GRLINKFLAGS = -L$(GRANALYZER) -Wl,-rpath,$(GRANALYZER) -lRCNPEvent -lGRAnalyzer -L$(realpath $(GRANAPATH)/lib) -lpacklib -lm -lgfortran -lnsl
-INCLUDES   = include $(GRANAPATH)/include $(GRANAPATH)/libRCNPEvent/include $(GRANAPATH)/libGRAnalyzer/include
+INCLUDES   = include
 CFLAGS     = -g -std=c++11 -O3 -Wall -Wextra -pedantic -Wno-unused-parameter -D`uname -m` -D`uname -s` -DLinux86 -Df2cFortran -DUSE_PAW
 LINKFLAGS_PREFIX  =
 LINKFLAGS_SUFFIX  = -L/opt/X11/lib -lX11 -lXpm -std=c++11
@@ -29,6 +25,19 @@ CPP        = g++
 CFLAGS     += -Wl,--no-as-needed
 SHAREDSWITCH = -shared -Wl,-soname,# NO ENDING SPACE
 endif
+
+# When compiling and linking against RCNP analyzer routines
+ifeq ($(RCNP),)
+RCNPANAPATH = ./GRAnalyzer/analyzer
+RCNPANALYZER = $(realpath $(RCNPANAPATH)/../lib)
+RCNPFLAGS = -DRCNP
+RCNPLINKFLAGS = -L$(RCNPANALYZER) -Wl,-rpath,$(RCNPANALYZER) -lRCNPEvent -lGRAnalyzer -L$(realpath $(RCNPANAPATH)/lib) -lpacklib -lm -lgfortran -lnsl
+RCNPINCLUDES = $(RCNPANAPATH)/include $(RCNPANAPATH)/libRCNPEvent/include $(RCNPANAPATH)/libGRAnalyzer/include
+CINTFLAGS += $(RCNPFLAGS)
+CFLAGS += $(RCNPFLAGS)
+INCLUDES += $(RCNPINCLUDES)
+endif
+
 
 COM_COLOR=\033[0;34m
 OBJ_COLOR=\033[0;36m
@@ -95,10 +104,10 @@ bin/%: util/% | bin
 	@ln -sf ../$< $@
 
 bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT) libGRAnalyzer bin
-	$(call run_and_test,$(CPP) $^ -o $@ $(LINKFLAGS) $(GRLINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,$(CPP) $^ -o $@ $(LINKFLAGS) $(RCNPLINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) libGRAnalyzer bin
-	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS) $(GRLINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS) $(RCNPLINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 bin:
 	@mkdir -p $@
@@ -138,7 +147,7 @@ find_linkdef = $(shell find $(1) -name "*LinkDef.h")
 define library_template
 .build/$(1)/$(notdir $(1))Dict.cxx: $$(call dict_header_files,$(1)/LinkDef.h) $(1)/LinkDef.h
 	@mkdir -p $$(dir $$@)
-	$$(call run_and_test,rootcint -f $$@ -c $$(INCLUDES) -p $$^,$$@,$$(COM_COLOR),$$(BLD_STRING) ,$$(OBJ_COLOR))
+	$$(call run_and_test,rootcint -f $$@ -c $$(INCLUDES) $$(CINTFLAGS) -p $$^,$$@,$$(COM_COLOR),$$(BLD_STRING) ,$$(OBJ_COLOR))
 
 .build/$(1)/LibDictionary.o: .build/$(1)/$(notdir $(1))Dict.cxx
 	$$(call run_and_test,$$(CPP) -fPIC -c $$< -o $$@ $$(CFLAGS),$$@,$$(COM_COLOR),$$(COM_STRING),$$(OBJ_COLOR) )
