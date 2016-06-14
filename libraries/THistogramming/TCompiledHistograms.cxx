@@ -22,14 +22,13 @@ typedef void* __attribute__((__may_alias__)) void_alias;
 TCompiledHistograms::TCompiledHistograms()
   : libname(""), library(nullptr), func(nullptr),
     last_modified(0), last_checked(0), check_every(5),
-    default_directory(0),obj(0) {
-  obj = new TRuntimeObjects(&objects, &gates, cut_files);
-}
+    default_directory(0),obj(&objects, &gates, cut_files) { }
 
 TCompiledHistograms::TCompiledHistograms(std::string input_lib)
-  : check_every(5), default_directory(0) {
+  : TCompiledHistograms() {
+
   libname = input_lib;
-  library = std::make_shared<DynamicLibrary>(this->libname.c_str(), true);
+  library = std::make_shared<DynamicLibrary>(libname.c_str(), true);
   // Casting required to keep gcc from complaining.
   *(void_alias*)(&func) = library->GetSymbol("MakeHistograms");
 
@@ -39,16 +38,6 @@ TCompiledHistograms::TCompiledHistograms(std::string input_lib)
   }
   last_modified = get_timestamp();
   last_checked = time(NULL);
-
-
-  obj = new TRuntimeObjects(&objects, &gates, cut_files);
-}
-
-TCompiledHistograms::~TCompiledHistograms() {
-  if(obj) {
-    delete obj;
-  }
-  obj=0;
 }
 
 void TCompiledHistograms::ClearHistograms() {
@@ -151,10 +140,8 @@ void TCompiledHistograms::Fill(TUnpackedEvent& detectors) {
   TPreserveGDirectory preserve;
   default_directory->cd();
 
-  if(obj) {
-    obj->SetDetectors(&detectors);
-    func(*obj);
-  }
+  obj.SetDetectors(&detectors);
+  func(obj);
 }
 
 void TCompiledHistograms::AddCutFile(TFile* cut_file) {
