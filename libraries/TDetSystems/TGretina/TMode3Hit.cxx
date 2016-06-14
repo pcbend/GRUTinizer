@@ -95,7 +95,7 @@ double TMode3Hit::AverageWave(int samples) {
     return 0.0;
   }
   if(samples < 0 ||
-     samples > waveform.size()) {
+     samples > int(waveform.size())) {
     samples = waveform.size();
   }
   double sum = 0.0;

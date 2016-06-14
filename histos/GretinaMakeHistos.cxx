@@ -86,7 +86,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
   bool haspids = gates->GetSize();
 
   if(bank29) {
-    for(int x=0;x<bank29->Size();x++) {
+    for(unsigned int x=0;x<bank29->Size();x++) {
       TMode3Hit &hit = (TMode3Hit&)bank29->GetHit(x);
       std::string histname = Form("bank29_%i",hit.GetChannel());
       obj.FillHistogram(histname,16000,0,64000,hit.Charge());
@@ -103,19 +103,19 @@ void MakeHistograms(TRuntimeObjects& obj) {
   //if(s800) {
     //std::string histname = "S800_DTA";
     //obj.FillHistogram(histname,200,-10,10,s800->GetDta());
-    
+
     //histname = "S800_YTA";
     //obj.FillHistogram(histname,200,-10,10,s800->GetYta());
 
   //}
 
   double gsum = 0.0;
-  for(int y=0;y<gretina->Size();y++) {
+  for(unsigned int y=0;y<gretina->Size();y++) {
     TGretinaHit hit = gretina->GetGretinaHit(y);
     std::string histname;
     gsum += hit.GetCoreEnergy();
 
-    for(int z=y+1;z<gretina->Size();z++) {
+    for(unsigned int z=y+1;z<gretina->Size();z++) {
       TGretinaHit hit2 = gretina->GetGretinaHit(z);
       histname = "Gamma_Gamma";
       obj.FillHistogramSym(histname,2000,0,4000,hit.GetCoreEnergy(),
@@ -126,7 +126,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       obj.FillHistogram(histname,800,-400,400,hit.GetTime()-hit2.GetTime(),
                                  2000,0,4000,hit.GetCoreEnergy());
     }
-      
+
 
 
     if(bank29) {
@@ -183,28 +183,28 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
       histname = "E1Raw";
       obj.FillHistogram(histname,2000,0,8000,s800->GetScint().GetTimeUp());
-      
+
       histname = "M_E1Raw";
       for(int z=0;z<s800->GetMTof().E1UpSize();z++)
         obj.FillHistogram(histname,2000,0,8000,s800->GetMTof().fE1Up[z]);
-      
+
       histname = "CRDC1_X";
       obj.FillHistogram(histname,800,-400,400,s800->GetCrdc(0).GetDispersiveX());
-     
+
       histname = "CRDC2_X";
       obj.FillHistogram(histname,800,-400,400,s800->GetCrdc(1).GetDispersiveX());
 
       histname = "IonChamberSum";
       obj.FillHistogram(histname,4000,0,32000,s800->GetIonChamber().GetSum());
 
-      
+
 
 
     }
     histname = Form("GretinaEnergyTheta");
     obj.FillHistogram(histname,4000,0,4000,hit.GetCoreEnergy(),
                                314,0,3.14,hit.GetTheta());
-    
+
     histname = Form("GretinaOverview");
     obj.FillHistogram(histname,4000,0,4000,hit.GetCoreEnergy(),
                                100,0,100,hit.GetCrystalId());
@@ -212,7 +212,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
     histname = Form("GretinaSummaryX%02i",hit.GetCrystalId());
     for(int z=0;z<hit.NumberOfInteractions();z++) {
       obj.FillHistogram(histname,40,0,40,hit.GetSegmentId(z),
-                                 2000,0,4000,hit.GetSegmentEng(z)); 
+                                 2000,0,4000,hit.GetSegmentEng(z));
       if(hit.GetSegmentId(z)>36)
         break;
       int layer  = hit.GetSegmentId(z)/6;
@@ -246,10 +246,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
     histname = Form("GretinaPosition");
     obj.FillHistogram(histname,628,0,6.28,hit.GetPhi(),
                                314,0,3.14,hit.GetTheta());
-    
+
     histname = "GretinaEnergyTotal";
     obj.FillHistogram(histname,8000,0,4000,hit.GetCoreEnergy());
-    
+
     histname = "GretinaDopplerTotal";
     obj.FillHistogram(histname,8000,0,4000,hit.GetDoppler(BETA));
 

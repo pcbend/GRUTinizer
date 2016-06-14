@@ -22,11 +22,14 @@ public:
   std::vector<TDetector*>& GetDetectors() { return detectors; }
   void AddDetector(TDetector* det) { detectors.push_back(det); }
   void AddRawData(const TRawEvent& event, kDetectorSystems detector);
+  void ClearRawData();
 
   void Build();
   void SetRunStart(unsigned int unix_time);
 
   int Size() { return detectors.size(); }
+
+  std::map<kDetectorSystems, std::vector<TRawEvent> >& GetRawData() { return raw_data_map; }
 
 private:
   std::vector<TDetector*> detectors;

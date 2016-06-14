@@ -392,7 +392,7 @@ void GCanvas::HandleInput(Int_t event,Int_t x,Int_t y) {
   switch(event) {
     case 0x00000001: //single click
     case 0x0000003d: //double click
-      used = HandleMousePress(event,x,y);
+        used = HandleMousePress(event,x,y);
       break;
     case 0x00000007: //shift-click
       used = HandleMouseShiftPress(event,x,y);
@@ -429,12 +429,6 @@ std::vector<TH1*> GCanvas::FindHists(int dim) {
   return tempvec;
 }
 
-
-
-
-
-
-
 std::vector<TH1*> GCanvas::FindAllHists() {
   std::vector<TH1*> tempvec;
   TIter iter(gPad->GetListOfPrimitives());
@@ -463,32 +457,18 @@ bool GCanvas::HandleArrowKeyPress(Event_t *event,UInt_t *keysym) {
 
 
 bool GCanvas::HandleKeyboardPress(Event_t *event,UInt_t *keysym) {
-  //printf("keysym = %i\n",*keysym);
-  TIter iter(gPad->GetListOfPrimitives());
-  //TGraphErrors * ge = 0;
   bool edited = false;
-  //while(TObject *obj = iter.Next()) {
-  //   if(obj->InheritsFrom("TGraphErrors")){
-  //         ge = (TGraphErrors*)obj;
-  //   }
-  //}
+
+  edited = ProcessNonHistKeyboardPress(event, keysym);
+
   std::vector<TH1*> hists = FindHists(1);
-  if(hists.size()>0){
+  if(hists.size()>0 && !edited){
     edited = Process1DKeyboardPress(event,keysym);
   }
   hists = FindHists(2);
   if(hists.size()>0 && !edited){
     edited = Process2DKeyboardPress(event,keysym);
   }
-
-
-  //if(ge){
-  //switch(*keysym) {
-  //    case kKey_p:
-  //      ge->Print();
-  //      break;
-  //  };
-  //}
 
   if(edited) {
     gPad->Modified();
@@ -497,30 +477,34 @@ bool GCanvas::HandleKeyboardPress(Event_t *event,UInt_t *keysym) {
   return true;
 }
 
-
 bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
-  //printf("Mouse clicked  %i   %i\n",x,y);
-  if(!GetSelected())
+  if(!GetSelected()) {
     return false;
-  //if(GetSelected()->InheritsFrom("TCanvas"))
-  //   ((TCanvas*)GetSelected())->cd();
-
-  TIter iter(gPad->GetListOfPrimitives());
-  TH1 *hist = 0;
-  while(TObject *obj = iter.Next()) {
-     if(obj->InheritsFrom(TH1::Class()))
-        hist = (TH1*)obj;
   }
-  if(!hist)
-     return false;
+
+
+  TH1* hist = 0;
+  if(GetSelected()->InheritsFrom(TH1::Class())) {
+    hist = (TH1*)GetSelected();
+  } else if(GetSelected()->IsA() == TFrame::Class()) {
+    std::vector<TH1*> hists = FindAllHists();
+    if(hists.size()) {
+      hist = hists.front();
+
+      // Let everybody know that the histogram is selected
+      SetSelected(hist);
+      SetClickSelected(hist);
+      Selected(GetSelectedPad(), hist, event);
+    }
+  }
+
+  if(!hist || hist->GetDimension() > 2) {
+    return false;
+  }
 
   bool used = false;
-  if(hist->GetDimension() > 2) {
-    return used;
-  }
 
-  if(fMarkerMode && (GetSelected()->InheritsFrom(TH1::Class()) ||
-                     GetSelected()->InheritsFrom(TFrame::Class()))) {
+  if(fMarkerMode) {
     AddMarker(x,y,hist->GetDimension());
     used = true;
   }
@@ -529,6 +513,7 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
     gPad->Modified();
     gPad->Update();
   }
+
   return used;
 }
 
@@ -710,6 +695,19 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
   return edited;
 }
 
+bool GCanvas::ProcessNonHistKeyboardPress(Event_t* event, UInt_t* keysym) {
+  bool edited = false;
+
+  switch(*keysym) {
+    case kKey_F2:
+      GetCanvasImp()->ShowEditor(!GetCanvasImp()->HasEditor());
+      edited = true;
+      break;
+  }
+
+  return edited;
+}
+
 bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
 
   //printf("keysym:   0x%08x\n",*keysym);
@@ -819,7 +817,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
     case kKey_I:
       if(!hists.empty()) {
         printf( BLUE );
-        
+
         printf( RESET_COLOR );
       }
       break;
@@ -952,12 +950,12 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
   case kKey_q:{
     TH1* ghist = hists.at(0);
     if(GetNMarkers()>1) {
-      
+
       edited = PhotoPeakFit(ghist,fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
     }
     if(edited){
       ghist->Draw("hist");
-    
+
       TIter iter(ghist->GetListOfFunctions());
       while(TObject *o = iter.Next()){
 	if(o->InheritsFrom(TF1::Class())) {
@@ -966,7 +964,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       }
     }
   }
-    
+
     break;
 
     case kKey_r:

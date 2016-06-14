@@ -8,6 +8,7 @@
 
 #pragma link C++ class TChannel-;
 #pragma link C++ class TCalibrator+;
+#pragma link C++ struct TCalibrator::Peak+;
 
 #pragma link C++ class TPresetPad+;
 #pragma link C++ class TPresetCanvas-;

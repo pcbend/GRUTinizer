@@ -5,14 +5,15 @@
 #include <cstring>
 
 #include "TVirtualPad.h"
-#include "GH2I.h"
-#include "GH2D.h"
-
+#include "TString.h"
 #include "TF1.h"
-
 #include "TFrame.h"
 //#include "TROOT.h"
 //#include "TSystem.h"
+
+#include "GCanvas.h"
+#include "GH2I.h"
+#include "GH2D.h"
 
 GH1D::GH1D(const TH1& source)
   : parent(NULL), projection_axis(-1) {
@@ -93,7 +94,12 @@ void GH1D::Copy(TObject& obj) const {
 
 
 void GH1D::Draw(Option_t* opt) {
-  TH1D::Draw(opt);
+  TString option(opt);
+  if(option.Contains("new",TString::kIgnoreCase)) {
+    option.ReplaceAll("new","");
+    new GCanvas;
+  }
+  TH1D::Draw(option.Data());
   if(gPad) {
     gPad->Update();
     gPad->GetFrame()->SetBit(TBox::kCannotMove);
