@@ -156,7 +156,7 @@ void correctCaesarTime(TH2D* time2d, int comp_det, std::string cal_file_name,
 
   TSpectrum peakfinder(1);
   const int TOTAL_DET_IN_PREV_RINGS[10] = {0,10,24,48,72,96,120,144,168,182};
-  const int FIT_PADDING = 50; //determines distance to left/right of peak for fitting
+  const int FIT_PADDING = 30; //determines distance to left/right of peak for fitting
   double centroids[N_DETS];
   std::string out_chan_filename("correctTimeOffsets.cal");
 
@@ -171,7 +171,7 @@ void correctCaesarTime(TH2D* time2d, int comp_det, std::string cal_file_name,
     TH1D *hist_1d = (TH1D*)time2d->ProjectionY("name",bin,bin);
     //Setting axis range allows us to avoid including the overflow peak
     hist_1d->Rebin(4);
-    hist_1d->GetXaxis()->SetRangeUser(500,1000);
+    hist_1d->GetXaxis()->SetRangeUser(150,350);
     peakfinder.Search(hist_1d);
     hist_1d->Fit("gaus","M","",peakfinder.GetPositionX()[0] - FIT_PADDING, 
                                peakfinder.GetPositionX()[0] + FIT_PADDING);
