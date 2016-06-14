@@ -1,0 +1,108 @@
+
+// Central contacts
+
+CLO01AP00 {
+  Address: 0x01007100
+  EnergyCoeff: -11.571 1.38547587
+}
+
+CLO01BP00 {
+  Address: 0x01007101
+  EnergyCoeff: -15.376 1.16580939
+}
+
+CLO01CP00 {
+  Address: 0x01007102
+  EnergyCoeff: -17.096 1.20797241
+}
+
+CLO01DP00 {
+  Address: 0x01007103
+  EnergyCoeff: -16.151 1.06947565
+}
+
+
+// Other channels
+
+EXT01AP00 {
+  Address: 0x01007200
+  EnergyCoeff: 0 1
+}
+EXT02AP00 {
+  Address: 0x01007201
+  EnergyCoeff: 0 1
+}
+EXT03AP00 {
+  Address: 0x01007202
+  EnergyCoeff: 0 1
+}
+EXT04AP00 {
+  Address: 0x01007203
+  EnergyCoeff: 0 1
+}
+
+EXT05AP00 {
+  Address: 0x01007300
+  EnergyCoeff: 0 1
+}
+EXT06AP00 {
+  Address: 0x01007301
+  EnergyCoeff: 0 1
+}
+EXT07AP00 {
+  Address: 0x01007302
+  EnergyCoeff: 0 1
+}
+EXT08AP00 {
+  Address: 0x01007303
+  EnergyCoeff: 0 1
+}
+EXT09AP00 {
+  Address: 0x01007304
+  EnergyCoeff: 0 1
+}
+
+
+
+
+// // Segments
+
+// CLO01AN01 {
+//   Address: 0x010071xx
+//   EnergyCoeff: 0 1
+// }
+
+// CLO01AN02 {
+//   Address: 0x010071xx
+//   EnergyCoeff: 0 1
+// }
+
+// CLO01BN01 {
+//   Address: 0x010071xx
+//   EnergyCoeff: 0 1
+// }
+
+// CLO01BN02 {
+//   Address: 0x010071xx
+//   EnergyCoeff: 0 1
+// }
+
+// CLO01CN01 {
+//   Address: 0x010071xx
+//   EnergyCoeff: 0 1
+// }
+
+// CLO01CN02 {
+//   Address: 0x010071xx
+//   EnergyCoeff: 0 1
+// }
+
+// CLO01DN01 {
+//   Address: 0x010071xx
+//   EnergyCoeff: 0 1
+// }
+
+// CLO01DN02 {
+//   Address: 0x010071xx
+//   EnergyCoeff: 0 1
+// }
