@@ -88,7 +88,7 @@ std::string TRCNPSource::SourceDescription() const {return "File: "+std::string(
 void TRCNPSource::LoadFakeTimestamps() {
 
   std::string line; std::stringstream stream; ULong_t ts;
-  ifstream file ("/projects/ceclub/sullivan/cagragr/GRUTinizer/timestamps.dat");
+  ifstream file ("./timestamps.dat");
   if (file.is_open())
   {
     while ( getline (file,line) )
