@@ -1,6 +1,7 @@
 #ifndef __TGRUTUTILITIES_H_
 #define __TGRUTUTILITIES_H_
 
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -15,5 +16,13 @@ std::string get_run_number(std::string input);
 EColor FindColor(std::string);
 
 void CalculateParameters();
+
+inline size_t FindFileSize(const char* fname) {
+  std::ifstream temp;
+  temp.open(fname, std::ios::in | std::ios::ate);
+  size_t fsize = temp.tellg();
+  temp.close();
+  return fsize;
+}
 
 #endif

@@ -78,19 +78,23 @@ TRawEventSource* TRawEventSource::EventSource(const char* filename,
     }
     file_type = TGRUTOptions::Get()->DetermineFileType(filename);
   }
-  TRawEventSource *source = 0;
+
+  TByteSource* byte_source = 0;
   // If it is a ring, open it
   if(is_ring){
-    source = new TRawEventRingSource(filename, file_type);
+    byte_source = new TRingByteSource(filename);
   // If it is an archived file, open it as such
   } else if(hasSuffix(filename,".bz2")){
-    source = new TRawEventBZipSource(filename, file_type);
+    byte_source = new TBZipByteSource(filename);
   } else if (hasSuffix(filename,".gz")){
-    source = new TRawEventGZipSource(filename, file_type);
+    byte_source = new TGZipByteSource(filename);
   // Otherwise, open it as a normal file.
   } else {
-    source = new TRawEventFileSource(filename, file_type);
+    byte_source = new TFileByteSource(filename);
   }
+
+  TRawEventSource* source = new TRawEventTimestampSource(byte_source, file_type);
+
   return source;
 }
 
@@ -106,18 +110,25 @@ double TRawEventSource::GetAverageRate() const {
   return sum/n;
 }
 
-ClassImp(TRawEventByteSource)
+ClassImp(TRawEventTimestampSource)
 
-TRawEventByteSource::TRawEventByteSource(kFileType file_type)
-  : fFileType(file_type), fFileSize(-1),
+TRawEventTimestampSource::TRawEventTimestampSource(TByteSource* byte_source, kFileType file_type)
+  : fByteSource(byte_source), fFileType(file_type),
     fDefaultBufferSize(8192) { }
 
-void TRawEventByteSource::Reset() {
-  TRawEventSource::Reset();
-  fCurrentBuffer = TSmartBuffer();
+TRawEventTimestampSource::~TRawEventTimestampSource() {
+  if(fByteSource) {
+    delete fByteSource;
+  }
 }
 
-std::string TRawEventByteSource::Status(bool long_description) const {
+void TRawEventTimestampSource::Reset() {
+  TRawEventSource::Reset();
+  fCurrentBuffer = TSmartBuffer();
+  fByteSource->Reset();
+}
+
+std::string TRawEventTimestampSource::Status(bool long_description) const {
   return Form("%s: %s %8.2f MB given %s / %s %8.2f MB total %s  => %s %3.02f MB/s processed %s",
               SourceDescription(long_description).c_str(),
               DCYAN, GetBytesGiven()/1e6, RESET_COLOR,
@@ -125,7 +136,7 @@ std::string TRawEventByteSource::Status(bool long_description) const {
               GREEN, GetAverageRate()/1e6, RESET_COLOR);
 }
 
-int TRawEventByteSource::GetEvent(TRawEvent& rawevent) {
+int TRawEventTimestampSource::GetEvent(TRawEvent& rawevent) {
   switch(fFileType) {
     case kFileType::NSCL_EVT:
     case kFileType::GRETINA_MODE2:
@@ -175,10 +186,10 @@ int TRawEventByteSource::GetEvent(TRawEvent& rawevent) {
   return total_bytes;
 }
 
-int TRawEventByteSource::FillBuffer(size_t bytes_requested) {
+int TRawEventTimestampSource::FillBuffer(size_t bytes_requested) {
   // //std::cout << "UNBUFFERED READ" << std::endl;
   // char* buf = (char*)malloc(bytes_requested);
-  // size_t bytes_read = ReadBytes(buf, bytes_requested);
+  // size_t bytes_read = fByteSource->ReadBytes(buf, bytes_requested);
   // fCurrentBuffer = TSmartBuffer(buf, bytes_requested);
   // if(bytes_read != bytes_requested){
   //   return -2;
@@ -199,7 +210,7 @@ int TRawEventByteSource::FillBuffer(size_t bytes_requested) {
 
   // Read to fill the buffer.
   size_t bytes_to_read = bytes_allocating - bytes_to_copy;
-  size_t bytes_read = ReadBytes(buf + bytes_to_copy, bytes_to_read);;
+  size_t bytes_read = fByteSource->ReadBytes(buf + bytes_to_copy, bytes_to_read);;
 
   // Store everything
   fCurrentBuffer = TSmartBuffer(buf, bytes_to_copy + bytes_read);
@@ -218,32 +229,4 @@ int TRawEventByteSource::FillBuffer(size_t bytes_requested) {
   } else {
     return bytes_requested;
   }
-}
-
-TRawEventPipeSource::TRawEventPipeSource(const std::string& command, kFileType file_type)
-  : TRawEventByteSource(file_type), fCommand(command) {
-  fPipe = popen(command.c_str(),"r");
-}
-
-TRawEventPipeSource::~TRawEventPipeSource() {
-  pclose(fPipe);
-}
-
-void TRawEventPipeSource::Reset() {
-  TRawEventByteSource::Reset();
-  pclose(fPipe);
-  fPipe = popen(fCommand.c_str(),"r");
-}
-
-int TRawEventPipeSource::ReadBytes(char* buf, size_t size){
-  size_t output = fread(buf, 1, size, fPipe);
-  if(output != size){
-    SetLastErrno(ferror(fPipe));
-    SetLastError(strerror(GetLastErrno()));
-  }
-  return output;
-}
-
-std::string TRawEventPipeSource::SourceDescription(bool /*long_description*/) const {
-  return "Pipe: " + fCommand;
 }

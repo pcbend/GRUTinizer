@@ -1,26 +1,25 @@
-#include "TRawSource.h"
+#include "TByteSource.h"
 
 #include "TGRUTUtilities.h"
 
-TRawEventGZipSource::TRawEventGZipSource(const std::string& filename, kFileType file_type)
-  : TRawEventByteSource(file_type), fFilename(filename) {
+TGZipByteSource::TGZipByteSource(const std::string& filename)
+  : fFilename(filename) {
   fFile = fopen(filename.c_str(),"rb");
   fGzFile = new gzFile;
   *fGzFile = gzdopen(fileno(fFile),"rb");
 }
 
-TRawEventGZipSource::~TRawEventGZipSource() {
+TGZipByteSource::~TGZipByteSource() {
   gzclose(*fGzFile);
   delete fGzFile;
   fclose(fFile);
 }
 
-void TRawEventGZipSource::Reset() {
-  TRawEventByteSource::Reset();
+void TGZipByteSource::Reset() {
   gzseek(*fGzFile, 0, SEEK_SET);
 }
 
-int TRawEventGZipSource::ReadBytes(char* buf, size_t size){
+int TGZipByteSource::ReadBytes(char* buf, size_t size){
   int output = gzread(*fGzFile, buf, size);
   if(size_t(output) != size){
     if(gzeof(*fGzFile)){
@@ -36,7 +35,7 @@ int TRawEventGZipSource::ReadBytes(char* buf, size_t size){
   return output;
 }
 
-std::string TRawEventGZipSource::SourceDescription(bool long_description) const {
+std::string TGZipByteSource::SourceDescription(bool long_description) const {
   if(long_description) {
     return fFilename;
   } else {
