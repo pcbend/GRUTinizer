@@ -157,6 +157,31 @@ UShort_t TRawEvent::GEBArgonneLEDv11::GeneralErrorFlag() const { return ((flags 
 UShort_t TRawEvent::GEBArgonneLEDv11::PileUpOnlyFlag() const { return ((flags & 0x4000)>>14); }
 UShort_t TRawEvent::GEBArgonneLEDv11::PileUpFlag() const { return ((flags & 0x8000)>>15); }
 
+ULong_t  TRawEvent::GEBArgonneLEDv18::GetPreviousLED() const { return (((ULong_t)led_high_prev) << 16) + ((ULong_t)led_low_prev); }
+UInt_t   TRawEvent::GEBArgonneLEDv18::GetBaseline() const { return ((sampled_baseline & 0x00FFFFFF) >> 0); }
+UInt_t   TRawEvent::GEBArgonneLEDv18::GetPreRiseE() const { return (postrise_sum_low_prerise_sum & 0xffffff); }
+UInt_t   TRawEvent::GEBArgonneLEDv18::GetPostRiseE() const { return ((postrise_sum_low_prerise_sum & 0xff000000)>>24) + (((UInt_t)postrise_sum_high) << 8); }
+// New
+ULong_t  TRawEvent::GEBArgonneLEDv18::GetTrigTimestamp() const { return ((ULong_t)timestamp_trigger_low) /*+ (((ULong_t)timestamp_trigger_high)<<16)*/; } // not fully implemented
+UShort_t TRawEvent::GEBArgonneLEDv18::GetLastPostRiseEnterSample() const { return (last_postrise_enter_sample & 0x3fff); }
+UShort_t TRawEvent::GEBArgonneLEDv18::GetLastPostRiseLeaveSample() const { return (last_postrise_leave_sample & 0x3fff); }
+UShort_t TRawEvent::GEBArgonneLEDv18::GetPostRiseLeaveSample() const { return (postrise_leave_sample & 0x3fff); }
+UShort_t TRawEvent::GEBArgonneLEDv18::GetPreRiseEnterSample() const { return (prerise_enter_sample & 0x3fff); }
+UShort_t TRawEvent::GEBArgonneLEDv18::GetPreRiseLeaveSample() const { return (prerise_leave_sample & 0x3fff); }
+
+UShort_t TRawEvent::GEBArgonneLEDv18::GetBaseSample() const { return (base_sample & 0x3fff); }
+UShort_t TRawEvent::GEBArgonneLEDv18::GetPeakSample() const { return (peak_sample & 0x3fff); }
+
+UShort_t TRawEvent::GEBArgonneLEDv18::WriteFlag() const { return ((flags & 0x20)>>5); }
+UShort_t TRawEvent::GEBArgonneLEDv18::VetoFlag() const { return ((flags & 0x40)>>6); }
+UShort_t TRawEvent::GEBArgonneLEDv18::ExternalDiscFlag() const { return ((flags & 0x100)>>8); }
+UShort_t TRawEvent::GEBArgonneLEDv18::PeakValidFlag() const { return ((flags & 0x200)>>9); }
+UShort_t TRawEvent::GEBArgonneLEDv18::OffsetFlag() const { return ((flags & 0x400)>>10); }
+UShort_t TRawEvent::GEBArgonneLEDv18::SyncErrorFlag() const { return ((flags & 0x1000)>>12); }
+UShort_t TRawEvent::GEBArgonneLEDv18::GeneralErrorFlag() const { return ((flags & 0x2000)>>13); }
+UShort_t TRawEvent::GEBArgonneLEDv18::PileUpOnlyFlag() const { return ((flags & 0x4000)>>14); }
+UShort_t TRawEvent::GEBArgonneLEDv18::PileUpFlag() const { return ((flags & 0x8000)>>15); }
+
 void TRawEvent::SwapArgonneHead(TRawEvent::GEBArgonneHead& header) {
         header.GA_packetlength = SwapShort(header.GA_packetlength);
         header.ud_channel = SwapShort(header.ud_channel);
@@ -180,6 +205,24 @@ void TRawEvent::SwapArgonneLEDv11(TRawEvent::GEBArgonneLEDv11& data) {
         data.base_sample = SwapShort(data.base_sample);
         data.peak_sample = SwapShort(data.peak_sample);
 }
+void TRawEvent::SwapArgonneLEDv18(TRawEvent::GEBArgonneLEDv18& data) {
+        data.led_low_prev = SwapShort(data.led_low_prev);
+        data.flags = SwapShort(data.flags);
+        data.led_high_prev = SwapInt(data.led_high_prev);
+        data.sampled_baseline = SwapInt(data.sampled_baseline);
+        data.postrise_sum_low_prerise_sum = SwapInt(data.postrise_sum_low_prerise_sum);
+        data.timestamp_peak_low = SwapShort(data.timestamp_peak_low);
+        data.postrise_sum_high = SwapShort(data.postrise_sum_high);
+        //data.timestamp_peak_high = SwapInt(data.timestamp_peak_high);
+	data.timestamp_trigger_low = SwapShort(data.timestamp_trigger_low); // not fully implemented
+        data.last_postrise_enter_sample = SwapShort(data.last_postrise_enter_sample);
+	data.last_postrise_leave_sample = SwapShort(data.last_postrise_leave_sample);
+        data.postrise_leave_sample = SwapShort(data.postrise_leave_sample);
+        data.prerise_enter_sample = SwapShort(data.prerise_enter_sample);
+        data.prerise_leave_sample = SwapShort(data.prerise_leave_sample);
+        data.base_sample = SwapShort(data.base_sample);
+        data.peak_sample = SwapShort(data.peak_sample);
+}
 
 #define STR(x) "\t GEBArgonne "<< #x <<": " << x
 std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBArgonneHead& header) {
@@ -192,21 +235,40 @@ std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBArgonneHead& head
 }
 std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBArgonneLEDv11& data) {
         return os << "-- Argonne LEDv11 data packet --"
-                << STR(data.led_low_prev) << "\n"
-                << STR(data.flags) << "\n"
-                << STR(data.led_high_prev) << "\n"
-                << STR(data.sampled_baseline) << "\n"
-                << STR(data._blank_) << "\n"
-                << STR(data.postrise_sum_low_prerise_sum) << "\n"
-                << STR(data.timestamp_peak_low) << "\n"
-                << STR(data.postrise_sum_high) << "\n"
-                << STR(data.timestamp_peak_high) << "\n"
-                << STR(data.postrise_end_sample) << "\n"
-                << STR(data.postrise_begin_sample) << "\n"
-                << STR(data.prerise_end_sample) << "\n"
-                << STR(data.prerise_begin_sample) << "\n"
-                << STR(data.base_sample) << "\n"
-                << STR(data.peak_sample) << std::endl;
+		  << STR(data.led_low_prev) << "\n"
+		  << STR(data.flags) << "\n"
+		  << STR(data.led_high_prev) << "\n"
+		  << STR(data.sampled_baseline) << "\n"
+		  << STR(data._blank_) << "\n"
+		  << STR(data.postrise_sum_low_prerise_sum) << "\n"
+		  << STR(data.timestamp_peak_low) << "\n"
+		  << STR(data.postrise_sum_high) << "\n"
+		  << STR(data.timestamp_peak_high) << "\n"
+		  << STR(data.postrise_end_sample) << "\n"
+		  << STR(data.postrise_begin_sample) << "\n"
+		  << STR(data.prerise_end_sample) << "\n"
+		  << STR(data.prerise_begin_sample) << "\n"
+		  << STR(data.base_sample) << "\n"
+		  << STR(data.peak_sample) << std::endl;
+}
+std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBArgonneLEDv18& data) {
+        return os << "-- Argonne LEDv18 data packet --"
+		  << STR(data.led_low_prev) << "\n"
+		  << STR(data.flags) << "\n"
+		  << STR(data.led_high_prev) << "\n"
+		  << STR(data.sampled_baseline) << "\n"
+		  << STR(data._blank_) << "\n"
+		  << STR(data.postrise_sum_low_prerise_sum) << "\n"
+		  << STR(data.timestamp_peak_low) << "\n"
+		  << STR(data.postrise_sum_high) << "\n"
+		  << STR(data.timestamp_trigger_low) << "\n"
+		  << STR(data.last_postrise_enter_sample) << "\n"
+		  << STR(data.last_postrise_leave_sample) << "\n"
+		  << STR(data.postrise_leave_sample) << "\n"
+		  << STR(data.prerise_enter_sample) << "\n"
+		  << STR(data.prerise_leave_sample) << "\n"
+		  << STR(data.base_sample) << "\n"
+		  << STR(data.peak_sample) << std::endl;
 }
 #undef STR
 

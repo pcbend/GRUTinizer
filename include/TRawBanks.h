@@ -276,7 +276,7 @@ struct GEBMode3Data {
 friend std::ostream& operator<<(std::ostream& os, const GEBMode3Data &data);
 static void SwapMode3Data(GEBMode3Data &data);
 
-enum ArgonneType { LEDv10, LEDv11, CFDv11 };
+enum ArgonneType { LEDv10, LEDv11, CFDv11, LEDv18, CFDv18 };
 
 struct GEBArgonneHead {
   UShort_t GA_packetlength;
@@ -333,8 +333,60 @@ struct GEBArgonneLEDv11 {
   UShort_t PileUpFlag() const;
 }__attribute__((__packed__));
 
+struct GEBArgonneLEDv18 {
+  UShort_t led_low_prev;
+  UShort_t flags;
+  UInt_t   led_high_prev;
+  UInt_t   sampled_baseline;
+  UInt_t   _blank_;
+  UInt_t   postrise_sum_low_prerise_sum;
+  UShort_t timestamp_peak_low;
+  UShort_t postrise_sum_high;
+  // begin differences from v11 //
+  UShort_t timestamp_trigger_low;
+  UShort_t last_postrise_enter_sample;
+  // old: UInt_t timestamp_peak_high;
+  UShort_t last_postrise_leave_sample;
+  UShort_t postrise_leave_sample;
+  // old: UShort_t postrise_end_sample;
+  // old: UShort_t postrise_begin_sample;
+  UShort_t prerise_enter_sample;
+  UShort_t prerise_leave_sample;
+  // old: UShort_t prerise_end_sample;
+  // old: UShort_t prerise_begin_sample;
+  UShort_t base_sample;
+  UShort_t peak_sample;
+  ULong_t  GetPreviousLED() const;
+  UInt_t   GetBaseline() const;
+  UInt_t   GetPreRiseE() const;
+  UInt_t   GetPostRiseE() const;
+  // need changes
+  ULong_t  GetTrigTimestamp() const;
+  UShort_t GetLastPostRiseEnterSample() const;
+  UShort_t GetLastPostRiseLeaveSample() const;
+  UShort_t GetPostRiseLeaveSample() const;
+  UShort_t GetPreRiseEnterSample() const;
+  UShort_t GetPreRiseLeaveSample() const;
+  // no change needed
+  UShort_t GetBaseSample() const;
+  UShort_t GetPeakSample() const;
+
+  UShort_t WriteFlag() const;
+  UShort_t VetoFlag() const;
+  UShort_t ExternalDiscFlag() const;
+  UShort_t PeakValidFlag() const;
+  UShort_t OffsetFlag() const;
+  UShort_t SyncErrorFlag() const;
+  UShort_t GeneralErrorFlag() const;
+  UShort_t PileUpOnlyFlag() const;
+  UShort_t PileUpFlag() const;
+}__attribute__((__packed__));
+
 friend std::ostream& operator<<(std::ostream& os, const GEBArgonneLEDv11& data);
 static void SwapArgonneLEDv11(TRawEvent::GEBArgonneLEDv11& data);
+
+friend std::ostream& operator<<(std::ostream& os, const GEBArgonneLEDv18& data);
+static void SwapArgonneLEDv18(TRawEvent::GEBArgonneLEDv18& data);
 
 struct GEBS800Header {
   Int_t    total_size;

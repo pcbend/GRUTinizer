@@ -73,6 +73,40 @@ struct ANL_LED_v11 {
   uint16_t peak_sample;
 }__attribute__((__packed__));
 
+struct ANL_LED_v18 {
+  uint32_t type;
+  uint32_t length;
+  uint64_t timestamp;
+  uint16_t ga_packetlength;
+  uint16_t ud_channel;
+  uint32_t led_low;
+  uint16_t hdrlength_evttype_hdrtype;
+
+  uint16_t led_high;
+  uint16_t led_low_prev;
+  uint16_t flags;
+  uint32_t led_high_prev;
+  uint32_t sampled_baseline;
+  uint32_t blank;
+  uint32_t postrise_sum_low_prerise_sum;
+  uint16_t timestamp_peak_low;
+  uint16_t postrise_sum_high;
+
+  uint16_t timestamp_trigger_low; // not fully implemented yet
+  uint16_t last_postrise_enter_sample;
+  // old: uint32_t timestamp_peak_high;
+
+  uint16_t last_postrise_leave_sample;
+  uint16_t postrise_leave_sample;
+  // old: uint16_t postrise_end_sample;
+  // old: uint16_t postrise_begin_sample;
+  uint16_t prerise_enter_sample;
+  uint16_t prereise_leave_sample;
+  // old: uint16_t prerise_end_sample;
+  // old: uint16_t prerise_begin_sample;
+  uint16_t base_sample;
+  uint16_t peak_sample;
+}__attribute__((__packed__));
 
 
 int main (int argc, char **argv) {
