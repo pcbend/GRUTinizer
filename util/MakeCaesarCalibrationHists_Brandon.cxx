@@ -2,7 +2,7 @@
 #define MAX_DETS 24
 
 //CHANGE THIS
-#define NUM_FILES 4 
+#define NUM_FILES 6 
 #include <iostream>
 #include <string>
 #include <vector>
@@ -27,15 +27,17 @@ int main(int argc, char *argv[]){
 
   //CHANGE THIS
   std::string source_name[NUM_FILES] = {
-    "cs137",
+    "na22",
     "y88",
+    "co60",
+    "cs137",
     "ba133",
-    "co60"
+    "bg"
   };
 
   //CHANGE THIS
   int run_numbers[NUM_FILES] = {
-    24,25,26,27
+    67,68,69,70,71,73
   };
   int det_per_ring[N_RINGS] = {
     10, 14, 24, 24, 24,
@@ -45,7 +47,7 @@ int main(int argc, char *argv[]){
   std::vector<std::string> input_file_names;
   std::vector<TFile*> files;
   std::string line;
-  std::ifstream input_file;
+  ifstream input_file;
 
   TH1D* output_hists[NUM_FILES][N_RINGS][MAX_DETS];
   TFile *out_file = new TFile(argv[2], "recreate");

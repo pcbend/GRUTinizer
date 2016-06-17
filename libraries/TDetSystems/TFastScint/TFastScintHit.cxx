@@ -1,4 +1,5 @@
 #include "TFastScintHit.h"
+#include "TFastScint.h"
 #include "TRandom.h"
 
 
@@ -37,6 +38,7 @@ void TFastScintHit::Print(Option_t *opt) const {
 }
 
 
+TVector3 &TFastScintHit::GetPosition() const { return TFastScint::GetPosition(fChannel); }
 
 
 /*

@@ -1,22 +1,16 @@
 #include <iostream>
-#include <fstream>
-#include <cstdlib> //for getenv and atoi
-#include <vector>
 #include <string>
-
-#include "TChannel.h"
+#include <fstream>
+#include <iomanip>
 #include "TEnv.h"
-#include "TH2D.h"
-#include "TFile.h"
-#include "TF1.h"
-#include "TSpectrum.h"
 
+
+#define N_RINGS 10
+#define MAX_DETS 24
 #define MAX_CHN 16
-#define MAX_VSN 12  
-#define N_RINGS 10 //total number of rings
-#define N_DETS 192 //total number of detectors
+#define MAX_VSN 12
 
-void readVSNMap(std::string in_file_name, int vsnchn_ring_map_energy[MAX_VSN][MAX_CHN], 
+void ReadVSNMap(std::string in_file_name, int vsnchn_ring_map_energy[MAX_VSN][MAX_CHN], 
                                           int vsnchn_det_map_energy[MAX_VSN][MAX_CHN], 
                                           int vsnchn_ring_map_time[MAX_VSN][MAX_CHN], 
                                           int vsnchn_det_map_time[MAX_VSN][MAX_CHN]){
@@ -120,124 +114,78 @@ void readVSNMap(std::string in_file_name, int vsnchn_ring_map_energy[MAX_VSN][MA
   return;
 }
 
-//correctCaesarTime cycles through all the bins of the 
-//"time2d" histogram whose x-axis is the absolute detector number (see 
-//GetAbsoluteDetectorNumber()) and whose y-axis is the CAESAR raw times. 
-//It finds the centroid of the peak of the 1d projection and stores it in
-//a file called "centroids.dat". It then computes the difference between 
-//all the centroids and the centroid of a detector that one wants to compare 
-//to, and gives the offsets in an output cal file. The offsets can either be 
-//relative to 0 or relative to the current offset in the input cal file by
-//setting add_cur_offset to false or true, respectively. 
-//
-//i.e. the reported offset for detector i will either be:
-// centroid_compdet-centroid_i or (centroid_compdet-centroid_i)+TIMECOEFF_OFFSET
-//
-//
-// INPUT:
-//
-//
-// OUTPUT:
-//
-//
+void translateCalFile(std::string vsn_map_file_name, std::string ecal_file_name,
+                      std::string tcal_file_name, std::string out_file_name){
 
-void correctCaesarTime(TH2D* time2d, int comp_det, std::string cal_file_name, 
-                 bool subtract_current_offset=true){
-  //Note: we need the channels + vsn mapping to correctly cycle through addresses
-  //and to determine the relationship between absolute detector number and address
-  std::string vsn_map_filename      = std::string(getenv("GRUTSYS")) + "/config/caesar/VSNMap.dat";
-  
+  int  const det_per_ring[] = {10,14,24,24,24, 24, 24, 24, 14, 10};
+  char const ring_names[] = {'a','b','c','d','e','f','g','h', 'i','j'};
+
+  double e_cal_par[N_RINGS][MAX_DETS][3];
+  double t_cal_par[N_RINGS][MAX_DETS];//just a constant offset
+  for (int i = 0; i < N_RINGS; i++){
+    for (int j = 0; j  < MAX_DETS; j++){
+      e_cal_par[i][j][0] = 0.0;
+      e_cal_par[i][j][1] = 0.0;
+      e_cal_par[i][j][2] = 0.0;
+      t_cal_par[i][j] = 0.0;
+    }
+  }
+
+  //First parse the GrROOT calibration file to fill the cal_par array and
+  //get the VSN map so I can relate VSN/CHN numbers to DET/RING values
+  //(necessary for addressing)
   int vsnchn_ring_map_energy[MAX_VSN][MAX_CHN];
   int vsnchn_det_map_energy[MAX_VSN][MAX_CHN];
   int vsnchn_ring_map_time[MAX_VSN][MAX_CHN];
   int vsnchn_det_map_time[MAX_VSN][MAX_CHN];
-  readVSNMap(vsn_map_filename, vsnchn_ring_map_energy, vsnchn_det_map_energy,
+  ReadVSNMap(vsn_map_file_name, vsnchn_ring_map_energy, vsnchn_det_map_energy,
                                 vsnchn_ring_map_time,   vsnchn_det_map_time);
 
-  TSpectrum peakfinder(1);
-  const int TOTAL_DET_IN_PREV_RINGS[10] = {0,10,24,48,72,96,120,144,168,182};
-  const int FIT_PADDING = 30; //determines distance to left/right of peak for fitting
-  double centroids[N_DETS];
-  std::string out_chan_filename("correctTimeOffsets.cal");
 
-  std::vector<double> time_coeff;//for storing offsets before saving to file
-  if (!cal_file_name.empty()){
-    TChannel::ReadCalFile(cal_file_name.c_str());
+
+  std::ofstream out_chan_file; //File in correct format for TChannel
+  out_chan_file.open(out_file_name.c_str());
+
+  TEnv *e_cal_file = new TEnv(ecal_file_name.c_str());
+  TEnv *t_cal_file = new TEnv(tcal_file_name.c_str());
+  for (int ring = 0; ring < N_RINGS; ring++){
+    for (int det = 1; det <= det_per_ring[ring]; det++){
+      e_cal_par[ring][det-1][0] = e_cal_file->GetValue(Form("Caesar.Ring.%c.e_a0.%d", 
+                                                        ring_names[ring],det),-1.0);
+      e_cal_par[ring][det-1][1] = e_cal_file->GetValue(Form("Caesar.Ring.%c.e_a1.%d", 
+                                                        ring_names[ring],det),-1.0);
+      e_cal_par[ring][det-1][2] = e_cal_file->GetValue(Form("Caesar.Ring.%c.e_a2.%d", 
+                                                        ring_names[ring],det),-1.0);
+      t_cal_par[ring][det-1] = t_cal_file->GetValue(Form("Caesar.Ring.%c.t_a0.%d", 
+                                                       ring_names[ring],det),-1.0);
+    }
   }
 
-  //First cycle through histogram and determine centroids
-  
-  for (int  bin= 1; bin <= N_DETS; bin++){
-    TH1D *hist_1d = (TH1D*)time2d->ProjectionY("name",bin,bin);
-    //Setting axis range allows us to avoid including the overflow peak
-    hist_1d->Rebin(4);
-    hist_1d->GetXaxis()->SetRangeUser(150,350);
-    peakfinder.Search(hist_1d);
-    hist_1d->Fit("gaus","M","",peakfinder.GetPositionX()[0] - FIT_PADDING, 
-                               peakfinder.GetPositionX()[0] + FIT_PADDING);
-
-    //First parameter in "gaus" is the mean
-    centroids[bin-1] = ((TF1*)hist_1d->FindObject("gaus"))->GetParameter(1);
-    delete hist_1d;
-  }
-
-  //Now cycle through cal file and enter the offsets!
+  //So now I need to create a new file with the following structure:
+  //RING00DET00 {
+  //  Name : 
+  //  Address : 
+  //  ENERGYCOEFF : 
+  //  TIMECOEFF:
+  //}
   for (int vsn = 0; vsn < MAX_VSN; vsn++){
     for (int chan = 0; chan < MAX_CHN; chan++){
-      time_coeff.clear();
       int ring = vsnchn_ring_map_energy[vsn][chan];
       int det  = vsnchn_det_map_energy[vsn][chan];
-      double offset = 0;
-      unsigned int address = ((37<<24) + (vsn << 16)+ chan);
-      int absolute_detector_number = det+TOTAL_DET_IN_PREV_RINGS[ring];
 
-      TChannel *tchan = TChannel::Get(address);
-      time_coeff = tchan->GetTimeCoeff();
 
-      offset =  centroids[comp_det] - centroids[absolute_detector_number];
+     
+      out_chan_file.fill('0');
+      out_chan_file << "RING" << setw(2) << ring << "DET" << setw(2) << det << " {" << std::endl
+                    << "  Address: 0x" << (std::hex) << ((37 << 24) + (vsn << 16) + chan) << std::dec << std::endl
+                    << "  ENERGYCOEFF: " << e_cal_par[ring][det][0] << " " 
+                                         << e_cal_par[ring][det][1] << " " 
+                                         << e_cal_par[ring][det][2] << std::endl
+                    << "  TIMECOEFF:  "  << t_cal_par[ring][det]     
+                                         << "  1" << std::endl
+                    << "}" << std::endl;
+    }
+  }
 
-      if (subtract_current_offset){
-        time_coeff[0] = offset+time_coeff.at(0);
-      }
-      else{
-        time_coeff[0] = offset;
-      }
-      tchan->SetTimeCoeff(time_coeff);
-    }//loop over channels
-  }//loop over VSN
-
-  TChannel::WriteCalFile(out_chan_filename);
-  return;
+  out_chan_file.close();
 }
-
-#ifndef __CINT__
-int main(int argc, char **argv){
-  std::string usage("USAGE: correctCaesarTime [hist_file] [hist_name] ");
-              usage += "[Detector to Compare To] [Cal file name] ";
-              usage += "[Subtract Curr Offset?]";
-  if (argc != 6) {
-    std::cout << "incorrect number of arguments: " << argc << std::endl;
-    std::cout << usage << std::endl;
-    return -1;
-  }
-
- 
-  TFile *input_file = new TFile(argv[1], "read");
-  if (!input_file){
-    std::cout << "Failed to open input file with name " << argv[1] << std::endl;
-    return -1;
-  }
-  TH2D *time2d_hist = (TH2D*)input_file->Get(argv[2]); 
-  if (!time2d_hist){
-    std::cout << "Failed to open input file with name " << argv[1] << std::endl;
-    return -1;
-  }
-
-  int comp_det = atoi(argv[3]);
-  bool subtract_current_offset = (atoi(argv[5]) != 0);
-  std::string cal_file_name(argv[4]);
-  
-  correctCaesarTime(time2d_hist, comp_det, cal_file_name, subtract_current_offset);
-}
-#endif
-

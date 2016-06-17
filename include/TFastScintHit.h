@@ -23,6 +23,10 @@ public:
   //int  GetTime()       const { return fTime;      }
   //long GetTimestamp()  const { return fTimestamp; }
   //float GetEnergy()    const { return fEnergy;    }
+  //
+  TVector3 &GetPosition() const;
+
+
 private:
   //long  fTimestamp;
   int   fChannel;
