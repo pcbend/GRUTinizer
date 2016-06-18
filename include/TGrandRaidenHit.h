@@ -7,6 +7,7 @@
 class TGrandRaidenHit : public TDetectorHit {
   public:
     TGrandRaidenHit();
+    TGrandRaidenHit(void* ptr);
     ~TGrandRaidenHit();
 
     virtual void Copy(TObject& obj) const;
@@ -23,12 +24,14 @@ class TGrandRaidenHit : public TDetectorHit {
     //void SetADC(Int_t chan, const Double_t& val) { ADC[chan] = val; }
     Long_t Timestamp;
 
-
   private:
     Double_t ADC[4];
     Double_t RF;
 
-  ClassDef(TGrandRaidenHit,1);
+
+
+    void* fDataPtr; //! do not save
+    ClassDef(TGrandRaidenHit,1);
 };
 
 

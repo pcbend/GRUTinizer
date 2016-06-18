@@ -18,6 +18,7 @@ TRawEvent::TRawEvent() {
   fEventHeader.datum2      =  0;
   fFileType = kFileType::UNKNOWN_FILETYPE;
   fTimestamp = -1;
+  fDataPtr = nullptr;
 }
 
 void TRawEvent::Copy(TObject &rhs) const {
@@ -25,7 +26,8 @@ void TRawEvent::Copy(TObject &rhs) const {
   ((TRawEvent&)rhs).fEventHeader = fEventHeader;
   ((TRawEvent&)rhs).fBody        = fBody;
   ((TRawEvent&)rhs).fFileType    = fFileType;
-  ((TRawEvent&)rhs).fTimestamp    = fTimestamp;
+  ((TRawEvent&)rhs).fTimestamp   = fTimestamp;
+  ((TRawEvent&)rhs).fDataPtr     = fDataPtr;
 }
 
 TRawEvent::TRawEvent(const TRawEvent &rhs)
@@ -46,6 +48,7 @@ TRawEvent &TRawEvent::operator=(const TRawEvent &rhs) {
   fBody        = rhs.fBody;
   fFileType    = rhs.fFileType;
   fTimestamp   = rhs.fTimestamp;
+  fDataPtr   = rhs.fDataPtr;
   return *this;
 }
 
@@ -88,6 +91,8 @@ Int_t TRawEvent::GetBodySize() const {
   case GRETINA_MODE2:
   case GRETINA_MODE3:
     return ((GEBHeader*)(&fEventHeader))->size() + sizeof(Long_t);  //Size in gretinadaq is exclusive, plus timestamp
+  case RCNP_BLD:
+    return sizeof(void*);
 
   default:
     return 0;

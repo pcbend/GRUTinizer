@@ -21,6 +21,7 @@ TRCNPSource::TRCNPSource(const char* Command, kFileType file_type)
 }
 
 int TRCNPSource::GetEvent(TRawEvent& event) {
+  event.SetFileType(fFileType);
 
   // TRCNPEvent* rcnp_evt = new TRCNPEvent;
   RCNPEvent* rcnp;// = new RCNPEvent;
@@ -55,13 +56,11 @@ int TRCNPSource::GetEvent(TRawEvent& event) {
   }
 
 
-  // event = *rcnp_evt;
-  event.SetFileType(fFileType);
-
-  char* ptrbytes = (char*)calloc(1,sizeof(rcnp));
-  *reinterpret_cast<RCNPEvent**>(ptrbytes) = rcnp;
-  auto eventbuffer = new TSmartBuffer(ptrbytes,sizeof(rcnp));
-  event.SetData(*eventbuffer);
+  //char* ptrbytes = (char*)calloc(1,sizeof(rcnp));
+  //*reinterpret_cast<RCNPEvent**>(ptrbytes) = rcnp;
+  //TSmartBuffer eventbuffer(ptrbytes,sizeof(rcnp));
+  //event.SetData(eventbuffer);
+  event.SetDataPtr((void*)rcnp);
 
   // set the timestamp of the ttree event
   if (timestamps.size()==0) {
