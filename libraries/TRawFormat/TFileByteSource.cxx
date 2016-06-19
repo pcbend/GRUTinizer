@@ -1,25 +1,22 @@
-#include "TRawSource.h"
+#include "TByteSource.h"
 
 #include "TGRUTUtilities.h"
 
-//#include "FileSize.h"
-
-TRawEventFileSource::TRawEventFileSource(const std::string& filename, kFileType file_type)
-  : TRawEventByteSource(file_type), fFilename(filename) {
+TFileByteSource::TFileByteSource(const std::string& filename)
+  : fFilename(filename) {
   fFile = fopen(filename.c_str(),"rb");
   SetFileSize(FindFileSize(filename.c_str()));
 }
 
-TRawEventFileSource::~TRawEventFileSource() {
+TFileByteSource::~TFileByteSource() {
   fclose(fFile);
 }
 
-void TRawEventFileSource::Reset() {
-  TRawEventByteSource::Reset();
+void TFileByteSource::Reset() {
   fseek(fFile, 0, SEEK_SET);
 }
 
-int TRawEventFileSource::ReadBytes(char* buf, size_t size){
+int TFileByteSource::ReadBytes(char* buf, size_t size){
   size_t output = fread(buf, 1, size, fFile);
   if(output == size){
     // Clear EOF if there was a sccuessful read.
@@ -40,7 +37,7 @@ int TRawEventFileSource::ReadBytes(char* buf, size_t size){
   return output;
 }
 
-std::string TRawEventFileSource::SourceDescription(bool long_description) const {
+std::string TFileByteSource::SourceDescription(bool long_description) const {
   if(long_description) {
     return fFilename;
   } else {

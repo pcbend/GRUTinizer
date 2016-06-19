@@ -7,55 +7,41 @@
 
 #include <pwd.h>
 
-#include <Getline.h>
-#include <TClass.h>
-#include <TFile.h>
-#include <TInterpreter.h>
-#include <TPython.h>
-#include <TROOT.h>
-#include <TString.h>
-#include <TTree.h>
-#include <TUnixSystem.h>
+#include "Getline.h"
+#include "TClass.h"
+#include "TCutG.h"
+#include "TFile.h"
+#include "TInterpreter.h"
+#include "TMethodCall.h"
+#include "TPython.h"
+#include "TROOT.h"
+#include "TString.h"
+#include "TThread.h"
+#include "TTree.h"
+#include "TUnixSystem.h"
+#include "TVirtualPad.h"
 
-#include <TCutG.h>
-#include <TThread.h>
-#include <TMethodCall.h>
-#include <TVirtualPad.h>
-
+#include "GRootCommands.h"
 #include "GRootGuiFactory.h"
-
-#include "TChannel.h"
 #include "GValue.h"
+#include "GrutNotifier.h"
+#include "TBuildingLoop.h"
+#include "TChainLoop.h"
+#include "TChannel.h"
+#include "TDataLoop.h"
 #include "TDetectorEnv.h"
-
+#include "TFilterLoop.h"
 #include "TGRUTOptions.h"
+#include "TGRUTUtilities.h"
+#include "THistogramLoop.h"
+#include "TInverseMap.h"
+#include "TMultiRawFile.h"
 #include "TOrderedRawFile.h"
 #include "TRawSource.h"
-#include "TMultiRawFile.h"
 #include "TSequentialRawFile.h"
-
-#include "GrutNotifier.h"
-#include "TGRUTUtilities.h"
-#include "GRootCommands.h"
-
-#include "TDataLoop.h"
-#include "TBuildingLoop.h"
+#include "TTerminalLoop.h"
 #include "TUnpackingLoop.h"
 #include "TWriteLoop.h"
-#include "TChainLoop.h"
-#include "THistogramLoop.h"
-
-#include "TInverseMap.h"
-
-//extern "C" G__value G__getitem(const char* item);
-//#include "FastAllocString.h"
-//char* G__valuemonitor(G__value buf, G__FastAllocString& temp);
-
-//extern void PopupLogo(bool);
-//extern void WaitLogo();
-
-
-//TChain *gChain = NULL;
 
 ClassImp(TGRUTint)
 
@@ -82,7 +68,6 @@ TGRUTint::TGRUTint(int argc, char **argv,void *options, Int_t numOptions, Bool_t
   TGRUTInterruptHandler *ih = new TGRUTInterruptHandler();
   ih->Add();
 
-  fChain = 0;
   fRootFilesOpened = 0;
   fRawFilesOpened  = 0;
   fHistogramLoop = 0;
@@ -148,6 +133,8 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 void TGRUTint::ApplyOptions() {
   TGRUTOptions* opt = TGRUTOptions::Get();
 
+  bool missing_raw_file = !all_files_exist(opt->RawInputFiles());
+
   if(!false) { //this can be change to something like, if(!ClassicRoot)
      LoadGRootGraphics();
   }
@@ -159,33 +146,26 @@ void TGRUTint::ApplyOptions() {
   TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
 
   if(opt->S800InverseMapFile().length()) {
-    //TS800::ReadInverseMap(opt->S800InverseMapFile().c_str());
     TInverseMap::Get(opt->S800InverseMapFile().c_str());
   }
 
-  std::vector<TFile*> cuts_files;
-  for(auto filename : opt->CutsInputFiles()) {
-    TFile* tfile = OpenRootFile(filename);
-    cuts_files.push_back(tfile);
-  }
-
   for(auto filename : opt->RootInputFiles()) {
-    OpenRootFile(filename);
     // this will populate gChain if able.
     //   TChannels from the root file will be loaded as file is opened.
     //   GValues from the root file will be loaded as file is opened.
+    OpenRootFile(filename);
   }
 
   //if I am passed any calibrations, lets load those, this
-  //will over write any wit the same address previously read in.
+  //will overwrite any with the same address previously read in.
   if(opt->CalInputFiles().size()) {
-    for(unsigned int x=0;x<opt->CalInputFiles().size();x++) {
-      TChannel::ReadCalFile(opt->CalInputFiles().at(x).c_str());
+    for(auto cal_filename : opt->CalInputFiles()) {
+      TChannel::ReadCalFile(cal_filename.c_str());
     }
   }
   if(opt->ValInputFiles().size()) {
-    for(unsigned int x=0;x<opt->ValInputFiles().size();x++) {
-      GValue::ReadValFile(opt->ValInputFiles().at(x).c_str());
+    for(auto val_filename : opt->ValInputFiles()) {
+      GValue::ReadValFile(val_filename.c_str());
     }
   }
 
@@ -194,147 +174,16 @@ void TGRUTint::ApplyOptions() {
     StartGUI();
   }
 
-  bool missing_file = false;
-  for(auto& filename : opt->RawInputFiles()) {
-    if(!file_exists(filename.c_str())) {
-      missing_file = true;
-      std::cerr << "File not found: " << filename << std::endl;
-    }
-  }
-
-  //next most important thing, if given a raw file && NOT told to not sort!
-  if((opt->InputRing().length() || opt->RawInputFiles().size())
-     && !missing_file && opt->SortRaw()) {
-
-    TRawEventSource* source = NULL;
-    if(opt->InputRing().length()) {
-      // Open a source from a ring.
-      source = new TRawEventRingSource(opt->InputRing(),
-                                       opt->DefaultFileType());
-
-    } else if(opt->RawInputFiles().size() > 1 && opt->SortMultiple()){
-      // Open multiple files, read from all at the same time.
-      TMultiRawFile* multi_source = new TMultiRawFile();
-      for(auto& filename : opt->RawInputFiles()){
-        multi_source->AddFile(new TRawFileIn(filename.c_str()));
-      }
-      source = multi_source;
-
-    } else if(opt->RawInputFiles().size() > 1 && !opt->SortMultiple()){
-      // Open multiple files, read from each one at a a time.
-      TSequentialRawFile* seq_source = new TSequentialRawFile();
-      for(auto& filename : opt->RawInputFiles()){
-        seq_source->Add(new TRawFileIn(filename.c_str()));
-      }
-      source = seq_source;
-
-    } else {
-      // Open a single file.
-      std::string filename = opt->RawInputFiles().at(0);
-      if(file_exists(filename.c_str())){
-        source = new TRawFileIn(filename.c_str());
-      }
-    }
-
-    if(opt->TimeSortInput()){
-      TOrderedRawFile* ordered_source = new TOrderedRawFile(source);
-      ordered_source->SetDepth(opt->TimeSortDepth());
-      source = ordered_source;
-    }
-
-    fDataLoop = TDataLoop::Get("1_input_loop",source);
-    // If we are not exiting automatically, keep the data loop alive
-    //   so that we can open a new file.
-    if(!opt->ExitAfterSorting()){
-      fDataLoop->SetSelfStopping(false);
-    }
-
-    fDataLoop->Resume();
-
-
-    TBuildingLoop *boop = TBuildingLoop::Get("2_build_loop",fDataLoop);
-    boop->SetBuildWindow(opt->BuildWindow());
-    boop->Resume();
-    TUnpackingLoop *uoop1 = TUnpackingLoop::Get("3_unpack1",boop);
-    uoop1->Resume();
-    //TUnpackingLoop *uoop2 = TUnpackingLoop::Get("unpack2",boop);
-    //uoop2->Resume();
-    // TUnpackingLoop *uoop3 = TUnpackingLoop::Get("unpack3",boop);
-    // uoop3->Resume();
-
-
-    // Determine output file names
-    std::string rootoutfile = "temp_tree.root";
-    std::string histoutfile = "temp_hist.root";
-    if(opt->RawInputFiles().size() > 0){
-      std::string filename = opt->RawInputFiles()[0];
-      rootoutfile = "run" + get_run_number(filename) + ".root";
-      histoutfile = "hist" + get_run_number(filename) + ".root";
-    } else {
-      rootoutfile = "ring_tree.root";
-      histoutfile = "ring_hist.root";
-    }
-
-    if(opt->OutputFile().length()) {
-      rootoutfile = opt->OutputFile();
-    }
-    if(opt->OutputHistogramFile().length()) {
-      histoutfile = opt->OutputHistogramFile();
-    }
-
-    TWriteLoop* woop = TWriteLoop::Get("4_write_loop", rootoutfile);
-    woop->Connect(uoop1);
-    //woop->Connect(uoop2);
-
-    if(opt->MakeHistos()){
-      fHistogramLoop = THistogramLoop::Get("5_hist_loop");
-      fHistogramLoop->SetOutputFilename(histoutfile);
-      for(auto cut_file : cuts_files) {
-        fHistogramLoop->AddCutFile(cut_file);
-      }
-
-      woop->AttachHistogramLoop(fHistogramLoop);
-      fHistogramLoop->Resume();
-    }
-    woop->Resume();
-  } else if(opt->RawInputFiles().size() && !opt->SortRaw()) {
-    //ok now, if told not to sort open any raw files as _data# (rootish like??)
+  //ok now, if told not to sort open any raw files as _data# (rootish like??)
+  if(opt->RawInputFiles().size() && !opt->SortRaw()) {
     for(unsigned int x=0;x<opt->RawInputFiles().size();x++) {
       OpenRawFile(opt->RawInputFiles().at(x));
     }
   }
 
-
-  //next, if given a root file and told to sort it.
-  //TChainLoop* coop = NULL;
-  if(gChain->GetListOfBranches() &&  (opt->MakeHistos() || opt->SortRoot()) ){
-    printf("Attempting to sort root files.\n");
-    fChainLoop = TChainLoop::Get("1_chain_loop",gChain);
-    if(!opt->ExitAfterSorting()){
-      fChainLoop->SetSelfStopping(false);
-    }
-    fHistogramLoop = THistogramLoop::Get("2_hist_loop");
-    gChain->GetEntry(0);
-    std::string histoutfile = "hist" + get_run_number(gChain->GetCurrentFile()->GetName()) + ".root";
-    if(opt->OutputHistogramFile().length()) {
-      histoutfile = opt->OutputHistogramFile();
-    } else {
-      if(opt->RootInputFiles().size()==1) {
-        histoutfile = "hist" + get_run_number(opt->RootInputFiles().at(0)) + ".root";
-      } else if(opt->RootInputFiles().size()>1){
-        histoutfile = "hist" + get_run_number(opt->RootInputFiles().at(0)) + "-"
-                             + get_run_number(opt->RootInputFiles().at(opt->RootInputFiles().size()-1))
-                             + ".root";
-      }
-    }
-    fHistogramLoop->SetOutputFilename(histoutfile);
-    for(auto cut_file : cuts_files) {
-      fHistogramLoop->AddCutFile(cut_file);
-    }
-    fChainLoop->AttachHistogramLoop(fHistogramLoop);
-    fHistogramLoop->Resume();
-    fChainLoop->Resume();
-  }
+  // Sets up all the various loops for data analysis.
+  // Note: Assumes that gChain has already been loaded.
+  SetupPipeline();
 
   for(auto& filename : opt->MacroInputFiles()){
     RunMacroFile(filename);
@@ -355,7 +204,7 @@ void TGRUTint::ApplyOptions() {
     }
     std::cout << std::endl;
 
-    int exit_status = missing_file ? 1 : 0;
+    int exit_status = missing_raw_file ? 1 : 0;
     this->Terminate(exit_status);
   }
 }
@@ -501,6 +350,185 @@ TRawFileIn *TGRUTint::OpenRawFile(const std::string& filename) {
   return file;
 }
 
+void TGRUTint::SetupPipeline() {
+  TGRUTOptions* opt = TGRUTOptions::Get();
+
+  // Determining which parts of the pipeline need to be set up.
+
+  bool missing_raw_file = false;
+  for(auto& filename : opt->RawInputFiles()) {
+    if(!file_exists(filename.c_str())) {
+      missing_raw_file = true;
+      std::cerr << "File not found: " << filename << std::endl;
+    }
+  }
+
+  bool has_input_ring = opt->InputRing().length();
+  bool has_raw_file = opt->RawInputFiles().size();
+  bool self_stopping = opt->ExitAfterSorting();
+  bool sort_raw = ( (has_input_ring || has_raw_file) &&
+                    !missing_raw_file && opt->SortRaw() );
+
+  bool has_explicit_root_output = opt->OutputFile().length();
+  bool filter_data = opt->CompiledFilterFile().length();
+  bool raw_filtered_output = opt->OutputFilteredFile().length();
+
+  bool has_input_tree = gChain->GetListOfBranches();
+  bool sort_tree = has_input_tree && (opt->MakeHistos() || opt->SortRoot() ||
+                                      (has_explicit_root_output && filter_data));
+
+  bool write_root_tree = sort_raw || (sort_tree && filter_data && has_explicit_root_output);
+  bool write_histograms = opt->MakeHistos() || sort_tree;
+
+  std::string output_root_file = "temp_tree.root";
+  if(opt->OutputFile().length()) {
+    output_root_file = opt->OutputFile();
+  } else if(opt->RawInputFiles().size() == 1) {
+    output_root_file = "run" + get_run_number(opt->RawInputFiles().front()) + ".root";
+  } else if(opt->RawInputFiles().size() > 1) {
+    output_root_file = ("run" +
+                        get_run_number(opt->RawInputFiles().front()) + "-" +
+                        get_run_number(opt->RawInputFiles().back()) +
+                        ".root");
+  } else if(has_input_ring) {
+    output_root_file = "ring_tree.root";
+  }
+
+
+  std::string output_hist_file = "temp_hist.root";
+  if(opt->OutputHistogramFile().length()) {
+    output_hist_file = opt->OutputHistogramFile();
+  } else if(sort_raw && opt->RawInputFiles().size() == 1) {
+    output_hist_file = "hist" + get_run_number(opt->RawInputFiles().front()) + ".root";
+  } else if(sort_raw && opt->RawInputFiles().size() > 1) {
+    output_hist_file = ("hist" +
+                        get_run_number(opt->RawInputFiles().front()) + "-" +
+                        get_run_number(opt->RawInputFiles().back()) +
+                        ".root");
+  } else if(sort_raw && has_input_ring) {
+    output_hist_file = "ring_tree.hist";
+  } else if(sort_tree && opt->RootInputFiles().size() == 1) {
+    output_hist_file = "hist" + get_run_number(opt->RootInputFiles().front()) + ".root";
+  } else if(sort_tree && opt->RootInputFiles().size() > 1) {
+    output_hist_file = ("hist" +
+                        get_run_number(opt->RootInputFiles().front()) + "-" +
+                        get_run_number(opt->RootInputFiles().back()) +
+                        ".root");
+  }
+
+
+  // Now, start setting stuff up
+
+  std::vector<TFile*> cuts_files;
+  for(auto filename : opt->CutsInputFiles()) {
+    TFile* tfile = OpenRootFile(filename);
+    cuts_files.push_back(tfile);
+  }
+
+  // No need to set up all the loops if we are just opening the interpreter.
+  if(!sort_raw && !sort_tree) {
+    return;
+  }
+
+  std::shared_ptr<ThreadsafeQueue<TUnpackedEvent*> > current_queue = nullptr;
+
+  //next most important thing, if given a raw file && NOT told to not sort!
+  if(sort_raw) {
+    TRawEventSource* source = OpenRawSource();
+    fDataLoop = TDataLoop::Get("1_input_loop",source);
+    fDataLoop->SetSelfStopping(self_stopping);
+
+    TBuildingLoop* build_loop = TBuildingLoop::Get("2_build_loop");
+    build_loop->SetBuildWindow(opt->BuildWindow());
+    build_loop->InputQueue() = fDataLoop->OutputQueue();
+
+    TUnpackingLoop* unpack_loop = TUnpackingLoop::Get("3_unpack");
+    unpack_loop->InputQueue() = build_loop->OutputQueue();
+    current_queue = unpack_loop->OutputQueue();
+
+  } else if(sort_tree) {
+    fChainLoop = TChainLoop::Get("1_chain_loop",gChain);
+    fChainLoop->SetSelfStopping(self_stopping);
+    current_queue = fChainLoop->OutputQueue();
+  }
+
+  if(filter_data) {
+    TFilterLoop* filter_loop = TFilterLoop::Get("4_filter_loop");
+    if(raw_filtered_output) {
+      filter_loop->OpenRawOutputFile(opt->OutputFilteredFile());
+    }
+    filter_loop->InputQueue() = current_queue;
+    current_queue = filter_loop->OutputQueue();
+  }
+
+  if(write_root_tree) {
+    TWriteLoop* write_loop = TWriteLoop::Get("5_write_loop", output_root_file);
+    write_loop->InputQueue() = current_queue;
+    current_queue = write_loop->OutputQueue();
+  }
+
+  if(write_histograms) {
+    fHistogramLoop = THistogramLoop::Get("6_hist_loop");
+    fHistogramLoop->SetOutputFilename(output_hist_file);
+    for(auto cut_file : cuts_files) {
+      fHistogramLoop->AddCutFile(cut_file);
+    }
+    fHistogramLoop->InputQueue() = current_queue;
+    current_queue = fHistogramLoop->OutputQueue();
+  }
+
+  TTerminalLoop* terminal_loop = TTerminalLoop::Get("7_terminal_loop");
+  terminal_loop->InputQueue() = current_queue;
+
+  StoppableThread::ResumeAll();
+}
+
+TRawEventSource* TGRUTint::OpenRawSource() {
+  TGRUTOptions* opt = TGRUTOptions::Get();
+
+  bool has_input_ring = opt->InputRing().length();
+  bool has_raw_file = opt->RawInputFiles().size();
+
+  TRawEventSource* source = NULL;
+
+  if(has_input_ring) {
+    // Open a source from a ring.
+    source = TRawEventSource::EventSource(opt->InputRing().c_str(),
+                                          true, true,
+                                          opt->DefaultFileType());
+
+  } else if(has_raw_file && opt->SortMultiple()){
+    // Open multiple files, read from all at the same time.
+    TMultiRawFile* multi_source = new TMultiRawFile();
+    for(auto& filename : opt->RawInputFiles()){
+      multi_source->AddFile(new TRawFileIn(filename.c_str()));
+    }
+    source = multi_source;
+
+  } else if(opt->RawInputFiles().size() > 1 && !opt->SortMultiple()){
+    // Open multiple files, read from each one at a a time.
+    TSequentialRawFile* seq_source = new TSequentialRawFile();
+    for(auto& filename : opt->RawInputFiles()){
+      seq_source->Add(new TRawFileIn(filename.c_str()));
+    }
+    source = seq_source;
+
+  } else {
+    // Open a single file.
+    std::string filename = opt->RawInputFiles().at(0);
+    if(file_exists(filename.c_str())){
+      source = new TRawFileIn(filename.c_str());
+    }
+  }
+
+  if(opt->TimeSortInput()){
+    TOrderedRawFile* ordered_source = new TOrderedRawFile(source);
+    ordered_source->SetDepth(opt->TimeSortDepth());
+    source = ordered_source;
+  }
+
+  return source;
+}
 
 void TGRUTint::RunMacroFile(const std::string& filename){
   if(!file_exists(filename.c_str())){
@@ -531,7 +559,7 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   // Any diagnostic print statements should be done after this if statement.
 
   sync = false;
-  
+
   if(fIsTabComplete){
     long res = TRint::ProcessLine(line, sync, error);
     return res;
