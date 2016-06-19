@@ -12,13 +12,13 @@ using namespace std;
 int main()
 {
     const char* filename = "./datatest/run6106.bld";
-    ThreadsafeQueue<RCNPEvent> gr_queue(500000);
+    ThreadsafeQueue<RCNPEvent*> gr_queue(500000);
     atomic<int> sig(0);
     stringstream stream; stream.str(""); stream << "cat " << filename;
     std::thread grloop(StartGRAnalyzer,stream.str().c_str(),&sig,[&](RCNPEvent* event){
-        gr_queue.Push(*event);
+        gr_queue.Push(event);
      },false);
-    RCNPEvent data;
+    RCNPEvent* data;
     static int count = 0;
     while (gr_queue.Pop(data,0)) {
         count++;

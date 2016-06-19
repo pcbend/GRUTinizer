@@ -100,14 +100,16 @@ void TRCNPSource::LoadFakeTimestamps() {
       //std::cout << ts << std::endl;
     }
     file.close();
+  } else {
+    throw std::runtime_error("./timestamps.dat not found");
   }
 }
 
 
-template<>
-int ThreadsafeQueue<RCNPEvent>::ObjectSize(RCNPEvent& event) {
-  return event.data.size();
-}
+// template<>
+// int ThreadsafeQueue<RCNPEvent>::ObjectSize(RCNPEvent& event) {
+//   return event.data.size();
+// }
 
 template<>
 int ThreadsafeQueue<RCNPEvent*>::ObjectSize(RCNPEvent*& event) {

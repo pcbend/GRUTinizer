@@ -3,11 +3,17 @@
 
 #include "TDetector.h"
 #include "TDetectorHit.h"
+#include "RCNPEvent.h"
+
+#include <vector>
+
+struct LaBrHit;
 
 class TGrandRaidenHit : public TDetectorHit {
   public:
-    TGrandRaidenHit();
-    TGrandRaidenHit(void* ptr);
+    TGrandRaidenHit(); // TODO: move to private
+    TGrandRaidenHit(RCNPEvent& rcnpevent);
+    TGrandRaidenHit(const TGrandRaidenHit& gr);
     ~TGrandRaidenHit();
 
     virtual void Copy(TObject& obj) const;
@@ -15,24 +21,38 @@ class TGrandRaidenHit : public TDetectorHit {
     virtual void Print(Option_t *opt = "") const;
     virtual void Clear(Option_t *opt = "");
 
-    void     BuildFrom(TSmartBuffer& buf);
+    void     BuildFrom();
 
 
-    Double_t* GetADC() { return &ADC[0]; }
-    Double_t GetADC(const Int_t& i) const { return ADC[i]; }
-    const Double_t& GetRF() { return RF; }
-    //void SetADC(Int_t chan, const Double_t& val) { ADC[chan] = val; }
+
+    const std::vector<LaBrHit>& GetLaBr() { return labr_hits; }
+    const Double_t& GetMeanPlastE1() { return madc1; }
+    const Double_t& GetMeanPlastE2() { return madc2; }
+    const Double_t& GetMeanPlastPos1() { return tpos1; }
+    const Double_t& GetMeanPlastPos2() { return tpos2; }
+    const Long_t& GetTimestamp() { return Timestamp; }
+    RCNPEvent& GR() { return rcnp; }
+private:
+    // Double_t ADC[4];
+    // Double_t RF;
+    // Double_t QTCLead;
+
+    std::vector<LaBrHit> labr_hits;
+    Double_t madc1;
+    Double_t madc2;
+    Double_t tpos1;
+    Double_t tpos2;
     Long_t Timestamp;
-
-  private:
-    Double_t ADC[4];
-    Double_t RF;
+    RCNPEvent rcnp;
 
 
 
-    void* fDataPtr; //! do not save
     ClassDef(TGrandRaidenHit,1);
 };
 
+struct LaBrHit {
+    Int_t channel;
+    Double_t width;
+};
 
 #endif

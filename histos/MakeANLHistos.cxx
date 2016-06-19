@@ -56,9 +56,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
     ncoin+=totalhits;
     //cout << "Coin: " << ncoin << endl;
   } else if (gr) {
-    for (auto& hit : *gr) {
+    //for (auto& hit : *gr) {
       //cout <<"Single GR: " << hit.Timestamp << endl;
-    }
+    //}
   }
 
 
@@ -72,22 +72,66 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   if (gr) {
     for (auto& hit : *gr) {
-      auto adc = hit.GetADC();
-      if (adc) {
+
+      auto& rcnp = hit.GR();
+
+
+      auto adc = rcnp.GR_ADC();
+
+
+
+
+      if (rcnp.GR_ADC()) {
+        auto& adc = *rcnp.GR_ADC();
         for (int i=0; i<4; i++) {
           stream.str(""); stream << "GR_ADC" << i;
           obj.FillHistogram(stream.str().c_str(), 1000,0,1000, adc[i]);
         }
-        auto rf = hit.GetRF();
-        if (rf != BAD_NUM) {
-          obj.FillHistogram("GR_RF",1000,0,0,rf);
+        obj.FillHistogram("MeanPlastE1", 2000,0,2000, hit.GetMeanPlastE1());
+        obj.FillHistogram("MeanPlastE2", 2000,0,2000, hit.GetMeanPlastE2());
+      }
+      if (rcnp.GR_TDC()) {
+        auto& tdc = *rcnp.GR_TDC();
+        for (int i=0; i<4; i++) {
+          stream.str(""); stream << "GR_TDC" << i;
+          obj.FillHistogram(stream.str().c_str(), 1000,-40000,40000, tdc[i]);
+        }
+        obj.FillHistogram("MeanPlastPos1", 1000, 0, 40000, hit.GetMeanPlastPos1());
+        obj.FillHistogram("MeanPlastPos2", 1000, 0, 40000, hit.GetMeanPlastPos2());
+      }
+      if (rcnp.QTC_LEADING_TDC()) {
+        auto& qtc_leading = *rcnp.QTC_LEADING_TDC();
+        auto& qtc_leading_chan = *rcnp.QTC_LEADING_CH();
 
-          auto first = TMath::Sqrt(adc[0]*adc[1]);
-          auto second = TMath::Sqrt(adc[2]*adc[3]);
-          obj.FillHistogram("pid_1",500,0,0,rf,500,0,0,first);
-          obj.FillHistogram("pid_2",500,0,0,rf,500,0,0,second);
+        for (int i=0; i< qtc_leading_chan.size(); i++) {
+          int channum = qtc_leading_chan[i];
+          stream.str(""); stream << "LaBrLeading" << channum;
+          obj.FillHistogram(stream.str().c_str(), 10000,-40000, 40000, qtc_leading[i]);
         }
       }
+      for (auto const& labr_hit : hit.GetLaBr()) {
+        int channum = labr_hit.channel;
+        stream.str(""); stream << "LaBrWidth" << channum;
+        obj.FillHistogram(stream.str().c_str(), 10000, -5000, 15000, labr_hit.width);
+      }
+      obj.FillHistogram("RayID",64,-16,48, rcnp.GR_RAYID(0));
+      if (rcnp.GR_RAYID(0) == 0) { // if track reconstruction successfull
+        obj.FillHistogram("GR_X",1200,-600,600, rcnp.GR_RAYID(0));
+        obj.FillHistogram("GR_Y",200,-100,100, rcnp.GR_RAYID(0));
+        obj.FillHistogram("GR_Theta",100,-1,1, rcnp.GR_RAYID(0)); // need to learn
+        obj.FillHistogram("GR_Phi",100,-1,1, rcnp.GR_RAYID(0)); // from hist.def
+      }
+      auto rf = rcnp.GR_RF(0);
+      if (rf != BAD_NUM) {
+        obj.FillHistogram("GR_RF",1000,0,0,rf);
+      }
+
+      //   obj.FillHistogram("GR_RF",1000,0,0,rf);
+      //   auto first = TMath::Sqrt(adc[0]*adc[1]);
+      //   auto second = TMath::Sqrt(adc[2]*adc[3]);
+      //   obj.FillHistogram("pid_1",500,0,0,rf,500,0,0,first);
+      //   obj.FillHistogram("pid_2",500,0,0,rf,500,0,0,second);
+      // }
     }
   }
 
@@ -116,5 +160,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   if(numobj!=list->GetSize())
     list->Sort();
+
 
 }
