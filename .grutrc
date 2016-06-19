@@ -8,6 +8,11 @@ GRUT.HistLib: $(GRUTSYS)/lib/libPolarHists3.so
 #GRUT.HistLib: $(GRUTSYS)/lib/libMakeSegaJanusHistos.so
 GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
 
+GRUT.SnapshotExt: png
+GRUT.SnapshotDir: 
+
+
+
 #files to load at log in:
 Rint.Logon: $(GRUTSYS)/.grut_logon
 Rint.History $(GRUTSYS)/.grut_history

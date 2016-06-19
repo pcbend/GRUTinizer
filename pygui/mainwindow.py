@@ -162,6 +162,11 @@ class MainWindow(object):
                            command=self.ResortDataFile)
         button.pack(side=tk.LEFT)
 
+        button = tk.Button(frame,
+                           text='Snapshot',fg="black",bg="goldenrod",
+                           command=self.Snapshot)
+        button.pack(side=tk.LEFT)
+
         frame.pack(fill=tk.X,expand=False)
 
         notebook = ttk.Notebook(self.window)
@@ -259,7 +264,6 @@ class MainWindow(object):
         filemenu.add_separator()
         filemenu.add_command(label="Close All Canvases",command=self.close_all_canvases)
         filemenu.add_separator()
-        filemenu.add_command(label="Open GUI",command=self.hello)
         filemenu.add_command(label="Save GUI",command=self._save_gui_file)
         filemenu.add_command(label="Dump ROOT Config",
                              command=lambda :self._dump_root_file(include_histograms=False))
@@ -561,8 +565,9 @@ class MainWindow(object):
                                         '..','libraries',library_name)
         ROOT.gSystem.Load(library_name)
 
-    def hello(self):
-        print "hello!"
+    def Snapshot(self):
+        if ROOT.gSnapshot:
+            ROOT.gSnapshot.Snapshot()
 
     def close_all_canvases(self):
         canvases = ROOT.gROOT.GetListOfCanvases()

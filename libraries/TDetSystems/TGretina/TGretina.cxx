@@ -290,6 +290,10 @@ void TGretina::Print(Option_t *opt) const {
   printf(BLUE "--------------------------------" RESET_COLOR "\n");
 }
 
+void TGretina::SortHits() {
+  std::sort(gretina_hits.begin(),gretina_hits.end());
+}
+
 void TGretina::Clear(Option_t *opt) {
   TDetector::Clear(opt);
   gretina_hits.clear();
