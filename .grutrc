@@ -16,7 +16,7 @@ GRUT.HistLib: $(GRUTSYS)/lib/libBetterCaesarHistos.so
 
 GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
 
-GRUT.SnapshotExt: png
+GRUT.SnapshotExt: 
 GRUT.SnapshotDir: 
 
 
