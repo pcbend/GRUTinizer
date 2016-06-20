@@ -2,7 +2,7 @@
 #define MAX_DETS 24
 
 //CHANGE THIS
-#define NUM_FILES 6 
+#define NUM_FILES 4 
 #include <iostream>
 #include <string>
 #include <vector>
@@ -27,17 +27,15 @@ int main(int argc, char *argv[]){
 
   //CHANGE THIS
   std::string source_name[NUM_FILES] = {
-    "na22",
-    "y88",
-    "co60",
     "cs137",
+    "y88",
     "ba133",
-    "bg"
+    "co60"
   };
 
   //CHANGE THIS
   int run_numbers[NUM_FILES] = {
-    67,68,69,70,71,73
+    24,25,26,27
   };
   int det_per_ring[N_RINGS] = {
     10, 14, 24, 24, 24,

@@ -4,9 +4,22 @@ Unix.*.Root.MacroPath: .:$(GRUTSYS)/util:$(ROOTSYS)/macros
 #default MakeHistos library
 #GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistos.so
 #GRUT.HistLib: $(GRUTSYS)/lib/libFastScintHists.so
-GRUT.HistLib: $(GRUTSYS)/lib/libPolarHists3.so
+GRUT.HistLib: $(GRUTSYS)/lib/libBetterCaesarHistos.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libMake_CRDC_Mask_Histos.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libPolarHists.so
+#:GRUT.HistLib: $(GRUTSYS)/lib/libPolarHists3.so
 #GRUT.HistLib: $(GRUTSYS)/lib/libMakeSegaJanusHistos.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistos.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libFastScintHists.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libPolarHists3.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libMakeSegaJanusHistos.so
+
 GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
+
+GRUT.SnapshotExt: 
+GRUT.SnapshotDir: 
+
+
 
 #files to load at log in:
 Rint.Logon: $(GRUTSYS)/.grut_logon

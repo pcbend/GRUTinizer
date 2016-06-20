@@ -24,10 +24,10 @@ namespace {
   }
 }
 
-TRawEventRingSource::TRawEventRingSource(const std::string& ringname, kFileType file_type)
-  : TRawEventPipeSource(generate_ring_command(ringname), file_type),
+TRingByteSource::TRingByteSource(const std::string& ringname)
+  : TPipeByteSource(generate_ring_command(ringname)),
     fRingName(ringname) { }
 
-std::string TRawEventRingSource::SourceDescription(bool /*long_description*/) const {
+std::string TRingByteSource::SourceDescription(bool /*long_description*/) const {
   return "Ring: " + fRingName;
 }

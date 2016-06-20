@@ -43,6 +43,8 @@ public:
   void SetTrigTime(UShort_t time) { trig_time = time; }
   int GetTrigTime()	      { return trig_time; }
 
+  static TVector3& GetPosition(int); 
+
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 

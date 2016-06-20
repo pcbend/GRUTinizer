@@ -493,8 +493,9 @@ TRawEventSource* TGRUTint::OpenRawSource() {
 
   if(has_input_ring) {
     // Open a source from a ring.
-    source = new TRawEventRingSource(opt->InputRing(),
-                                     opt->DefaultFileType());
+    source = TRawEventSource::EventSource(opt->InputRing().c_str(),
+                                          true, true,
+                                          opt->DefaultFileType());
 
   } else if(has_raw_file && opt->SortMultiple()){
     // Open multiple files, read from all at the same time.
@@ -558,7 +559,7 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   // Any diagnostic print statements should be done after this if statement.
 
   sync = false;
-  
+
   if(fIsTabComplete){
     long res = TRint::ProcessLine(line, sync, error);
     return res;

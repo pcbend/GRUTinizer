@@ -21,7 +21,11 @@
 #include "TObject.h"
 #include "TFastScint.h"
 
-
+float gamma1 = 1173;
+float gamma2 = 1332;
+float tol1 = 30;
+float tol2 = 30;
+int   eventnum = 0;
 
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
@@ -30,6 +34,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
   if(!fast)
     return;
 
+  eventnum++;
   TList *list = &(obj.GetObjects());
   int numobj = list->GetSize();
 
@@ -96,16 +101,45 @@ void MakeHistograms(TRuntimeObjects& obj) {
       histname = "dtime_all";
       obj.FillHistogram(dirname,histname,4000,-2000,2000,hit.GetTime() - hit2.GetTime());
 
-      histname = Form("dtime_%i_%i",hit.GetChannel(),hit2.GetChannel());
-      obj.FillHistogram(dirname,histname,4000,-2000,2000,hit.GetTime() - hit2.GetTime());
+      //histname = Form("dtime_%i_%i",hit.GetChannel(),hit2.GetChannel());
+      //obj.FillHistogram(dirname,histname,4000,-2000,2000,hit.GetTime() - hit2.GetTime());
 
-      dirname = "energy_mat";
-      histname = Form("eng%i_eng%i",hit.GetChannel(),hit2.GetChannel());
-      obj.FillHistogram(dirname,histname,4000,0,4000,hit.GetEnergy(),
-                                 4000,0,4000,hit2.GetEnergy());
+      //dirname = "energy_mat";
+      //histname = Form("eng%i_eng%i",hit.GetChannel(),hit2.GetChannel());    
+      //obj.FillHistogram(dirname,histname,4000,0,4000,hit.GetEnergy(),
+      //                           4000,0,4000,hit2.GetEnergy());
 
-    }
-  }
+      if(abs(hit.GetEnergy() - gamma1) < tol1){
+         dirname = "coincidence_energy_gated";
+         histname = Form("%5.1f_in_channel_%i__dtime_vs_energy_in_channel_%i",gamma1,hit.GetChannel(),hit2.GetChannel());
+         obj.FillHistogram(dirname,histname,4000,-2000,2000,hit.GetTime() - hit2.GetTime(),
+                                            4000,0,4000,hit2.GetEnergy());
+
+      }//end if correct energy in first detector
+
+      if(abs(hit2.GetEnergy() - gamma1) < tol1){
+         dirname = "coincidence_energy_gated";
+         histname = Form("%5.1f_in_channel_%i__dtime_vs_energy_in_channel_%i",gamma1,hit2.GetChannel(),hit.GetChannel());
+         obj.FillHistogram(dirname,histname,4000,-2000,2000,hit2.GetTime() - hit.GetTime(),
+                                            4000,0,4000,hit.GetEnergy());
+
+      }//end if correct energy in second detector
+
+      if((abs(hit.GetEnergy() - gamma1) < tol1) && (abs(hit2.GetEnergy() - gamma2) < tol2)){
+
+         dirname = "coincidence_energy_gated";
+         histname = Form("dtime_energies_%5.1f_and_%5.1f___channels_%i_%i",gamma1,gamma2,hit.GetChannel(),hit2.GetChannel());
+         obj.FillHistogram(dirname,histname,4000,-2000,2000,hit.GetTime() - hit2.GetTime());
+
+         histname = "dtime_vs_eventnum";
+         obj.FillHistogram(dirname,histname,4000,-2000,2000,hit.GetTime() - hit2.GetTime(),
+                                            20000000/200000,0,20000000, eventnum);
+
+
+      }//end if correct energies in two coincident detectros   
+
+    }//end for loop over j
+  }//end for loop over i
   if(numobj!=list->GetSize())
     list->Sort();
 }

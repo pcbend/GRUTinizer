@@ -75,6 +75,7 @@ public:
   bool HasInteractions() { return fNumberOfInteractions; }
   //TGretinaHit& operator+=(const TGretinaHit&);
   //TGretinaHit& operator+(const TGretinaHit&);
+  bool operator<(const TGretinaHit &rhs) const { return fCoreEnergy > rhs.fCoreEnergy; }
 
 
   double GetDoppler(double beta,const TVector3 *vec=0) {

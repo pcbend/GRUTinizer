@@ -5,6 +5,7 @@
 
 #include "TNSCLEvent.h"
 #include "TH2.h"
+#include "TMath.h"
 
 int TFastScint::errors;
 
@@ -42,7 +43,7 @@ void TFastScint::Print(Option_t *opt) const {
   printf("TFastScint @  %lu \n",Timestamp());
   for(unsigned int x=0;x<Size();x++) {
     printf("\t");
-    GetLaBrHit(x).Print();
+    GetLaBrHit(static_cast<int>(x)).Print();
   }
 }
 
@@ -276,3 +277,40 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
   
   return 0;
 }
+
+TVector3 &TFastScint::GetPosition(int detector) { 
+  static std::map<int,TVector3> fFastScintDetectorMap;
+  if(fFastScintDetectorMap.size()==0) {
+    fFastScintDetectorMap[16] = TVector3(0,0,1);
+  }
+  if(detector>15) {
+    fprintf(stderr,"%s, detector out of range.\n",__PRETTY_FUNCTION__);
+    detector=16;
+  }
+  if(fFastScintDetectorMap.count(detector)==0) {
+    double phi = TMath::Pi()/2;
+    double theta = TMath::Pi()/2 - TMath::ATan(24.13/139.7);
+    //double z   = 24.13;
+    if(detector<8) {
+      phi = phi + TMath::Pi()/8. + static_cast<double>(detector)*TMath::Pi()/4.;
+    } else {
+      theta = -theta;
+      //z = -24.13;
+      phi = phi + static_cast<double>(detector-8)*TMath::Pi()/4.;
+    }
+    if(phi>2*TMath::Pi())
+      phi -= 2*TMath::Pi();
+    double mag = TMath::Sqrt(139.7*139.7 + 24.13*24.13);
+   
+    printf("\t\tmag   = %f\n",mag);
+    printf("\t\ttheta = %f\n",theta*TMath::RadToDeg());
+    printf("\t\tphi   = %f\n",phi*TMath::RadToDeg());
+
+    TVector3 v;
+    v.SetMagThetaPhi(mag,theta,phi);
+    fFastScintDetectorMap[detector] = v;
+  }
+  return fFastScintDetectorMap.at(detector);
+}
+
+

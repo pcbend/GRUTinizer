@@ -5,7 +5,7 @@
 #define MAX_PEAKS 2  // Maximum number of peaks in a source spectrum
 #define TOTAL_PEAKS_TO_FIT 8 // Maximum number of peaks to find for each detector
 #define FIT_PADDING 12    // Distance to go to left and right of peak for fitting with gaussian
-#define FIND_PADDING 75 // for ensuring correct energy is found from rough estimate
+#define FIND_PADDING 100 // for ensuring correct energy is found from rough estimate
 #define FIT_ORDER 2
 
 #define HIGH_CH_LIMIT_Y88_PEAK_1 300 //Helps fit y88 by checking whether found peaks are in correct
