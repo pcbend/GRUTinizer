@@ -27,6 +27,11 @@ TGrandRaidenHit::~TGrandRaidenHit() {
 }
 
 void TGrandRaidenHit::BuildFrom(){
+  static bool once = true;
+  if (once) {
+    RCNPEvent::HistDefCheckSum();
+    once = false;
+  }
   Clear();
 
   Timestamp = rcnp.GetTimestamp();

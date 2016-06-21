@@ -2,6 +2,8 @@
 .SECONDARY:
 .SECONDEXPANSION:
 
+RCNP=1
+
 PLATFORM:=$(PLATFORM)
 # EDIT THIS SECTION
 
@@ -27,7 +29,7 @@ SHAREDSWITCH = -shared -Wl,-soname,# NO ENDING SPACE
 endif
 
 # When compiling and linking against RCNP analyzer routines
-ifeq ($(RCNP),)
+ifeq ($(RCNP),1)
 RCNPANAPATH = ./GRAnalyzer/analyzer
 RCNPANALYZER = $(realpath $(RCNPANAPATH)/../lib)
 RCNPFLAGS = -DRCNP
@@ -103,10 +105,10 @@ docs:
 bin/%: util/% | bin
 	@ln -sf ../$< $@
 
-bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT) libGRAnalyzer bin
+bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT)bin
 	$(call run_and_test,$(CPP) $^ -o $@ $(LINKFLAGS) $(RCNPLINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
-bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) libGRAnalyzer bin
+bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) bin
 	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS) $(RCNPLINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 bin:
@@ -134,7 +136,7 @@ lib_dictionary  = $(patsubst %/LinkDef.h,.build/%/LibDictionary.o,$(call lib_lin
 libraries/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%)
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
-.build/%.o: %.$(SRC_SUFFIX)
+.build/%.o: %.$(SRC_SUFFIX) libGRAnalyzer
 	@mkdir -p $(dir $@)
 	$(call run_and_test,$(CPP) -fPIC -c $< -o $@ $(CFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
