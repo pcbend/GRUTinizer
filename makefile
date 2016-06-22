@@ -25,7 +25,7 @@ SHAREDSWITCH = -install_name # ENDING SPACE
 else
 export __LINUX__:= 1
 CPP        = g++
-CFLAGS     += -Wl,--no-as-needed
+LINKFLAGS_PREFIX += -Wl,--no-as-needed
 SHAREDSWITCH = -shared -Wl,-soname,# NO ENDING SPACE
 endif
 
