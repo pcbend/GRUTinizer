@@ -597,11 +597,13 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
   bool edited = false;
   std::vector<TH1*> hists = FindHists();
 
-  int first = hists.at(0)->GetXaxis()->GetFirst();
-  int last = hists.at(0)->GetXaxis()->GetLast();
+  TAxis* axis = hists.at(0)->GetXaxis();
+
+  int first = axis->GetFirst();
+  int last = axis->GetLast();
 
   int min = std::min(first,0);
-  int max = std::max(last,hists.at(0)->GetXaxis()->GetNbins()+1);
+  int max = std::max(last,axis->GetNbins()+1);
 
   int xdiff = last-first;
   int mdiff = max-min-2;
@@ -621,8 +623,11 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
           last  = last -(xdiff/2);
         }
       }
-      for(unsigned int i=0;i<hists.size();i++)
-        hists.at(i)->GetXaxis()->SetRange(first,last);
+      double begin = axis->GetBinLowEdge(first);
+      double end = axis->GetBinUpEdge(last);
+      for(unsigned int i=0;i<hists.size();i++) {
+        hists.at(i)->GetXaxis()->SetRangeUser(begin,end);
+      }
 
       edited = true;
     }
@@ -640,8 +645,11 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
           first = first+(xdiff/2);
         }
       }
-      for(unsigned int i=0;i<hists.size();i++)
-        hists.at(i)->GetXaxis()->SetRange(first,last);
+      double begin = axis->GetBinLowEdge(first);
+      double end = axis->GetBinUpEdge(last);
+      for(unsigned int i=0;i<hists.size();i++) {
+        hists.at(i)->GetXaxis()->SetRangeUser(begin,end);
+      }
 
       edited = true;
     }
@@ -659,7 +667,8 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
     if(ghist) {
       TH1* prev = ghist->GetNext();
       if(prev) {
-        prev->GetXaxis()->SetRange(first,last);
+        prev->GetXaxis()->SetRange(axis->GetBinLowEdge(first),
+                                   axis->GetBinUpEdge(last));
         prev->Draw("");
         RedrawMarkers();
         edited = true;
@@ -680,7 +689,8 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
     if(ghist) {
       TH1* prev = ghist->GetPrevious();
       if(prev) {
-        prev->GetXaxis()->SetRange(first,last);
+        prev->GetXaxis()->SetRange(axis->GetBinLowEdge(first),
+                                   axis->GetBinUpEdge(last));
         prev->Draw("");
         RedrawMarkers();
         edited = true;
