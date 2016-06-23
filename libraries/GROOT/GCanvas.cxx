@@ -1068,6 +1068,14 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
 	RemoveMarker("all");
       }
       break;
+    case kKey_F9:{
+        int color =  hists.at(0)->GetLineColor() + 1;
+        if(color>9)
+          color =1;
+        hists.at(0)->SetLineColor(color);
+        edited=true;
+      }
+      break;
 
     case kKey_F10:{
       }

@@ -16,6 +16,11 @@ GRUT.HistLib: $(GRUTSYS)/lib/libBetterCaesarHistos.so
 
 GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
 
+GRUT.SnapshotExt: 
+GRUT.SnapshotDir: 
+
+
+
 #files to load at log in:
 Rint.Logon: $(GRUTSYS)/.grut_logon
 Rint.History $(GRUTSYS)/.grut_history

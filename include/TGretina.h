@@ -52,8 +52,9 @@ public:
     return fAddbackCondition;
   }
 #endif
-
   const std::vector<TGretinaHit> &GetAllHits() const { return gretina_hits; }
+
+  void  SortHits();
 
 private:
   void BuildAddback() const;
