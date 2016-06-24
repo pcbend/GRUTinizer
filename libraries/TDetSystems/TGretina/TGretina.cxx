@@ -47,6 +47,7 @@ void TGretina::BuildAddback() const {
   
   std::deque<const TGretinaHit*> hits;
   for(auto& hit : gretina_hits) {
+    hit.SetCoreEnergy(hit.GetCoreEnergy(3));
     hits.push_back(&hit);
   }
   std::sort(hits.begin(), hits.end(), [](const TGretinaHit* a, const TGretinaHit* b) {
