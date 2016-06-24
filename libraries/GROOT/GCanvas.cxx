@@ -703,6 +703,9 @@ bool GCanvas::ProcessNonHistKeyboardPress(Event_t* event, UInt_t* keysym) {
       GetCanvasImp()->ShowEditor(!GetCanvasImp()->HasEditor());
       edited = true;
       break;
+    case kKey_F9:
+      this->SetCrosshair(!this->HasCrosshair());
+      edited = true;
   }
 
   return edited;
