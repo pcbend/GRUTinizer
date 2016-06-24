@@ -86,7 +86,7 @@ TF1 *fitpeak(TString fileName, Double_t energy){
 
 }
 
-void photopeaksNew(){
+void photopeaks(){
   const Int_t npeaks = 29;
   Double_t energies [npeaks] = {244.7, 344.3, 411.1, 444.0, 778.9, 
                              867.4,  898.0,  964.0,  1085.8, 1089.7, 
