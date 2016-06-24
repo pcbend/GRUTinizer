@@ -63,14 +63,13 @@ int TRCNPSource::GetEvent(TRawEvent& event) {
   event.SetDataPtr((void*)rcnp);
 
   // set the timestamp of the ttree event
-  // if (timestamps.size()==0) {
-  //   std::cout << "End of time stamps" << std::endl;
-  //   return -1;
-  // }
-  static Long_t counter = 0;
-  rcnp->SetTimestamp(counter);
-  event.SetFragmentTimestamp(counter);
-  counter+=1001;
+  if (timestamps.size()==0) {
+    std::cout << "End of time stamps" << std::endl;
+    return -1;
+  }
+  rcnp->SetTimestamp(timestamps.front());
+  event.SetFragmentTimestamp(timestamps.front());
+  timestamps.pop();
 
   return sizeof(rcnp);
 }

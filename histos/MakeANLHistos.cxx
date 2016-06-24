@@ -102,11 +102,17 @@ void MakeHistograms(TRuntimeObjects& obj) {
       if (rcnp.QTC_LEADING_TDC()) {
         auto& qtc_leading = *rcnp.QTC_LEADING_TDC();
         auto& qtc_leading_chan = *rcnp.QTC_LEADING_CH();
+        auto x = rcnp.GR_X(0);
 
         for (int i=0; i< qtc_leading_chan.size(); i++) {
           int channum = qtc_leading_chan[i];
           stream.str(""); stream << "LaBrLeading" << channum;
           obj.FillHistogram(stream.str().c_str(), 10000,-40000, 40000, qtc_leading[i]);
+          // gate on gr_x
+          if (x < 100 && x > 0) {
+            stream.str(""); stream << "LaBrLead"<< channum << "_GateX";
+            obj.FillHistogram(stream.str().c_str(), 10000,-40000, 40000, qtc_leading[i]);
+          }
         }
       }
       for (auto const& labr_hit : hit.GetLaBr()) {
