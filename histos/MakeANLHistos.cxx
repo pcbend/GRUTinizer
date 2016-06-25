@@ -151,7 +151,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       stream << "PostE_BoardID" << hit.GetBoardID()  << "_Chan" << hit.GetChannel();
       obj.FillHistogram(stream.str(),10000,0,0,hit.Charge());
 
-      obj.FillHistogram("DigitizerHits",4,101,104,hit.GetBoardID(),10,0,9,hit.GetChannel());
+      obj.FillHistogram("DigitizerHits",12,97,109,hit.GetBoardID(),12,-1,11,hit.GetChannel());
       //cout << hit.GetBoardID() << " " << hit.GetChannel() << endl;
 
       if (hit.GetBoardID() == 0x65) {
