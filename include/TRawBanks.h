@@ -401,6 +401,9 @@ struct GEBArgonneCFDv18 {
   UShort_t prerise_begin_sample;
   UShort_t base_sample;
   UShort_t peak_sample;
+  Short_t  GetCFD0() const;
+  Short_t  GetCFD1() const;
+  Short_t  GetCFD2() const;
   ULong_t  GetPrevCFD(const GEBArgonneHead*) const;
   UInt_t   GetBaseline() const;
   UInt_t   GetPreRiseE() const;
@@ -416,6 +419,7 @@ struct GEBArgonneCFDv18 {
   UShort_t WriteFlag() const;
   UShort_t VetoFlag() const;
   UShort_t TSMatchFlag() const;
+  UShort_t CFDValidFlag() const;
   UShort_t ExternalDiscFlag() const;
   UShort_t PeakValidFlag() const;
   UShort_t OffsetFlag() const;
@@ -431,7 +435,7 @@ static void SwapArgonneLEDv11(TRawEvent::GEBArgonneLEDv11& data);
 friend std::ostream& operator<<(std::ostream& os, const GEBArgonneLEDv18& data);
 static void SwapArgonneLEDv18(TRawEvent::GEBArgonneLEDv18& data);
 
-friend std::ostream& operator<<(std::ostream& os, const GEBArgonneLEDv18& data);
+friend std::ostream& operator<<(std::ostream& os, const GEBArgonneCFDv18& data);
 static void SwapArgonneCFDv18(TRawEvent::GEBArgonneCFDv18& data);
 
 struct GEBS800Header {

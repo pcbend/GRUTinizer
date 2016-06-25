@@ -24,8 +24,7 @@ TANLEvent::TANLEvent(TSmartBuffer& buf) {
   global_addr = header->GetGA();
   board_id = header->GetBoardID();
   channel = header->GetChannel();
-  led = header->GetLED();
-  cfd = 0;
+  discriminator = header->GetDisc();
 
   // Extract payload data. Two versions LED and CFD, with small changes for different FW versions
   switch( static_cast<TRawEvent::ArgonneType>(header->GetHeaderType()) ) {
@@ -40,7 +39,7 @@ TANLEvent::TANLEvent(TSmartBuffer& buf) {
     // Swap big endian for little endian
     TRawEvent::SwapArgonneLEDv11(*data);
     // Extract data from payload
-    led_prev = data->GetPreviousLED();
+    disc_prev = data->GetPreviousLED();
     flags = data->flags;
     prerise_energy = data->GetPreRiseE();
     postrise_energy = data->GetPostRiseE();
@@ -69,7 +68,7 @@ TANLEvent::TANLEvent(TSmartBuffer& buf) {
     // // Swap big endian for little endian
     // TRawEvent::SwapArgonneLEDv11(*data);
     // // Extract data from payload
-    // led_prev = data->GetPreviousLED();
+    // disc_prev = data->GetPreviousLED();
     // flags = data->flags;
     // prerise_energy = data->GetPreRiseE();
     // postrise_energy = data->GetPostRiseE();
@@ -90,8 +89,8 @@ TANLEvent::TANLEvent(TSmartBuffer& buf) {
     // Swap big endian for little endian
     TRawEvent::SwapArgonneCFDv18(*data);
     // Extract data from payload
-    cfd = data->GetCFD0(); // this should be a function to interpolate the zero crossing
-    cfd_prev = data->GetPrevCFD(header);
+    discriminator = data->GetCFD0(); // this should be a function to interpolate the zero crossing
+    disc_prev = data->GetPrevCFD(header);
     flags = data->flags;
     prerise_energy = data->GetPreRiseE();
     postrise_energy = data->GetPostRiseE();

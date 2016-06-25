@@ -181,7 +181,6 @@ UShort_t TRawEvent::GEBArgonneLEDv18::PileUpFlag() const { return ((flags & 0x80
 
 
 //ULong_t  TRawEvent::GEBArgonneCFDv18::GetPreviousCFD() const { return (((ULong_t)cfd_high_prev) << 16) + ((ULong_t)cfd_low_prev); }
-Int_t    TRawEvent::GEBArgonneCFDv18::GetCFD0() const { return (cfd_sample0 & 0x3fff); }
 ULong_t  TRawEvent::GEBArgonneCFDv18::GetPrevCFD(const GEBArgonneHead* header) const {
   if (TSMatchFlag() == 1) {
     ULong_t current_cfd= header->GetDisc();
@@ -326,27 +325,27 @@ std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBArgonneLEDv18& da
 		  << STR(data.base_sample) << "\n"
 		  << STR(data.peak_sample) << std::endl;
 }
-std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBArgonneLEDv18& data) {
+std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBArgonneCFDv18& data) {
         return os << "-- Argonne CFDv18 data packet --"
 
-		  << STR(cfd_low_prev) << "\n"
-		  << STR(flags) << "\n"
-		  << STR(cfd_sample0) << "\n"
-		  << STR(cfd_mid_prev) << "\n"
-		  << STR(sampled_baseline) << "\n"
-		  << STR(cfd_sample2) << "\n"
-		  << STR(cfd_sample1) << "\n"
-		  << STR(postrise_sum_low_prerise_sum) << "\n"
-		  << STR(timestamp_peak_low) << "\n"
-		  << STR(postrise_sum_high) << "\n"
-		  << STR(timestamp_trigger_low) << "\n"
-		  << STR(last_postrise_enter_sample) << "\n"
-		  << STR(postrise_end_sample) << "\n"
-		  << STR(postrise_begin_sample) << "\n"
-		  << STR(prerise_end_sample) << "\n"
-		  << STR(prerise_begin_sample) << "\n"
-		  << STR(base_sample) << "\n"
-		  << STR(peak_sample) << std::endl;
+		  << STR(data.cfd_low_prev) << "\n"
+		  << STR(data.flags) << "\n"
+		  << STR(data.cfd_sample0) << "\n"
+		  << STR(data.cfd_mid_prev) << "\n"
+		  << STR(data.sampled_baseline) << "\n"
+		  << STR(data.cfd_sample2) << "\n"
+		  << STR(data.cfd_sample1) << "\n"
+		  << STR(data.postrise_sum_low_prerise_sum) << "\n"
+		  << STR(data.timestamp_peak_low) << "\n"
+		  << STR(data.postrise_sum_high) << "\n"
+		  << STR(data.timestamp_trigger_low) << "\n"
+		  << STR(data.last_postrise_enter_sample) << "\n"
+		  << STR(data.postrise_end_sample) << "\n"
+		  << STR(data.postrise_begin_sample) << "\n"
+		  << STR(data.prerise_end_sample) << "\n"
+		  << STR(data.prerise_begin_sample) << "\n"
+		  << STR(data.base_sample) << "\n"
+		  << STR(data.peak_sample) << std::endl;
 }
 #undef STR
 

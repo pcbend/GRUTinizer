@@ -11,15 +11,12 @@ class TANLEvent : public TObject {
     TANLEvent(TSmartBuffer& buf);
     ~TANLEvent();
 
-
-
-    Long_t   GetLED()       const { return led; }
-    Long_t   GetCFD()       const { return cfd; }
+    Long_t   GetDiscriminator()       const { return discriminator; }
     Int_t    GetPreE()      const { return prerise_energy; }
     Int_t    GetPostE()     const { return postrise_energy; }
     UShort_t GetBoardID()   const { return board_id; }
     UShort_t GetChannel()   const { return channel; }
-    Long_t   GetPrevLED()   const { return led_prev; }
+    Long_t   GetPrevDisc()   const { return disc_prev; }
     UShort_t GetPostBegin() const { return postrise_begin_sample; }
     UShort_t GetPostEnd() const { return postrise_end_sample; }
     UShort_t GetPreBegin() const { return prerise_begin_sample; }
@@ -43,12 +40,9 @@ class TANLEvent : public TObject {
     UShort_t global_addr;
     UShort_t board_id;
     UShort_t channel;
-    ULong_t led;
-    ULong_t cfd;
+    ULong_t discriminator;
 
-
-    ULong_t led_prev;
-    ULong_t cfd_prev;
+    ULong_t disc_prev;
     UInt_t flags;
     //UInt_t sampled_baseline;
     UInt_t prerise_energy;
