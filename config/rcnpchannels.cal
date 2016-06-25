@@ -1,66 +1,249 @@
 
-// Central contacts
-
-CLO01AP00 {
-  Address: 0x01007100
-  EnergyCoeff: -11.571 1.38547587
-}
-
-CLO01BP00 {
-  Address: 0x01007101
-  EnergyCoeff: -15.376 1.16580939
-}
-
-CLO01CP00 {
-  Address: 0x01007102
-  EnergyCoeff: -17.096 1.20797241
-}
-
-CLO01DP00 {
-  Address: 0x01007103
-  EnergyCoeff: -16.151 1.06947565
-}
-
-
 // Other channels
-
+EXT00AP00 {
+  Address: 0x01006500
+  EnergyCoeff: 0 1
+}
 EXT01AP00 {
-  Address: 0x01007200
+  Address: 0x01006501
   EnergyCoeff: 0 1
 }
 EXT02AP00 {
-  Address: 0x01007201
+  Address: 0x01006502
   EnergyCoeff: 0 1
 }
 EXT03AP00 {
-  Address: 0x01007202
+  Address: 0x01006503
   EnergyCoeff: 0 1
 }
 EXT04AP00 {
-  Address: 0x01007203
+  Address: 0x01006504
   EnergyCoeff: 0 1
 }
-
 EXT05AP00 {
-  Address: 0x01007300
+  Address: 0x01006505
   EnergyCoeff: 0 1
 }
 EXT06AP00 {
-  Address: 0x01007301
+  Address: 0x01006506
   EnergyCoeff: 0 1
 }
 EXT07AP00 {
-  Address: 0x01007302
+  Address: 0x01006507
   EnergyCoeff: 0 1
 }
 EXT08AP00 {
-  Address: 0x01007303
+  Address: 0x01006508
   EnergyCoeff: 0 1
 }
 EXT09AP00 {
-  Address: 0x01007304
+  Address: 0x01006509
   EnergyCoeff: 0 1
 }
+EXT10AP00 {
+  Address: 0x01006600
+  EnergyCoeff: 0 1
+}
+EXT11AP00 {
+  Address: 0x01006601
+  EnergyCoeff: 0 1
+}
+EXT12AP00 {
+  Address: 0x01006602
+  EnergyCoeff: 0 1
+}
+EXT13AP00 {
+  Address: 0x01006603
+  EnergyCoeff: 0 1
+}
+EXT14AP00 {
+  Address: 0x01006604
+  EnergyCoeff: 0 1
+}
+EXT15AP00 {
+  Address: 0x01006605
+  EnergyCoeff: 0 1
+}
+EXT16AP00 {
+  Address: 0x01006606
+  EnergyCoeff: 0 1
+}
+EXT17AP00 {
+  Address: 0x01006607
+  EnergyCoeff: 0 1
+}
+EXT18AP00 {
+  Address: 0x01006608
+  EnergyCoeff: 0 1
+}
+EXT19AP00 {
+  Address: 0x01006609
+  EnergyCoeff: 0 1
+}
+EXT20AP00 {
+  Address: 0x01006700
+  EnergyCoeff: 0 1
+}
+EXT21AP00 {
+  Address: 0x01006701
+  EnergyCoeff: 0 1
+}
+EXT22AP00 {
+  Address: 0x01006702
+  EnergyCoeff: 0 1
+}
+EXT23AP00 {
+  Address: 0x01006703
+  EnergyCoeff: 0 1
+}
+EXT24AP00 {
+  Address: 0x01006704
+  EnergyCoeff: 0 1
+}
+EXT25AP00 {
+  Address: 0x01006705
+  EnergyCoeff: 0 1
+}
+EXT26AP00 {
+  Address: 0x01006706
+  EnergyCoeff: 0 1
+}
+EXT27AP00 {
+  Address: 0x01006707
+  EnergyCoeff: 0 1
+}
+EXT28AP00 {
+  Address: 0x01006708
+  EnergyCoeff: 0 1
+}
+EXT29AP00 {
+  Address: 0x01006709
+  EnergyCoeff: 0 1
+}
+EXT30AP00 {
+  Address: 0x01006800
+  EnergyCoeff: 0 1
+}
+EXT31AP00 {
+  Address: 0x01006801
+  EnergyCoeff: 0 1
+}
+EXT32AP00 {
+  Address: 0x01006802
+  EnergyCoeff: 0 1
+}
+EXT33AP00 {
+  Address: 0x01006803
+  EnergyCoeff: 0 1
+}
+EXT34AP00 {
+  Address: 0x01006804
+  EnergyCoeff: 0 1
+}
+EXT35AP00 {
+  Address: 0x01006805
+  EnergyCoeff: 0 1
+}
+EXT36AP00 {
+  Address: 0x01006806
+  EnergyCoeff: 0 1
+}
+EXT37AP00 {
+  Address: 0x01006807
+  EnergyCoeff: 0 1
+}
+EXT38AP00 {
+  Address: 0x01006808
+  EnergyCoeff: 0 1
+}
+EXT39AP00 {
+  Address: 0x01006809
+  EnergyCoeff: 0 1
+}
+
+
+// // Central contacts
+
+// CLO01AP00 {
+//   Address: 0x01006500
+//   EnergyCoeff: 0 1
+// }
+
+// CLO01BP00 {
+//   Address: 0x01006501
+//   EnergyCoeff: 0 1
+// }
+
+// CLO01CP00 {
+//   Address: 0x01006502
+//   EnergyCoeff: 0 1
+// }
+
+// CLO01DP00 {
+//   Address: 0x01006503
+//   EnergyCoeff: 0 1
+// }
+
+// CLO01EP00 {
+//   Address: 0x01006504
+//   EnergyCoeff: 0 1
+// }
+
+// // left
+// CLO01AN01 {
+//   Address: 0x01006505
+//   EnergyCoeff: 0 1
+// }
+
+// // center
+// CLO01AN02 {
+//   Address: 0x01006506
+//   EnergyCoeff: 0 1
+// }
+
+// //right
+// CLO01AN03 {
+//   Address: 0x01006507
+//   EnergyCoeff: 0 1
+// }
+
+// EXT11AP00 {
+//   Address: 0x01607200
+//   EnergyCoeff: 0 1
+// }
+// EXT02AP00 {
+//   Address: 0x01007201
+//   EnergyCoeff: 0 1
+// }
+// EXT03AP00 {
+//   Address: 0x01007202
+//   EnergyCoeff: 0 1
+// }
+// EXT04AP00 {
+//   Address: 0x01007203
+//   EnergyCoeff: 0 1
+// }
+
+// EXT05AP00 {
+//   Address: 0x01007300
+//   EnergyCoeff: 0 1
+// }
+// EXT06AP00 {
+//   Address: 0x01007301
+//   EnergyCoeff: 0 1
+// }
+// EXT07AP00 {
+//   Address: 0x01007302
+//   EnergyCoeff: 0 1
+// }
+// EXT08AP00 {
+//   Address: 0x01007303
+//   EnergyCoeff: 0 1
+// }
+// EXT09AP00 {
+//   Address: 0x01007304
+//   EnergyCoeff: 0 1
+// }
 
 
 

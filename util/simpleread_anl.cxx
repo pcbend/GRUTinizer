@@ -148,8 +148,8 @@ int main (int argc, char **argv) {
       //if (nevents>10) break;
 
       auto head = (GEB_HEADER*)header;
-      //cout << head->length << endl;
-      //cin.get();
+      cout << head->length << endl;
+      cin.get();
       datasize = head->length;
 
       if (fread(payload,datasize,1,fd) == 1) {
