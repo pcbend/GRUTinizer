@@ -11,7 +11,7 @@ using namespace std;
 /* main */
 int main()
 {
-    const char* filename = "./datatest/run6106.bld";
+    const char* filename = "~/data/run1006.bld";
     ThreadsafeQueue<RCNPEvent*> gr_queue(500000);
     atomic<int> sig(0);
     stringstream stream; stream.str(""); stream << "cat " << filename;

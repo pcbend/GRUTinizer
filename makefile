@@ -105,7 +105,7 @@ docs:
 bin/%: util/% | bin
 	@ln -sf ../$< $@
 
-bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT)bin
+bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT) bin
 	$(call run_and_test,$(CPP) $^ -o $@ $(LINKFLAGS) $(RCNPLINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) bin

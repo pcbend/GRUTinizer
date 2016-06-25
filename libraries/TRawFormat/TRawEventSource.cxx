@@ -95,7 +95,8 @@ TRawEventSource* TRawEventSource::EventSource(const char* filename,
     source = new TTreeSource<RCNPEvent>(filename,"rcnptree","rcnpevent", file_type);
   } else if (hasSuffix(filename,".bld")){
     std::string command;
-    if (is_online) {
+    if (string(filename) == "online.bld") {
+      std::cout << "Going online with TRCNPSource..." <<std::endl;
       command = "router_save -s -b 1024 BLD";
     }else {
       command = std::string("cat ") + std::string(filename);
