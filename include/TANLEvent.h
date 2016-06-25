@@ -48,6 +48,7 @@ class TANLEvent : public TObject {
 
 
     ULong_t led_prev;
+    ULong_t cfd_prev;
     UInt_t flags;
     //UInt_t sampled_baseline;
     UInt_t prerise_energy;
