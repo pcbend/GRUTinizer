@@ -81,6 +81,7 @@ int TCagra::BuildHits(std::vector<TRawEvent>& raw_data){
     if(segnum==0){
       hit->SetAddress(address);
       hit->SetTimestamp(event.GetTimestamp());
+      hit->SetDiscTime(anl.GetDiscriminator());
       hit->SetCharge(anl.GetEnergy());
     } else {
       TCagraSegmentHit& seg = hit->MakeSegmentByAddress(address);

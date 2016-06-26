@@ -146,7 +146,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
     //cout << "Size: " << cagra->Size() << endl;
     for (auto& hit : *cagra) {
 
-      //cout << hit.Timestamp() << endl;
+      //cout << hit.Timestamp() << " " << hit.GetDiscTime() << endl;
+
       stream.str("");
       stream << "PostE_BoardID" << hit.GetBoardID()  << "_Chan" << hit.GetChannel();
       obj.FillHistogram(stream.str(),10000,0,0,hit.Charge());

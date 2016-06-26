@@ -89,7 +89,7 @@ TANLEvent::TANLEvent(TSmartBuffer& buf) {
     // Swap big endian for little endian
     TRawEvent::SwapArgonneCFDv18(*data);
     // Extract data from payload
-    discriminator = data->GetCFD0(); // this should be a function to interpolate the zero crossing
+    //discriminator = data->GetCFD0(); // this should be a function to interpolate the zero crossing
     disc_prev = data->GetPrevCFD(header);
     flags = data->flags;
     prerise_energy = data->GetPreRiseE();
@@ -98,6 +98,8 @@ TANLEvent::TANLEvent(TSmartBuffer& buf) {
     prerise_begin_sample = data->GetPreRiseSampleBegin();
     postrise_end_sample = data->GetPostRiseSampleEnd();
     prerise_end_sample = data->GetPreRiseSampleEnd();
+
+    //std:: cout << data->GetCFD0() << " " << data->GetCFD1() << " " << data->GetCFD2() << std::endl;
 
     // ignore waveform data
     size_t wave_bytes = header->GetLength()*4 - sizeof(*header) - sizeof(*data);

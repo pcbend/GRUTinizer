@@ -43,10 +43,12 @@ class TCagraHit : public TDetectorHit {
                       const TVector3& particle_vec = TVector3(0,0,1),
                       const TVector3& cagra_offset = TVector3(0,0,0)) const;
 
+    void SetDiscTime(const ULong_t t) { time = t; }
+    ULong_t GetDiscTime() { return time; }
 
   private:
     std::vector<TCagraSegmentHit> fSegments;
-
+    ULong_t time;
 
   ClassDef(TCagraHit,1);
 };

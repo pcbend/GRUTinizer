@@ -189,9 +189,10 @@ ULong_t  TRawEvent::GEBArgonneCFDv18::GetPrevCFD(const GEBArgonneHead* header) c
     return 0xffffffffffffffff;
   }
 }
-Short_t    TRawEvent::GEBArgonneCFDv18::GetCFD0() const { return (cfd_sample0 & 0x3fff); }
-Short_t    TRawEvent::GEBArgonneCFDv18::GetCFD1() const { return (cfd_sample1 & 0x3fff); }
-Short_t    TRawEvent::GEBArgonneCFDv18::GetCFD2() const { return (cfd_sample2 & 0x3fff); }
+
+Short_t  TRawEvent::GEBArgonneCFDv18::GetCFD0() const { return (cfd_sample0 & 0x3fff); }
+Short_t  TRawEvent::GEBArgonneCFDv18::GetCFD1() const { return (cfd_sample1 & 0x3fff); }
+Short_t  TRawEvent::GEBArgonneCFDv18::GetCFD2() const { return (cfd_sample2 & 0x3fff); }
 
 UInt_t   TRawEvent::GEBArgonneCFDv18::GetBaseline() const { return ((sampled_baseline & 0x00FFFFFF) >> 0); }
 UInt_t   TRawEvent::GEBArgonneCFDv18::GetPreRiseE() const { return (postrise_sum_low_prerise_sum & 0xffffff); }
