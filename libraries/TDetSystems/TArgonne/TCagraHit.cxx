@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "TString.h"
+#include "TRandom.h"
 
 #include "GCanvas.h"
 #include "GValue.h"
@@ -138,4 +139,17 @@ Int_t TCagraHit::Charge() const {
   } else {
     return fCharge;
   }
+}
+
+double TCagraHit::GetBLCorrectedE() const {
+  if(!std::isnan(fEnergy))
+    return fEnergy;
+  TChannel* chan = TChannel::GetChannel(fAddress);
+  if(!chan){
+    fEnergy = Charge() + gRandom->Uniform();
+    //return Charge() + gRandom->Uniform();
+  } else {
+    fEnergy = chan->CalEnergy(Charge(), fTimestamp);
+  }
+  return fEnergy;
 }

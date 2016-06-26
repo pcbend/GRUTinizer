@@ -45,6 +45,8 @@ class TCagraHit : public TDetectorHit {
 
     void SetDiscTime(const ULong_t t) { time = t; }
     ULong_t GetDiscTime() { return time; }
+    double GetBLCorrectedE() const;
+
 
   private:
     std::vector<TCagraSegmentHit> fSegments;

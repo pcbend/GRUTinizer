@@ -545,6 +545,10 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
           channel->SetEnergyCoeff(ParseListOfDoubles(ss),
                                   ParseStartTime(type));
 
+        } else if(type.find("POLEZERO")==0) {
+          //channel->SetEnergyCoeff(ParseListOfDoubles(ss),
+          //ParseStartTime(type));
+
         } else if(type == "PEDESTAL") {
           int val = 0; ss >> val;
           channel->SetPedestal(val);
