@@ -47,6 +47,8 @@ public:
   bool SortMultiple()       const { return fSortMultiple; }
   bool TreeSource()         const { return fTreeSource; }
   bool SaveRCNPTree()       const { return fSaveRCNPTree; }
+  bool FastForwardRawFile() const { return fFastForwardRaw; }
+
 
   bool IsOnline()           const { return fIsOnline; }
 
@@ -105,7 +107,7 @@ private:
   int fBuildWindow;
   bool fShouldExit;
 
-
+  bool fFastForwardRaw;
   bool fSaveRCNPTree;
 
   ClassDef(TGRUTOptions,0);

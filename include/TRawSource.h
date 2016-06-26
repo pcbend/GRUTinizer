@@ -193,7 +193,10 @@ public:
   virtual void Reset();
 
   virtual std::string SourceDescription() const;
+
 private:
+  void FastForward();
+
   std::string fFilename;
   FILE* fFile;
 

@@ -130,6 +130,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("g start-gui",&fStartGui)
     .description("Start the GUI")
     .default_value(false);
+  parser.option("F fast-forward",&fFastForwardRaw)
+    .description("Seek to the end of all raw files that are added so as to read freshly saved data in online mode.")
+    .default_value(false);
   parser.option("w gretina-waves",&fExtractWaves)
     .description("Extract wave forms to data class when available.")
     .default_value(false);
