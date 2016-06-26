@@ -17,7 +17,8 @@ TRCNPSource::TRCNPSource(const char* Command, kFileType file_type)
                        },
                        TGRUTOptions::Get()->SaveRCNPTree());
 
-  LoadFakeTimestamps();
+  //LoadFakeTimestamps();
+  std::this_thread::sleep_for(std::chrono::seconds(4));
 }
 
 int TRCNPSource::GetEvent(TRawEvent& event) {
@@ -60,17 +61,13 @@ int TRCNPSource::GetEvent(TRawEvent& event) {
   //*reinterpret_cast<RCNPEvent**>(ptrbytes) = rcnp;
   //TSmartBuffer eventbuffer(ptrbytes,sizeof(rcnp));
   //event.SetData(eventbuffer);
+
   event.SetDataPtr((void*)rcnp);
+  double time = rcnp->GR_MYRIAD(0);
+  if (time == -441441) { time = 11; }
 
-  // set the timestamp of the ttree event
-  if (timestamps.size()==0) {
-    std::cout << "End of time stamps" << std::endl;
-    return -1;
-  }
-  rcnp->SetTimestamp(timestamps.front());
-  event.SetFragmentTimestamp(timestamps.front());
-  timestamps.pop();
-
+  rcnp->SetTimestamp(time);
+  event.SetFragmentTimestamp(time);
   return sizeof(rcnp);
 }
 
@@ -82,28 +79,6 @@ std::string TRCNPSource::Status() const {
               GREEN, GetAverageRate()/1e6, RESET_COLOR);
 }
 std::string TRCNPSource::SourceDescription() const {return "File: "+std::string("RCNP_BLD: ")+fCommand;}
-
-
-void TRCNPSource::LoadFakeTimestamps() {
-
-  std::string line; std::stringstream stream; ULong_t ts;
-  ifstream file ("./timestamps.dat");
-  if (file.is_open())
-  {
-    while ( getline (file,line) )
-    {
-      stream << line;
-      stream >> ts;
-      timestamps.push(ts);
-      stream.str("");
-      stream.clear();
-      //std::cout << ts << std::endl;
-    }
-    file.close();
-  } else {
-    throw std::runtime_error("./timestamps.dat not found");
-  }
-}
 
 
 // template<>

@@ -39,7 +39,7 @@ public:
 
 protected:
   void SetFileSize(long file_size) { fFileSize = file_size; }
-  void LoadFakeTimestamps();
+  //void LoadFakeTimestamps();
 
 private:
   TRCNPSource() {;}
@@ -53,7 +53,7 @@ private:
   #endif
   ThreadsafeQueue<RCNPEvent*> rcnp_queue;
 
-  std::queue<Long_t> timestamps;
+  //std::queue<Long_t> timestamps;
 
   ClassDef(TRCNPSource,0);
 };
