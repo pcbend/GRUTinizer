@@ -32,6 +32,7 @@
 #include "TOrderedRawFile.h"
 #include "TRawSource.h"
 #include "TMultiRawFile.h"
+#include "TGlobRawFile.h"
 #include "TSequentialRawFile.h"
 
 #include "GrutNotifier.h"
@@ -240,6 +241,12 @@ void TGRUTint::ApplyOptions() {
         multi_source->AddFile(filename.c_str());
       }
       source = multi_source;
+
+    } else if(opt->SortMultipleGlob() != "") {
+      // Open multiple files, read from all at the same time.
+      TGlobRawFile* glob_multi_source = new TGlobRawFile(opt->SortMultipleGlob());
+      std::cout << opt->SortMultipleGlob() << std::endl; std::cin.get();
+      source = glob_multi_source;
 
     } else if(!opt->SortMultiple() && (
                 opt->RawInputFiles().size() > 1 ||

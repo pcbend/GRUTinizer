@@ -13,12 +13,14 @@
 class TGlobRawFile : public TRawEventSource {
 public:
   TGlobRawFile(std::string pattern);
+  virtual ~TGlobRawFile(){;}
 
-  virtual std::string SourceDescription(bool long_description=false) const {
-    return fWrapped.SourceDescription(long_description);
+
+  virtual std::string SourceDescription() const {
+    return fWrapped.SourceDescription();
   }
-  virtual std::string Status(bool long_description = false) const {
-    return fWrapped.Status(long_description);
+  virtual std::string Status() const {
+    return fWrapped.Status();
   }
 
   virtual int GetLastErrno() const { return fWrapped.GetLastErrno(); }

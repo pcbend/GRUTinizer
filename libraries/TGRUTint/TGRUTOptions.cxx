@@ -130,6 +130,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("g start-gui",&fStartGui)
     .description("Start the GUI")
     .default_value(false);
+  parser.option("G glob-raw",&fGlobRaw)
+    .description("Open files according to a pattern and continuously look for new files.")
+    .default_value("");
   parser.option("F fast-forward",&fFastForwardRaw)
     .description("Seek to the end of all raw files that are added so as to read freshly saved data in online mode.")
     .default_value(false);
