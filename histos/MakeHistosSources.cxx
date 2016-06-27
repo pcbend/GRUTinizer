@@ -81,10 +81,17 @@ void MakeHistograms(TRuntimeObjects& obj) {
 		      4000, 0., 4000., hit.GetCoreEnergy(),
 		      100, 0, 100, hit.GetCrystalId());
 
+    obj.FillHistogram("energy",  "overview",
+		      4000, 0., 4000., hit.GetCoreEnergy());
+
     obj.FillHistogram("energy", "overview_gaus",
 		      4000, 0., 4000.,
 		      hit.GetCoreEnergy()*gRandom->Gaus(1,1./1000.),
 		      100, 0, 100, hit.GetCrystalId());
+
+    obj.FillHistogram("energy", "energy_gaus",
+		      4000, 0., 4000.,
+		      hit.GetCoreEnergy()*gRandom->Gaus(1,1./1000.));
 
     // obj.FillHistogram("position", "theta_vs_phi",
     // 		      360, 0., 360.,
