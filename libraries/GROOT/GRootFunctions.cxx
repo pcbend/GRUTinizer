@@ -151,7 +151,7 @@ Double_t GRootFunctions::GausExpo(Double_t *x, Double_t *pars) {
   // par[2] = sigma
   // par[3] = decay parameter
 
-  result = TMath::Gaus(pars[0],pars[1],pars[2])+TMath::Floor(x[0]+pars[2])*pars[0]*TMath::Exp(-pars[3]); 
+  result = TMath::Gaus(pars[0],pars[1],pars[2])+(double)(x[0]>pars[1])*pars[0]*TMath::Exp(-pars[3]); 
   return result;
 }
 
