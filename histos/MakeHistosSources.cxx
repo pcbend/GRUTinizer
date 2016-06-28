@@ -81,9 +81,16 @@ void MakeHistograms(TRuntimeObjects& obj) {
 		      4000, 0., 4000., hit.GetCoreEnergy(),
 		      100, 0, 100, hit.GetCrystalId());
 
-    obj.FillHistogram("energy",  "overview",
+    obj.FillHistogram("energy",  "energy",
 		      4000, 0., 4000., hit.GetCoreEnergy());
 
+    if( hit.GetCrystalId()%2 )
+      obj.FillHistogram("energy",  "energy_A", 
+                        4000, 0., 4000., hit.GetCoreEnergy());
+    else
+      obj.FillHistogram("energy",  "energy_B", 
+                        4000, 0., 4000., hit.GetCoreEnergy());
+                        
     obj.FillHistogram("energy", "overview_gaus",
 		      4000, 0., 4000.,
 		      hit.GetCoreEnergy()*gRandom->Gaus(1,1./1000.),
@@ -92,7 +99,16 @@ void MakeHistograms(TRuntimeObjects& obj) {
     obj.FillHistogram("energy", "energy_gaus",
 		      4000, 0., 4000.,
 		      hit.GetCoreEnergy()*gRandom->Gaus(1,1./1000.));
-
+		      
+    if( hit.GetCrystalId()%2 )
+      obj.FillHistogram("energy",  "energy_gaus_A", 
+                        4000, 0., 4000.,
+			hit.GetCoreEnergy()*gRandom->Gaus(1,1./1000.));
+    else
+      obj.FillHistogram("energy",  "energy_gaus_B", 
+                        4000, 0., 4000.,
+			hit.GetCoreEnergy()*gRandom->Gaus(1,1./1000.));
+                        
     // obj.FillHistogram("position", "theta_vs_phi",
     // 		      360, 0., 360.,
     // 		      hit.GetPhi()*TMath::RadToDeg(),
@@ -130,10 +146,29 @@ void MakeHistograms(TRuntimeObjects& obj) {
 			  Form("energy_below_%s", LayerMap[k].c_str()),
 			  4000, 0., 4000.,
 			  hit.GetCoreEnergy());
+	if( hit.GetCrystalId()%2 )
+	  obj.FillHistogram("energy",
+			    Form("energy_A_below_%s", LayerMap[k].c_str()),
+			    4000, 0., 4000., hit.GetCoreEnergy());
+	else
+	  obj.FillHistogram("energy",
+			    Form("energy_B_below_%s", LayerMap[k].c_str()),
+			    4000, 0., 4000., hit.GetCoreEnergy());
+	
 	obj.FillHistogram("energy",
 			  Form("energy_gaus_below_%s", LayerMap[k].c_str()),
 			  4000, 0., 4000.,
 			  hit.GetCoreEnergy()*gRandom->Gaus(1,1./1000.));
+	if( hit.GetCrystalId()%2 )
+	  obj.FillHistogram("energy",
+			    Form("energy_gaus_A_below_%s", LayerMap[k].c_str()),
+			    4000, 0., 4000.,
+			    hit.GetCoreEnergy()*gRandom->Gaus(1,1./1000.));
+	else
+	  obj.FillHistogram("energy",
+			    Form("energy_gaus_B_below_%s", LayerMap[k].c_str()),
+			    4000, 0., 4000.,
+			    hit.GetCoreEnergy()*gRandom->Gaus(1,1./1000.));
       }
 
     }
