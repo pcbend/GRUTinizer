@@ -49,6 +49,7 @@ public:
   bool TreeSource()         const { return fTreeSource; }
   bool SaveRCNPTree()       const { return fSaveRCNPTree; }
   bool FastForwardRawFile() const { return fFastForwardRaw; }
+  bool GRSingles()          const { return fGRSingles; }
 
 
   bool IsOnline()           const { return fIsOnline; }
@@ -111,6 +112,7 @@ private:
   bool fFastForwardRaw;
   bool fSaveRCNPTree;
   std::string fGlobRaw;
+  bool fGRSingles;
 
   ClassDef(TGRUTOptions,0);
 };

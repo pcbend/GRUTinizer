@@ -346,7 +346,18 @@ std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBArgonneCFDv18& da
 		  << STR(data.prerise_end_sample) << "\n"
 		  << STR(data.prerise_begin_sample) << "\n"
 		  << STR(data.base_sample) << "\n"
-		  << STR(data.peak_sample) << std::endl;
+		  << STR(data.peak_sample) << "\n"
+		  << STR(data.WriteFlag()) << "\n"
+		  << STR(data.VetoFlag()) << "\n"
+		  << STR(data.TSMatchFlag()) << "\n"
+		  << STR(data.ExternalDiscFlag()) << "\n"
+		  << STR(data.PeakValidFlag()) << "\n"
+		  << STR(data.OffsetFlag()) << "\n"
+		  << STR(data.CFDValidFlag()) << "\n"
+		  << STR(data.SyncErrorFlag()) << "\n"
+		  << STR(data.GeneralErrorFlag()) << "\n"
+		  << STR(data.PileUpOnlyFlag()) << "\n"
+		  << STR(data.PileUpFlag()) << std::endl;
 }
 #undef STR
 

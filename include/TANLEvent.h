@@ -54,6 +54,7 @@ class TANLEvent : public TObject {
     UShort_t prerise_begin_sample;
     //UShort_t base_sample;
     //UShort_t peak_sample;
+    std::vector<UShort_t> wave_data;
 
   ClassDef(TANLEvent,0);
 };

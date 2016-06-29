@@ -62,12 +62,34 @@ int TRCNPSource::GetEvent(TRawEvent& event) {
   //TSmartBuffer eventbuffer(ptrbytes,sizeof(rcnp));
   //event.SetData(eventbuffer);
 
+  double time = 0;
   event.SetDataPtr((void*)rcnp);
-  double time = rcnp->GR_MYRIAD(0);
-  if (time == -441441) { time = 11; }
+  if (TGRUTOptions::Get()->GRSingles()) {
+    // singles (ignoring myriad timestamp)
+    static ULong_t counter = 0;
+    counter += TGRUTOptions::Get()->BuildWindow()*1.5;
+    time = counter;
+  }
+  else {
+    // normal, use the GR myriad timestamp and if it's not present set the time to a random constant
+    time = rcnp->GR_MYRIAD(0);
+    if (time == -441441) {
+
+      static int not_found = 0;
+      if (not_found < 100) {
+        std::cout << "GR Myriad timestamp not found!!!" << std::endl;
+        if (not_found == 99) {
+          std::cout << "More than 100 GR events are missing a timestamp. This warning is being supressed, but you should probably investigate this." << std::endl;
+        }
+      }
+
+      time = 2112;
+    }
+  }
 
   rcnp->SetTimestamp(time);
   event.SetFragmentTimestamp(time);
+
   return sizeof(rcnp);
 }
 

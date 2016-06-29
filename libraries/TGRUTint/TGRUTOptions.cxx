@@ -95,6 +95,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("R save-rcnp-tree", &fSaveRCNPTree)
     .description("Save ROOT tree from raw RCNP analyzer data.")
     .default_value(false);
+  parser.option("S gr-singles", &fGRSingles)
+    .description("Ignore GR timestamps and take singles.")
+    .default_value(false);
 
 
   parser.option("hist-output",&output_histogram_file)

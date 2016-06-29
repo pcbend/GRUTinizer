@@ -67,12 +67,31 @@ int TMultiRawFile::GetEvent(TRawEvent& outevent){
   // If another event exists, put it back into the list
   FileEvent next;
   next.file = output.file;
+
   int bytes_read = next.file->Read(next.next_event);
   if(bytes_read > 0){
     fFileEvents.insert(next);
-  } else if (!TGRUTOptions::Get()->ExitAfterSorting()) {
-    stalled_source = next.file;
-  } else { // otherwise delete the source from the file list
+  } // else if (!TGRUTOptions::Get()->ExitAfterSorting()) {
+  //   // // if in online mode and the current source is at its end, delete it
+  //   // std::cout << next.file->Status() << std::endl;
+  //   // TRawEventFileSource* filein = dynamic_cast<TRawEventFileSource*>(next.file);
+  //   // if (filein) {
+  //   //         std::cout << filein->SourceDescription() << " : " << (filein->GetFileSize() - filein->GetBytesGiven()) << std::endl;
+  //   //   if ((filein->GetFileSize() - filein->GetBytesGiven()) == 0) {
+  //   //     std::lock_guard<std::mutex> lock(fFileListMutex);
+  //   //     delete output.file;
+  //   //     fFileList.erase(output.file);
+  //   //   }
+  //   // } else { // otherwise it is a stalled source and we should wait until data is available for coincidence building
+  //   //   stalled_source = next.file;
+  //   // }
+  // }
+  else { // otherwise delete the source from the file list
+    std::cout << "######################################\n";
+    std::cout << std::endl << "Deleting source: " << next.file->SourceDescription() << std::endl;
+    std::cout << next.file->Status() << std::endl << std::endl;
+    std::cout << "######################################\n";
+
     std::lock_guard<std::mutex> lock(fFileListMutex);
     delete output.file;
     fFileList.erase(output.file);

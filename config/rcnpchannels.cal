@@ -82,15 +82,15 @@ EXT19AP00 {
 }
 EXT20AP00 {
   Address: 0x01006700
-  EnergyCoeff: 0 1
+  EnergyCoeff: -23.996 1.5685
 }
 EXT21AP00 {
   Address: 0x01006701
-  EnergyCoeff: 0 1
+  EnergyCoeff: -7.5781 1.5026
 }
 EXT22AP00 {
   Address: 0x01006702
-  EnergyCoeff: 0 1
+  EnergyCoeff: -31.6613 1.5664
 }
 EXT23AP00 {
   Address: 0x01006703
@@ -122,15 +122,15 @@ EXT29AP00 {
 }
 EXT30AP00 {
   Address: 0x01006800
-  EnergyCoeff: 0 1
+  EnergyCoeff: -18.3471 0.8697
 }
 EXT31AP00 {
   Address: 0x01006801
-  EnergyCoeff: 0 1
+  EnergyCoeff: -7.7967 0.8227
 }
 EXT32AP00 {
   Address: 0x01006802
-  EnergyCoeff: 0 1
+  EnergyCoeff: -23.9436 0.8553
 }
 EXT33AP00 {
   Address: 0x01006803
