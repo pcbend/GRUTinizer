@@ -5,6 +5,8 @@
 
 #include "TSmartBuffer.h"
 
+#include <vector>
+
 
 class TANLEvent : public TObject {
   public:
@@ -34,6 +36,8 @@ class TANLEvent : public TObject {
     // TODO: add to input calibrations file for second order corrections
     //       e.g. pole zero etc.
     double   GetEnergy() const { return ((GetPostE() - GetPreE())/350.0); }
+    Double_t GetCFD() const { return (Double_t)discriminator + d_cfd; }
+    std::vector<Short_t>& GetTrace() { return wave_data; }
 
   private:
 
@@ -41,6 +45,8 @@ class TANLEvent : public TObject {
     UShort_t board_id;
     UShort_t channel;
     ULong_t discriminator;
+
+    Double_t d_cfd;
 
     ULong_t disc_prev;
     UInt_t flags;
@@ -54,7 +60,7 @@ class TANLEvent : public TObject {
     UShort_t prerise_begin_sample;
     //UShort_t base_sample;
     //UShort_t peak_sample;
-    std::vector<UShort_t> wave_data;
+    std::vector<Short_t> wave_data;
 
   ClassDef(TANLEvent,0);
 };

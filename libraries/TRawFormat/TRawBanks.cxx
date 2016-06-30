@@ -189,10 +189,28 @@ ULong_t  TRawEvent::GEBArgonneCFDv18::GetPrevCFD(const GEBArgonneHead* header) c
     return 0xffffffffffffffff;
   }
 }
+#define STR(x) #x << ": " << x
+Double_t TRawEvent::GEBArgonneCFDv18::GetCFD()  const {
+  // std::cout << STR(CFDValidFlag()) << std::endl;
+  // std::cout << STR(cfd_sample0) << std::endl;
+  // std::cout << STR(cfd_sample1) << std::endl;
+  // std::cout << STR(cfd_sample2) << std::endl;
+  // std::cout << STR(GetCFD0()) << std::endl;
+  // std::cout << STR(GetCFD1()) << std::endl;
+  // std::cout << STR(GetCFD2()) << std::endl;
+  // std::cout << std::endl;
+  // std::cin.get();
+  return 0. - GetCFD2()*2./(GetCFD2()-GetCFD0());
+}
+#undef STR
 
-Short_t  TRawEvent::GEBArgonneCFDv18::GetCFD0() const { return (cfd_sample0 & 0x3fff); }
-Short_t  TRawEvent::GEBArgonneCFDv18::GetCFD1() const { return (cfd_sample1 & 0x3fff); }
-Short_t  TRawEvent::GEBArgonneCFDv18::GetCFD2() const { return (cfd_sample2 & 0x3fff); }
+Short_t  TRawEvent::GetSigned14BitFromUShort(UShort_t ushort) {
+  return ((Short_t)((ushort & 0x3fff) << 2))/4;
+}
+
+Short_t  TRawEvent::GEBArgonneCFDv18::GetCFD0() const { return GetSigned14BitFromUShort(cfd_sample0); }
+Short_t  TRawEvent::GEBArgonneCFDv18::GetCFD1() const { return GetSigned14BitFromUShort(cfd_sample1); }
+Short_t  TRawEvent::GEBArgonneCFDv18::GetCFD2() const { return GetSigned14BitFromUShort(cfd_sample2); }
 
 UInt_t   TRawEvent::GEBArgonneCFDv18::GetBaseline() const { return ((sampled_baseline & 0x00FFFFFF) >> 0); }
 UInt_t   TRawEvent::GEBArgonneCFDv18::GetPreRiseE() const { return (postrise_sum_low_prerise_sum & 0xffffff); }

@@ -43,12 +43,20 @@ class TCagraHit : public TDetectorHit {
                       const TVector3& particle_vec = TVector3(0,0,1),
                       const TVector3& cagra_offset = TVector3(0,0,0)) const;
 
-    void SetDiscTime(const ULong_t t) { time = t; }
-    ULong_t GetDiscTime() { return time; }
+    void SetDiscTime(const Double_t t) { time = t; }
+    Double_t GetDiscTime() { return time; }
+
+    std::vector<Short_t>* GetTrace(int segnum=0);
+    void SetTrace(std::vector<Short_t>& trace);
+    void DrawTrace(int segnum);
+    double GetTraceHeight() const;
+    double GetTraceHeightDoppler(double beta,const TVector3& vec = TVector3(0,0,1)) const;
+    Double_t GetTraceEnergy(const UShort_t& a,const UShort_t& b,const UShort_t& x,const UShort_t& y) const;
 
   private:
+    std::vector<Short_t> fTrace;
     std::vector<TCagraSegmentHit> fSegments;
-    ULong_t time;
+    Double_t time;
 
   ClassDef(TCagraHit,1);
 };

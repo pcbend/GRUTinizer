@@ -7,7 +7,7 @@ ClassImp(TANLEvent)
 
 //bool TANLEvent::fExtractWaves = true;
 
-TANLEvent::TANLEvent(TSmartBuffer& buf) {
+TANLEvent::TANLEvent(TSmartBuffer& buf) : d_cfd(0.) {
 
   bool read_waveform = TGRUTOptions::Get()->ExtractWaves();
   if (read_waveform) {
@@ -89,7 +89,9 @@ TANLEvent::TANLEvent(TSmartBuffer& buf) {
     // Swap big endian for little endian
     TRawEvent::SwapArgonneCFDv18(*data);
     // Extract data from payload
-    //discriminator = data->GetCFD0(); // this should be a function to interpolate the zero crossing
+    d_cfd = data->GetCFD();  // TODO: use a fit
+    // std::cout << cfd << std::endl;
+    // std::cin.get();
     disc_prev = data->GetPrevCFD(header);
     flags = data->flags;
     prerise_energy = data->GetPreRiseE();
@@ -102,13 +104,15 @@ TANLEvent::TANLEvent(TSmartBuffer& buf) {
 
     size_t wave_bytes = header->GetLength()*4 - sizeof(*header) - sizeof(*data); // labr 1.52us
     // // trace analysis here
-    // for (auto i=0u; i<wave_bytes; i+=sizeof(UShort_t)) {
-    //   wave_data.push_back(((UShort_t*)buf.GetData())[0] & 0x3fff);
-    //   buf.Advance(sizeof(UShort_t));
-    // }
+    for (auto i=0u; i<wave_bytes; i+=sizeof(UShort_t)) {
+      UShort_t swapped = TRawEvent::SwapShort(((UShort_t*)buf.GetData())[0]);
+      Short_t tracept = TRawEvent::GetSigned14BitFromUShort(swapped);
+      wave_data.push_back(tracept);
+      buf.Advance(sizeof(UShort_t));
+    }
 
     // advance the buffer to the next event (sometimes there is an extra 4bytes which must be skipped)
-    buf.Advance(wave_bytes);
+    //buf.Advance(wave_bytes);
 
 
     // const char* temp = buf.GetData();

@@ -385,11 +385,11 @@ struct GEBArgonneLEDv18 {
 struct GEBArgonneCFDv18 {
   UShort_t cfd_low_prev;
   UShort_t flags;
-  Short_t  cfd_sample0; // signed
+  UShort_t cfd_sample0; // signed
   UShort_t cfd_mid_prev; // bits 16:29
   UInt_t   sampled_baseline;
-  Short_t  cfd_sample2;
-  Short_t  cfd_sample1;
+  UShort_t cfd_sample2;
+  UShort_t cfd_sample1;
   UInt_t   postrise_sum_low_prerise_sum;
   UShort_t timestamp_peak_low;
   UShort_t postrise_sum_high;
@@ -401,6 +401,7 @@ struct GEBArgonneCFDv18 {
   UShort_t prerise_begin_sample;
   UShort_t base_sample;
   UShort_t peak_sample;
+  Double_t  GetCFD() const;
   Short_t  GetCFD0() const;
   Short_t  GetCFD1() const;
   Short_t  GetCFD2() const;
@@ -428,6 +429,8 @@ struct GEBArgonneCFDv18 {
   UShort_t PileUpOnlyFlag() const;
   UShort_t PileUpFlag() const;
 }__attribute__((__packed__));
+
+static Short_t GetSigned14BitFromUShort(UShort_t ushort);
 
 friend std::ostream& operator<<(std::ostream& os, const GEBArgonneLEDv11& data);
 static void SwapArgonneLEDv11(TRawEvent::GEBArgonneLEDv11& data);
