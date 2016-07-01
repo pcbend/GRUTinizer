@@ -65,6 +65,17 @@ public:
   double CalEnergy(int charge, double timestamp=-DBL_MAX) const;
   double CalEnergy(double charge, double timestamp=-DBL_MAX) const;
 
+  void SetPoleZeroCoeff(std::vector<double> coeff, double timestamp);
+  const std::vector<double>& GetPoleZeroCoeff(double timestamp) const;
+  void ClearPoleZeroCoeff();
+  double PoleZeroCorrection(const double& prerise, const double& postrise, const double& shaping_time, double timestamp=-DBL_MAX) const;
+
+  void SetBaselineCoeff(std::vector<double> coeff, double timestamp);
+  const std::vector<double>& GetBaselineCoeff(double timestamp) const;
+  void ClearBaselineCoeff();
+  double BaselineCorrection(const double& charge, double asym_bl=0, double timestamp=-DBL_MAX) const;
+
+
   void SetTimeCoeff(std::vector<double> tmp, double timestamp=-DBL_MAX);
   const std::vector<double>& GetTimeCoeff(double timestamp=-DBL_MAX) const;
   void ClearTimeCoeff();
@@ -120,6 +131,8 @@ public:
 
   std::vector<CoefficientTimes> energy_coeff;
   std::vector<CoefficientTimes> time_coeff;
+  std::vector<CoefficientTimes> polezero_corrections;
+  std::vector<CoefficientTimes> baseline_corrections;
   std::vector<double> efficiency_coeff;
   int pedestal;
   //name and title held by TNamed.

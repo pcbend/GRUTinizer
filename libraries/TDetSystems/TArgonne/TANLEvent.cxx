@@ -6,8 +6,9 @@
 ClassImp(TANLEvent)
 
 //bool TANLEvent::fExtractWaves = true;
+Float_t TANLEvent::shaping_time = std::sqrt(-1);
 
-TANLEvent::TANLEvent(TSmartBuffer& buf) {
+TANLEvent::TANLEvent(TSmartBuffer& buf) : d_cfd(0.) {
 
   bool read_waveform = TGRUTOptions::Get()->ExtractWaves();
   if (read_waveform) {
@@ -89,7 +90,9 @@ TANLEvent::TANLEvent(TSmartBuffer& buf) {
     // Swap big endian for little endian
     TRawEvent::SwapArgonneCFDv18(*data);
     // Extract data from payload
-    //discriminator = data->GetCFD0(); // this should be a function to interpolate the zero crossing
+    d_cfd = data->GetCFD();  // TODO: use a fit
+    // std::cout << cfd << std::endl;
+    // std::cin.get();
     disc_prev = data->GetPrevCFD(header);
     flags = data->flags;
     prerise_energy = data->GetPreRiseE();
@@ -99,12 +102,35 @@ TANLEvent::TANLEvent(TSmartBuffer& buf) {
     postrise_end_sample = data->GetPostRiseSampleEnd();
     prerise_end_sample = data->GetPreRiseSampleEnd();
 
-    //std:: cout << data->GetCFD0() << " " << data->GetCFD1() << " " << data->GetCFD2() << std::endl;
 
-    // ignore waveform data
-    size_t wave_bytes = header->GetLength()*4 - sizeof(*header) - sizeof(*data);
-    buf.Advance(wave_bytes);
+    size_t wave_bytes = header->GetLength()*4 - sizeof(*header) - sizeof(*data); // labr 1.52us
+    // // trace analysis here
+    for (auto i=0u; i<wave_bytes; i+=sizeof(UShort_t)) {
+      UShort_t swapped = TRawEvent::SwapShort(((UShort_t*)buf.GetData())[0]);
+      Short_t tracept = TRawEvent::GetSigned14BitFromUShort(swapped);
+      wave_data.push_back(tracept);
+      buf.Advance(sizeof(UShort_t));
+    }
 
+    // advance the buffer to the next event (sometimes there is an extra 4bytes which must be skipped)
+    //buf.Advance(wave_bytes);
+
+
+    // const char* temp = buf.GetData();
+
+    // // check if the next byte is the GEB type id 0xe for ANL firmware events (DGS)
+    // if (*temp != 0xe) {
+    //   buf.Advance(4);
+    //   temp = buf.GetData();
+    // }
+    // // if after advancing we are still not on a geb header, then print out the bytes for debugging
+    // if (*temp != 0xe) {
+    //   for (int i=0;i<64;i++){
+    //     if(i%2==0)std::cout << " ";
+    //     if(i%16==0)std::cout << std::endl;
+    //     std::cout << std::setfill('0') << std::setw(2) <<std::right << std::hex << (int)((unsigned char*)temp)[i];
+    //   } std::cout << std::endl<<std::endl;
+    // }
 
     break;
   }

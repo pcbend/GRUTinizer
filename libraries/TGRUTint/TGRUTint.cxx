@@ -32,6 +32,7 @@
 #include "TOrderedRawFile.h"
 #include "TRawSource.h"
 #include "TMultiRawFile.h"
+#include "TGlobRawFile.h"
 #include "TSequentialRawFile.h"
 
 #include "GrutNotifier.h"
@@ -216,6 +217,7 @@ void TGRUTint::ApplyOptions() {
 
   //next most important thing, if given a raw file && NOT told to not sort!
   if((opt->InputRing().length() || opt->RawInputFiles().size()
+      || opt->SortMultipleGlob().length()
       || (opt->RootInputFiles().size() && opt->TreeSource()))
      && !missing_file && opt->SortRaw()) {
 
@@ -240,6 +242,11 @@ void TGRUTint::ApplyOptions() {
         multi_source->AddFile(filename.c_str());
       }
       source = multi_source;
+
+    } else if(opt->SortMultipleGlob().length()) {
+      // Open multiple files, read from all at the same time.
+      TGlobRawFile* glob_multi_source = new TGlobRawFile(opt->SortMultipleGlob());
+      source = glob_multi_source;
 
     } else if(!opt->SortMultiple() && (
                 opt->RawInputFiles().size() > 1 ||

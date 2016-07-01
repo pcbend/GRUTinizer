@@ -7,10 +7,17 @@ void TCagraSegmentHit::Copy(TObject& obj) const{
   TDetectorHit::Copy(obj);
 
   TCagraSegmentHit& cagra = (TCagraSegmentHit&)obj;
+  cagra.fTrace = fTrace;
 }
 
 void TCagraSegmentHit::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
+  fTrace.clear();
+}
+
+void TCagraSegmentHit::SetTrace(std::vector<Short_t>& trace) {
+  fTrace.clear();
+  fTrace.swap(trace);
 }
 
 void TCagraSegmentHit::Print(Option_t *opt) const {

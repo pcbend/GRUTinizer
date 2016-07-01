@@ -20,8 +20,12 @@ public:
   int GetBoardID() const;
   int GetChannel() const;
 
-private:
+  std::vector<Short_t>& GetTrace() { return fTrace; }
+  void SetTrace(std::vector<Short_t>& trace);
 
+
+private:
+  std::vector<Short_t> fTrace;
   ClassDef(TCagraSegmentHit,1);
 };
 

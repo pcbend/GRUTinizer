@@ -262,6 +262,8 @@ void TChannel::ClearCalibrations() {
   ClearEnergyCoeff();
   ClearEfficiencyCoeff();
   ClearTimeCoeff();
+  ClearPoleZeroCoeff();
+  ClearBaselineCoeff();
 }
 
 const std::vector<double>& TChannel::GetEnergyCoeff(double timestamp) const {
@@ -301,6 +303,82 @@ double TChannel::CalEnergy(int charge, double timestamp) const {
 
 double TChannel::CalEnergy(double charge, double timestamp) const {
   return Calibrate(charge-pedestal, GetEnergyCoeff(timestamp));
+}
+
+const std::vector<double>& TChannel::GetPoleZeroCoeff(double timestamp) const {
+  for(auto& coeff_time : polezero_corrections){
+    if(timestamp >= coeff_time.start_time) {
+      return coeff_time.coefficients;
+    }
+  }
+  // Should never reach here, but just in case.
+  return empty_vec;
+}
+
+void TChannel::ClearPoleZeroCoeff() {
+  polezero_corrections.clear();
+  polezero_corrections.push_back({std::vector<double>(), -DBL_MAX});
+}
+
+void TChannel::SetPoleZeroCoeff(std::vector<double> coeff, double timestamp) {
+  std::vector<double>* found = NULL;
+  for(auto& pz : polezero_corrections) {
+    if(pz.start_time == timestamp){
+      found = &pz.coefficients;
+    }
+  }
+
+  if(found){
+    *found = std::move(coeff);
+  } else {
+    polezero_corrections.push_back({std::move(coeff), timestamp});
+    std::sort(polezero_corrections.begin(), polezero_corrections.end());
+  }
+}
+
+double TChannel::PoleZeroCorrection(const double& prerise, const double& postrise, const double& shaping_time, double timestamp) const {
+  auto pz = GetPoleZeroCoeff(timestamp);
+  return (pz.size()) ? (postrise-prerise*pz[0])/shaping_time : 0;
+}
+
+const std::vector<double>& TChannel::GetBaselineCoeff(double timestamp) const {
+  for(auto& coeff_time : baseline_corrections){
+    if(timestamp >= coeff_time.start_time) {
+      return coeff_time.coefficients;
+    }
+  }
+  // Should never reach here, but just in case.
+  return empty_vec;
+}
+
+void TChannel::ClearBaselineCoeff() {
+  baseline_corrections.clear();
+  baseline_corrections.push_back({std::vector<double>(), -DBL_MAX});
+}
+
+void TChannel::SetBaselineCoeff(std::vector<double> coeff, double timestamp) {
+  std::vector<double>* found = NULL;
+  for(auto& pz : baseline_corrections) {
+    if(pz.start_time == timestamp){
+      found = &pz.coefficients;
+    }
+  }
+
+  if(found){
+    *found = std::move(coeff);
+  } else {
+    baseline_corrections.push_back({std::move(coeff), timestamp});
+    std::sort(baseline_corrections.begin(), baseline_corrections.end());
+  }
+}
+
+double TChannel::BaselineCorrection(const double& charge, double asym_bl, double timestamp) const {
+  auto pz = GetPoleZeroCoeff(timestamp);
+  if (!asym_bl) {
+    auto bl = GetBaselineCoeff(timestamp);
+    asym_bl = (bl.size()) ? bl[0] : 0;
+  }
+  return (pz.size()) ? charge - asym_bl*(1. - pz[0]) : charge - asym_bl;
 }
 
 const std::vector<double>& TChannel::GetTimeCoeff(double timestamp) const {
@@ -546,8 +624,12 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
                                   ParseStartTime(type));
 
         } else if(type.find("POLEZERO")==0) {
-          //channel->SetEnergyCoeff(ParseListOfDoubles(ss),
-          //ParseStartTime(type));
+          channel->SetPoleZeroCoeff(ParseListOfDoubles(ss),
+                                    ParseStartTime(type));
+
+        } else if(type.find("BASELINE")==0) {
+          channel->SetBaselineCoeff(ParseListOfDoubles(ss),
+                                    ParseStartTime(type));
 
         } else if(type == "PEDESTAL") {
           int val = 0; ss >> val;

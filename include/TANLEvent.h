@@ -5,6 +5,11 @@
 
 #include "TSmartBuffer.h"
 
+#include <vector>
+
+#include "GValue.h"
+
+
 
 class TANLEvent : public TObject {
   public:
@@ -21,6 +26,11 @@ class TANLEvent : public TObject {
     UShort_t GetPostEnd() const { return postrise_end_sample; }
     UShort_t GetPreBegin() const { return prerise_begin_sample; }
     UShort_t GetPreEnd() const { return prerise_end_sample; }
+    static Float_t& GetShapingTime() {
+        if (std::isnan(shaping_time)) { shaping_time = GValue::Value("ShapingTime"); }
+        return shaping_time;
+    }
+
 
     // Parse flags
     UShort_t ExternalDiscFlag() const { return ((flags & 0x100)>>8); }
@@ -31,19 +41,22 @@ class TANLEvent : public TObject {
     UShort_t PileUpOnlyFlag() const { return ((flags & 0x4000)>>14); }
     UShort_t PileUpFlag() const { return ((flags & 0x8000)>>15); }
 
-    // TODO: add to input calibrations file for second order corrections
-    //       e.g. pole zero etc.
-    double   GetEnergy() const { return ((GetPostE() - GetPreE())/350.0); }
+    double   GetEnergy() const { return ((GetPostE() - GetPreE())/GetShapingTime()); }
+    Double_t GetCFD() const { return (Double_t)discriminator + d_cfd; }
+    std::vector<Short_t>& GetTrace() { return wave_data; }
 
   private:
+    static Float_t shaping_time;
 
     UShort_t global_addr;
     UShort_t board_id;
     UShort_t channel;
     ULong_t discriminator;
 
+    Double_t d_cfd;
+
     ULong_t disc_prev;
-    UInt_t flags;
+    UShort_t flags;
     //UInt_t sampled_baseline;
     UInt_t prerise_energy;
     UInt_t postrise_energy;
@@ -54,6 +67,7 @@ class TANLEvent : public TObject {
     UShort_t prerise_begin_sample;
     //UShort_t base_sample;
     //UShort_t peak_sample;
+    std::vector<Short_t> wave_data;
 
   ClassDef(TANLEvent,0);
 };

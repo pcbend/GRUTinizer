@@ -17,7 +17,8 @@ TRCNPSource::TRCNPSource(const char* Command, kFileType file_type)
                        },
                        TGRUTOptions::Get()->SaveRCNPTree());
 
-  LoadFakeTimestamps();
+  //LoadFakeTimestamps();
+  std::this_thread::sleep_for(std::chrono::seconds(4));
 }
 
 int TRCNPSource::GetEvent(TRawEvent& event) {
@@ -60,16 +61,34 @@ int TRCNPSource::GetEvent(TRawEvent& event) {
   //*reinterpret_cast<RCNPEvent**>(ptrbytes) = rcnp;
   //TSmartBuffer eventbuffer(ptrbytes,sizeof(rcnp));
   //event.SetData(eventbuffer);
-  event.SetDataPtr((void*)rcnp);
 
-  // set the timestamp of the ttree event
-  if (timestamps.size()==0) {
-    std::cout << "End of time stamps" << std::endl;
-    return -1;
+  double time = 0;
+  event.SetDataPtr((void*)rcnp);
+  if (TGRUTOptions::Get()->GRSingles()) {
+    // singles (ignoring myriad timestamp)
+    static ULong_t counter = 0;
+    counter += TGRUTOptions::Get()->BuildWindow()*1.5;
+    time = counter;
   }
-  rcnp->SetTimestamp(timestamps.front());
-  event.SetFragmentTimestamp(timestamps.front());
-  timestamps.pop();
+  else {
+    // normal, use the GR myriad timestamp and if it's not present set the time to a random constant
+    time = rcnp->GR_MYRIAD(0);
+    if (time == -441441) {
+
+      static int not_found = 0;
+      if (not_found < 100) {
+        std::cout << "GR Myriad timestamp not found!!!" << std::endl;
+        if (not_found == 99) {
+          std::cout << "More than 100 GR events are missing a timestamp. This warning is being supressed, but you should probably investigate this." << std::endl;
+        }
+      }
+
+      time = 2112;
+    }
+  }
+
+  rcnp->SetTimestamp(time);
+  event.SetFragmentTimestamp(time);
 
   return sizeof(rcnp);
 }
@@ -82,28 +101,6 @@ std::string TRCNPSource::Status() const {
               GREEN, GetAverageRate()/1e6, RESET_COLOR);
 }
 std::string TRCNPSource::SourceDescription() const {return "File: "+std::string("RCNP_BLD: ")+fCommand;}
-
-
-void TRCNPSource::LoadFakeTimestamps() {
-
-  std::string line; std::stringstream stream; ULong_t ts;
-  ifstream file ("./timestamps.dat");
-  if (file.is_open())
-  {
-    while ( getline (file,line) )
-    {
-      stream << line;
-      stream >> ts;
-      timestamps.push(ts);
-      stream.str("");
-      stream.clear();
-      //std::cout << ts << std::endl;
-    }
-    file.close();
-  } else {
-    throw std::runtime_error("./timestamps.dat not found");
-  }
-}
 
 
 // template<>

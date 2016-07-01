@@ -45,8 +45,12 @@ public:
   bool StartGUI()           const { return fStartGui; }
   bool MakeHistos()         const { return fMakeHistos; }
   bool SortMultiple()       const { return fSortMultiple; }
+  std::string SortMultipleGlob()   const { return fGlobRaw; }
   bool TreeSource()         const { return fTreeSource; }
   bool SaveRCNPTree()       const { return fSaveRCNPTree; }
+  bool FastForwardRawFile() const { return fFastForwardRaw; }
+  bool GRSingles()          const { return fGRSingles; }
+
 
   bool IsOnline()           const { return fIsOnline; }
 
@@ -105,8 +109,10 @@ private:
   int fBuildWindow;
   bool fShouldExit;
 
-
+  bool fFastForwardRaw;
   bool fSaveRCNPTree;
+  std::string fGlobRaw;
+  bool fGRSingles;
 
   ClassDef(TGRUTOptions,0);
 };

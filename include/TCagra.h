@@ -9,6 +9,8 @@
 
 #include "TVector3.h"
 
+#include <vector>
+
 class TCagra : public TDetector {
 
 public:
@@ -29,7 +31,6 @@ public:
   // Allows for looping over all hits with for(auto& hit : cagra) { }
   std::vector<TCagraHit>::iterator begin() { return cagra_hits.begin(); }
   std::vector<TCagraHit>::iterator end() { return cagra_hits.end(); }
-
 
 private:
   virtual int BuildHits(std::vector<TRawEvent>& raw_data);

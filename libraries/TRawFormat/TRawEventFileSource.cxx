@@ -6,6 +6,10 @@ TRawEventFileSource::TRawEventFileSource(const std::string& filename, kFileType 
   : TRawEventByteSource(file_type), fFilename(filename) {
   fFile = fopen(filename.c_str(),"rb");
   SetFileSize(FindFileSize(filename.c_str()));
+
+  if (TGRUTOptions::Get()->FastForwardRawFile() && TGRUTOptions::Get()->StartGUI())  {
+    FastForward();
+  }
 }
 
 TRawEventFileSource::~TRawEventFileSource() {
@@ -15,6 +19,10 @@ TRawEventFileSource::~TRawEventFileSource() {
 void TRawEventFileSource::Reset() {
   TRawEventByteSource::Reset();
   fseek(fFile, 0, SEEK_SET);
+}
+
+void TRawEventFileSource::FastForward() {
+  fseek(fFile, 0, SEEK_END);
 }
 
 int TRawEventFileSource::ReadBytes(char* buf, size_t size){
