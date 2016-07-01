@@ -338,7 +338,11 @@ void TChannel::SetPoleZeroCoeff(std::vector<double> coeff, double timestamp) {
 
 double TChannel::PoleZeroCorrection(const double& prerise, const double& postrise, const double& shaping_time, double timestamp) const {
   auto pz = GetPoleZeroCoeff(timestamp);
-  return (pz.size()) ? (postrise-prerise*pz[0])/shaping_time : 0;
+  if (!pz.size()) {
+    std::cout <<std::hex << address << std::endl;
+    throw std::runtime_error("No polezero in calibrations file, yet one is requested.");
+  }
+  return (postrise-prerise*pz[0])/shaping_time;
 }
 
 const std::vector<double>& TChannel::GetBaselineCoeff(double timestamp) const {
@@ -378,7 +382,11 @@ double TChannel::BaselineCorrection(const double& charge, double asym_bl, double
     auto bl = GetBaselineCoeff(timestamp);
     asym_bl = (bl.size()) ? bl[0] : 0;
   }
-  return (pz.size()) ? charge - asym_bl*(1. - pz[0]) : charge - asym_bl;
+  if (!pz.size()) {
+    std::cout <<std::hex << address << std::endl;
+    throw std::runtime_error("No polezero in calibrations file, yet one is requested.");
+  }
+  return charge - asym_bl*(1. - pz[0]);
 }
 
 const std::vector<double>& TChannel::GetTimeCoeff(double timestamp) const {

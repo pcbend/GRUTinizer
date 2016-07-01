@@ -87,6 +87,7 @@ int TCagra::BuildHits(std::vector<TRawEvent>& raw_data){
       hit->SetPreRise(anl.GetPreE());
       hit->SetPostRise(anl.GetPostE());
       hit->SetFlags(anl.GetFlags());
+      hit->SetBaseSample(anl.GetBaseSample());
     } else {
       TCagraSegmentHit& seg = hit->MakeSegmentByAddress(address);
       seg.SetCharge(anl.GetEnergy());
@@ -96,6 +97,7 @@ int TCagra::BuildHits(std::vector<TRawEvent>& raw_data){
       //seg->SetPreRise(anl.GetPreE());
       //seg->SetPostRise(anl.GetPostE());
       //seg->SetFlags(anl.GetFlags());
+      //seg->SetBaseSample(anl.GetBaseSample());
       seg.SetTrace(anl.GetTrace());
     }
   }

@@ -401,7 +401,7 @@ struct GEBArgonneCFDv18 {
   UShort_t prerise_begin_sample;
   UShort_t base_sample;
   UShort_t peak_sample;
-  Double_t  GetCFD() const;
+  Double_t GetCFD() const;
   Short_t  GetCFD0() const;
   Short_t  GetCFD1() const;
   Short_t  GetCFD2() const;
@@ -428,6 +428,7 @@ struct GEBArgonneCFDv18 {
   UShort_t GeneralErrorFlag() const;
   UShort_t PileUpOnlyFlag() const;
   UShort_t PileUpFlag() const;
+
 }__attribute__((__packed__));
 
 static Short_t GetSigned14BitFromUShort(UShort_t ushort);

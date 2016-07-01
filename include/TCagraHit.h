@@ -48,7 +48,10 @@ class TCagraHit : public TDetectorHit {
     Double_t GetCorrectedEnergy(Double_t asym_bl=0.);
     void SetPreRise(Double_t prerise) { prerise_energy = prerise; }
     void SetPostRise(Double_t postrise) { postrise_energy = postrise; }
-
+    void SetFlags(UShort_t fl) { flags = fl; }
+    const UShort_t& GetFlags() const { return flags; }
+    void SetBaseSample(UShort_t base) { base_sample = base; }
+    const UShort_t& GetBaseSample() const { return base_sample; }
     std::vector<Short_t>* GetTrace(int segnum=0);
     void SetTrace(std::vector<Short_t>& trace);
     void DrawTrace(int segnum);
@@ -61,10 +64,11 @@ class TCagraHit : public TDetectorHit {
     std::vector<Short_t> fTrace;
     std::vector<TCagraSegmentHit> fSegments;
     Double_t time;
+    UShort_t flags;
     Double_t prerise_energy;
     Double_t postrise_energy;
+    UShort_t base_sample;
     //Double_t fPZEnergy;
-    Double_t fCorEnergy;
 
   ClassDef(TCagraHit,1);
 };

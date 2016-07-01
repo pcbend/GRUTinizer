@@ -17,7 +17,6 @@
 ClassImp(TCagraHit)
 
 TCagraHit::TCagraHit() : prerise_energy(0), postrise_energy(0) {
-  fCorEnergy = std::sqrt(-1);
 }
 
 TCagraHit::~TCagraHit() {
@@ -144,16 +143,16 @@ Int_t TCagraHit::Charge() const {
 }
 
 Double_t TCagraHit::GetCorrectedEnergy(Double_t asym_bl) {
-  //if(!std::isnan(fCorEnergy)) {return fCorEnergy;}
   TChannel* chan = TChannel::GetChannel(fAddress);
+  Double_t Energy = 0;
   if(!chan){
     std::cout << std::hex << "Channel 0x" << fAddress << " not defined in calibrations file, no corrections are applied." << std::endl;
   } else {
     auto pzE = chan->PoleZeroCorrection(prerise_energy,postrise_energy,TANLEvent::GetShapingTime());
     pzE = chan->BaselineCorrection(pzE,asym_bl);
-    fCorEnergy = chan->CalEnergy(Charge(), fTimestamp);
+    Energy = chan->CalEnergy(pzE, fTimestamp);
   }
-  return fCorEnergy;
+  return Energy;
 }
 Double_t TCagraHit:: GetTraceBaseline() {
   std::vector<Short_t>* trace = GetTrace();

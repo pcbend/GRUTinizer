@@ -101,6 +101,7 @@ TANLEvent::TANLEvent(TSmartBuffer& buf) : d_cfd(0.) {
     prerise_begin_sample = data->GetPreRiseSampleBegin();
     postrise_end_sample = data->GetPostRiseSampleEnd();
     prerise_end_sample = data->GetPreRiseSampleEnd();
+    base_sample = data->GetBaseSample();
 
 
     size_t wave_bytes = header->GetLength()*4 - sizeof(*header) - sizeof(*data); // labr 1.52us
