@@ -1,4 +1,4 @@
-// TCAGRA.h TCAGRAHit.h TCAGRASegmentHit.h TANLEvent.h
+// TCagra.h TCagraHit.h TCagraSegmentHit.h TANLEvent.h
 
 #ifdef __CINT__
 
@@ -8,10 +8,10 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class TANLEvent+;
-#pragma link C++ class TCAGRAHit+;
-#pragma link C++ class TCAGRASegmentHit+;
-#pragma link C++ class std::vector<TCAGRAHit>+;
-#pragma link C++ class std::vector<TCAGRASegmentHit>+;
-#pragma link C++ class TCAGRA+;
+#pragma link C++ class TCagraHit+;
+#pragma link C++ class TCagraSegmentHit+;
+#pragma link C++ class std::vector<TCagraHit>+;
+#pragma link C++ class std::vector<TCagraSegmentHit>+;
+#pragma link C++ class TCagra+;
 
 #endif

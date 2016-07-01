@@ -24,11 +24,12 @@ void TGrandRaiden::InsertHit(const TDetectorHit& hit){
 int TGrandRaiden::BuildHits(std::vector<TRawEvent>& raw_data){
   for(auto& event : raw_data){
     SetTimestamp(event.GetTimestamp());
-    TGrandRaidenHit hit;
-    auto buf = event.GetBuffer();
-    hit.BuildFrom(buf);
+    auto rcnp = reinterpret_cast<RCNPEvent*>(event.GetDataPtr());
+    TGrandRaidenHit hit(*rcnp);
+    hit.BuildFrom();
     hit.SetTimestamp(event.GetTimestamp());
     InsertHit(hit);
+    delete rcnp;
   }
   return Size();
 }

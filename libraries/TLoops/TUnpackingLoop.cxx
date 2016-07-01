@@ -69,10 +69,18 @@ bool TUnpackingLoop::Iteration(){
         HandleGEBData(geb_event);
       }
       break;
+      case kFileType::RCNP_BLD:
+      {
+        //TRCNPEvent& evt = (TRCNPEvent&)raw_event;
+        fOutputEvent->AddRawData(raw_event, kDetectorSystems::GRAND_RAIDEN);
+        //consider adding HandleRCNPData
+      }
+      break;
       case kFileType::ROOT_DATA:
       {
         fOutputEvent->AddRawData(raw_event, kDetectorSystems::GRAND_RAIDEN);
       }
+      break;
       default:
         break;
     }
@@ -163,7 +171,7 @@ void TUnpackingLoop::HandleGEBMode3(TGEBEvent& event, kDetectorSystems system){
 
 void TUnpackingLoop::HandleNSCLPeriodicScalers(TNSCLEvent& event){
   TUnpackedEvent* scaler_event = new TUnpackedEvent;
-  scaler_event->AddRawData(event, kDetectorSystems::S800SCALER);
+  scaler_event->AddRawData(event, kDetectorSystems::NSCLSCALERS);
   scaler_event->Build();
   scaler_event->SetRunStart(fRunStart);
   output_queue.Push(scaler_event);

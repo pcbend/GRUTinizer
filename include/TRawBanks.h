@@ -276,14 +276,14 @@ struct GEBMode3Data {
 friend std::ostream& operator<<(std::ostream& os, const GEBMode3Data &data);
 static void SwapMode3Data(GEBMode3Data &data);
 
-enum ArgonneType { LEDv10, LEDv11, CFDv11 };
+enum ArgonneType { LEDv10, LEDv11, CFDv11, LEDv18, CFDv18 };
 
 struct GEBArgonneHead {
   UShort_t GA_packetlength;
   UShort_t ud_channel;
-  UInt_t   led_low;
+  UInt_t   disc_low;
   UShort_t hdrlength_evttype_hdrtype;
-  UShort_t led_high;
+  UShort_t disc_high;
   UShort_t GetGA() const;
   UShort_t GetLength() const;
   UShort_t GetBoardID() const;
@@ -291,7 +291,7 @@ struct GEBArgonneHead {
   UInt_t   GetHeaderType() const;
   UShort_t GetEventType() const;
   UShort_t GetHeaderLength() const;
-  ULong_t  GetLED() const;
+  ULong_t  GetDisc() const;
 }__attribute__((__packed__));
 
 friend std::ostream& operator<<(std::ostream& os, const GEBArgonneHead &header);
@@ -333,8 +333,114 @@ struct GEBArgonneLEDv11 {
   UShort_t PileUpFlag() const;
 }__attribute__((__packed__));
 
+struct GEBArgonneLEDv18 {
+  UShort_t led_low_prev;
+  UShort_t flags;
+  UInt_t   led_high_prev;
+  UInt_t   sampled_baseline;
+  UInt_t   _blank_;
+  UInt_t   postrise_sum_low_prerise_sum;
+  UShort_t timestamp_peak_low;
+  UShort_t postrise_sum_high;
+  // begin differences from v11 //
+  UShort_t timestamp_trigger_low;
+  UShort_t last_postrise_enter_sample;
+  // old: UInt_t timestamp_peak_high;
+  UShort_t last_postrise_leave_sample;
+  UShort_t postrise_leave_sample;
+  // old: UShort_t postrise_end_sample;
+  // old: UShort_t postrise_begin_sample;
+  UShort_t prerise_enter_sample;
+  UShort_t prerise_leave_sample;
+  // old: UShort_t prerise_end_sample;
+  // old: UShort_t prerise_begin_sample;
+  UShort_t base_sample;
+  UShort_t peak_sample;
+  ULong_t  GetPreviousLED() const;
+  UInt_t   GetBaseline() const;
+  UInt_t   GetPreRiseE() const;
+  UInt_t   GetPostRiseE() const;
+  // need changes
+  ULong_t  GetTrigTimestamp() const;
+  UShort_t GetLastPostRiseEnterSample() const;
+  UShort_t GetLastPostRiseLeaveSample() const;
+  UShort_t GetPostRiseLeaveSample() const;
+  UShort_t GetPreRiseEnterSample() const;
+  UShort_t GetPreRiseLeaveSample() const;
+  // no change needed
+  UShort_t GetBaseSample() const;
+  UShort_t GetPeakSample() const;
+
+  UShort_t WriteFlag() const;
+  UShort_t VetoFlag() const;
+  UShort_t ExternalDiscFlag() const;
+  UShort_t PeakValidFlag() const;
+  UShort_t OffsetFlag() const;
+  UShort_t SyncErrorFlag() const;
+  UShort_t GeneralErrorFlag() const;
+  UShort_t PileUpOnlyFlag() const;
+  UShort_t PileUpFlag() const;
+}__attribute__((__packed__));
+
+struct GEBArgonneCFDv18 {
+  UShort_t cfd_low_prev;
+  UShort_t flags;
+  UShort_t cfd_sample0; // signed
+  UShort_t cfd_mid_prev; // bits 16:29
+  UInt_t   sampled_baseline;
+  UShort_t cfd_sample2;
+  UShort_t cfd_sample1;
+  UInt_t   postrise_sum_low_prerise_sum;
+  UShort_t timestamp_peak_low;
+  UShort_t postrise_sum_high;
+  UShort_t timestamp_trigger_low;
+  UShort_t last_postrise_enter_sample;
+  UShort_t postrise_end_sample;
+  UShort_t postrise_begin_sample;
+  UShort_t prerise_end_sample;
+  UShort_t prerise_begin_sample;
+  UShort_t base_sample;
+  UShort_t peak_sample;
+  Double_t GetCFD() const;
+  Short_t  GetCFD0() const;
+  Short_t  GetCFD1() const;
+  Short_t  GetCFD2() const;
+  ULong_t  GetPrevCFD(const GEBArgonneHead*) const;
+  UInt_t   GetBaseline() const;
+  UInt_t   GetPreRiseE() const;
+  UInt_t   GetPostRiseE() const;
+  ULong_t  GetTrigTimestamp() const;
+  UShort_t GetLastPostRiseEnterSample() const;
+  UShort_t GetPostRiseSampleBegin() const;
+  UShort_t GetPostRiseSampleEnd() const;
+  UShort_t GetPreRiseSampleBegin() const;
+  UShort_t GetPreRiseSampleEnd() const;
+  UShort_t GetBaseSample() const;
+  UShort_t GetPeakSample() const;
+  UShort_t WriteFlag() const;
+  UShort_t VetoFlag() const;
+  UShort_t TSMatchFlag() const;
+  UShort_t CFDValidFlag() const;
+  UShort_t ExternalDiscFlag() const;
+  UShort_t PeakValidFlag() const;
+  UShort_t OffsetFlag() const;
+  UShort_t SyncErrorFlag() const;
+  UShort_t GeneralErrorFlag() const;
+  UShort_t PileUpOnlyFlag() const;
+  UShort_t PileUpFlag() const;
+
+}__attribute__((__packed__));
+
+static Short_t GetSigned14BitFromUShort(UShort_t ushort);
+
 friend std::ostream& operator<<(std::ostream& os, const GEBArgonneLEDv11& data);
 static void SwapArgonneLEDv11(TRawEvent::GEBArgonneLEDv11& data);
+
+friend std::ostream& operator<<(std::ostream& os, const GEBArgonneLEDv18& data);
+static void SwapArgonneLEDv18(TRawEvent::GEBArgonneLEDv18& data);
+
+friend std::ostream& operator<<(std::ostream& os, const GEBArgonneCFDv18& data);
+static void SwapArgonneCFDv18(TRawEvent::GEBArgonneCFDv18& data);
 
 struct GEBS800Header {
   Int_t    total_size;

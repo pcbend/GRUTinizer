@@ -63,7 +63,7 @@ bool TDataLoop::Iteration() {
     return true;
   } else {
     static TRawEventSource* source_ptr = NULL;
-    if(source_ptr != source){
+    if (source_ptr != source) {
       std::cout << "Finished reading source" << std::endl;
       source_ptr = source;
     }

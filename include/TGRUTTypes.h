@@ -16,13 +16,18 @@ enum kDetectorSystems {
   BANK29     = 8,
   GRETINA_SIM= 11,
   S800_SIM   = 9,
+
   SEGA = 64,
   JANUS = 65,
   FASTSCINT =4,
+
   CAESAR = 80,
+
   PHOSWALL = 17,
   ANL = 14,
-  GRAND_RAIDEN = 50
+  GRAND_RAIDEN = 50,
+
+  NSCLSCALERS = 100
 };
 
 extern std::map<std::string, kDetectorSystems> detector_system_map;
@@ -33,6 +38,7 @@ enum kFileType {
   GRETINA_MODE2 = 2,
   GRETINA_MODE3 = 3,
   ANL_RAW = 4,
+  RCNP_BLD = 50,
   ROOT_DATA = 256,
   ROOT_MACRO = 257,
   CALIBRATED = 512,

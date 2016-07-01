@@ -20,6 +20,7 @@ template<typename T>
 class ThreadsafeQueue {
 public:
   ThreadsafeQueue();
+  ThreadsafeQueue(size_t maxsize);
   ~ThreadsafeQueue();
   int Push(T obj);
   int Pop(T& output, int millisecond_wait = 1000);
@@ -49,6 +50,11 @@ private:
 template<typename T>
 ThreadsafeQueue<T>::ThreadsafeQueue()
   : max_queue_size(50000),
+    items_in_queue(0), items_pushed(0), items_popped(0) { }
+
+template<typename T>
+ThreadsafeQueue<T>::ThreadsafeQueue(size_t maxsize)
+  : max_queue_size(maxsize),
     items_in_queue(0), items_pushed(0), items_popped(0) { }
 
 template<typename T>

@@ -1,3 +1,4 @@
+#ifdef RCNP
 #ifndef _TTREESOURCE_H_
 #define _TTREESOURCE_H_
 
@@ -10,8 +11,9 @@
 #include "TRawEvent.h"
 #include "TRawSource.h"
 #include "TChain.h"
+#include "TFile.h"
 
-#include "rootalyze.h"
+#include "RCNPEvent.h"
 
 templateClassImp(TTreeSource)
 
@@ -19,37 +21,8 @@ template <typename T>
 class TTreeSource : public TRawEventSource {
 public:
 
-  /* TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type) */
-  /*   : TTreeSource<T>({filename},treename,eventclassname,file_type) { ; } */
-
-  // template<typename... Args>
-  // TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type, Args&&... args)
-  //   : TTreeSource<T>({filename},treename,eventclassname,file_type,std::forward<Args>(args)...) { ; }
-
-  // template<typename... Args>
-  // TTreeSource(const std::vector<char*>& filenames, const char* treename, const char* eventclassname, kFileType file_type, Args&&... args)
-
-  // template<typename... Args>
-  // TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type, Args&&... args)
-  //   : fChain(treename), fCurrentEntry(0) {
-
-  //   assert(file_type == kFileType::ROOT_DATA);
-
-  //   fFileType = file_type;
-
-  //   fChain.Add(filename);
-
-  //   fFileSize =  fChain.GetEntries()*sizeof(T);
-
-  //   if (sizeof...(Args) > 0) {
-  //     fEvent = new T(std::forward<Args>(args)...);
-  //   } else {
-  //     fEvent = new T();
-  //   }
-  //   fChain.SetBranchAddress(eventclassname, &fEvent);
-  // }
   TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type)
-    : fChain(treename), fCurrentEntry(0) {
+    : fChain(treename), fEvent(0), fCurrentEntry(0) {
 
     assert(file_type == kFileType::ROOT_DATA);
 
@@ -59,9 +32,7 @@ public:
 
     fNumEvents = fChain.GetEntries();
 
-    fFileSize =  fNumEvents*sizeof(T);
-
-    fEvent = new T();
+    fFileSize =  fNumEvents*sizeof(T*);
 
     fChain.SetBranchAddress(eventclassname, &fEvent);
 
@@ -70,8 +41,14 @@ public:
 
   ~TTreeSource() {;}
 
-  virtual std::string Status() const {return std::string("");}
-  virtual std::string SourceDescription() const {return std::string("");}
+  virtual std::string Status() const {
+    return Form("%s: %s %8.2f MB given %s / %s %8.2f MB total %s  => %s %3.02f MB/s processed %s",
+                SourceDescription().c_str(),
+                DCYAN, GetBytesGiven()/1e6, RESET_COLOR,
+                BLUE,  GetFileSize()/1e6, RESET_COLOR,
+                GREEN, GetAverageRate()/1e6, RESET_COLOR);
+  }
+  virtual std::string SourceDescription() const {return "File: "+std::string(fChain.GetCurrentFile()->GetName());}
 
 
   kFileType GetFileType() const { return fFileType; }
@@ -114,20 +91,20 @@ private:
     // create a small memory buffer to hold the pointer to the current entry
     char* ptrbytes = (char*)calloc(1,sizeof(fEvent));
     // copy the address stored in fEvent into the temporary buffer
-    memcpy(&ptrbytes, &fEvent, sizeof(fEvent));
+    *reinterpret_cast<T**>(ptrbytes) = fEvent;
     // prepare the events smart buffer payload
-    TSmartBuffer eventbuffer(ptrbytes,sizeof(fEvent));
+    auto eventbuffer = new TSmartBuffer(ptrbytes,sizeof(fEvent));
     // set the pointer address into the buffer
-    event.SetData(eventbuffer);
+    event.SetData(*eventbuffer);
     // set the timestamp of the ttree event
     if (timestamps.size()==0) {
       std::cout << "End of time stamps" << std::endl;
       return -1;
     }
-    fEvent->SetTimestamp(timestamps.front()+1);
+    fEvent->SetTimestamp(timestamps.front());
+    event.SetFragmentTimestamp(timestamps.front());
     timestamps.pop();
 
-    event.SetFragmentTimestamp(fEvent->GetTimestamp());
     // increment the event count
     fCurrentEntry++;
     //fEvent = nullptr;
@@ -146,3 +123,59 @@ private:
 };
 
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+#else // if RCNP is not defined
+
+
+#ifndef _TTREESOURCE_H_
+#define _TTREESOURCE_H_
+#include "TObject.h"
+#include "TRawEvent.h"
+#include "TRawSource.h"
+templateClassImp(TTreeSource)
+template <typename T>
+class TTreeSource : public TRawEventSource {
+public:
+  TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type) {;}
+  ~TTreeSource() {;}
+  virtual std::string Status() const { return ""; }
+  virtual std::string SourceDescription() const {return ""; }
+  kFileType GetFileType() const { return kFileType::UNKNOWN_FILETYPE; }
+  long GetFileSize() const { return 0; }
+  virtual void Reset() {;}
+protected:
+  void SetFileSize(long file_size) { ; }
+private:
+  TTreeSource() {;}
+  virtual int GetEvent(TRawEvent& event) { event.SetFragmentTimestamp(0); return -1; }
+  ClassDef(TTreeSource,0);
+};
+// ---------------------
+class RCNPEvent : public TObject {
+public:
+  RCNPEvent() {;}
+  virtual ~RCNPEvent() {;}
+  void Clear() {;}
+  long GetTimestamp() { return 0; }
+  void SetTimestamp(const long& ts) { ; }
+private:
+public:
+  ClassDef(RCNPEvent,1);
+};
+// ---------------------
+#endif
+
+
+#endif // RCNP

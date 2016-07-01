@@ -1,48 +1,77 @@
+
 #include "TGrandRaidenHit.h"
 #include "TGRUTOptions.h"
-#include "rootalyze.h"
+#include "RCNPEvent.h"
 #include "TSmartBuffer.h"
+#include "TMath.h"
 
 ClassImp(TGrandRaidenHit)
 
 TGrandRaidenHit::TGrandRaidenHit() {
-  memset(&ADC[0],0,sizeof(Double_t));
+  madc1=0; madc2=0; tpos1=0; tpos2=0;
 }
-
+TGrandRaidenHit::TGrandRaidenHit(const TGrandRaidenHit& gr) {
+  labr_hits = gr.labr_hits;
+  madc1 = gr.madc1;
+  madc2 = gr.madc2;
+  tpos1 = gr.tpos1;
+  tpos2 = gr.tpos2;
+  Timestamp = gr.Timestamp;
+  rcnp = gr.rcnp;
+}
+TGrandRaidenHit::TGrandRaidenHit(RCNPEvent& rcnpevent) :
+  rcnp(rcnpevent) {
+  madc1=0; madc2=0; tpos1=0; tpos2=0;
+}
 TGrandRaidenHit::~TGrandRaidenHit() {
-
 }
 
-
-
-
-void TGrandRaidenHit::BuildFrom(TSmartBuffer& buf){
+void TGrandRaidenHit::BuildFrom(){
+  static bool once = true;
+  if (once) {
+    RCNPEvent::HistDefCheckSum();
+    once = false;
+  }
   Clear();
 
-  // method 1
-  //char* ptrbytes = (char*)calloc(1,sizeof(RCNPEvent*));
-  //auto buffer = buf.GetData();
-  //memcpy(&ptrbytes, &buffer, sizeof(RCNPEvent*));
+  Timestamp = rcnp.GetTimestamp();
 
-  // method 2
-  //TSmartBuffer temp(std::move(buf));
+  auto adc = rcnp.GR_ADC();
+  auto tdc = rcnp.GR_TDC();
 
-  // method 3
-  auto event = const_cast<RCNPEvent*>((const RCNPEvent*)buf.GetData());
-  auto adc = event->GR_ADC();
-  if (adc != nullptr) {
-    std::copy(adc->begin(),adc->end(),&ADC[0]);
+  auto qtc_le_tdc =  rcnp.QTC_LEADING_TDC();
+  auto qtc_le_chan =  rcnp.QTC_LEADING_CH();
+  auto qtc_tr_tdc =  rcnp.QTC_TRAILING_TDC();
+  auto qtc_tr_chan =  rcnp.QTC_TRAILING_CH();
+
+  if (qtc_le_tdc && qtc_tr_tdc) {
+
+    for (auto i=0u; i<qtc_le_chan->size(); i++) {
+      for (auto j=0u; j<qtc_tr_chan->size(); j++) {
+        if ((*qtc_le_chan)[i]==(*qtc_tr_chan)[j]) {
+
+          LaBrHit temphit;
+          temphit.channel = (*qtc_le_chan)[i];
+          temphit.width = (*qtc_tr_tdc)[i] - (*qtc_le_tdc)[j];
+          labr_hits.push_back(temphit);
+
+          //labr_hits.emplace_back({(*qtc_le_chan)[i],(*qtc_le_tdc)[i] - (*qtc_tr_tdc)[j]}); // =(
+        }
+      }
+    }
+
   }
-  Timestamp = event->GetTimestamp();
 
-  // for (int i=0; i<4; i++) {
-  //   std::cout << ADC[i] << " ";
-  // } std::cout << std::endl;
+  if (adc) {
+    madc1 = TMath::Sqrt((*adc)[0]*(*adc)[1]);
+    madc2 = TMath::Sqrt((*adc)[2]*(*adc)[3]);
+  }
+  if (tdc) {
+    tpos1 = TMath::Sqrt((*tdc)[0]*(*tdc)[1]);
+    tpos2 = TMath::Sqrt((*tdc)[2]*(*tdc)[3]);
+  }
 
-  //std::cout << event->GR_ADC() << std::endl;
-  buf.Advance(sizeof(event));
-  //buf.Clear();
-  //if (event) delete event;
+
 }
 
 
@@ -62,4 +91,16 @@ void TGrandRaidenHit::Print(Option_t *opt) const { }
 void TGrandRaidenHit::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
 }
+
+
+
+
+
+
+
+
+
+
+
+
 

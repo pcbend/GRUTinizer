@@ -8,13 +8,14 @@
 #include "TGretSim.h"
 #include "TJanus.h"
 #include "TMode3.h"
+#include "TNSCLScalers.h"
 #include "TPhosWall.h"
 #include "TS800.h"
 #include "TS800Sim.h"
 #include "TS800Scaler.h"
 #include "TSega.h"
 #include "TFastScint.h"
-#include "TCAGRA.h"
+#include "TCagra.h"
 #include "TGrandRaiden.h"
 
 TUnpackedEvent::TUnpackedEvent() { }
@@ -79,14 +80,17 @@ void TUnpackedEvent::Build() {
       GetDetector<TPhosWall>(true)->Build(raw_data);
       break;
 
+    case kDetectorSystems::NSCLSCALERS:
+      GetDetector<TNSCLScalers>(true)->Build(raw_data);
+      break;
+
     case kDetectorSystems::ANL:
-      GetDetector<TCAGRA>(true)->Build(raw_data);
+      GetDetector<TCagra>(true)->Build(raw_data);
       break;
 
     case kDetectorSystems::GRAND_RAIDEN:
       GetDetector<TGrandRaiden>(true)->Build(raw_data);
       break;
-
 
     default:
       break;

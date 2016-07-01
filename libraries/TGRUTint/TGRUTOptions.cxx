@@ -92,6 +92,12 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("T tree-source", &fTreeSource)
     .description("Input TTree source.")
     .default_value(false);
+  parser.option("R save-rcnp-tree", &fSaveRCNPTree)
+    .description("Save ROOT tree from raw RCNP analyzer data.")
+    .default_value(false);
+  parser.option("S gr-singles", &fGRSingles)
+    .description("Ignore GR timestamps and take singles.")
+    .default_value(false);
 
 
   parser.option("hist-output",&output_histogram_file)
@@ -126,6 +132,12 @@ void TGRUTOptions::Load(int argc, char** argv) {
                  "If unspecified, will be guessed from the filename.");
   parser.option("g start-gui",&fStartGui)
     .description("Start the GUI")
+    .default_value(false);
+  parser.option("G glob-raw",&fGlobRaw)
+    .description("Open files according to a pattern and continuously look for new files.")
+    .default_value("");
+  parser.option("F fast-forward",&fFastForwardRaw)
+    .description("Seek to the end of all raw files that are added so as to read freshly saved data in online mode.")
     .default_value(false);
   parser.option("w gretina-waves",&fExtractWaves)
     .description("Extract wave forms to data class when available.")
@@ -237,6 +249,8 @@ kFileType TGRUTOptions::DetermineFileType(const std::string& filename) const{
     return kFileType::PRESETWINDOW;
   } else if (ext == "cuts") {
     return kFileType::CUTS_FILE;
+  } else if (ext == "bld") {
+    return kFileType::RCNP_BLD;
   } else if (ext.find("gtd")!=std::string::npos) {
     return kFileType::ANL_RAW;
   } else {
@@ -248,6 +262,7 @@ bool TGRUTOptions::FileAutoDetect(const std::string& filename) {
   switch(DetermineFileType(filename)){
     case kFileType::NSCL_EVT:
     case kFileType::ANL_RAW:
+    case kFileType::RCNP_BLD:
     case kFileType::GRETINA_MODE2:
     case kFileType::GRETINA_MODE3:
       input_raw_files.push_back(filename);

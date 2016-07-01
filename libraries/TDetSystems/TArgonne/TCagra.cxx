@@ -1,4 +1,4 @@
-#include "TCAGRA.h"
+#include "TCagra.h"
 
 #include <iostream>
 #include <fstream>
@@ -9,30 +9,30 @@
 #include "TGEBEvent.h"
 
 
-std::map<int,TVector3> TCAGRA::detector_positions;
+std::map<int,TVector3> TCagra::detector_positions;
 
 
-TCAGRA::TCAGRA(){
+TCagra::TCagra(){
   Clear();
 }
 
-TCAGRA::~TCAGRA() {
+TCagra::~TCagra() {
 
 }
 
-void TCAGRA::Copy(TObject& obj) const {
+void TCagra::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 
-  TCAGRA& detector = (TCAGRA&)obj;
+  TCagra& detector = (TCagra&)obj;
   detector.cagra_hits = cagra_hits;
 }
 
-void TCAGRA::InsertHit(const TDetectorHit& hit){
-  cagra_hits.emplace_back((TCAGRAHit&)hit);
+void TCagra::InsertHit(const TDetectorHit& hit){
+  cagra_hits.emplace_back((TCagraHit&)hit);
   fSize++;
 }
 
-int TCAGRA::BuildHits(std::vector<TRawEvent>& raw_data){
+int TCagra::BuildHits(std::vector<TRawEvent>& raw_data){
   for (auto& event : raw_data) {
     SetTimestamp(event.GetTimestamp());
 
@@ -61,12 +61,13 @@ int TCAGRA::BuildHits(std::vector<TRawEvent>& raw_data){
     }
 
     int detnum = chan->GetArrayPosition(); // clover number
+    char leaf = *chan->GetArraySubposition(); // clover number
     int segnum = chan->GetSegment(); // segment number
 
     // Get a hit, make it if it does not exist
-    TCAGRAHit* hit = NULL;
+    TCagraHit* hit = NULL;
     for(auto& ihit : cagra_hits){
-      if(ihit.GetDetnum() == detnum){
+      if(ihit.GetDetnum() == detnum && ihit.GetLeaf() == leaf){
         hit = &ihit;
         break;
       }
@@ -80,23 +81,36 @@ int TCAGRA::BuildHits(std::vector<TRawEvent>& raw_data){
     if(segnum==0){
       hit->SetAddress(address);
       hit->SetTimestamp(event.GetTimestamp());
+      hit->SetDiscTime(anl.GetCFD());
       hit->SetCharge(anl.GetEnergy());
+      hit->SetTrace(anl.GetTrace());
+      hit->SetPreRise(anl.GetPreE());
+      hit->SetPostRise(anl.GetPostE());
+      hit->SetFlags(anl.GetFlags());
+      hit->SetBaseSample(anl.GetBaseSample());
     } else {
-      TCAGRASegmentHit& seg = hit->MakeSegmentByAddress(address);
+      TCagraSegmentHit& seg = hit->MakeSegmentByAddress(address);
       seg.SetCharge(anl.GetEnergy());
       seg.SetTimestamp(event.GetTimestamp());
+      // TODO: the following need implementation
+      //seg.SetDiscTime(anl.GetCFD());
+      //seg->SetPreRise(anl.GetPreE());
+      //seg->SetPostRise(anl.GetPostE());
+      //seg->SetFlags(anl.GetFlags());
+      //seg->SetBaseSample(anl.GetBaseSample());
+      seg.SetTrace(anl.GetTrace());
     }
   }
 
 
 
-  //TCAGRAHit hit;
+  //TCagraHit hit;
   //hit.BuildFrom(buf);
   //hit.SetTimestamp(event.GetTimestamp());
   //InsertHit(hit);
   return Size();
 }
-TVector3 TCAGRA::GetSegmentPosition(int detnum, char subpos, int segnum) {
+TVector3 TCagra::GetSegmentPosition(int detnum, char subpos, int segnum) {
   if(detnum < 1 || detnum > 16 || segnum < 0 || segnum > 2 ||
      subpos < 0x41 || subpos > 0x44){
     return TVector3(std::sqrt(-1),std::sqrt(-1),std::sqrt(-1));
@@ -132,7 +146,7 @@ TVector3 TCAGRA::GetSegmentPosition(int detnum, char subpos, int segnum) {
   // return global_pos;
 }
 
-void TCAGRA::LoadDetectorPositions() {
+void TCagra::LoadDetectorPositions() {
   static bool loaded = false;
   if(loaded){
     return;
@@ -146,7 +160,7 @@ void TCAGRA::LoadDetectorPositions() {
   std::ifstream infile(filename);
 
   if(!infile){
-    std::cout << "CAGRA positions file \"" << filename << "\""
+    std::cout << "Cagra positions file \"" << filename << "\""
               << " does not exist, skipping" << std::endl;
     return;
   }
@@ -172,8 +186,8 @@ void TCAGRA::LoadDetectorPositions() {
   }
 }
 
-void TCAGRA::Print(Option_t *opt) const { }
+void TCagra::Print(Option_t *opt) const { }
 
-void TCAGRA::Clear(Option_t *opt) {
+void TCagra::Clear(Option_t *opt) {
   cagra_hits.clear();
 }

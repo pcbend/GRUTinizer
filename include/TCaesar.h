@@ -16,6 +16,7 @@
 #include "TEnv.h" 
 //For easy parsing of detector positions
 #include <fstream>
+#include <functional>
 
 class TCaesar : public TDetector {
 

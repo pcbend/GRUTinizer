@@ -1,5 +1,7 @@
 #include "TRawSource.h"
 
+#include "TRCNPSource.h"
+
 #include "TTreeSource.h"
 
 #include <cassert>
@@ -17,7 +19,7 @@ int TRawEventSource::Read(TRawEvent& event){
     int result = GetEvent(event);
     if(result > 0){
       UpdateByteThroughput(event.GetTotalSize());
-    } else if (result < 0) {
+    } else if (result < 0 && TGRUTOptions::Get()->ExitAfterSorting()) {
       fIsFinished = true;
     }
     return result;
@@ -91,6 +93,15 @@ TRawEventSource* TRawEventSource::EventSource(const char* filename,
     source = new TRawEventGZipSource(filename, file_type);
   } else if (hasSuffix(filename,".root")){
     source = new TTreeSource<RCNPEvent>(filename,"rcnptree","rcnpevent", file_type);
+  } else if (hasSuffix(filename,".bld")){
+    std::string command;
+    if (string(filename) == "online.bld") {
+      std::cout << "Going online with TRCNPSource..." <<std::endl;
+      command = "router_save -s -b 1024 BLD";
+    }else {
+      command = std::string("cat ") + std::string(filename);
+    }
+    source = new TRCNPSource(command.c_str(), file_type);
   // If it is an in-progress file, open it that way
   } else if (is_online) {
     source = new TRawEventOnlineFileSource(filename, file_type);
