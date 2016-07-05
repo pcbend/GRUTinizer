@@ -72,10 +72,15 @@ void MakeHistograms(TRuntimeObjects& obj) {
   if(!gretina)
     return;
 
+  Double_t calorimeterEnergy = 0.;
+  
   for(int x=0; x<gretina->Size(); x++){
 
     TGretinaHit hit = gretina->GetGretinaHit(x);
-
+    // Addback (pre)processing
+    calorimeterEnergy += hit.GetCoreEnergy();
+    
+    
     //                directory, histogram
     obj.FillHistogram("energy",  "overview",
 		      4000, 0., 4000., hit.GetCoreEnergy(),
@@ -174,6 +179,11 @@ void MakeHistograms(TRuntimeObjects& obj) {
     }
     
   }
+  
+  obj.FillHistogram("energy",  "calorimeter",
+		    4000, 0., 4000., calorimeterEnergy);
+  obj.FillHistogram("energy",  "calorimeter_gaus",
+		    4000, 0., 4000., calorimeterEnergy*gRandom->Gaus(1,1./1000.));
   
   TList *list = &(obj.GetObjects());
   int numobj = list->GetSize();

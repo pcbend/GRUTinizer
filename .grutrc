@@ -29,6 +29,7 @@ Canvas.UseScreenFactor: true
 Canvas.ShowGuideLines: false
 
 Root.Fitter: Fumili2
+#Root.Fitter: Minuit
 
 
 
