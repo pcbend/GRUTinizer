@@ -238,7 +238,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       lastClusterSize = cluster.size();
     }
     
-    // Calculate the total energy deposited,
+    // Calculate the total energy deposited in the cluster,
     // and count the pairs of neighbors.
     Int_t neighbors = 0;
     Double_t addbackEnergy = 0.;
@@ -265,13 +265,34 @@ void MakeHistograms(TRuntimeObjects& obj) {
       addbackType = "addback_ng";
 
     // Fill addback histograms.
-    
+
     obj.FillHistogram("addback",  addbackType,
 		      energyNChannels, energyLlim, energyUlim,
 		      addbackEnergy);
     obj.FillHistogram("addback",  addbackType+"_gaus",
 		      energyNChannels, energyLlim, energyUlim,
 		      addbackEnergy_gaus);
+
+    if(addbackType == "addback_n0"
+       || addbackType == "addback_n1"){
+      obj.FillHistogram("addback",  "addback_n0n1",
+			energyNChannels, energyLlim, energyUlim,
+			addbackEnergy);
+      obj.FillHistogram("addback",  "addback_n0n1_gaus",
+			energyNChannels, energyLlim, energyUlim,
+			addbackEnergy_gaus);
+    }
+    
+    if(addbackType == "addback_n0"
+       || addbackType == "addback_n1"
+       || addbackType == "addback_n2"){
+      obj.FillHistogram("addback",  "addback_n0n1n2",
+			energyNChannels, energyLlim, energyUlim,
+			addbackEnergy);
+      obj.FillHistogram("addback",  "addback_n0n1n2_gaus",
+			energyNChannels, energyLlim, energyUlim,
+			addbackEnergy_gaus);
+    }
     
     obj.FillHistogram("addback",  "clusterSize_vs_neighborPairs",
 		      20, 0, 20, neighbors,
