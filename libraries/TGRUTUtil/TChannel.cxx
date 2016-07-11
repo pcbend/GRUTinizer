@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <utility>
+#include <stdexcept>
 
 #include "TRandom.h"
 

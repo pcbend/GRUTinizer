@@ -225,87 +225,48 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   if(cagra) {
 
-    static ULong_t ts_prev = 0;
-
-    ULong_t current_time = cagra->Timestamp();
-    if (ts_prev) {
-      auto diff =  current_time - ts_prev;
-      if (diff < 0) {
-        obj.FillHistogram("TimeOrdering",10,0,11,3);
-      } else {
-        obj.FillHistogram("TimeOrdering",10,0,11,7);
-      }
-    }
-    ts_prev = current_time;
-
-
-    //cout << "Size: " << cagra->Size() << endl;
     for (auto& hit : *cagra) {
 
-      stream.str("");
-      stream << "PostE_BoardID" << hit.GetBoardID()  << "_Chan" << hit.GetChannel();
-      obj.FillHistogram(stream.str().c_str(),10000,0,0,hit.Charge());
-      obj.FillHistogram("DigitizerHits",12,97,109,hit.GetBoardID(),12,-1,11,hit.GetChannel());
+      auto boardid = hit.GetBoardID();
+      auto chan = hit.GetChannel();
 
       stream.str("");
-      stream << "Ge_" << hit.GetBoardID() << "Raw" << hit.GetChannel();
-      obj.FillHistogram(stream.str().c_str(),10000,0,10000,hit.Charge());
+      stream << "Ge_" << boardid << "_" << chan;
+      obj.FillHistogram("Raw", stream.str().c_str(),10000,0,10000,hit.Charge());
+
       stream.str("");
-      stream << "Ge_" << hit.GetBoardID() << "Cal" << hit.GetChannel();
-      if (hit.GetBoardID() == 102) {
+      stream << "Ge_" << boardid << "_" << chan;
+      if (boardid == 102) {
         auto labr_E = hit.GetTraceEnergy(0,57,60,60+57);
         //if (nevent % 10000 == 0) { cout << labr_E << endl; }
-        obj.FillHistogram(stream.str().c_str(),10000,0,10000,labr_E);
+        obj.FillHistogram("Calibrated",stream.str().c_str(),10000,0,10000,labr_E);
       } else {
-        obj.FillHistogram(stream.str().c_str(),10000,0,10000,hit.GetEnergy());
+        obj.FillHistogram("Calibrated",stream.str().c_str(),10000,0,10000,hit.GetEnergy());
       }
-      stream.str("");
-      stream << "Ge_PZ_" << hit.GetBoardID() << "Cal" << hit.GetChannel();
-      //Double_t baseline = 180;
-      Double_t baseline = hit.GetBaseSample();
-      //auto baseline = hit.GetTraceBaseline();
-      obj.FillHistogram(stream.str().c_str(),10000,0,10000,hit.GetCorrectedEnergy(0));
-      stream.str("");
-      stream << "Ge_PZ_AsymBL_" << hit.GetBoardID() << "Cal" << hit.GetChannel();
-      obj.FillHistogram(stream.str().c_str(),10000,0,10000,hit.GetCorrectedEnergy(baseline));
 
       stream.str("");
-      stream << "E_BL" << hit.GetBoardID() << "_" << hit.GetChannel();
-      obj.FillHistogram(stream.str().c_str(),1000,0,10000,hit.GetEnergy(),1000,0,3000,baseline);
+      stream << "Ge_PZ_" << boardid << "_" << chan;
+      obj.FillHistogram("Corrected", stream.str().c_str(),10000,0,10000,hit.GetCorrectedEnergy(0));
       stream.str("");
-      stream << "E_cor_BL" << hit.GetBoardID() << "_" << hit.GetChannel();
-      obj.FillHistogram(stream.str().c_str(),1000,0,10000,hit.GetCorrectedEnergy(baseline),1000,0,3000,baseline);
+      stream << "Ge_PZ_AsymBL_" << boardid << "Cal" << chan;
+      obj.FillHistogram("Corrected", stream.str().c_str(),10000,0,10000,hit.GetCorrectedEnergy(hit.GetBaseSample()));
 
-      if (!TANLEvent::PileUpFlag(hit.GetFlags())) {
-        stream.str("");
-        stream << "Ge_NoPileUp_" << hit.GetBoardID() << "Raw" << hit.GetChannel();
-        obj.FillHistogram(stream.str().c_str(),10000,0,10000,hit.Charge());
-        stream.str("");
-        stream << "Ge_NoPileUp_" << hit.GetBoardID() << "Cal" << hit.GetChannel();
-        if (hit.GetBoardID() == 102) {
-          auto labr_E = hit.GetTraceEnergy(0,57,60,60+57);
-          //if (nevent % 10000 == 0) { cout << labr_E << endl; }
-          obj.FillHistogram(stream.str().c_str(),10000,0,10000,labr_E);
-        } else {
-          obj.FillHistogram(stream.str().c_str(),10000,0,10000,hit.GetEnergy());
-        }
-      }
-      else {
-        stream.str("");
-        stream << "Ge_PileUp_" << hit.GetBoardID() << "Raw" << hit.GetChannel();
-        obj.FillHistogram(stream.str().c_str(),10000,0,10000,hit.Charge());
-        stream.str("");
-        stream << "Ge_PileUp_" << hit.GetBoardID() << "Cal" << hit.GetChannel();
-        if (hit.GetBoardID() == 102) {
-          auto labr_E = hit.GetTraceEnergy(0,57,60,60+57);
-          //if (nevent % 10000 == 0) { cout << labr_E << endl; }
-          obj.FillHistogram(stream.str().c_str(),10000,0,10000,labr_E);
-        } else {
-          obj.FillHistogram(stream.str().c_str(),10000,0,10000,hit.GetEnergy());
-        }
+      Double_t prerise_base = hit.GetPreRise()/TANLEvent::GetShapingTime();
+
+      stream.str("");
+      stream << "E_BL" << boardid << "_" << chan;
+      obj.FillHistogram("Baseline", stream.str().c_str(),1000,0,10000,hit.Charge(),1000,0,3000,prerise_base);
+
+      stream.str("");
+      stream << "E_BL_scale" << boardid << "_" << chan;
+      obj.FillHistogram("Baseline", stream.str().c_str(),1000,0,10000,hit.Charge()-(1.0/-11.21)*prerise_base,1000,0,3000,prerise_base);
+
+      stream.str("");
+      stream << "E_cor_BL" << boardid << "_" << chan;
+      obj.FillHistogram("Baseline", stream.str().c_str(),1000,0,10000,hit.GetCorrectedEnergy(hit.GetBaseSample()),1000,0,3000,prerise_base);
 
 
-      }
+
     }
 
   }

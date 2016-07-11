@@ -87,7 +87,7 @@ EXT16AP00 {
 EXT17AP00 {
   Address: 0x01006607
   EnergyCoeff: 0 1
-    Pol        o: 1
+  PoleZero: 1
 }
 EXT18AP00 {
   Address: 0x01006608
@@ -102,12 +102,12 @@ EXT19AP00 {
 EXT20AP00 {
   Address: 0x01006700
   EnergyCoeff: -55.898 2.2208
-  PoleZero: 0.920
+  PoleZero: 0.911
 }
 EXT21AP00 {
   Address: 0x01006701
   EnergyCoeff: -53.9224 1.1362
-  PoleZero: 0.920
+  PoleZero: 0.911
 }
 EXT22AP00 {
   Address: 0x01006702
