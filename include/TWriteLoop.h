@@ -41,6 +41,7 @@ private:
   TFile* output_file;
   TTree* event_tree;
   std::map<TClass*, TDetector**> det_map;
+  std::map<TClass*, TDetector*> default_dets;
 
   size_t items_handled;
 
