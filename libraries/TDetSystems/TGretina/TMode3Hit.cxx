@@ -6,6 +6,9 @@
 #include "TGRUTOptions.h"
 #include "TChannel.h"
 
+#include "GH1D.h"
+#include "GCanvas.h"
+
 ClassImp(TMode3Hit)
 
 bool TMode3Hit::fExtractWaves = true;
@@ -99,10 +102,29 @@ double TMode3Hit::AverageWave(int samples) {
     samples = waveform.size();
   }
   double sum = 0.0;
+  double wsum = 0.0;
   for(int i=0;i<samples;i++) {
+    wsum += (double)i*(std::abs((double)waveform[i]));
     sum += waveform[i];
   }
-  return sum/samples;
+  return wsum/sum;
+}
+
+
+void TMode3Hit::Draw(Option_t *opt)  {
+  if(!waveform.size())
+    return;
+  TString option = opt;
+  if(!gPad || option.Contains("new",TString::kIgnoreCase)) {
+    new GCanvas;
+  } else {
+    gPad->Clear();
+  }
+  GH1D wave("wave","wave",(int)waveform.size(),0,(double)waveform.size());
+  for(unsigned int x=0;x<waveform.size();x++) 
+    wave.Fill(x,waveform.at(x));
+  wave.DrawCopy();
+
 }
 
 double TMode3Hit::GetEnergy0() const {

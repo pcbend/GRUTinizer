@@ -51,6 +51,12 @@ void TPhosWall::Clear(Option_t *opt) {
 
 }
 
+void TPhosWall::SortHits() {
+  std::sort(phoswall_hits.begin(),phoswall_hits.end());
+}
+
+
+
 void TPhosWall::Print(Option_t *opt) const {
   TString option(opt);
   std::cout << "TPhosWall:  "  << fTimestamp << "    " <<  fLargestHit << std::endl;
@@ -79,6 +85,7 @@ int TPhosWall::BuildHits(std::vector<TRawEvent>& raw_data) {
     for(int j=0;j<(geb.GetBodySize()-8); j+=sizeof(TRawEvent::PWHit)) {
       TPhosWallHit hit((TRawEvent::PWHit*)(geb.GetPayload() + j));
       hit.SetTimestamp(geb.GetTimestamp());
+      hit.SetAddress(0xbaff0000 + hit.Pixel());
       InsertHit(hit);
       if(hit.Pixel()>255)
         geb.Print("all");

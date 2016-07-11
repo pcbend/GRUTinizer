@@ -321,7 +321,7 @@ std::map<double,double> TCalibrator::Match(std::vector<double> peaks,std::vector
 	source_values.push_back(0);
 
         if(peaks.size()>3) {
-          double max_err = 0.01; 
+          double max_err = 0.02; 
           double pratio = peak_values.front()/peak_values.at(peak_values.size()-2);
           double sratio = source_values.front()/source_values.at(source_values.size()-2);
           //std::cout << "ratio: " << pratio << " - " << sratio << " = " << std::abs(pratio-sratio) << std::endl;
