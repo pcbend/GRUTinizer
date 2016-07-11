@@ -3,6 +3,7 @@ Unix.*.Root.MacroPath: .:$(GRUTSYS)/util:$(ROOTSYS)/macros
 
 #default MakeHistos library
 GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistosSources.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistosSourcesTest.so
 
 GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
 

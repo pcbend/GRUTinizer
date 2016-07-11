@@ -163,6 +163,15 @@ void MakeHistograms(TRuntimeObjects& obj) {
     obj.FillHistogram("layers", "max_layer", 12, -2, 10,
 		      max_layer);
 
+    if(max_layer == 5){
+	obj.FillHistogram("energy", "energy_involves_phi",
+			  energyNChannels, energyLlim, energyUlim,
+			  hit.GetCoreEnergy());
+	obj.FillHistogram("energy", "energy_gaus_involves_phi",
+			  energyNChannels, energyLlim, energyUlim,
+			  hit.GetCoreEnergy()*gRandom->Gaus(1,1./1000.));
+    }
+    
     for(int k = 5; k > 0; k--){
       if(max_layer < k){
 	obj.FillHistogram("energy",
