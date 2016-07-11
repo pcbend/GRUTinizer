@@ -133,7 +133,7 @@ public:
   //void SetPosition(TVector3 &vec) { fCorePosition = vec; }
 
 
-  void   SetCoreEnergy(float temp) { fCoreEnergy = temp; }
+  void   SetCoreEnergy(float temp) const { fCoreEnergy = temp; }
 
 
 private:
@@ -144,7 +144,7 @@ private:
 
   Int_t   fAddress;
   Int_t   fCrystalId;
-  Float_t fCoreEnergy;
+  mutable Float_t fCoreEnergy;
   Int_t   fCoreCharge[4];
 
   Int_t   fPad;

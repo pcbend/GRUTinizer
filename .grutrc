@@ -2,11 +2,14 @@ Unix.*.Root.MacroPath: .:$(GRUTSYS)/util:$(ROOTSYS)/macros
 #Unix.*.Root.DynamicPath:  .:~/rootlibs:$(ROOTSYS)/lib:$/home/tiguser/packages/SharcAnalysis
 
 #default MakeHistos library
+
 GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistosSources.so
 #GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistosSourcesTest.so
 
 GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
 
+#GRUT.SnapshotExt: png
+#GRUT.SnapshotDir: /user/benderp/public_html/figures  
 GRUT.SnapshotExt: 
 GRUT.SnapshotDir: 
 
