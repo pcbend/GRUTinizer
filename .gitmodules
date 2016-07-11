@@ -3,4 +3,4 @@
 	url = git@github.com:CAGRA-GrandRaiden/GRAnalyzer.git
 [submodule "MPIEventLoop"]
 	path = MPIEventLoop
-	url = git@github.com:csullivan/MPIEventLoop.git
+	url = git@github.com:CAGRA-GrandRaiden/MPIEventLoop.git
