@@ -66,6 +66,5 @@
 #pragma link C++ class GrutNotifier+;
 
 #pragma link C++ class GSnapshot+;
-#pragma link C++ global gSnapshot;
 
 #endif
