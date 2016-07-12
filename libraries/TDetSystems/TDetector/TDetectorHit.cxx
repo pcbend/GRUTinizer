@@ -23,6 +23,7 @@ void TDetectorHit::Clear(Option_t *opt) {
   fTime = -1;
   fTimestamp = -1;
   fEnergy = sqrt(-1);
+  fCalculatedEnergy = sqrt(-1);
 }
 
 void TDetectorHit::Print(Option_t *opt) const { }
@@ -34,22 +35,36 @@ void TDetectorHit::Copy(TObject& obj) const {
   hit.fAddress = fAddress;
   hit.fCharge = fCharge;
   hit.fEnergy = fEnergy;
+  hit.fCalculatedEnergy = fCalculatedEnergy;
   hit.fTime = fTime;
   hit.fTimestamp = fTimestamp;
 }
 
 double TDetectorHit::GetEnergy() const {
-  //if(!std::isnan(fEnergy))
-  //  return fEnergy;
-  double energy;
-  TChannel* chan = TChannel::GetChannel(fAddress);
-  if(!chan){
-    energy = Charge() + gRandom->Uniform();
-    //return Charge() + gRandom->Uniform();
-  } else {
-    energy = chan->CalEnergy(Charge(), fTimestamp);
+  //We've reintroduced "fEnergy" because there are situations where
+  //we want to be able to override the energy calculated from the 
+  //charge. To do this, we use SetEnergy to set "fEnergy", which is
+  //initialized as nan, and "fCalculatedEnergy", which is calculated 
+  //in this function if there is no fEnergy/fCalculatedEnergy set 
+  //already. Calling SetCharge() will reset fCalculatedENergy to nan,
+  //but have no effect on fEnergy. - BAE
+
+  if(!std::isnan(fEnergy))
+    return fEnergy;
+  else if(!std::isnan(fCalculatedEnergy)){
+    return fCalculatedEnergy;
   }
-  return energy;
+  else{
+    //std::cout << "fAddress " << std::hex << fAddress << std::endl;
+    TChannel* chan = TChannel::GetChannel(fAddress);
+    if(!chan){
+      fCalculatedEnergy = Charge() + gRandom->Uniform();
+      //return Charge() + gRandom->Uniform();
+    } else {
+      fCalculatedEnergy = chan->CalEnergy(Charge(), fTimestamp);
+    }
+    return fCalculatedEnergy;
+  }
 }
 
 void TDetectorHit::AddEnergy(double eng) {

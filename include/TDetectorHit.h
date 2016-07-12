@@ -25,7 +25,7 @@ public:
   long   Timestamp() const      { return fTimestamp; }
 
   void SetAddress(int address)      { fAddress = address; }
-  void SetCharge(int charge)        { fCharge = charge;  }
+  void SetCharge(int charge)        { fCalculatedEnergy = sqrt(-1); fCharge = charge;  }
   void SetTime(int time)            { fTime = time; }
   void SetTimestamp(long timestamp) { fTimestamp = timestamp; }
 
@@ -42,8 +42,8 @@ protected:
   Int_t fCharge;
   Int_t fTime;
   long fTimestamp;
-
-  mutable double fEnergy; //!
+  mutable double fCalculatedEnergy;//!
+  double fEnergy;
 
   ClassDef(TDetectorHit,2)
 };
