@@ -48,7 +48,7 @@ public:
   static void SetExtractWaves(bool flag=true) { fExtractWaves = flag;  }
   static bool ExtractWaves()                  { return fExtractWaves;  }
 
-  virtual Int_t  Charge() const   { return TDetectorHit::Charge()/128; }
+  virtual Int_t  Charge() const   { return TDetectorHit::Charge()/128.; }
 
   double GetEnergy0() const;
   double GetEnergy1() const;

@@ -1,6 +1,7 @@
 #include "TDetectorHit.h"
 
 #include <iostream>
+#include <cmath>
 
 #include <TClass.h>
 #include "TRandom.h"

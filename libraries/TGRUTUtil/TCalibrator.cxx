@@ -153,11 +153,11 @@ void TCalibrator::Draw(Option_t *opt) {
   fit_graph.Draw("AP");
 }
 
-void TCalibrator::Fit(int order) {
+void TCalibrator::Fit(int order,bool zerozero) {
   
   //if((graph_of_everything.GetN()<1) &&
   //    (all_fits.size()>0))
-  MakeCalibrationGraph();
+  MakeCalibrationGraph(zerozero);
   if(fit_graph.GetN()<1)
     return;
   if(order==1) {
@@ -176,6 +176,7 @@ void TCalibrator::Fit(int order) {
     linfit->SetParName(2,"C");
   }
   fit_graph.Fit(linfit);
+  fit_graph.Print();
   Print();
   
 }
@@ -193,11 +194,15 @@ double TCalibrator::GetEffParameter(int i) const {
 }
 
 
-TGraph &TCalibrator::MakeCalibrationGraph(double min_fom) {
+TGraph &TCalibrator::MakeCalibrationGraph(bool zerozero) { //double min_fom) {
   std::vector<double> xvalues;
   std::vector<double> yvalues;
   //std::vector<double> xerrors;
   //std::vector<double> yerrors;
+  if(zerozero) {
+    xvalues.push_back(0.0);
+    yvalues.push_back(0.0);
+  }
 
   for(auto it:fPeaks) {
     xvalues.push_back(it.centroid);
