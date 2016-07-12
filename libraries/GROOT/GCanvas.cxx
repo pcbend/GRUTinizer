@@ -601,9 +601,13 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
 
   int first = hists.at(0)->GetXaxis()->GetFirst();
   int last = hists.at(0)->GetXaxis()->GetLast();
+  //TAxis* axis = hists.at(0)->GetXaxis();
+  //int first = axis->GetFirst();
+  //int last = axis->GetLast();
 
   int min = std::min(first,0);
   int max = std::max(last,hists.at(0)->GetXaxis()->GetNbins()+1);
+  //int max = std::max(last,axis->GetNbins()+1);
 
   int xdiff = last-first;
   int mdiff = max-min-2;
@@ -625,6 +629,11 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
       }
       for(unsigned int i=0;i<hists.size();i++)
         hists.at(i)->GetXaxis()->SetRange(first,last);
+      //double begin = axis->GetBinLowEdge(first);
+      //double end = axis->GetBinUpEdge(last);
+      //for(unsigned int i=0;i<hists.size();i++) {
+      //  hists.at(i)->GetXaxis()->SetRangeUser(begin,end);
+      //}
 
       edited = true;
     }
@@ -644,6 +653,11 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
       }
       for(unsigned int i=0;i<hists.size();i++)
         hists.at(i)->GetXaxis()->SetRange(first,last);
+      //double begin = axis->GetBinLowEdge(first);
+      //double end = axis->GetBinUpEdge(last);
+      //for(unsigned int i=0;i<hists.size();i++) {
+      //  hists.at(i)->GetXaxis()->SetRangeUser(begin,end);
+      //}
 
       edited = true;
     }
@@ -662,6 +676,8 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
       TH1* prev = ghist->GetNext();
       if(prev) {
         prev->GetXaxis()->SetRange(first,last);
+        //prev->GetXaxis()->SetRange(axis->GetBinLowEdge(first),
+        //                           axis->GetBinUpEdge(last));
         prev->Draw("");
         RedrawMarkers();
         edited = true;
@@ -683,6 +699,8 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
       TH1* prev = ghist->GetPrevious();
       if(prev) {
         prev->GetXaxis()->SetRange(first,last);
+        //prev->GetXaxis()->SetRange(axis->GetBinLowEdge(first),
+        //                           axis->GetBinUpEdge(last));
         prev->Draw("");
         RedrawMarkers();
         edited = true;
@@ -705,6 +723,9 @@ bool GCanvas::ProcessNonHistKeyboardPress(Event_t* event, UInt_t* keysym) {
       GetCanvasImp()->ShowEditor(!GetCanvasImp()->HasEditor());
       edited = true;
       break;
+    case kKey_F9:
+      this->SetCrosshair(!this->HasCrosshair());
+      edited = true;
   }
 
   return edited;
