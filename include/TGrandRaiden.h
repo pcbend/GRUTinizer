@@ -28,6 +28,11 @@ public:
   std::vector<TGrandRaidenHit>::iterator begin() { return GRHits.begin(); }
   std::vector<TGrandRaidenHit>::iterator end() { return GRHits.end(); }
 
+
+
+  bool CheckHit(UInt_t i) { return (i < GRHits.size()) ? true : false; }
+  RCNPEvent* GetGRHit(UInt_t i) { return GRHits.at(i).GR(); }
+
 private:
   virtual int BuildHits(std::vector<TRawEvent>& raw_data);
 

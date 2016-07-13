@@ -101,7 +101,7 @@ class MainWindow(object):
 
     def _load_default_style(self):
         style = ROOT.TStyle("GRUTStyle","")
-        style.SetOptStat(1001111)
+        #style.SetOptStat(1001111)
         style.SetPalette(1)
         style.SetTitleColor(ROOT.kBlue)
         style.SetStatTextColor(ROOT.kBlue)
@@ -110,6 +110,8 @@ class MainWindow(object):
         style.SetOptFit(1111)
         style.SetPadBorderSize(1)
         style.SetPadBorderMode(1)
+        style.SetPadTickX(1); #
+        style.SetPadTickY(1); #
         ROOT.gROOT.SetStyle("GRUTStyle")
         ROOT.gROOT.ForceStyle()
 

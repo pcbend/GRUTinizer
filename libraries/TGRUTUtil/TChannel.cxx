@@ -68,6 +68,32 @@ std::ostream& operator<<(std::ostream& out, const TChannel& chan) {
     out << "\n";
   }
 
+  // Print out each PoleZero correction coeff
+  for(auto& start_coeff : chan.polezero_corrections) {
+    out << "   PoleZero";
+    if(start_coeff.start_time != -DBL_MAX) {
+      out << "[" << start_coeff.start_time << "]";
+    }
+    out << ":";
+    for(double coef : start_coeff.coefficients) {
+      out << "\t" << coef;
+    }
+    out << "\n";
+  }
+
+  // Print out each Baseline correction coeff
+  for(auto& start_coeff : chan.baseline_corrections) {
+    out << "   Baseline";
+    if(start_coeff.start_time != -DBL_MAX) {
+      out << "[" << start_coeff.start_time << "]";
+    }
+    out << ":";
+    for(double coef : start_coeff.coefficients) {
+      out << "\t" << coef;
+    }
+    out << "\n";
+  }
+
   // Print out each time coefficient
   for(auto& start_coeff : chan.time_coeff) {
     out << "   TimeCoeff";
