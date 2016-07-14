@@ -145,6 +145,36 @@ void MakeHistograms(TRuntimeObjects& obj) {
 		      180, 0., 180.,
 		      hit.GetTheta()*TMath::RadToDeg());
 
+    // Position spectra in crystal coordinates
+    if(hit.NumberOfInteractions()){
+      obj.FillHistogram("position",
+			Form("crys_%d_x", hit.GetCrystalId()),
+			1200, -60, 60, hit.GetLocalPosition(0).X());
+
+      obj.FillHistogram("position",
+			Form("crys_%d_y", hit.GetCrystalId()),
+			1200, -60, 60, hit.GetLocalPosition(0).Y());
+
+      obj.FillHistogram("position",
+			Form("crys_%d_z", hit.GetCrystalId()),
+			1200, -10, 100, hit.GetLocalPosition(0).Z());
+
+      obj.FillHistogram("position",
+			Form("crys_%d_xy", hit.GetCrystalId()),
+			1200, -60, 60, hit.GetLocalPosition(0).X(),
+			1200, -60, 60, hit.GetLocalPosition(0).Y());
+
+      obj.FillHistogram("position",
+			Form("crys_%d_xz", hit.GetCrystalId()),
+			1200, -60, 60,  hit.GetLocalPosition(0).X(),
+			1200, -10, 100, hit.GetLocalPosition(0).Z());
+
+      obj.FillHistogram("position",
+			Form("crys_%d_yz", hit.GetCrystalId()),
+			1200, -60, 60,  hit.GetLocalPosition(0).Y(),
+			1200, -10, 100, hit.GetLocalPosition(0).Z());
+    }
+    
     int max_layer = -1;
     for(int y=0; y < hit.NumberOfInteractions(); y++){
 
@@ -158,8 +188,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
 			hit.GetPhi()*TMath::RadToDeg(),
 			180, 0., 180.,
 			hit.GetTheta()*TMath::RadToDeg());
-      
     }
+
     obj.FillHistogram("layers", "max_layer", 12, -2, 10,
 		      max_layer);
 
