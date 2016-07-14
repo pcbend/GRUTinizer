@@ -45,7 +45,7 @@ protected:
   mutable double fCalculatedEnergy;//!
   double fEnergy;
 
-  ClassDef(TDetectorHit,2)
+  ClassDef(TDetectorHit,3)
 };
 
 #endif

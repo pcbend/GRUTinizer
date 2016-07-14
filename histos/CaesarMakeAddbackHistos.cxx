@@ -235,7 +235,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
                         8192,0,8192,energies_singles.at(0));
       obj.FillHistogram(dirname,histname,
                         8192,0,8192,energies_singles.at(1));
-      dirname = "Caeasr";
+      dirname = "Caesar";
       histname = "energy_dc_coincidence_matrix_mult_two";
       obj.FillHistogram(dirname, histname,
                         8192,0,8192, energies_singles.at(0),
@@ -277,6 +277,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
     int n1_mult = energies_addback_n1.size();
     int n2_mult = energies_addback_n2.size();
     int ng_mult = energies_addback_ng.size();
+    if (addback_mult != n0_mult+n1_mult+n2_mult+ng_mult){
+      std::cout << "FATAL ADDBACK ERROR! Total Addback multiplicity not sum of parts!" << std::endl;
+    }
     if (addback_mult == 1){
       dirname = "CaesarAddback";
       histname = "ab_energy_dc_mult_one";
@@ -343,6 +346,16 @@ void MakeHistograms(TRuntimeObjects& obj) {
             obj.FillHistogram(dirname,histname,
                 8192,0,8192, energies_addback.at(j),
                 8192,0,8192, energies_addback.at(i));
+          }
+          if (n1_mult == 2){
+            histname = "ab_energy_dc_coincidence_matrix_multtwo_n1n1";
+            obj.FillHistogram(dirname,histname,
+                8192,0,8192, energies_addback.at(i),
+                8192,0,8192, energies_addback.at(j));
+            obj.FillHistogram(dirname,histname,
+                8192,0,8192, energies_addback.at(j),
+                8192,0,8192, energies_addback.at(i));
+
           }
         }
       }
