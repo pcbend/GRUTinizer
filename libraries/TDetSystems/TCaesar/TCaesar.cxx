@@ -459,12 +459,12 @@ TCaesarHit& TCaesar::GetHit_VSNChannel(int vsn, int channel){
 
 void TCaesar::SetCharge(int vsn, int channel, int data) {
   TCaesarHit& hit = GetHit_VSNChannel(vsn, channel);
-  hit.SetCharge(data);
+  hit.SetCharge(data + gRandom->Uniform());
 }
 
 void TCaesar::SetTime(int vsn, int channel, int data) {
   TCaesarHit& hit = GetHit_VSNChannel(vsn, channel);
-  hit.SetTime(data);
+  hit.SetTime(data + gRandom->Uniform());
 }
 
 void TCaesar::InsertHit(const TDetectorHit& hit) {

@@ -22,8 +22,7 @@ void TDetectorHit::Clear(Option_t *opt) {
   fCharge = -1;
   fTime = -1;
   fTimestamp = -1;
-  fEnergy = sqrt(-1);
-  fCalculatedEnergy = sqrt(-1);
+  fFlags = 0;
 }
 
 void TDetectorHit::Print(Option_t *opt) const { }
@@ -34,44 +33,44 @@ void TDetectorHit::Copy(TObject& obj) const {
   TDetectorHit& hit = (TDetectorHit&)obj;
   hit.fAddress = fAddress;
   hit.fCharge = fCharge;
-  hit.fEnergy = fEnergy;
-  hit.fCalculatedEnergy = fCalculatedEnergy;
   hit.fTime = fTime;
   hit.fTimestamp = fTimestamp;
+  hit.fFlags = fFlags;
+}
+
+void TDetectorHit::SetCharge(float charge) { 
+  fCharge = charge;  
+  fFlags &= ~kIsEnergy;
+}
+
+void TDetectorHit::SetEnergy(double energy) {
+  fCharge = energy;
+  fFlags |= kIsEnergy;
+}
+
+Int_t  TDetectorHit::Charge() const {
+  if(fFlags & kIsEnergy) {
+    return 0;
+  } else {
+    return fCharge;
+  }
 }
 
 double TDetectorHit::GetEnergy() const {
-  //We've reintroduced "fEnergy" because there are situations where
-  //we want to be able to override the energy calculated from the 
-  //charge. To do this, we use SetEnergy to set "fEnergy", which is
-  //initialized as nan, and "fCalculatedEnergy", which is calculated 
-  //in this function if there is no fEnergy/fCalculatedEnergy set 
-  //already. Calling SetCharge() will reset fCalculatedENergy to nan,
-  //but have no effect on fEnergy. - BAE
-
-  if(!std::isnan(fEnergy))
-    return fEnergy;
-  else if(!std::isnan(fCalculatedEnergy)){
-    return fCalculatedEnergy;
-  }
-  else{
-    //std::cout << "fAddress " << std::hex << fAddress << std::endl;
+  if(fFlags & kIsEnergy) {
+    return fCharge;
+  } else {
     TChannel* chan = TChannel::GetChannel(fAddress);
     if(!chan){
-      fCalculatedEnergy = Charge() + gRandom->Uniform();
-      //return Charge() + gRandom->Uniform();
+      return fCharge;
     } else {
-      fCalculatedEnergy = chan->CalEnergy(Charge(), fTimestamp);
+      return chan->CalEnergy(fCharge, fTimestamp);
     }
-    return fCalculatedEnergy;
   }
 }
 
 void TDetectorHit::AddEnergy(double eng) {
-  if(std::isnan(fEnergy))
-    fEnergy=eng;
-  else
-    fEnergy+=eng;
+  SetEnergy(eng + GetEnergy());
 }
 
 
