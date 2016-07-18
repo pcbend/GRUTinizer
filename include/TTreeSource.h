@@ -163,17 +163,7 @@ private:
   ClassDef(TTreeSource,0);
 };
 // ---------------------
-class RCNPEvent : public TObject {
-public:
-  RCNPEvent() {;}
-  virtual ~RCNPEvent() {;}
-  void Clear() {;}
-  long GetTimestamp() { return 0; }
-  void SetTimestamp(const long& ts) { ; }
-private:
-public:
-  ClassDef(RCNPEvent,1);
-};
+class RCNPEvent : public TObject { };
 // ---------------------
 #endif
 

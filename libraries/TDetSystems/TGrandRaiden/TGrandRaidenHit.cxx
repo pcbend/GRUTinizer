@@ -1,7 +1,6 @@
 
 #include "TGrandRaidenHit.h"
 #include "TGRUTOptions.h"
-#include "RCNPEvent.h"
 #include "TSmartBuffer.h"
 #include "TMath.h"
 
@@ -27,6 +26,7 @@ TGrandRaidenHit::~TGrandRaidenHit() {
 }
 
 void TGrandRaidenHit::BuildFrom(){
+#ifdef RCNP
   static bool once = true;
   if (once) {
     RCNPEvent::HistDefCheckSum();
@@ -71,7 +71,7 @@ void TGrandRaidenHit::BuildFrom(){
     tpos2 = TMath::Sqrt((*tdc)[2]*(*tdc)[3]);
   }
 
-
+#endif
 }
 
 

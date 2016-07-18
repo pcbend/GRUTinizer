@@ -22,6 +22,7 @@ void TGrandRaiden::InsertHit(const TDetectorHit& hit){
 }
 
 int TGrandRaiden::BuildHits(std::vector<TRawEvent>& raw_data){
+
   for(auto& event : raw_data){
     SetTimestamp(event.GetTimestamp());
     auto rcnp = reinterpret_cast<RCNPEvent*>(event.GetDataPtr());

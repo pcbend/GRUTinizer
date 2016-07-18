@@ -2,13 +2,13 @@
 .SECONDARY:
 .SECONDEXPANSION:
 
-RCNP=1
+#RCNP=1
 
 PLATFORM:=$(PLATFORM)
 # EDIT THIS SECTION
 
 INCLUDES   = include
-CFLAGS     = -g -std=c++11 -O3 -Wall -Wextra -pedantic -Wno-unused-parameter -D`uname -m` -D`uname -s` -DLinux86 -Df2cFortran -DUSE_PAW
+CFLAGS     = -g -std=c++11 -O3 -Wall -Wextra -pedantic -Wno-unused-parameter
 LINKFLAGS_PREFIX  =
 LINKFLAGS_SUFFIX  = -L/opt/X11/lib -lX11 -lXpm -std=c++11
 SRC_SUFFIX = cxx
@@ -32,7 +32,7 @@ endif
 ifeq ($(RCNP),1)
 RCNPANAPATH = ./GRAnalyzer/analyzer
 RCNPANALYZER = $(realpath $(RCNPANAPATH)/../lib)
-RCNPFLAGS = -DRCNP
+RCNPFLAGS = -D`uname -m` -D`uname -s` -DLinux86 -Df2cFortran -DUSE_PAW -DRCNP
 RCNPLINKFLAGS = -L$(RCNPANALYZER) -Wl,-rpath,$(RCNPANALYZER) -lRCNPEvent -lGRAnalyzer -L$(realpath $(RCNPANAPATH)/lib) -lpacklib -lm -lgfortran -lnsl
 RCNPINCLUDES = $(RCNPANAPATH)/include $(RCNPANAPATH)/libRCNPEvent/include $(RCNPANAPATH)/libGRAnalyzer/include
 CINTFLAGS += $(RCNPFLAGS)
@@ -121,7 +121,9 @@ libraries/lib%.so: .build/histos/%.o
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 libGRAnalyzer:
+ifdef RCNP
 	$(MAKE) -C GRAnalyzer
+endif
 
 # Functions for determining the files included in a library.
 # All src files in the library directory are included.
@@ -165,7 +167,9 @@ clean:
 	@-$(RM) -rf bin
 	@-$(RM) -f $(LIBRARY_OUTPUT)
 	@-$(RM) -f libraries/*.so
+ifdef RCNP
 	@-$(MAKE) clean -sC GRAnalyzer
+endif
 
 cleaner: clean
 	@printf "\nEven more clean up\n\n"

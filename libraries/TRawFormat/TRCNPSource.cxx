@@ -1,7 +1,11 @@
 #include "TRCNPSource.h"
+#include <atomic>
+
+extern std::atomic<int> stop_rcnp_signal;
+
+#ifdef RCNP
 #include "GRUTinizerInterface.h"
 
-extern atomic<int> stop_rcnp_signal;
 
 TRCNPSource::TRCNPSource(const char* Command, kFileType file_type)
   : fCommand(Command), fFileType(file_type) {
@@ -112,3 +116,5 @@ template<>
 int ThreadsafeQueue<RCNPEvent*>::ObjectSize(RCNPEvent*& event) {
   return event->data.size();
 }
+
+#endif

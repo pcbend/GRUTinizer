@@ -83,7 +83,9 @@ private:
 #include "TRawSource.h"
 class TRCNPSource : public TRawEventSource {
 public:
-  TRCNPSource(const char* Command, kFileType file_type) {}
+  TRCNPSource(const char* Command, kFileType file_type) {
+    throw std::runtime_error("RCNP GRAnalyzer submodule is required when utilizing TRCNPSource.");
+  }
   TRCNPSource(const TRCNPSource& source) { }
   ~TRCNPSource() {;}
   virtual std::string Status() const { return ""; }

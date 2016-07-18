@@ -1,14 +1,9 @@
 #include "TRawSource.h"
-
-#include "TRCNPSource.h"
-
-#include "TTreeSource.h"
-
 #include <cassert>
-
 #include "TString.h"
-
 #include "TGRUTOptions.h"
+#include "TRCNPSource.h"
+#include "TTreeSource.h"
 
 ClassImp(TRawEventSource)
 
@@ -95,7 +90,7 @@ TRawEventSource* TRawEventSource::EventSource(const char* filename,
     source = new TTreeSource<RCNPEvent>(filename,"rcnptree","rcnpevent", file_type);
   } else if (hasSuffix(filename,".bld")){
     std::string command;
-    if (string(filename) == "online.bld") {
+    if (std::string(filename) == "online.bld") {
       std::cout << "Going online with TRCNPSource..." <<std::endl;
       command = "router_save -s -b 1024 BLD";
     }else {

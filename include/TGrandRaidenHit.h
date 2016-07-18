@@ -3,7 +3,14 @@
 
 #include "TDetector.h"
 #include "TDetectorHit.h"
+
+#ifdef RCNP
 #include "RCNPEvent.h"
+#else
+#include "TTreeSource.h"
+#endif
+
+
 
 #include <vector>
 
