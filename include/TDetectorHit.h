@@ -25,7 +25,7 @@ public:
   long   Timestamp() const      { return fTimestamp; }
 
   void SetAddress(int address)      { fAddress = address; }
-  void SetCharge(float charge);
+  void SetCharge(int charge);
   void SetTime(int time)            { fTime = time; }
   void SetTimestamp(long timestamp) { fTimestamp = timestamp; }
 
@@ -46,14 +46,14 @@ protected:
   unsigned char fFlags;
 
   enum EHitFlags {
-    kIsEnergy = 1,
-    kUnused2  = 2,
-    kUnused3  = 4,
-    kUnused4  = 8,
-    kUnused5  = 16,
-    kUnused6  = 32,
-    kUnused7  = 64,
-    kUnused8  = 128
+    kIsEnergy = BIT(0),
+    kUnused1  = BIT(1),
+    kUnused2  = BIT(2),
+    kUnused3  = BIT(3),
+    kUnused4  = BIT(4),
+    kUnused5  = BIT(5),
+    kUnused6  = BIT(6),
+    kUnused7  = BIT(7)
   };
 
   ClassDef(TDetectorHit,4)

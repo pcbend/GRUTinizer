@@ -38,8 +38,8 @@ void TDetectorHit::Copy(TObject& obj) const {
   hit.fFlags = fFlags;
 }
 
-void TDetectorHit::SetCharge(float charge) { 
-  fCharge = charge;  
+void TDetectorHit::SetCharge(int charge) {
+  fCharge = charge + gRandom->Uniform();
   fFlags &= ~kIsEnergy;
 }
 

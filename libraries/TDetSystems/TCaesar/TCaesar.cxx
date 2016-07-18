@@ -147,7 +147,7 @@ void TCaesar::BuildAddbackTest() const {
   std::vector<int> neighbor_positions;
 //std::cout << "NUMBER OF HITS TO CHECK = " << hits.size() << std::endl;;
   while(hits.size()) {
-    
+
     addback_hits.push_back(*hits.front());
     hits.pop_front();
     TCaesarHit& new_hit = addback_hits.back();
@@ -200,7 +200,7 @@ void TCaesar::BuildAddbackTest() const {
 //std::cout << "Hits after valid check and sorting: "<< std::endl;
 //for(auto& ab_hit : addback_hits) {
 //  ab_hit.Print();
-//} 
+//}
 }
 
 int  const TCaesar::det_per_ring[] = {10,14,24,24,24, 24, 24, 24, 14, 10};
@@ -459,12 +459,12 @@ TCaesarHit& TCaesar::GetHit_VSNChannel(int vsn, int channel){
 
 void TCaesar::SetCharge(int vsn, int channel, int data) {
   TCaesarHit& hit = GetHit_VSNChannel(vsn, channel);
-  hit.SetCharge(data + gRandom->Uniform());
+  hit.SetCharge(data);
 }
 
 void TCaesar::SetTime(int vsn, int channel, int data) {
   TCaesarHit& hit = GetHit_VSNChannel(vsn, channel);
-  hit.SetTime(data + gRandom->Uniform());
+  hit.SetTime(data);
 }
 
 void TCaesar::InsertHit(const TDetectorHit& hit) {
