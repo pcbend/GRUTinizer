@@ -193,6 +193,8 @@ void GCanvas::AddMarker(int x,int y,int dim) {
     mark->localy = gPad->AbsPixeltoY(y);
     mark->binx = hist->GetXaxis()->FindBin(mark->localx);
     mark->biny = hist->GetYaxis()->FindBin(mark->localy);
+
+
     double bin_edge = hist->GetXaxis()->GetBinLowEdge(mark->binx);
     mark->linex = new TLine(bin_edge,hist->GetMinimum(),
                             bin_edge,hist->GetMaximum());
@@ -923,8 +925,18 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
         if(binlow > binhigh){
           std::swap(binlow, binhigh);
         }
-        double value_low  = ghist->GetXaxis()->GetBinCenter(binlow);
-        double value_high = ghist->GetXaxis()->GetBinCenter(binhigh);
+        double value_low  = ghist->GetXaxis()->GetBinLowEdge(binlow);
+        double value_high = ghist->GetXaxis()->GetBinLowEdge(binhigh);
+
+	{
+	  double epsilon = 16*(std::nextafter(value_low, INFINITY) - value_low);
+	  value_low += epsilon;
+	}
+
+	{
+	  double epsilon = 16*(value_high - std::nextafter(value_high, -INFINITY));
+	  value_high -= epsilon;
+	}
 
         if(fBackgroundMarkers.size()>=2 &&
            fBackgroundMode!=kNoBackground){
