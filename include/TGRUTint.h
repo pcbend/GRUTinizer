@@ -18,11 +18,13 @@
 #include "TSysEvtHandler.h"
 #include "TSystem.h"
 
-class TRawFileIn;
-class TDataLoop;
-class TChainLoop;
-class THistogramLoop;
 class TCutG;
+
+class TChainLoop;
+class TDataLoop;
+class THistogramLoop;
+class TRawEventSource;
+class TRawFileIn;
 
 extern TChain *gChain;
 
@@ -53,20 +55,18 @@ public:
   void LoadRawFile(std::string filename);
 
   void LoadTCutG(TCutG* cutg);
+  TList *GetListOfRawFiles() { return &fOpenedRawFiles; }
 
-public:
   void DelayedProcessLine_Action();
 
-
- protected:
-   void RunMacroFile(const std::string& filename);
-   void SplashPopNWait(bool flag);
-   void CreateDataLoop();
+protected:
+  void RunMacroFile(const std::string& filename);
+  void SplashPopNWait(bool flag);
 
 private:
   Long_t DelayedProcessLine(std::string message);
 
-  //TTimer* fGuiTimer;
+  TTimer* fKeepAliveTimer;
 #ifndef __CINT__
   std::thread::id main_thread_id;
 #endif
@@ -77,21 +77,20 @@ private:
   bool fIsTabComplete;
   bool fAllowedToTerminate;
 
-  TChain* fChain;
+  void Init();
+  void ApplyOptions();
+  void LoadGRootGraphics();
+
+  TList fOpenedRawFiles;
+
+  // Data processing objects/methods
+  void SetupPipeline();
+  TRawEventSource* OpenRawSource();
+
   TDataLoop* fDataLoop;
   TChainLoop* fChainLoop;
   THistogramLoop* fHistogramLoop;
 
-  void Init();
-  void ApplyOptions();
-  void LoadGRootGraphics();
-  void LoadDetectorClasses();
-
-public:
-  TList *GetListOfRawFiles() { return &fOpenedRawFiles; }
-
-private:
-  TList fOpenedRawFiles;
 
   ClassDef(TGRUTint,0);
 };

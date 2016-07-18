@@ -31,8 +31,8 @@ public:
   TRCNPSource(const TRCNPSource& source) { }
   ~TRCNPSource() {;}
 
-  virtual std::string Status() const;
-  virtual std::string SourceDescription() const;
+  virtual std::string Status(bool long_description) const;
+  virtual std::string SourceDescription(bool long_description) const;
   kFileType GetFileType() const { return fFileType; }
   long GetFileSize() const { return fFileSize; }
   virtual void Reset() {;}
@@ -88,8 +88,8 @@ public:
   }
   TRCNPSource(const TRCNPSource& source) { }
   ~TRCNPSource() {;}
-  virtual std::string Status() const { return ""; }
-  virtual std::string SourceDescription() const { return ""; }
+  virtual std::string Status(bool long_description) const { return ""; }
+  virtual std::string SourceDescription(bool long_description) const { return ""; }
   kFileType GetFileType() const { return kFileType::UNKNOWN_FILETYPE; }
   long GetFileSize() const { return 0; }
   virtual void Reset() {;}

@@ -31,7 +31,8 @@ public:
   TVector3 ExitTargetVect(int order=6);
   Float_t Azita(int order=6);
 
-  TVector3 Track() const; 
+  //TVector3 Track() const;  //  s800 track with respect to optical axis
+  TVector3 Track(double ata=0.000,double bta=0.000) const; // s800 track with respect to vector with ata,bta.
 
   float GetXFP(int i=0) const; // x position in the first(second) CRDC (mm)
   float GetYFP(int i=0) const; // y position in the first(second) CRDC (mm)

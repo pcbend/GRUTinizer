@@ -128,9 +128,9 @@ int fitCoulex(const char *cfg_file_name){
   //All Variables
   const int MAX_PARS = 10;
   //These angles determine the maximum angle cut that will be used
-  const double START_ANGLE = 1.0;
-  const double FINAL_ANGLE = 3.5;
-  const double ANGLE_STEPS = 0.5;
+  const double START_ANGLE = 2.0;
+  const double FINAL_ANGLE = 4.0;
+  const double ANGLE_STEPS = 0.1;
   const int TOTAL_ANGLES = (FINAL_ANGLE-START_ANGLE)/ANGLE_STEPS + 1;
 
   double init_pars[MAX_PARS];
@@ -284,12 +284,11 @@ int fitCoulex(const char *cfg_file_name){
     return -1;
   }
   if (num_geant_files == 1){
-    out_file << "HistConstant     FitError     ChiSquared     ResSum     ResSumInPeak     PeakSum" << std::endl;
+    out_file << "Angle\tFEP Scaling\tCompton Scaling\tFit Error\tChi Squared\tResidual Sum\tResSumInPeak\tPeakSum" << std::endl;
   }
   else if (num_geant_files == 2){
     out_file << "Angle\t Fep Scaling\t Compton Scaling\t 2nd-2Plus Scaling\t FitError\t ChiSquared\t ResSum\t ResSumInPeak\t PeakSum" << std::endl;
   }
-  
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   //GET GEANT HISTOGRAMS
@@ -359,7 +358,10 @@ int fitCoulex(const char *cfg_file_name){
     else {
       std::cout << "Unknown reason for num_geant_files = " << num_geant_files << std::endl;
     }
-    GH1D *fit_func_hist = new GH1D(*fit_func, 512,0,8192);
+
+    //GH1D *fit_func_hist = new GH1D(*fit_func, 512,0,8192);
+    GH1D *fit_func_hist = new GH1D(*fit_func, 8192./kev_per_bin,0,8192);
+    //fit_func_hist->Rebin(kev_per_bin);
     TSpline3 *fit_func_spline = new TSpline3(fit_func_hist);
     std::cout << "Parameters from Fit Function are: " << std::endl;
     fit_func->Print();

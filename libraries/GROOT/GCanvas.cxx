@@ -193,6 +193,8 @@ void GCanvas::AddMarker(int x,int y,int dim) {
     mark->localy = gPad->AbsPixeltoY(y);
     mark->binx = hist->GetXaxis()->FindBin(mark->localx);
     mark->biny = hist->GetYaxis()->FindBin(mark->localy);
+
+
     double bin_edge = hist->GetXaxis()->GetBinLowEdge(mark->binx);
     mark->linex = new TLine(bin_edge,hist->GetMinimum(),
                             bin_edge,hist->GetMaximum());
@@ -392,7 +394,7 @@ void GCanvas::HandleInput(Int_t event,Int_t x,Int_t y) {
   switch(event) {
     case 0x00000001: //single click
     case 0x0000003d: //double click
-      used = HandleMousePress(event,x,y);
+        used = HandleMousePress(event,x,y);
       break;
     case 0x00000007: //shift-click
       used = HandleMouseShiftPress(event,x,y);
@@ -429,12 +431,6 @@ std::vector<TH1*> GCanvas::FindHists(int dim) {
   return tempvec;
 }
 
-
-
-
-
-
-
 std::vector<TH1*> GCanvas::FindAllHists() {
   std::vector<TH1*> tempvec;
   TIter iter(gPad->GetListOfPrimitives());
@@ -463,32 +459,18 @@ bool GCanvas::HandleArrowKeyPress(Event_t *event,UInt_t *keysym) {
 
 
 bool GCanvas::HandleKeyboardPress(Event_t *event,UInt_t *keysym) {
-  //printf("keysym = %i\n",*keysym);
-  TIter iter(gPad->GetListOfPrimitives());
-  //TGraphErrors * ge = 0;
   bool edited = false;
-  //while(TObject *obj = iter.Next()) {
-  //   if(obj->InheritsFrom("TGraphErrors")){
-  //         ge = (TGraphErrors*)obj;
-  //   }
-  //}
+
+  edited = ProcessNonHistKeyboardPress(event, keysym);
+
   std::vector<TH1*> hists = FindHists(1);
-  if(hists.size()>0){
+  if(hists.size()>0 && !edited){
     edited = Process1DKeyboardPress(event,keysym);
   }
   hists = FindHists(2);
   if(hists.size()>0 && !edited){
     edited = Process2DKeyboardPress(event,keysym);
   }
-
-
-  //if(ge){
-  //switch(*keysym) {
-  //    case kKey_p:
-  //      ge->Print();
-  //      break;
-  //  };
-  //}
 
   if(edited) {
     gPad->Modified();
@@ -497,30 +479,34 @@ bool GCanvas::HandleKeyboardPress(Event_t *event,UInt_t *keysym) {
   return true;
 }
 
-
 bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
-  //printf("Mouse clicked  %i   %i\n",x,y);
-  if(!GetSelected())
+  if(!GetSelected()) {
     return false;
-  //if(GetSelected()->InheritsFrom("TCanvas"))
-  //   ((TCanvas*)GetSelected())->cd();
-
-  TIter iter(gPad->GetListOfPrimitives());
-  TH1 *hist = 0;
-  while(TObject *obj = iter.Next()) {
-     if(obj->InheritsFrom(TH1::Class()))
-        hist = (TH1*)obj;
   }
-  if(!hist)
-     return false;
+
+
+  TH1* hist = 0;
+  if(GetSelected()->InheritsFrom(TH1::Class())) {
+    hist = (TH1*)GetSelected();
+  } else if(GetSelected()->IsA() == TFrame::Class()) {
+    std::vector<TH1*> hists = FindAllHists();
+    if(hists.size()) {
+      hist = hists.front();
+
+      // Let everybody know that the histogram is selected
+      SetSelected(hist);
+      SetClickSelected(hist);
+      Selected(GetSelectedPad(), hist, event);
+    }
+  }
+
+  if(!hist || hist->GetDimension() > 2) {
+    return false;
+  }
 
   bool used = false;
-  if(hist->GetDimension() > 2) {
-    return used;
-  }
 
-  if(fMarkerMode && (GetSelected()->InheritsFrom(TH1::Class()) ||
-                     GetSelected()->InheritsFrom(TFrame::Class()))) {
+  if(fMarkerMode) {
     AddMarker(x,y,hist->GetDimension());
     used = true;
   }
@@ -529,6 +515,7 @@ bool GCanvas::HandleMousePress(Int_t event,Int_t x,Int_t y) {
     gPad->Modified();
     gPad->Update();
   }
+
   return used;
 }
 
@@ -614,9 +601,13 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
 
   int first = hists.at(0)->GetXaxis()->GetFirst();
   int last = hists.at(0)->GetXaxis()->GetLast();
+  //TAxis* axis = hists.at(0)->GetXaxis();
+  //int first = axis->GetFirst();
+  //int last = axis->GetLast();
 
   int min = std::min(first,0);
   int max = std::max(last,hists.at(0)->GetXaxis()->GetNbins()+1);
+  //int max = std::max(last,axis->GetNbins()+1);
 
   int xdiff = last-first;
   int mdiff = max-min-2;
@@ -638,6 +629,11 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
       }
       for(unsigned int i=0;i<hists.size();i++)
         hists.at(i)->GetXaxis()->SetRange(first,last);
+      //double begin = axis->GetBinLowEdge(first);
+      //double end = axis->GetBinUpEdge(last);
+      //for(unsigned int i=0;i<hists.size();i++) {
+      //  hists.at(i)->GetXaxis()->SetRangeUser(begin,end);
+      //}
 
       edited = true;
     }
@@ -657,6 +653,11 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
       }
       for(unsigned int i=0;i<hists.size();i++)
         hists.at(i)->GetXaxis()->SetRange(first,last);
+      //double begin = axis->GetBinLowEdge(first);
+      //double end = axis->GetBinUpEdge(last);
+      //for(unsigned int i=0;i<hists.size();i++) {
+      //  hists.at(i)->GetXaxis()->SetRangeUser(begin,end);
+      //}
 
       edited = true;
     }
@@ -675,6 +676,8 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
       TH1* prev = ghist->GetNext();
       if(prev) {
         prev->GetXaxis()->SetRange(first,last);
+        //prev->GetXaxis()->SetRange(axis->GetBinLowEdge(first),
+        //                           axis->GetBinUpEdge(last));
         prev->Draw("");
         RedrawMarkers();
         edited = true;
@@ -696,6 +699,8 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
       TH1* prev = ghist->GetPrevious();
       if(prev) {
         prev->GetXaxis()->SetRange(first,last);
+        //prev->GetXaxis()->SetRange(axis->GetBinLowEdge(first),
+        //                           axis->GetBinUpEdge(last));
         prev->Draw("");
         RedrawMarkers();
         edited = true;
@@ -707,6 +712,22 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
     printf("keysym = %i\n",*keysym);
     break;
   }
+  return edited;
+}
+
+bool GCanvas::ProcessNonHistKeyboardPress(Event_t* event, UInt_t* keysym) {
+  bool edited = false;
+
+  switch(*keysym) {
+    case kKey_F2:
+      GetCanvasImp()->ShowEditor(!GetCanvasImp()->HasEditor());
+      edited = true;
+      break;
+    case kKey_F9:
+      this->SetCrosshair(!this->HasCrosshair());
+      edited = true;
+  }
+
   return edited;
 }
 
@@ -819,7 +840,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
     case kKey_I:
       if(!hists.empty()) {
         printf( BLUE );
-        
+
         printf( RESET_COLOR );
       }
       break;
@@ -854,6 +875,8 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       for(unsigned int i=0;i<hists.size();i++) {
         hists.at(i)->GetListOfFunctions()->Clear();
       }
+      for(unsigned int ii=0;ii<hists.size();ii++)
+        hists[ii]->Sumw2(false);
       RemovePeaks(hists.data(),hists.size());
       edited = true;
       break;
@@ -902,8 +925,18 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
         if(binlow > binhigh){
           std::swap(binlow, binhigh);
         }
-        double value_low  = ghist->GetXaxis()->GetBinCenter(binlow);
-        double value_high = ghist->GetXaxis()->GetBinCenter(binhigh);
+        double value_low  = ghist->GetXaxis()->GetBinLowEdge(binlow);
+        double value_high = ghist->GetXaxis()->GetBinLowEdge(binhigh);
+
+	{
+	  double epsilon = 16*(std::nextafter(value_low, INFINITY) - value_low);
+	  value_low += epsilon;
+	}
+
+	{
+	  double epsilon = 16*(value_high - std::nextafter(value_high, -INFINITY));
+	  value_high -= epsilon;
+	}
 
         if(fBackgroundMarkers.size()>=2 &&
            fBackgroundMode!=kNoBackground){
@@ -950,12 +983,12 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
   case kKey_q:{
     TH1* ghist = hists.at(0);
     if(GetNMarkers()>1) {
-      
+
       edited = PhotoPeakFit(ghist,fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
     }
     if(edited){
       ghist->Draw("hist");
-    
+
       TIter iter(ghist->GetListOfFunctions());
       while(TObject *o = iter.Next()){
 	if(o->InheritsFrom(TF1::Class())) {
@@ -964,7 +997,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       }
     }
   }
-    
+
     break;
 
     case kKey_r:
@@ -1056,6 +1089,14 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
 	  sigma = 10.0;
 	edited = ShowPeaks(hists.data(),hists.size(),sigma,thresh);
 	RemoveMarker("all");
+      }
+      break;
+    case kKey_F9:{
+        int color =  hists.at(0)->GetLineColor() + 1;
+        if(color>9)
+          color =1;
+        hists.at(0)->SetLineColor(color);
+        edited=true;
       }
       break;
 
@@ -1176,6 +1217,8 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       //for(unsigned int i=0;i<hists.size();i++)
       //  hists.at(i)->GetListOfFunctions()->Delete();
       RemovePeaks(hists.data(),hists.size());
+      for(unsigned int ii=0;ii<hists.size();ii++)
+        hists[ii]->Sumw2(false);
       edited = true;
       break;
     case kKey_o:

@@ -11,6 +11,8 @@
 
 #include "TRandom.h"
 
+#include "GRootFunctions.h"
+
 std::map<unsigned int,TChannel*> TChannel::fChannelMap;
 TChannel *TChannel::fDefaultChannel = new TChannel("TChannel",0xffffffff);
 std::string TChannel::fChannelData;
@@ -342,6 +344,10 @@ const std::vector<double>& TChannel::GetPoleZeroCoeff(double timestamp) const {
   return empty_vec;
 }
 
+double TChannel::CalEfficiency(double energy) const {
+  return Efficiency(energy,GetEfficiencyCoeff());
+}
+
 void TChannel::ClearPoleZeroCoeff() {
   polezero_corrections.clear();
   polezero_corrections.push_back({std::vector<double>(), -DBL_MAX});
@@ -482,6 +488,19 @@ double TChannel::Calibrate(double value, const std::vector<double>& coeff) {
   }
   return cal_value;
 }
+
+double TChannel::Efficiency(double energy,const std::vector<double>& coeff) {
+  // EFF = 10^(A0 + A1*LOG(E) + A2*LOG(E)^2 + A3/E^2);
+  if(coeff.size()<4) {
+    return 0.0;
+  }
+  return GRootFunctions::GammaEff(&energy,const_cast<double*>(&coeff[0]));
+}
+
+
+
+
+
 
 int TChannel::ReadCalFile(const char* filename,Option_t *opt) {
   std::string infilename = filename;

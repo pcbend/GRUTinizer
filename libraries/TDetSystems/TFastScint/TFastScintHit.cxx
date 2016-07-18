@@ -1,13 +1,14 @@
 #include "TFastScintHit.h"
+#include "TFastScint.h"
 #include "TRandom.h"
 
 
-TFastScintHit::TFastScintHit() { 
+TFastScintHit::TFastScintHit() {
   Clear();
 }
 
 
-TFastScintHit::TFastScintHit(const TDetectorHit &hit) { 
+TFastScintHit::TFastScintHit(const TDetectorHit &hit) {
   Clear();
   hit.Copy(*this);
 }
@@ -33,10 +34,11 @@ void TFastScintHit::Clear(Option_t* opt) {
 
 void TFastScintHit::Print(Option_t *opt) const {
   printf("LaBrHit[%i]:   chg[%04i] -> %.02f  |  time[%04i] -> %.02f \n",
-          fChannel,Charge(),GetEnergy(),GetTime(),GetTime());
+          fChannel,Charge(),GetEnergy(),Time(),GetTime());
 }
 
 
+TVector3 &TFastScintHit::GetPosition() const { return TFastScint::GetPosition(fChannel); }
 
 
 /*
@@ -44,7 +46,7 @@ void TFastScintHit::Print(Option_t *opt) const {
 void TFastScintHit::SetEnergy(){
   double charge = fCharge;
   charge+=gRandom->Uniform();
-  
+
   switch(fChannel){
   case 0:
     //fEnergy = 8.3684*charge - 446.29; //825 V different base
@@ -138,7 +140,7 @@ void TFastScintHit::SetEnergy(){
   case 13:
     //fEnergy = charge;
     //fEnergy = 0.8331*charge + 5.9087; //run589
-    fEnergy = 0.7619*charge - 29.451; //run687 
+    fEnergy = 0.7619*charge - 29.451; //run687
     break;
   case 14:
     //fEnergy = charge;
@@ -154,7 +156,7 @@ void TFastScintHit::SetEnergy(){
   }
 
   //Old Calibration Settings
-  //switch(fChannel){ 
+  //switch(fChannel){
   //case 3:
     //fEnergy = 3.5333*charge + 176.6;
     //break;

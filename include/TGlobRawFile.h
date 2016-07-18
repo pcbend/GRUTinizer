@@ -16,11 +16,11 @@ public:
   virtual ~TGlobRawFile(){;}
 
 
-  virtual std::string SourceDescription() const {
-    return fWrapped.SourceDescription();
+  virtual std::string SourceDescription(bool long_description) const {
+    return fWrapped.SourceDescription(long_description);
   }
-  virtual std::string Status() const {
-    return fWrapped.Status();
+  virtual std::string Status(bool long_description) const {
+    return fWrapped.Status(long_description);
   }
 
   virtual int GetLastErrno() const { return fWrapped.GetLastErrno(); }

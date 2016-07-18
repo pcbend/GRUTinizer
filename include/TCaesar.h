@@ -18,6 +18,10 @@
 #include <fstream>
 #include <functional>
 
+#ifndef __CINT__
+#include <functional>
+#endif
+
 class TCaesar : public TDetector {
 
 
@@ -46,7 +50,7 @@ public:
   void SetULM(int ulm) { fUlm = ulm; }
 
 
-  int Size() const { return caesar_hits.size(); }
+  unsigned int Size() const { return caesar_hits.size(); }
   int AddbackSize() { BuildAddbackTest(); return addback_hits.size(); }
 
 //double GetEnergyDC(TCaesarHit hit);
@@ -89,6 +93,7 @@ public:
     return fAddbackCondition;
   }
 #endif
+//  void AddHit(TCaesarHit &hit);
 
 private:
   void BuildAddback() const;

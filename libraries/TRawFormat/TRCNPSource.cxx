@@ -97,14 +97,14 @@ int TRCNPSource::GetEvent(TRawEvent& event) {
   return sizeof(rcnp);
 }
 
-std::string TRCNPSource::Status() const {
+std::string TRCNPSource::Status(bool long_description) const {
   return Form("%s: %s %8.2f MB given %s / %s  Unknown MB total %s  => %s %3.02f MB/s processed %s",
-              SourceDescription().c_str(),
+              SourceDescription(long_description).c_str(),
               DCYAN, GetBytesGiven()/1e6, RESET_COLOR,
               BLUE, RESET_COLOR,
               GREEN, GetAverageRate()/1e6, RESET_COLOR);
 }
-std::string TRCNPSource::SourceDescription() const {return "File: "+std::string("RCNP_BLD: ")+fCommand;}
+std::string TRCNPSource::SourceDescription(bool long_description) const {return "File: "+std::string("RCNP_BLD: ")+fCommand;}
 
 
 // template<>
@@ -113,8 +113,9 @@ std::string TRCNPSource::SourceDescription() const {return "File: "+std::string(
 // }
 
 template<>
-int ThreadsafeQueue<RCNPEvent*>::ObjectSize(RCNPEvent*& event) {
+int ThreadsafeQueue<RCNPEvent*>::ObjectSize(RCNPEvent*& event) const {
   return event->data.size();
 }
+
 
 #endif

@@ -48,11 +48,11 @@ if [ -n "${old_grutsys}" ] ; then
       PATH=$newpath
    fi
    if [ -n "${LD_LIBRARY_PATH}" ]; then
-      drop_from_path $LD_LIBRARY_PATH ${old_grutsys}/libraries
+      drop_from_path $LD_LIBRARY_PATH ${old_grutsys}/lib
       LD_LIBRARY_PATH=$newpath
    fi
    if [ -n "${DYLD_LIBRARY_PATH}" ]; then
-      drop_from_path $DYLD_LIBRARY_PATH ${old_grutsys}/libraries
+      drop_from_path $DYLD_LIBRARY_PATH ${old_grutsys}/lib
       DYLD_LIBRARY_PATH=$newpath
    fi
    if [ -n "${MANPATH}" ]; then
@@ -77,15 +77,15 @@ else
 fi
 
 if [ -z "${LD_LIBRARY_PATH}" ]; then
-   LD_LIBRARY_PATH=$GRUTSYS/libraries; export LD_LIBRARY_PATH       # Linux, ELF HP-UX
+   LD_LIBRARY_PATH=$GRUTSYS/lib; export LD_LIBRARY_PATH       # Linux, ELF HP-UX
 else
-   LD_LIBRARY_PATH=$GRUTSYS/libraries:$LD_LIBRARY_PATH; export LD_LIBRARY_PATH
+   LD_LIBRARY_PATH=$GRUTSYS/lib:$LD_LIBRARY_PATH; export LD_LIBRARY_PATH
 fi
 
 if [ -z "${DYLD_LIBRARY_PATH}" ]; then
-   DYLD_LIBRARY_PATH=$GRUTSYS/libraries; export DYLD_LIBRARY_PATH   # Mac OS X
+   DYLD_LIBRARY_PATH=$GRUTSYS/lib; export DYLD_LIBRARY_PATH   # Mac OS X
 else
-   DYLD_LIBRARY_PATH=$GRUTSYS/libraries:$DYLD_LIBRARY_PATH; export DYLD_LIBRARY_PATH
+   DYLD_LIBRARY_PATH=$GRUTSYS/lib:$DYLD_LIBRARY_PATH; export DYLD_LIBRARY_PATH
 fi
 
 if [ -z "${MANPATH}" ]; then

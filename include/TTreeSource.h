@@ -41,14 +41,14 @@ public:
 
   ~TTreeSource() {;}
 
-  virtual std::string Status() const {
+  virtual std::string Status(bool long_description) const {
     return Form("%s: %s %8.2f MB given %s / %s %8.2f MB total %s  => %s %3.02f MB/s processed %s",
-                SourceDescription().c_str(),
+                SourceDescription(long_description).c_str(),
                 DCYAN, GetBytesGiven()/1e6, RESET_COLOR,
                 BLUE,  GetFileSize()/1e6, RESET_COLOR,
                 GREEN, GetAverageRate()/1e6, RESET_COLOR);
   }
-  virtual std::string SourceDescription() const {return "File: "+std::string(fChain.GetCurrentFile()->GetName());}
+  virtual std::string SourceDescription(bool long_description) const {return "File: "+std::string(fChain.GetCurrentFile()->GetName());}
 
 
   kFileType GetFileType() const { return fFileType; }
@@ -150,8 +150,8 @@ class TTreeSource : public TRawEventSource {
 public:
   TTreeSource(const char* filename, const char* treename, const char* eventclassname, kFileType file_type) {;}
   ~TTreeSource() {;}
-  virtual std::string Status() const { return ""; }
-  virtual std::string SourceDescription() const {return ""; }
+  virtual std::string Status(bool long_description) const { return ""; }
+  virtual std::string SourceDescription(bool long_description) const {return ""; }
   kFileType GetFileType() const { return kFileType::UNKNOWN_FILETYPE; }
   long GetFileSize() const { return 0; }
   virtual void Reset() {;}

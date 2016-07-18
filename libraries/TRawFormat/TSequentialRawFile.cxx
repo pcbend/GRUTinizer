@@ -21,17 +21,17 @@ void TSequentialRawFile::Reset() {
   active_source = 0;
 }
 
-std::string TSequentialRawFile::SourceDescription() const {
+std::string TSequentialRawFile::SourceDescription(bool long_description) const {
   if(active_source < sources.size()){
-    return sources[active_source]->SourceDescription();
+    return sources[active_source]->SourceDescription(long_description);
   } else {
     return "";
   }
 }
 
-std::string TSequentialRawFile::Status() const {
+std::string TSequentialRawFile::Status(bool long_description) const {
   if(active_source < sources.size()){
-    return sources[active_source]->Status();
+    return sources[active_source]->Status(long_description);
   } else {
     return "";
   }

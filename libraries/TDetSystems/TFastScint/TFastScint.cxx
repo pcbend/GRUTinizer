@@ -5,6 +5,7 @@
 
 #include "TNSCLEvent.h"
 #include "TH2.h"
+#include "TMath.h"
 
 int TFastScint::errors;
 
@@ -40,9 +41,9 @@ void TFastScint::Clear(Option_t* opt){
 
 void TFastScint::Print(Option_t *opt) const { 
   printf("TFastScint @  %lu \n",Timestamp());
-  for(int x=0;x<Size();x++) {
+  for(unsigned int x=0;x<Size();x++) {
     printf("\t");
-    GetLaBrHit(x).Print();
+    GetLaBrHit(static_cast<int>(x)).Print();
   }
 }
 
@@ -54,7 +55,7 @@ int TFastScint::BuildHits(std::vector<TRawEvent>& raw_data){
     SetTimestamp(nscl.GetTimestamp());
     errors+=Build_From(nscl,true);
   }
-  return Size();
+  return (int)Size();
 }
 
 void TFastScint::InsertHit(const TDetectorHit& hit){
@@ -63,14 +64,14 @@ void TFastScint::InsertHit(const TDetectorHit& hit){
   fs_hits.push_back((TFastScintHit)hit);
 }
 
-int TFastScint::Size() const {
+unsigned int TFastScint::Size() const {
   return fs_hits.size(); //->GetEntries();
 }
 
 
 int TFastScint::GoodSize() const {
   int size=0;
-  for(int i =0;i<Size();i++) {
+  for(unsigned int i =0;i<Size();i++) {
     if(fs_hits[i].Charge()>100)
       size++;
   }
@@ -85,7 +86,7 @@ TFastScintHit TFastScint::GetLaBrHit(int i) const {
 
 int TFastScint::GetDetNumberIn_fs_hits(Int_t det){
   int detNumber = -1;
-  for(int i_hit = 0; i_hit < Size(); i_hit++){
+  for(unsigned int i_hit = 0; i_hit < Size(); i_hit++){
     TFastScintHit& temp_hit = fs_hits.at(i_hit);
     if(temp_hit.GetChannel()==det)
       detNumber=i_hit;
@@ -94,7 +95,7 @@ int TFastScint::GetDetNumberIn_fs_hits(Int_t det){
 }
 
 TFastScintHit *TFastScint::FindHit(int channelnumber) {
-  for(int i=0;i<Size();i++) {
+  for(unsigned int i=0;i<Size();i++) {
     if(fs_hits.at(i).GetChannel()==channelnumber)
       return &fs_hits[i];
   }
@@ -276,3 +277,40 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
   
   return 0;
 }
+
+TVector3 &TFastScint::GetPosition(int detector) { 
+  static std::map<int,TVector3> fFastScintDetectorMap;
+  if(fFastScintDetectorMap.size()==0) {
+    fFastScintDetectorMap[16] = TVector3(0,0,1);
+  }
+  if(detector>15) {
+    fprintf(stderr,"%s, detector out of range.\n",__PRETTY_FUNCTION__);
+    detector=16;
+  }
+  if(fFastScintDetectorMap.count(detector)==0) {
+    double phi = TMath::Pi()/2;
+    double theta = TMath::Pi()/2 - TMath::ATan(24.13/139.7);
+    //double z   = 24.13;
+    if(detector<8) {
+      phi = phi + TMath::Pi()/8. + static_cast<double>(detector)*TMath::Pi()/4.;
+    } else {
+      theta = -theta;
+      //z = -24.13;
+      phi = phi + static_cast<double>(detector-8)*TMath::Pi()/4.;
+    }
+    if(phi>2*TMath::Pi())
+      phi -= 2*TMath::Pi();
+    double mag = TMath::Sqrt(139.7*139.7 + 24.13*24.13);
+   
+    printf("\t\tmag   = %f\n",mag);
+    printf("\t\ttheta = %f\n",theta*TMath::RadToDeg());
+    printf("\t\tphi   = %f\n",phi*TMath::RadToDeg());
+
+    TVector3 v;
+    v.SetMagThetaPhi(mag,theta,phi);
+    fFastScintDetectorMap[detector] = v;
+  }
+  return fFastScintDetectorMap.at(detector);
+}
+
+

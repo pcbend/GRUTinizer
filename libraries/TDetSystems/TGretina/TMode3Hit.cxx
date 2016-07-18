@@ -1,27 +1,21 @@
 #include "TMode3Hit.h"
 
+#include "TRandom.h"
+
 #include "TGEBEvent.h"
 #include "TGRUTOptions.h"
+#include "TChannel.h"
+
+#include "GH1D.h"
+#include "GCanvas.h"
 
 ClassImp(TMode3Hit)
 
 bool TMode3Hit::fExtractWaves = true;
 
-TMode3Hit::TMode3Hit(){
-  //fOwnWave = false;
-  wave = NULL;
-  wavesize = 0;
-  for(int i=0;i<MAXTRACE;i++) {wavebuffer[i]=0;}
-}
+TMode3Hit::TMode3Hit(){ }
 
-TMode3Hit::~TMode3Hit() {
-  //if(fOwnWave && wave) {
-  //  wave = 0;
-  //  delete wave;
-  //}
-}
-
-
+TMode3Hit::~TMode3Hit() { }
 
 void TMode3Hit::BuildFrom(TSmartBuffer& buf){
   Clear();
@@ -32,34 +26,36 @@ void TMode3Hit::BuildFrom(TSmartBuffer& buf){
   buf.Advance(sizeof(TRawEvent::GEBMode3Head));
 
   board_id = header->board_id;
+  SetAddress((1<<24) + board_id);
 
   auto data   = (TRawEvent::GEBMode3Data*)buf.GetData();
   buf.Advance(sizeof(TRawEvent::GEBMode3Data));
 
   led = data->GetLed();
-  charge = data->GetEnergy(*header);
+  //charge = data->GetEnergy(*header);
   SetCharge(data->GetEnergy(*header));
 
-  SetAddress((2<<24) +
-             (GetCrystalId()<<16) );
+  dt1  = data->GetDeltaT1();
+  dt2  = data->GetDeltaT2();
+
+  charge0  = data->GetEnergy0(*header);
+  charge1  = data->GetEnergy1(*header);
+  charge2  = data->GetEnergy2(*header);
+
   cfd = data->GetCfd();
 
   size_t wave_bytes = header->GetLength()*4 - sizeof(*header) + 4 - sizeof(*data);
-  if(read_waveform & (wavesize<MAXTRACE)){
-    wavesize = wave_bytes/sizeof(short);
-    //wave = (short*)malloc(wave_bytes);
-    //fOwnWave = true;
-    memcpy((char*)wavebuffer, buf.GetData(), wave_bytes);
+  if(read_waveform){
+    size_t wavesize = wave_bytes/sizeof(short);
+    waveform.resize(wavesize);
 
-    for(int i=0; i<wavesize; i+=2){
-      short tmp      = TRawEvent::SwapShort(wavebuffer[i+1]);
-      wavebuffer[i+1] = TRawEvent::SwapShort(wavebuffer[i]);
-      wavebuffer[i]   = tmp;
+    memcpy((char*)&waveform[0], buf.GetData(), wave_bytes);
+
+    for(unsigned int i=0; i<wavesize; i+=2){
+      short tmp      = TRawEvent::SwapShort(waveform[i+1]);
+      waveform[i+1] = TRawEvent::SwapShort(waveform[i]);
+      waveform[i]   = tmp;
     }
-    wave = &wavebuffer[0];
-  } else {
-    wave = NULL;
-    wavesize = 0;
   }
   buf.Advance(wave_bytes);
 }
@@ -75,21 +71,9 @@ void TMode3Hit::Copy(TObject& obj) const {
 
 
   mode3.board_id = board_id;
-  //mode3.energy   = energy;
-  mode3.charge   = charge;
-  mode3.wavesize = wavesize;
   mode3.led      = led;
   mode3.cfd      = cfd;
-  //if(mode3.wave) { delete wave; }
-  if(ExtractWaves() && wavesize>0) {
-    //fOwnWave = true;
-    //mode3.wave = new Short_t[wavesize];
-    memcpy(mode3.wavebuffer,wavebuffer,wavesize*(sizeof(Short_t)));
-    mode3.wave = &(mode3.wavebuffer[0]);
-  } else {
-    mode3.wave=0;
-  }
-  //mode3.raw_data.clear();
+  mode3.waveform = waveform;
 }
 
 
@@ -98,38 +82,83 @@ void TMode3Hit::Print(Option_t *opt) const { }
 void TMode3Hit::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
   board_id = -1;
-  charge   = -1;
   led      = -1;
   cfd      = -1;
-  //if(fOwnWave && wave) {
-  //  delete wave;
-  //}
-  ClearWave();
-  //raw_data.clear();
-}
+  dt1      =  0xffff;
+  dt2      =  0xffff;
+  charge0  = -1;
+  charge1  = -1;
+  charge2  = -1;
 
-void TMode3Hit::ClearWave(Option_t *opt) {
-  for(int i=0;i<wavesize;i++) {
-    if(i>MAXTRACE)
-      break;
-    //std::cout << "Clear wave  " << i << std::endl;
-    wavebuffer[i] = 0;
-  }
-  wave = NULL;
-  wavesize =  0;
+  waveform.clear();
 }
 
 double TMode3Hit::AverageWave(int samples) {
-  //printf("wavesize = %i\n",wavesize);
-  if(wavesize<1)
+  if(waveform.size() == 0) {
     return 0.0;
-  if(samples<0 || samples >wavesize)
-    samples = wavesize;
-  double avg = 0.0;
-  for(int i=0;i<samples;i++) { 
-    //printf("wavebiffer[%i] = %i\n",i,wave[i]);
-    avg += wave[i];
   }
-  return avg/((double)samples);
+  if(samples < 0 ||
+     samples > int(waveform.size())) {
+    samples = waveform.size();
+  }
+  double sum = 0.0;
+  double wsum = 0.0;
+  for(int i=0;i<samples;i++) {
+    wsum += (double)i*(std::abs((double)waveform[i]));
+    sum += waveform[i];
+  }
+  return wsum/sum;
 }
 
+
+void TMode3Hit::Draw(Option_t *opt)  {
+  if(!waveform.size())
+    return;
+  TString option = opt;
+  if(!gPad || option.Contains("new",TString::kIgnoreCase)) {
+    new GCanvas;
+  } else {
+    gPad->Clear();
+  }
+  GH1D wave("wave","wave",(int)waveform.size(),0,(double)waveform.size());
+  for(unsigned int x=0;x<waveform.size();x++) 
+    wave.Fill(x,waveform.at(x));
+  wave.DrawCopy();
+
+}
+
+double TMode3Hit::GetEnergy0() const {
+  double energy;
+  TChannel* chan = TChannel::GetChannel(Address());
+  if(!chan){
+    energy = charge0/128 + gRandom->Uniform();
+    //return Charge() + gRandom->Uniform();
+  } else {
+    energy = chan->CalEnergy(charge0/128, fTimestamp);
+  }
+  return energy;
+}
+
+double TMode3Hit::GetEnergy1() const {
+  double energy;
+  TChannel* chan = TChannel::GetChannel(Address());
+  if(!chan){
+    energy = charge1/128 + gRandom->Uniform();
+    //return Charge() + gRandom->Uniform();
+  } else {
+    energy = chan->CalEnergy(charge1/128, fTimestamp);
+  }
+  return energy;
+}
+
+double TMode3Hit::GetEnergy2() const {
+  double energy;
+  TChannel* chan = TChannel::GetChannel(Address());
+  if(!chan){
+    energy = charge2/128 + gRandom->Uniform();
+    //return Charge() + gRandom->Uniform();
+  } else {
+    energy = chan->CalEnergy(charge2/128, fTimestamp);
+  }
+  return energy;
+}

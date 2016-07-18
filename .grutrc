@@ -2,11 +2,33 @@ Unix.*.Root.MacroPath: .:$(GRUTSYS)/util:$(ROOTSYS)/macros
 #Unix.*.Root.DynamicPath:  .:~/rootlibs:$(ROOTSYS)/lib:$/home/tiguser/packages/SharcAnalysis
 
 #default MakeHistos library
-GRUT.HistLib: $(GRUTSYS)/libraries/libRCNPsav.so
+GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistos.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistos.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libMakeSimHistos.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libFastScintHists.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libBetterCaesarHistos.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libMake_CRDC_Mask_Histos.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libPolarHists.so
+#:GRUT.HistLib: $(GRUTSYS)/lib/libPolarHists3.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libMakeSegaJanusHistos.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistos.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libFastScintHists.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libPolarHists3.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libMakeSegaJanusHistos.so
+#GRUT.HistLib: $(GRUTSYS)/libraries/libRCNPsav.so
+
 GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
 
+#GRUT.SnapshotExt: png
+#GRUT.SnapshotDir: /user/benderp/public_html/figures  
+GRUT.SnapshotExt: 
+GRUT.SnapshotDir: 
+
+
+
 #files to load at log in:
-Rint.Logon: $(GRUTSYS)/logon.C
+Rint.Logon: $(GRUTSYS)/.grut_logon
+#Rint.Logon: $(GRUTSYS)/logon.C
 Rint.History $(GRUTSYS)/.grut_history
 Rint.HistSize: 1000000
 

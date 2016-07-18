@@ -25,24 +25,31 @@ public:
   int Push(T obj);
   int Pop(T& output, int millisecond_wait = 1000);
 
-  size_t ItemsPushed();
-  size_t ItemsPopped();
-  size_t Size();
+  size_t ItemsPushed() const;
+  size_t ItemsPopped() const;
+  size_t Size() const;
 
-  int ObjectSize(T&);
+  int ObjectSize(T&) const;
+
+  bool IsFinished() const;
+  void SetFinished(bool finished = true);
 
 private:
 #ifndef __CINT__
-  std::mutex mutex;
+  mutable std::mutex mutex;
   std::queue<T> queue;
   std::condition_variable can_push;
   std::condition_variable can_pop;
+
+  std::atomic_int num_writers;
 
   size_t max_queue_size;
 
   size_t items_in_queue;
   size_t items_pushed;
   size_t items_popped;
+
+  std::atomic_bool is_finished;
 #endif
 };
 
@@ -50,7 +57,8 @@ private:
 template<typename T>
 ThreadsafeQueue<T>::ThreadsafeQueue()
   : max_queue_size(50000),
-    items_in_queue(0), items_pushed(0), items_popped(0) { }
+    items_in_queue(0), items_pushed(0), items_popped(0),
+    is_finished(false) { }
 
 template<typename T>
 ThreadsafeQueue<T>::ThreadsafeQueue(size_t maxsize)
@@ -97,21 +105,31 @@ int ThreadsafeQueue<T>::Pop(T& output, int millisecond_wait) {
 }
 
 template<typename T>
-size_t ThreadsafeQueue<T>::Size() {
+size_t ThreadsafeQueue<T>::Size() const {
   std::unique_lock<std::mutex> lock(mutex);
   return items_in_queue;
 }
 
 template<typename T>
-size_t ThreadsafeQueue<T>::ItemsPushed() {
+size_t ThreadsafeQueue<T>::ItemsPushed() const {
   std::unique_lock<std::mutex> lock(mutex);
   return items_pushed;
 }
 
 template<typename T>
-size_t ThreadsafeQueue<T>::ItemsPopped() {
+size_t ThreadsafeQueue<T>::ItemsPopped() const {
   std::unique_lock<std::mutex> lock(mutex);
   return items_popped;
+}
+
+template<typename T>
+bool ThreadsafeQueue<T>::IsFinished() const {
+  return is_finished;
+}
+
+template<typename T>
+void ThreadsafeQueue<T>::SetFinished(bool finished) {
+  is_finished = finished;
 }
 #endif /* __CINT__ */
 

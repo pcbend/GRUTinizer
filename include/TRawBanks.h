@@ -270,7 +270,13 @@ struct GEBMode3Data {
   UShort_t cfd_pt2_low;
   Long_t GetLed() const;
   Long_t GetCfd() const;
+  UShort_t GetDeltaT1() const;
+  UShort_t GetDeltaT2() const;
+
   Int_t  GetEnergy(GEBMode3Head&) const;
+  Int_t  GetEnergy0(GEBMode3Head&) const;
+  Int_t  GetEnergy1(GEBMode3Head&) const;
+  Int_t  GetEnergy2(GEBMode3Head&) const;
 }__attribute__((__packed__));
 
 friend std::ostream& operator<<(std::ostream& os, const GEBMode3Data &data);
@@ -543,8 +549,6 @@ typedef struct RawHeader {
   Int_t datum2;
 } __attribute__((__packed__)) RawHeader;
 
-
-
 typedef struct GEBHeader : public RawHeader {
   Int_t type()      { return datum1; } //Int_t  type; //int32_t
   Int_t size()      { return datum2; } //int32_t
@@ -559,6 +563,13 @@ typedef struct EVTHeader : public RawHeader {
 } __attribute__((__packed__)) EVTHeader;
 
 friend std::ostream& operator<<(std::ostream& os, const RawHeader &head);
+
+typedef struct NSCLBodyHeader {
+  int body_header_size;
+  long timestamp;
+  int sourceid;
+  int barrier;
+} __attribute__((__packed__)) NSCLBodyHeader;
 
 typedef struct TNSCLFragmentHeader {
   long timestamp;

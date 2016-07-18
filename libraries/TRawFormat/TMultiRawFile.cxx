@@ -67,32 +67,12 @@ int TMultiRawFile::GetEvent(TRawEvent& outevent){
   // If another event exists, put it back into the list
   FileEvent next;
   next.file = output.file;
-
   int bytes_read = next.file->Read(next.next_event);
   if(bytes_read > 0){
     fFileEvents.insert(next);
   } else if (!TGRUTOptions::Get()->ExitAfterSorting()) {
-  //   // // if in online mode and the current source is at its end, delete it
-  //   // std::cout << next.file->Status() << std::endl;
-  //   // TRawEventFileSource* filein = dynamic_cast<TRawEventFileSource*>(next.file);
-  //   // if (filein) {
-  //   //         std::cout << filein->SourceDescription() << " : " << (filein->GetFileSize() - filein->GetBytesGiven()) << std::endl;
-  //   //   if ((filein->GetFileSize() - filein->GetBytesGiven()) == 0) {
-  //   //     std::lock_guard<std::mutex> lock(fFileListMutex);
-  //   //     delete output.file;
-  //   //     fFileList.erase(output.file);
-  //   //   }
-  //   // } else { // otherwise it is a stalled source and we should wait until data is available for coincidence building
-  //   //   stalled_source = next.file;
-  //   // }
     stalled_source = next.file;
-  }
-  else { // otherwise delete the source from the file list
-    std::cout << "######################################\n";
-    std::cout << std::endl << "Deleting source: " << next.file->SourceDescription() << std::endl;
-    std::cout << next.file->Status() << std::endl << std::endl;
-    std::cout << "######################################\n";
-
+  } else { // otherwise delete the source from the file list
     std::lock_guard<std::mutex> lock(fFileListMutex);
     delete output.file;
     fFileList.erase(output.file);
@@ -109,20 +89,20 @@ void TMultiRawFile::Reset() {
   }
 }
 
-std::string TMultiRawFile::SourceDescription() const{
+std::string TMultiRawFile::SourceDescription(bool long_description) const{
   std::lock_guard<std::mutex> lock(fFileListMutex);
 
   std::stringstream ss;
   ss << "Multi file: ";
   int i=0;
   for(auto& file : fFileList){
-    ss << i << " = (" << file->SourceDescription() << ") ";
+    ss << i << " = (" << file->SourceDescription(long_description) << ") ";
     i++;
   }
   return ss.str();
 }
 
-std::string TMultiRawFile::Status() const{
+std::string TMultiRawFile::Status(bool long_description) const{
   std::lock_guard<std::mutex> lock(fFileListMutex);
 
   std::stringstream ss;
@@ -135,7 +115,7 @@ std::string TMultiRawFile::Status() const{
 
   size_t max_length = 0;
   for(auto& file : fFileList){
-    max_length = std::max(max_length, file->SourceDescription().length());
+    max_length = std::max(max_length, file->SourceDescription(long_description).length());
   }
 
   for(auto& file : fFileList){

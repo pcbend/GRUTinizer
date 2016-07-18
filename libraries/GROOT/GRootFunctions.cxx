@@ -140,6 +140,24 @@ Double_t GRootFunctions::Efficiency(Double_t *dim, Double_t *par){
 }
 
 
+Double_t GRootFunctions::GausExpo(Double_t *x, Double_t *pars) {
+
+  double result;
+
+  // gaus + step*expo conv with a gaus.
+
+  // par[0] = height
+  // par[1] = cent
+  // par[2] = sigma
+  // par[3] = decay parameter
+
+  result = TMath::Gaus(pars[0],pars[1],pars[2])+(double)(x[0]>pars[1])*pars[0]*TMath::Exp(-pars[3]); 
+  return result;
+}
+
+
+
+
 
 Double_t GRootFunctions::LanGaus(Double_t *x, Double_t *pars){
    double dy, y, conv, spec, gaus;
@@ -148,11 +166,9 @@ Double_t GRootFunctions::LanGaus(Double_t *x, Double_t *pars){
    for(int i=0; i<10; i++){
     dy = 5*pars[2]/10.0; // truncate the convolution by decreasing number of evaluation points and decreasing range [2.5 sigma still covers 98.8% of gaussian]
     y = x[0]-2.5*pars[2]+dy*i;
-
     spec = pars[0]+pars[1]*y; // define background SHOULD THIS BE CONVOLUTED ????? *************************************
     //for( int n=0; n<(int)(pars[0]+0.5); n++) // the implementation of landau function should be done using the landau function
       spec +=pars[3]*TMath::Landau(-y,-pars[4],pars[5])/TMath::Landau(0,0,100); // add peaks, dividing by max height of landau
-
     gaus = TMath::Gaus(-x[0],-y,pars[2])/sqrt(2*TMath::Pi()*pars[2]*pars[2]); // gaus must be normalisd so there is no sigma weighting
     conv += gaus*spec*dy; // now convolve this [integrate the product] with a gaussian centered at x;
   }
@@ -180,10 +196,14 @@ Double_t GRootFunctions::LanGausHighRes(Double_t *x, Double_t *pars){ // 5x more
 }
 
 
+Double_t GRootFunctions::GammaEff(Double_t *x,Double_t *par) {
+  // LOG(EFF) = A0 + A1*LOG(E) + A2*LOG(E)^2 + A3/E^2 
 
+  double logE = TMath::Log10(x[0]);
+  double temp =  par[0] + par[1]*logE + par[2]*logE*logE +par[3]/(x[0]*x[0]);
+  return pow(10,temp);
 
-
-
+}
 
 
 

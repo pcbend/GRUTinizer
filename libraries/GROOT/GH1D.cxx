@@ -1,16 +1,19 @@
 #include "GH1D.h"
 
 #include <iostream>
+#include <fstream>
+#include <cstring>
 
 #include "TVirtualPad.h"
-#include "GH2I.h"
-#include "GH2D.h"
-
+#include "TString.h"
 #include "TF1.h"
-
 #include "TFrame.h"
 //#include "TROOT.h"
 //#include "TSystem.h"
+
+#include "GCanvas.h"
+#include "GH2I.h"
+#include "GH2D.h"
 
 GH1D::GH1D(const TH1& source)
   : parent(NULL), projection_axis(-1) {
@@ -31,6 +34,22 @@ GH1D::GH1D(const TF1& function,Int_t nbinsx,Double_t xlow,Double_t xup) :
   //f->Delete();
 }
 
+bool GH1D::WriteDatFile(const char *outFile){
+  if(strlen(outFile)<1) return 0;
+
+  std::ofstream out;
+  out.open(outFile);
+  
+  if(!(out.is_open())) return 0;
+  
+  for(int i=0;i<GetNbinsX();i++){
+    out << GetXaxis()->GetBinCenter(i) << "\t" << GetBinContent(i) << std::endl;
+  }
+  out << std::endl;
+  out.close();
+
+  return 1;
+}
 
 
 /*
@@ -75,7 +94,12 @@ void GH1D::Copy(TObject& obj) const {
 
 
 void GH1D::Draw(Option_t* opt) {
-  TH1D::Draw(opt);
+  TString option(opt);
+  if(option.Contains("new",TString::kIgnoreCase)) {
+    option.ReplaceAll("new","");
+    new GCanvas;
+  }
+  TH1D::Draw(option.Data());
   if(gPad) {
     gPad->Update();
     gPad->GetFrame()->SetBit(TBox::kCannotMove);
