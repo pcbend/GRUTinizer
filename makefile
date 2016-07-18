@@ -105,7 +105,7 @@ bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) bin
 bin lib:
 	@mkdir -p $@
 
-include/GVersion.h: .git/HEAD .git/index
+include/GVersion.h: .git/HEAD .git/index util/gen_version.sh
 	$(call run_and_test,util/gen_version.sh,$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 lib/lib%.so: .build/histos/%.o | lib

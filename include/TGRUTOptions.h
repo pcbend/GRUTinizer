@@ -40,6 +40,7 @@ public:
 
   bool ExitAfterSorting()   const { return fExitAfterSorting; }
   bool ShowedHelp()         const { return fHelp; }
+  bool ShowedVersion()      const { return fShowedVersion; }
   bool ShowLogo()           const { return fShowLogo; }
   bool SortRaw()            const { return fSortRaw; }
   bool SortRoot()           const { return fSortRoot; }
@@ -47,6 +48,7 @@ public:
   bool StartGUI()           const { return fStartGui; }
   bool MakeHistos()         const { return fMakeHistos; }
   bool SortMultiple()       const { return fSortMultiple; }
+
 
   bool IsOnline()           const { return fIsOnline; }
 
@@ -94,6 +96,7 @@ private:
 
   kFileType fDefaultFileType;
   bool fExitAfterSorting;
+  bool fShowedVersion;
   bool fHelp;
   bool fShowLogo;
   bool fSortRaw;
