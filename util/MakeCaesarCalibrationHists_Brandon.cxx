@@ -2,7 +2,7 @@
 #define MAX_DETS 24
 
 //CHANGE THIS
-#define NUM_FILES 6 
+#define NUM_FILES 6
 #include <iostream>
 #include <string>
 #include <vector>
@@ -18,7 +18,7 @@
 //Usage: makeCalibrationHists input_file_list.dat output_hists.root
 //input_file_list should contain the list of files that will be used for the calibration
 
-//NUM_FILES, run_numbers, and source_names must be changed by hand! 
+//NUM_FILES, run_numbers, and source_names must be changed by hand!
 int main(int argc, char *argv[]){
   if (argc < 3){
     std::cout << "Usaged: MakeCalibrationHists input_filelist.dat output_file.root" << std::endl;
@@ -47,19 +47,19 @@ int main(int argc, char *argv[]){
   std::vector<std::string> input_file_names;
   std::vector<TFile*> files;
   std::string line;
-  ifstream input_file;
+  std::ifstream input_file;
 
   TH1D* output_hists[NUM_FILES][N_RINGS][MAX_DETS];
   TFile *out_file = new TFile(argv[2], "recreate");
 
   TCaesar *caesar = 0;
-  
+
   Int_t det;
   Int_t ring;
   Int_t n_gamma;
   Int_t n_entries;
   Double_t energy;
-  
+
   Int_t hist_high_x = 4096;
   Int_t hist_low_x = 0;
   Int_t hist_n_bins_x = hist_high_x;
@@ -76,12 +76,12 @@ int main(int argc, char *argv[]){
   input_file.close();
 
   for (unsigned int i = 0; i < input_file_names.size(); i++){
-    files.push_back(new TFile(input_file_names.at(i).c_str(),"read")); 
+    files.push_back(new TFile(input_file_names.at(i).c_str(),"read"));
   }
   if (files.size() != NUM_FILES){
     std::cout << "ERROR: Found incorrect number of files!" << std::endl;
   }
-  
+
   //Make all histograms with format:
   //sourcename_ring_#_det_#
   for (int file = 0; file < NUM_FILES; file++){
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]){
         output_hists[file][ring][det] = new TH1D(Form("%s_run_%d_ring_%d_det_%d",source_name[file].c_str(), run_numbers[file],ring,det),
                                                  Form("%s_run_%d_ring_%d_det_%d",source_name[file].c_str(), run_numbers[file],ring,det), hist_n_bins_x, hist_low_x, hist_high_x);
         output_hists[file][ring][det]->SetDirectory(out_file);
-      } 
+      }
     }
   }
 
@@ -129,8 +129,7 @@ int main(int argc, char *argv[]){
     cur_source += 1;
     delete cur_tree;
   }//cycle through files in chain
- 
+
   out_file->Write();
   out_file->Close();
 }
-

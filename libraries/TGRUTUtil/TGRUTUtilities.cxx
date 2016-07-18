@@ -1,9 +1,11 @@
 #include "TGRUTUtilities.h"
 
 #include <cstdlib>
-#include <sys/stat.h>
 #include <iostream>
 #include <fstream>
+
+#include <sys/stat.h>
+#include <glob.h>
 
 #include "TObjArray.h"
 #include "TObjString.h"
@@ -69,4 +71,26 @@ void CalculateParameters() {
     std::string("xterm -e python2 ") + getenv("GRUTSYS") + "/libraries/TGRUTUtil/very-important-file &";
   std::cout << command << std::endl;
   system(command.c_str());
+}
+
+// From http://stackoverflow.com/a/8615450/2689797
+std::vector<std::string> glob(const std::string& pattern) {
+  glob_t glob_result;
+  glob(pattern.c_str(), GLOB_TILDE, NULL, &glob_result);
+
+  std::vector<std::string> output;
+  for(unsigned int i=0; i<glob_result.gl_pathc; i++) {
+    output.push_back(glob_result.gl_pathv[i]);
+  }
+  globfree(&glob_result);
+
+  return output;
+}
+
+bool is_bash_pattern(const std::string& pattern) {
+  return (pattern.find("*") != std::string::npos ||
+          pattern.find("?") != std::string::npos ||
+          pattern.find("[") != std::string::npos ||
+          pattern.find("]") != std::string::npos ||
+          pattern.find("!") != std::string::npos);
 }

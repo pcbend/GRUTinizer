@@ -14,11 +14,12 @@ bool FileEvent::operator<(const FileEvent& other) const{
 }
 
 TMultiRawFile::TMultiRawFile()
-  : fIsFirstStatus(true), fIsValid(true) { }
+  : fCurrentlyStallingSource(nullptr),
+    fIsFirstStatus(true), fIsValid(true) { }
 
 TMultiRawFile::~TMultiRawFile(){
-  for(auto& val : fFileEvents){
-    delete val.file;
+  for(auto& file : fFileList){
+    delete file;
   }
 }
 
@@ -27,7 +28,7 @@ void TMultiRawFile::AddFile(TRawEventSource* infile){
   f.file = infile;
   infile->Read(f.next_event);
   fFileEvents.insert(f);
-  fFileList.insert(infile);
+  fFileList.push_back(infile);
 }
 
 void TMultiRawFile::AddFile(const char* filename){
@@ -43,23 +44,47 @@ void TMultiRawFile::AddFile(const char* filename){
 }
 
 int TMultiRawFile::GetEvent(TRawEvent& outevent){
-  if(fFileEvents.begin() == fFileEvents.end()){
-    return -1;
-  }
-
-  static TRawEventSource* stalled_source = nullptr;
-  if (stalled_source) {
+  // If a source has currently stalling, give it up to a minute to recover.
+  if(fCurrentlyStallingSource) {
     FileEvent next;
-    int bytes_read = stalled_source->Read(next.next_event);
-    if (bytes_read > 0) {
-      next.file = stalled_source;
+    next.file = fCurrentlyStallingSource;
+    int bytes_read = fCurrentlyStallingSource->Read(next.next_event);
+    if(bytes_read > 0) {
       fFileEvents.insert(next);
-      stalled_source = nullptr;
+      fCurrentlyStallingSource = nullptr;
+    } else if(std::chrono::system_clock::now() > fStallingGiveUp) {
+      fStalledSources.insert(fCurrentlyStallingSource);
+      fCurrentlyStallingSource = nullptr;
+    } else {
+      return -1;
     }
+  }
+
+  // Every 10 seconds, check all the stalled sources.
+  if (fStalledSources.size() &&
+      std::chrono::system_clock::now() > fNextStalledCheck) {
+
+    std::set<TRawEventSource*> stalled_sources(fStalledSources);
+    for(auto source : stalled_sources) {
+      FileEvent next;
+      next.file = source;
+      int bytes_read = source->Read(next.next_event);
+      if (bytes_read > 0) {
+        fFileEvents.insert(next);
+        fStalledSources.erase(source);
+      }
+    }
+
+    // Schedule the next stalled-source check for 10 seconds from now.
+    fNextStalledCheck = std::chrono::system_clock::now() + std::chrono::seconds(10);
+  }
+
+  // No events remaining means that we are at the end of all files.
+  if(fFileEvents.size() == 0){
     return -1;
   }
 
-  // Pop the event, place in output
+  // Pop the earliest event, place in output
   FileEvent output = *fFileEvents.begin();
   fFileEvents.erase(fFileEvents.begin());
   outevent = output.next_event;
@@ -71,14 +96,12 @@ int TMultiRawFile::GetEvent(TRawEvent& outevent){
   if(bytes_read > 0){
     fFileEvents.insert(next);
   } else if (!TGRUTOptions::Get()->ExitAfterSorting()) {
-    stalled_source = next.file;
-  } else { // otherwise delete the source from the file list
-    std::lock_guard<std::mutex> lock(fFileListMutex);
-    delete output.file;
-    fFileList.erase(output.file);
+    // Source is now stalling, give it a 60-second grace period.
+    fCurrentlyStallingSource = next.file;
+    fStallingGiveUp = std::chrono::system_clock::now() + std::chrono::seconds(60);
   }
 
-  return output.next_event.GetTotalSize();
+  return outevent.GetTotalSize();
 }
 
 void TMultiRawFile::Reset() {

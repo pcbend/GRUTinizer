@@ -25,4 +25,7 @@ inline size_t FindFileSize(const char* fname) {
   return fsize;
 }
 
+std::vector<std::string> glob(const std::string& pattern);
+bool is_bash_pattern(const std::string& pattern);
+
 #endif

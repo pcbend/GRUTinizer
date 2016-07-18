@@ -5,6 +5,7 @@
 #include "TString.h"
 
 #include "TGRUTOptions.h"
+#include "TGlobRawFile.h"
 
 ClassImp(TRawEventSource)
 
@@ -71,6 +72,10 @@ kFileType TRawEventSource::DefaultFileType() {
 TRawEventSource* TRawEventSource::EventSource(const char* filename,
                                               bool is_online, bool is_ring,
                                               kFileType file_type){
+  if(is_bash_pattern(filename)) {
+    return new TGlobRawFile(filename, file_type);
+  }
+
   if(file_type == kFileType::UNKNOWN_FILETYPE){
     if(is_ring){
       std::cerr << "File type determination does not work for ring sources" << std::endl;

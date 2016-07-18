@@ -357,7 +357,8 @@ void TGRUTint::SetupPipeline() {
 
   bool missing_raw_file = false;
   for(auto& filename : opt->RawInputFiles()) {
-    if(!file_exists(filename.c_str())) {
+    if(!is_bash_pattern(filename) &&
+       !file_exists(filename.c_str())) {
       missing_raw_file = true;
       std::cerr << "File not found: " << filename << std::endl;
     }
@@ -516,7 +517,8 @@ TRawEventSource* TGRUTint::OpenRawSource() {
   } else {
     // Open a single file.
     std::string filename = opt->RawInputFiles().at(0);
-    if(file_exists(filename.c_str())){
+    if(file_exists(filename.c_str()) ||
+       is_bash_pattern(filename)){
       source = new TRawFileIn(filename.c_str());
     }
   }

@@ -3,6 +3,7 @@
 
 #include <set>
 #ifndef __CINT__
+#   include <chrono>
 #   include <mutex>
 #endif
 
@@ -42,8 +43,26 @@ private:
   TMultiRawFile(const TMultiRawFile& other) { }
   TMultiRawFile& operator=(const TMultiRawFile& other) { return *this; }
 
-  std::set<TRawEventSource*> fFileList; // This list does not get modified frequently
-  std::set<FileEvent> fFileEvents; // This list is modified frequently
+  // Contains all sources owned by the TMultiRawFile
+  std::vector<TRawEventSource*> fFileList;
+
+  // A list of (source, next_event) pairs, ordered by earliest event.
+  std::set<FileEvent> fFileEvents;
+
+  // All sources that have stalled.  In online mode, these are re-checked every 10 seconds.
+  std::set<TRawEventSource*> fStalledSources;
+
+  // The currently stalling source.  TMultiRawFile will wait up to 60 seconds for it to recover.
+  TRawEventSource* fCurrentlyStallingSource;
+
+#ifndef __CINT__
+  // The timeout for checking the long-stalled sources.
+  std::chrono::system_clock::time_point fNextStalledCheck;
+
+  // The timeout when a "stalling" source is declared "stalled"
+  std::chrono::system_clock::time_point fStallingGiveUp;
+#endif
+
 
 #ifndef __CINT__
   mutable std::mutex fFileListMutex;
