@@ -96,12 +96,14 @@ void TUnpackedEvent::Build() {
       break;
     }
   }
-
-  raw_data_map.clear();
 }
 
 void TUnpackedEvent::AddRawData(const TRawEvent& event, kDetectorSystems detector) {
   raw_data_map[detector].push_back(event);
+}
+
+void TUnpackedEvent::ClearRawData() {
+  raw_data_map.clear();
 }
 
 void TUnpackedEvent::SetRunStart(unsigned int unix_time){

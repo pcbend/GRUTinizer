@@ -1,19 +1,15 @@
 #include "TChainLoop.h"
 
+#include <chrono>
+#include <thread>
+
 #include "TClass.h"
 #include "TFile.h"
 #include "TThread.h"
 
-#include "TGRUTint.h"
-#include "THistogramLoop.h"
-
-#include <chrono>
-#include <thread>
-
 #include "TDetector.h"
-#include "TGretina.h"
-
-//#include "TPreserveGDirectory.h"
+#include "TGRUTint.h"
+#include "TUnpackedEvent.h"
 
 TChainLoop* TChainLoop::Get(std::string name,TChain *chain){
   if(name.length()==0){
@@ -35,12 +31,22 @@ TChainLoop* TChainLoop::Get(std::string name,TChain *chain){
 TChainLoop::TChainLoop(std::string name, TChain *chain)
   : StoppableThread(name),
     fEntriesRead(0), fEntriesTotal(chain->GetEntries()),
-    input_chain(chain), hist_loop(0), fSelfStopping(true) {
-    SetupChain();
+    input_chain(chain),
+    output_queue(std::make_shared<ThreadsafeQueue<TUnpackedEvent*> >()),
+    fSelfStopping(true) {
+  SetupChain();
 }
 
-TChainLoop::~TChainLoop() {
+TChainLoop::~TChainLoop() { }
 
+void TChainLoop::ClearQueue() {
+  while(output_queue->Size()){
+    TUnpackedEvent* event = NULL;
+    output_queue->Pop(event);
+    if(event){
+      delete event;
+    }
+  }
 }
 
 int TChainLoop::SetupChain() {
@@ -65,29 +71,26 @@ int TChainLoop::SetupChain() {
 }
 
 std::string TChainLoop::Status() {
-  return Form("Event: %ld / %ld", fEntriesRead, fEntriesTotal);
+  return Form("Event: %ld / %ld", long(fEntriesRead), fEntriesTotal);
 }
 
 
 void TChainLoop::Restart() {
-  std::lock_guard<std::mutex> lock(restart_mutex);
   fEntriesRead = 0;
-  return;
 }
 
 void TChainLoop::OnEnd() {
-  if(hist_loop){
-    hist_loop->SendStop();
-  }
+  output_queue->SetFinished();
 }
 
 bool TChainLoop::Iteration() {
   if(fEntriesRead >= fEntriesTotal){
     if(fSelfStopping) {
       return false;
+    } else {
+      std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+      return true;
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    return true;
   }
 
   for(auto& elem : det_map){
@@ -101,123 +104,15 @@ bool TChainLoop::Iteration() {
     if(!det->TestBit(TDetector::kUnbuilt)){
       event->AddDetector(det);
     } else {
+      if(det->Timestamp()!=-1 && det->Size()!=0){
+	std::cout << det->IsA()->GetName() << " was not present in this event (TS="
+		  << det->Timestamp() << ")"
+		  << std::endl;
+      }
       delete det;
     }
   }
 
-  if(hist_loop){
-    hist_loop->Push(event);
-  } else {
-    delete event;
-  }
-
-  //std::cout << "hit = " << (det_map[TGretina::Class()]) << std::endl;
-  //std::cout << "size = " << det_map.size() << std::endl;
-  //std::map<TClass*,TDetector**>::iterator it;
-  //TUnpackedEvent *event = new TUnpackedEvent();
-  //for(int it=det_map.begin();it!=det_map.end();i++) {
-    //TDetector *det = new TDetector(*it->second)
-    //event->AddDetector(*(it->second));
-
-  //}
-
-  //it = det_map.begin();
-  //std::cout << TGretina::Class() << std::endl;
-  //std::cout << it->first << std::endl;
-  //std::cout << det_map[TGretina::Class()] << std::endl;
-
-
-
-/*
-  {
-    std::lock_guard<std::mutex> lock(input_queue_mutex);
-    for(auto& queue : input_queues){
-      int size = queue->Pop(event,0);
-      if(size >= 0) {
-        HandleEvent(event);
-        handled_event = true;
-        living_parent = true;
-      } else if (queue->IsRunning()){
-        living_parent = true;
-      }
-    }
-  }
-
-  if(!handled_event){
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  }
-  if(!living_parent && hist_loop)
-    hist_loop->SendStop();
-
-  return living_parent || (input_queues.size()==0);
-  */
+  output_queue->Push(event);
   return true;
-
-
 }
-
-/*
-void TChainLoop::HandleEvent(TUnpackedEvent* event) {
-  if(in_learning_phase) {
-    LearningPhase(event);
-    learning_phase_size++;
-    if(learning_queue.size() > learning_phase_length){
-      EndLearningPhase();
-    }
-  } else {
-    ChainEvent(event);
-  }
-}
-
-
-void TChainLoop::LearningPhase(TUnpackedEvent* event) {
-  for(auto det : event->GetDetectors()) {
-    TClass* cls = det->IsA();
-    if(!det_map.count(cls)){
-      TThread::Lock();
-      std::cout << "LearningPhase has locked" << std::endl;
-      TDetector** det = new TDetector*;
-      *det = (TDetector*)cls->New();
-      std::cout << "Made detector" << std::endl;
-      det_map[cls] = det;
-      // TODO: Place this mutex here
-      event_tree->Branch(cls->GetName(), cls->GetName(), det);
-      TThread::UnLock();
-      std::cout << "LearningPhase has unlocked" << std::endl;
-    }
-  }
-  learning_queue.push_back(event);
-}
-
-void TChainLoop::EndLearningPhase() {
-  in_learning_phase = false;
-  for(auto event : learning_queue){
-    ChainEvent(event);
-    learning_phase_size--;
-  }
-  learning_queue.clear();
-}
-*/
-
-/*
-void TChainLoop::ChainEvent(TUnpackedEvent* event) {
-  event_tree_size++;
-  // Clear pointers from previous writes.
-  for(auto& elem : det_map){
-    *elem.second = NULL;
-  }
-
-  // Load current events
-  for(auto det : event->GetDetectors()) {
-    TClass* cls = det->IsA();
-    *det_map.at(cls) = det;
-  }
-
-  // Fill
-  event_tree->Fill();
-  if(hist_loop)
-    hist_loop->Push(event);
-  else
-    delete event;
-}
-*/

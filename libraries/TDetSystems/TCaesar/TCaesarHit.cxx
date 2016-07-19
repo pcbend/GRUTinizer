@@ -2,6 +2,8 @@
 
 #include "TCaesar.h"
 
+
+const int TCaesarHit::TOTAL_DET_IN_PREV_RINGS[10] = {0,10,24,48,72,96,120,144,168,182};
 TCaesarHit::TCaesarHit(const TCaesarHit &hit) {
   hit.Copy(*this);
 }
@@ -32,9 +34,10 @@ void TCaesarHit::Print(Option_t *opt) const {
 //       GetRingNumber(), GetDetectorNumber(), IsValid(),GetNumHitsContained(), is_garbage_addback, GetDoppler(0.341));
   TVector3 pos = GetPosition();
   std::cout << "Ring["<<GetRingNumber()<<"]\tDet["<<GetDetectorNumber()<<"]\tPos["
-            <<pos.X()<<","<<pos.Y()<<","<<pos.Z()<<"]\tTime["<<GetTime()<<"]\tHits Contained["
-            <<GetNumHitsContained()<<"]\tGarbage["<<is_garbage_addback<<"]\tEnergy["
-            <<GetDoppler(0.341) << "]" <<std::endl;
+            <<pos.X()<<","<<pos.Y()<<","<<pos.Z()<<"]\tTime["<<Time()<<"]\tHits Contained["
+            <<GetNumHitsContained()<<"]\tGarbage["<<is_garbage_addback
+            <<"]\tCharge[" << Charge() << "]" << "\tEnergy["<<GetEnergy()<<"]"//<< std::endl;
+            <<"]\tDCEnergy["<<GetDoppler() << "]" <<std::endl;
             
 }
 
@@ -45,6 +48,9 @@ TVector3 TCaesarHit::GetPosition(double z_shift) const {
   return TCaesar::GetPosition(this, z_shift);
 }
 
+int TCaesarHit::GetAbsoluteDetectorNumber() const {
+  return GetDetectorNumber()+TOTAL_DET_IN_PREV_RINGS[GetRingNumber()];
+}
 void TCaesarHit::AddToSelf(const TCaesarHit& other) {
 
 //  std::cout << "INSIDE ADD TO SELF" << std::endl;

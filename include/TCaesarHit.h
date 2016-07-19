@@ -24,6 +24,7 @@ public:
 //  int GetTime() const		{ return Time();        }
   int GetDetectorNumber() const { return fDet;          }
   int GetRingNumber() const     { return fRing;         }
+  int GetAbsoluteDetectorNumber() const;
   double *GetPos()              { return pos;        }  
   double  GetX()      const     { return pos[0];     }
   double  GetY()      const     { return pos[1];     }
@@ -42,12 +43,15 @@ public:
   //Detector number is not ordered in any reasonable way. This is just
   //all the detectors.
 
-  bool IsValid() const { return (fCharge!=-1 && fTime!=-1); }
+  bool IsValid() const { return (Charge()!=-1 && Time()!=-1); }
   //For so-called ng events
   void IsGarbageAddback() { is_garbage_addback = true;}
 
   TVector3 GetPosition() const; 
+  //z_shift is the target shift relative to the center of the array.
+  //Positive values are downstream, and the units should be in cm.
   TVector3 GetPosition(double z_shift) const; 
+
  
   
   double GetDoppler(double beta=-1, TVector3 *track=0) const{
@@ -80,6 +84,7 @@ public:
   void AddToSelf(const TCaesarHit& other);
   bool is_garbage_addback;
 
+  static const int TOTAL_DET_IN_PREV_RINGS[10];
 
 private:
 	 

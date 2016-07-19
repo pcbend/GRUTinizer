@@ -48,6 +48,8 @@ class TCagraHit : public TDetectorHit {
     Double_t GetCorrectedEnergy(Double_t asym_bl=0.);
     void SetPreRise(Double_t prerise) { prerise_energy = prerise; }
     void SetPostRise(Double_t postrise) { postrise_energy = postrise; }
+    Double_t GetPreRise() { return prerise_energy; }
+    Double_t GetPostRise() { return postrise_energy; }
     void SetFlags(UShort_t fl) { flags = fl; }
     const UShort_t& GetFlags() const { return flags; }
     void SetBaseSample(UShort_t base) { base_sample = base; }

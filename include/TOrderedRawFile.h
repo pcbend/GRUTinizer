@@ -16,8 +16,12 @@ public:
   size_t GetDepth() const { return depth; }
   virtual void Reset() { unordered->Reset(); }
 
-  virtual std::string SourceDescription() const { return unordered->SourceDescription(); }
-  virtual std::string Status()            const { return unordered->Status(); }
+  virtual std::string SourceDescription(bool long_description = false) const {
+    return unordered->SourceDescription(long_description);
+  }
+  virtual std::string Status(bool long_description = false) const {
+    return unordered->Status(long_description);
+  }
   virtual int GetLastErrno()              const { return unordered->GetLastErrno(); }
   virtual std::string GetLastError()      const { return unordered->GetLastError(); }
 

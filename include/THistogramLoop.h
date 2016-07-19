@@ -14,6 +14,12 @@ public:
   static THistogramLoop* Get(std::string name="");
 
   ~THistogramLoop();
+
+#ifndef __CINT__
+  std::shared_ptr<ThreadsafeQueue<TUnpackedEvent*> >& InputQueue() { return input_queue; }
+  std::shared_ptr<ThreadsafeQueue<TUnpackedEvent*> >& OutputQueue() { return output_queue; }
+#endif
+
   void SetOutputFilename(const std::string& name);
   std::string GetOutputFilename() const;
 
@@ -27,23 +33,13 @@ public:
 
   virtual void ClearQueue();
 
-  // void SetReplaceVariable(const char* name, double value);
-  // void RemoveVariable(const char* name);
-  // TList* GetVariables();
-
   TList* GetObjects();
   TList* GetGates();
 
-  size_t GetItemsPopped()  { return input_queue.ItemsPopped(); }
-  size_t GetItemsPushed()  { return input_queue.ItemsPushed(); }
+  size_t GetItemsPopped()  { return input_queue->ItemsPopped(); }
+  size_t GetItemsPushed()  { return input_queue->ItemsPushed(); }
   size_t GetItemsCurrent() { return 0; }
   size_t GetRate()         { return 0; }
-
-  void cd(Option_t* opt="");
-  void popd();
-
-  int Push(TUnpackedEvent *event);
-  void SendStop(bool flag=true) { stopsent = flag; }
 
 protected:
   bool Iteration();
@@ -54,16 +50,16 @@ private:
 
   TCompiledHistograms compiled_histograms;
 
-  ThreadsafeQueue<TUnpackedEvent*>  input_queue;
-  //ThreadsafeQueue<TUnpackedEvent*>& output_queue;
-
   void OpenFile();
   void CloseFile();
 
   TFile* output_file;
-  TDirectory* previous_dir;
   std::string output_filename;
-  bool stopsent;
+
+#ifndef __CINT__
+  std::shared_ptr<ThreadsafeQueue<TUnpackedEvent*> > input_queue;
+  std::shared_ptr<ThreadsafeQueue<TUnpackedEvent*> > output_queue;
+#endif
 
   ClassDef(THistogramLoop,0);
 };

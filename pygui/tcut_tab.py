@@ -107,7 +107,7 @@ class TCutTab(object):
         cut.SetLineWidth(3)
         self.cuts[full_name] = cut
 
-        if det_type is None:
+        if det_type not in self.detector_classes:
             parent = ''
         else:
             parent = det_type

@@ -41,7 +41,7 @@ bool TInverseMap::ReadMapFile(const char *filename) {
   }
   //static std::mutex inv_map_mutex;
 
-  ifstream infile;
+  std::ifstream infile;
   infile.open(mapfile.c_str());
   std::string line;
   getline(infile,info);

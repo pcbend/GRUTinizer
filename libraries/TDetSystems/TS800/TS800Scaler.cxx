@@ -1,5 +1,6 @@
 #include <TS800Scaler.h>
 
+#include <ctime>
 #include <iostream>
 
 #include <TGEBEvent.h>
@@ -20,7 +21,15 @@ void TS800Scaler::Copy(TObject& obj) const {
 }
 
 void TS800Scaler::Print(Option_t *opt) const {
+  time_t time = unix_time;
 
+  std::cout << "Scalers from " << interval_start << " to " << interval_end << std::endl;
+  std::cout << "Scaler period: " << interval_div << std::endl;
+  std::cout << "Time: " << std::ctime(&time) << std::endl;
+  std::cout << "Num scalers: " << num_scalers << std::endl;
+  for(unsigned int i=0; i<scalers.size(); i++) {
+    std::cout << "\t" << i << ": " << scalers[i] << std::endl;
+  }
 }
 
 void TS800Scaler::Clear(Option_t *opt) {
@@ -37,9 +46,8 @@ void TS800Scaler::Clear(Option_t *opt) {
 
 int TS800Scaler::BuildHits(std::vector<TRawEvent>& raw_data) {
   for(auto& event : raw_data){
-    TGEBEvent* geb = (TGEBEvent*)&event;
-    SetTimestamp(geb->GetTimestamp());
-    int *data = (int*)geb->GetPayload();
+    SetTimestamp(event.GetTimestamp());
+    int *data = (int*)event.GetPayload();
     int ptr=0;
     /* int  nscl_size = *(data+ptr); */ ptr++;
     /* int  nscl_type = *(data+ptr); */ ptr++;
@@ -50,7 +58,7 @@ int TS800Scaler::BuildHits(std::vector<TRawEvent>& raw_data) {
     unix_time      = *(data+ptr); ptr++;
     num_scalers    = *(data+ptr); ptr++;
     for(int x=0;x<num_scalers;x++)
-      scalers.push_back(*(data+ptr));
+      scalers.push_back(*(data+ptr+x));
   }
   return Size();
 }

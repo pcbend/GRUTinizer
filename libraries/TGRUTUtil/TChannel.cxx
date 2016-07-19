@@ -7,8 +7,11 @@
 #include <fstream>
 #include <sstream>
 #include <utility>
+#include <stdexcept>
 
 #include "TRandom.h"
+
+#include "GRootFunctions.h"
 
 std::map<unsigned int,TChannel*> TChannel::fChannelMap;
 TChannel *TChannel::fDefaultChannel = new TChannel("TChannel",0xffffffff);
@@ -57,6 +60,32 @@ std::ostream& operator<<(std::ostream& out, const TChannel& chan) {
   // Print out each energy coefficient
   for(auto& start_coeff : chan.energy_coeff) {
     out << "   EnergyCoeff";
+    if(start_coeff.start_time != -DBL_MAX) {
+      out << "[" << start_coeff.start_time << "]";
+    }
+    out << ":";
+    for(double coef : start_coeff.coefficients) {
+      out << "\t" << coef;
+    }
+    out << "\n";
+  }
+
+  // Print out each PoleZero correction coeff
+  for(auto& start_coeff : chan.polezero_corrections) {
+    out << "   PoleZero";
+    if(start_coeff.start_time != -DBL_MAX) {
+      out << "[" << start_coeff.start_time << "]";
+    }
+    out << ":";
+    for(double coef : start_coeff.coefficients) {
+      out << "\t" << coef;
+    }
+    out << "\n";
+  }
+
+  // Print out each Baseline correction coeff
+  for(auto& start_coeff : chan.baseline_corrections) {
+    out << "   Baseline";
     if(start_coeff.start_time != -DBL_MAX) {
       out << "[" << start_coeff.start_time << "]";
     }
@@ -315,6 +344,10 @@ const std::vector<double>& TChannel::GetPoleZeroCoeff(double timestamp) const {
   return empty_vec;
 }
 
+double TChannel::CalEfficiency(double energy) const {
+  return Efficiency(energy,GetEfficiencyCoeff());
+}
+
 void TChannel::ClearPoleZeroCoeff() {
   polezero_corrections.clear();
   polezero_corrections.push_back({std::vector<double>(), -DBL_MAX});
@@ -455,6 +488,19 @@ double TChannel::Calibrate(double value, const std::vector<double>& coeff) {
   }
   return cal_value;
 }
+
+double TChannel::Efficiency(double energy,const std::vector<double>& coeff) {
+  // EFF = 10^(A0 + A1*LOG(E) + A2*LOG(E)^2 + A3/E^2);
+  if(coeff.size()<4) {
+    return 0.0;
+  }
+  return GRootFunctions::GammaEff(&energy,const_cast<double*>(&coeff[0]));
+}
+
+
+
+
+
 
 int TChannel::ReadCalFile(const char* filename,Option_t *opt) {
   std::string infilename = filename;

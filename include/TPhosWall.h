@@ -27,7 +27,7 @@ public:
   virtual void InsertHit(const TDetectorHit& hit);
 
 
-  int Size()       const { return phoswall_hits.size(); }
+  unsigned int Size()       const { return phoswall_hits.size(); }
   int Pixel(int i) const { return phoswall_hits.at(i).Pixel(); }
   int A(int i)     const { return phoswall_hits.at(i).A(); }
   int B(int i)     const { return phoswall_hits.at(i).B(); }
@@ -35,7 +35,7 @@ public:
   TVector3 Position(int i) const { return GetWallPosition(Pixel(i)); }
 
   Int_t GetLargestNumber()                  const { return fLargestHit; }
-  TPhosWallHit& GetLargetHit()                    { return GetPhosWallHit(GetLargestNumber()); }
+  TPhosWallHit& GetLargestHit()                   { return GetPhosWallHit(GetLargestNumber()); }
         TPhosWallHit& GetPhosWallHit(int i)       { return phoswall_hits.at(i); }
   const TPhosWallHit& GetPhosWallHit(int i) const { return phoswall_hits.at(i); }
   TDetectorHit& GetHit(int i)                     { return phoswall_hits.at(i); }
@@ -65,6 +65,7 @@ public:
          int    IsInside(Option_t *opt = "BC") const; 
   static const char* GetGateName(int i) { return gates.At(i)->GetName(); }
 
+  void SortHits();
 
 private:
   virtual int BuildHits(std::vector<TRawEvent>& raw_data);

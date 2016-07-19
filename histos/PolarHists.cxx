@@ -66,7 +66,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   static int entry = 0;
 
-  double BETA = GValue::Value("BETA"); 
+  double BETA = GValue::Value("BETA");
 
   if(bank29) {
 //    for(int x=0;x<bank29->Size();x++) {
@@ -92,9 +92,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
   double gsum = 0.0;
   int    largesthit = -1;
   double largesteng = -1.0;
-  for(int y=0;y<gretina->Size();y++) {
+  for(unsigned int y=0;y<gretina->Size();y++) {
     TGretinaHit hit = gretina->GetGretinaHit(y);
-    //if(hit.NumberOfInteractions()<1 || hit.GetSegmentId(0)<1 || hit.GetPad()>0) 
+    //if(hit.NumberOfInteractions()<1 || hit.GetSegmentId(0)<1 || hit.GetPad()>0)
     //  continue;
 
     std::string histname;
@@ -103,9 +103,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
       largesteng = hit.GetCoreEnergy(0);
       largesthit = y;
     }
-    for(int z=y+1;z<gretina->Size();z++) {
+    for(unsigned int z=y+1;z<gretina->Size();z++) {
       TGretinaHit hit2 = gretina->GetGretinaHit(z);
-      //if(hit2.NumberOfInteractions()<1 || hit2.GetSegmentId(0)<1 || hit2.GetPad()>0) 
+      //if(hit2.NumberOfInteractions()<1 || hit2.GetSegmentId(0)<1 || hit2.GetPad()>0)
       //  continue;
       histname = "Gamma_Gamma";
       obj.FillHistogramSym(histname,2000,0,4000,hit.GetCoreEnergy(0),
@@ -115,7 +115,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
                                   2000,0,4000,hit2.GetCoreEnergy(0));
       obj.FillHistogram(histname,800,-400,400,hit.GetTime()-hit2.GetTime(),
                                   2000,0,4000,hit.GetCoreEnergy(0));
-    }   
+    }
 
     histname = "Gretina_Energy_Time";
     obj.FillHistogram(histname,1000,0,4000,hit.GetCoreEnergy(0),
@@ -144,11 +144,11 @@ void MakeHistograms(TRuntimeObjects& obj) {
     //  obj.FillHistogram(histnamecal,8000,0,4000,hit.GetDoppler(0,beta),
     //                             101,0.00,betamax,beta);
     //}
-   
+
     histname = "GretinaDopplerPhi";
     obj.FillHistogram(histname,628,0,6.28,hit.GetPhi(),
                                8000,0,4000,hit.GetDoppler(BETA));
-    
+
     histname = "GretinaDopplerXId";
     obj.FillHistogram(histname,200,0,200,hit.GetCrystalId(),
                                8000,0,4000,hit.GetDoppler(BETA));
@@ -159,7 +159,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     histname = "GretinaEnergyXId";
     obj.FillHistogram(histname,200,0,200,hit.GetCrystalId(),
-                               8000,0,4000,hit.GetCoreEnergy(0));
+                               8000,0,4000,hit.GetCoreEnergy());
 
     histname = "GretinaEnergyXIdCal";
     obj.FillHistogram(histname,200,0,200,hit.GetCrystalId(),
@@ -191,11 +191,11 @@ void MakeHistograms(TRuntimeObjects& obj) {
     histname = "GretinaEnergyTheta";
     obj.FillHistogram(histname,314,0,3.14,hit.GetTheta(),
                               4000,0,4000,hit.GetCoreEnergy(0));
-    
+
     histname = "Gretina_Theta_bySegment";
     obj.FillHistogram(histname,314,0,3.14,hit.GetSegmentPosition().Theta(),
                               4000,0,4000,hit.GetCoreEnergy(0));
-    
+
     histname = "Gretina_Theta_byCrystal";
     obj.FillHistogram(histname,314,0,3.14,hit.GetCrystalPosition().Theta(),
                               4000,0,4000,hit.GetCoreEnergy(0));
@@ -203,23 +203,23 @@ void MakeHistograms(TRuntimeObjects& obj) {
     histname = "Gretina_Theta_byDecomp";
     obj.FillHistogram(histname,314,0,3.14,hit.GetPosition().Theta(),
                               4000,0,4000,hit.GetCoreEnergy(0));
-    
+
     histname = Form("GretinaPosition");
     obj.FillHistogram(histname,628,0,6.28,hit.GetPhi(),
                                 314,0,3.14,hit.GetTheta());
 
     histname = "GretinaEnergySum";
     obj.FillHistogram(histname,8000,0,4000,hit.GetCoreEnergy(0));
-    
+
     histname = "GretinaDopplerSum";
     obj.FillHistogram(histname,8000,0,4000,hit.GetDoppler(BETA));
 
     histname = "CrystalId_hitpattern";
     obj.FillHistogram(histname,200,0,200,hit.GetCrystalId());
-    
-    if(hit.NumberOfInteractions()<1 || hit.GetSegmentId(0)<1 || hit.GetPad()>0) 
+
+    if(hit.NumberOfInteractions()<1 || hit.GetSegmentId(0)<1 || hit.GetPad()>0)
       continue;
-    
+
     std::string layer;
     if(hit.GetSegmentId(0)<7)
       layer = "_1_alpha";
@@ -233,7 +233,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       layer = "_5_epsilon";
     else if(hit.GetSegmentId(0)<37)
       layer = "_6_phi";
-    else 
+    else
       layer = "_7_unknown";
 
     histname = "Gretina_Theta_bySegment";
@@ -245,17 +245,17 @@ void MakeHistograms(TRuntimeObjects& obj) {
     histname.append(layer);
     obj.FillHistogram(histname,314,0,3.14,hit.GetCrystalPosition().Theta(),
                               4000,0,4000,hit.GetCoreEnergy(0));
-    
+
     histname = "Gretina_Theta_byDecomp";
     histname.append(layer);
     obj.FillHistogram(histname,314,0,3.14,hit.GetPosition().Theta(),
                               4000,0,4000,hit.GetCoreEnergy(0));
-    
+
     histname = "GretinaOverview";
     obj.FillHistogram(histname,4000,0,4000,hit.GetCoreEnergy(0),
                                   60,20,80,hit.GetCrystalId());
 
- 
+
     /*
     histname = Form("GretinaSummaryX%02i",hit.GetCrystalId());
     for(int z=0;z<hit.NumberOfInteractions();z++) {
@@ -276,7 +276,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
   if(gsum>1) {
     std::string histname = "GCalorimeter";
     obj.FillHistogram(histname,16000,0,8000,gsum);
-   
+
     TGretinaHit hit = gretina->GetGretinaHit(largesthit);
     histname = "GCalorimeter_Theta";
     obj.FillHistogram(histname,314,0,3.14,hit.GetTheta(),

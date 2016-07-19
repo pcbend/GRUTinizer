@@ -22,7 +22,7 @@ public:
   virtual TFastScintHit GetLaBrHit(int i) const;
   virtual TDetectorHit& GetHit(int i);
           TFastScintHit* FindHit(int);
-  virtual int Size() const;
+  virtual unsigned int Size() const;
   virtual int GoodSize() const;
 
   int GetDetNumberIn_fs_hits(Int_t det);
@@ -42,6 +42,8 @@ public:
 
   void SetTrigTime(UShort_t time) { trig_time = time; }
   int GetTrigTime()	      { return trig_time; }
+
+  static TVector3& GetPosition(int); 
 
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);

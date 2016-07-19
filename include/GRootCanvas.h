@@ -1,7 +1,7 @@
 //
 //  A slightly edited version of the the GRootCanvas
-//  file in the default root source.  The reason for 
-//  the swap was take more control over the keyboard 
+//  file in the default root source.  The reason for
+//  the swap was take more control over the keyboard
 //  interface to the canvas (particularly the arrow
 //  keys.)   pcb.
 //

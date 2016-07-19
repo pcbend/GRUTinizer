@@ -86,6 +86,7 @@ public:
   std::vector<double> GetEfficiencyCoeff() const { return efficiency_coeff; }
   void AddEfficiencyCoeff(double tmp) { efficiency_coeff.push_back(tmp); }
   void ClearEfficiencyCoeff();
+  double CalEfficiency(double energy) const;
 
 
   bool AppendChannel(TChannel*);
@@ -103,6 +104,9 @@ public:
   static double Calibrate(int value, const std::vector<double>& coeff);
   static double Calibrate(double value, const std::vector<double>& coeff);
   static double ParseStartTime(const std::string& type);
+  static double Efficiency(double energy, const std::vector<double>& coeff);
+
+
 
   static std::vector<double> empty_vec; //!
 

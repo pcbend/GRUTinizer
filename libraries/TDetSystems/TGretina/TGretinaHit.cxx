@@ -64,7 +64,8 @@ void TGretinaHit::Copy(TObject &rhs) const {
 
 Float_t TGretinaHit::GetCoreEnergy(int i) const {
   float charge = (float)GetCoreCharge(i) + gRandom->Uniform();
-  TChannel *channel = TChannel::GetChannel(GetAddress()+i);
+  //board_id=; //card  number : 0x0030  information not available here.
+  TChannel *channel = TChannel::GetChannel(GetAddress()+(i<<4));
   //printf("GetAddress() + i = 0x%08x\n",GetAddress()+i); 
   if(!channel)
     return charge;
@@ -106,7 +107,14 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
   fCrystalId = raw.crystal_id;
   fCoreEnergy = raw.tot_e;
 
-  fAddress = (1<<24) + (fCrystalId<<16);
+  //fAddress = (1<<24) + (fCrystalId<<16);
+  //fAddress = (1<<24) + ( raw.board_id );
+  int board_id = ((fCrystalId/4) << 8) ;  //hole  number : 0x1f00
+//    board_id =                       ;  //card  number : 0x0030  information not available here.
+      board_id += ((fCrystalId%4) << 6) ;  //x-tal number : 0x00c0
+      board_id += 9;                       //chan  number : 0x000f  information not available here(assume core).
+  fAddress = (1<<24) + board_id;
+
 
   for(int i=0; i<4; i++){
     fCoreCharge[i] = raw.core_e[i];
@@ -183,16 +191,28 @@ double TGretinaHit::GetDoppler_dB(double beta, const TVector3 *vec,double Dta){
   return tmp;
 }
 
-double TGretinaHit::GetDoppler(const TS800 *s800,int EngRange) {
+double TGretinaHit::GetDoppler(const TS800 *s800,bool doDTAcorr,int EngRange) {
   if(!s800 || Size()<1)
     return 0.0;
   double beta  = GValue::Value("BETA");
   if(std::isnan(beta))
     return 0.0;
-  double gamma = 1.0/(sqrt(1.-beta*beta));
-  double dp_p = gamma/(1.+gamma) * s800->GetDta();
-  beta *=(1.+dp_p/(gamma*gamma));
-  TVector3 track = s800->Track();  //(TMath::Sin(s800->GetAta()),-TMath::Sin(s800->GetBta()),1);
+  double gata =  GValue::Value("GRETINA_ATA_OFFSET");
+  if(std::isnan(gata))
+    gata = 0.0;
+  else 
+    gata = gata*TMath::DegToRad();
+  double gbta =  GValue::Value("GRETINA_BTA_OFFSET");
+  if(std::isnan(gbta))
+    gbta = 0.0;
+  else 
+    gbta = gata*TMath::DegToRad();
+  if(doDTAcorr){
+    double gamma = 1.0/(sqrt(1.-beta*beta));
+    double dp_p = gamma/(1.+gamma) * s800->GetDta();
+    beta *=(1.+dp_p/(gamma*gamma));
+  }
+  TVector3 track = s800->Track(gata,gbta);  //(TMath::Sin(s800->GetAta()),-TMath::Sin(s800->GetBta()),1);
   if(EngRange>-1)
     return GetDoppler(EngRange,beta,&track);
   return GetDoppler(beta,&track);
@@ -343,28 +363,31 @@ TVector3 TGretinaHit::GetFirstIntPosition() const {
  
   TVector3 offset(xoffset,yoffset,zoffset);
   
-  // if(offset.Z()!=0.1){
-  //   std::cout << " -----------------" << std::endl;
-  //   std::cout << "\tX Offset = " << offset.X() <<std::endl;
-  //   std::cout << "\tY Offset = " << offset.Y() <<std::endl;
-  //   std::cout << "\tZ Offset = " << offset.Z() <<std::endl;
-  //   std::cout << "\tZ Offset2 = " << zoffset <<std::endl;
-  //   std::cout << "\tZ Offset3 = " << GValue::Value("GRETINA_Z_OFFSET") <<std::endl;
-  //   std::cout << "\tIntPoint = " << GetFirstIntPoint() << std::endl;
-  //   std::cout << "\tIntPoint = " << GetFirstIntPoint() << std::endl;
-  //   std::cout << "\tX Int    = " << GetInteractionPosition(GetFirstIntPoint()).X() << std::endl;
-  //   std::cout << "\tY Int    = " << GetInteractionPosition(GetFirstIntPoint()).Y() << std::endl;
-  //   std::cout << "\tZ Int    = " << GetInteractionPosition(GetFirstIntPoint()).Z() << std::endl;
-  //   TVector3 sum;
-  //   sum = GetInteractionPosition(GetFirstIntPoint())+offset;
-  //   std::cout << "\tX Sum    = " << sum.X() << std::endl;
-  //   std::cout << "\tY Sum    = " << sum.Y() << std::endl;
-  //   std::cout << "\tZ Sum    = " << sum.Z() << std::endl;
-  //   std::cout << "\t END OF VECTOR SUMMARY " << std::endl;
-  //}
   if(GetFirstIntPoint()>-1)
      return GetInteractionPosition(GetFirstIntPoint()) + offset;
    return TDetectorHit::BeamUnitVec;
+}
+
+TVector3 TGretinaHit::GetFirstIntPosition_2() const {
+  double xoffset = GValue::Value("GRETINA_X_OFFSET");
+  if(std::isnan(xoffset))
+    xoffset=0.00;
+  double yoffset = GValue::Value("GRETINA_Y_OFFSET");
+  if(std::isnan(yoffset))
+    yoffset=0.00;
+  double zoffset = GValue::Value("GRETINA_Z_OFFSET");
+  if(std::isnan(zoffset))
+    zoffset=0.00;
+
+  if(GetFirstIntPoint()>-1){
+    TVector3 IntPos = GetInteractionPosition(GetFirstIntPoint());
+    IntPos.SetX(IntPos.X()-xoffset);
+    IntPos.SetY(IntPos.Y()-yoffset);
+    IntPos.SetZ(IntPos.Z()-zoffset);
+
+    return IntPos;
+  }
+  return TDetectorHit::BeamUnitVec;
 }
 
 TVector3 TGretinaHit::GetSecondIntPosition() const {
@@ -461,3 +484,6 @@ void TGretinaHit::Clear(Option_t *opt) {
   }
   */
 }
+
+
+

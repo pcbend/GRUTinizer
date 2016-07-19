@@ -26,6 +26,9 @@ public:
 
   Int_t IsInside(Option_t *opt="") const;
 
+  bool operator<(const TPhosWallHit& rhs) const { return fBCharge > rhs.fBCharge; }
+
+
 private:
   Short_t  fACharge;
   Short_t  fBCharge;

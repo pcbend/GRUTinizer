@@ -1,4 +1,4 @@
-// THistogramLoop.h TCompiledHistograms.h TRuntimeObjects.h
+// THistogramLoop.h TCompiledHistograms.h TRuntimeObjects.h TCompiledFilter.h
 
 #ifdef __CINT__
 
@@ -8,6 +8,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class TCompiledHistograms+;
+#pragma link C++ class TCompiledFilter+;
 #pragma link C++ class TRuntimeObjects+;
 #pragma link C++ class THistogramLoop+;
 

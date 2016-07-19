@@ -41,30 +41,33 @@ TRuntimeObjects::TRuntimeObjects(TList* objects, TList *gates,
 
 
 TH1* TRuntimeObjects::FillHistogram(const char* name,
-                                    int bins, double low, double high, double value){
+                                    int bins, double low, double high, double value,
+                                    double weight){
   TH1* hist = (TH1*) GetObjects().FindObject(name);
   if(!hist){
-    hist = new TH1I(name,name,bins,low,high);
+    hist = new GH1D(name,name,bins,low,high);
     GetObjects().Add(hist);
   }
-  if(!(std::isnan(value)))
-    hist->Fill(value);
+  if(!(std::isnan(value))) {
+    hist->Fill(value, weight);
+  }
   return hist;
 }
 
 TH2* TRuntimeObjects::FillHistogram(const char* name,
                                     int Xbins, double Xlow, double Xhigh, double Xvalue,
-                                    int Ybins, double Ylow, double Yhigh, double Yvalue){
+                                    int Ybins, double Ylow, double Yhigh, double Yvalue,
+                                    double weight){
   TH2* hist = (TH2*) GetObjects().FindObject(name);
   if(!hist){
     hist = new GH2D(name,name,
-                            Xbins, Xlow, Xhigh,
-                            Ybins, Ylow, Yhigh);
+                    Xbins, Xlow, Xhigh,
+                    Ybins, Ylow, Yhigh);
     GetObjects().Add(hist);
   }
-  if(!(std::isnan(Xvalue)))
-    if(!(std::isnan(Yvalue)))
-      hist->Fill(Xvalue, Yvalue);
+  if(!std::isnan(Xvalue) && !std::isnan(Yvalue)) {
+    hist->Fill(Xvalue, Yvalue, weight);
+  }
   return hist;
 }
 
@@ -93,7 +96,7 @@ TH2* TRuntimeObjects::FillHistogramSym(const char* name,
                             Ybins, Ylow, Yhigh);
     GetObjects().Add(hist);
   }
-  
+
   if(!(std::isnan(Xvalue))){
     if(!(std::isnan(Yvalue))){
       hist->Fill(Xvalue, Yvalue);
@@ -105,8 +108,10 @@ TH2* TRuntimeObjects::FillHistogramSym(const char* name,
 
 //-------------------------------------------------------------------------
 TDirectory* TRuntimeObjects::FillHistogram(const char* dirname,const char* name,
-					   int bins, double low, double high, double value){
+					   int bins, double low, double high, double value,
+                                           double weight){
 
+  
   TDirectory *dir = (TDirectory*)GetObjects().FindObject(dirname);
   if(!dir){
     dir = new TDirectory(dirname,dirname);
@@ -115,13 +120,14 @@ TDirectory* TRuntimeObjects::FillHistogram(const char* dirname,const char* name,
   dir->cd();
   TH1* hist = (TH1*)dir->FindObject(name);
   if(!hist){
-    hist = new TH1I(name,name,
+    hist = new GH1D(name,name,
 		    bins, low, high);
     dir->Add(hist);
   }
-  
-  if(!(std::isnan(value)))
-    hist->Fill(value);
+
+  if(!std::isnan(value)) {
+    hist->Fill(value, weight);
+  }
   dir->cd("../");
   //return hist;
   return dir;
@@ -156,8 +162,9 @@ TDirectory* TRuntimeObjects::FillHistogram(const char* dirname,const char* name,
 }
 
 TDirectory* TRuntimeObjects::FillHistogram(const char* dirname,const char* name,
-                                    int Xbins, double Xlow, double Xhigh, double Xvalue,
-                                    int Ybins, double Ylow, double Yhigh, double Yvalue){
+                                           int Xbins, double Xlow, double Xhigh, double Xvalue,
+                                           int Ybins, double Ylow, double Yhigh, double Yvalue,
+                                           double weight){
   TDirectory *dir = (TDirectory*)GetObjects().FindObject(dirname);
   if(!dir){
     dir = new TDirectory(dirname,dirname);
@@ -172,9 +179,9 @@ TDirectory* TRuntimeObjects::FillHistogram(const char* dirname,const char* name,
     dir->Add(hist);
   }
 
-  if(!(std::isnan(Xvalue)))
-    if(!(std::isnan(Yvalue)))
-      hist->Fill(Xvalue, Yvalue);
+  if(!std::isnan(Xvalue) && !std::isnan(Yvalue)) {
+    hist->Fill(Xvalue, Yvalue, weight);
+  }
   dir->cd("../");
   //return hist;
   return dir;/*
