@@ -67,7 +67,7 @@ std::string StoppableThread::Status() {
 }
 
 void StoppableThread::StopAll() {
-  stop_rcnp_signal = 1;
+  stop_rcnp_signal = 1; std::this_thread::sleep_for(std::chrono::milliseconds(500));
   for(auto& elem : fthreadmap){
     TDataLoop* data_loop = dynamic_cast<TDataLoop*>(elem.second);
     TChainLoop* chain_loop = dynamic_cast<TChainLoop*>(elem.second);

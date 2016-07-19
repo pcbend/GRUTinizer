@@ -19,7 +19,9 @@ TRCNPSource::TRCNPSource(const char* Command, kFileType file_type)
                        [&](RCNPEvent* event) {
                          rcnp_queue.Push(event);
                        },
-                       TGRUTOptions::Get()->SaveRCNPTree());
+                       TGRUTOptions::Get()->SaveRCNPTree(),
+                       !TGRUTOptions::Get()->StartGUI()
+    );
 
   //LoadFakeTimestamps();
   std::this_thread::sleep_for(std::chrono::seconds(4));
