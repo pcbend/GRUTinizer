@@ -27,8 +27,8 @@ GRUT.SnapshotDir:
 
 
 #files to load at log in:
-#Rint.Logon: $(GRUTSYS)/.grut_logon
-Rint.Logon: $(GRUTSYS)/logon.C
+Rint.Logon: $(GRUTSYS)/.grut_logon
+#Rint.Logon: $(GRUTSYS)/logon.C
 Rint.History $(GRUTSYS)/.grut_history
 Rint.HistSize: 1000000
 
