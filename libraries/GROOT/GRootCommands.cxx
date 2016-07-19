@@ -42,7 +42,7 @@ public:
     gChain->SetNotify(GrutNotifier::Get());
   }
 } temp_thing;
-  
+
 
 
 void Help()     { printf("This is helpful information.\n"); }
@@ -51,6 +51,9 @@ void Commands() { printf("this is a list of useful commands.\n");}
 
 void Prompt() { Getlinem(EGetLineMode::kInit,((TRint*)gApplication)->GetPrompt()); }
 
+void Version() {
+  system(Form("%s/bin/grutinizer-config --version", getenv("GRUTSYS")));
+}
 
 bool GetProjection(GH2D *hist,double low, double high, double bg_low,double bg_high){
   if(!hist) return 0;
@@ -70,10 +73,10 @@ bool GetProjection(GH2D *hist,double low, double high, double bg_low,double bg_h
 
   C_gammagamma->cd();
   hist->Draw();
-  
+
   C_projections->cd(1);
   GH1D *Proj_x = hist->ProjectionX("Gamma_Gamma_xProjection");
-  
+
   GH1D *Proj_x_Clone = (GH1D*)Proj_x->Clone();
   GH1D *Proj_gated = 0;
 
@@ -84,7 +87,7 @@ bool GetProjection(GH2D *hist,double low, double high, double bg_low,double bg_h
   }
   Proj_x->GetXaxis()->SetTitle("Energy [keV]");
   Proj_x->GetYaxis()->SetTitle("Counts ");
-  
+
 
 
   double Grace = 300;
@@ -99,7 +102,7 @@ bool GetProjection(GH2D *hist,double low, double high, double bg_low,double bg_h
   Proj_x->Draw();
   double Projx_Max = Proj_x->GetMaximum();
   double Projx_Min = Proj_x->GetMinimum();
- 
+
   TLine *CutLow  = new TLine(low,Projx_Min,low,Projx_Max);
   TLine *CutHigh = new TLine(high,Projx_Min,high,Projx_Max);
   TLine *BGLow   = new TLine(bg_low,Projx_Min,bg_low,Projx_Max);
@@ -125,7 +128,7 @@ bool GetProjection(GH2D *hist,double low, double high, double bg_low,double bg_h
   }else{
     Proj_gated = Proj_x_Clone->Project(low,high);
   }
- 
+
   if(bg_high>0 && bg_low>0){
     Proj_gated->SetTitle(Form("Gate From [%.01f,%.01f] with Background [%.01f,%.01f]",low,high,bg_low,bg_high));
   }else{
@@ -133,7 +136,7 @@ bool GetProjection(GH2D *hist,double low, double high, double bg_low,double bg_h
   }
   Proj_gated->GetXaxis()->SetTitle("Energy [keV]");
   Proj_gated->GetYaxis()->SetTitle("Counts");
- 
+
   C_projections->cd(2);
   Proj_gated->Draw();
   return 1;
@@ -224,7 +227,7 @@ GGaus *GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
     std::swap(xlow,xhigh);
 
   //std::cout << "here." << std::endl;
-  
+
   GGaus *mypeak= new GGaus(xlow,xhigh);
   std::string options = opt;
   options.append("Q+");
@@ -236,11 +239,11 @@ GGaus *GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
 
   return mypeak;
 }
- 
-/* 
-  
-  
-  
+
+/*
+
+
+
   bool edit = false;
   if(!hist)
     return edit;
@@ -293,15 +296,15 @@ GGaus *GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
   printf(GREEN "Resolution: %.02f %%" RESET_COLOR "\n",TMath::Abs(param[2]*2.35)/param[1]*100.0);
 
   edit = true;
-  
+
   TIter it(hist->GetListOfFunctions());
   while(TObject *obj=it.Next()) {
     if(!hist->InheritsFrom(TF1::Class()))
       continue;
     ((TF1*)obj)->Draw("same");
   }
-  
-  
+
+
   return edit;
 
 }
@@ -467,10 +470,3 @@ TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
    }
   return toreturn;
 }
-
-
-
-
-
-
-
