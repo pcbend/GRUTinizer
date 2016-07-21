@@ -73,7 +73,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
   std::string histname = "";
   std::string dirname  = "";
   if(bank29) {
-    for(int x=0;x<bank29->Size();x++) {
+    for(unsigned int x=0;x<bank29->Size();x++) {
       TMode3Hit &hit = (TMode3Hit&)bank29->GetHit(x);
       dirname = "Bank29";
       histname = Form("bank29_%i",hit.GetChannel());
@@ -96,9 +96,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
   \*=============================*/
   if(!gretina || gretina->Size()<1)
     return;
-  
+
   double gsum = 0.0;
-  for(int y=0;y<gretina->Size();y++) {
+  for(unsigned int y=0;y<gretina->Size();y++) {
     TGretinaHit hit = gretina->GetGretinaHit(y);
     gsum += hit.GetCoreEnergy();
     if(bank29) {
@@ -159,38 +159,38 @@ void MakeHistograms(TRuntimeObjects& obj) {
       histname = "1D_OBJvsE1";
       obj.FillHistogram(dirname,histname,
 			3000,-50000,50000,AllCorrOBJ_E1Val);
-      
+
       histname = "1D_XFPvsE1";
       obj.FillHistogram(dirname,histname,
 			3000,-50000,50000,AllCorrXFP_E1Val);
-    
+
       histname = "2D_OBJvsE1";
       obj.FillHistogram(dirname,histname,
 			3000,0,70000,s800->MCorrelatedOBJ(),
 			3000,0,70000,s800->MCorrelatedE1());
-      
+
       histname = "2D_XFPvsE1";
       obj.FillHistogram(dirname,histname,
 			3000,0,70000,s800->MCorrelatedXFP(),
 			3000,0,70000,s800->MCorrelatedE1());
-      
+
       histname = "2D_Incoming_PID";
       obj.FillHistogram(dirname,histname,
 			2000,-3000,0,AllCorrOBJ_E1Val,
 			2000,2000,5000,AllCorrXFP_E1Val);
-      
+
       double AllCorrectedOBJ_E1Val = s800->MCorrelatedOBJ_E1(true);
       double AllCorrectedXFP_E1Val = s800->MCorrelatedXFP_E1(true);
       histname = "2D_MTOF_vs_DispX";
       obj.FillHistogram(dirname,histname,
 			4000,-2000,0,AllCorrectedOBJ_E1Val,
 			600,-300,300,s800->GetCrdc(0).GetDispersiveX());
-    
+
       histname = "2D_MTOF_vs_AFP";
       obj.FillHistogram(dirname,histname,
 			4000,-2000,0,AllCorrectedOBJ_E1Val,
 			600,-0.1,0.1,s800->GetAFP());
-    
+
       histname ="2D_MTOF_PID";
       obj.FillHistogram(dirname,histname,
 			1000,-2000,0,AllCorrectedOBJ_E1Val,
@@ -205,7 +205,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       obj.FillHistogram(dirname,histname,
 			2000,-3000,0,AllCorrectedOBJ_E1Val,
 			2000,2000,5000,AllCorrectedXFP_E1Val);
-      
+
       histname = "2D_Incoming_PID_XFPCorrected";
       obj.FillHistogram(dirname,histname,
 			2000,-3000,0,AllCorrOBJ_E1Val,
@@ -229,7 +229,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 			  3000,0,6000,hit.GetDoppler(BETA));
       }
 
-      
+
       histname = "GretinaDopplerVsOpenAng";
       obj.FillHistogram(dirname,histname,
 			1000,0,6.3,openang,
@@ -242,13 +242,13 @@ void MakeHistograms(TRuntimeObjects& obj) {
       obj.FillHistogram(dirname,histname,
 			2000,-7,7,openang2,
 			2000,0,4000,hit.GetDoppler(BETA));*/
-      
-      
+
+
       int QuadNumb = HoleQMap[hit.GetCrystalId()/4];
       int SummarySlot = 0;
       bool FWDet = false;
       switch(QuadNumb){
-      case 1: 
+      case 1:
 	FWDet = false;
 	SummarySlot = 1;
 	break;
@@ -276,7 +276,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	SummarySlot = 4;
 	FWDet = false;
 	break;
-      case 8:  
+      case 8:
 	SummarySlot = 4;
 	FWDet = true;
 	break;
@@ -285,9 +285,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	FWDet = false;
 	break;
       default:
-	
+
 	break;
-      }      
+      }
 
       histname = Form("GretinaDopplerVsDTA_Quad%02i",QuadNumb);;
       obj.FillHistogram(dirname,histname,
@@ -300,14 +300,14 @@ void MakeHistograms(TRuntimeObjects& obj) {
       obj.FillHistogram(dirname,histname,
 			70,20,90,hit.GetCrystalId(),
 			1000,0,4000,hit.GetDoppler(BETA));
-      
+
 
 
       histname = "QuadDoppSummary";
       obj.FillHistogram(dirname,histname,
 			10,0,10,HoleQMap[hit.GetCrystalId()/4],
 			2000,0,4000,hit.GetDoppler(BETA));
-      
+
 
       //std::cout << " ---- First call to GetDoppler with TRACK --------" << std::endl;
       if(FWDet){
@@ -320,12 +320,12 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	obj.FillHistogram(dirname,histname,
 			  1000,-0.06,0.02,s800->GetDta(),
 			  2000,0,4000,hit.GetDoppler(BETA));
-      } else{ 
+      } else{
 	histname = "QuadDoppSummary_90DegRing";
 	obj.FillHistogram(dirname,histname,
 			  10,0,10,SummarySlot,
 			  2000,0,4000,hit.GetDoppler(BETA,&trackvect));
-	
+
 	histname = "GretinaDopplerVsDTA_90DegRing";
 	obj.FillHistogram(dirname,histname,
 			  1000,-0.06,0.02,s800->GetDta(),
@@ -333,9 +333,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
       }
 
-      for(int z2=y+1;z2<gretina->Size();z2++) {
+      for(unsigned int z2=y+1;z2<gretina->Size();z2++) {
 	TGretinaHit hit_2 = gretina->GetGretinaHit(z2);
-	
+
 	histname = "Gamma_Gamma";
 	obj.FillHistogram(dirname,histname,
 			  3000,0,6000,hit.GetDoppler(BETA),
@@ -343,7 +343,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	obj.FillHistogram(dirname,histname,
 			  3000,0,6000,hit_2.GetDoppler(BETA),
 			  3000,0,6000,hit.GetDoppler(BETA));
-	
+
 	histname = "Gamma_Gamma_Time";
 	obj.FillHistogram(dirname,histname,
 			  800,-400,400,hit.GetTime()-hit_2.GetTime(),
@@ -351,13 +351,13 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	obj.FillHistogram(dirname,histname,
 			  800,-400,400,hit_2.GetTime()-hit.GetTime(),
 			  3000,0,6000,hit.GetDoppler(BETA));
-      }   
+      }
 
       //--------------------------------------------------------------------
       dirname = "Gamma_InvMapCorr";
       histname = "GretinaVecCorr";
       obj.FillHistogram(dirname,histname,
-			3000,0,6000,hit.GetDoppler(BETA,&trackvect));            
+			3000,0,6000,hit.GetDoppler(BETA,&trackvect));
 
       if(gretina->Size()==1){
 	histname = "Singles_GretinaInvMap";
@@ -365,18 +365,18 @@ void MakeHistograms(TRuntimeObjects& obj) {
 			  3000,0,6000,hit.GetDoppler(BETA,&trackvect));
       }
 
-      
+
       histname = "GretinaVecCorrVsOpenAng";
       obj.FillHistogram(dirname,histname,
 			1000,0,6.3,openang,
 			2000,0,4000,hit.GetDoppler(BETA,&trackvect));
-      
+
       histname = "GretinaVecCorrVsDTA";
       obj.FillHistogram(dirname,histname,
 			1000,-0.2,0.2,s800->GetDta(),
 			2000,0,4000,hit.GetDoppler(BETA,&trackvect));
 
-      
+
       histname = Form("GretinaVectorVsDTA_Quad%02i",QuadNumb);;
       obj.FillHistogram(dirname,histname,
 			1000,-0.06,0.02,s800->GetDta(),
@@ -391,7 +391,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       // std::cout << " X Offset = " << GValue::Value("GRETINA_X_OFFSET") << std::endl;
       // std::cout << " Y Offset = " << GValue::Value("GRETINA_Y_OFFSET") << std::endl;
       // std::cout << " Z Offset = " << GValue::Value("GRETINA_Z_OFFSET") << std::endl;
-      
+
       histname = "XtalVectSummary";
       obj.FillHistogram(dirname,histname,
 			70,20,90,hit.GetCrystalId(),
@@ -403,7 +403,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       TV270.RotateZ(3.0*TMath::Pi()/2.);
       TVector3 TV180 = trackvect;
       TV180.RotateZ(TMath::Pi());
-      
+
       histname = "XtalVectSummary_90";
       obj.FillHistogram(dirname,histname,
 			70,20,90,hit.GetCrystalId(),
@@ -429,7 +429,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       obj.FillHistogram(dirname,histname,
 			70,20,90,hit.GetCrystalId(),
 			1000,0,4000,hit.GetDoppler(BETA,&trackvect_WithNegTC));
-      
+
 
       if(FWDet){
 	histname = "QuadVectSummary_FWRing";
@@ -441,8 +441,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	obj.FillHistogram(dirname,histname,
 			  1000,-0.06,0.02,s800->GetDta(),
 			  2000,0,4000,hit.GetDoppler(BETA,&trackvect));
-      
-      } else{ 
+
+      } else{
 	histname = "QuadVectSummary_90DegRing";
 	obj.FillHistogram(dirname,histname,
 			  10,0,10,SummarySlot,
@@ -453,12 +453,12 @@ void MakeHistograms(TRuntimeObjects& obj) {
 			  1000,-0.06,0.02,s800->GetDta(),
 			  2000,0,4000,hit.GetDoppler(BETA,&trackvect));
       }
-      
 
 
-      for(int z3=y+1;z3<gretina->Size();z3++) {
+
+      for(unsigned int z3=y+1;z3<gretina->Size();z3++) {
 	TGretinaHit hit_3 = gretina->GetGretinaHit(z3);
-	
+
 	histname = "Gamma_Gamma";
 	obj.FillHistogram(dirname,histname,
 			  3000,0,6000,hit.GetDoppler(BETA,&trackvect),
@@ -466,7 +466,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	obj.FillHistogram(dirname,histname,
 			  3000,0,6000,hit_3.GetDoppler(BETA,&trackvect),
 			  3000,0,6000,hit.GetDoppler(BETA,&trackvect));
-	
+
 	histname = "Gamma_Gamma_Time";
 	obj.FillHistogram(dirname,histname,
 			  800,-400,400,hit.GetTime()-hit_3.GetTime(),
@@ -474,7 +474,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	obj.FillHistogram(dirname,histname,
 			  800,-400,400,hit_3.GetTime()-hit.GetTime(),
 			  3000,0,6000,hit.GetDoppler(BETA,&trackvect));
-      }   
+      }
 
       //--------------------------------------------------------------------
 
@@ -482,16 +482,16 @@ void MakeHistograms(TRuntimeObjects& obj) {
       histname = "S800_YTA";
       obj.FillHistogram(dirname,histname,
 			1000,-0.2,0.2,s800->GetYta());
-      
+
       histname = "S800_DTA";
       obj.FillHistogram(dirname,histname,
 			1000,-0.2,0.2,s800->GetDta());
-      
+
       histname = "ATA_vs_BTA";
       obj.FillHistogram(dirname,histname,
 			1000,-0.2,0.2,s800->GetAta(),
 			1000,-0.2,0.2,s800->GetBta());
-	    
+
       //--------------------------------------------------------------------
       dirname = "PID";
       if(haspids) {
@@ -510,11 +510,11 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	    histname = Form("GammaDoppler_Beta_%s",mypid->GetName());
 	    obj.FillHistogram(dirname,histname,
 			      2000,0,4000,hit.GetDoppler(BETA));
-	
-	    
-	    for(int z2_pid=y+1;z2_pid<gretina->Size();z2_pid++) {
+
+
+	    for(unsigned int z2_pid=y+1;z2_pid<gretina->Size();z2_pid++) {
 	      TGretinaHit hit_2_pid = gretina->GetGretinaHit(z2_pid);
-	      
+
 	      histname = Form("Gamma_Gamma_Beta_%s",mypid->GetName());
 	      obj.FillHistogram(dirname,histname,
 				3000,0,6000,hit.GetDoppler(BETA),
@@ -539,17 +539,17 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	  // 			3000,0,6000,hit.GetDoppler(BETA));
 	  //   }
 
-      
+
 	  //   histname = Form("GretinaDopplerVsOpenAng_%s",mypid->GetName());
 	  //   obj.FillHistogram(dirname,histname,
 	  // 		      1000,-3.15,3.15,openang,
 	  // 		      2000,0,4000,hit.GetDoppler(BETA));
-      
+
 	  //   histname = Form("GretinaDopplerVsDTA_%s",mypid->GetName());
 	  //   obj.FillHistogram(dirname,histname,
 	  // 		      1000,-0.2,0.2,s800->GetDta(),
 	  // 		      2000,0,4000,hit.GetDoppler(BETA));
-      
+
 	  //   histname = Form("QuadDoppSummary_%s",mypid->GetName());
 	  //   obj.FillHistogram(dirname,histname,
 	  // 		      10,0,10,HoleQMap[hit.GetCrystalId()/4],
@@ -557,7 +557,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
 	  //   for(int z2=y+1;z2<gretina->Size();z2++) {
 	  //     TGretinaHit hit_2 = gretina->GetGretinaHit(z2);
-	
+
 	  //     histname = Form("Gamma_Gamma_%s",mypid->GetName());
 	  //     obj.FillHistogram(dirname,histname,
 	  // 			3000,0,6000,hit.GetDoppler(BETA),
@@ -565,7 +565,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	  //     obj.FillHistogram(dirname,histname,
 	  // 			3000,0,6000,hit_2.GetDoppler(BETA),
 	  // 			3000,0,6000,hit.GetDoppler(BETA));
-	
+
 	  //     histname = Form("Gamma_Gamma_Time_%s",mypid->GetName());
 	  //     obj.FillHistogram(dirname,histname,
 	  // 			800,-400,400,hit.GetTime()-hit_2.GetTime(),
@@ -573,7 +573,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	  //     obj.FillHistogram(dirname,histname,
 	  // 			800,-400,400,hit_2.GetTime()-hit.GetTime(),
 	  // 			3000,0,6000,hit.GetDoppler(BETA));
-	  //   }   
+	  //   }
 
 	  // }// end inside PID for Disp X
 	  // if(mypid->IsInside(bank29->Timestamp()-hit.GetTime(),hit.GetCoreEnergy())){// Note GetTime has walk correction.
@@ -588,17 +588,17 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	  // 			3000,0,6000,hit.GetDoppler(BETA));
 	  //   }
 
-      
+
 	  //   histname = Form("GretinaDopplerVsOpenAng_%s",mypid->GetName());
 	  //   obj.FillHistogram(dirname,histname,
 	  // 		      1000,-3.15,3.15,openang,
 	  // 		      2000,0,4000,hit.GetDoppler(BETA));
-      
+
 	  //   histname = Form("GretinaDopplerVsDTA_%s",mypid->GetName());
 	  //   obj.FillHistogram(dirname,histname,
 	  // 		      1000,-0.2,0.2,s800->GetDta(),
 	  // 		      2000,0,4000,hit.GetDoppler(BETA));
-      
+
 	  //   histname = Form("QuadDoppSummary_%s",mypid->GetName());
 	  //   obj.FillHistogram(dirname,histname,
 	  // 		      10,0,10,HoleQMap[hit.GetCrystalId()/4],
@@ -606,7 +606,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
 	  //   for(int z2=y+1;z2<gretina->Size();z2++) {
 	  //     TGretinaHit hit_2 = gretina->GetGretinaHit(z2);
-	
+
 	  //     histname = Form("Gamma_Gamma_%s",mypid->GetName());
 	  //     obj.FillHistogram(dirname,histname,
 	  // 			3000,0,6000,hit.GetDoppler(BETA),
@@ -614,7 +614,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	  //     obj.FillHistogram(dirname,histname,
 	  // 			3000,0,6000,hit_2.GetDoppler(BETA),
 	  // 			3000,0,6000,hit.GetDoppler(BETA));
-	
+
 	  //     histname = Form("Gamma_Gamma_Time_%s",mypid->GetName());
 	  //     obj.FillHistogram(dirname,histname,
 	  // 			800,-400,400,hit.GetTime()-hit_2.GetTime(),
@@ -622,17 +622,17 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	  //     obj.FillHistogram(dirname,histname,
 	  // 			800,-400,400,hit_2.GetTime()-hit.GetTime(),
 	  // 			3000,0,6000,hit.GetDoppler(BETA));
-	  //   }   
+	  //   }
 	  // }
 	  // end insided prompt timing peak
         }// end iterate over cuts.
       } // end "HAS PIDS"
- 
+
       dirname  = "CRDC";
       histname = "CRDC1_X";
       obj.FillHistogram(dirname,histname,
 			800,-400,400,s800->GetCrdc(0).GetDispersiveX());
-     
+
       histname = "CRDC2_X";
       obj.FillHistogram(dirname,histname,
 			800,-400,400,s800->GetCrdc(1).GetDispersiveX());
@@ -641,19 +641,19 @@ void MakeHistograms(TRuntimeObjects& obj) {
       obj.FillHistogram(dirname,histname,
 			10000,0,4000,s800->GetTimestamp()/1e8,
 			800,-400,400,s800->GetCrdc(0).GetNonDispersiveY());
-     
+
       histname = "CRDC2_Y_vs_S800Timestamp";
       obj.FillHistogram(dirname,histname,
 			10000,0,4000,s800->GetTimestamp()/1e8,
 			800,-400,400,s800->GetCrdc(1).GetNonDispersiveY());
     }// end good correlated events.
-    
+
     for(int z=0;z<hit.NumberOfInteractions();z++) {
       dirname  = "GretSummCrystal";
       histname = Form("GretinaSummaryX%02i",hit.GetCrystalId());
       obj.FillHistogram(dirname,histname,
 			40,0,40,hit.GetSegmentId(z),
-			2000,0,4000,hit.GetSegmentEng(z)); 
+			2000,0,4000,hit.GetSegmentEng(z));
       if(hit.GetSegmentId(z)>36)
         break;
       int layer  = hit.GetSegmentId(z)/6;
@@ -676,18 +676,18 @@ void MakeHistograms(TRuntimeObjects& obj) {
     obj.FillHistogram(dirname,histname,
 		       628,0,6.28,hit.GetPhi(),
 		       314,0,3.14,hit.GetTheta());
-    
+
     histname = Form("GretinaPosition_Xtal_%i",hit.GetCrystalId());
     obj.FillHistogram(dirname,histname,
 		       628,0,6.28,hit.GetPhi(),
 		       314,0,3.14,hit.GetTheta());
-    
-    
+
+
 
 
     histname = "GretinaEnergyTotal";
     obj.FillHistogram(histname,
-		      8000,0,4000,hit.GetCoreEnergy());   
+		      8000,0,4000,hit.GetCoreEnergy());
     //--------------------------------------------------------------------
     dirname = "DopplerGretResDiag";
     histname = "GretinaDopplerTotal";
@@ -723,7 +723,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
     //--------------------------------------------------------------------
     dirname = "VectCorrByXtal";
     histname = Form("Gret_VectCorr_Xtal");
-    
+
     obj.FillHistogram(dirname,histname,
 			100,0,100,hit.GetCrystalId(),
 			2000,0,4000,hit.GetDoppler(BETA,&trackvect_Spec));
@@ -743,9 +743,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
     obj.FillHistogram(dirname,histname,
 		      10,0,10,HoleQMap[hit.GetCrystalId()/4],
 		      2000,0,4000,hit.GetDoppler(BETA,&trackvect_Spec));
-    
+
     histname = "GretinaDoppVectPosLoopZ";
-    double z_ = -5.0;
+    // double z_ = -5.0;
     // double zdef = GValue::FindValue("GRETINA_Z_OFFSET")->GetValue();
     // for(int z=0;z<100;z++) {
     //   z_ += 10.0/100.0;
@@ -753,7 +753,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
     //   obj.FillHistogram(dirname,histname,
     // 			2000,0,4000,hit.GetDoppler(BETA,&trackvect_Spec),
     // 			101,-5.0,5.0,z_);
-    // }      
+    // }
     // GValue::FindValue("GRETINA_Z_OFFSET")->SetValue(zdef);
     //--------------------------------------------------------------------
     dirname = "GretSummCoreCharge";
