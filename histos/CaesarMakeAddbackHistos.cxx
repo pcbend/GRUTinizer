@@ -65,7 +65,8 @@ void initializeKr90Cuts(TFile * &cut_file, TCutG* &pid, TCutG* &tcut,
     TPreserveGDirectory a;
     cut_file = new TFile("/mnt/analysis/pecan-gade/elman/Kr90/cut_files/kr90_cuts.root","Read");
     pid = (TCutG*)cut_file->Get("kr90_mid");
-    tcut = (TCutG*)cut_file->Get("tcut");
+//    tcut = (TCutG*)cut_file->Get("tcut");
+    tcut = (TCutG*)cut_file->Get("tcut_tighter");
     in = (TCutG*)cut_file->Get("in_kr90");
     omitted_det = 176;
 }
@@ -131,7 +132,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
                   time_singles.push_back(hit.Time());
                   pos_singles.push_back(hit.GetPosition());
                 }
-
               }//For multiplicity purposes
 
               dirname = "Caesar";
@@ -149,6 +149,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
     int num_addback_hits = caesar->AddbackSize();
     for (int y = 0; y < num_addback_hits; y++){
       TCaesarHit &hit = caesar->GetAddbackHit(y);
+      
+      if (omitted_det != -1 &&  omitted_det == hit.GetAbsoluteDetectorNumber()){
+        continue;
+      }
       if (hit.IsValid()){//only accept hits with both times and energies
         std::string histname;
 
@@ -167,10 +171,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
                 }
               }//For multiplicity purposes
 
-//            if (hit.GetNumHitsContained() > 2){
-//              caesar->Print();
-//              caesar->PrintAddback();
-//            }
               dirname = "CaesarAddback";
               histname = "ab_energy_dc_pid_in_tcut";
               obj.FillHistogram(dirname,histname,
@@ -270,6 +270,12 @@ void MakeHistograms(TRuntimeObjects& obj) {
     obj.FillHistogram(dirname, histname,
                       192, 0, 192, num_hits_singles);
 
+    for (unsigned int i = 0; i < num_hits_singles; i++){
+      histname = "multiplicity_energy_summary";
+      obj.FillHistogram(dirname, histname,
+                        192, 0, 192, num_hits_singles,
+                        8192,0,8192, energies_singles.at(i));
+    }
 
     //addback_mult == multiplicity in gates
     int addback_mult = energies_addback.size();
@@ -416,6 +422,12 @@ void MakeHistograms(TRuntimeObjects& obj) {
     histname = "ab_multiplicity";
     obj.FillHistogram(dirname, histname,
                       192, 0, 192, addback_mult);
+    for (int i = 0; i < addback_mult; i++){
+      histname = "multiplicity_ab_energy_summary";
+      obj.FillHistogram(dirname, histname,
+                        192, 0, 192, addback_mult,
+                        8192,0,8192, energies_addback.at(i));
+    }
   }//caesar exists
 
   if(caesar) { caesar->Clear(); }

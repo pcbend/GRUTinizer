@@ -41,7 +41,7 @@ void TCaesarHit::Print(Option_t *opt) const {
             
 }
 
-bool TCaesarHit::isOverflow() const{
+bool TCaesarHit::IsOverflow() const{
   if (fFlags & kIsEnergy){
     std::cout << "Attempting to check overflow, but charge is now energy!" << std::endl;
     return false;
