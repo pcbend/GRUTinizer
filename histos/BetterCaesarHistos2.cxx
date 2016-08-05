@@ -95,16 +95,16 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   TList *list = &(obj.GetObjects());
   int numobj = list->GetSize();
-  if(!caesar) 
+  if(!caesar)
     return;
-  if(!s800) 
+  if(!s800)
     return;
   double ic_sum = s800->GetIonChamber().GetAve();
   double objtac_corr = s800->GetCorrTOF_OBJTAC();
   double objtac = s800->GetTof().GetTacOBJ();
   double xfptac = s800->GetTof().GetTacXFP();
-  double afp = s800->GetAFP();
-  double xfp_focalplane = s800->GetXFP(0);
+  //double afp = s800->GetAFP();
+  //double xfp_focalplane = s800->GetXFP(0);
   TVector3 track = s800->Track();
   if(! newal23blob->IsInside(objtac_corr,ic_sum) && InBeam_btwnTopMid->IsInside(objtac,xfptac)){
     return;
@@ -115,7 +115,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   std::string histname;
 
-  for(int y=0;y<caesar->Size();y++) {
+  for(unsigned int y=0;y<caesar->Size();y++) {
     TCaesarHit hit = caesar->GetCaesarHit(y);
     counter++;
     if(!hit.IsValid())
@@ -131,7 +131,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 		double beta_use = 0.2+(0.3/300.0)*double(beta_i);
 		obj.FillHistogram("Caesar","Gamma_Gated_newal23blob_beta_scan",
 				  300,0.2,0.499,beta_use,
-				  1024,0,8192,hit.GetDoppler(beta_use,z_shift,&track));		
+				  1024,0,8192,hit.GetDoppler(beta_use,z_shift,&track));
       }
 
     }//end if inside newal23blob and inside between incomingPID
@@ -157,7 +157,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 		double beta_use = 0.2+(0.3/300.0)*double(beta_i);
 		obj.FillHistogram("Addback","a_Gamma_Gated_newal23blob_beta_scan",
 				  300,0.2,0.499,beta_use,
-				  1024,0,8192,hit.GetDoppler(beta_use,z_shift,&track));		
+				  1024,0,8192,hit.GetDoppler(beta_use,z_shift,&track));
       }
 
     }//end if inside newal23blob and inside between incomingPID

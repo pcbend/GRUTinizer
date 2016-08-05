@@ -44,6 +44,7 @@ public:
   //all the detectors.
 
   bool IsValid() const { return (Charge()!=-1 && Time()!=-1); }
+  bool IsOverflow() const;
   //For so-called ng events
   void IsGarbageAddback() { is_garbage_addback = true;}
 

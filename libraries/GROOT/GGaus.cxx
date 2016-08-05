@@ -25,7 +25,8 @@ GGaus::GGaus(Double_t xlow,Double_t xhigh,Option_t *opt)
   fBGFit.SetLineStyle(2);
   fBGFit.SetLineColor(kBlack);
 
-  SetName(Form("gaus_%d_to_%d",(Int_t)(xlow),(Int_t)(xhigh)));
+  // Changing the name here causes an infinite loop when starting the FitEditor
+  //SetName(Form("gaus_%d_to_%d",(Int_t)(xlow),(Int_t)(xhigh)));
   InitNames();
   //TF1::SetParameter("centroid",cent);
 
@@ -37,7 +38,8 @@ GGaus::GGaus(Double_t xlow,Double_t xhigh,TF1 *bg,Option_t *opt)
   if(xlow>xhigh)
     std::swap(xlow,xhigh);
   TF1::SetRange(xlow,xhigh);
-  SetName(Form("gaus_%d_to_%d",(Int_t)(xlow),(Int_t)(xhigh)));
+  // Changing the name here causes an infinite loop when starting the FitEditor
+  //SetName(Form("gaus_%d_to_%d",(Int_t)(xlow),(Int_t)(xhigh)));
   InitNames();
 
   if(bg) {
