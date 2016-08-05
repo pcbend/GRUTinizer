@@ -52,10 +52,12 @@ void TGrandRaidenHit::BuildFrom(){
 
           LaBrHit temphit;
           temphit.channel = (*qtc_le_chan)[i];
-          temphit.width = (*qtc_tr_tdc)[i] - (*qtc_le_tdc)[j];
+          temphit.width = (*qtc_tr_tdc)[j] - (*qtc_le_tdc)[i];
+          temphit.qtc_le =(*qtc_le_tdc)[i];
+          temphit.qtc_tr = (*qtc_tr_tdc)[j];
+
           labr_hits.push_back(temphit);
 
-          //labr_hits.emplace_back({(*qtc_le_chan)[i],(*qtc_le_tdc)[i] - (*qtc_tr_tdc)[j]}); // =(
         }
       }
     }

@@ -26,10 +26,15 @@ class HistTab(object):
 
     def _MakeHistView(self,parent):
         self.treeview = ttk.Treeview(parent)
-        self.treeview.pack(fill=tk.BOTH,expand=True)
+        self.treeview.pack(fill=tk.BOTH,expand=True,side=tk.LEFT)
         # Map from treeview name to ROOT object
         self.hist_lookup = TKeyDict()
         self.treeview.bind("<Double-1>", self.OnHistClick)
+
+        scrollbar = ttk.Scrollbar(parent)
+        scrollbar.pack(side=tk.LEFT,fill=tk.Y)
+        self.treeview.configure(yscrollcommand=scrollbar.set)
+        scrollbar.configure(command=self.treeview.yview)
 
     def AddActiveDirectory(self, tdir):
         if tdir.GetName() not in [d.GetName() for d in self.active_dirs]:
