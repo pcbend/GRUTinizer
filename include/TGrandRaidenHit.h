@@ -59,7 +59,10 @@ private:
 
 struct LaBrHit {
     Int_t channel;
+    Double_t qtc_le;
+    Double_t qtc_tr;
     Double_t width;
+    //Double_t width() { return qtc_tr - qtc_le; }
 };
 
 #endif
