@@ -29,7 +29,7 @@ LINKFLAGS_PREFIX += -Wl,--no-as-needed
 SHAREDSWITCH = -shared -Wl,-soname,# NO ENDING SPACE
 endif
 
-# When compiling and linking against RCNP analyzer routines
+# When compiling and linking against RCNP analyzer routines one must set RCNP=1
 ifeq ($(RCNP),1)
 RCNPANAPATH = ./GRAnalyzer/analyzer
 RCNPANALYZER = $(realpath $(RCNPANAPATH)/../lib)
