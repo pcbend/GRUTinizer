@@ -39,11 +39,13 @@ public:
 
 protected:
   Int_t fAddress;
-  Int_t fCharge;
+  Float_t fCharge;
   Int_t fTime;
   long fTimestamp;
 
   mutable double fEnergy; //!
+  
+  
 
   ClassDef(TDetectorHit,2)
 };

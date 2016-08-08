@@ -79,6 +79,16 @@ void GH2D::Draw(Option_t *opt) {
   }
 }
 
+
+void GH2D::Draw(TCutG *cut) {
+  if(!cut)
+    return;
+  std::string option = Form("colz [%s]",cut->GetName());
+  TH2D::Draw(option.c_str());
+}
+
+
+
 TH1 *GH2D::DrawCopy(Option_t *opt) const {
   TH1 *h = TH2D::DrawCopy(opt);
   if(gPad) {

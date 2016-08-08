@@ -411,7 +411,8 @@ void GCanvas::HandleInput(Int_t event,Int_t x,Int_t y) {
 void GCanvas::Draw(Option_t *opt) {
    printf("GCanvas Draw was called.\n");
    TCanvas::Draw(opt);
-   this->FindObject("TFrame")->SetBit(TBox::kCannotMove);
+   if(this->FindObject("TFrame"))
+     this->FindObject("TFrame")->SetBit(TBox::kCannotMove);
 }
 
 
