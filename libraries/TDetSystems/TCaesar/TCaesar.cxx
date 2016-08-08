@@ -113,9 +113,12 @@ void TCaesar::BuildAddbackTest() const {
 //std::cout << "\n\n\n\n";
 //std::cout << "============ INSIDE BUILD ADDBACK TEST ========================" << std::endl;
 
+
   std::deque<const TCaesarHit*> hits;
+//  std::cout << " Input Caesar Hits: " <<std::endl;
   for(auto& hit : caesar_hits) {
     if (hit.IsValid()){
+//      hit.Print();
       hits.push_back(&hit);
     }
   }
@@ -144,6 +147,7 @@ void TCaesar::BuildAddbackTest() const {
   std::vector<int> neighbor_positions;
 //std::cout << "NUMBER OF HITS TO CHECK = " << hits.size() << std::endl;;
   while(hits.size()) {
+
     addback_hits.push_back(*hits.front());
     hits.pop_front();
     TCaesarHit& new_hit = addback_hits.back();
@@ -193,6 +197,10 @@ void TCaesar::BuildAddbackTest() const {
         break;
     }//switch over number of neighbors
   }//while there are still hits in event
+//std::cout << "Hits after valid check and sorting: "<< std::endl;
+//for(auto& ab_hit : addback_hits) {
+//  ab_hit.Print();
+//}
 }
 
 int  const TCaesar::det_per_ring[] = {10,14,24,24,24, 24, 24, 24, 14, 10};

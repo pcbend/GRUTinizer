@@ -7,11 +7,16 @@
 #include "TSystem.h"
 #include "TEnv.h"
 
-GSnapshot gSnapshot;
+GSnapshot& GSnapshot::Get() {
+  static GSnapshot snapshot;
+  return snapshot;
+}
 
 GSnapshot::GSnapshot(const char* snapshot_dir) {
   if(snapshot_dir) {
     fSnapshotDir = snapshot_dir;
+  } else if(gEnv->Defined("GRUT.SnapshotDir")) {
+    fSnapshotDir = gEnv->GetValue("GRUT.SnapshotDir","");
   } else {
     fSnapshotDir = Form("%s/snapshot",getenv("GRUTSYS"));
   }
@@ -47,18 +52,14 @@ void GSnapshot::Snapshot(TCanvas *can) {
   //const char* ext = needs_png ? "png" : "pdf";
 
   std::string ext = gEnv->GetValue("GRUT.SnapshotExt","");
-  if(ext.length()==0)
+  if(ext.length()==0) {
     ext = "pdf";         //TODO, make this smarter again...
+  }
 
-  std::string dir = gEnv->GetValue("GRUT.SnapshotDir","");
-  if(dir.length()==0)
-    dir = fSnapshotDir;  //TODO, make this smarter again...
-  
   int date,time;
   TDatime::GetDateTime(TDatime().Get(), date, time);
-  
+
   can->SaveAs(Form("%s/%s_%d_%d.%s",
-		   dir.c_str(), can->GetName(),
+		   fSnapshotDir.c_str(), can->GetName(),
 		   date, time, ext.c_str()));
 }
-

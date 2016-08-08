@@ -25,6 +25,7 @@ TFile *cut_file  = 0;
 TCutG *pid   = 0;
 TCutG *tcut  = 0;
 TCutG *in    = 0;
+int omitted_det = -1;
 
 #define NUM_DETS 192
 
@@ -55,10 +56,25 @@ void initializeSe86Cuts(TFile* &cut_file, TCutG* &pid, TCutG* &in, TCutG *&tcut)
     exit(5);
   }
   pid = (TCutG*)cut_file->Get("prelim_pid_se86");
-  in = (TCutG*)cut_file->Get("prelim_in_cut");
-  tcut = 0;
+  //in = (TCutG*)cut_file->Get("prelim_in_cut");
+  in = (TCutG*)cut_file->Get("in_se86");
+  tcut = (TCutG*)cut_file->Get("prelim_tcut");
+  omitted_det = 176;
 }
-
+void initializeKr90Cuts(TFile* &cut_file, TCutG* &pid, TCutG* &in, TCutG *&tcut){
+  TPreserveGDirectory a;//needed to stop root from switching directories to cut_file
+  cut_file = new TFile("/mnt/analysis/pecan-gade/elman/Kr90/cut_files/kr90_cuts.root","Read");
+  if (!cut_file){
+    std::cout << "Failed to open cut file" << std::endl;
+    exit(5);
+  }
+  pid = (TCutG*)cut_file->Get("kr90_mid");
+  //in = (TCutG*)cut_file->Get("prelim_in_cut");
+  in = (TCutG*)cut_file->Get("in_kr90");
+//  tcut = (TCutG*)cut_file->Get("tcut");
+  tcut = (TCutG*)cut_file->Get("tcut_tighter");
+  omitted_det = 176;
+}
 void initializeKr88Cuts(TFile* &cut_file, TCutG* &pid, TCutG* &in, TCutG *&tcut){
   TPreserveGDirectory a;//needed to stop root from switching directories to cut_file
   cut_file = new TFile("/mnt/analysis/pecan-gade/elman/Kr88/cut_files/kr88_cuts.root","Read");
@@ -90,8 +106,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
   if(caesar) {
     for(unsigned int y=0;y<caesar->Size();y++) {
       if (cut_file == 0){
- //       initializeSe86Cuts(cut_file,pid,in,tcut);
-        initializeKr88Cuts(cut_file,pid,in,tcut);
+//        initializeSe86Cuts(cut_file,pid,in,tcut);
+//        initializeKr88Cuts(cut_file,pid,in,tcut);
+        initializeKr90Cuts(cut_file,pid,in,tcut);
       }
       TCaesarHit &hit = caesar->GetCaesarHit(y);
       int det = hit.GetDetectorNumber();
@@ -106,15 +123,15 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
         dirname = "GeneralCaesar";
 
-        histname = "Detector_Energy_Summary";
-        obj.FillHistogram(dirname, histname, 
-                          NUM_DETS+1, 0, NUM_DETS+1,             det+total_det_in_prev_rings[ring],
-                          N_BINS_X, ENERGY_LOW_X, ENERGY_HIGH_X, energy);
+//      histname = "Detector_Energy_Summary";
+//      obj.FillHistogram(dirname, histname, 
+//                        NUM_DETS+1, 0, NUM_DETS+1,             det+total_det_in_prev_rings[ring],
+//                        N_BINS_X, ENERGY_LOW_X, ENERGY_HIGH_X, energy);
 
-        histname = "Detector_DCEnergy_Summary";
-        obj.FillHistogram(dirname, histname, 
-                          NUM_DETS+1, 0, NUM_DETS+1,             det+total_det_in_prev_rings[ring],
-                          N_BINS_X, ENERGY_LOW_X, ENERGY_HIGH_X, energy_dc);
+//      histname = "Detector_DCEnergy_Summary";
+//      obj.FillHistogram(dirname, histname, 
+//                        NUM_DETS+1, 0, NUM_DETS+1,             det+total_det_in_prev_rings[ring],
+//                        N_BINS_X, ENERGY_LOW_X, ENERGY_HIGH_X, energy_dc);
 
         if (s800){
           int abs_det_num = hit.GetAbsoluteDetectorNumber();
@@ -123,15 +140,11 @@ void MakeHistograms(TRuntimeObjects& obj) {
           double objtac_corr = s800->GetCorrTOF_OBJTAC();
           double ic_sum = s800->GetIonChamber().GetAve();
           //targ_exit_vec = (pt,theta,phi)
-          TVector3 targ_exit_vec = s800->ExitTargetVect();
-          double scatter_angle = targ_exit_vec.Theta()*(180.0/TMath::Pi());
 
           double crdc_1_y = s800->GetCrdc(0).GetNonDispersiveY();
           double crdc_2_y = s800->GetCrdc(1).GetNonDispersiveY();
           double crdc_1_x = s800->GetCrdc(0).GetDispersiveX();
           double crdc_2_x = s800->GetCrdc(1).GetDispersiveX();
-          histname = "ScatterAngle";
-          obj.FillHistogram(dirname, histname, 18000,0,180, fabs(scatter_angle));
           if (energy_dc > 300){//need energy cut to not gate on noise
             histname = "Raw_Time_Summary_Ungated";
             obj.FillHistogram(dirname, histname,200,0, 200, abs_det_num,
@@ -155,19 +168,23 @@ void MakeHistograms(TRuntimeObjects& obj) {
                             N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, energy_dc);
 
           
-          histname = "ungated_coincidence";
-          for (unsigned int hit_num = 0; hit_num < caesar->Size(); hit_num++){
-            if (hit_num ==y){
-              continue; //don't add self coincidence
-            }
-            obj.FillHistogram(dirname, histname, 
-                            N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, energy_dc,
-                            N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, caesar->GetCaesarHit(hit_num).GetDoppler());
-          }
+//        histname = "ungated_coincidence";
+//        for (unsigned int hit_num = 0; hit_num < caesar->Size(); hit_num++){
+//          if (hit_num ==y){
+//            continue; //don't add self coincidence
+//          }
+//          obj.FillHistogram(dirname, histname, 
+//                          N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, energy_dc,
+//                          N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, caesar->GetCaesarHit(hit_num).GetDoppler());
+//        }
 
+          if (in->IsInside(xfptac,objtac)){
+            histname ="PID_TAC_INBEAM";
+            obj.FillHistogram(dirname, histname,N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, objtac_corr,
+                                                N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, ic_sum);
+          }
           
           if (pid->IsInside(objtac_corr, ic_sum)){
-            //make coincidence matrix
             dirname = "PID";
 
 //          int maxpad1 = s800->GetCrdc(0).GetMaxPad();
@@ -187,11 +204,11 @@ void MakeHistograms(TRuntimeObjects& obj) {
             obj.FillHistogram(dirname, histname, 
                             N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, xfptac, 
                             N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, objtac);
-            histname = "ScatterAngleKr88";
-            obj.FillHistogram(dirname, histname, 18000,0,180, fabs(scatter_angle));
+          if (energy_dc > 300){//need energy cut to not gate on noise
             histname = "Raw_Time_Summary_PID";
             obj.FillHistogram(dirname, histname,200,0, 200, abs_det_num,
                                                2048,0,2048, raw_time);
+          }
             histname = "CRDC1_Y_PID";
             obj.FillHistogram(dirname, histname, 2000,-200,200, crdc_1_y);
             histname = "CRDC2_Y_PID";
@@ -208,8 +225,20 @@ void MakeHistograms(TRuntimeObjects& obj) {
                 //              energies_in_tcut.push_back(energy_dc);
                 //            }
                 //histname = "EnergyDC_PID_tcut_incut";
+                if (omitted_det != -1 && det+total_det_in_prev_rings[ring] != omitted_det){
+                  histname = "EnergyDC_PID_incut_no176";
+                  obj.FillHistogram(dirname, histname, N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, energy_dc);
+                  histname = "EnergyDC_CorrTime_PID_no176";
+                  obj.FillHistogram(dirname, histname, 
+                                    4000,-2000,2000, corr_time, 
+                                    N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, energy_dc);
+                }
                 histname = "EnergyDC_PID_incut";
                 obj.FillHistogram(dirname, histname, N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, energy_dc);
+                histname = "EnergyDC_CorrTime_PID";
+                obj.FillHistogram(dirname, histname, 
+                                4000,-2000,2000, corr_time, 
+                                N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, energy_dc);
 
                 histname = "Detector_Energy_Summary_PID_IN_TCUT";
                 obj.FillHistogram(dirname, histname, 
@@ -233,7 +262,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
     double objtac_corr = s800->GetCorrTOF_OBJTAC();
     double objtac = s800->GetTof().GetTacOBJ();
     double xfptac = s800->GetTof().GetTacXFP();
-    //double afp = s800->GetAFP();
+    double afp = s800->GetAFP();
+    double xfp = s800->GetCrdc(0).GetDispersiveX();//for timing correction
     double ata = s800->GetAta();
     double bta = s800->GetBta();
     dirname = "S800";
@@ -247,6 +277,19 @@ void MakeHistograms(TRuntimeObjects& obj) {
     histname ="tacxfp_tacobj_ungated";
     obj.FillHistogram(dirname, histname,N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, xfptac,
                                         N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, objtac);
+    histname ="raw_tacobj_vs_xfp";
+    obj.FillHistogram(dirname, histname,N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, objtac,
+                                        600,-300,300, xfp);
+    histname ="raw_tacobj_vs_afp";
+    obj.FillHistogram(dirname, histname,N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, objtac,
+                                        1000,-0.1,0.1, afp);
+    histname ="corr_tacobj_vs_xfp";
+    obj.FillHistogram(dirname, histname,N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, objtac_corr,
+                                        600,-300,300, xfp);
+    histname ="corr_tacobj_vs_afp";
+    obj.FillHistogram(dirname, histname,N_BINS_X,ENERGY_LOW_X,ENERGY_HIGH_X, objtac_corr,
+                                        1000,-0.1,0.1, afp);
+    
     
     histname = "TrigBit";
     int trig_bit = 6;

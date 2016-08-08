@@ -43,7 +43,8 @@ public:
   //Detector number is not ordered in any reasonable way. This is just
   //all the detectors.
 
-  bool IsValid() const { return (Charge()!=-1 && Charge()<2000 && Time()!=-1); }
+  bool IsValid() const { return (Charge()!=-1 && Time()!=-1); }
+  bool IsOverflow() const;
   //For so-called ng events
   void IsGarbageAddback() { is_garbage_addback = true;}
 

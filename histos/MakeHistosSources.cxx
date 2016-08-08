@@ -66,14 +66,14 @@ extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
   InitMap();
   TGretina *gretina = obj.GetDetector<TGretina>();
-  TBank29  *bank29  = obj.GetDetector<TBank29>();
-  TS800 *s800       = obj.GetDetector<TS800>();
+  // TBank29  *bank29  = obj.GetDetector<TBank29>();
+  // TS800 *s800       = obj.GetDetector<TS800>();
 
 
-  if(!gretina) 
+  if(!gretina)
     return;
 
-  for(int x=0;x<gretina->Size();x++) {
+  for(unsigned int x=0;x<gretina->Size();x++) {
     TGretinaHit hit = gretina->GetGretinaHit(x);
     obj.FillHistogram("energy","summary",4000,0,4000,hit.GetCoreEnergy(),
         100,0,100,hit.GetCrystalId() );
@@ -97,7 +97,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
     }
 
     //obj.FillHistogram("max_layer",12,-2,10,largest_layer);
-   // if(largest_layer<5) { 
+   // if(largest_layer<5) {
     for(int z=5;z>-1;z--) {
       if(largest_layer<z) {
         obj.FillHistogram("energy",Form("summary_%s_and_below",LayerMap[z-1].c_str()),
@@ -115,7 +115,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     /*
     }
-    iif(largest_layer<4) { 
+    iif(largest_layer<4) {
       obj.FillHistogram("energy",Form("summary_%s_veto",LayerMap[4].c_str()),
           4000,0,4000,hit.GetCoreEnergy(),
           100,0,100,hit.GetCrystalId() );
@@ -123,7 +123,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
           4000,0,4000,hit.GetCoreEnergy()*gRandom->Gaus(1,(1./1000.)),
           100,0,100,hit.GetCrystalId());
     }
-    if(largest_layer<3) { 
+    if(largest_layer<3) {
       obj.FillHistogram("energy",Form("summary_%s_veto",LayerMap[3].c_str()),
           4000,0,4000,hit.GetCoreEnergy(),
           100,0,100,hit.GetCrystalId() );
@@ -131,7 +131,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
           4000,0,4000,hit.GetCoreEnergy()*gRandom->Gaus(1,(1./1000.)),
           100,0,100,hit.GetCrystalId());
     }
-    if(largest_layer<2) { 
+    if(largest_layer<2) {
       obj.FillHistogram("energy",Form("summary_%s_veto",LayerMap[2].c_str()),
           4000,0,4000,hit.GetCoreEnergy(),
           100,0,100,hit.GetCrystalId() );
@@ -139,7 +139,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
           4000,0,4000,hit.GetCoreEnergy()*gRandom->Gaus(1,(1./1000.)),
           100,0,100,hit.GetCrystalId());
     }
-    if(largest_layer<1) { 
+    if(largest_layer<1) {
       obj.FillHistogram("energy",Form("summary_%s_veto",LayerMap[1].c_str()),
           4000,0,4000,hit.GetCoreEnergy(),
           100,0,100,hit.GetCrystalId() );
@@ -164,12 +164,3 @@ void MakeHistograms(TRuntimeObjects& obj) {
   if(numobj!=list->GetSize())
     list->Sort();
 }
-
-
-
-
-
-
-
-
-

@@ -132,7 +132,7 @@ class MainWindow(object):
                            text='Load Root File',fg="black",bg="goldenrod",
                            command=self.LoadRootFile)
         button.pack(side=tk.LEFT)
-        
+
         button = tk.Button(frame,
                            text='Load Window File',fg="black",bg="goldenrod",
                            command=self.LoadWindowFile)
@@ -566,8 +566,7 @@ class MainWindow(object):
         ROOT.gSystem.Load(library_name)
 
     def Snapshot(self):
-        if ROOT.gSnapshot:
-            ROOT.gSnapshot.Snapshot()
+        ROOT.GSnapshot.Get().Snapshot()
 
     def close_all_canvases(self):
         canvases = ROOT.gROOT.GetListOfCanvases()
