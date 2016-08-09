@@ -28,6 +28,12 @@ GGaus *GausFit(TH1*,double,double,Option_t *opt="");
 std::string MergeStrings(const std::vector<std::string>& strings, char split='\n');
 
 bool GetProjection(GH2D *hist,double low, double high, double bg_low=0,double bg_high=0);
+bool GetProjection(GH2D *hist,GH2D *hist2,
+		   double low, double high,double bg_low=-1,double bg_high=-1,
+		   bool overlay = false,
+		   double back_low=-1,double back_high=-1,double back_bg_low=-1,
+		   double back_bg_high=-1,
+		   bool back_overlay=false);
 
 //bool PeakFit(TH1*,Double_t,Double_t,Option_t *opt="");
 

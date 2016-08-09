@@ -22,6 +22,7 @@ class TGretinaHit : public TDetectorHit {
 
 public:
   TGretinaHit();
+  TGretinaHit(const TGretinaHit& hit){ hit.Copy(*this); }
   ~TGretinaHit();
 
   void Copy(TObject& obj) const;
@@ -78,6 +79,23 @@ public:
   bool operator<(const TGretinaHit &rhs) const { return fCoreEnergy > rhs.fCoreEnergy; }
 
 
+
+  double GetDopplerSim(double beta, double en,const TVector3 *gvec=0, const TVector3 *vec=0){
+    if(Size()<1)
+      return 0.0;
+    if(vec==0) {
+      vec = &BeamUnitVec;
+    }
+    TVector3 vechold = GetPosition();
+    if(gvec==0){
+      gvec = &vechold;
+    }
+    
+    double tmp = 0.0;
+    double gamma = 1/(sqrt(1-pow(beta,2)));
+    tmp = en*gamma *(1 - beta*TMath::Cos(gvec->Angle(*vec)));
+    return tmp;
+  }
   double GetDoppler(double beta,const TVector3 *vec=0) {
     if(Size()<1)
       return 0.0;
@@ -117,7 +135,7 @@ public:
   TVector3 GetLocalPosition(int i) const;
   //TVector3 GetCrystalPosition(int i)     const { return TVector3(0,0,1): }
   TVector3 GetPosition()                  const { return GetFirstIntPosition(); }
-  TVector3 GetPosition_2()                const { return GetFirstIntPosition_2(); }
+  TVector3 GetLastPosition()              const;
 
   TVector3 GetCrystalPosition()           const; 
   TVector3 GetSegmentPosition()           const; 
@@ -125,7 +143,6 @@ public:
 
 
   TVector3 GetFirstIntPosition() const;
-  TVector3 GetFirstIntPosition_2() const;
   TVector3 GetSecondIntPosition() const;
 
   void AddToSelf(const TGretinaHit& other);
