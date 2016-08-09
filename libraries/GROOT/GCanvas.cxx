@@ -962,6 +962,15 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
             }
             double bg_value_low  = ghist->GetXaxis()->GetBinCenter(bg_binlow);
             double bg_value_high = ghist->GetXaxis()->GetBinCenter(bg_binhigh);
+            {
+              double epsilon = 16*(std::nextafter(value_low, INFINITY) - value_low);
+              bg_value_low += epsilon;
+            }
+
+            {
+              double epsilon = 16*(value_high - std::nextafter(value_high, -INFINITY));
+              bg_value_high -= epsilon;
+            }
             // Using binhigh-1 instead of binhigh,
             //  because the ProjectionX/Y functions from ROOT use inclusive bin numbers,
             //  rather than exclusive.
