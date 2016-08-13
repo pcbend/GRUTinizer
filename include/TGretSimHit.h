@@ -34,9 +34,13 @@ public:
 
   int    GetEn() const   { return fEnergy; }
   double GetBeta() const { return fBeta; }
-  double GetX()  const   { return fPosit.X(); }
-  double GetY()  const   { return fPosit.Y(); }
-  double GetZ()  const   { return fPosit.Z(); }
+  /* double GetX()  const   { return fPosit.X(); } */
+  /* double GetY()  const   { return fPosit.Y(); } */
+  /* double GetZ()  const   { return fPosit.Z(); } */
+  double GetX()  const   { return fInteraction.X(); }
+  double GetY()  const   { return fInteraction.Y(); }
+  double GetZ()  const   { return fInteraction.Z(); }
+
   
 
   double GetDoppler(const TVector3 *vec=0) {
