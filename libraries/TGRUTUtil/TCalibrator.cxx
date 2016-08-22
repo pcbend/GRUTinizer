@@ -20,7 +20,7 @@
 #include <GRootFunctions.h>
 #include <GRootCommands.h>
 #include <GCanvas.h>
-#include <GGaus.h>
+#include <GPeak.h>
 #include <Globals.h>
 
 #include "combinations.h"
@@ -254,7 +254,7 @@ int TCalibrator::AddData(TH1 *data,TNucleus *source, double sigma,double thresho
   for(int x=0;x<spectrum.GetNPeaks();x++) {
     double range = 8*data->GetXaxis()->GetBinWidth(1);
     //printf(DGREEN "\tlow %.02f \t high %.02f" RESET_COLOR "\n",spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range);
-    GGaus *fit = GausFit(data,spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range,"no-print");
+    GPeak *fit = PhotoPeakFit(data,spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range,"no-print");
     //data_channels
     //data_channels.push_back(fit.GetCentroid());
     //datatosource[fit->GetCentroid()] = sqrt(-1);

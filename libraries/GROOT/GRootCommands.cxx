@@ -240,7 +240,40 @@ GGaus *GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
   return mypeak;
 }
 
-/*
+
+TF1 *DoubleGausFit(TH1 *hist,double cent1,double cent2,double xlow, double xhigh,Option_t *opt) {
+  if(!hist)
+    return 0;
+  if(xlow>xhigh)
+    std::swap(xlow,xhigh);
+
+  //std::cout << "here." << std::endl;
+  
+  GGaus *mypeak= new GGaus(xlow,xhigh);
+  std::string options = opt;
+  options.append("Q+");
+  mypeak->Fit(hist,options.c_str());
+  //mypeak->Background()->Draw("SAME");
+  TF1 *bg = new TF1(*mypeak->Background());
+  hist->GetListOfFunctions()->Add(bg);
+  //edit = true;
+
+  return mypeak;
+}
+
+
+
+
+
+
+
+
+
+/* 
+  
+  
+  
+=======
 
 
 
