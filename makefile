@@ -1,4 +1,4 @@
-.PHONY: clean all extras pcm_files libGRAnalyzer
+.PHONY: clean all extras pcm_files
 .SECONDARY:
 .SECONDEXPANSION:
 
