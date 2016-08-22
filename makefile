@@ -1,7 +1,6 @@
-.PHONY: clean all extras
+.PHONY: clean all extras libGRAnalyzer
 .SECONDARY:
 .SECONDEXPANSION:
-
 
 PLATFORM:=$(PLATFORM)
 # EDIT THIS SECTION
