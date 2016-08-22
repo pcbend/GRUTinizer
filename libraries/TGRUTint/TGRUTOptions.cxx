@@ -92,9 +92,6 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .description("Root output file");
   parser.option("f filter-output",&output_filtered_file)
     .description("Output file for raw filtered data");
-  parser.option("T tree-source", &fTreeSource)
-    .description("Input TTree source.")
-    .default_value(false);
   parser.option("R save-rcnp-tree", &fSaveRCNPTree)
     .description("Save ROOT tree from raw RCNP analyzer data.")
     .default_value(false);

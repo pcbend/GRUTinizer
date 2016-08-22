@@ -149,13 +149,11 @@ void TGRUTint::ApplyOptions() {
   if(opt->S800InverseMapFile().length()) {
     TInverseMap::Get(opt->S800InverseMapFile().c_str());
   }
-  if (!opt->TreeSource()) {
-    for(auto filename : opt->RootInputFiles()) {
-      // this will populate gChain if able.
-      //   TChannels from the root file will be loaded as file is opened.
-      //   GValues from the root file will be loaded as file is opened.
-      OpenRootFile(filename);
-    }
+  for(auto filename : opt->RootInputFiles()) {
+    // this will populate gChain if able.
+    //   TChannels from the root file will be loaded as file is opened.
+    //   GValues from the root file will be loaded as file is opened.
+    OpenRootFile(filename);
   }
 
   //if I am passed any calibrations, lets load those, this
@@ -491,7 +489,6 @@ TRawEventSource* TGRUTint::OpenRawSource() {
   bool has_input_ring = opt->InputRing().length();
   bool has_raw_file = opt->RawInputFiles().size();
   bool is_glob_source = opt->SortMultipleGlob().length();
-  bool has_ttree_source = (opt->RootInputFiles().size() && opt->TreeSource());
   bool is_multi_sort = opt->SortMultiple();
 
   TRawEventSource* source = NULL;
@@ -502,17 +499,11 @@ TRawEventSource* TGRUTint::OpenRawSource() {
                                           true, true,
                                           opt->DefaultFileType());
 
-  } else if(is_multi_sort && (has_raw_file || has_ttree_source)){
+  } else if(is_multi_sort && has_raw_file ){
     // Open multiple files, read from all at the same time.
     TMultiRawFile* multi_source = new TMultiRawFile();
     for(auto& filename : opt->RawInputFiles()){
       multi_source->AddFile(new TRawFileIn(filename.c_str()));
-    }
-    if (has_ttree_source) {
-      // using rootfiles as source for sorting
-      for(auto& filename : opt->RootInputFiles()){
-        multi_source->AddFile(filename.c_str());
-      }
     }
     source = multi_source;
 
@@ -520,21 +511,11 @@ TRawEventSource* TGRUTint::OpenRawSource() {
     // Open multiple files, read from all at the same time.
     TGlobRawFile* glob_multi_source = new TGlobRawFile(opt->SortMultipleGlob());
     source = glob_multi_source;
-  } else if(!is_multi_sort && (
-              opt->RawInputFiles().size() > 1 ||
-              (opt->RootInputFiles().size() > 1 && has_ttree_source) ||
-              (opt->RawInputFiles().size() && opt->RootInputFiles().size() && has_ttree_source)
-              )){
+  } else if(!is_multi_sort && opt->RawInputFiles().size() > 1){
     // Open multiple files, read from each one at a a time.
     TSequentialRawFile* seq_source = new TSequentialRawFile();
     for(auto& filename : opt->RawInputFiles()){
       seq_source->Add(new TRawFileIn(filename.c_str()));
-    }
-    // using rootfiles as source for sorting
-    if (has_ttree_source) {
-      for(auto& filename : opt->RootInputFiles()){
-        seq_source->Add(TRawEventSource::EventSource(filename.c_str()));
-      }
     }
     source = seq_source;
 

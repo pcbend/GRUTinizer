@@ -3,7 +3,6 @@
 #include "TString.h"
 #include "TGRUTOptions.h"
 #include "TRCNPSource.h"
-#include "TTreeSource.h"
 
 ClassImp(TRawEventSource)
 
@@ -80,10 +79,7 @@ TRawEventSource* TRawEventSource::EventSource(const char* filename,
 
   TRawEventSource* source;
 
-  if (hasSuffix(filename,".root")){
-    source = new TTreeSource<RCNPEvent>(filename,"rcnptree","rcnpevent", file_type);
-    return source;
-  } else if (hasSuffix(filename,".bld")){
+  if (hasSuffix(filename,".bld")){
     std::string command;
     if (std::string(filename) == "online.bld") {
       std::cout << "Going online with TRCNPSource..." <<std::endl;

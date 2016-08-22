@@ -71,15 +71,10 @@ bool TUnpackingLoop::Iteration(){
       break;
       case kFileType::RCNP_BLD:
       {
-        //TRCNPEvent& evt = (TRCNPEvent&)raw_event;
+        // Consider adding HandleRCNPData to check for LAS or GR detector systems
         fOutputEvent->AddRawData(raw_event, kDetectorSystems::GRAND_RAIDEN);
-        //consider adding HandleRCNPData
       }
       break;
-      case kFileType::ROOT_DATA:
-      {
-        fOutputEvent->AddRawData(raw_event, kDetectorSystems::GRAND_RAIDEN);
-      }
       break;
       default:
         break;

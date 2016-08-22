@@ -3,16 +3,15 @@
 
 #include "TDetector.h"
 #include "TDetectorHit.h"
+#include <vector>
 
 #ifdef RCNP
 #include "RCNPEvent.h"
 #else
-#include "TTreeSource.h"
+// ---------------------
+class RCNPEvent : public TObject { };
+// ---------------------
 #endif
-
-
-
-#include <vector>
 
 struct LaBrHit;
 
@@ -64,5 +63,6 @@ struct LaBrHit {
     Double_t width;
     //Double_t width() { return qtc_tr - qtc_le; }
 };
+
 
 #endif
