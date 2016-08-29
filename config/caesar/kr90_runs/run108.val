@@ -1,0 +1,47 @@
+OBJTAC_TOF_CORR_XFP {
+  Value: 0.2
+}
+OBJTAC_TOF_CORR_AFP {
+  Value: 1175
+}
+CRDC1_X_OFFSET {
+  Value: -280.134
+}
+CRDC1_X_SLOPE {
+  Value: 2.53108
+}
+CRDC1_Y_OFFSET {
+  Value: 128.64
+}
+CRDC1_Y_SLOPE {
+  Value: -0.0548965
+}
+CRDC2_X_OFFSET {
+  Value: -278.609
+}
+CRDC2_X_SLOPE {
+  Value: 2.53022
+}
+CRDC2_Y_OFFSET {
+  Value: -139.756
+}
+CRDC2_Y_SLOPE {
+  Value: 0.0533993
+}
+TARGET_SHIFT_Z {
+  Value: 0.66
+}
+BETA {
+  Value: 0.329
+}
+ATA_SHIFT {
+  Value: -0.0017105
+}
+BTA_SHIFT {
+  Value: 0.0000079666
+}
+
+
+
+
+
