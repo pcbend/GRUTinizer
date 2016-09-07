@@ -74,18 +74,18 @@ bool GetProjection(GH2D *hist,double low, double high, double bg_low,double bg_h
   hist->Draw();
   
   C_projections->cd(1);
-  GH1D *Proj_x = hist->ProjectionX("Gamma_Gamma_xProjection");
-  GH1D *Proj_x_Clone = (GH1D*)Proj_x->Clone(); 
+  GH1D *Proj_y = hist->ProjectionY("Gamma_Gamma_yProjection");
+  GH1D *Proj_y_Clone = (GH1D*)Proj_y->Clone(); 
   GH1D *Proj_gated = 0;
 
   if(bg_high>0 && bg_low>0){
-    Proj_x->SetTitle(Form("Projection with Gate From [%.01f,%.01f] and Background [%.01f,%.01f]",low,high,bg_low,bg_high));
+    Proj_y->SetTitle(Form("Projection with Gate From [%.01f,%.01f] and Background [%.01f,%.01f]",low,high,bg_low,bg_high));
   }else{
-    Proj_x->SetTitle(Form("Projection with Gate From [%.01f,%.01f] NO background",low,high));
+    Proj_y->SetTitle(Form("Projection with Gate From [%.01f,%.01f] NO background",low,high));
   }
 
-  Proj_x->GetXaxis()->SetTitle("Energy [keV]");
-  Proj_x->GetYaxis()->SetTitle("Counts");
+  Proj_y->GetXaxis()->SetTitle("Energy [keV]");
+  Proj_y->GetYaxis()->SetTitle("Counts");
   
 
 
@@ -97,15 +97,15 @@ bool GetProjection(GH2D *hist,double low, double high, double bg_low,double bg_h
   if(bg_low>0 && bg_low<low)
     ZoomLow = bg_low-Grace;
 
-  Proj_x->GetXaxis()->SetRangeUser(ZoomLow,ZoomHigh);
-  Proj_x->Draw();
-  double Projx_Max = Proj_x->GetMaximum();
-  double Projx_Min = Proj_x->GetMinimum();
+  Proj_y->GetXaxis()->SetRangeUser(ZoomLow,ZoomHigh);
+  Proj_y->Draw();
+  double Projy_Max = Proj_y->GetMaximum();
+  double Projy_Min = Proj_y->GetMinimum();
  
-  TLine *CutLow  = new TLine(low,Projx_Min,low,Projx_Max);
-  TLine *CutHigh = new TLine(high,Projx_Min,high,Projx_Max);
-  TLine *BGLow   = new TLine(bg_low,Projx_Min,bg_low,Projx_Max);
-  TLine *BGHigh  = new TLine(bg_high,Projx_Min,bg_high,Projx_Max);
+  TLine *CutLow  = new TLine(low,Projy_Min,low,Projy_Max);
+  TLine *CutHigh = new TLine(high,Projy_Min,high,Projy_Max);
+  TLine *BGLow   = new TLine(bg_low,Projy_Min,bg_low,Projy_Max);
+  TLine *BGHigh  = new TLine(bg_high,Projy_Min,bg_high,Projy_Max);
   CutLow->SetLineColor(kRed);
   CutHigh->SetLineColor(kRed);
   CutLow->SetLineWidth(2);
@@ -121,11 +121,11 @@ bool GetProjection(GH2D *hist,double low, double high, double bg_low,double bg_h
   if(bg_low>0 && bg_high>0){
     BGHigh->Draw("same");
     BGLow->Draw("same");
-    Proj_gated = Proj_x_Clone->Project_Background(low,high,
+    Proj_gated = Proj_y_Clone->Project_Background(low,high,
 						  bg_low,bg_high,
 						  kRegionBackground);
   }else{
-    Proj_gated = Proj_x_Clone->Project(low,high);
+    Proj_gated = Proj_y_Clone->Project(low,high);
   }
  
   if(bg_high>0 && bg_low>0){
@@ -185,44 +185,44 @@ bool GetProjection(GH2D *hist,GH2D *hist2,
   hist->Draw();
   
   C_projections->cd(1);
-  GH1D *Proj_x  = hist->ProjectionX("Gamma_Gamma_xProjection");
-  GH1D *Proj_x2 = hist2->ProjectionX("Gamma_Gamma_xProjection2");
+  GH1D *Proj_y  = hist->ProjectionY("Gamma_Gamma_yProjection");
+  GH1D *Proj_y2 = hist2->ProjectionY("Gamma_Gamma_yProjection2");
   
   GH2D *hist_Clone  = (GH2D*)hist->Clone();
   GH2D *hist2_Clone = (GH2D*)hist2->Clone();
 
-  GH1D *Proj_back_x  = hist_Clone->ProjectionX("Gamma_Gamma_xProjection_back");
-  GH1D *Proj_back_x2 = hist2_Clone->ProjectionX("Gamma_Gamma_xProjection2_back");
+  GH1D *Proj_back_y  = hist_Clone->ProjectionY("Gamma_Gamma_yProjection_back");
+  GH1D *Proj_back_y2 = hist2_Clone->ProjectionY("Gamma_Gamma_yProjection2_back");
 
 
   //  GH1D *Proj_x_Clone = (GH1D*)Proj_x->Clone();
-  GH1D *Proj_x2_Clone       = (GH1D*)Proj_x2->Clone();
-  GH1D *Proj_x2_Clone2      = (GH1D*)Proj_x2->Clone();
-  GH1D *Proj_back_x2_Clone  = (GH1D*)Proj_back_x2->Clone();
-  GH1D *Proj_back_x2_Clone2 = (GH1D*)Proj_back_x2->Clone();
+  GH1D *Proj_y2_Clone       = (GH1D*)Proj_y2->Clone();
+  GH1D *Proj_y2_Clone2      = (GH1D*)Proj_y2->Clone();
+  GH1D *Proj_back_y2_Clone  = (GH1D*)Proj_back_y2->Clone();
+  GH1D *Proj_back_y2_Clone2 = (GH1D*)Proj_back_y2->Clone();
   GH1D *Proj_gated          = 0;
   GH1D *Proj_gated2         = 0;
   GH1D *Proj_gated_back     = 0;
   GH1D *Proj_gated_back2    = 0;
 
   if(bg_high>0 && bg_low>0){
-    Proj_x->SetTitle(Form("Projection with Gate From [%.01f,%.01f] and Background [%.01f,%.01f]",low,high,bg_low,bg_high));
+    Proj_y->SetTitle(Form("Projection with Gate From [%.01f,%.01f] and Background [%.01f,%.01f]",low,high,bg_low,bg_high));
   }else{
-    Proj_x->SetTitle(Form("Projection with Gate From [%.01f,%.01f] NO background",low,high));
+    Proj_y->SetTitle(Form("Projection with Gate From [%.01f,%.01f] NO background",low,high));
   }
 
   if(back_bg_high>0 && back_bg_low>0 && back_low>0 && back_high>0){
-    Proj_back_x->SetTitle(Form("Projection with Gate From [%.01f,%.01f] and Background [%.01f,%.01f]",back_low,back_high,back_bg_low,back_bg_high));
+    Proj_back_y->SetTitle(Form("Projection with Gate From [%.01f,%.01f] and Background [%.01f,%.01f]",back_low,back_high,back_bg_low,back_bg_high));
   }else if(back_low>0 && back_high>0){
-    Proj_back_x->SetTitle(Form("Projection with Gate From [%.01f,%.01f] NO background",back_low,back_high));
+    Proj_back_y->SetTitle(Form("Projection with Gate From [%.01f,%.01f] NO background",back_low,back_high));
   }
 
 
-  double binsize = (Proj_x->GetXaxis()->GetXmax()-Proj_x->GetXaxis()->GetXmin())/Proj_x->GetXaxis()->GetNbins();
-  Proj_x->GetXaxis()->SetTitle("Energy [keV]");
-  Proj_x->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize));
-  Proj_back_x->GetXaxis()->SetTitle("Energy [keV]");
-  Proj_back_x->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize));
+  double binsize = (Proj_y->GetXaxis()->GetXmax()-Proj_y->GetXaxis()->GetXmin())/Proj_y->GetXaxis()->GetNbins();
+  Proj_y->GetXaxis()->SetTitle("Energy [keV]");
+  Proj_y->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize));
+  Proj_back_y->GetXaxis()->SetTitle("Energy [keV]");
+  Proj_back_y->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize));
   
 
 
@@ -234,15 +234,15 @@ bool GetProjection(GH2D *hist,GH2D *hist2,
   if(bg_low>0 && bg_low<low)
     ZoomLow = bg_low-Grace;
 
-  Proj_x->GetXaxis()->SetRangeUser(ZoomLow,ZoomHigh);
-  Proj_x->Draw();
-  double Projx_Max = Proj_x->GetMaximum();
-  double Projx_Min = Proj_x->GetMinimum();
+  Proj_y->GetXaxis()->SetRangeUser(ZoomLow,ZoomHigh);
+  Proj_y->Draw();
+  double Projy_Max = Proj_y->GetMaximum();
+  double Projy_Min = Proj_y->GetMinimum();
  
-  TLine *CutLow  = new TLine(low,Projx_Min,low,Projx_Max);
-  TLine *CutHigh = new TLine(high,Projx_Min,high,Projx_Max);
-  TLine *BGLow   = new TLine(bg_low,Projx_Min,bg_low,Projx_Max);
-  TLine *BGHigh  = new TLine(bg_high,Projx_Min,bg_high,Projx_Max);
+  TLine *CutLow  = new TLine(low,Projy_Min,low,Projy_Max);
+  TLine *CutHigh = new TLine(high,Projy_Min,high,Projy_Max);
+  TLine *BGLow   = new TLine(bg_low,Projy_Min,bg_low,Projy_Max);
+  TLine *BGHigh  = new TLine(bg_high,Projy_Min,bg_high,Projy_Max);
   CutLow->SetLineColor(kRed);
   CutHigh->SetLineColor(kRed);
   CutLow->SetLineWidth(2);
@@ -258,14 +258,14 @@ bool GetProjection(GH2D *hist,GH2D *hist2,
   if(bg_low>0 && bg_high>0){
     BGHigh->Draw("same");
     BGLow->Draw("same");
-    Proj_gated = Proj_x2_Clone->Project_Background(low,high,
+    Proj_gated = Proj_y2_Clone->Project_Background(low,high,
 						  bg_low,bg_high,
 						  kRegionBackground);
   }else{
-    Proj_gated = Proj_x2_Clone->Project(low,high);
+    Proj_gated = Proj_y2_Clone->Project(low,high);
   }
   if(overlay){
-    Proj_gated2 = Proj_x2_Clone2->Project(low,high);
+    Proj_gated2 = Proj_y2_Clone2->Project(low,high);
     Proj_gated2->SetLineColor(2);
   }
  
@@ -313,15 +313,15 @@ bool GetProjection(GH2D *hist,GH2D *hist2,
       back_ZoomLow = back_bg_low-Grace;
 
 
-    Proj_back_x->GetXaxis()->SetRangeUser(back_ZoomLow,back_ZoomHigh);
-    Proj_back_x->Draw();
-    double Proj_back_x_Max = Proj_back_x->GetMaximum();
-    double Proj_back_x_Min = Proj_back_x->GetMinimum();
+    Proj_back_y->GetXaxis()->SetRangeUser(back_ZoomLow,back_ZoomHigh);
+    Proj_back_y->Draw();
+    double Proj_back_y_Max = Proj_back_y->GetMaximum();
+    double Proj_back_y_Min = Proj_back_y->GetMinimum();
  
-    TLine *back_CutLow  = new TLine(back_low,Proj_back_x_Min,back_low,Proj_back_x_Max);
-    TLine *back_CutHigh = new TLine(back_high,Proj_back_x_Min,back_high,Proj_back_x_Max);
-    TLine *back_BGLow   = new TLine(back_bg_low,Proj_back_x_Min,back_bg_low,Proj_back_x_Max);
-    TLine *back_BGHigh  = new TLine(back_bg_high,Proj_back_x_Min,back_bg_high,Proj_back_x_Max);
+    TLine *back_CutLow  = new TLine(back_low,Proj_back_y_Min,back_low,Proj_back_y_Max);
+    TLine *back_CutHigh = new TLine(back_high,Proj_back_y_Min,back_high,Proj_back_y_Max);
+    TLine *back_BGLow   = new TLine(back_bg_low,Proj_back_y_Min,back_bg_low,Proj_back_y_Max);
+    TLine *back_BGHigh  = new TLine(back_bg_high,Proj_back_y_Min,back_bg_high,Proj_back_y_Max);
     back_CutLow->SetLineColor(kRed);
     back_CutHigh->SetLineColor(kRed);
     back_CutLow->SetLineWidth(2);
@@ -337,15 +337,15 @@ bool GetProjection(GH2D *hist,GH2D *hist2,
     if(back_bg_low>0 && back_bg_high>0){
       back_BGHigh->Draw("same");
       back_BGLow->Draw("same");
-      Proj_gated_back = Proj_back_x2_Clone->Project_Background(back_low,back_high,
+      Proj_gated_back = Proj_back_y2_Clone->Project_Background(back_low,back_high,
 							       back_bg_low,back_bg_high,
 							       kRegionBackground);
     }else{
-      Proj_gated_back = Proj_back_x2_Clone->Project(back_low,back_high);
+      Proj_gated_back = Proj_back_y2_Clone->Project(back_low,back_high);
     }
  
     if(back_overlay){
-      Proj_gated_back2 = Proj_back_x2_Clone2->Project(back_low,back_high);
+      Proj_gated_back2 = Proj_back_y2_Clone2->Project(back_low,back_high);
       Proj_gated_back2->SetLineColor(2);
     }
     
