@@ -1,4 +1,4 @@
-.PHONY: clean all extras
+.PHONY: clean all extras pcm_files
 .SECONDARY:
 .SECONDEXPANSION:
 
@@ -86,9 +86,11 @@ run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  
                 rm -f $(2).log $(2).error
 endif
 
-all: include/GVersion.h $(EXECUTABLES) $(LIBRARY_OUTPUT) bin/grutinizer-config bin/gadd_fast.py\
+all: include/GVersion.h $(EXECUTABLES) $(LIBRARY_OUTPUT) pcm_files bin/grutinizer-config bin/gadd_fast.py\
      $(HISTOGRAM_SO) $(FILTER_SO) extras
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
+
+pcm_files:
 
 docs:
 	doxygen doxygen.config
@@ -96,10 +98,10 @@ docs:
 bin/%: util/% | bin
 	@ln -sf ../$< $@
 
-bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT) bin
+bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT) pcm_files bin
 	$(call run_and_test,$(CPP) $^ -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
-bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) bin
+bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) pcm_files bin
 	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 bin lib:
@@ -123,7 +125,10 @@ lib_src_files   = $(shell find $(call libdir,$(1)) -name "*.$(SRC_SUFFIX)")
 lib_o_files     = $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(call lib_src_files,$(1)))
 lib_linkdef     = $(wildcard $(call libdir,$(1))/LinkDef.h)
 lib_dictionary  = $(patsubst %/LinkDef.h,.build/%/LibDictionary.o,$(call lib_linkdef,$(1)))
-lib_pcm         = lib/$(dir $(notdir $(call lib_linkdef,$(1)))).pcm
+# If using ROOT6, and if there is a linkdef, then we need to copy the pcm file
+lib_pcm         = $(if \
+                     $(and $(filter 1,$(USING_ROOT_6)),$(call lib_linkdef,$(1))), \
+                     lib/$(1)Dict_rdict.pcm)
 
 lib/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%) | lib
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
@@ -139,13 +144,9 @@ find_linkdef = $(shell find $(1) -name "*LinkDef.h")
 # Therefore, usual wildcard rules are insufficient.
 # Eval is more powerful, but is less convenient to use.
 define library_template
-.build/$(1)/$(notdir $(1))Dict.cxx: $$(call dict_header_files,$(1)/LinkDef.h) $(1)/LinkDef.h
+.build/$(1)/$(notdir $(1))Dict.cxx: $(1)/LinkDef.h $$(call dict_header_files,$(1)/LinkDef.h)
 	@mkdir -p $$(dir $$@)
-	$$(call run_and_test,rootcint -f $$@ -c $$(INCLUDES) -p $$^,$$@,$$(COM_COLOR),$$(BLD_STRING) ,$$(OBJ_COLOR))
-ifeq ($(USING_ROOT_6),1)
-	@mkdir -p lib && cp .build/$(1)/$(notdir $(1))Dict_rdict.pcm lib/$(notdir $(1))Dict_rdict.pcm
-endif
-
+	$$(call run_and_test,rootcint -f $$@ -c $$(INCLUDES) -p $$(notdir $$(filter-out $$<,$$^)) $$<,$$@,$$(COM_COLOR),$$(BLD_STRING) ,$$(OBJ_COLOR))
 
 .build/$(1)/LibDictionary.o: .build/$(1)/$(notdir $(1))Dict.cxx
 	$$(call run_and_test,$$(CPP) -fPIC -c $$< -o $$@ $$(CFLAGS),$$@,$$(COM_COLOR),$$(COM_STRING),$$(OBJ_COLOR) )
@@ -153,6 +154,9 @@ endif
 
 lib/$(notdir $(1))Dict_rdict.pcm: .build/$(1)/$(notdir $(1))Dict_rdict.pcm | lib
 	$$(call run_and_test,cp $$< $$@,$$@,$$(COM_COLOR),$$(COPY_STRING),$$(OBJ_COLOR) )
+
+pcm_files: $$(call lib_pcm,$$(notdir $(1)))
+
 endef
 
 # rootcling makes the Dict_rdict.pcm at the same time as making Dict.cxx
