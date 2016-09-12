@@ -598,7 +598,7 @@ void TGRUTint::Terminate(Int_t status){
     //std::cout << "SQUASHED!" << std::endl;
     return;
   }
-  StoppableThread::StopAllClean();
+  StoppableThread::StopAll();
 
   //if(GUIIsRunning()){
   //  TPython::Exec("on_close()");

@@ -261,6 +261,10 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   TVirtualFitter::SetMaxIterations(100000);
 
   bool verbose = !options.Contains("Q");
+  bool noprint =  options.Contains("no-print");
+  if(noprint) {
+    options.ReplaceAll("no-print","");
+  }
 
   if(fithist->GetSumw2()->fN!=fithist->GetNbinsX()+2)
     fithist->Sumw2();

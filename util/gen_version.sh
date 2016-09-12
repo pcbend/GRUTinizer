@@ -27,4 +27,4 @@ read -r -d '' file_contents <<EOF
 #endif /* GRUT_GVERSION */
 EOF
 
-echo "$file_contents" >> "$include_file"
+echo "$file_contents" > "$include_file"

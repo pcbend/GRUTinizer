@@ -20,7 +20,7 @@
 #include <GRootFunctions.h>
 #include <GRootCommands.h>
 #include <GCanvas.h>
-#include <GGaus.h>
+#include <GPeak.h>
 #include <Globals.h>
 
 #include "combinations.h"
@@ -259,7 +259,7 @@ int TCalibrator::AddData(TH1 *data,TNucleus *source, double sigma,double thresho
   for(int x=0;x<spectrum.GetNPeaks();x++) {
     double range = 8*data->GetXaxis()->GetBinWidth(1);
     //printf(DGREEN "\tlow %.02f \t high %.02f" RESET_COLOR "\n",spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range);
-    GGaus *fit = GausFit(data,spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range,"no-print");
+    GPeak *fit = PhotoPeakFit(data,spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range,"no-print");
     //data_channels
     //data_channels.push_back(fit.GetCentroid());
     //datatosource[fit->GetCentroid()] = sqrt(-1);
@@ -326,7 +326,7 @@ std::map<double,double> TCalibrator::Match(std::vector<double> peaks,std::vector
 	source_values.push_back(0);
 
         if(peaks.size()>3) {
-          double max_err = 0.01; 
+          double max_err = 0.02; 
           double pratio = peak_values.front()/peak_values.at(peak_values.size()-2);
           double sratio = source_values.front()/source_values.at(source_values.size()-2);
           //std::cout << "ratio: " << pratio << " - " << sratio << " = " << std::abs(pratio-sratio) << std::endl;

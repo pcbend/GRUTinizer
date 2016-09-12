@@ -149,14 +149,16 @@ int TRawEventTimestampSource::GetEvent(TRawEvent& rawevent) {
       break;
   }
 
+  const size_t header_size = sizeof(TRawEvent::RawHeader);
+
   rawevent.Clear();
   rawevent.SetFileType(fFileType);
 
-  int bytes_read_header = FillBuffer(sizeof(TRawEvent::RawHeader));
+  int bytes_read_header = FillBuffer(header_size);
   // If not enough was read, check the errno.
   // If it is 0, we may still receive more data. (e.g. reading from ring)
   // If it is nonzero, we are done. (e.g. end of file)
-  if(bytes_read_header == 0) {
+  if(bytes_read_header < int(header_size)) {
     if(GetLastErrno()){
       return -1;
     } else {
@@ -164,25 +166,32 @@ int TRawEventTimestampSource::GetEvent(TRawEvent& rawevent) {
     }
   }
 
-  memcpy(rawevent.GetRawHeader(), fCurrentBuffer.GetData(), sizeof(TRawEvent::RawHeader));
-  fCurrentBuffer.Advance(sizeof(TRawEvent::RawHeader));
+  memcpy(rawevent.GetRawHeader(), fCurrentBuffer.GetData(), header_size);
 
   if(!rawevent.IsGoodSize()) {
     SetLastErrno(-1);
     SetLastError("Invalid event size");
+    // Corrupt header, unlikely to ever recover,
+    //   but we can be hopeful.
+    fCurrentBuffer.Advance(header_size);
     return -3;
   }
 
   size_t body_size = rawevent.GetBodySize();
-  int bytes_read_body = FillBuffer(body_size);
-  if(bytes_read_body < 0){
+  size_t total_bytes = header_size + body_size;
+  int bytes_read_body = FillBuffer(total_bytes);
+  if(bytes_read_body < 0 ||
+     bytes_read_body < int(total_bytes)){
     return -2;
   }
 
-  rawevent.SetData(fCurrentBuffer.BufferSubset(0, body_size));
-  fCurrentBuffer.Advance(body_size);
+  rawevent.SetData(fCurrentBuffer.BufferSubset(header_size, body_size));
 
-  size_t total_bytes = sizeof(TRawEvent::RawHeader) + body_size;
+  // Advancing past the header and body in a single step prevents
+  //   errors if the header has been completely written to disk,
+  //   but the body has not.
+  fCurrentBuffer.Advance(total_bytes);
+
   return total_bytes;
 }
 

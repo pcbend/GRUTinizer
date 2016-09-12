@@ -20,32 +20,43 @@ public:
   virtual void  Print(Option_t *opt = "" ) const;
 
   Int_t  Address()   const      { return fAddress; }
-  virtual Int_t  Charge() const { return fCharge;  }
+  virtual Int_t  Charge() const;
   Int_t  Time() const           { return fTime; }
   long   Timestamp() const      { return fTimestamp; }
 
   void SetAddress(int address)      { fAddress = address; }
-  void SetCharge(int charge)        { fCharge = charge;  }
+  void SetCharge(int charge);
   void SetTime(int time)            { fTime = time; }
   void SetTimestamp(long timestamp) { fTimestamp = timestamp; }
 
   double GetEnergy() const; //applies TChannel ENERGYCOEFF to Charge
+  void SetEnergy(double energy);
   double GetTime() const;   //applies TChannel TIMECOEFF to Time()
 
   void AddEnergy(double eng);
-  void SetEnergy(double eng) { fEnergy = eng; }
 
   static const TVector3 BeamUnitVec; //!
 
 protected:
   Int_t fAddress;
-  Int_t fCharge;
+  Float_t fCharge;
   Int_t fTime;
   long fTimestamp;
 
-  mutable double fEnergy; //!
+  unsigned char fFlags;
 
-  ClassDef(TDetectorHit,2)
+  enum EHitFlags {
+    kIsEnergy = BIT(0),
+    kUnused1  = BIT(1),
+    kUnused2  = BIT(2),
+    kUnused3  = BIT(3),
+    kUnused4  = BIT(4),
+    kUnused5  = BIT(5),
+    kUnused6  = BIT(6),
+    kUnused7  = BIT(7)
+  };
+
+  ClassDef(TDetectorHit,4)
 };
 
 #endif

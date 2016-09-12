@@ -54,6 +54,8 @@ public:
   double GetEnergy1() const;
   double GetEnergy2() const;
 
+  void Draw(Option_t *opt="");
+
 
 private:
   //virtual int BuildHits();

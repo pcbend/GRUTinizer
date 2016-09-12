@@ -65,7 +65,8 @@ void initializeKr90Cuts(TFile * &cut_file, TCutG* &pid, TCutG* &tcut,
     TPreserveGDirectory a;
     cut_file = new TFile("/mnt/analysis/pecan-gade/elman/Kr90/cut_files/kr90_cuts.root","Read");
     pid = (TCutG*)cut_file->Get("kr90_mid");
-    tcut = (TCutG*)cut_file->Get("tcut");
+//    tcut = (TCutG*)cut_file->Get("tcut");
+    tcut = (TCutG*)cut_file->Get("tcut_tighter");
     in = (TCutG*)cut_file->Get("in_kr90");
     omitted_det = 176;
 }
@@ -87,6 +88,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
     }
     const int SINGLES_ENERGY_THRESHOLD = 300;
     const int AB_ENERGY_THRESHOLD = 0;
+    const int SCATTER_ANGLE_CUT = 180;
 
     std::vector<double> energies_singles;
     std::vector<double> energies_addback;
@@ -100,7 +102,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
     energies_addback.clear();
     std::string dirname = "";
     std::string histname = "";
-    TVector3 track_vect = s800->ExitTargetVect();
+    //TVector3 track_vect = s800->ExitTargetVect();
     double objtac_corr = s800->GetCorrTOF_OBJTAC();
     double objtac = s800->GetTof().GetTacOBJ();
     double xfptac = s800->GetTof().GetTacXFP();
@@ -116,10 +118,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
         std::string histname;
         double energy_dc = hit.GetDoppler();
 
-        TVector3 targ_exit_vec = s800->ExitTargetVect();
-        //double scatter_angle = targ_exit_vec.Theta()*(180.0/TMath::Pi());
-        //Using no scatter angle
-        double scatter_angle = 0;
+        //double scatter_angle = 0;
+        double scatter_angle = s800->Track().Theta()*(180.0/TMath::Pi());
         double corr_time = caesar->GetCorrTime(hit,s800);
         //targ_exit_vec = (pt,theta,phi)
 
@@ -127,12 +127,11 @@ void MakeHistograms(TRuntimeObjects& obj) {
           if (tcut->IsInside(corr_time, energy_dc)){
             if (in->IsInside(xfptac,objtac)){
               if (energy_dc > SINGLES_ENERGY_THRESHOLD){
-                if (scatter_angle < 3){
+                if (scatter_angle < SCATTER_ANGLE_CUT){
                   energies_singles.push_back(energy_dc);
                   time_singles.push_back(hit.Time());
                   pos_singles.push_back(hit.GetPosition());
                 }
-
               }//For multiplicity purposes
 
               dirname = "Caesar";
@@ -150,30 +149,28 @@ void MakeHistograms(TRuntimeObjects& obj) {
     int num_addback_hits = caesar->AddbackSize();
     for (int y = 0; y < num_addback_hits; y++){
       TCaesarHit &hit = caesar->GetAddbackHit(y);
+      
+      if (omitted_det != -1 &&  omitted_det == hit.GetAbsoluteDetectorNumber()){
+        continue;
+      }
       if (hit.IsValid()){//only accept hits with both times and energies
         std::string histname;
 
         //double energy_dc = caesar->GetEnergyDC(hit);
         double energy_dc = hit.GetDoppler();
         double corr_time = caesar->GetCorrTime(hit,s800);
-        TVector3 targ_exit_vec = s800->ExitTargetVect();
-//       double scatter_angle = targ_exit_vec.Theta()*(180.0/TMath::Pi());
-        double scatter_angle = 0;
+        double scatter_angle = s800->Track().Theta()*(180.0/TMath::Pi());
 
 
         if (pid->IsInside(objtac_corr, ic_sum)){
           if (tcut->IsInside(corr_time, energy_dc)){
             if (in->IsInside(xfptac,objtac)){
               if (energy_dc > AB_ENERGY_THRESHOLD){
-                if (scatter_angle < 3){
+                if (scatter_angle <SCATTER_ANGLE_CUT){
                   energies_addback.push_back(energy_dc);
                 }
               }//For multiplicity purposes
 
-//            if (hit.GetNumHitsContained() > 2){
-//              caesar->Print();
-//              caesar->PrintAddback();
-//            }
               dirname = "CaesarAddback";
               histname = "ab_energy_dc_pid_in_tcut";
               obj.FillHistogram(dirname,histname,
@@ -238,17 +235,26 @@ void MakeHistograms(TRuntimeObjects& obj) {
                         8192,0,8192,energies_singles.at(0));
       obj.FillHistogram(dirname,histname,
                         8192,0,8192,energies_singles.at(1));
+      dirname = "Caesar";
+      histname = "energy_dc_coincidence_matrix_mult_two";
+      obj.FillHistogram(dirname, histname,
+                        8192,0,8192, energies_singles.at(0),
+                        8192,0,8192, energies_singles.at(1));
+      obj.FillHistogram(dirname, histname,
+                        8192,0,8192, energies_singles.at(1),
+                        8192,0,8192, energies_singles.at(0));
+
     }
     for (unsigned int i = 0; i < num_hits_singles; i++){
       for (unsigned int j = i+1; j < num_hits_singles; j++){
         dirname = "Caesar";
         histname = "energy_dc_coincidence_matrix";
         obj.FillHistogram(dirname, histname,
-                          4096,0,4096, energies_singles.at(i),
-                          4096,0,4096, energies_singles.at(j));
+                          8192,0,8192, energies_singles.at(i),
+                          8192,0,8192, energies_singles.at(j));
         obj.FillHistogram(dirname, histname,
-                          4096,0,4096, energies_singles.at(j),
-                          4096,0,4096, energies_singles.at(i));
+                          8192,0,8192, energies_singles.at(j),
+                          8192,0,8192, energies_singles.at(i));
         histname = "poss_diff";
         obj.FillHistogram(dirname, histname,
                           2000,-1000,1000,  (pos_singles.at(i)-pos_singles.at(j)).Mag());
@@ -264,6 +270,12 @@ void MakeHistograms(TRuntimeObjects& obj) {
     obj.FillHistogram(dirname, histname,
                       192, 0, 192, num_hits_singles);
 
+    for (unsigned int i = 0; i < num_hits_singles; i++){
+      histname = "multiplicity_energy_summary";
+      obj.FillHistogram(dirname, histname,
+                        192, 0, 192, num_hits_singles,
+                        8192,0,8192, energies_singles.at(i));
+    }
 
     //addback_mult == multiplicity in gates
     int addback_mult = energies_addback.size();
@@ -271,6 +283,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
     int n1_mult = energies_addback_n1.size();
     int n2_mult = energies_addback_n2.size();
     int ng_mult = energies_addback_ng.size();
+    if (addback_mult != n0_mult+n1_mult+n2_mult+ng_mult){
+      std::cout << "FATAL ADDBACK ERROR! Total Addback multiplicity not sum of parts!" << std::endl;
+    }
     if (addback_mult == 1){
       dirname = "CaesarAddback";
       histname = "ab_energy_dc_mult_one";
@@ -304,39 +319,49 @@ void MakeHistograms(TRuntimeObjects& obj) {
           dirname = "CaesarAddback";
           histname = "ab_energy_dc_coincidence_matrix_multtwo";
           obj.FillHistogram(dirname, histname,
-              256,0,4096, energies_addback.at(i),
-              256,0,4096, energies_addback.at(j));
+              8192,0,8192, energies_addback.at(i),
+              8192,0,8192, energies_addback.at(j));
           obj.FillHistogram(dirname, histname,
-              250,0,4096, energies_addback.at(j),
-              256,0,4096, energies_addback.at(i));
+              8192,0,8192, energies_addback.at(j),
+              8192,0,8192, energies_addback.at(i));
 
           if (n0_mult + n1_mult + n2_mult == 2){
             histname = "ab_energy_dc_coincidence_matrix_multtwo_nogarbage";
             obj.FillHistogram(dirname,histname,
-                256,0,4096, energies_addback.at(i),
-                256,0,4096, energies_addback.at(j));
+                8192,0,8192, energies_addback.at(i),
+                8192,0,8192, energies_addback.at(j));
             obj.FillHistogram(dirname,histname,
-                256,0,4096, energies_addback.at(j),
-                256,0,4096, energies_addback.at(i));
+                8192,0,8192, energies_addback.at(j),
+                8192,0,8192, energies_addback.at(i));
           }
 
           if (n0_mult == 2){
             histname = "ab_energy_dc_coincidence_matrix_multtwo_n0";
             obj.FillHistogram(dirname,histname,
-                256,0,4096, energies_addback.at(i),
-                256,0,4096, energies_addback.at(j));
+                8192,0,8192, energies_addback.at(i),
+                8192,0,8192, energies_addback.at(j));
             obj.FillHistogram(dirname,histname,
-                256,0,4096, energies_addback.at(j),
-                256,0,4096, energies_addback.at(i));
+                8192,0,8192, energies_addback.at(j),
+                8192,0,8192, energies_addback.at(i));
           }
           if (n0_mult + n1_mult == 2){
             histname = "ab_energy_dc_coincidence_matrix_multtwo_n0n1";
             obj.FillHistogram(dirname,histname,
-                256,0,4096, energies_addback.at(i),
-                256,0,4096, energies_addback.at(j));
+                8192,0,8192, energies_addback.at(i),
+                8192,0,8192, energies_addback.at(j));
             obj.FillHistogram(dirname,histname,
-                256,0,4096, energies_addback.at(j),
-                256,0,4096, energies_addback.at(i));
+                8192,0,8192, energies_addback.at(j),
+                8192,0,8192, energies_addback.at(i));
+          }
+          if (n1_mult == 2){
+            histname = "ab_energy_dc_coincidence_matrix_multtwo_n1n1";
+            obj.FillHistogram(dirname,histname,
+                8192,0,8192, energies_addback.at(i),
+                8192,0,8192, energies_addback.at(j));
+            obj.FillHistogram(dirname,histname,
+                8192,0,8192, energies_addback.at(j),
+                8192,0,8192, energies_addback.at(i));
+
           }
         }
       }
@@ -376,19 +401,19 @@ void MakeHistograms(TRuntimeObjects& obj) {
         dirname = "CaesarAddback";
         histname = "ab_energy_dc_coincidence_matrix";
         obj.FillHistogram(dirname, histname,
-                          4096,0,4096, energies_addback.at(i),
-                          4096,0,4096, energies_addback.at(j));
+                          8192,0,8192, energies_addback.at(i),
+                          8192,0,8192, energies_addback.at(j));
         obj.FillHistogram(dirname, histname,
-                          4096,0,4096, energies_addback.at(j),
-                          4096,0,4096, energies_addback.at(i));
+                          8192,0,8192, energies_addback.at(j),
+                          8192,0,8192, energies_addback.at(i));
         if (ng_mult == 0){
           histname = "ab_energy_dc_coincidence_matrix_nogarbage";
           obj.FillHistogram(dirname, histname,
-              4096,0,4096, energies_addback.at(i),
-              4096,0,4096, energies_addback.at(j));
+              8192,0,8192, energies_addback.at(i),
+              8192,0,8192, energies_addback.at(j));
           obj.FillHistogram(dirname, histname,
-              4096,0,4096, energies_addback.at(j),
-              4096,0,4096, energies_addback.at(i));
+              8192,0,8192, energies_addback.at(j),
+              8192,0,8192, energies_addback.at(i));
         }
       }
     }
@@ -397,6 +422,12 @@ void MakeHistograms(TRuntimeObjects& obj) {
     histname = "ab_multiplicity";
     obj.FillHistogram(dirname, histname,
                       192, 0, 192, addback_mult);
+    for (int i = 0; i < addback_mult; i++){
+      histname = "multiplicity_ab_energy_summary";
+      obj.FillHistogram(dirname, histname,
+                        192, 0, 192, addback_mult,
+                        8192,0,8192, energies_addback.at(i));
+    }
   }//caesar exists
 
   if(caesar) { caesar->Clear(); }

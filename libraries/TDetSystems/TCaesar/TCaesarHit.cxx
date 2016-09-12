@@ -34,12 +34,21 @@ void TCaesarHit::Print(Option_t *opt) const {
 //       GetRingNumber(), GetDetectorNumber(), IsValid(),GetNumHitsContained(), is_garbage_addback, GetDoppler(0.341));
   TVector3 pos = GetPosition();
   std::cout << "Ring["<<GetRingNumber()<<"]\tDet["<<GetDetectorNumber()<<"]\tPos["
-            <<pos.X()<<","<<pos.Y()<<","<<pos.Z()<<"]\tTime["<<GetTime()<<"]\tHits Contained["
+            <<pos.X()<<","<<pos.Y()<<","<<pos.Z()<<"]\tTime["<<Time()<<"]\tHits Contained["
             <<GetNumHitsContained()<<"]\tGarbage["<<is_garbage_addback
-            <<"]\tEnergy[" << Charge() << "]" << std::endl;
-            //<<"]\tEnergy["
-            //<<GetDoppler(0.341) << "]" <<std::endl;
+            <<"]\tCharge[" << Charge() << "]" << "\tEnergy["<<GetEnergy()<<"]"//<< std::endl;
+            <<"]\tDCEnergy["<<GetDoppler() << "]" <<std::endl;
             
+}
+
+bool TCaesarHit::IsOverflow() const{
+  if (fFlags & kIsEnergy){
+    std::cout << "Attempting to check overflow, but charge is now energy!" << std::endl;
+    return false;
+  }
+  else{
+    return (((int)Charge()) == 2047);
+  }
 }
 
 TVector3 TCaesarHit::GetPosition() const {

@@ -30,6 +30,7 @@
 
 #pragma link C++ function Help;
 #pragma link C++ function Commands;
+#pragma link C++ function Version;
 #pragma link C++ function GrabHist;
 #pragma link C++ function GrabFit;
 #pragma link C++ function StartGUI;
@@ -66,6 +67,5 @@
 #pragma link C++ class GrutNotifier+;
 
 #pragma link C++ class GSnapshot+;
-#pragma link C++ global gSnapshot;
 
 #endif
