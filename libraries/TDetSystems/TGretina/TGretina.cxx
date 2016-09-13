@@ -218,7 +218,6 @@ int TGretina::BuildHits(std::vector<TRawEvent>& raw_data){
     TSmartBuffer buf = event.GetPayloadBuffer();
     hit.BuildFrom(buf);
     InsertHit(hit);
-    //    fSumEnergy+=hit.GetCoreEnergy(); // Comment this out?!
   }
   //gretina_hits->At(0)->Print();
   //BuildAddbackHits();
@@ -307,7 +306,6 @@ void TGretina::Clear(Option_t *opt) {
   TDetector::Clear(opt);
   gretina_hits.clear();
   addback_hits.clear();
-  fSumEnergy=0.0;
 }
 
 

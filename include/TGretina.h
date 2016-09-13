@@ -76,9 +76,6 @@ private:
   static bool fCRMATSet;
 
 
-  double fSumEnergy;
-
-
   ClassDef(TGretina,3);
 };
 
