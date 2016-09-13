@@ -138,7 +138,9 @@ void TCalibrator::Clear(Option_t *opt) {
   //all_fits.clear();
   
   for(int i=0;i<4;i++) eff_par[i]=0.;
-  
+ 
+  fPeaks.clear();
+
   total_points=0;
 }
 
