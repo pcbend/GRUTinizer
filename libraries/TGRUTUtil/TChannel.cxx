@@ -53,7 +53,7 @@ std::ostream& operator<<(std::ostream& out, const TChannel& chan) {
       << "   Position:\t" << chan.array_position << "\n"
       << "   Subposition:\t" << chan.array_subposition << "\n"
       << "   Segment:\t" << chan.segment << "\n"
-      << "   Collected_Charge:\t" << chan.collected_charge << "\n"
+      //<< "   Collected_Charge:\t" << chan.collected_charge << "\n"
       << "   Pedestal:\t" << chan.pedestal << "\n";
 
   // Print out each energy coefficient

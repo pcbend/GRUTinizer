@@ -91,7 +91,7 @@ int TPhosWall::BuildHits(std::vector<TRawEvent>& raw_data) {
         geb.Print("all");
     }
   }
-
+  SortHits();
   return Size();
 }
 

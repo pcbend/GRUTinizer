@@ -24,6 +24,7 @@ bool RemovePeaks(TH1**,unsigned int);
 
 GPeak *PhotoPeakFit(TH1*,double,double,Option_t *opt="");
 GGaus *GausFit(TH1*,double,double,Option_t *opt="");
+TF1   *DoubleGausFit(TH1*,double,double,double,double,Option_t *opt="");
 
 std::string MergeStrings(const std::vector<std::string>& strings, char split='\n');
 
@@ -53,6 +54,7 @@ bool GetProjectionY(GH2D *hist,GH2D *hist2,
 void Prompt();
 void Help();
 void Commands();
+void Version();
 TH1 *GrabHist(int i=0); //return the ith histogram from the current canvas.
 TF1 *GrabFit(int i=0); //return the ith fit from the current canvas.
 

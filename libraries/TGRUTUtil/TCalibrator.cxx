@@ -20,7 +20,7 @@
 #include <GRootFunctions.h>
 #include <GRootCommands.h>
 #include <GCanvas.h>
-#include <GGaus.h>
+#include <GPeak.h>
 #include <Globals.h>
 
 #include "combinations.h"
@@ -138,7 +138,9 @@ void TCalibrator::Clear(Option_t *opt) {
   //all_fits.clear();
   
   for(int i=0;i<4;i++) eff_par[i]=0.;
-  
+ 
+  fPeaks.clear();
+
   total_points=0;
 }
 
@@ -153,11 +155,11 @@ void TCalibrator::Draw(Option_t *opt) {
   fit_graph.Draw("AP");
 }
 
-void TCalibrator::Fit(int order) {
+void TCalibrator::Fit(int order,bool zerozero) {
   
   //if((graph_of_everything.GetN()<1) &&
   //    (all_fits.size()>0))
-  MakeCalibrationGraph();
+  MakeCalibrationGraph(zerozero);
   if(fit_graph.GetN()<1)
     return;
   if(order==1) {
@@ -176,6 +178,7 @@ void TCalibrator::Fit(int order) {
     linfit->SetParName(2,"C");
   }
   fit_graph.Fit(linfit);
+  fit_graph.Print();
   Print();
   
 }
@@ -193,11 +196,15 @@ double TCalibrator::GetEffParameter(int i) const {
 }
 
 
-TGraph &TCalibrator::MakeCalibrationGraph(double min_fom) {
+TGraph &TCalibrator::MakeCalibrationGraph(bool zerozero) { //double min_fom) {
   std::vector<double> xvalues;
   std::vector<double> yvalues;
   //std::vector<double> xerrors;
   //std::vector<double> yerrors;
+  if(zerozero) {
+    xvalues.push_back(0.0);
+    yvalues.push_back(0.0);
+  }
 
   for(auto it:fPeaks) {
     xvalues.push_back(it.centroid);
@@ -254,7 +261,7 @@ int TCalibrator::AddData(TH1 *data,TNucleus *source, double sigma,double thresho
   for(int x=0;x<spectrum.GetNPeaks();x++) {
     double range = 8*data->GetXaxis()->GetBinWidth(1);
     //printf(DGREEN "\tlow %.02f \t high %.02f" RESET_COLOR "\n",spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range);
-    GGaus *fit = GausFit(data,spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range,"no-print");
+    GPeak *fit = PhotoPeakFit(data,spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range,"no-print");
     //data_channels
     //data_channels.push_back(fit.GetCentroid());
     //datatosource[fit->GetCentroid()] = sqrt(-1);

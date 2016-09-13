@@ -43,7 +43,11 @@ TWriteLoop::TWriteLoop(std::string name, std::string output_filename)
 }
 
 TWriteLoop::~TWriteLoop() {
-  for(auto& elem : det_map){
+  for(auto& elem : det_map) {
+    delete elem.second;
+  }
+
+  for(auto& elem : default_dets) {
     delete elem.second;
   }
 
@@ -108,15 +112,17 @@ void TWriteLoop::AddBranch(TClass* cls){
     // This uses the ROOT dictionaries, so we need to lock the threads.
     TThread::Lock();
 
+    // Make a default detector of that type.
+    TDetector* det_p = (TDetector*)cls->New();
+    default_dets[cls] = det_p;
+
     // Make the TDetector**
-    TDetector** det = new TDetector*;
-    *det = (TDetector*)cls->New();
-    det_map[cls] = det;
+    TDetector** det_pp = new TDetector*;
+    *det_pp = det_p;
+    det_map[cls] = det_pp;
 
     // Make a new branch.
-    TBranch* new_branch = event_tree->Branch(cls->GetName(), cls->GetName(), det);
-    delete *det;
-    *det = NULL;
+    TBranch* new_branch = event_tree->Branch(cls->GetName(), cls->GetName(), det_pp);
 
     // Fill the new branch up to the point where the tree is filled.
     // Explanation:
@@ -144,8 +150,13 @@ void TWriteLoop::AddBranch(TClass* cls){
 void TWriteLoop::WriteEvent(TUnpackedEvent& event) {
   if(event_tree){
     // Clear pointers from previous writes.
+    // Note that we cannot just set this equal to NULL,
+    //   because ROOT would then construct a new object.
+    // This contradicts the ROOT documentation for TBranchElement::SetAddress,
+    //   which suggests that a new object would be constructed only when setting the address,
+    //   not when filling the TTree.
     for(auto& elem : det_map){
-      *elem.second = NULL;
+      *elem.second = default_dets[elem.first];
     }
 
     // Load current events

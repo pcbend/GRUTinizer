@@ -44,7 +44,7 @@ public:
     gChain->SetNotify(GrutNotifier::Get());
   }
 } temp_thing;
-  
+
 
 
 void Help()     { printf("This is helpful information.\n"); }
@@ -53,6 +53,9 @@ void Commands() { printf("this is a list of useful commands.\n");}
 
 void Prompt() { Getlinem(EGetLineMode::kInit,((TRint*)gApplication)->GetPrompt()); }
 
+void Version() {
+  system(Form("%s/bin/grutinizer-config --version", getenv("GRUTSYS")));
+}
 
 bool GetProjectionX(GH2D *hist,double low, double high, double bg_low,double bg_high){
   if(!hist) return 0;
@@ -72,7 +75,7 @@ bool GetProjectionX(GH2D *hist,double low, double high, double bg_low,double bg_
 
   C_gammagamma->cd();
   hist->Draw();
-  
+
   C_projections->cd(1);
   GH1D *Proj_y = hist->ProjectionX("Gamma_Gamma_xProjection");
   GH1D *Proj_y_Clone = (GH1D*)Proj_y->Clone(); 
@@ -420,8 +423,6 @@ bool GetProjectionY(GH2D *hist,double low, double high, double bg_low,double bg_
   Proj_y->GetXaxis()->SetTitle("Energy [keV]");
   Proj_y->GetYaxis()->SetTitle("Counts");
   
-
-
   double Grace = 300;
   double ZoomHigh = high+Grace;
   double ZoomLow  = low-Grace;
@@ -460,7 +461,7 @@ bool GetProjectionY(GH2D *hist,double low, double high, double bg_low,double bg_
   }else{
     Proj_gated = Proj_y_Clone->Project(low,high);
   }
- 
+
   if(bg_high>0 && bg_low>0){
     Proj_gated->SetTitle(Form("Gate From [%.01f,%.01f] with Background [%.01f,%.01f]",low,high,bg_low,bg_high));
   }else{
@@ -468,7 +469,7 @@ bool GetProjectionY(GH2D *hist,double low, double high, double bg_low,double bg_
   }
   Proj_gated->GetXaxis()->SetTitle("Energy [keV]");
   Proj_gated->GetYaxis()->SetTitle("Counts");
- 
+
   C_projections->cd(2);
   Proj_gated->Draw();
   return 1;
@@ -804,6 +805,27 @@ GGaus *GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
     std::swap(xlow,xhigh);
 
   //std::cout << "here." << std::endl;
+
+  GGaus *mypeak= new GGaus(xlow,xhigh);
+  std::string options = opt;
+  options.append("Q+");
+  mypeak->Fit(hist,options.c_str());
+  //mypeak->Background()->Draw("SAME");
+  TF1 *bg = new TF1(*mypeak->Background());
+  hist->GetListOfFunctions()->Add(bg);
+  //edit = true;
+
+  return mypeak;
+}
+
+
+TF1 *DoubleGausFit(TH1 *hist,double cent1,double cent2,double xlow, double xhigh,Option_t *opt) {
+  if(!hist)
+    return 0;
+  if(xlow>xhigh)
+    std::swap(xlow,xhigh);
+
+  //std::cout << "here." << std::endl;
   
   GGaus *mypeak= new GGaus(xlow,xhigh);
   std::string options = opt;
@@ -816,11 +838,23 @@ GGaus *GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
 
   return mypeak;
 }
- 
+
+
+
+
+
+
+
+
+
 /* 
   
   
   
+=======
+
+
+
   bool edit = false;
   if(!hist)
     return edit;
@@ -873,15 +907,15 @@ GGaus *GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
   printf(GREEN "Resolution: %.02f %%" RESET_COLOR "\n",TMath::Abs(param[2]*2.35)/param[1]*100.0);
 
   edit = true;
-  
+
   TIter it(hist->GetListOfFunctions());
   while(TObject *obj=it.Next()) {
     if(!hist->InheritsFrom(TF1::Class()))
       continue;
     ((TF1*)obj)->Draw("same");
   }
-  
-  
+
+
   return edit;
 
 }
@@ -1047,10 +1081,3 @@ TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
    }
   return toreturn;
 }
-
-
-
-
-
-
-
