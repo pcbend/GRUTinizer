@@ -103,8 +103,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
   double objtac_corr = s800->GetCorrTOF_OBJTAC();
   double objtac = s800->GetTof().GetTacOBJ();
   double xfptac = s800->GetTof().GetTacXFP();
-  double afp = s800->GetAFP();
-  double xfp_focalplane = s800->GetXFP(0);
+  //  double afp = s800->GetAFP();
+  //double xfp_focalplane = s800->GetXFP(0);
   TVector3 track = s800->Track();
   if(! newal23blob->IsInside(objtac_corr,ic_sum) && InBeam_btwnTopMid->IsInside(objtac,xfptac)){
     return;
@@ -115,7 +115,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   std::string histname;
 
-  for(int y=0;y<caesar->Size();y++) {
+  for(unsigned int y=0;y<caesar->Size();y++) {
     TCaesarHit hit = caesar->GetCaesarHit(y);
     counter++;
     if(!hit.IsValid())

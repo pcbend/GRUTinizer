@@ -66,14 +66,14 @@ extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
   InitMap();
   TGretina *gretina = obj.GetDetector<TGretina>();
-  TBank29  *bank29  = obj.GetDetector<TBank29>();
-  TS800 *s800       = obj.GetDetector<TS800>();
+  // TBank29  *bank29  = obj.GetDetector<TBank29>();
+  // TS800 *s800       = obj.GetDetector<TS800>();
 
 
   if(!gretina) 
     return;
 
-  for(int x=0;x<gretina->Size();x++) {
+  for(unsigned int x=0;x<gretina->Size();x++) {
     TGretinaHit hit = gretina->GetGretinaHit(x);
     obj.FillHistogram("energy","summary",4000,0,4000,hit.GetCoreEnergy(),
         100,0,100,hit.GetCrystalId() );

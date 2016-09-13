@@ -73,7 +73,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
   std::string histname = "";
   std::string dirname  = "";
   if(bank29) {
-    for(int x=0;x<bank29->Size();x++) {
+    for(unsigned int x=0;x<bank29->Size();x++) {
       TMode3Hit &hit = (TMode3Hit&)bank29->GetHit(x);
       dirname = "Bank29";
       histname = Form("bank29_%i",hit.GetChannel());
@@ -98,7 +98,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
     return;
   
   double gsum = 0.0;
-  for(int y=0;y<gretina->Size();y++) {
+  for(unsigned int y=0;y<gretina->Size();y++) {
     TGretinaHit hit = gretina->GetGretinaHit(y);
     gsum += hit.GetCoreEnergy();
     if(bank29) {
@@ -333,7 +333,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
       }
 
-      for(int z2=y+1;z2<gretina->Size();z2++) {
+      for(unsigned int z2=y+1;z2<gretina->Size();z2++) {
 	TGretinaHit hit_2 = gretina->GetGretinaHit(z2);
 	
 	histname = "Gamma_Gamma";
@@ -456,7 +456,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       
 
 
-      for(int z3=y+1;z3<gretina->Size();z3++) {
+      for(unsigned int z3=y+1;z3<gretina->Size();z3++) {
 	TGretinaHit hit_3 = gretina->GetGretinaHit(z3);
 	
 	histname = "Gamma_Gamma";
@@ -512,7 +512,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 			      2000,0,4000,hit.GetDoppler(BETA));
 	
 	    
-	    for(int z2_pid=y+1;z2_pid<gretina->Size();z2_pid++) {
+	    for(unsigned int z2_pid=y+1;z2_pid<gretina->Size();z2_pid++) {
 	      TGretinaHit hit_2_pid = gretina->GetGretinaHit(z2_pid);
 	      
 	      histname = Form("Gamma_Gamma_Beta_%s",mypid->GetName());
@@ -745,7 +745,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 		      2000,0,4000,hit.GetDoppler(BETA,&trackvect_Spec));
     
     histname = "GretinaDoppVectPosLoopZ";
-    double z_ = -5.0;
+    //double z_ = -5.0;
     // double zdef = GValue::FindValue("GRETINA_Z_OFFSET")->GetValue();
     // for(int z=0;z<100;z++) {
     //   z_ += 10.0/100.0;

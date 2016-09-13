@@ -34,7 +34,8 @@
 #pragma link C++ function GrabFit;
 #pragma link C++ function StartGUI;
 #pragma link C++ function GUIIsRunning;
-#pragma link C++ function GetProjection;
+#pragma link C++ function GetProjectionX;
+#pragma link C++ function GetProjectionY;
 
 #pragma link C++ enum EAxis;
 #pragma link C++ enum kBackgroundSubtraction;

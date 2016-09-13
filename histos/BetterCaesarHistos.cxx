@@ -128,7 +128,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
     int ng_newsi24blob=0;
     int ng_newmg22blob=0;
 
-    for(int k=0;k<caesar->Size();k++) {
+    for(unsigned int k=0;k<caesar->Size();k++) {
       TCaesarHit hit_m = caesar->GetCaesarHit(k);
         if(!hit_m.IsValid())
           continue;
@@ -154,7 +154,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     }//end for loop to get multiplicity of caesar event
     
-    for(int i=0;i<caesar->Size();i++) {
+    for(unsigned int i=0;i<caesar->Size();i++) {
       TCaesarHit hit = caesar->GetCaesarHit(i);
       if(!hit.IsValid())
         continue;      
@@ -179,7 +179,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       obj.FillHistogram("Caesar","Detector_Doppler_Summary",300,0,300,hit.GetDetectorNumber()+total_det_in_prev_rings[ring],
                                                   2048,0,8192,hit.GetDoppler(beta,z_shift));
  
-      for(int j=0;j<caesar->Size();j++) {
+      for(unsigned int j=0;j<caesar->Size();j++) {
         if(i==j)
           continue;
         TCaesarHit hit2 = caesar->GetCaesarHit(j);
