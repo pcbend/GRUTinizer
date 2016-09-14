@@ -143,6 +143,8 @@ void TChannel::Copy(TObject &rhs) const {
   ((TChannel&)rhs).collected_charge    = collected_charge;
   ((TChannel&)rhs).segment    = segment;
   ((TChannel&)rhs).energy_coeff = energy_coeff;
+  ((TChannel&)rhs).polezero_corrections = polezero_corrections;
+  ((TChannel&)rhs).baseline_corrections = baseline_corrections;
   ((TChannel&)rhs).time_coeff = time_coeff;
   ((TChannel&)rhs).efficiency_coeff = efficiency_coeff;
   ((TChannel&)rhs).pedestal = pedestal;
