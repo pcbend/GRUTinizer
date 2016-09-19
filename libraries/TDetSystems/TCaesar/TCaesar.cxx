@@ -13,9 +13,9 @@
  *  INPUT:  Two TCaesarHit objects
  * OUTPUT:  True if the two TCaesarHit object are within the given distance and time window
  *PURPOSE:  This function determines whether two TCaesarHit variables can be added together
- *          to form a single Caesar Addback hit. The time and position variable should be chosen
- *          with careful consideration of what time and distance should separate events where
- *          the gamma compton scatters in one crystal but is fully absorbed in a neighboring crystal.
+ *          to form a single Caesar Addback hit based on whether they come within a certain
+ *          time window and they are in neighboring detectors
+ *.
  */
 bool DefaultAddback(const TCaesarHit& one,const TCaesarHit &two){
   int ring = one.GetRingNumber();
@@ -25,6 +25,10 @@ bool DefaultAddback(const TCaesarHit& one,const TCaesarHit &two){
   int poss_neigh_det  = two.GetDetectorNumber();
   int num_neighbors_total = TCaesar::num_neighbors[ring][det];
 
+  
+  if (TMath::Abs(one.GetTime()-two.GetTime()) > 100){
+    return false;
+  }
   for (int neigh = 0; neigh < num_neighbors_total; neigh++){
     int neigh_ring = TCaesar::neighbors[ring][det][neigh][0];
     int neigh_det  = TCaesar::neighbors[ring][det][neigh][1];
@@ -83,7 +87,6 @@ void TCaesar::BuildAddback() const {
       }
     }//loop over hits to possibly addback
     //Now do a switch based on number of neighbors!
-//  std::cout << "Number of neighbors: " << neighbor_positions.size() << std::endl;
     switch(neighbor_positions.size()){
       //No neighbors!
       case 0:

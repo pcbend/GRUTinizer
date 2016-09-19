@@ -112,7 +112,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       if (omitted_det != -1 &&  omitted_det == hit.GetAbsoluteDetectorNumber()){
         continue;
       }
-      if (hit.IsValid() && !hit.IsOverflow()){//only accept hits with both times and energies
+      if (hit.IsValid()){//only accept hits with both times and energies
         std::string histname;
         double energy_dc = hit.GetDoppler();
         double scatter_angle = s800->Track().Theta()*(180.0/TMath::Pi());
@@ -146,7 +146,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       if (omitted_det != -1 &&  omitted_det == hit.GetAbsoluteDetectorNumber()){
         continue;
       }
-      if (hit.IsValid() && !hit.IsOverflow()){//only accept hits with both times and energies
+      if (hit.IsValid()){//only accept hits with both times and energies
         std::string histname;
 
         //double energy_dc = caesar->GetEnergyDC(hit);
