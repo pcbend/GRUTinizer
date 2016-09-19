@@ -1,0 +1,70 @@
+ATA_SHIFT	{
+value:	-0.000111
+}
+
+
+BETA	{
+value:	0.369000
+}
+
+
+BTA_SHIFT	{
+value:	-0.000049
+}
+
+
+CRDC1_X_OFFSET	{
+value:	-280.054000
+}
+
+
+CRDC1_X_SLOPE	{
+value:	2.534400
+}
+
+
+CRDC1_Y_OFFSET	{
+value:	121.636000
+}
+
+
+CRDC1_Y_SLOPE	{
+value:	-0.053840
+}
+
+
+CRDC2_X_OFFSET	{
+value:	-278.759000
+}
+
+
+CRDC2_X_SLOPE	{
+value:	2.532038
+}
+
+
+CRDC2_Y_OFFSET	{
+value:	-136.796000
+}
+
+
+CRDC2_Y_SLOPE	{
+value:	0.054064
+}
+
+
+OBJTAC_TOF_CORR_AFP	{
+value:	1070.000000
+}
+
+
+OBJTAC_TOF_CORR_XFP	{
+value:	0.230000
+}
+
+
+TARGET_SHIFT_Z	{
+value:	0.660000
+}
+
+

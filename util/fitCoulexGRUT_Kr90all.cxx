@@ -131,8 +131,10 @@ int fitCoulex(const char *cfg_file_name){
   //All Variables
   const int MAX_PARS = 15;
   //These angles determine the maximum angle cut that will be used
-  const double START_ANGLE = 2.4;
-  const double FINAL_ANGLE = 2.4;
+//const double START_ANGLE = 2.4;
+//const double FINAL_ANGLE = 2.4;
+  const double START_ANGLE = 180;
+  const double FINAL_ANGLE = 180;
   const double ANGLE_STEPS = 0.1;
   const int TOTAL_ANGLES = (FINAL_ANGLE-START_ANGLE)/ANGLE_STEPS + 1;
 

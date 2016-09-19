@@ -466,13 +466,6 @@ class DoubleExpSixHist : sixHistHolder{
   public:
     DoubleExpSixHist(TH1 *hist1, TH1 *hist2, TH1 *hist3,TH1 *hist4, TH1 *hist5, TH1 *hist6): sixHistHolder(hist1,hist2,hist3,hist4,hist5,hist6){}
     virtual double operator()(double *x, double *par){
-    //return (par[0]*histValue(hist1, x[0])+par[1]*histValue(hist2,x[0]) +
-    //        par[2]*histValue(hist3,x[0]) + par[3]*(par[4]*TMath::Exp(par[5]*x[0])+
-    //        par[6]*TMath::Exp(par[7]*x[0])));
-//    return (par[0]*(histValue(hist1, x[0])+par[1]*histValue(hist2,x[0])) +
-//            par[2]*histValue(hist3,x[0]) + par[3]*histValue(hist4,x[0])  + 
-//            par[4]*histValue(hist5,x[0]) + par[5]*histValue(hist6,x[0])  + 
-//            par[6]*(par[7]*TMath::Exp(par[8]*x[0])+ par[9]*TMath::Exp(par[10]*x[0])));
       return (par[0] * (histValue(hist1, x[0]) + par[1]*histValue(hist2,x[0]))      +
               par[2] * (par[4]*histValue(hist3,x[0])/0.26  + histValue(hist5,x[0])) + 
               par[3] * histValue(hist4,x[0])   + par[5]*histValue(hist6,x[0])       + 
@@ -526,6 +519,7 @@ TF1* FitExpHist(TH1F *hist, TH1F* fitting, Double_t gLowX, Double_t gUpX,Double_
   fitfunc->SetParName(1, "Exp.Intercept  ");
   fitfunc->SetParName(2, "Exp.Decay.Const");
 
+  hist->Sumw2();
   hist->Fit(fitfunc, "LR0", "SAME");
   return fitfunc;
 }
@@ -565,6 +559,7 @@ TF1* FitDoubleExpHist(TH1F *hist, TH1F* fitting, Double_t gLowX, Double_t gUpX, 
   fitfunc->SetParName(4, "2nd Exp. Intercept   ");
   fitfunc->SetParName(5, "2nd Exp. Decay Const ");
 
+  hist->Sumw2();
   hist->Fit(fitfunc, "PRMEQ", "");
   return fitfunc;
 }
@@ -615,6 +610,8 @@ TF1 *FitDoubleExpTwoHist(TH1F *hist_to_fit, TH1F *geant_hist1, TH1F *geant_hist2
   fitfunc->SetParName(4, "Exp.Decay.Const     ");
   fitfunc->SetParName(5, "2nd Exp. Intercept   ");
   fitfunc->SetParName(6, "2nd Exp. Decay Const ");
+
+  hist_to_fit->Sumw2();
   hist_to_fit->Fit(fitfunc, "PMEOQ", "", gLowX,gUpX);
   fitfunc_to_draw->SetRange(0,4096);
   fitfunc_to_draw->SetParameters(fitfunc->GetParameters());
@@ -680,6 +677,7 @@ TF1 *FitDoubleExpThreeHist(TH1F *hist_to_fit, TH1F *geant_fep, TH1F *geant_compt
   fitfunc->SetParName(7, "2nd Exp. Decay Const  ");
 
   //hist_to_fit->Fit(fitfunc, "PRMEQ");
+  hist_to_fit->Sumw2();
   hist_to_fit->Fit(fitfunc, "PMEOQ","",gLowX,gUpX);
   fitfunc_to_draw->SetRange(0,4096);
   fitfunc_to_draw->SetParameters(fitfunc->GetParameters());
@@ -747,6 +745,7 @@ TF1 *FitDoubleExpFourHist(TH1F *hist_to_fit, TH1F *geant_fep, TH1F *geant_compto
   fitfunc->SetParName(8, "2nd Exp. Decay Const  ");
 
   //hist_to_fit->Fit(fitfunc, "PRMEQ");
+  hist_to_fit->Sumw2();
   hist_to_fit->Fit(fitfunc, "PMEOQ","",gLowX,gUpX);
   fitfunc_to_draw->SetRange(0,4096);
   fitfunc_to_draw->SetParameters(fitfunc->GetParameters());
@@ -817,6 +816,7 @@ TF1 *FitDoubleExpFiveHist(TH1F *hist_to_fit, TH1F *geant_fep, TH1F *geant_compto
   fitfunc->SetParName(9, "2nd Exp. Decay Const  ");
 
   //hist_to_fit->Fit(fitfunc, "PRMEQ");
+  hist_to_fit->Sumw2();
   hist_to_fit->Fit(fitfunc, "PMEOQ","",gLowX,gUpX);
   fitfunc_to_draw->SetRange(0,4096);
   fitfunc_to_draw->SetParameters(fitfunc->GetParameters());
@@ -888,6 +888,7 @@ TF1 *FitDoubleExpSixHist(TH1F *hist_to_fit, TH1F *geant_fep, TH1F *geant_compton
   fitfunc->SetParName(10, "2nd Exp. Decay Const  ");
 
   //hist_to_fit->Fit(fitfunc, "PRMEQ");
+  hist_to_fit->Sumw2();
   hist_to_fit->Fit(fitfunc, "PMEOQ","",gLowX,gUpX);
   fitfunc_to_draw->SetRange(0,4096);
   fitfunc_to_draw->SetParameters(fitfunc->GetParameters());

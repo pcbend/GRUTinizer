@@ -109,20 +109,14 @@ void MakeHistograms(TRuntimeObjects& obj) {
     double ic_sum = s800->GetIonChamber().GetAve();
     for(unsigned int y=0;y<caesar->Size();y++) {
       TCaesarHit &hit = caesar->GetCaesarHit(y);
-
       if (omitted_det != -1 &&  omitted_det == hit.GetAbsoluteDetectorNumber()){
         continue;
       }
-
       if (hit.IsValid()){//only accept hits with both times and energies
         std::string histname;
         double energy_dc = hit.GetDoppler();
-
-        //double scatter_angle = 0;
         double scatter_angle = s800->Track().Theta()*(180.0/TMath::Pi());
         double corr_time = caesar->GetCorrTime(hit,s800);
-        //targ_exit_vec = (pt,theta,phi)
-
         if (pid->IsInside(objtac_corr, ic_sum)){
           if (tcut->IsInside(corr_time, energy_dc)){
             if (in->IsInside(xfptac,objtac)){
@@ -133,7 +127,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
                   pos_singles.push_back(hit.GetPosition());
                 }
               }//For multiplicity purposes
-
               dirname = "Caesar";
               histname = "energy_dc_pid_in_tcut";
               obj.FillHistogram(dirname,histname,
@@ -222,6 +215,13 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     //Fill multiplicity and coincidence histograms for singles
     unsigned int num_hits_singles = energies_singles.size();
+    for (unsigned int i = 0; i < num_hits_singles; i++){
+      dirname = "Caesar";
+      histname = "energy_premultsort";
+      obj.FillHistogram(dirname,histname,
+                        8192,0,8192,energies_singles.at(i));
+    }
+
     if (num_hits_singles == 1){
       dirname = "Caesar";
       histname = "energy_dc_mult_one";
