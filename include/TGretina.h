@@ -24,13 +24,16 @@ public:
   virtual void Clear(Option_t *opt = "");
 
   virtual UInt_t Size() const { return gretina_hits.size(); }
-  virtual Int_t AddbackSize() { BuildAddback(); return addback_hits.size(); }
+  virtual Int_t AddbackSize(int EngRange=-1) { BuildAddback(EngRange); return addback_hits.size(); }
+  void ResetAddback() { addback_hits.clear();}
 
   virtual void InsertHit(const TDetectorHit& hit);
   virtual TDetectorHit& GetHit(int i)            { return gretina_hits.at(i); }
 
   const TGretinaHit& GetGretinaHit(int i) const { return gretina_hits.at(i); }
-  const TGretinaHit& GetAddbackHit(int i) { BuildAddback(); return addback_hits.at(i); }
+  const TGretinaHit& GetAddbackHit(int i) const { return addback_hits.at(i); }
+
+
   void PrintHit(int i){ gretina_hits.at(i).Print(); }
 
   static TVector3 CrystalToGlobal(int cryId,
@@ -57,7 +60,7 @@ public:
   void  SortHits();
 
 private:
-  void BuildAddback() const;
+  void BuildAddback(int EngRange=-1) const;
 #if !defined (__CINT__) 
   static std::function<bool(const TGretinaHit&,const TGretinaHit&)> fAddbackCondition;  
 #endif

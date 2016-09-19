@@ -455,7 +455,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
       }
 
 
-
       for(unsigned int z3=y+1;z3<gretina->Size();z3++) {
 	TGretinaHit hit_3 = gretina->GetGretinaHit(z3);
 
@@ -510,8 +509,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	    histname = Form("GammaDoppler_Beta_%s",mypid->GetName());
 	    obj.FillHistogram(dirname,histname,
 			      2000,0,4000,hit.GetDoppler(BETA));
-
-
 	    for(unsigned int z2_pid=y+1;z2_pid<gretina->Size();z2_pid++) {
 	      TGretinaHit hit_2_pid = gretina->GetGretinaHit(z2_pid);
 

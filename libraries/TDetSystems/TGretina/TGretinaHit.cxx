@@ -53,13 +53,11 @@ void TGretinaHit::Copy(TObject &rhs) const {
   ((TGretinaHit&)rhs).fFirstInteraction  = fFirstInteraction;
   ((TGretinaHit&)rhs).fSecondInteraction = fSecondInteraction;
   ((TGretinaHit&)rhs).fNumberOfInteractions = fNumberOfInteractions;
-  //for(int i=0;i<fNumberOfInteractions;i++) {
-    ((TGretinaHit&)rhs).fSegmentNumber = fSegmentNumber;
-    ((TGretinaHit&)rhs).fGlobalInteractionPosition = fGlobalInteractionPosition;
-    ((TGretinaHit&)rhs).fLocalInteractionPosition  = fLocalInteractionPosition;
-    ((TGretinaHit&)rhs).fInteractionEnergy = fInteractionEnergy;
-    ((TGretinaHit&)rhs).fInteractionFraction = fInteractionFraction;
-  //}
+  ((TGretinaHit&)rhs).fSegmentNumber = fSegmentNumber;
+  ((TGretinaHit&)rhs).fGlobalInteractionPosition = fGlobalInteractionPosition;
+  ((TGretinaHit&)rhs).fLocalInteractionPosition  = fLocalInteractionPosition;
+  ((TGretinaHit&)rhs).fInteractionEnergy = fInteractionEnergy;
+  ((TGretinaHit&)rhs).fInteractionFraction = fInteractionFraction;
 }
 
 Float_t TGretinaHit::GetCoreEnergy(int i) const {
@@ -153,7 +151,7 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
       second_interaction_value = seg_ener;
     }
   }
-
+  //  fFirstInteraction=0;
   SortHits();
   //  Print("all");
 
@@ -276,7 +274,7 @@ void TGretinaHit::SortHits(){
 //       First and second may be assigned across crystal boundaries.
 void TGretinaHit::AddToSelf(const TGretinaHit& rhs) {
 
-  // Stash all interaction points
+  // qStash all interaction points
   std::set<interaction_point> ips;
   for(int i=0; i<fNumberOfInteractions; i++){
     ips.insert(interaction_point(fSegmentNumber[i],
@@ -368,7 +366,7 @@ TVector3 TGretinaHit::GetFirstIntPosition() const {
    return TDetectorHit::BeamUnitVec;
 }
 
-TVector3 TGretinaHit::GetFirstIntPosition_2() const {
+TVector3 TGretinaHit::GetLastPosition() const {
   double xoffset = GValue::Value("GRETINA_X_OFFSET");
   if(std::isnan(xoffset))
     xoffset=0.00;
@@ -378,16 +376,13 @@ TVector3 TGretinaHit::GetFirstIntPosition_2() const {
   double zoffset = GValue::Value("GRETINA_Z_OFFSET");
   if(std::isnan(zoffset))
     zoffset=0.00;
+ 
+  TVector3 offset(xoffset,yoffset,zoffset);
 
-  if(GetFirstIntPoint()>-1){
-    TVector3 IntPos = GetInteractionPosition(GetFirstIntPoint());
-    IntPos.SetX(IntPos.X()-xoffset);
-    IntPos.SetY(IntPos.Y()-yoffset);
-    IntPos.SetZ(IntPos.Z()-zoffset);
-
-    return IntPos;
-  }
-  return TDetectorHit::BeamUnitVec;
+  if(fNumberOfInteractions>0)
+     return GetInteractionPosition(fNumberOfInteractions-1) + offset;
+   return TDetectorHit::BeamUnitVec;
+  
 }
 
 TVector3 TGretinaHit::GetSecondIntPosition() const {
