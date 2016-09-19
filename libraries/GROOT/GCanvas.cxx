@@ -60,17 +60,28 @@ enum MyArrowPress{
 
 ClassImp(GMarker)
 
-  void GMarker::Copy(TObject &object) const {
-    TObject::Copy(object);
-    ((GMarker&)object).x      = x;
-    ((GMarker&)object).y      = y;
-    ((GMarker&)object).localx = localx;
-    ((GMarker&)object).localy = localy;
-    ((GMarker&)object).linex  = 0;
-    ((GMarker&)object).liney  = 0;
-    ((GMarker&)object).binx  = binx;
-    ((GMarker&)object).biny  = biny;
-  }
+void GMarker::Copy(TObject &object) const {
+  TObject::Copy(object);
+  ((GMarker&)object).x      = x;
+  ((GMarker&)object).y      = y;
+  ((GMarker&)object).localx = localx;
+  ((GMarker&)object).localy = localy;
+  ((GMarker&)object).linex  = 0;
+  ((GMarker&)object).liney  = 0;
+  ((GMarker&)object).binx  = binx;
+  ((GMarker&)object).biny  = biny;
+}
+
+
+void GMarker::Print(Option_t *opt) const {
+  printf("--- Marker 0x%p ---\n",(void*)this);
+  printf("Pixel Space:   (%i,%i)\n",x,y);
+  printf("Bin Space:     (%i,%i)\n",binx,biny);
+  printf("Value Space:   (%.02f,%.02f)\n",localx,localy);
+  printf("-------------------\n");
+}
+
+
 /*
    ClassImp(GPopup)
 
