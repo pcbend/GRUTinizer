@@ -1154,16 +1154,16 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
         break;
       {
         double x1 = fMarkers.at(fMarkers.size()-1)->localx;
-        double y1 = fMarkers.at(fMarkers.size()-1)->localy;
+        //double y1 = fMarkers.at(fMarkers.size()-1)->localy;
         double x2 = fMarkers.at(fMarkers.size()-2)->localx;
-        double y2 = fMarkers.at(fMarkers.size()-2)->localy;
+        //double y2 = fMarkers.at(fMarkers.size()-2)->localy;
         if(x1>x2)
           std::swap(x1,x2);
-        if(y1>y2)
-          std::swap(y1,y2);
+        //if(y1>y2)
+        //  std::swap(y1,y2);
         for(unsigned int i=0;i<hists.size();i++){
           hists.at(i)->GetXaxis()->SetRangeUser(x1,x2);
-          hists.at(i)->GetYaxis()->SetRangeUser(y1,y2);
+          //hists.at(i)->GetYaxis()->SetRangeUser(y1,y2);
         }
       }
       edited = true;
@@ -1277,47 +1277,47 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
                  }
                  break;
     case kKey_r:
-                 if(GetNMarkers()<2)
-                   break;
-                 {
-                   if(fMarkers.at(fMarkers.size()-1)->localy < fMarkers.at(fMarkers.size()-2)->localy)
-                     for(unsigned int i=0;i<hists.size();i++)
-                       hists.at(i)->GetYaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-1)->localy,fMarkers.at(fMarkers.size()-2)->localy);
-                   else
-                     for(unsigned int i=0;i<hists.size();i++)
-                       hists.at(i)->GetXaxis()->SetRangeUser(fMarkers.at(fMarkers.size()-2)->localy,fMarkers.at(fMarkers.size()-1)->localy);
-                 }
-                 edited = true;
-                 RemoveMarker("all");
-                 break;
+      if(GetNMarkers()<2)
+        break;
+      {
+        double y1 = fMarkers.at(fMarkers.size()-1)->localy;
+        double y2 = fMarkers.at(fMarkers.size()-2)->localy;
+        if(y1>y2)
+          std::swap(y1,y2);
+        for(unsigned int i=0;i<hists.size();i++)
+          hists.at(i)->GetYaxis()->SetRangeUser(y1,y2);
+      }
+      edited = true;
+      RemoveMarker("all");
+      break;
     case kKey_R:
-                 //this->GetListOfPrimitives()->Print();
-                 GetContextMenu()->Action(hists.back()->GetYaxis(),hists.back()->GetYaxis()->Class()->GetMethodAny("SetRangeUser"));
-                 {
-                   double y1 = hists.back()->GetXaxis()->GetBinCenter(hists.back()->GetYaxis()->GetFirst());
-                   double y2 = hists.back()->GetXaxis()->GetBinCenter(hists.back()->GetYaxis()->GetLast());
-                   TIter iter(this->GetListOfPrimitives());
-                   while(TObject *obj = iter.Next()) {
-                     if(obj->InheritsFrom(TPad::Class())) {
-                       TPad *pad = (TPad*)obj;
-                       TIter iter2(pad->GetListOfPrimitives());
-                       while(TObject *obj2=iter2.Next()) {
-                         if(obj2->InheritsFrom(TH1::Class())) {
-                           TH1* hist = (TH1*)obj2;
-                           hist->GetYaxis()->SetRangeUser(y1,y2);
-                           pad->Modified();
-                           pad->Update();
-                         }
-                       }
-                     }
-                   }
+      //this->GetListOfPrimitives()->Print();
+      GetContextMenu()->Action(hists.back()->GetYaxis(),hists.back()->GetYaxis()->Class()->GetMethodAny("SetRangeUser"));
+      {
+        double y1 = hists.back()->GetXaxis()->GetBinCenter(hists.back()->GetYaxis()->GetFirst());
+        double y2 = hists.back()->GetXaxis()->GetBinCenter(hists.back()->GetYaxis()->GetLast());
+        TIter iter(this->GetListOfPrimitives());
+        while(TObject *obj = iter.Next()) {
+          if(obj->InheritsFrom(TPad::Class())) {
+            TPad *pad = (TPad*)obj;
+            TIter iter2(pad->GetListOfPrimitives());
+            while(TObject *obj2=iter2.Next()) {
+              if(obj2->InheritsFrom(TH2::Class())) {
+                TH2* hist = (TH2*)obj2;
+                hist->GetYaxis()->SetRangeUser(y1,y2);
+                pad->Modified();
+                pad->Update();
+              }
+            }
+          }
+        }
 
-                   //for(int i=0;i<hists.size()-1;i++)   // this doesn't work, set range needs values not bins.   pcb.
-                   //   hists.at(i)->GetXaxis()->SetRangeUser(hists.back()->GetXaxis()->GetFirst(),hists.back()->GetXaxis()->GetLast());
+        //for(int i=0;i<hists.size()-1;i++)   // this doesn't work, set range needs values not bins.   pcb.
+        //   hists.at(i)->GetXaxis()->SetRangeUser(hists.back()->GetXaxis()->GetFirst(),hists.back()->GetXaxis()->GetLast());
 
-                 }
-                 edited = true;
-                 break;
+      }
+      edited = true;
+      break;
 
     case kKey_x: {
                    GH2D* ghist = NULL;
@@ -1414,29 +1414,29 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
 
     case kKey_l:
     case kKey_z:
-                 if(GetLogz()){
-                   // Show full y range, not restricted to positive values.
-                   for(unsigned int i=0;i<hists.size();i++) {
-                     hists.at(i)->GetYaxis()->UnZoom();
-                   }
-                   TVirtualPad *cpad = gPad;
-                   this->cd();
-                   gPad->SetLogz(0);
-                   cpad->cd();
-                 } else {
-                   // Only show plot from 0 up when in log scale.
-                   for(unsigned int i=0;i<hists.size();i++) {
-                     if(hists.at(i)->GetYaxis()->GetXmin()<0) {
-                       hists.at(i)->GetYaxis()->SetRangeUser(0,hists.at(i)->GetYaxis()->GetXmax());
-                     }
-                   }
-                   TVirtualPad *cpad = gPad;
-                   this->cd();
-                   gPad->SetLogz(1);
-                   cpad->cd();
-                 }
-                 edited = true;
-                 break;
+      if(GetLogz()){
+        // Show full z range, not restricted to positive values.
+        for(unsigned int i=0;i<hists.size();i++) {
+          hists.at(i)->GetYaxis()->UnZoom();
+        }
+        TVirtualPad *cpad = gPad;
+        this->cd();
+        gPad->SetLogz(0);
+        cpad->cd();
+      } else {
+        // Only show plot from 0 up when in log scale.
+        for(unsigned int i=0;i<hists.size();i++) {
+          if(hists.at(i)->GetYaxis()->GetXmin()<0) {
+            hists.at(i)->GetYaxis()->SetRangeUser(0,hists.at(i)->GetYaxis()->GetXmax());
+          }
+        }
+        TVirtualPad *cpad = gPad;
+        this->cd();
+        gPad->SetLogz(1);
+        cpad->cd();
+      }
+      edited = true;
+      break;
   };
   return edited;
 }
