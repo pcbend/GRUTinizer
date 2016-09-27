@@ -330,7 +330,6 @@ bool GCanvas::CycleBackgroundSubtraction() {
   switch(fBackgroundMode){
     case kNoBackground:
       fBackgroundMode = kRegionBackground;
-      printf("hello??\n");
       Prompt();
       color = kBlue;
       break;
@@ -828,6 +827,42 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
           edited = true;
       }
       break;
+    case kKey_F: 
+      //this->GetListOfPrimitives()->Print();
+      if(hists.back()->IsA() != GH1D::Class())
+        break;
+      {
+      GH1D *ghist = (GH1D*)hists.back();
+      GetContextMenu()->Action(ghist,ghist->Class()->GetMethodAny("DoPhotoPeakFit"));
+      {
+        double x1 = ghist->GetLastXlow();
+        double x2 = ghist->GetLastXhigh();
+        TIter iter(this->GetCanvas()->GetListOfPrimitives());
+        while(TObject *obj = iter.Next()) {
+          if(obj->InheritsFrom(TPad::Class())) {
+            TPad *pad = (TPad*)obj;
+            TIter iter2(pad->GetListOfPrimitives());
+            while(TObject *obj2=iter2.Next()) {
+              if(obj2->InheritsFrom(TH1::Class())) {
+                GH1D* hist = (GH1D*)obj2;
+                hist->DoPhotoPeakFit(x1,x2);
+                pad->Modified();
+                pad->Update();
+              }
+            }
+          }
+        }
+
+        //for(int i=0;i<hists.size()-1;i++)   // this doesn't work, set range needs values not bins.   pcb.
+        //   hists.at(i)->GetXaxis()->SetRangeUser(hists.back()->GetXaxis()->GetFirst(),hists.back()->GetXaxis()->GetLast());
+
+      }
+      edited = true;
+      }
+      break;
+
+
+
 
     case kKey_g:
       if(GausFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx))

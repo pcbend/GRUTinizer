@@ -153,7 +153,7 @@ public:
   void   SetCoreEnergy(float temp) const { fCoreEnergy = temp; }
 
 
-private:
+//private:
   void SortHits();
 
   Long_t  fTimeStamp;

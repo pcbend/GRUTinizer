@@ -69,12 +69,17 @@ void LoadGRUTEnv() {
   }
 }
 
-
+void AclicUseCpp11() {
+  std::string cmd = gSystem->GetMakeSharedLib();
+  cmd = ReplaceAll(cmd,"g++","g++ -std=c++11");
+  gSystem->SetMakeSharedLib(cmd.c_str());
+}
 
 int main(int argc, char **argv) {
   //Find the grut environment variable so that we can read in .grutrc
   LoadGRUTEnv();
   SetGRUTPluginHandlers();
+  AclicUseCpp11();
   //ReplaceCleanups();
 
   // This turns on both the Cint Mutex and gROOT Mutex,

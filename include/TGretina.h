@@ -1,7 +1,9 @@
 #ifndef TGRETINA_H
 #define TGRETINA_H
 
+#ifndef __CINT__
 #include <functional>
+#endif
 
 #include <TObject.h>
 #include <TMath.h>
@@ -30,7 +32,8 @@ public:
   virtual void InsertHit(const TDetectorHit& hit);
   virtual TDetectorHit& GetHit(int i)            { return gretina_hits.at(i); }
 
-  const TGretinaHit& GetGretinaHit(int i) const { return gretina_hits.at(i); }
+  //const TGretinaHit& GetGretinaHit(int i) const { return gretina_hits.at(i); }
+  TGretinaHit GetGretinaHit(int i) const { return gretina_hits.at(i); }
   const TGretinaHit& GetAddbackHit(int i) const { return addback_hits.at(i); }
 
 
@@ -47,7 +50,7 @@ public:
   static void DrawCoreSummary(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
 
   
-#if !defined (__CINT__) 
+#ifndef __CINT__ 
   static void SetAddbackCondition(std::function<bool(const TGretinaHit&,const TGretinaHit&)> condition) {
     fAddbackCondition = condition;
   }
@@ -61,7 +64,7 @@ public:
 
 private:
   void BuildAddback(int EngRange=-1) const;
-#if !defined (__CINT__) 
+#ifndef __CINT__ 
   static std::function<bool(const TGretinaHit&,const TGretinaHit&)> fAddbackCondition;  
 #endif
   virtual int BuildHits(std::vector<TRawEvent>& raw_data);
