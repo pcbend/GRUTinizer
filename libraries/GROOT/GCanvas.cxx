@@ -32,6 +32,7 @@
 
 //#include "GROOTGuiFactory.h"
 #include "GRootCommands.h"
+#include "GCutG.h"
 #include "GH2I.h"
 #include "GH2D.h"
 #include "GH1D.h"
@@ -1249,7 +1250,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
         break;
       {
         static int cutcounter=0;
-        TCutG *cut = new TCutG(Form("_cut%i",cutcounter++),9);
+        GCutG *cut = new GCutG(Form("_cut%i",cutcounter++),9);
         //cut->SetVarX("");
         //cut->SetVarY("");
         //
@@ -1488,7 +1489,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       {
         TIter iter(this->GetListOfPrimitives());
         bool set = !gPad->GetLogz();
-        int counter = 0;
+        //int counter = 0;
         while(TObject *obj = iter.Next()) {
           if(obj->InheritsFrom(TPad::Class())) {
             TPad *pad = (TPad*)obj;

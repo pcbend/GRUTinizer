@@ -365,6 +365,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
     histname = Form("GretinaOverview");
     obj.FillHistogram(histname,4000,0,4000,hit.GetCoreEnergy(),
                                100,0,100,hit.GetCrystalId());
+    
+    histname = Form("GretinaSum");
+    obj.FillHistogram(histname,10000,0,10000,hit.GetCoreEnergy());
+
     histname = Form("GretinaDecompErrorCode");
     obj.FillHistogram(histname,150,0,150,hit.GetPad());       
 
