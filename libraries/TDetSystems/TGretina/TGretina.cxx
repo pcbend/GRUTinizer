@@ -183,14 +183,17 @@ TVector3 TGretina::GetSegmentPosition(int cry_id,int segment) {
 
 TVector3 TGretina::GetCrystalPosition(int cry_id) {
   SetCRMAT();
+  //return CrystalToGlobal(cry_id,0.0,0.0,0.0); 
+  
   TVector3 v;
   v.SetXYZ(0.0,0.0,0.0);
-  for(int i=0;i<6;i++) {
+  for(int i=30;i<36;i++) {
     TVector3 a = GetSegmentPosition(cry_id,i);
     v.SetXYZ(v.X()+a.X(),v.Y()+a.Y(),v.Z()+a.Z());
   }
   v.SetXYZ(v.X()/6.0,v.Y()/6.0,v.Z()/6.0);
   return v;      
+  
 }
 
 void TGretina::Copy(TObject& obj) const {
