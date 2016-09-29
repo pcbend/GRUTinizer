@@ -36,6 +36,7 @@ public:
   TLine *linex;
   TLine *liney;
   void Copy(TObject &object) const;
+  void Print(Option_t *opt) const; 
   bool operator<(const GMarker &rhs) const { return x < rhs.x; }
   ClassDef(GMarker,0)
 };

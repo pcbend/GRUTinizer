@@ -212,10 +212,16 @@ bool GPeak::InitParams(TH1 *fithist){
   TF1::SetParLimits(2,0.1,xhigh-xlow);
   TF1::SetParLimits(3,0.0,40);
   TF1::SetParLimits(4,0.01,5);
-  double step = ((highy-lowy)/largesty)*50;
+  //double step = ((highy-lowy)/largesty)*50;
+  double step = (highy-lowy)/largesty*50;
 
   //TF1::SetParLimits(5,step-step*.1,step+.1*step);
+  //printf(" highy = %.02f \t lowy = %.02f \t step = %.02f\n",highy,lowy,step); fflush(stdout);
+  
   TF1::SetParLimits(5,0.0,step+step);
+  //TF1::SetParLimits(5,0.0,step+step);
+
+
 
   //double slope  = (yhigh-ylow)/(xhigh-xlow);
   //double offset = yhigh-slope*xhigh;
@@ -358,6 +364,7 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
 
 
   if(!verbose) {
+    printf("hist: %s\n",fithist->GetName());
     Print();/*
     printf("BG Area:         %.02f\n",bgArea);
     printf("GetChisquared(): %.4f\n", TF1::GetChisquare());
@@ -379,11 +386,83 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
 }
 
 
+Bool_t GPeak::FitExclude(TH1 *fithist,double xlow,double xhigh,Option_t *opt) {
+  //ok, we are going to assume we have a funny shaped peak here,
+  //freeze all parameters except offset and step and see if we can get the 
+  //bg right so we can at least try to use the sum...  - this is bad, i am going to create and 
+  //return a new one.....
+  TF1 ff("photopeakbg_exclude",GRootFunctions::PhotoPeakBGExcludeRegion,xlow,xhigh,9);
+  ff.SetParName(0,"Height");
+  ff.SetParName(1,"centroid");
+  ff.SetParName(2,"sigma");
+  ff.SetParName(3,"R");
+  ff.SetParName(4,"beta");
+  ff.SetParName(5,"step");
+  ff.SetParName(6,"bg_offset");
+  ff.SetParName(7,"exclude_low");
+  ff.SetParName(8,"exclude_high");
+  
+  ff.FixParameter(0,TF1::GetParameter(0));         //fithist->GetBinContent(bin));
+  ff.FixParameter(1,TF1::GetParameter(1)); 
+  ff.FixParameter(2,TF1::GetParameter(2)); 
+  ff.FixParameter(3,TF1::GetParameter(3)); 
+  ff.FixParameter(4,TF1::GetParameter(4)); 
+  ff.SetParameter(5,TF1::GetParameter(5)); 
+  ff.SetParameter(6,TF1::GetParameter(6)); 
+  ff.FixParameter(7,xlow+10); 
+  ff.FixParameter(8,xhigh-10); 
+
+  fithist->Fit(&ff,"QRN+");
+  
+  TF1::SetParameter(5,ff.GetParameter(5));
+  TF1::SetParameter(6,ff.GetParameter(6));
+  
+  double bgpars[5];
+  bgpars[0] = TF1::GetParameters()[0];
+  bgpars[1] = TF1::GetParameters()[1];
+  bgpars[2] = TF1::GetParameters()[2];
+  bgpars[3] = TF1::GetParameters()[5];
+  bgpars[4] = TF1::GetParameters()[6];
+  //bgpars[5] = TF1::GetParameters()[7];
+  fBGFit.SetParameters(bgpars);
+
+  fArea = this->Integral(xlow,xhigh) / fithist->GetBinWidth(1);
+  double bgArea = fBGFit.Integral(xlow,xhigh) / fithist->GetBinWidth(1);
+  fArea -= bgArea;
 
 
+  if(xlow>xhigh)
+    std::swap(xlow,xhigh);
+  fSum = fithist->Integral(fithist->GetXaxis()->FindBin(xlow),
+                           fithist->GetXaxis()->FindBin(xhigh)); //* fithist->GetBinWidth(1);
+  printf("sum between markers: %02f\n",fSum);
+  fDSum = TMath::Sqrt(fSum);
+  fSum -= bgArea;
+  printf("sum after subtraction: %02f\n",fSum);
 
 
+  //if(!verbose) {
+    printf("exclude on hist: %s\n",fithist->GetName());
+    Print();/*
+    printf("BG Area:         %.02f\n",bgArea);
+    printf("GetChisquared(): %.4f\n", TF1::GetChisquare());
+    printf("GetNDF():        %i\n",   TF1::GetNDF());
+    printf("GetProb():       %.4f\n", TF1::GetProb());*/
+    //TF1::Print();
+  //}
+  
+  fithist->GetListOfFunctions()->Clear();
+  fithist->GetListOfFunctions()->Add(this);
 
+
+  //Copy(*fithist->GetListOfFunctions()->FindObject(GetName()));
+  //fithist->GetListOfFunctions()->Remove(fBGFit.GetName()); 
+  fithist->GetListOfFunctions()->Add(fBGFit.Clone()); //use to be a clone.
+  
+  return true;
+
+
+}
 
 
 

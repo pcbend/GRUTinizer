@@ -285,6 +285,7 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
   printf("sum after subtraction: %02f\n",fSum);
 
   if(!verbose && !noprint) {
+    printf("hist: %s\n",fithist->GetName());
     Print();/*
     printf("BG Area:         %.02f\n",bgArea);
     printf("GetChisquared(): %.4f\n", TF1::GetChisquare());

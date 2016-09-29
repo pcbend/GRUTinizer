@@ -1,6 +1,6 @@
 
 #include "GRootFunctions.h"
-
+#include "TF1.h"
 
 NamespaceImp(GRootFunctions)
 
@@ -22,10 +22,28 @@ Double_t GRootFunctions::LinFit(Double_t *dim, Double_t *par) {
   return PolyBg(dim,par,1);
 }
 
+//Double_t GRootFunctions::LinearBG(Double_t *dim,Double_*par) {
+//  //  -dim[0]: channels to fit
+//  //  -par[0]: offset
+//  //  -par[1]: slope
+//  //  -par[2]: begin of exclude; should be fixed.
+//  //  -par[3]: end of exclude; should be fixed.
+// 
+//  if(!std::is_nan(par[2]) && !std::is_nan(par[3])) {
+//    if(par[2]>par[3])
+//      std::swap(par[2],par[3]);
+//    if(x[0]>par[2] && x[0]<par[3]) {
+//      TF1::RejectPoint();
+//      return 0;
+//    }
+//  }
+//  return par[0] + par[1]*x[0];
+//}
+
+
 Double_t GRootFunctions::QuadFit(Double_t *dim, Double_t *par) {
   return PolyBg(dim,par,2);
 }
-
 
 Double_t GRootFunctions::StepFunction(Double_t *dim, Double_t *par) {
   //  -dim[0]: channels to fit
@@ -108,6 +126,32 @@ Double_t GRootFunctions::PhotoPeakBG(Double_t *dim,Double_t *par) {
   // - par[6]: base bg height.
   // - par[7]: slope of bg.
   
+  double spar[4];
+  spar[0] = par[0];
+  spar[1] = par[1];
+  spar[2] = par[2];
+  spar[3] = par[5];  //stepsize;
+  return Gaus(dim,par) + SkewedGaus(dim,par) + StepFunction(dim,spar) + PolyBg(dim,par+6,0);
+}
+
+Double_t GRootFunctions::PhotoPeakBGExcludeRegion(Double_t *dim,Double_t *par) {
+  // - dim[0]: channels to fit
+  // - par[0]: height of peak
+  // - par[1]: cent of peak
+  // - par[2]: sigma
+  // - par[3]: relative height of skewed gaus to gaus
+  // - par[4]: "skewedness" of the skewed gaussin
+  // - par[5]: size of stepfunction step.
+  
+  // - par[6]: base bg height.
+  
+  // - par[7]: exclude low;
+  // - par[8]: exclude high;
+
+  if(dim[0]>par[7] && dim[0]<par[8]) {
+    TF1::RejectPoint();
+    return 0;
+  }
   double spar[4];
   spar[0] = par[0];
   spar[1] = par[1];
@@ -206,19 +250,24 @@ Double_t GRootFunctions::GammaEff(Double_t *x,Double_t *par) {
 }
 
 
+Double_t GRootFunctions::ComptonFormula(Double_t *x,Double_t *par) {
 
+  //par[0] = inital gamma energy; in keV.
 
+  double lower = 1 + (par[0]/511.)*(1-TMath::Cos(TMath::DegToRad()*x[0]));
+  return par[0]/lower;
 
+}
 
+Double_t GRootFunctions::AnalyzingPower(Double_t *x,Double_t *par) {
 
+  //par[0] = inital gamma energy; in keV.
+  double scattered = ComptonFormula(x,par);
 
-
-
-
-
-
-
-
+  double sin2 = (TMath::Sin(TMath::DegToRad()*x[0]))*(TMath::Sin(TMath::DegToRad()*x[0]));
+  double lower = scattered/par[0] + par[0]/scattered  - sin2;
+  return sin2/lower;
+}
 
 
 
