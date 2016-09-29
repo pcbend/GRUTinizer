@@ -1,7 +1,6 @@
 #include "TDetectorHit.h"
 
 #include <iostream>
-#include <cmath>
 
 #include <TClass.h>
 #include "TRandom.h"
@@ -23,7 +22,7 @@ void TDetectorHit::Clear(Option_t *opt) {
   fCharge = -1;
   fTime = -1;
   fTimestamp = -1;
-  fFlags = 0;
+  fEnergy = sqrt(-1);
 }
 
 void TDetectorHit::Print(Option_t *opt) const { }
@@ -34,44 +33,29 @@ void TDetectorHit::Copy(TObject& obj) const {
   TDetectorHit& hit = (TDetectorHit&)obj;
   hit.fAddress = fAddress;
   hit.fCharge = fCharge;
+  hit.fEnergy = fEnergy;
   hit.fTime = fTime;
   hit.fTimestamp = fTimestamp;
-  hit.fFlags = fFlags;
-}
-
-void TDetectorHit::SetCharge(int charge) {
-  fCharge = charge + gRandom->Uniform();
-  fFlags &= ~kIsEnergy;
-}
-
-void TDetectorHit::SetEnergy(double energy) {
-  fCharge = energy;
-  fFlags |= kIsEnergy;
-}
-
-Int_t  TDetectorHit::Charge() const {
-  if(fFlags & kIsEnergy) {
-    return 0;
-  } else {
-    return fCharge;
-  }
 }
 
 double TDetectorHit::GetEnergy() const {
-  if(fFlags & kIsEnergy) {
-    return fCharge;
+  if(!std::isnan(fEnergy))
+    return fEnergy;
+  TChannel* chan = TChannel::GetChannel(fAddress);
+  if(!chan){
+    fEnergy = Charge() + gRandom->Uniform();
+    //return Charge() + gRandom->Uniform();
   } else {
-    TChannel* chan = TChannel::GetChannel(fAddress);
-    if(!chan){
-      return fCharge;
-    } else {
-      return chan->CalEnergy(fCharge, fTimestamp);
-    }
+    fEnergy = chan->CalEnergy(Charge(), fTimestamp);
   }
+  return fEnergy;
 }
 
 void TDetectorHit::AddEnergy(double eng) {
-  SetEnergy(eng + GetEnergy());
+  if(std::isnan(fEnergy))
+    fEnergy=eng;
+  else
+    fEnergy+=eng;
 }
 
 

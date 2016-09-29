@@ -42,13 +42,13 @@ void TCaesarHit::Print(Option_t *opt) const {
 }
 
 bool TCaesarHit::IsOverflow() const{
-  if (fFlags & kIsEnergy){
-    std::cout << "Attempting to check overflow, but charge is now energy!" << std::endl;
-    return false;
-  }
-  else{
+  //if (fFlags & kIsEnergy){
+  //  std::cout << "Attempting to check overflow, but charge is now energy!" << std::endl;
+  //  return false;
+  //}
+  //else{
     return (((int)Charge()) == 2047);
-  }
+  //}
 }
 
 TVector3 TCaesarHit::GetPosition() const {

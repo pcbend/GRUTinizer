@@ -4,36 +4,59 @@ vector<double> YTA_Centroid;
 vector<double> ATA_Offsets;
 vector<double> BTA_Offsets;
 vector<int> ATABTA_Run;
+vector<int> RunNumbers;
 
-bool GetATABTAOffsets(const char* outfile){
+
+bool GetATABTAOffsets(string Directory, double InitialVal = 0.0/*degrees*/){
 
   if(!(ATA_Offsets.size()) || !(BTA_Offsets.size())) return 0;
-  ofstream outFile;
-  outFile.open(outfile);
+  //  outFile.open(outfile);
   for(int i=0;i<ATA_Offsets.size();i++){
+
+    ifstream checkFile;
+    ofstream outFile;
+    std::string FileName = Form("%s/values_run%04i.val",Directory.c_str(),RunNumbers.at(i));
+    // std::cout << "=======================" << std::endl;
+    // std::cout << FileName << std::endl;
+
+    //check to see if file exists:
+    checkFile.open(FileName.c_str());
+    if(checkFile.good()){
+      // std::cout << " File exists!!!" << std::endl;
+      std::string NewOutName = Form("%s/values_run%04i_WithATAOff.val",Directory.c_str(),RunNumbers.at(i));
+      // std::cout << " New outfile = " << NewOutName << std::endl;
+      outFile.open(NewOutName.c_str());
+      while(!(checkFile.eof())){
+	string eat;
+	getline(checkFile,eat);
+	outFile << eat << std::endl;
+      }
+      
+      checkFile.close();
+    } else{
+      checkFile.close();
+      // std::cout << " File DOES NOT exist :( " << std::endl;
+      outFile.open(FileName.c_str());
+    }
+
+
     std::cout << " --- Run : " << ATABTA_Run.at(i) << std::endl;
-    std::cout << "  ATA Offset = " << ATA_Offsets.at(i) << " radians " << std::endl;
-    std::cout << "  BTA Offset = " << BTA_Offsets.at(i) << " radians " << std::endl;
+    std::cout << "  ATA Offset      = " << ATA_Offsets.at(i) << " radians " << std::endl;
+    std::cout << "  ATA Offset      = " << ATA_Offsets.at(i)*TMath::RadToDeg() << " degrees " << std::endl;
+    std::cout << "  ATA Offset-Init = " << InitialVal+ATA_Offsets.at(i)*TMath::RadToDeg() << " degrees " << std::endl;
 
-    outFile << " --- Run : " << ATABTA_Run.at(i) << std::endl;
-    outFile << "  ATA Offset = " << ATA_Offsets.at(i) << " radians " << std::endl;
-    outFile << "  ATA Offset = " << ATA_Offsets.at(i)*TMath::RadToDeg() << " degrees " << std::endl;
-    outFile << "  BTA Offset = " << BTA_Offsets.at(i) << " radians " << std::endl;
-    outFile << "  BTA Offset = " << BTA_Offsets.at(i)*TMath::RadToDeg() << " degrees " << std::endl << std::endl;
-    outFile << " ATA_SHIFT { " << std::endl;
-    outFile << "  Value: " << ATA_Offsets.at(i)*TMath::RadToDeg() << std::endl;
+    outFile << std::endl;
+    outFile << "ATA_SHIFT { " << std::endl;
+    outFile << "  Value: " << InitialVal+ATA_Offsets.at(i)*TMath::RadToDeg() << std::endl;
     outFile << "}" << std::endl << std::endl;
-    outFile << " BTA_SHIFT { " << std::endl;
-    outFile << "  Value: " << BTA_Offsets.at(i)*TMath::RadToDeg() << std::endl;
-    outFile << "}" << std::endl << std::endl;
-    
-
+    outFile.close();
   }
-  outFile.close();
+  
   return 1;
 }
 
-TList *CheckATABTA(float lowa=0,float higha=0,float lowb=0,float highb=0){
+TList *CheckATABTA(float lowa=0,float higha=0,float lowb=0,float highb=0,
+		   double rebin = 0,bool UseMean = false){
   TList *HistList = new TList;
   TList *FileList = gROOT->GetListOfFiles();
   int NumFiles = FileList->GetSize();
@@ -46,17 +69,25 @@ TList *CheckATABTA(float lowa=0,float higha=0,float lowb=0,float highb=0){
   TCanvas *TACanv = new TCanvas("TACanv","Target Angle Canvas"); // 2D plots
   TCanvas *ATACanv = new TCanvas("ATACanv","ATA Canvas");        // 1d ATA 
   TCanvas *BTACanv = new TCanvas("BTACanv","BTA Canvas");        // 1d BTA
+
+  if(RunNumbers.size()>0)
+    RunNumbers.clear();
   
-  if(NumFiles%2==0){
-    int FirstDivide = NumFiles/2;
-    TACanv->Divide(FirstDivide,2);
-    ATACanv->Divide(FirstDivide,2);
-    BTACanv->Divide(FirstDivide,2);
+  if(NumFiles%4==0){
+    int FirstDivide = NumFiles/4;
+    TACanv->Divide(FirstDivide,4);
+    ATACanv->Divide(FirstDivide,4);
+    BTACanv->Divide(FirstDivide,4);
   }else if(NumFiles%3==0){ 
     int FirstDivide = NumFiles/3;
     TACanv->Divide(FirstDivide,3);
     ATACanv->Divide(FirstDivide,3);
     BTACanv->Divide(FirstDivide,3);
+  }else if(NumFiles%2==0){ 
+    int FirstDivide = NumFiles/2;
+    TACanv->Divide(FirstDivide,2);
+    ATACanv->Divide(FirstDivide,2);
+    BTACanv->Divide(FirstDivide,2);
   } else{
     TACanv->Divide(NumFiles);
     ATACanv->Divide(NumFiles);
@@ -77,6 +108,11 @@ TList *CheckATABTA(float lowa=0,float higha=0,float lowb=0,float highb=0){
   double highCentATA=0;
   double highCentBTA=0;
   double lowRun=0,highRun=0;
+  double ATA_mean=0.0;
+  double BTA_mean=0.0;
+  double ATA_stdev=0.0;
+  double BTA_stdev=0.0;
+
   for(int i=0;i<NumFiles;i++){
     TFile *WorkingFile = (TFile*)FileList->At(i);
     
@@ -128,7 +164,11 @@ TList *CheckATABTA(float lowa=0,float higha=0,float lowb=0,float highb=0){
     
     TH1D *ProjATA = ATA_vs_BTA->ProjectionX(Form("ATA_Run%s",run.c_str()));
     TH1D *ProjBTA = ATA_vs_BTA->ProjectionY(Form("BTA_Run%s",run.c_str()));
-
+    if(rebin!=0){
+      UseMean = false;
+      ProjATA->Rebin(rebin);
+      ProjBTA->Rebin(rebin);
+    }
 
     double ProjATA_yMax = ProjATA->GetMaximum();
     double ProjBTA_yMax = ProjBTA->GetMaximum();
@@ -144,9 +184,17 @@ TList *CheckATABTA(float lowa=0,float higha=0,float lowb=0,float highb=0){
     LineATA->SetLineStyle(kDashed);
     LineATA->SetLineWidth(3);
     LineATA->Draw("Same");
-    GausFit(ProjATA,lowa,higha);
-    double CentATA = GetCentroid(ProjATA);
+    std::cout << " Low A = " << lowa << std::endl;
+    std::cout << " High A = " << higha << std::endl;
+    if(!UseMean){
+      GGaus *g1 = GausFit(ProjATA,lowa,higha);
+      double CentATA = g1->GetCentroid();
+    }else{
+      CentATA = ProjATA->GetMean();
+    }
+    ATA_mean += CentATA;
     ATA_Offsets.push_back(-CentATA); // Do I want to do this?
+    RunNumbers.push_back(runNumb);
     ProjATA->SetTitle(Form("ATA Run%s Centoid = %.4f",run.c_str(),CentATA));
     ATAGraph->SetPoint(i,runNumb,CentATA);
     ATABTA_Run.push_back(runNumb);
@@ -158,8 +206,15 @@ TList *CheckATABTA(float lowa=0,float higha=0,float lowb=0,float highb=0){
     LineBTA->SetLineStyle(kDashed);
     LineBTA->SetLineWidth(3);
     LineBTA->Draw("Same");
-    GausFit(ProjBTA,lowb,highb);
-    double CentBTA = GetCentroid(-ProjBTA);
+    std::cout << " Low B = " << lowb << std::endl;
+    std::cout << " High B = " << highb << std::endl;
+    if(!UseMean){
+      GGaus *g2 = GausFit(ProjBTA,lowb,highb);
+      double CentBTA = g2->GetCentroid();
+    }else{
+      CentBTA= ProjBTA->GetMean();
+    }
+    BTA_mean += CentBTA;
     BTA_Offsets.push_back(CentBTA); // Do I want to do this?
     ProjBTA->SetTitle(Form("BTA Run%s Centoid = %.4f",run.c_str(),CentBTA));
     BTAGraph->SetPoint(i,runNumb,CentBTA);
@@ -224,11 +279,27 @@ TList *CheckATABTA(float lowa=0,float higha=0,float lowb=0,float highb=0){
   HistList->Add(ATAGraph);
   HistList->Add(BTAGraph);
 
+
+  double N = (double)(BTA_Offsets.size());
+  BTA_mean = BTA_mean / N;
+  ATA_mean = ATA_mean / N;
+  for(int j=0;j<BTA_Offsets.size();j++){
+    ATA_stdev = TMath::Power((ATA_Offsets.at(j)-ATA_mean),2);
+    BTA_stdev = TMath::Power((BTA_Offsets.at(j)+BTA_mean),2);
+  }
+  ATA_stdev = TMath::Sqrt(ATA_stdev/N);
+  BTA_stdev = TMath::Sqrt(BTA_stdev/N);
+
+  std::cout << "---------------------" << std::endl;
+  std::cout << " ATA = " << ATA_mean << " +- " << ATA_stdev << std::endl;
+  std::cout << " BTA = " << BTA_mean << " +- " << BTA_stdev << std::endl;
+
+  
   return HistList;
 }
 
 
-TList *CheckYTA(float low=0,float high=0){
+TList *CheckYTA(float low=0,float high=0,bool UseMean=false){
   TList *HistList = new TList;
   TList *FileList = gROOT->GetListOfFiles();
   int NumFiles = FileList->GetSize();
@@ -237,12 +308,15 @@ TList *CheckYTA(float low=0,float high=0){
   YTAGraph->SetName("YTA_Graph");
   TCanvas *YTACanv = new TCanvas("YTACanv","YTA Canvas");
   
-  if(NumFiles%2==0){
-    int FirstDivide = NumFiles/2;
-    YTACanv->Divide(FirstDivide,2);
+  if(NumFiles%4==0){
+    int FirstDivide = NumFiles/4;
+    YTACanv->Divide(FirstDivide,4);
   }else if(NumFiles%3==0){ 
     int FirstDivide = NumFiles/3;
     YTACanv->Divide(FirstDivide,3);
+  }else if(NumFiles%2==0){ 
+    int FirstDivide = NumFiles/2;
+    YTACanv->Divide(FirstDivide,2);
   } else{
     YTACanv->Divide(NumFiles);
   }
@@ -251,6 +325,9 @@ TList *CheckYTA(float low=0,float high=0){
     low=-20;
     high=20;
   }
+
+  double mean  = 0.0;
+  double stdev = 0.0;
   
   double lowRun=0,highRun=0;
   double lowCent1=0,highCent1=0;
@@ -290,7 +367,7 @@ TList *CheckYTA(float low=0,float high=0){
 
     WorkingFile->cd("InverseMap");
     
-    TH1I *Proj1 = S800_YTA;
+    GH1D *Proj1 = S800_YTA;
     Proj1->GetXaxis()->SetRangeUser(low-10,high+10);
     double Proj1_yMax = Proj1->GetMaximum();
     
@@ -301,10 +378,15 @@ TList *CheckYTA(float low=0,float high=0){
     Line1->SetLineStyle(kDashed);
     Line1->SetLineWidth(3);
     Line1->Draw("Same");
-    TF1 *gfit = new TF1("gfit","gaus",low,high);
-    Proj1->Fit(gfit);
-    double Cent1 = gfit->GetParameter("Mean");
+    if(!UseMean){
+      TF1 *gfit = new TF1("gfit","gaus",low,high);
+      Proj1->Fit(gfit);
+      double Cent1 = gfit->GetParameter("Mean");
+    }else{
+      double Cent1 = Proj1->GetMean();
+    }
     YTA_Centroid.push_back(Cent1);
+    mean += Cent1;
     Proj1->SetTitle(Form("YTA Run%s Centoid = %.6f",run.c_str(),Cent1));
     YTAGraph->SetPoint(i,runNumb,Cent1);
 
@@ -349,20 +431,58 @@ TList *CheckYTA(float low=0,float high=0){
   Line3->Draw("same");
   
   HistList->Add(YTAGraph);
+
+  double N = (double)(YTA_Centroid.size());
+  mean = mean / N;
+  for(int j=0;j<YTA_Centroid.size();j++){
+    stdev = TMath::Power((YTA_Centroid.at(j)-mean),2);
+  }
+  stdev = TMath::Sqrt(stdev/N);
+
+  std::cout << "---------------------" << std::endl;
+  std::cout << " YTA = " << mean << " +- " << stdev << std::endl;
+
+
   
   return HistList;
 }
 
-bool GetNewSlopes(double slope1=1,double offset1=0,double slope2=0,double offset2=0){
-  if((slope1==1 && offset1==0) || (slope1==2 && offset2==0) ){
+bool GetNewSlopes(double slope1=1,double offset1=0,double slope2=1,double offset2=0, string fileName = ""){
+  if((slope1==1 && offset1==0) || (slope2==1 && offset2==0) ){
     cout << " Input a slope and offset please" << endl;
     return 0;
   }
 
+  ifstream inFile;
+  std::vector<string> Part1;
+  std::vector<string> Part2;
+  std::vector<string> Part3;
+  if(!(fileName.empty())){
+    inFile.open(fileName.c_str());
+    int inFile_counter = 0;
+    while(!(inFile.eof())){
+      string eat;
+      getline(inFile,eat);
+      Part1.push_back(eat);
+      getline(inFile,eat);
+      Part2.push_back(eat);
+      getline(inFile,eat);
+      Part3.push_back(eat);
+      getline(inFile,eat);
+      
+      // std::cout << " -----------" << std::endl;
+      // std::cout << Part1.at(inFile_counter) << std::endl;
+      // std::cout << Part2.at(inFile_counter) << std::endl;
+      // std::cout << Part3.at(inFile_counter) << std::endl;
+      inFile_counter++;
+    }
+  }
+
+  //return false;  
   double NewSlope1;
   double NewSlope2;
-  double UnCalVal1=0;
-  double UnCalVal2=0;
+  double UnCalVal1=0.0;
+  double UnCalVal2=0.0;
   int Centroids = CRDC1_Y_Centroid.size();
   printf("------ CRDC 1 Old Slope = %.5f -- Old Offset = %.5f ------\n",slope1,offset1);
   printf("------ CRDC 2 Old Slope = %.5f -- Old Offset = %.5f ------\n",slope2,offset2);
@@ -373,18 +493,44 @@ bool GetNewSlopes(double slope1=1,double offset1=0,double slope2=0,double offset
     
     NewSlope1 = (-offset1/UnCalVal1);
     NewSlope2 = (-offset2/UnCalVal2);
-
-    printf(" - - - Run %f - - - \n",i); 
+    
+    printf(" - - - Run %f - - - \n",RunNumbers.at(i)); 
     printf(" CRDC1 : New Slope  = %.5f \n",NewSlope1);
     printf(" CRDC2 : New Slope  = %.5f \n",NewSlope2);
- 
+
+    ofstream outfile;
+    outfile.open(Form("values_run%04i.val",RunNumbers.at(i)));
+    for(int j=0;j<Part1.size();j++){
+      outfile << Part1.at(j) << std::endl;
+      outfile << Part2.at(j) << std::endl;
+      outfile << Part3.at(j) << std::endl << std::endl;
+    }
+    outfile << "CRDC1_Y_SLOPE {" << std::endl;
+    outfile << "  Value: " << NewSlope1 << std::endl;
+    outfile << "}" << std::endl<<endl;
+
+    outfile << "CRDC1_Y_OFFSET {" << std::endl;
+    outfile << "  Value: " << offset1 << std::endl;
+    outfile << "}" << std::endl<<endl;
+    
+    outfile << "CRDC2_Y_SLOPE {" << std::endl;
+    outfile << "  Value: " << NewSlope2 << std::endl;
+    outfile << "}" << std::endl<<endl;
+
+    outfile << "CRDC2_Y_OFFSET {" << std::endl;
+    outfile << "  Value: " << offset2 << std::endl;
+    outfile << "}" << std::endl<<endl;
+        
+    outfile.close();
+    
   }
   
   return 1;
 }
 
 
-TList *CheckCalibratedCRDCY(int low=0,int high=0){
+TList *CheckCalibratedCRDCY(int low=0,int high=0,
+			    bool UseZoom = false, bool UseMean = false){
   
   TList *HistList = new TList;
   TList *FileList = gROOT->GetListOfFiles();
@@ -401,30 +547,56 @@ TList *CheckCalibratedCRDCY(int low=0,int high=0){
   TCanvas *TwoDCanvas2 = new TCanvas("TwoDCanvas2","2D Canvas CRDC 2");
   TCanvas *CRDC1 = new TCanvas("CRDC1","CRDC1");
   TCanvas *CRDC2 = new TCanvas("CRDC2","CRDC2");
+
+  if(RunNumbers.size()>0)
+    RunNumbers.clear();
+
+  std::cout << " NumFiles = " << NumFiles << std::endl;
+  std::cout << " NumFiles%4 = " << NumFiles%4 << std::endl;
   
-  if(NumFiles%2==0){
-    int FirstDivide = NumFiles/2;
-    TwoDCanvas1->Divide(FirstDivide,2);
-    TwoDCanvas2->Divide(FirstDivide,2);
-    CRDC1->Divide(FirstDivide,2);
-    CRDC2->Divide(FirstDivide,2);
-  }else if(NumFiles%3==0){ 
+  if(NumFiles%4==0){
+    int FirstDivide = NumFiles/4;
+    TwoDCanvas1->Divide(FirstDivide,4);
+    TwoDCanvas2->Divide(FirstDivide,4);
+    CRDC1->Divide(FirstDivide,4);
+    CRDC2->Divide(FirstDivide,4);
+  }else if(NumFiles%3==0 && NumFiles%4!=0){ 
     int FirstDivide = NumFiles/3;
     TwoDCanvas1->Divide(FirstDivide,3);
     TwoDCanvas2->Divide(FirstDivide,3);
     CRDC1->Divide(FirstDivide,3);
     CRDC2->Divide(FirstDivide,3);
-  } else{
+  }else if(NumFiles%2==0 && NumFiles%4!=0 && NumFiles%3!=0){
+    int FirstDivide = NumFiles/2;
+    TwoDCanvas1->Divide(FirstDivide,2);
+    TwoDCanvas2->Divide(FirstDivide,2);
+    CRDC1->Divide(FirstDivide,2);
+    CRDC2->Divide(FirstDivide,2);
+  }else{
     TwoDCanvas1->Divide(NumFiles);
     TwoDCanvas2->Divide(NumFiles);
     CRDC1->Divide(NumFiles);
     CRDC2->Divide(NumFiles);
   }
-  
+
+
+  int low1  = 0;
+  int low2  = 0;
+  int high1 = 0;
+  int high2 = 0;
   if(low==0 && high==0){
-    low=-400;
-    high=400;
+    low1  =-400;
+    high1 =400;
+    low2  =-400;
+    high2 =400;
+  }else{
+    low1  =low;
+    high1 =high;
+    low2  =-low;
+    high2 =-high;
+  
   }
+  
   
   double lowRun=0,highRun=0;
   double lowCent1=0,highCent1=0;
@@ -469,10 +641,14 @@ TList *CheckCalibratedCRDCY(int low=0,int high=0){
     Line0->SetLineStyle(kDashed);
     Line0->SetLineWidth(3);
     CRDC1_Y_vs_S800Timestamp->SetTitle(Form("CRDC1 Calibrated Y Run%s vs Timestamp",run.c_str()));
+    if(UseZoom)
+      CRDC1_Y_vs_S800Timestamp->GetYaxis()->SetRangeUser(low1-10,high1+10);
     CRDC1_Y_vs_S800Timestamp->Draw();
     Line0->Draw("same");
     TwoDCanvas2->cd(i+1);
     CRDC2_Y_vs_S800Timestamp->SetTitle(Form("CRDC2 Calibrated Y Run%s vs Timestamp",run.c_str()));
+    if(UseZoom)
+      CRDC2_Y_vs_S800Timestamp->GetYaxis()->SetRangeUser(low2-10,high2+10);
     CRDC2_Y_vs_S800Timestamp->Draw();
     Line0->Draw("same");
     
@@ -494,9 +670,14 @@ TList *CheckCalibratedCRDCY(int low=0,int high=0){
     Line1->SetLineStyle(kDashed);
     Line1->SetLineWidth(3);
     Line1->Draw("Same");
-    GausFit(Proj1,low,high);
-    double Cent1 = GetCentroid(Proj1);
+    if(!UseMean){
+      GGaus *g1 = GausFit(Proj1,low1,high1);
+      double Cent1 = g1->GetCentroid();//(Proj1);
+    } else{
+      double Cent1 = Proj1->GetMean(1);
+    }
     CRDC1_Y_Centroid.push_back(Cent1);
+    RunNumbers.push_back(runNumb);
     Proj1->SetTitle(Form("CRDC1 Calibrated Y Run%s Centoid = %.4f",run.c_str(),Cent1));
     CRDC1Graph->SetPoint(i,runNumb,Cent1);
 
@@ -507,8 +688,12 @@ TList *CheckCalibratedCRDCY(int low=0,int high=0){
     Line2->SetLineStyle(kDashed);
     Line2->SetLineWidth(3);
     Line2->Draw("same");
-    GausFit(Proj2,low,high);
-    double Cent2 = GetCentroid(Proj2);
+    if(!UseMean){
+      GGaus *g2 = GausFit(Proj2,low2,high2);
+      double Cent2 = g2->GetCentroid();//Proj2);
+    } else{
+      double Cent2 = Proj2->GetMean(1);
+    }
     CRDC2_Y_Centroid.push_back(Cent2);
     Proj2->SetTitle(Form("CRDC2 Calibrated Y Run%s Centoid = %.4f",run.c_str(),Cent2));
     CRDC2Graph->SetPoint(i,runNumb,Cent2);
@@ -691,8 +876,8 @@ TList *CheckUnShiftedCRDCY(int low=0,int high=0){
     Line1->SetLineStyle(kDashed);
     Line1->SetLineWidth(3);
     Line1->Draw("Same");
-    GausFit(Proj1,low1,high1);
-    double Cent1 = GetCentroid(Proj1);
+    GGaus *g1 = GausFit(Proj1,low1,high1);
+    double Cent1 = g1->GetCentroid();//Proj1);
     Proj1->SetTitle(Form("CRDC1 UnShifted Y Run%s Centoid = %.2f",run.c_str(),Cent1));
     CRDC1Graph->SetPoint(i,runNumb,Cent1);
 
@@ -703,8 +888,8 @@ TList *CheckUnShiftedCRDCY(int low=0,int high=0){
     Line2->SetLineStyle(kDashed);
     Line2->SetLineWidth(3);
     Line2->Draw("same");
-    GausFit(Proj2,low2,high2);
-    double Cent2 = GetCentroid(Proj2);
+    GGaus *g2 = GausFit(Proj2,low2,high2);
+    double Cent2 = g2->GetCentroid();//Proj2);
     Proj2->SetTitle(Form("CRDC2 UnShifted Y Run%s Centoid = %.2f",run.c_str(),Cent2));
     CRDC2Graph->SetPoint(i,runNumb,Cent2);
 
@@ -852,8 +1037,8 @@ TList *CheckRawCrdcY(int low=0,int high=0){
     Line1->SetLineStyle(kDashed);
     Line1->SetLineWidth(3);
     //Line1->Draw("Same");
-    GausFit(Proj1,low,high);
-    double Cent1 = GetCentroid(Proj1);
+    GGaus *g1 = GausFit(Proj1,low,high);
+    double Cent1 = g1->GetCentroid();//Proj1);
     Proj1->SetTitle(Form("CRDC1 Raw Y Run%s Centoid = %.2f",run.c_str(),Cent1));
     CRDC1Graph->SetPoint(i,runNumb,Cent1);
 
@@ -864,8 +1049,8 @@ TList *CheckRawCrdcY(int low=0,int high=0){
     Line2->SetLineStyle(kDashed);
     Line2->SetLineWidth(3);
     //Line2->Draw("same");
-    GausFit(Proj2,low,high);
-    double Cent2 = GetCentroid(Proj2);
+    GGaus *g2 = GausFit(Proj2,low,high);
+    double Cent2 = g2->GetCentroid();//Proj2);
     Proj2->SetTitle(Form("CRDC2 Raw Y Run%s Centoid = %.2f",run.c_str(),Cent2));
     CRDC2Graph->SetPoint(i,runNumb,Cent2);
 
