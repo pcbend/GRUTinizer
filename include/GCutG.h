@@ -18,7 +18,7 @@ class GCutG : public TCutG {
     
     virtual void Print(Option_t *opt="") const;
 
-    int SaveTo(const char* filename="",Option_t* option="update"); // *MENU* 
+    int SaveTo(const char *cutname="",const char* filename="",Option_t* option="update"); // *MENU* 
     
   private:
 
