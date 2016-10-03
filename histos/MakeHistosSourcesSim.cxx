@@ -16,11 +16,11 @@
 #include "TS800.h"
 #include "TBank29.h"
 #include "TS800.h"
+#include "TGretSim.h"
 #include "GValue.h"
 
 
 #include "TChannel.h"
-#include "GValue.h"
 
 #define Q1 15
 #define Q2 7
@@ -68,15 +68,31 @@ void MakeHistograms(TRuntimeObjects& obj) {
   TGretina *gretina = obj.GetDetector<TGretina>();
   TBank29  *bank29  = obj.GetDetector<TBank29>();
   TS800 *s800       = obj.GetDetector<TS800>();
-
-  if(!gretina)
-    return;
-
-  Double_t res = 1./1000.; // Relative energy resolution
+  TGretSim *gretSim = obj.GetDetector<TGretSim>();
   
   Int_t    energyNChannels = 4000;
   Double_t energyLlim = 0.;
   Double_t energyUlim = 4000.;
+  
+  if(gretSim){
+    for(int x=0; x<gretSim->Size(); x++){
+      TGretSimHit hit = gretSim->GetGretinaSimHit(x);
+      obj.FillHistogram("sim","emitted_energy",
+			energyNChannels, energyLlim, energyUlim,
+			hit.GetEn());
+      obj.FillHistogram("sim","emitted_theta",
+			180, 0., 180.,
+			hit.GetTheta()*TMath::RadToDeg());
+      obj.FillHistogram("sim","emitted_phi",
+			360, 0., 360.,
+			hit.GetPhi()*TMath::RadToDeg());
+    }
+  }
+
+  if(!gretina)
+    return;
+  
+  Double_t res = 1./1000.; // Relative energy resolution
   
   Double_t calorimeterEnergy_gaus = 0.;
   std::vector<TGretinaHit> hits;
@@ -94,12 +110,36 @@ void MakeHistograms(TRuntimeObjects& obj) {
   if(iGate>=0){
     for(int i=0; i<gretina->Size(); i++){
       TGretinaHit hit = gretina->GetGretinaHit(i);
-      if(i != iGate)
+      if(i != iGate){
 	obj.FillHistogram("energy",
 			  Form("energy_gaus_%.0f",
 			       (eGateLlim+eGateUlim)/2.0),
 			  energyNChannels, energyLlim, energyUlim,
 			  hit.GetCoreEnergy()*gRandom->Gaus(1,res));
+	obj.FillHistogram("energy",
+			  Form("fold_vs_energy_gaus_%.0f",
+			       (eGateLlim+eGateUlim)/2.0),
+			  energyNChannels/8, energyLlim, energyUlim,
+			  hit.GetCoreEnergy()*gRandom->Gaus(1,res),
+			  20, 0, 20, hit.NumberOfInteractions());
+
+	// Count segment fold
+	int segment_fold = hit.NumberOfInteractions();
+	for(int y=0; y < hit.NumberOfInteractions(); y++)
+	  for(int z = y+1; z < hit.NumberOfInteractions(); z++)
+	    if(hit.GetSegmentId(y) == hit.GetSegmentId(z)){
+	      segment_fold--;
+	      break;
+	    }
+
+	obj.FillHistogram("energy",
+			  Form("segfold_vs_energy_gaus_%.0f",
+			       (eGateLlim+eGateUlim)/2.0),
+			  energyNChannels/8, energyLlim, energyUlim,
+			  hit.GetCoreEnergy()*gRandom->Gaus(1,res),
+			  20, 0, 20, segment_fold);
+	
+      }
     }
   }
   
@@ -126,7 +166,32 @@ void MakeHistograms(TRuntimeObjects& obj) {
     obj.FillHistogram("energy", "energy_gaus",
 		      energyNChannels, energyLlim, energyUlim,
 		      hit.GetCoreEnergy()*gRandom->Gaus(1,res));
-		      
+
+    obj.FillHistogram("energy", "fold_vs_energy",
+		      energyNChannels/8, energyLlim, energyUlim,
+		      hit.GetCoreEnergy(),
+		      20, 0, 20, hit.NumberOfInteractions());
+
+    obj.FillHistogram("energy", "fold_vs_energy_gaus",
+		      energyNChannels/8, energyLlim, energyUlim,
+		      hit.GetCoreEnergy()*gRandom->Gaus(1,res),
+		      20, 0, 20, hit.NumberOfInteractions());
+
+    // Count segment fold
+    int segment_fold = hit.NumberOfInteractions();
+    for(int y=0; y < hit.NumberOfInteractions(); y++)
+      for(int z = y+1; z < hit.NumberOfInteractions(); z++)
+	if(hit.GetSegmentId(y) == hit.GetSegmentId(z)){
+	  segment_fold--;
+	  break;
+	}
+
+    obj.FillHistogram("energy",
+		      "segfold_vs_energy_gaus",
+		      energyNChannels/8, energyLlim, energyUlim,
+		      hit.GetCoreEnergy()*gRandom->Gaus(1,res),
+		      20, 0, 20, segment_fold);
+
     if( hit.GetCrystalId()%2 )
       obj.FillHistogram("energy",  "energy_gaus_A",
 			energyNChannels, energyLlim, energyUlim,

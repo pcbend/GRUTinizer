@@ -3,8 +3,8 @@ Unix.*.Root.MacroPath: .:$(GRUTSYS)/util:$(ROOTSYS)/macros
 
 #default MakeHistos library
 
-GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistosSources.so
-#GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistosSourcesTest.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistosSourcesSim.so
+GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistosInBeam.so
 
 GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
 
@@ -34,7 +34,6 @@ Canvas.ShowGuideLines: false
 
 Root.Fitter: Fumili2
 #Root.Fitter: Minuit
-
 
 
 Gui.IconPath:      $(GRUTSYS)/icons:$(ROOTSYS)/icons

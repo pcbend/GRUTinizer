@@ -360,12 +360,18 @@ TVector3 TGretinaHit::GetFirstIntPosition() const {
   double zoffset = GValue::Value("GRETINA_Z_OFFSET");
   if(std::isnan(zoffset))
     zoffset=0.00;
- 
-  TVector3 offset(xoffset,yoffset,zoffset);
   
-  if(GetFirstIntPoint()>-1)
-     return GetInteractionPosition(GetFirstIntPoint()) + offset;
-   return TDetectorHit::BeamUnitVec;
+  TVector3 offset(xoffset,yoffset,zoffset);
+
+  if(GetFirstIntPoint()>-1){
+    TVector3 IntPos = GetInteractionPosition(GetFirstIntPoint());
+    IntPos.SetX(IntPos.X()+xoffset);
+    IntPos.SetY(IntPos.Y()+yoffset);
+    IntPos.SetZ(IntPos.Z()+zoffset);
+
+    return IntPos;
+  }
+  return TDetectorHit::BeamUnitVec;
 }
 
 TVector3 TGretinaHit::GetFirstIntPosition_2() const {

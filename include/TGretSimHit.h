@@ -54,6 +54,15 @@ public:
     return tmp;
   }
 
+  double GetPhi() {
+    double phi = fPosit.Phi();
+    if(phi<0) {
+      return TMath::TwoPi()+phi;
+    } else {
+      return phi;
+    }
+  }
+  double GetTheta()    const { return fPosit.Theta(); }
 
   /*
   double GetPhi(int id=0) {
