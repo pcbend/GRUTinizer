@@ -142,12 +142,12 @@ void MakeHistograms(TRuntimeObjects& obj) {
       }
     }
   }
-  
+
+  // Addback preprocessing
   for(int x=0; x<gretina->Size(); x++){
 
     TGretinaHit hit = gretina->GetGretinaHit(x);
-
-    // Addback preprocessing
+    
     if(hit.GetCoreEnergy() > energyLlim &&
        hit.GetCoreEnergy() < energyUlim){
 
@@ -156,7 +156,14 @@ void MakeHistograms(TRuntimeObjects& obj) {
       hits.push_back(hit);
 
     }
-    
+  }
+  
+  int max_layer = -1;
+
+  for(int x=0; x<gretina->Size(); x++){
+
+    TGretinaHit hit = gretina->GetGretinaHit(x);
+
     //                directory, histogram
     obj.FillHistogram("energy", "overview_gaus",
 		      energyNChannels, energyLlim, energyUlim,
@@ -238,7 +245,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
 			1200, -10, 100, hit.GetLocalPosition(0).Z());
     }
     
-    int max_layer = -1;
     for(int y=0; y < hit.NumberOfInteractions(); y++){
 
       int layer = hit.GetSegmentId(y)/6;
@@ -292,10 +298,19 @@ void MakeHistograms(TRuntimeObjects& obj) {
   obj.FillHistogram("addback",  "calorimeter_gaus",
 		    energyNChannels, energyLlim, energyUlim,
 		    calorimeterEnergy_gaus);
-
+  for(int k = 5; k > 0; k--){
+    if(max_layer < k){
+      obj.FillHistogram("addback",
+			Form("calorimeter_gaus_below_%s",
+			     LayerMap[k].c_str()),
+			energyNChannels, energyLlim, energyUlim,
+			calorimeterEnergy_gaus);
+    }
+  }
+  
   // For energy-gated addback spectra
-  Double_t ABenergy[100];
-  TString  ABtype[100];
+  std::vector<Double_t> ABenergy;
+  std::vector<TString> ABtype;
   Int_t    Naddback = 0;
   iGate = -1;
   
@@ -383,8 +398,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
        addbackEnergy_gaus < eGateUlim)
       iGate = Naddback;
 
-    ABenergy[Naddback] = addbackEnergy_gaus;
-    ABtype[Naddback]   = addbackType;
+    ABenergy.push_back(addbackEnergy_gaus);
+    ABtype.push_back(addbackType);
     Naddback++;
 
   }

@@ -78,6 +78,52 @@ void MakeHistograms(TRuntimeObjects& obj) {
   
   Double_t calorimeterEnergy = 0.;
   std::vector<TGretinaHit> hits;
+
+  // Gamma-gated crystal spectrum
+  Double_t eGateLlim = 1327.5;
+  Double_t eGateUlim = 1337.5;
+  int iGate = -1;
+  for(int i=0; i<gretina->Size(); i++){
+    TGretinaHit hit = gretina->GetGretinaHit(i);
+    if( hit.GetCoreEnergy() > eGateLlim &&
+        hit.GetCoreEnergy() < eGateUlim )
+      iGate = i;
+  }
+  if(iGate>=0){
+    for(int i=0; i<gretina->Size(); i++){
+      TGretinaHit hit = gretina->GetGretinaHit(i);
+      if(i != iGate){
+	obj.FillHistogram("energy",
+			  Form("energy_%.0f",
+			       (eGateLlim+eGateUlim)/2.0),
+			  energyNChannels, energyLlim, energyUlim,
+			  hit.GetCoreEnergy());
+	obj.FillHistogram("energy",
+			  Form("fold_vs_energy_%.0f",
+			       (eGateLlim+eGateUlim)/2.0),
+			  energyNChannels/8, energyLlim, energyUlim,
+			  hit.GetCoreEnergy(),
+			  20, 0, 20, hit.NumberOfInteractions());
+
+	// Count segment fold
+	int segment_fold = hit.NumberOfInteractions();
+	for(int y=0; y < hit.NumberOfInteractions(); y++)
+	  for(int z = y+1; z < hit.NumberOfInteractions(); z++)
+	    if(hit.GetSegmentId(y) == hit.GetSegmentId(z)){
+	      segment_fold--;
+	      break;
+	    }
+
+	obj.FillHistogram("energy",
+			  Form("segfold_vs_energy_%.0f",
+			       (eGateLlim+eGateUlim)/2.0),
+			  energyNChannels/8, energyLlim, energyUlim,
+			  hit.GetCoreEnergy(),
+			  20, 0, 20, segment_fold);
+	
+      }
+    }
+  }
   
   for(int x=0; x<gretina->Size(); x++){
 
@@ -103,6 +149,26 @@ void MakeHistograms(TRuntimeObjects& obj) {
 		      energyNChannels, energyLlim, energyUlim,
 		      hit.GetCoreEnergy());
 
+    obj.FillHistogram("energy", "fold_vs_energy",
+		      energyNChannels/8, energyLlim, energyUlim,
+		      hit.GetCoreEnergy(),
+		      20, 0, 20, hit.NumberOfInteractions());
+
+    // Count segment fold
+    int segment_fold = hit.NumberOfInteractions();
+    for(int y=0; y < hit.NumberOfInteractions(); y++)
+      for(int z = y+1; z < hit.NumberOfInteractions(); z++)
+	if(hit.GetSegmentId(y) == hit.GetSegmentId(z)){
+	  segment_fold--;
+	  break;
+	}
+
+    obj.FillHistogram("energy",
+		      "segfold_vs_energy",
+		      energyNChannels/8, energyLlim, energyUlim,
+		      hit.GetCoreEnergy(),
+		      20, 0, 20, segment_fold);
+    
     if( hit.GetCrystalId()%2 )
       obj.FillHistogram("energy",  "energy_A",
 			energyNChannels, energyLlim, energyUlim,
@@ -204,6 +270,12 @@ void MakeHistograms(TRuntimeObjects& obj) {
 		    energyNChannels, energyLlim, energyUlim,
 		    calorimeterEnergy);
 
+  // For energy-gated addback spectra
+  Double_t ABenergy[100];
+  TString  ABtype[100];
+  Int_t    Naddback = 0;
+  iGate = -1;
+  
   while(hits.size() > 0){
     TGretinaHit currentHit = hits.back();
     hits.pop_back();
@@ -281,7 +353,49 @@ void MakeHistograms(TRuntimeObjects& obj) {
     obj.FillHistogram("addback",  "clusterSize_vs_neighborPairs",
 		      20, 0, 20, neighbors,
 		      10, 0, 10, cluster.size());
+
+    // For energy-gated addback spectra
+    if(addbackEnergy > eGateLlim &&
+       addbackEnergy < eGateUlim)
+      iGate = Naddback;
+
+    ABenergy[Naddback] = addbackEnergy;
+    ABtype[Naddback]   = addbackType;
+    Naddback++;
+
+  }
+
+  // Fill energy-gated addback spectra
+  if(iGate >= 0){
+    for(int i = 0; i<Naddback; i++){
+      if(i != iGate){
+	obj.FillHistogram("addback",
+			  ABtype[i]+Form("_%.0f",
+					   (eGateLlim+eGateUlim)/2.0),
+			  energyNChannels, energyLlim, energyUlim,
+			  ABenergy[i]);
+
+	if(ABtype[i] == "addback_n0"
+	   || ABtype[i] == "addback_n1"){
+	  obj.FillHistogram("addback",
+			    Form("addback_n0n1_%.0f",
+				 (eGateLlim+eGateUlim)/2.0),
+			    energyNChannels, energyLlim, energyUlim,
+			    ABenergy[i]);
+	}
     
+	if(ABtype[i] == "addback_n0"
+	   || ABtype[i] == "addback_n1"
+	   || ABtype[i] == "addback_n2"){
+	  obj.FillHistogram("addback",
+			    Form("addback_n0n1n2_%.0f",
+				 (eGateLlim+eGateUlim)/2.0),
+			    energyNChannels, energyLlim, energyUlim,
+			    ABenergy[i]);
+	}
+	
+      }
+    }
   }
   
   TList *list = &(obj.GetObjects());
