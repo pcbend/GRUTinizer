@@ -1,15 +1,15 @@
 #define VERBOSE 0
-#define N_KNOWN_SOURCES 6  // Number of Known Sources to be used in Source Class
-#define N_RINGS  10  // Number of Caesar Rings
-#define MAX_DETS 24  // Maximum number of detectors in a ring
-#define MAX_PEAKS 2  // Maximum number of peaks in a source spectrum
+#define N_KNOWN_SOURCES 6    // Number of Known Sources to be used in Source Class
+#define N_RINGS  10          // Number of Caesar Rings
+#define MAX_DETS 24          // Maximum number of detectors in a ring
+#define MAX_PEAKS 2          // Maximum number of peaks in a source spectrum
 #define TOTAL_PEAKS_TO_FIT 8 // Maximum number of peaks to find for each detector
-#define FIT_PADDING 12    // Distance to go to left and right of peak for fitting with gaussian
-#define FIND_PADDING 100 // for ensuring correct energy is found from rough estimate
+#define FIT_PADDING 15       // Distance to go to left and right of peak for fitting with gaussian
+#define FIND_PADDING 100     // for ensuring correct energy is found from rough estimate
 #define FIT_ORDER 2
 
-#define HIGH_CH_LIMIT_Y88_PEAK_1 300 //Helps fit y88 by checking whether found peaks are in correct
-#define LOW_CH_LIMIT_Y88_PEAK_2 400  //range
+#define HIGH_CH_LIMIT_Y88_PEAK_1 330 //Helps fit y88 by checking whether found peaks are in correct
+#define LOW_CH_LIMIT_Y88_PEAK_2  400  //range
 
 #include <iostream>
 #include <fstream>
@@ -23,6 +23,9 @@
 #include "TSpectrum.h"
 #include "TTree.h"
 #include "TGraph.h"
+#include "TCaesar.h"
+
+#include "TChannel.h"
 
 //The Source class allows easy organization of different source runs by source
 //name and number without having to always explicitly give the energies, etc. 
@@ -98,22 +101,22 @@ class Source {
       known_n_peaks[5] = 1;//Bg
     }
     void fillKnownRanges(){ //Low/High X-Axis Values for Ease of Finding Peaks
-      known_ranges[0][0]  = 100;
+      known_ranges[0][0]  = 150;
       known_ranges[0][1]  = 2000;
 
-      known_ranges[1][0]  = 200;
+      known_ranges[1][0]  = 150;
       known_ranges[1][1]  = 2000;
 
-      known_ranges[2][0]  = 75;
+      known_ranges[2][0]  = 80;
       known_ranges[2][1]  = 2000;
 
-      known_ranges[3][0]  = 50;
+      known_ranges[3][0]  = 150;
       known_ranges[3][1]  = 2000;
 
-      known_ranges[4][0]  = 50;
+      known_ranges[4][0]  = 150;
       known_ranges[4][1]  = 2000;
 
-      known_ranges[5][0]  = 100;
+      known_ranges[5][0]  = 150;
       known_ranges[5][1]  = 2000;
     }
 };
@@ -210,6 +213,47 @@ void saveCalibration(double data_to_save[N_RINGS][MAX_DETS][4], char *out_cal_fi
   out_file.close();
 }
 
+//saveChannels will create a TChannel file for GRUTinizer Calibration purposes
+//If current cal file name is passed, the cal file will be opened and energy coefficient
+//data inside will be overwritten with the fitted data (useful when you have already done
+//a time calibration!)
+
+void saveChannels(double data_to_save[N_RINGS][MAX_DETS][4], char *out_cal_file_name, std::string cal_file_name =""){
+  if (!cal_file_name.empty()){
+    TChannel::ReadCalFile(cal_file_name.c_str());
+  }
+  TCaesar *caesar = new TCaesar(); //gets us access to VSN mapping
+
+  TChannel *tchan;
+  std::vector<double> energy_coeff;
+
+  
+  for (int vsn = 0; vsn < MAX_VSN; vsn++){
+    for (int chan = 0; chan < MAX_CHN; chan++){
+      energy_coeff.clear();
+      int ring = caesar->vsnchn_ring_map_energy[vsn][chan];
+      int det  = caesar->vsnchn_det_map_energy[vsn][chan];
+      unsigned int address = ((37<<24) + (vsn << 16)+ chan);
+
+      for (int par = 0; par < 4; par++){
+        energy_coeff.push_back(data_to_save[ring][det][par]);
+      }
+
+      if (!cal_file_name.empty()){
+        tchan = TChannel::Get(address);
+        tchan->SetEnergyCoeff(energy_coeff);
+      }
+      else{
+        tchan = new TChannel(Form("RING%02dDET%02d",ring,det), address);
+        tchan->SetEnergyCoeff(energy_coeff);
+        TChannel::AddChannel(tchan);
+      }
+    }//loop over channels
+  }//loop over vsn
+
+  TChannel::WriteCalFile(out_cal_file_name);
+}
+
 void readInitialCalibration(char *in_par_file_name, double cal_par[N_RINGS][MAX_DETS][4]){
   std::ifstream in_par_file;
   in_par_file.open(in_par_file_name);
@@ -233,7 +277,35 @@ void readInitialCalibration(char *in_par_file_name, double cal_par[N_RINGS][MAX_
   in_par_file.close();
   return;
 }
+void readInitialCalibration_GRUTinizer(char *in_cal_file_name, double cal_par[N_RINGS][MAX_DETS][4]){
+  
+  TChannel::ReadCalFile(in_cal_file_name);
+  if(!TChannel::Size()){
+    std::cout << "Failed to get channels from in_cal_file_name: " << in_cal_file_name << std::endl;
+    return;
+  }
+  std::vector<double> energy_coeff;
+  TChannel *tchan;
+  TCaesar *caesar = new TCaesar();
+  for (int vsn = 0; vsn < MAX_VSN; vsn++){
+    for (int chan = 0; chan < MAX_CHN; chan++){
+      energy_coeff.clear();
+      int ring = caesar->vsnchn_ring_map_energy[vsn][chan];
+      int det  = caesar->vsnchn_det_map_energy[vsn][chan];
+      unsigned int address = ((37<<24) + (vsn << 16)+ chan);
 
+      tchan = TChannel::Get(address);
+      energy_coeff = tchan->GetEnergyCoeff();
+
+      for (unsigned int par = 0; par < energy_coeff.size(); par++){
+        cal_par[ring][det][par] = energy_coeff.at(par);
+      }
+    }//loop over channels
+  }//loop over VSN
+
+  delete caesar;
+  return;
+}
 //Used as follows:
 //(Note: All ring/det #'s start from 0!)
 //in_hist_file_name is a file containing the energy histograms for the sources organized by the names
@@ -246,8 +318,12 @@ void readInitialCalibration(char *in_par_file_name, double cal_par[N_RINGS][MAX_
 
 //in_par_file is a file containing an intial guess at the calibration where each line is in the form:
 //Caesar.Ring.a.e_a0.1: #, where 1 is the det_id (1,..,24),  a is the ring name, and E = a0+a1*E_raw+a2*E_raw^2
+//or as a tchannel file!
+//
+//in_cal_file_name is the file containing the time calibration that you want to append the energy
+//coefficients to
 void CalibrateCaesar(char *in_hist_file_name, char *in_source_list, char *out_cal_file_name, 
-                     char *out_hist_file_name, char *in_par_file_name = NULL){
+                     char *out_hist_file_name, char *in_cal_file_name = NULL, char *in_par_file_name =NULL){
   unsigned int det_per_ring[N_RINGS] = {
     10, 14, 24, 24, 24,
     24, 24, 24, 14, 10
@@ -344,7 +420,8 @@ void CalibrateCaesar(char *in_hist_file_name, char *in_source_list, char *out_ca
                                                    //the parameters
 
   if (in_par_file_name != NULL){
-    readInitialCalibration(in_par_file_name, cal_par);
+    //readInitialCalibration(in_par_file_name, cal_par);
+    readInitialCalibration_GRUTinizer(in_par_file_name, cal_par);
   }
 
   for (unsigned int ring = 0; ring < N_RINGS; ring++){
@@ -400,6 +477,15 @@ void CalibrateCaesar(char *in_hist_file_name, char *in_source_list, char *out_ca
                     source_list[y88_indices[i]].run_number, ring, det)));
             out_hists.back()->SetDirectory(out_hist_file);
           }//Found correct peaks for y88
+          else{
+                std::cout << "\tlow_ch_limit: " << source_list[y88_indices[i]].low_ch_limit << std::endl;
+                std::cout << "\thigh_ch_limit: " << source_list[y88_indices[i]].high_ch_limit << std::endl;
+                std::cout << "HIGH_CH_LIMIT_Y88_PEAK_1: " << HIGH_CH_LIMIT_Y88_PEAK_1 << std::endl;
+                std::cout << "LOW_CH_LIMIT_Y88_PEAK_2: " << LOW_CH_LIMIT_Y88_PEAK_2 << std::endl;
+                std::cout << "Found positions: " << y88_peak_finder.GetPositionX()[0] << " and " << y88_peak_finder.GetPositionX()[1] << std::endl;
+
+          }
+          
         }//Loop over Y88 Indices
 
         if (!found_y88_peaks){
@@ -410,9 +496,9 @@ void CalibrateCaesar(char *in_hist_file_name, char *in_source_list, char *out_ca
         TGraph y88_graph(fit_means.size(), &fit_means[0], &expected_energy[0]);
         TF1 *test_poly1_fit = new TF1(Form("test_poly_fit_ring_%d_det_%d", ring, det), Form("pol%d",1));
         test_poly1_fit->SetParameter(0,30);
-        test_poly1_fit->SetParameter(1,3);
-        test_poly1_fit->SetParLimits(0,-100,100);
-        test_poly1_fit->SetParLimits(1,3,5);
+        test_poly1_fit->SetParameter(1,4);
+        test_poly1_fit->SetParLimits(0,-60,60);
+        test_poly1_fit->SetParLimits(1,3,4);
         y88_graph.Fit(test_poly1_fit, "QME");
         cal_par[ring][det][0] = y88_graph.GetFunction(Form("test_poly_fit_ring_%d_det_%d",ring,det))->GetParameter(0);
         cal_par[ring][det][1] = y88_graph.GetFunction(Form("test_poly_fit_ring_%d_det_%d",ring,det))->GetParameter(1);
@@ -472,21 +558,19 @@ void CalibrateCaesar(char *in_hist_file_name, char *in_source_list, char *out_ca
             expected_energy.push_back(source_list[source].energies[1]);
             peaks_fit++;
           }//is peak 2
-
-     //   else {
-     //     std::cout << "peak energy: " << peak_energy << std::endl;
-     //   }
-        }//loop over peaks_found
-        if (peaks_fit != source_list[source].n_peaks){//failed to fit all peaks
+          if (i == peaks_found-1 && peaks_fit != source_list[source].n_peaks){//failed to fit all peaks
             std::cout << "Failed calibration for source " << source_list[source].name << " with " << peaks_fit << " peaks fit" << std::endl;
             std::cout << "out of " << peaks_found << " peaks found " << "for ring: " << ring << " det: " << det << " run number: " 
-            << source_list[source].run_number << std::endl;
-
+                      << source_list[source].run_number << std::endl;
+            std::cout << "Found peak_energy = " << peak_energy << std::endl;
+          }//peaks fit not enough
+        }//loop over peaks_found
+        if (peaks_fit != source_list[source].n_peaks){
             failed_calibration = true; //forces to skip to next detector
             break;
         }
         out_hists.push_back((TH1D*)in_hist->Clone(Form("%s_run_%d_ring_%d_det_%d_fitted", source_list[source].name.c_str(),
-                                                                  source_list[source].run_number, ring, det)));
+                                                  source_list[source].run_number, ring, det)));
         (out_hists.back())->SetDirectory(out_hist_file);
       }//loop over non-y88 sources
 
@@ -501,10 +585,11 @@ void CalibrateCaesar(char *in_hist_file_name, char *in_source_list, char *out_ca
       for (int par = 0; par < FIT_ORDER+1; par++){
         poly_fit->SetParameter(par, cal_par[ring][det][par]);
       }
-      poly_fit->SetParameter(2,-0.0001);
+      poly_fit->SetParameter(1,4);
+      poly_fit->SetParameter(2,-0.0003);
 //    poly_fit->SetParameter(1,4);
 //    poly_fit->SetParLimits(0,-60,60);
-//    poly_fit->SetParLimits(1,2,5);
+//      poly_fit->SetParLimits(1,3,5);
       fit_graph.Fit(poly_fit, "Q");
       //fit_graph.Fit(Form("pol%d", FIT_ORDER), "Q");
       for (int par = 0; par < FIT_ORDER+1; par++){
@@ -524,7 +609,9 @@ void CalibrateCaesar(char *in_hist_file_name, char *in_source_list, char *out_ca
     }//loop over det
   }//loop over rings
 
-  saveCalibration(cal_par, out_cal_file_name);
+//  saveCalibration(cal_par, out_cal_file_name);
+  saveChannels(cal_par, out_cal_file_name, in_cal_file_name);
+  
   out_hist_file->Write();
   out_hist_file->Close();
   in_hist_file->Close();
@@ -536,12 +623,20 @@ void CalibrateCaesar(char *in_hist_file_name, char *in_source_list, char *out_ca
 #ifndef __CINT__
 
 int main(int argc, char**argv){
-  if (argc < 5){
+  if (argc < 5 || argc > 7){
     std::cout << "Incorrect number of arguements!" << std::endl;
-    std::cout << "USAGE: CalibrateCaesar in_hists.root in_source_lists.dat out_cal_file_name.dat out_fitted_hists.root [starting_pars.dat]" << std::endl;
+    std::cout << "USAGE: CalibrateCaesar in_hists.root in_source_lists.dat out_cal_file_name.dat out_fitted_hists.root [tcal file] [starting_pars.dat]" << std::endl;
     return -1;
   }
-  CalibrateCaesar(argv[1],argv[2],argv[3],argv[4]);
+  if (argc == 7){
+    CalibrateCaesar(argv[1],argv[2],argv[3],argv[4],argv[5],argv[6]);
+  }
+  if (argc == 6){
+    CalibrateCaesar(argv[1],argv[2],argv[3],argv[4],argv[5]);
+  }
+  if (argc == 5){
+    CalibrateCaesar(argv[1],argv[2],argv[3],argv[4]);
+  }
   return 0;
 }
 

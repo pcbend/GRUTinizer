@@ -54,11 +54,11 @@ void initializeKr90Cuts(TFile * &cut_file, TCutG* &pid, TCutG* &tcut,
     pid = (TCutG*)cut_file->Get("kr90_mid");
 //    pid = (TCutG*)cut_file->Get("kr90_widest");
 //    pid = (TCutG*)cut_file->Get("kr90_tightest");
-    tcut = (TCutG*)cut_file->Get("tcut");
-//    tcut = (TCutG*)cut_file->Get("tcut_tighter");
-//   in = (TCutG*)cut_file->Get("in_kr90");
+//  tcut = (TCutG*)cut_file->Get("tcut");
+    tcut = (TCutG*)cut_file->Get("tcut_tighter");
+    in = (TCutG*)cut_file->Get("in_kr90");
 //    in = (TCutG*)cut_file->Get("in_kr90_tight");
-  in = (TCutG*)cut_file->Get("in_kr90_widest");
+//  in = (TCutG*)cut_file->Get("in_kr90_widest");
     omitted_det = 176;//referenced from 0! It's ring 8 detector 8
 }
 
@@ -91,9 +91,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   if (s800){
     if (cut_file == 0){
-      //initializeKr90Cuts(cut_file,pid,tcut,in);
+      initializeKr90Cuts(cut_file,pid,tcut,in);
       //initializeSe86Cuts(cut_file,pid,in,tcut);
-      initializeKr88Cuts(cut_file,pid,tcut,in);
+      //initializeKr88Cuts(cut_file,pid,tcut,in);
     }
 
     double objtac_corr = s800->GetCorrTOF_OBJTAC();
@@ -154,8 +154,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
     if(caesar) {
       const double START_ANGLE = 180.0;
       const double FINAL_ANGLE = 180.0;
-    //const double START_ANGLE = 1.0;
-    //const double FINAL_ANGLE = 3.5;
+//    const double START_ANGLE = 1.0;
+//    const double FINAL_ANGLE = 3.5;
       const double ANGLE_STEPS = 0.1;
       const int TOTAL_ANGLES = (FINAL_ANGLE-START_ANGLE)/ANGLE_STEPS + 1;
       std::vector<double> angles;
