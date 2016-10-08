@@ -25,4 +25,9 @@ inline size_t FindFileSize(const char* fname) {
   return fsize;
 }
 
+std::vector<int> MakeVectorFromFile(const char *fname);
+
+std::string ReplaceAll(std::string str, const std::string& from, const std::string& to);
+
+
 #endif

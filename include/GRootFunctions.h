@@ -14,6 +14,7 @@ namespace GRootFunctions {
   Double_t StepFunction(Double_t *dim, Double_t *par);
   Double_t PhotoPeak(Double_t *dim, Double_t *par);
   Double_t PhotoPeakBG(Double_t *dim, Double_t *par);
+  Double_t PhotoPeakBGExcludeRegion(Double_t *dim,Double_t *par);
   Double_t Gaus(Double_t *dim, Double_t *par);
   Double_t SkewedGaus(Double_t *dim, Double_t *par);
   Double_t Efficiency(Double_t *dim, Double_t *par);
@@ -24,6 +25,11 @@ namespace GRootFunctions {
   Double_t LanGausHighRes(Double_t *dim,Double_t *par);
 
   Double_t GammaEff(Double_t *dim,Double_t *par);
+
+
+  Double_t ComptonFormula(Double_t *x,Double_t *par);
+  Double_t AnalyzingPower(Double_t *x,Double_t *par);
+
 
 }
 

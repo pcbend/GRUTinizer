@@ -1,4 +1,4 @@
-// GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GRootBrowser.h GCanvas.h GH2Base.h  GH2I.h GH2D.h  GPeak.h GGaus.h GValue.h GH1D.h GrutNotifier.h GPopup.h GSnapshot.h
+// GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GRootBrowser.h GCanvas.h GH2Base.h  GH2I.h GH2D.h  GPeak.h GGaus.h GValue.h GH1D.h GrutNotifier.h GPopup.h GSnapshot.h GCutG.h
 
 
 #ifdef __CINT__
@@ -30,11 +30,13 @@
 
 #pragma link C++ function Help;
 #pragma link C++ function Commands;
+#pragma link C++ function Version;
 #pragma link C++ function GrabHist;
 #pragma link C++ function GrabFit;
 #pragma link C++ function StartGUI;
 #pragma link C++ function GUIIsRunning;
-#pragma link C++ function GetProjection;
+#pragma link C++ function GetProjectionX;
+#pragma link C++ function GetProjectionY;
 
 #pragma link C++ enum EAxis;
 #pragma link C++ enum kBackgroundSubtraction;
@@ -42,6 +44,10 @@
 
 
 #pragma link C++ class GPopup+;
+
+#pragma link C++ class GCutG+;
+#pragma link C++ class GPeak+;
+#pragma link C++ class GGaus+;
 
 #pragma link C++ class GValue-;
 #pragma link C++ class std::map<std::string,GValue*>+;
@@ -59,13 +65,10 @@
 #pragma link C++ class GH2I+;
 #pragma link C++ class GH2D+;
 
-#pragma link C++ class GPeak+;
-#pragma link C++ class GGaus+;
 //#pragma link C++ class GEfficiency+;
 
 #pragma link C++ class GrutNotifier+;
 
 #pragma link C++ class GSnapshot+;
-#pragma link C++ global gSnapshot;
 
 #endif

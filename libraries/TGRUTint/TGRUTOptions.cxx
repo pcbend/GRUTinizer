@@ -9,6 +9,7 @@
 #include "ArgParser.h"
 #include "DynamicLibrary.h"
 #include "TGRUTUtilities.h"
+#include "GRootCommands.h"
 
 TGRUTOptions* TGRUTOptions::Get(int argc, char** argv){
   static TGRUTOptions* item = NULL;
@@ -39,6 +40,7 @@ void TGRUTOptions::Clear(Option_t* opt) {
   fExtractWaves     = false;
   fExitAfterSorting = false;
   fHelp       = false;
+  fShowedVersion = false;
   fShowLogo   = true;
   fSortRaw    = true;
   fSortRoot   = false;
@@ -133,6 +135,8 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .description("Run in batch mode");
   parser.option("h help ?", &fHelp)
     .description("Show this help message");
+  parser.option("v version", &fShowedVersion)
+    .description("Show version information");
 
 
   // Look for any arguments ending with .info, pass to parser.
@@ -160,7 +164,14 @@ void TGRUTOptions::Load(int argc, char** argv) {
 
   // Print help if requested.
   if(fHelp){
+    Version();
     std::cout << parser << std::endl;
+    fShouldExit = true;
+  }
+
+  // Print version if requested
+  if(fShowedVersion) {
+    Version();
     fShouldExit = true;
   }
 

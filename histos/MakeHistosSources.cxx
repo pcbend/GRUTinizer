@@ -66,8 +66,8 @@ extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
   InitMap();
   TGretina *gretina = obj.GetDetector<TGretina>();
-  TBank29  *bank29  = obj.GetDetector<TBank29>();
-  TS800 *s800       = obj.GetDetector<TS800>();
+  // TBank29  *bank29  = obj.GetDetector<TBank29>();
+  // TS800 *s800       = obj.GetDetector<TS800>();
 
   if(!gretina)
     return;
@@ -126,7 +126,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
   }
   
   for(int x=0; x<gretina->Size(); x++){
-
     TGretinaHit hit = gretina->GetGretinaHit(x);
 
     // Addback preprocessing

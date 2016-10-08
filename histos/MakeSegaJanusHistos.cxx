@@ -675,11 +675,21 @@ void MakeUpstream78KrPlots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_h
 
   if(time_energy->IsInside(energy, time_diff)) {
 
-    obj.FillHistogram("upstream", Form("gamma_energy_%s",cutname.c_str()),
+    obj.FillHistogram("upstream", Form("energy_%s",cutname.c_str()),
                       4000, 0, 4000, s_hit.GetEnergy());
 
-    obj.FillHistogram("upstream", Form("gamma_energyDC_%s", cutname.c_str()),
-                      4000, 0, 4000, s_hit.GetDoppler(beta_nominal, particle_position));
+    double dc_energy = s_hit.GetDoppler(beta_nominal, particle_position);
+    obj.FillHistogram("upstream", Form("DCenergy_%s", cutname.c_str()),
+                      4000, 0, 4000, dc_energy);
+
+
+    double theta_deg = s_hit.GetPosition().Angle(particle_position) * (180/3.1415926);
+    obj.FillHistogram("upstream","energy_angle",
+                      2000, 0, 2000, s_hit.GetEnergy(),
+                      180, 0, 180, theta_deg);
+    obj.FillHistogram("upstream","DCenergy_angle",
+                      2000, 0, 2000, dc_energy,
+                      180, 0, 180, theta_deg);
 
 
     obj.FillHistogram("upstream",Form("janus_pos_%s", cutname.c_str()),

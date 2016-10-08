@@ -22,15 +22,25 @@
 #include "TChannel.h"
 #include "GValue.h"
 
+//#define Q1 15
+//#define Q2 7
+//#define Q3 8
+//#define Q4 16
+//#define Q5 9
+//#define Q6 14
+//#define Q7 17
+//#define Q8 6
+//#define Q9 19
+
 #define Q1 15
 #define Q2 7
-#define Q3 8
-#define Q4 16
-#define Q5 9
+#define Q3 11
+#define Q4 1
+#define Q5 22
 #define Q6 14
-#define Q7 17
+#define Q7 12
 #define Q8 6
-#define Q9 19
+#define Q9 21
 
 //#define BETA .37
 
@@ -347,18 +357,42 @@ void MakeHistograms(TRuntimeObjects& obj) {
     histname = Form("GretinaEnergyTheta");
     obj.FillHistogram(histname,4000,0,4000,hit.GetCoreEnergy(),
                                314,0,3.14,hit.GetTheta());
-
+    //if(hit.GetPad()==0) {
+    //  histname = Form("GretinaOverview_pad0");
+    //  obj.FillHistogram(histname,4000,0,4000,hit.GetCoreEnergy(),
+    //                             100,0,100,hit.GetCrystalId());
+    //}
     histname = Form("GretinaOverview");
     obj.FillHistogram(histname,4000,0,4000,hit.GetCoreEnergy(),
                                100,0,100,hit.GetCrystalId());
+    
+    histname = Form("GretinaSum");
+    obj.FillHistogram(histname,10000,0,10000,hit.GetCoreEnergy());
+
+    histname = Form("GretinaDecompErrorCode");
+    obj.FillHistogram(histname,150,0,150,hit.GetPad());       
 
     //std::cout << " In gret loop before Number of interactions loop" << std::endl;
+    //
+    //histname = Form("Q%i_detmap",HoleQMap[hit.GetCrystalId()/4]);
+    //obj.FillHistogram(histname,160,0,160,hit.GetCrystalId()%4+9,
+    //                           4000,0,4000,hit.GetCoreEnergy());
+    
+    
     for(int z=0;z<hit.NumberOfInteractions();z++) {
       dirname  = "GretSummCrystal";
+      //if(hit.GetPad()==0) {
+      //  histname = Form("GretinaSummaryX%02i_pad0",hit.GetCrystalId());
+      //  obj.FillHistogram(dirname,histname,
+   //			40,0,40,hit.GetSegmentId(z),
+//			2000,0,4000,hit.GetSegmentEng(z));
+      //}
       histname = Form("GretinaSummaryX%02i",hit.GetCrystalId());
       obj.FillHistogram(dirname,histname,
-			40,0,40,hit.GetSegmentId(z),
+   			40,0,40,hit.GetSegmentId(z),
 			2000,0,4000,hit.GetSegmentEng(z));
+
+
       if(hit.GetSegmentId(z)>36)
         break;
       int layer  = hit.GetSegmentId(z)/6;
@@ -366,17 +400,20 @@ void MakeHistograms(TRuntimeObjects& obj) {
       histname = Form("GretinaPosition_%s",LayerMap[layer].c_str());
       double phi = hit.GetInteractionPosition(z).Phi();
       if(phi<0) phi +=TMath::Pi()*2;
-      obj.FillHistogram(dirname,histname,
-			628,0.0,6.28,phi,
-			314,0,3.14,hit.GetInteractionPosition(z).Theta());
+      if(hit.GetPad()==0) {
+        obj.FillHistogram(dirname,histname,
+                          628,0.0,6.28,phi,
+			  314,0,3.14,hit.GetInteractionPosition(z).Theta());
+      }
     }
     //std::cout << " In gret loop after number interactions loop" << std::endl;
     dirname = "GretSummPos";
+    if(hit.GetPad()==0) {
     histname = Form("GretinaPosition");
-    obj.FillHistogram(dirname,histname,
-		      628,0,6.28,hit.GetPhi(),
-		      314,0,3.14,hit.GetTheta());
-
+      obj.FillHistogram(dirname,histname,
+    		        628,0,6.28,hit.GetPhi(),
+ 		        314,0,3.14,hit.GetTheta());
+    }
     histname = "GretinaEnergyTotal";
     obj.FillHistogram(histname,
 		      8000,0,4000,hit.GetCoreEnergy());

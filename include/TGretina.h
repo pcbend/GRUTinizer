@@ -1,7 +1,9 @@
 #ifndef TGRETINA_H
 #define TGRETINA_H
 
+#ifndef __CINT__
 #include <functional>
+#endif
 
 #include <TObject.h>
 #include <TMath.h>
@@ -24,13 +26,17 @@ public:
   virtual void Clear(Option_t *opt = "");
 
   virtual UInt_t Size() const { return gretina_hits.size(); }
-  virtual Int_t AddbackSize() { BuildAddback(); return addback_hits.size(); }
+  virtual Int_t AddbackSize(int EngRange=-1) { BuildAddback(EngRange); return addback_hits.size(); }
+  void ResetAddback() { addback_hits.clear();}
 
   virtual void InsertHit(const TDetectorHit& hit);
   virtual TDetectorHit& GetHit(int i)            { return gretina_hits.at(i); }
 
-  const TGretinaHit& GetGretinaHit(int i) const { return gretina_hits.at(i); }
-  const TGretinaHit& GetAddbackHit(int i) { BuildAddback(); return addback_hits.at(i); }
+  //const TGretinaHit& GetGretinaHit(int i) const { return gretina_hits.at(i); }
+  TGretinaHit GetGretinaHit(int i) const { return gretina_hits.at(i); }
+  const TGretinaHit& GetAddbackHit(int i) const { return addback_hits.at(i); }
+
+
   void PrintHit(int i){ gretina_hits.at(i).Print(); }
 
   static TVector3 CrystalToGlobal(int cryId,
@@ -44,7 +50,7 @@ public:
   static void DrawCoreSummary(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
 
   
-#if !defined (__CINT__) 
+#ifndef __CINT__ 
   static void SetAddbackCondition(std::function<bool(const TGretinaHit&,const TGretinaHit&)> condition) {
     fAddbackCondition = condition;
   }
@@ -57,8 +63,8 @@ public:
   void  SortHits();
 
 private:
-  void BuildAddback() const;
-#if !defined (__CINT__) 
+  void BuildAddback(int EngRange=-1) const;
+#ifndef __CINT__ 
   static std::function<bool(const TGretinaHit&,const TGretinaHit&)> fAddbackCondition;  
 #endif
   virtual int BuildHits(std::vector<TRawEvent>& raw_data);

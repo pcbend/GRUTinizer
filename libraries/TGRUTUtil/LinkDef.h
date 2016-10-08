@@ -16,6 +16,7 @@
 #pragma link C++ function get_run_number;
 #pragma link C++ function FindColor;
 #pragma link C++ function CalculateParameters;
+#pragma link C++ function MakeVectorFromFile;
 
 
 #endif

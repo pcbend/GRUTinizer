@@ -30,16 +30,23 @@ void TCaesarHit::Clear(Option_t* opt) {
 }
 
 void TCaesarHit::Print(Option_t *opt) const {
-//printf("Ring[%03i]\tDet[%03i]\tValid[%d]\tPos\tTime\tHits Contained[%d]\tGarbage[%d]\tEnergy: %1.1f\n",
-//       GetRingNumber(), GetDetectorNumber(), IsValid(),GetNumHitsContained(), is_garbage_addback, GetDoppler(0.341));
   TVector3 pos = GetPosition();
   std::cout << "Ring["<<GetRingNumber()<<"]\tDet["<<GetDetectorNumber()<<"]\tPos["
-            <<pos.X()<<","<<pos.Y()<<","<<pos.Z()<<"]\tTime["<<GetTime()<<"]\tHits Contained["
+            <<pos.X()<<","<<pos.Y()<<","<<pos.Z()<<"]\tTime["<<Time()<<"]\tHits Contained["
             <<GetNumHitsContained()<<"]\tGarbage["<<is_garbage_addback
-            <<"]\tEnergy[" << Charge() << "]" << std::endl;
-            //<<"]\tEnergy["
-            //<<GetDoppler(0.341) << "]" <<std::endl;
+            <<"]\tCharge[" << Charge() << "]" << "\tEnergy["<<GetEnergy()<<"]"//<< std::endl;
+            <<"]\tDCEnergy["<<GetDoppler() << "]" <<std::endl;
             
+}
+
+bool TCaesarHit::IsOverflow() const{
+  if (fFlags & kIsEnergy){
+    std::cout << "Attempting to check overflow, but charge is now energy!" << std::endl;
+    return false;
+  }
+  else{
+    return (((int)Charge()) == 2047);
+  }
 }
 
 TVector3 TCaesarHit::GetPosition() const {
@@ -53,25 +60,11 @@ int TCaesarHit::GetAbsoluteDetectorNumber() const {
   return GetDetectorNumber()+TOTAL_DET_IN_PREV_RINGS[GetRingNumber()];
 }
 void TCaesarHit::AddToSelf(const TCaesarHit& other) {
-
-//  std::cout << "INSIDE ADD TO SELF" << std::endl;
   double energy = GetEnergy() + other.GetEnergy();
-//  int temp_num_hits_contained = -1;
-//std::cout << "GetNumHitsContained() = " << GetNumHitsContained()
-//          <<  "\tother.GetNumHitsContained() = " << other.GetNumHitsContained() << std::endl;
-//if (GetNumHitsContained() < other.GetNumHitsContained()){
-//  temp_num_hits_contained = other.GetNumHitsContained() + 1;
-//}
-//else{
-//  temp_num_hits_contained = numHitsContained+1;
-//}
   if(GetEnergy()<other.GetEnergy()) {
     other.Copy(*this); 
   }
   numHitsContained++;
-//std::cout  <<  "temp_num_hits_contained = " << temp_num_hits_contained << std::endl;
-//numHitsContained = temp_num_hits_contained;
-//std::cout  <<  "GetNumHitsContained() = " << GetNumHitsContained() << std::endl;
   TDetectorHit::SetEnergy(energy);
 }
 

@@ -55,7 +55,7 @@ private:
 #ifndef __CINT__
 template<typename T>
 ThreadsafeQueue<T>::ThreadsafeQueue()
-  : max_queue_size(50000),
+  : max_queue_size(200000), 
     items_in_queue(0), items_pushed(0), items_popped(0),
     is_finished(false) { }
 

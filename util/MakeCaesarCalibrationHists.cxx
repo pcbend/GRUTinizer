@@ -61,6 +61,11 @@ int main(int argc, char *argv[]){
   Int_t hist_high_x = 4096;
   Int_t hist_low_x = 0;
   Int_t hist_n_bins_x = hist_high_x;
+
+
+  //open cut file and background files. Cut file will be used to apply
+  //time cut to each histogram.
+  
   //Open list of files to parse
   input_file.open(argv[1]);
   if (!input_file.is_open()){
