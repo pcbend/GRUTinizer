@@ -23,15 +23,16 @@
 #include "TChannel.h"
 #include "GValue.h"
 
+// LH-target setup: 8 Quads, Q4 @ LBNL
 #define Q1 15
 #define Q2 7
-#define Q3 8
-#define Q4 16
-#define Q5 9
+#define Q3 11
+#define Q4 -1
+#define Q5 22
 #define Q6 14
-#define Q7 17
+#define Q7 12
 #define Q8 6
-#define Q9 19
+#define Q9 21
 
 std::map<int,int> HoleQMap;
 std::map<int,std::string> LayerMap;
