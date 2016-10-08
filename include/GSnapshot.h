@@ -9,6 +9,8 @@ class TCanvas;
 
 class GSnapshot {
  public:
+  static GSnapshot& Get();
+
   GSnapshot(const char* snapshot_dir = NULL);
   ~GSnapshot() { }
 

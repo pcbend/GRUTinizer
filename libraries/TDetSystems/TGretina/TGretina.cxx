@@ -31,40 +31,47 @@ Float_t TGretina::m_segpos[2][36][3];
 bool    TGretina::fCRMATSet = false;
 
 bool DefaultAddback(const TGretinaHit& one,const TGretinaHit &two) {
-  TVector3 res = one.GetPosition()-two.GetPosition();
+  TVector3 res = one.GetLastPosition()-two.GetPosition();
   return ((std::abs(one.GetTime()-two.GetTime()) < 44.0) &&
-          (res.Mag() < 140.0) ) ;
+          (res.Mag() < 80.0) ) ;
 }
 
 std::function<bool(const TGretinaHit&,const TGretinaHit&)> TGretina::fAddbackCondition = DefaultAddback;
 
-void TGretina::BuildAddback() const {
+void TGretina::BuildAddback(int EngRange) const {
   if( addback_hits.size() > 0 ||
       gretina_hits.size() == 0) {
     return;
   }
 
-  
-  std::deque<const TGretinaHit*> hits;
-  for(auto& hit : gretina_hits) {
-    hit.SetCoreEnergy(hit.GetCoreEnergy(3));
-    hits.push_back(&hit);
-  }
-  std::sort(hits.begin(), hits.end(), [](const TGretinaHit* a, const TGretinaHit* b) {
-      return a->GetCoreEnergy() > b->GetCoreEnergy();
-    });
+  addback_hits = gretina_hits;
 
-  while(hits.size()) {
-    addback_hits.push_back(*hits.front());
-    hits.pop_front();
-    TGretinaHit& new_hit = addback_hits.back();
-    
-    for(int i=hits.size()-1; i>=0; i--) {
-      const TGretinaHit& other_hit = *hits[i];
-      if(fAddbackCondition(new_hit, other_hit)) {
-	new_hit.AddToSelf(other_hit);
-	hits.erase(hits.begin() + i);
+  if(EngRange>=0 && EngRange<4){
+    for(auto& hit : addback_hits) {
+      hit.SetCoreEnergy(hit.GetCoreEnergy(EngRange));
+    }
+  }
+
+  
+  std::sort(addback_hits.begin(), addback_hits.end(),
+	    [](const TGretinaHit& a, const TGretinaHit& b) {
+	      return a.GetCoreEnergy() > b.GetCoreEnergy();
+	    });
+
+  for(unsigned int i=0; i<addback_hits.size(); i++) {
+    TGretinaHit& current_hit = addback_hits[i];
+    std::vector<unsigned int> to_erase;
+    for(unsigned int j=i+1; j<addback_hits.size(); j++) {
+      TGretinaHit& other_hit = addback_hits[j];
+      if(fAddbackCondition(current_hit, other_hit)) {
+	current_hit.AddToSelf(other_hit);
+	to_erase.push_back(j);
       }
+    }
+
+    for(auto it = to_erase.rbegin(); it<to_erase.rend(); it++) {
+      unsigned int erasing = *it;
+      addback_hits.erase(addback_hits.begin() + erasing);
     }
   }
 }
@@ -176,14 +183,17 @@ TVector3 TGretina::GetSegmentPosition(int cry_id,int segment) {
 
 TVector3 TGretina::GetCrystalPosition(int cry_id) {
   SetCRMAT();
+  //return CrystalToGlobal(cry_id,0.0,0.0,0.0); 
+  
   TVector3 v;
   v.SetXYZ(0.0,0.0,0.0);
-  for(int i=0;i<6;i++) {
+  for(int i=30;i<36;i++) {
     TVector3 a = GetSegmentPosition(cry_id,i);
     v.SetXYZ(v.X()+a.X(),v.Y()+a.Y(),v.Z()+a.Z());
   }
   v.SetXYZ(v.X()/6.0,v.Y()/6.0,v.Z()/6.0);
   return v;      
+  
 }
 
 void TGretina::Copy(TObject& obj) const {

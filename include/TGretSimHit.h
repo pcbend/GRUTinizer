@@ -5,6 +5,7 @@
 #include <Rtypes.h>
 #include <TVector3.h>
 #include <TMath.h>
+#include <TRandom.h>
 
 #include <cmath>
 
@@ -40,17 +41,19 @@ public:
   double GetX()  const   { return fInteraction.X(); }
   double GetY()  const   { return fInteraction.Y(); }
   double GetZ()  const   { return fInteraction.Z(); }
+  int    IsFEP()     const   { return fIsFull; }
+  int    TotalHits() const   { return fTotalHits; }
+  int    HitNum()    const   { return fHitNum; }
 
-  
-
-  double GetDoppler(const TVector3 *vec=0) {
+  double GetDoppler(double sigma=1, const TVector3 *vec=0) {
 
     if(vec==0) {
       vec = &BeamUnitVec;
     }
     double tmp = 0.0;
     double gamma = 1/(sqrt(1-pow(GetBeta(),2)));
-    tmp = fEnergy*gamma *(1 - GetBeta()*TMath::Cos(fPosit.Angle(*vec)));
+    double Energy = gRandom->Gaus(fEnergy,sigma);
+    tmp = Energy*gamma *(1 - GetBeta()*TMath::Cos(fPosit.Angle(*vec)));
     return tmp;
   }
 
@@ -87,7 +90,9 @@ public:
   TVector3 fPosit;
   TVector3 fInteraction;
   double   fBeta;
-
+  int      fIsFull;
+  int      fTotalHits;
+  int      fHitNum;
 
 private:
   ClassDef(TGretSimHit,1)

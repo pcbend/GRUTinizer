@@ -23,11 +23,27 @@ bool ShowPeaks(TH1**,unsigned int, double sigma=2.0, double thresh=0.02);
 bool RemovePeaks(TH1**,unsigned int);
 
 GPeak *PhotoPeakFit(TH1*,double,double,Option_t *opt="");
+GPeak *PhotoPeakFitNormBG(TH1*,double,double,Option_t *opt="");
 GGaus *GausFit(TH1*,double,double,Option_t *opt="");
+TF1   *DoubleGausFit(TH1*,double,double,double,double,Option_t *opt="");
 
 std::string MergeStrings(const std::vector<std::string>& strings, char split='\n');
 
-bool GetProjection(GH2D *hist,double low, double high, double bg_low=0,double bg_high=0);
+bool GetProjectionX(GH2D *hist,double low, double high, double bg_low=0,double bg_high=0);
+bool GetProjectionX(GH2D *hist,GH2D *hist2,
+		   double low, double high,double bg_low=-1,double bg_high=-1,
+		   bool overlay = false,
+		   double back_low=-1,double back_high=-1,double back_bg_low=-1,
+		   double back_bg_high=-1,
+		   bool back_overlay=false);
+
+bool GetProjectionY(GH2D *hist,double low, double high, double bg_low=0,double bg_high=0);
+bool GetProjectionY(GH2D *hist,GH2D *hist2,
+		   double low, double high,double bg_low=-1,double bg_high=-1,
+		   bool overlay = false,
+		   double back_low=-1,double back_high=-1,double back_bg_low=-1,
+		   double back_bg_high=-1,
+		   bool back_overlay=false);
 
 //bool PeakFit(TH1*,Double_t,Double_t,Option_t *opt="");
 
@@ -39,6 +55,7 @@ bool GetProjection(GH2D *hist,double low, double high, double bg_low=0,double bg
 void Prompt();
 void Help();
 void Commands();
+void Version();
 TH1 *GrabHist(int i=0); //return the ith histogram from the current canvas.
 TF1 *GrabFit(int i=0); //return the ith fit from the current canvas.
 

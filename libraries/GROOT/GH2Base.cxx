@@ -64,6 +64,9 @@ GH1D* GH2Base::Projection_Background(int axis,
   } else {
     return NULL;
   }
+  double scale = (xhigh-xlow) / (bg_xhigh = bg_xlow) ;
+  
+  
   name  = Form("%s_%s_%d_%d_bg_%d_%d",GetTH2()->GetName(),sproj.c_str()
                                         ,firstbin,lastbin,
                                          first_bg_bin,last_bg_bin);

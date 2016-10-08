@@ -15,7 +15,6 @@
 class StoppableThread {
 public:
   static void StopAll();
-  static void StopAllClean();
   static bool AnyThreadRunning();
   static std::string AnyThreadStatus();
 

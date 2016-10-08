@@ -10,6 +10,7 @@
 #include <TVirtualPad.h>
 #include <TFrame.h>
 
+#include <TCutG.h>
 #include <GH2Base.h>
 
 class GH1D;
@@ -30,6 +31,7 @@ public:
   ~GH2D();
 
   virtual void Draw(Option_t *opt="");
+  virtual void Draw(TCutG*);
   TH1 *DrawCopy(Option_t *opt="") const;
   TH1 *DrawNormalized(Option_t *opt="",Double_t norm=1) const;
 

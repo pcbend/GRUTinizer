@@ -21,6 +21,7 @@ class GPeak : public TF1 {
     void InitNames();
     bool InitParams(TH1* fithist = 0);
     bool Fit(TH1*,Option_t *opt="");
+    bool FitExclude(TH1*,double low, double high,Option_t *opt="");
     void DrawResiduals(TH1*) const;
     //void DrawResiduals(); // *MENU*
 

@@ -18,6 +18,9 @@ void TGretSimHit::Copy(TObject &rhs) const {
   ((TGretSimHit&)rhs).fEnergy      = fEnergy;
   ((TGretSimHit&)rhs).fPosit       = fPosit;
   ((TGretSimHit&)rhs).fBeta        = fBeta;
+  ((TGretSimHit&)rhs).fIsFull      = fIsFull;
+  ((TGretSimHit&)rhs).fTotalHits   = fTotalHits;
+  ((TGretSimHit&)rhs).fHitNum      = fHitNum;
 
 }
 
@@ -45,6 +48,9 @@ void TGretSimHit::Clear(Option_t *opt) {
   fPosit.SetMagThetaPhi(sqrt(-1),sqrt(-1),sqrt(-1));
   fInteraction.SetXYZ(sqrt(-1),sqrt(-1),sqrt(-1));
   fBeta=sqrt(-1);
+  fIsFull=sqrt(-1);
+  fTotalHits=sqrt(-1);
+  fHitNum=sqrt(-1);
  
 }
 

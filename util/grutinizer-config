@@ -48,6 +48,7 @@ libdir=$GRUTSYS/lib
 incdir=$GRUTSYS/include
 #utildir=$GRUTSYS/etc
 
+rpath="-Wl,-rpath=$libdir"
 grutlibs="-lTGRUTUtil -lTRawFormat -lGROOT -lTNSCLFormat -lTGEBFormat -lTGRUTUtil -lTNucleus -lTKinematics -lTReaction -lTSRIM -lTNSCLScalers"
 detlibs="-lTSega -lTDetector  -lTGretina -lTJanus -lTPhosWall -lTS800 -lTFastScint -lTCaesar -lTS800Sim -lTGretSim"
 grutmore="-lTGRUTint -lTLoops -lTHistogramming "
@@ -108,7 +109,7 @@ while test $# -gt 0; do
         shift
         continue
       fi
-      out=$"$out -L${libdir} $grutlibs $detlibs "
+      out=$"$out -L${libdir} $rpath $grutlibs $detlibs "
       ;;
     --all-libs)
       if test "x$alllibsout" = "xyes" ; then
@@ -119,7 +120,7 @@ while test $# -gt 0; do
       if test "x$libsout" = "xyes" ; then
         out=$"$out $grutmore "
       else
-        out=$"$out -L${libdir} $grutlibs $detlibs $grutmore -lXMLParser -lXMLIO -lX11 -lXpm -lProof -lGuiHtml "
+        out=$"$out -L${libdir} $rpath $grutlibs $detlibs $grutmore -lXMLParser -lXMLIO -lX11 -lXpm -lProof -lGuiHtml "
       fi
       ;;
     --root)

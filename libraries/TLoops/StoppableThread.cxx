@@ -27,34 +27,6 @@ StoppableThread::StoppableThread(std::string name)
 }
 
 
-void StoppableThread::StopAll() {
-  std::cout << "Stopping status thread" << std::endl;
-  stop_status_thread();
-
-  std::cout << "Stopping each thread" << std::endl;
-  for(auto& elem : fthreadmap){
-    std::cout << "Stopping thread " << elem.first << std::endl;
-    StoppableThread* thread = elem.second;
-    thread->Stop();
-  }
-
-  for(auto& elem : fthreadmap){
-    std::cout << "Joining thread " << elem.first << std::endl;
-    StoppableThread* thread = elem.second;
-    thread->Join();
-  }
-
-  for(auto& elem : fthreadmap){
-    std::cout << "Deleting thread " << elem.first << std::endl;
-    StoppableThread* thread = elem.second;
-    delete thread;
-  }
-
-  std::cout << "Last status" << std::endl;
-  status_out();
-  std::cout << "End of function" << std::endl;
-}
-
 bool StoppableThread::AnyThreadRunning() {
   for(auto& elem : fthreadmap){
     if(elem.second->IsRunning()){
@@ -92,8 +64,7 @@ std::string StoppableThread::Status() {
   return ss.str();
 }
 
-void StoppableThread::StopAllClean() {
-  std::cout << "Stopping each TDataLoop" << std::endl;
+void StoppableThread::StopAll() {
   for(auto& elem : fthreadmap){
     TDataLoop* data_loop = dynamic_cast<TDataLoop*>(elem.second);
     TChainLoop* chain_loop = dynamic_cast<TChainLoop*>(elem.second);
@@ -115,9 +86,7 @@ void StoppableThread::StopAllClean() {
     delete thread;
   }
 
-  std::cout << "Last status" << std::endl;
   status_out();
-  std::cout << "End of function" << std::endl;
 }
 
 StoppableThread *StoppableThread::Get(std::string name) {
