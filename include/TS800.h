@@ -77,14 +77,15 @@ public:
   
   float GetOBJ_E1Raw_MESY(int i=0) const;
   float GetOBJ_E1Raw_MESY_Ch15(int i=0) const;
+
+  float GetXF_E1Raw_MESY(int i=0) const;
+  float GetXF_E1Raw_MESY_Ch15(int i=0) const;
  
   float GetRawOBJ_MESY(unsigned int i=0) const;
 
   float GetRawE1_MESY(unsigned int i=0) const;
   float GetRawE1_MESY_Ch15(unsigned int i=0) const;
   
-  float GetXF_E1Raw_MESY(int i=0) const;
-  float GetXF_E1Raw_MESY_Ch15(int i=0) const;
   
   float GetRawXF_MESY(unsigned int i=0) const;
 

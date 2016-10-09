@@ -392,7 +392,6 @@ class TMTof : public TDetectorHit {
 
     //std::vector<int> fGalotte;
     //
-    //
     virtual Int_t Charge() const  {return 0;}
     //
     //

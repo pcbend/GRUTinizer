@@ -14,6 +14,8 @@
 #include <GH2Base.h>
 
 class GH1D;
+class TClass;
+class TMethodCall;
 
 class GH2D : public TH2D , public GH2Base {
 
@@ -52,7 +54,18 @@ public:
 
   virtual TH2 *GetTH2() { return this; }
 
+  void SetFillMethod(const char *classnamex,const char *methodnamex,const char* paramx="",
+                     const char *classnamey="",const char *methodnamey="",const char* paraym="");
+
+  Int_t Fill(const TObject* objx,const TObject *objy=NULL);
+
 private:
+  
+  TClass      *fXFillClass;  //!
+  TClass      *fYFillClass;  //!
+  TMethodCall *fXFillMethod; //!
+  TMethodCall *fYFillMethod; //!
+
   ClassDef(GH2D,1)
 };
 

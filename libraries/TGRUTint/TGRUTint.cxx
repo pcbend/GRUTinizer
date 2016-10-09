@@ -471,6 +471,14 @@ void TGRUTint::SetupPipeline() {
     fHistogramLoop = THistogramLoop::Get("6_hist_loop");
     fHistogramLoop->SetOutputFilename(output_hist_file);
     for(auto cut_file : cuts_files) {
+
+      if(GUIIsRunning()) {
+        printf("loading cuts, gui is running\n"); fflush(stdout);
+        if(cut_file && GUIIsRunning()){
+          TPython::Bind(cut_file,"tdir");
+          ProcessLine("TPython::Exec(\"window.LoadCutFile(tdir)\");");
+        }
+      }
       fHistogramLoop->AddCutFile(cut_file);
     }
     fHistogramLoop->InputQueue() = current_queue;

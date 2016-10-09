@@ -512,6 +512,17 @@ class MainWindow(object):
         if cutg:
             self.tcut_tab.AddCut(cutg)
 
+    def LoadCutFile(self, cutfile):
+        #if cutname is None:
+        #    filename = tkFileDialog.askopenfilename(filetypes=(("Cuts File", "*.cuts"),
+        #                                                       ("Cuts File", "*.root")))
+        #if not filename:
+        #   return
+        
+	#filename = os.path.abspath(filename)
+        #tfile = ROOT.TFile(filename);                
+        self.tcut_tab.AddFile(cutfile)
+
     def LoadDataFile(self, filename = None):
         if filename is None:
             filename = tkFileDialog.askopenfilename(filetypes=(("NSCL Evt", "*.evt"),
