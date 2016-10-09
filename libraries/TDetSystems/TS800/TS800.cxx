@@ -20,6 +20,15 @@
 
 #include "TInverseMap.h"
 
+bool TS800::fGlobalReset =false;
+
+
+
+static double f_mafp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+static double f_mxfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+
+
+
 TS800::TS800() {
   Clear();
 }
@@ -1173,9 +1182,13 @@ float TS800::GetCorrTOF_OBJ() const {
 
 //std::vector<float> TS800::GetCorrTOF_OBJ_MESY() const {
 float TS800::GetCorrTOF_OBJ_MESY(int i) const {
-  double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
-  double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
-  return GetTofE1_MTDC(afp_cor,xfp_cor,i);
+  //static double f_afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+  //static double f_xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+  if(fGlobalReset) {
+    f_mafp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    f_mxfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+  }
+  return GetTofE1_MTDC(f_mafp_cor,f_mxfp_cor,i);
 }
 
 //float TS800::GetCorrTOF_XFP(){

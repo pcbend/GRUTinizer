@@ -124,6 +124,8 @@ private:
   //TMultiHitTof multi_tof;
   
   Long_t fEventCounter;
+  static bool fGlobalReset; //!
+
 
   public:
     static void DrawPID(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
@@ -135,6 +137,9 @@ private:
     static void DrawAFP_Mesy(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,int i=0,TChain *chain=0);
     static void DrawDispX_Mesy(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,int i=0,TChain *chain=0);
     static void DrawPID_Mesy_Tune(Long_t entries=kMaxLong,int i=0,TChain *chain=0);
+
+  void SetGlobalReset(bool flag=true) { fGlobalReset=flag; }  
+
 
   ClassDef(TS800,3);
 };

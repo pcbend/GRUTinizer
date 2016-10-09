@@ -497,7 +497,8 @@ class MainWindow(object):
             opt.append('colz')
         self._SetOptStat()
         hist.SetLineColor(color)
-        hist.Draw(' '.join(opt))
+        #hist.Draw(' '.join(opt))
+        hist.Draw()
 
     def AddDirectory(self, tdir):
         if tdir:

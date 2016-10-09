@@ -24,6 +24,8 @@ class GCutG : public TCutG {
     void SetGateMethod(const char* xclass,const char* xmethod,
                        const char* yclass,const char* ymethod);
     bool IsInside(TObject *objx,TObject *objy=0);
+    
+    Int_t IsInside(Double_t x,Double_t y) const { return TCutG::IsInside(x,y); }
 
   private:
 
