@@ -24,6 +24,8 @@ enum kDetectorSystems {
   CAESAR = 80,
 
   PHOSWALL = 17,
+  ANL = 14,
+  GRAND_RAIDEN = 50,
 
   NSCLSCALERS = 100
 };
@@ -35,6 +37,8 @@ enum kFileType {
   NSCL_EVT = 1,
   GRETINA_MODE2 = 2,
   GRETINA_MODE3 = 3,
+  ANL_RAW = 4,
+  RCNP_BLD = 50,
   ROOT_DATA = 256,
   ROOT_MACRO = 257,
   CALIBRATED = 512,

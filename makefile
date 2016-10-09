@@ -29,6 +29,19 @@ LINKFLAGS_PREFIX += -Wl,--no-as-needed
 SHAREDSWITCH = -shared -Wl,-soname,# NO ENDING SPACE
 endif
 
+# When compiling and linking against RCNP analyzer routines one must set RCNP=1
+ifeq ($(RCNP),1)
+RCNPANAPATH = ./GRAnalyzer/analyzer
+RCNPANALYZER = $(realpath $(RCNPANAPATH)/../lib)
+RCNPFLAGS = -D`uname -m` -D`uname -s` -DLinux86 -Df2cFortran -DUSE_PAW -DRCNP
+RCNPLINKFLAGS = -L$(RCNPANALYZER) -Wl,-rpath,$(RCNPANALYZER) -lRCNPEvent -lGRAnalyzer -L$(realpath $(RCNPANAPATH)/lib) -lpacklib -lm -lgfortran -lnsl
+RCNPINCLUDES = $(RCNPANAPATH)/include $(RCNPANAPATH)/libRCNPEvent/include $(RCNPANAPATH)/libGRAnalyzer/include
+CINTFLAGS += $(RCNPFLAGS)
+CFLAGS += $(RCNPFLAGS)
+INCLUDES += $(RCNPINCLUDES)
+endif
+
+
 COM_COLOR=\033[0;34m
 OBJ_COLOR=\033[0;36m
 BLD_COLOR=\033[3;34m
@@ -99,10 +112,10 @@ bin/%: util/% | bin
 	@ln -sf ../$< $@
 
 bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT) pcm_files bin
-	$(call run_and_test,$(CPP) $^ -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,$(CPP) $^ -o $@ $(LINKFLAGS) $(RCNPLINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) pcm_files bin
-	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS) $(RCNPLINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 bin lib:
 	@mkdir -p $@
@@ -115,6 +128,10 @@ lib/lib%.so: .build/histos/%.o | lib
 
 lib/lib%.so: .build/filters/%.o | lib
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
+libGRAnalyzer:
+ifdef RCNP
+	$(MAKE) -C GRAnalyzer
+endif
 
 # Functions for determining the files included in a library.
 # All src files in the library directory are included.
@@ -133,7 +150,7 @@ lib_pcm         = $(if \
 lib/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%) | lib
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
-.build/%.o: %.$(SRC_SUFFIX)
+.build/%.o: %.$(SRC_SUFFIX) libGRAnalyzer
 	@mkdir -p $(dir $@)
 	$(call run_and_test,$(CPP) -fPIC -c $< -o $@ $(CFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
@@ -146,7 +163,7 @@ find_linkdef = $(shell find $(1) -name "*LinkDef.h")
 define library_template
 .build/$(1)/$(notdir $(1))Dict.cxx: $(1)/LinkDef.h $$(call dict_header_files,$(1)/LinkDef.h)
 	@mkdir -p $$(dir $$@)
-	$$(call run_and_test,rootcint -f $$@ -c $$(INCLUDES) -p $$(notdir $$(filter-out $$<,$$^)) $$<,$$@,$$(COM_COLOR),$$(BLD_STRING) ,$$(OBJ_COLOR))
+	$$(call run_and_test,rootcint -f $$@ -c $$(INCLUDES) $$(CINTFLAGS) -p $$(notdir $$(filter-out $$<,$$^)) $$<,$$@,$$(COM_COLOR),$$(BLD_STRING) ,$$(OBJ_COLOR))
 
 .build/$(1)/LibDictionary.o: .build/$(1)/$(notdir $(1))Dict.cxx
 	$$(call run_and_test,$$(CPP) -fPIC -c $$< -o $$@ $$(CFLAGS),$$@,$$(COM_COLOR),$$(COM_STRING),$$(OBJ_COLOR) )
@@ -171,6 +188,9 @@ $(foreach lib,$(LIBRARY_DIRS),$(eval $(call library_template,$(lib))))
 clean:
 	@printf "\n$(WARN_COLOR)Cleaning up$(NO_COLOR)\n\n"
 	@-$(RM) -rf .build bin lib include/GVersion.h
+ifdef RCNP
+	@-$(MAKE) clean -sC GRAnalyzer
+endif
 
 cleaner: clean
 	@printf "\nEven more clean up\n\n"

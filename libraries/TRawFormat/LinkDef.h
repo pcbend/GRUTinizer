@@ -1,4 +1,4 @@
-// TRawSource.h TByteSource.h TRawEvent.h TSmartBuffer.h TMultiRawFile.h TOrderedRawFile.h  TSequentialRawFile.h TRawFileOut.h
+// TRawSource.h TRawEvent.h TSmartBuffer.h TMultiRawFile.h TGlobRawFile.h TOrderedRawFile.h  TSequentialRawFile.h TRawFileOut.h TRCNPSource.h
 
 #ifdef __CINT__
 
@@ -27,10 +27,13 @@
 #pragma link C++ class TRawFileIn+;
 
 #pragma link C++ class TMultiRawFile+;
+#pragma link C++ class TGlobRawFile+;
 #pragma link C++ class TOrderedRawFile+;
 #pragma link C++ class TSequentialRawFile+;
-
 #pragma link C++ class TRawFileOut+;
 
+#pragma link C++ class TRCNPSource+;
+
+#pragma link C++ enum TRawEvent::ArgonneType;
 
 #endif

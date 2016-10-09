@@ -16,6 +16,7 @@ GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistos.so
 #GRUT.HistLib: $(GRUTSYS)/lib/libFastScintHists.so
 #GRUT.HistLib: $(GRUTSYS)/lib/libPolarHists3.so
 #GRUT.HistLib: $(GRUTSYS)/lib/libMakeSegaJanusHistos.so
+#GRUT.HistLib: $(GRUTSYS)/libraries/libRCNPsav.so
 
 GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
 
@@ -28,6 +29,7 @@ GRUT.DefaultCutFile: mycuts.root
 
 #files to load at log in:
 Rint.Logon: $(GRUTSYS)/.grut_logon
+#Rint.Logon: $(GRUTSYS)/logon.C
 Rint.History $(GRUTSYS)/.grut_history
 Rint.HistSize: 1000000
 

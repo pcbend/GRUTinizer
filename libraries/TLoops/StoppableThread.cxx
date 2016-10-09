@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <atomic>
 
 #include <TString.h>
 
@@ -13,6 +14,7 @@ std::map<std::string,StoppableThread*> StoppableThread::fthreadmap;
 bool StoppableThread::status_thread_on = false;
 std::thread StoppableThread::status_thread;
 
+std::atomic<int> stop_rcnp_signal(0);
 
 int StoppableThread::GetNThreads() { return fthreadmap.size(); }
 
@@ -65,6 +67,7 @@ std::string StoppableThread::Status() {
 }
 
 void StoppableThread::StopAll() {
+  stop_rcnp_signal = 1; std::this_thread::sleep_for(std::chrono::milliseconds(500));
   for(auto& elem : fthreadmap){
     TDataLoop* data_loop = dynamic_cast<TDataLoop*>(elem.second);
     TChainLoop* chain_loop = dynamic_cast<TChainLoop*>(elem.second);

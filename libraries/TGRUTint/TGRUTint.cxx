@@ -38,6 +38,7 @@
 #include "TMultiRawFile.h"
 #include "TOrderedRawFile.h"
 #include "TRawSource.h"
+#include "TGlobRawFile.h"
 #include "TSequentialRawFile.h"
 #include "TTerminalLoop.h"
 #include "TUnpackingLoop.h"
@@ -148,7 +149,6 @@ void TGRUTint::ApplyOptions() {
   if(opt->S800InverseMapFile().length()) {
     TInverseMap::Get(opt->S800InverseMapFile().c_str());
   }
-
   for(auto filename : opt->RootInputFiles()) {
     // this will populate gChain if able.
     //   TChannels from the root file will be loaded as file is opened.
@@ -488,6 +488,8 @@ TRawEventSource* TGRUTint::OpenRawSource() {
 
   bool has_input_ring = opt->InputRing().length();
   bool has_raw_file = opt->RawInputFiles().size();
+  bool is_glob_source = opt->SortMultipleGlob().length();
+  bool is_multi_sort = opt->SortMultiple();
 
   TRawEventSource* source = NULL;
 
@@ -497,7 +499,7 @@ TRawEventSource* TGRUTint::OpenRawSource() {
                                           true, true,
                                           opt->DefaultFileType());
 
-  } else if(has_raw_file && opt->SortMultiple()){
+  } else if(is_multi_sort && has_raw_file ){
     // Open multiple files, read from all at the same time.
     TMultiRawFile* multi_source = new TMultiRawFile();
     for(auto& filename : opt->RawInputFiles()){
@@ -505,7 +507,11 @@ TRawEventSource* TGRUTint::OpenRawSource() {
     }
     source = multi_source;
 
-  } else if(opt->RawInputFiles().size() > 1 && !opt->SortMultiple()){
+  } else if(is_glob_source) {
+    // Open multiple files, read from all at the same time.
+    TGlobRawFile* glob_multi_source = new TGlobRawFile(opt->SortMultipleGlob());
+    source = glob_multi_source;
+  } else if(!is_multi_sort && opt->RawInputFiles().size() > 1){
     // Open multiple files, read from each one at a a time.
     TSequentialRawFile* seq_source = new TSequentialRawFile();
     for(auto& filename : opt->RawInputFiles()){
@@ -515,9 +521,17 @@ TRawEventSource* TGRUTint::OpenRawSource() {
 
   } else {
     // Open a single file.
-    std::string filename = opt->RawInputFiles().at(0);
-    if(file_exists(filename.c_str())){
-      source = new TRawFileIn(filename.c_str());
+    if (opt->RawInputFiles().size()) {
+      std::string filename = opt->RawInputFiles().at(0);
+      if(file_exists(filename.c_str())){
+        source = new TRawFileIn(filename.c_str());
+      }
+    }
+    else if (opt->RootInputFiles().size()) {
+      std::string filename = opt->RootInputFiles().at(0);
+      if(file_exists(filename.c_str())){
+        source = TRawEventSource::EventSource(filename.c_str());
+      }
     }
   }
 

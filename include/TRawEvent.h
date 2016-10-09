@@ -50,11 +50,15 @@ public:
 
   void SetFragmentTimestamp(long timestamp) { fTimestamp = timestamp; }
 
+  void SetDataPtr(void* ptr) { fDataPtr = ptr; }
+  void* GetDataPtr() { return fDataPtr; }
+
 protected:
   RawHeader fEventHeader;
   kFileType fFileType;
   long fTimestamp;
   TSmartBuffer fBody;
+  void* fDataPtr;
 
 
   ClassDef(TRawEvent,0)

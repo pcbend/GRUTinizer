@@ -1,10 +1,8 @@
 #include "TRawSource.h"
-
 #include <cassert>
-
 #include "TString.h"
-
 #include "TGRUTOptions.h"
+#include "TRCNPSource.h"
 
 ClassImp(TRawEventSource)
 
@@ -79,6 +77,20 @@ TRawEventSource* TRawEventSource::EventSource(const char* filename,
     file_type = TGRUTOptions::Get()->DetermineFileType(filename);
   }
 
+  TRawEventSource* source;
+
+  if (hasSuffix(filename,".bld")){
+    std::string command;
+    if (std::string(filename) == "online.bld") {
+      std::cout << "Going online with TRCNPSource..." <<std::endl;
+      command = "router_save -s -b 1024 BLD";
+    }else {
+      command = std::string("cat ") + std::string(filename);
+    }
+    source = new TRCNPSource(command.c_str(), file_type);
+    return source;
+  }
+
   TByteSource* byte_source = 0;
   // If it is a ring, open it
   if(is_ring){
@@ -88,12 +100,11 @@ TRawEventSource* TRawEventSource::EventSource(const char* filename,
     byte_source = new TBZipByteSource(filename);
   } else if (hasSuffix(filename,".gz")){
     byte_source = new TGZipByteSource(filename);
-  // Otherwise, open it as a normal file.
   } else {
     byte_source = new TFileByteSource(filename);
   }
 
-  TRawEventSource* source = new TRawEventTimestampSource(byte_source, file_type);
+  source = new TRawEventTimestampSource(byte_source, file_type);
 
   return source;
 }
@@ -139,6 +150,7 @@ std::string TRawEventTimestampSource::Status(bool long_description) const {
 int TRawEventTimestampSource::GetEvent(TRawEvent& rawevent) {
   switch(fFileType) {
     case kFileType::NSCL_EVT:
+    case kFileType::ANL_RAW:
     case kFileType::GRETINA_MODE2:
     case kFileType::GRETINA_MODE3:
       break;

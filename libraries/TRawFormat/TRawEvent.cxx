@@ -18,6 +18,7 @@ TRawEvent::TRawEvent() {
   fEventHeader.datum2      =  0;
   fFileType = kFileType::UNKNOWN_FILETYPE;
   fTimestamp = -1;
+  fDataPtr = nullptr;
 }
 
 void TRawEvent::Copy(TObject &rhs) const {
@@ -25,7 +26,8 @@ void TRawEvent::Copy(TObject &rhs) const {
   ((TRawEvent&)rhs).fEventHeader = fEventHeader;
   ((TRawEvent&)rhs).fBody        = fBody;
   ((TRawEvent&)rhs).fFileType    = fFileType;
-  ((TRawEvent&)rhs).fTimestamp    = fTimestamp;
+  ((TRawEvent&)rhs).fTimestamp   = fTimestamp;
+  ((TRawEvent&)rhs).fDataPtr     = fDataPtr;
 }
 
 TRawEvent::TRawEvent(const TRawEvent &rhs)
@@ -46,6 +48,7 @@ TRawEvent &TRawEvent::operator=(const TRawEvent &rhs) {
   fBody        = rhs.fBody;
   fFileType    = rhs.fFileType;
   fTimestamp   = rhs.fTimestamp;
+  fDataPtr   = rhs.fDataPtr;
   return *this;
 }
 
@@ -66,7 +69,8 @@ Int_t TRawEvent::GetEventType() const {
   switch(fFileType){
   case NSCL_EVT:
     return ((EVTHeader*)(&fEventHeader))->type();
-    
+
+  case ANL_RAW:
   case GRETINA_MODE2:
   case GRETINA_MODE3:
     return ((GEBHeader*)(&fEventHeader))->type();
@@ -83,9 +87,12 @@ Int_t TRawEvent::GetBodySize() const {
   case NSCL_EVT:
     return ((EVTHeader*)(&fEventHeader))->size() - sizeof(RawHeader); //Size in nscldaq is inclusive
 
+  case ANL_RAW:
   case GRETINA_MODE2:
   case GRETINA_MODE3:
     return ((GEBHeader*)(&fEventHeader))->size() + sizeof(Long_t);  //Size in gretinadaq is exclusive, plus timestamp
+  case RCNP_BLD:
+    return sizeof(void*);
 
   default:
     return 0;
@@ -111,6 +118,7 @@ Long_t TRawEvent::GetTimestamp() const {
    case NSCL_EVT:
      return ((TNSCLEvent*)this)->GetTimestamp();
 
+   case ANL_RAW:
    case GRETINA_MODE2:
    case GRETINA_MODE3:
      return ((TGEBEvent*)this)->GetTimestamp();
@@ -135,6 +143,7 @@ const char* TRawEvent::GetPayload() const {
    case NSCL_EVT:
      return ((TNSCLEvent*)this)->GetPayload();
 
+   case ANL_RAW:
    case GRETINA_MODE2:
    case GRETINA_MODE3:
      return ((TGEBEvent*)this)->GetPayload();
@@ -159,6 +168,7 @@ TSmartBuffer TRawEvent::GetPayloadBuffer() const {
    case NSCL_EVT:
      return ((TNSCLEvent*)this)->GetPayloadBuffer();
 
+   case ANL_RAW:
    case GRETINA_MODE2:
    case GRETINA_MODE3:
      return ((TGEBEvent*)this)->GetPayloadBuffer();
