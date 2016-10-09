@@ -2,20 +2,9 @@ Unix.*.Root.MacroPath: .:$(GRUTSYS)/util:$(ROOTSYS)/macros
 #Unix.*.Root.DynamicPath:  .:~/rootlibs:$(ROOTSYS)/lib:$/home/tiguser/packages/SharcAnalysis
 
 #default MakeHistos library
-#GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistosTemplate.so
-GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistos.so
-#GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistos.so
-#GRUT.HistLib: $(GRUTSYS)/lib/libMakeSimHistos.so
-#GRUT.HistLib: $(GRUTSYS)/lib/libFastScintHists.so
-#GRUT.HistLib: $(GRUTSYS)/lib/libBetterCaesarHistos.so
-#GRUT.HistLib: $(GRUTSYS)/lib/libMake_CRDC_Mask_Histos.so
-#GRUT.HistLib: $(GRUTSYS)/lib/libPolarHists.so
-#:GRUT.HistLib: $(GRUTSYS)/lib/libPolarHists3.so
-#GRUT.HistLib: $(GRUTSYS)/lib/libMakeSegaJanusHistos.so
-#GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistos.so
-#GRUT.HistLib: $(GRUTSYS)/lib/libFastScintHists.so
-#GRUT.HistLib: $(GRUTSYS)/lib/libPolarHists3.so
-#GRUT.HistLib: $(GRUTSYS)/lib/libMakeSegaJanusHistos.so
+
+#GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistosSourcesSim.so
+GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistosInBeam.so
 
 GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
 
@@ -24,7 +13,7 @@ GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
 GRUT.SnapshotExt: 
 GRUT.SnapshotDir: 
 
-GRUT.DefaultCutFile: mycuts.root
+#GRUT.DefaultCutFile: mycuts.root
 
 #files to load at log in:
 Rint.Logon: $(GRUTSYS)/.grut_logon
@@ -45,7 +34,7 @@ Canvas.UseScreenFactor: true
 Canvas.ShowGuideLines: false
 
 Root.Fitter: Fumili2
-
+#Root.Fitter: Minuit
 
 
 Gui.IconPath:      $(GRUTSYS)/icons:$(ROOTSYS)/icons

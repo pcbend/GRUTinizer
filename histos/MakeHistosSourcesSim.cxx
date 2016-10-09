@@ -16,11 +16,11 @@
 #include "TS800.h"
 #include "TBank29.h"
 #include "TS800.h"
+#include "TGretSim.h"
 #include "GValue.h"
 
 
 #include "TChannel.h"
-#include "GValue.h"
 
 #define Q1 15
 #define Q2 7
@@ -66,17 +66,35 @@ extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
   InitMap();
   TGretina *gretina = obj.GetDetector<TGretina>();
-  // TBank29  *bank29  = obj.GetDetector<TBank29>();
-  // TS800 *s800       = obj.GetDetector<TS800>();
-
-  if(!gretina)
-    return;
-
+  TBank29  *bank29  = obj.GetDetector<TBank29>();
+  TS800 *s800       = obj.GetDetector<TS800>();
+  TGretSim *gretSim = obj.GetDetector<TGretSim>();
+  
   Int_t    energyNChannels = 4000;
   Double_t energyLlim = 0.;
   Double_t energyUlim = 4000.;
   
-  Double_t calorimeterEnergy = 0.;
+  if(gretSim){
+    for(int x=0; x<gretSim->Size(); x++){
+      TGretSimHit hit = gretSim->GetGretinaSimHit(x);
+      obj.FillHistogram("sim","emitted_energy",
+			energyNChannels, energyLlim, energyUlim,
+			hit.GetEn());
+      obj.FillHistogram("sim","emitted_theta",
+			180, 0., 180.,
+			hit.GetTheta()*TMath::RadToDeg());
+      obj.FillHistogram("sim","emitted_phi",
+			360, 0., 360.,
+			hit.GetPhi()*TMath::RadToDeg());
+    }
+  }
+
+  if(!gretina)
+    return;
+  
+  Double_t res = 1./1000.; // Relative energy resolution
+  
+  Double_t calorimeterEnergy_gaus = 0.;
   std::vector<TGretinaHit> hits;
 
   // Gamma-gated crystal spectrum
@@ -94,15 +112,15 @@ void MakeHistograms(TRuntimeObjects& obj) {
       TGretinaHit hit = gretina->GetGretinaHit(i);
       if(i != iGate){
 	obj.FillHistogram("energy",
-			  Form("energy_%.0f",
+			  Form("energy_gaus_%.0f",
 			       (eGateLlim+eGateUlim)/2.0),
 			  energyNChannels, energyLlim, energyUlim,
-			  hit.GetCoreEnergy());
+			  hit.GetCoreEnergy()*gRandom->Gaus(1,res));
 	obj.FillHistogram("energy",
-			  Form("fold_vs_energy_%.0f",
+			  Form("fold_vs_energy_gaus_%.0f",
 			       (eGateLlim+eGateUlim)/2.0),
 			  energyNChannels/8, energyLlim, energyUlim,
-			  hit.GetCoreEnergy(),
+			  hit.GetCoreEnergy()*gRandom->Gaus(1,res),
 			  20, 0, 20, hit.NumberOfInteractions());
 
 	// Count segment fold
@@ -115,42 +133,55 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	    }
 
 	obj.FillHistogram("energy",
-			  Form("segfold_vs_energy_%.0f",
+			  Form("segfold_vs_energy_gaus_%.0f",
 			       (eGateLlim+eGateUlim)/2.0),
 			  energyNChannels/8, energyLlim, energyUlim,
-			  hit.GetCoreEnergy(),
+			  hit.GetCoreEnergy()*gRandom->Gaus(1,res),
 			  20, 0, 20, segment_fold);
 	
       }
     }
   }
-  
-  for(int x=0; x<gretina->Size(); x++){
-    TGretinaHit hit = gretina->GetGretinaHit(x);
 
-    // Addback preprocessing
+  // Addback preprocessing
+  for(int x=0; x<gretina->Size(); x++){
+
+    TGretinaHit hit = gretina->GetGretinaHit(x);
+    
     if(hit.GetCoreEnergy() > energyLlim &&
        hit.GetCoreEnergy() < energyUlim){
 
-      calorimeterEnergy      += hit.GetCoreEnergy();
+      calorimeterEnergy_gaus += hit.GetCoreEnergy()*gRandom->Gaus(1,res);
 
       hits.push_back(hit);
 
     }
-    
+  }
+  
+  int max_layer = -1;
+
+  for(int x=0; x<gretina->Size(); x++){
+
+    TGretinaHit hit = gretina->GetGretinaHit(x);
+
     //                directory, histogram
-    obj.FillHistogram("energy",  "overview",
+    obj.FillHistogram("energy", "overview_gaus",
 		      energyNChannels, energyLlim, energyUlim,
-		      hit.GetCoreEnergy(),
+		      hit.GetCoreEnergy()*gRandom->Gaus(1,res),
 		      100, 0, 100, hit.GetCrystalId());
 
-    obj.FillHistogram("energy",  "energy",
+    obj.FillHistogram("energy", "energy_gaus",
 		      energyNChannels, energyLlim, energyUlim,
-		      hit.GetCoreEnergy());
+		      hit.GetCoreEnergy()*gRandom->Gaus(1,res));
 
     obj.FillHistogram("energy", "fold_vs_energy",
 		      energyNChannels/8, energyLlim, energyUlim,
 		      hit.GetCoreEnergy(),
+		      20, 0, 20, hit.NumberOfInteractions());
+
+    obj.FillHistogram("energy", "fold_vs_energy_gaus",
+		      energyNChannels/8, energyLlim, energyUlim,
+		      hit.GetCoreEnergy()*gRandom->Gaus(1,res),
 		      20, 0, 20, hit.NumberOfInteractions());
 
     // Count segment fold
@@ -163,19 +194,19 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	}
 
     obj.FillHistogram("energy",
-		      "segfold_vs_energy",
+		      "segfold_vs_energy_gaus",
 		      energyNChannels/8, energyLlim, energyUlim,
-		      hit.GetCoreEnergy(),
+		      hit.GetCoreEnergy()*gRandom->Gaus(1,res),
 		      20, 0, 20, segment_fold);
-    
+
     if( hit.GetCrystalId()%2 )
-      obj.FillHistogram("energy",  "energy_A",
+      obj.FillHistogram("energy",  "energy_gaus_A",
 			energyNChannels, energyLlim, energyUlim,
-                        hit.GetCoreEnergy());
+			hit.GetCoreEnergy()*gRandom->Gaus(1,res));
     else
-      obj.FillHistogram("energy",  "energy_B",
+      obj.FillHistogram("energy",  "energy_gaus_B", 
 			energyNChannels, energyLlim, energyUlim,
-                        hit.GetCoreEnergy());
+			hit.GetCoreEnergy()*gRandom->Gaus(1,res));
                         
     // Peter wrote these to give Dirk his Phi range (0-360).
     obj.FillHistogram("position", "theta_vs_phi",
@@ -214,7 +245,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
 			1200, -10, 100, hit.GetLocalPosition(0).Z());
     }
     
-    int max_layer = -1;
     for(int y=0; y < hit.NumberOfInteractions(); y++){
 
       int layer = hit.GetSegmentId(y)/6;
@@ -233,45 +263,54 @@ void MakeHistograms(TRuntimeObjects& obj) {
 		      max_layer);
 
     if(max_layer == 5){
-	obj.FillHistogram("energy", "energy_involves_phi",
+	obj.FillHistogram("energy", "energy_gaus_involves_phi",
 			  energyNChannels, energyLlim, energyUlim,
-			  hit.GetCoreEnergy());
-	obj.FillHistogram("energy", "overview_involves_phi",
+			  hit.GetCoreEnergy()*gRandom->Gaus(1,res));
+	obj.FillHistogram("energy", "overview_gaus_involves_phi",
 			  energyNChannels, energyLlim, energyUlim,
-			  hit.GetCoreEnergy(),
+			  hit.GetCoreEnergy()*gRandom->Gaus(1,res),
 			  100, 0, 100, hit.GetCrystalId());
     }
     
     for(int k = 5; k > 0; k--){
       if(max_layer < k){
 	obj.FillHistogram("energy",
-			  Form("energy_below_%s", LayerMap[k].c_str()),
+			  Form("energy_gaus_below_%s", LayerMap[k].c_str()),
 			  energyNChannels, energyLlim, energyUlim,
-			  hit.GetCoreEnergy());
+			  hit.GetCoreEnergy()*gRandom->Gaus(1,res));
 	if( hit.GetCrystalId()%2 )
 	  obj.FillHistogram("energy",
-			    Form("energy_A_below_%s", LayerMap[k].c_str()),
+			    Form("energy_gaus_A_below_%s", LayerMap[k].c_str()),
 			    energyNChannels, energyLlim, energyUlim,
-			    hit.GetCoreEnergy());
+			    hit.GetCoreEnergy()*gRandom->Gaus(1,res));
 	else
 	  obj.FillHistogram("energy",
-			    Form("energy_B_below_%s", LayerMap[k].c_str()),
+			    Form("energy_gaus_B_below_%s", LayerMap[k].c_str()),
 			    energyNChannels, energyLlim, energyUlim,
-			    hit.GetCoreEnergy());
+			    hit.GetCoreEnergy()*gRandom->Gaus(1,res));
       }
 
     }
     
   }
-
+  
   // Addback
-  obj.FillHistogram("addback",  "calorimeter",
+  obj.FillHistogram("addback",  "calorimeter_gaus",
 		    energyNChannels, energyLlim, energyUlim,
-		    calorimeterEnergy);
-
+		    calorimeterEnergy_gaus);
+  for(int k = 5; k > 0; k--){
+    if(max_layer < k){
+      obj.FillHistogram("addback",
+			Form("calorimeter_gaus_below_%s",
+			     LayerMap[k].c_str()),
+			energyNChannels, energyLlim, energyUlim,
+			calorimeterEnergy_gaus);
+    }
+  }
+  
   // For energy-gated addback spectra
-  Double_t ABenergy[100];
-  TString  ABtype[100];
+  std::vector<Double_t> ABenergy;
+  std::vector<TString> ABtype;
   Int_t    Naddback = 0;
   iGate = -1;
   
@@ -308,9 +347,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
     // Calculate the total energy deposited in the cluster,
     // and count the pairs of neighbors.
     Int_t neighbors = 0;
-    Double_t addbackEnergy = 0.;
+    Double_t addbackEnergy_gaus = 0.;
     for(int i = 0; i < cluster.size(); i++){
-      addbackEnergy += cluster[i].GetCoreEnergy();
+      addbackEnergy_gaus +=
+	cluster[i].GetCoreEnergy()*gRandom->Gaus(1,res);
       for(int j = i+1; j < cluster.size(); j++){
 	TVector3 distance =   cluster[i].GetCrystalPosition()
 	                    - cluster[j].GetCrystalPosition();
@@ -330,23 +370,23 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     // Fill addback histograms.
 
-    obj.FillHistogram("addback",  addbackType,
+    obj.FillHistogram("addback",  addbackType+"_gaus",
 		      energyNChannels, energyLlim, energyUlim,
-		      addbackEnergy);
+		      addbackEnergy_gaus);
 
     if(addbackType == "addback_n0"
        || addbackType == "addback_n1"){
-      obj.FillHistogram("addback",  "addback_n0n1",
+      obj.FillHistogram("addback",  "addback_n0n1_gaus",
 			energyNChannels, energyLlim, energyUlim,
-			addbackEnergy);
+			addbackEnergy_gaus);
     }
     
     if(addbackType == "addback_n0"
        || addbackType == "addback_n1"
        || addbackType == "addback_n2"){
-      obj.FillHistogram("addback",  "addback_n0n1n2",
+      obj.FillHistogram("addback",  "addback_n0n1n2_gaus",
 			energyNChannels, energyLlim, energyUlim,
-			addbackEnergy);
+			addbackEnergy_gaus);
     }
     
     obj.FillHistogram("addback",  "clusterSize_vs_neighborPairs",
@@ -354,12 +394,12 @@ void MakeHistograms(TRuntimeObjects& obj) {
 		      10, 0, 10, cluster.size());
 
     // For energy-gated addback spectra
-    if(addbackEnergy > eGateLlim &&
-       addbackEnergy < eGateUlim)
+    if(addbackEnergy_gaus > eGateLlim &&
+       addbackEnergy_gaus < eGateUlim)
       iGate = Naddback;
 
-    ABenergy[Naddback] = addbackEnergy;
-    ABtype[Naddback]   = addbackType;
+    ABenergy.push_back(addbackEnergy_gaus);
+    ABtype.push_back(addbackType);
     Naddback++;
 
   }
@@ -369,7 +409,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
     for(int i = 0; i<Naddback; i++){
       if(i != iGate){
 	obj.FillHistogram("addback",
-			  ABtype[i]+Form("_%.0f",
+			  ABtype[i]+Form("_gaus_%.0f",
 					   (eGateLlim+eGateUlim)/2.0),
 			  energyNChannels, energyLlim, energyUlim,
 			  ABenergy[i]);
@@ -377,7 +417,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	if(ABtype[i] == "addback_n0"
 	   || ABtype[i] == "addback_n1"){
 	  obj.FillHistogram("addback",
-			    Form("addback_n0n1_%.0f",
+			    Form("addback_n0n1_gaus_%.0f",
 				 (eGateLlim+eGateUlim)/2.0),
 			    energyNChannels, energyLlim, energyUlim,
 			    ABenergy[i]);
@@ -387,7 +427,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	   || ABtype[i] == "addback_n1"
 	   || ABtype[i] == "addback_n2"){
 	  obj.FillHistogram("addback",
-			    Form("addback_n0n1n2_%.0f",
+			    Form("addback_n0n1n2_gaus_%.0f",
 				 (eGateLlim+eGateUlim)/2.0),
 			    energyNChannels, energyLlim, energyUlim,
 			    ABenergy[i]);

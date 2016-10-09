@@ -19,7 +19,8 @@ public:
   virtual void Copy(TObject& obj) const;
   virtual void Print(Option_t *opt = "") const;
   virtual void Clear(Option_t *opt = "");
-
+  virtual UInt_t Size() const { return s800sim_hits.size(); }
+ 
   virtual void          InsertHit(const TDetectorHit& hit);
   virtual TDetectorHit& GetHit(int i)            { return s800sim_hits.at(i); }
 
