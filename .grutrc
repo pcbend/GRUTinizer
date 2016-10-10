@@ -4,7 +4,8 @@ Unix.*.Root.MacroPath: .:$(GRUTSYS)/util:$(ROOTSYS)/macros
 #default MakeHistos library
 
 #GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistosSourcesSim.so
-GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistosInBeam.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistosInBeam.so
+GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistos_e10010.so
 
 GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
 
@@ -13,7 +14,7 @@ GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
 GRUT.SnapshotExt: 
 GRUT.SnapshotDir: 
 
-#GRUT.DefaultCutFile: mycuts.root
+GRUT.DefaultCutFile: mycuts.cuts
 
 #files to load at log in:
 Rint.Logon: $(GRUTSYS)/.grut_logon

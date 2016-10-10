@@ -24,8 +24,8 @@ bool TS800::fGlobalReset =false;
 
 
 
-static double f_mafp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
-static double f_mxfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+//static double f_mafp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+//static double f_mxfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
 
 
 
@@ -189,6 +189,7 @@ float TS800::GetAFP() const{
     return sqrt(-1);
   }
   float AFP = TMath::ATan((GetXFP(1)-GetXFP(0))/1073.0);
+
   return AFP;
 
 }
@@ -716,9 +717,27 @@ float TS800::GetTofE1_MTDC(float c1,float c2,int i) const {
   for(unsigned int x=0;x<mtof.fObj.size();x++) {
     for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
       result.push_back( mtof.fObj.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
-      }
-    }
 
+      // std::cout << "-----------------" << std::endl;
+      // std::cout << " c1 = "  << c1
+      // 		<< ", c2 = "  << c2
+      // 		<< std::endl;
+      // std::cout << " mtof.fObj.at(" << x
+      // 	      << ") = " << mtof.fObj.at(x)
+      // 	      << std::endl;
+      // std::cout << " mtof.fE1Up.at(" << x
+      // 	      << ") = " << mtof.fE1Up.at(y)
+      // 	      << std::endl;
+      // std::cout << " GetAFP() = "
+      // 	      << ") = " << GetAFP()
+      // 	      << std::endl;
+      // std::cout << " GetCrdc(0).GetDispersiveX() = "
+      // 		<< GetCrdc(0).GetDispersiveX()
+      // 		<< std::endl;
+   
+    }
+  }
+  
    if(result.size()>(unsigned int)i)
      return result.at(i);
    return sqrt(-1.0);
@@ -1184,10 +1203,10 @@ float TS800::GetCorrTOF_OBJ() const {
 float TS800::GetCorrTOF_OBJ_MESY(int i) const {
   //static double f_afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
   //static double f_xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
-  if(fGlobalReset) {
-    f_mafp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
-    f_mxfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
-  }
+  //  if(fGlobalReset) {
+  static double    f_mafp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+  static double    f_mxfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+  //  }
   return GetTofE1_MTDC(f_mafp_cor,f_mxfp_cor,i);
 }
 
