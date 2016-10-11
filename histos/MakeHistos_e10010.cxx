@@ -164,16 +164,13 @@ bool IncomingS800(TRuntimeObjects &obj,TS800 *s800,GCutG *incoming) {
 
 }
 
-bool DTA(TS800* s800, GCutG *incoming, GCutG *outgoing){
+bool DTA(TRuntimeObjects &obj, GCutG *incoming, GCutG *outgoing){
 
+  TS800       *s800 = obj.GetDetector<TS800>();
+  
   if(!s800)
     return false;
   
-  std::string dirname = "S800";
-  std::string histname = Form("dta_%s_%s",
-			      incoming->GetName(),
-			      outgoing->GetName());
-
   if(!incoming || !outgoing)
     return false;
 
@@ -184,7 +181,16 @@ bool DTA(TS800* s800, GCutG *incoming, GCutG *outgoing){
   if(!outgoing->IsInside(s800->GetCorrTOF_OBJ_MESY(),
 			 s800->GetIonChamber().GetSum()) )
     return false;
+
+  std::string dirname = "S800";
+  std::string histname = Form("dta_%s_%s",
+			      incoming->GetName(),
+			      outgoing->GetName());
+  obj.FillHistogram(dirname, histname,
+		    200, -0.1, 0.1,
+		    s800->GetDta());
   
+  return true;
 }
 
 bool TriggerRegister(TRuntimeObjects &obj, GCutG *incoming, GCutG *outgoing){
@@ -269,13 +275,13 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
 
      std::string histname = Form("doppler_%s",outgoing->GetName());
      obj.FillHistogram(dirname, histname,
-		       4000, 0, 4000,
+		       1000, 0, 4000,
 		       hit.GetDoppler(beta, 0));
 
      histname = Form("doppler_s800_%s",outgoing->GetName());
      TVector3 track = s800->Track();
      obj.FillHistogram(dirname, histname,
-		       4000, 0, 4000,
+		       1000, 0, 4000,
 		       hit.GetDoppler(beta, &track));
 
      histname = Form("doppler_theta_%s_t",outgoing->GetName());
@@ -292,12 +298,12 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
   
      histname = Form("doppler_%s_t",outgoing->GetName());
      obj.FillHistogram(dirname, histname,
-		       4000, 0, 4000,
+		       1000, 0, 4000,
 		       hit.GetDoppler(beta, 0));
 
      histname = Form("doppler_s800_%s_t",outgoing->GetName());
      obj.FillHistogram(dirname, histname,
-		       4000, 0, 4000,
+		       1000, 0, 4000,
 		       hit.GetDoppler(beta, &track));
 
      histname = Form("doppler_theta_%s_t",outgoing->GetName());
