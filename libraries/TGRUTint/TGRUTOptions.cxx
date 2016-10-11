@@ -114,7 +114,7 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("t time-sort", &fTimeSortInput)
     .description("Reorder raw events by time");
   parser.option("time-sort-depth",&fTimeSortDepth)
-    .description("Number of events to hold when time sorting")
+    .description("Number of events to hold when time sorting; default value 100000")
     .default_value(100000);
   parser.option("build-window", &fBuildWindow)
     .description("Build window, timestamp units")
