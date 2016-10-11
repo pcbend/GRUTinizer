@@ -185,6 +185,9 @@ void TGRUTint::ApplyOptions() {
   // Note: Assumes that gChain has already been loaded.
   SetupPipeline();
 
+
+
+
   for(auto& filename : opt->MacroInputFiles()){
     RunMacroFile(filename);
   }
@@ -423,6 +426,11 @@ void TGRUTint::SetupPipeline() {
   for(auto filename : opt->CutsInputFiles()) {
     TFile* tfile = OpenRootFile(filename);
     cuts_files.push_back(tfile);
+    //printf("loading cuts, gui is running\n"); fflush(stdout);
+    if(tfile && GUIIsRunning()){
+      TPython::Bind(tfile,"tdir");
+      ProcessLine("TPython::Exec(\"window.LoadCutFile(tdir)\");");
+    }
   }
 
   // No need to set up all the loops if we are just opening the interpreter.
@@ -472,13 +480,6 @@ void TGRUTint::SetupPipeline() {
     fHistogramLoop->SetOutputFilename(output_hist_file);
     for(auto cut_file : cuts_files) {
 
-      if(GUIIsRunning()) {
-        printf("loading cuts, gui is running\n"); fflush(stdout);
-        if(cut_file && GUIIsRunning()){
-          TPython::Bind(cut_file,"tdir");
-          ProcessLine("TPython::Exec(\"window.LoadCutFile(tdir)\");");
-        }
-      }
       fHistogramLoop->AddCutFile(cut_file);
     }
     fHistogramLoop->InputQueue() = current_queue;
