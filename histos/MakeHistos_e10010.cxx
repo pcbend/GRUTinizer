@@ -239,6 +239,240 @@ bool TriggerRegister(TRuntimeObjects &obj, GCutG *incoming, GCutG *outgoing){
   
 }
 
+bool HandleAddback(TRuntimeObjects &obj,GCutG *incoming,
+		   GCutG *outgoing, GCutG *gt_time) {
+
+  TGretina *gretina = obj.GetDetector<TGretina>();
+  TS800       *s800 = obj.GetDetector<TS800>();
+
+  if(!gretina || !s800)
+    return false;
+
+  if(!incoming || !outgoing || !gt_time)
+    return false;
+
+  if(!incoming->IsInside(s800->GetOBJ_E1Raw_MESY(),
+			 s800->GetXF_E1Raw_MESY()) )
+     return false;
+
+  if(!outgoing->IsInside(s800->GetCorrTOF_OBJ_MESY(),
+			 s800->GetIonChamber().GetSum()) )
+    return false;
+
+  Int_t    energyNChannels = 1000;
+  Double_t energyLlim = 0.;
+  Double_t energyUlim = 4000.;
+
+  std::string dirname = Form("addback_%s_%s",
+			     incoming->GetName(),
+			     outgoing->GetName());
+  
+  double beta = GValue::Value("BETA");
+  if(std::isnan(beta))
+    beta=0.00;
+  double xoffset = GValue::Value("GRETINA_X_OFFSET");
+  if(std::isnan(xoffset))
+    xoffset=0.00;
+  double yoffset = GValue::Value("GRETINA_Y_OFFSET");
+  if(std::isnan(yoffset))
+    yoffset=0.00;
+  double zoffset = GValue::Value("GRETINA_Z_OFFSET");
+  if(std::isnan(zoffset))
+    zoffset=0.00;
+  TVector3 targetOffset(xoffset, yoffset, zoffset);
+
+  Double_t calorimeterEnergy = 0.;
+  std::vector<TGretinaHit> hits;
+  
+  for(int x=0; x<gretina->Size(); x++){
+
+    TGretinaHit hit = gretina->GetGretinaHit(x);
+
+    // Preprocessing
+    if( hit.GetCoreEnergy() > energyLlim &&
+	hit.GetCoreEnergy() < energyUlim &&
+	gt_time->IsInside(s800->GetTimestamp()-hit.GetTime(),
+			  hit.GetCoreEnergy()) ){
+
+      calorimeterEnergy += hit.GetCoreEnergy();
+
+      if( hit.HasInteractions() )
+	hits.push_back(hit);
+
+    }
+  }
+
+  // Addback
+  obj.FillHistogram(dirname,
+		    "calorimeter",
+		    1000, 0, 4000,
+		    calorimeterEnergy);
+
+  while(hits.size() > 0){
+    TGretinaHit currentHit = hits.back();
+    hits.pop_back();
+    
+
+    // Find and add all hits in a cluster of adjacent crystals including
+    // the current hit.
+    //
+    // CAUTION: This clustering includes neighbors of neighbors!
+    std::vector<TGretinaHit> cluster;
+    cluster.push_back(currentHit);
+    int lastClusterSize = 0;
+    while(lastClusterSize < cluster.size()){
+      for(int i = 0; i < cluster.size(); i++){
+	for(int j = 0; j < hits.size(); j++){
+	  TVector3 distance = cluster[i].GetCrystalPosition()
+	    - hits[j].GetCrystalPosition();
+	  
+	  //	  std::cout << " * distance.Mag() = " << distance.Mag()
+	  //		    << std::endl;
+	  
+	  obj.FillHistogram(dirname,
+			    "crystal_separation",
+			    1000, 0., 1000.,
+			    distance.Mag());
+	  
+	  if(distance.Mag() < 80.){ // Neighbors
+	    cluster.push_back(hits.back());
+	    hits.pop_back();
+	  }
+	}
+      }
+      lastClusterSize = cluster.size();
+    }
+
+    // Calculate the total energy deposited in the cluster,
+    // and count the pairs of neighbors.
+    Int_t neighbors = 0;
+    Double_t addbackEnergy = 0.;
+    TVector3 firstHitPos;
+    Int_t firstHitHoleNum;
+    Double_t firstHitEnergy = 0;
+    for(int i = 0; i < cluster.size(); i++){
+      addbackEnergy += cluster[i].GetCoreEnergy();
+      // Find the largest IP in the cluster and save its position
+      // for Doppler correction.
+      if(cluster[i].GetSegmentEng(cluster[i].GetFirstIntPoint())
+	 > firstHitEnergy){
+	firstHitHoleNum = cluster[i].GetHoleNumber();
+	firstHitPos = cluster[i].GetInteractionPosition(cluster[i].GetFirstIntPoint()) - targetOffset;
+	firstHitEnergy = cluster[i].GetSegmentEng(cluster[i].GetFirstIntPoint());
+      }
+      
+      for(int j = i+1; j < cluster.size(); j++){
+	TVector3 distance =   cluster[i].GetCrystalPosition()
+	  - cluster[j].GetCrystalPosition();
+	if(distance.Mag() < 80.) neighbors++;
+      }
+    }
+
+    // Doppler correct the addback energy.
+    // *** NEED TO ADD S800 TRAJECTORY ***
+
+    Double_t dopplerABEnergy = 0.;
+    double gamma = 1/(sqrt(1-pow(beta,2)));
+    dopplerABEnergy =
+      addbackEnergy*gamma*(1-beta*TMath::Cos(firstHitPos.Theta()));
+    
+    TString addbackType;
+    if(neighbors == 0 && cluster.size() == 1)
+      addbackType = "n0";
+    else if(neighbors == 1 && cluster.size() == 2)
+      addbackType = "n1";
+    else if(neighbors == 3 && cluster.size() == 3)
+      addbackType = "n2";
+    else
+      addbackType = "ng";
+
+    // Fill addback histograms.
+    obj.FillHistogram(dirname,  addbackType.Data(),
+		      energyNChannels, energyLlim, energyUlim,
+		      addbackEnergy);
+
+    obj.FillHistogram(dirname,
+		      Form("dop_%s_%.0f",
+			   addbackType.Data(),
+			   beta*10000),
+		      energyNChannels, energyLlim, energyUlim,
+		      dopplerABEnergy);
+    if(firstHitHoleNum < 10){
+      obj.FillHistogram(dirname,
+			Form("dop_fw_%s_%.0f",
+			     addbackType.Data(),
+			     beta*10000),
+			energyNChannels, energyLlim, energyUlim,
+			dopplerABEnergy);
+    } else {
+      obj.FillHistogram(dirname,
+			Form("dop_bw_%s_%.0f",
+			     addbackType.Data(),
+			     beta*10000),
+			energyNChannels, energyLlim, energyUlim,
+			dopplerABEnergy);
+    }
+    
+    if(addbackType == "n0"
+       || addbackType == "n1"){
+      obj.FillHistogram(dirname,  "n0n1",
+			energyNChannels, energyLlim, energyUlim,
+			addbackEnergy);
+      obj.FillHistogram(dirname,
+			Form("dop_n0n1_%.0f",
+			     beta*10000),
+			energyNChannels, energyLlim, energyUlim,
+			dopplerABEnergy);
+      if(firstHitHoleNum < 10){
+	obj.FillHistogram(dirname,
+			  Form("dop_fw_n0n1_%.0f",
+			       beta*10000),
+			  energyNChannels, energyLlim, energyUlim,
+			  dopplerABEnergy);
+      } else {
+	obj.FillHistogram(dirname,
+			  Form("dop_bw_n0n1_%.0f",
+			       beta*10000),
+			  energyNChannels, energyLlim, energyUlim,
+			  dopplerABEnergy);
+      }
+    }
+      
+    if(addbackType == "n0"
+       || addbackType == "n1"
+       || addbackType == "n2"){
+      obj.FillHistogram(dirname,  "n0n1n2",
+			energyNChannels, energyLlim, energyUlim,
+			addbackEnergy);
+      obj.FillHistogram(dirname,
+			Form("dop_n0n1n2_%.0f",
+			     beta*10000),
+			energyNChannels, energyLlim, energyUlim,
+			dopplerABEnergy);
+      if(firstHitHoleNum < 10){
+	obj.FillHistogram(dirname,
+			  Form("dop_fw_n0n1n2_%.0f",
+			       beta*10000),
+			  energyNChannels, energyLlim, energyUlim,
+			  dopplerABEnergy);
+      } else {
+	obj.FillHistogram(dirname,
+			  Form("dop_bw_n0n1n2_%.0f",
+			       beta*10000),
+			  energyNChannels, energyLlim, energyUlim,
+			  dopplerABEnergy);
+      }
+    }
+    
+    obj.FillHistogram(dirname,  "clusterSize_vs_neighborPairs",
+		      20, 0, 20, neighbors,
+		      10, 0, 10, cluster.size());
+  }
+    
+  return true;
+  
+}
+
 bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
 		   GCutG *outgoing, GCutG *gt_time) {
 
@@ -284,7 +518,7 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
 		       1000, 0, 4000,
 		       hit.GetDoppler(beta, &track));
 
-     histname = Form("doppler_theta_%s_t",outgoing->GetName());
+     histname = Form("doppler_theta_%s",outgoing->GetName());
      obj.FillHistogram(dirname, histname,
 		       100, 0, TMath::Pi(),
 		       hit.GetTheta(),
@@ -386,6 +620,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
       
       HandleGretina(obj, incoming_s44, outgoing_s44, gt_time);
 
+      HandleAddback(obj, incoming_s44, outgoing_s44, gt_time);
+
       dirname = "gretina";
       for(unsigned int i=0;i<gretina->Size();i++) {
 	TGretinaHit hit = gretina->GetGretinaHit(i);
@@ -397,7 +633,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 			  hit.GetCoreEnergy());
 	histname = "dtimet0_all";
 	obj.FillHistogram(dirname,histname,
-			  500, -250, 250,
+			  500, 0, 500,
 			  s800->GetTimestamp()-hit.GetTime(),
 			  1000, 0, 4000,
 			  hit.GetCoreEnergy());
@@ -461,9 +697,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
 		      s800->GetCrdc(1).GetDispersiveX());
 
   }
-  //std::cout << " After Gret Calorimeter" << std::endl;
+
   if(numobj!=list->GetSize())
     list->Sort();
-  //std::cout << " end" << std::endl;
+
 }
 

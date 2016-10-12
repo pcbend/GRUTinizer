@@ -21,12 +21,14 @@ bool FilterCondition(TRuntimeObjects& obj) {
     //    printf("i am returning false ***\n"); fflush(stdout);
     return false;
   }
-  //if((s800->GetTrigger().GetRegistr()&0x0002)>>1)
-  // return true;
+
+
 
   //  std::cout << s800->Size() << std::endl;
   
-  if(s800->GetTrigger().GetRegistr()==3) {
+
+  //  if(s800->GetTrigger().GetRegistr()==3) {
+  if( s800->GetTrigger().GetRegistr()&0x0002 ){
     //    printf("i am returning true\n"); fflush(stdout);
     return true;
   }
