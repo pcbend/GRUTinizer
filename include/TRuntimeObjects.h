@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+#include <cmath>
 
 #include "TCutG.h"
 #include "TDirectory.h"
