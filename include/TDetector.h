@@ -2,6 +2,7 @@
 #define _TDETECTOR_H_
 
 #include <vector>
+#include <cmath>
 
 #include "TNamed.h"
 
