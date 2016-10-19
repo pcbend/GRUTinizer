@@ -18,8 +18,4 @@
 #pragma link C++ function CalculateParameters;
 #pragma link C++ function MakeVectorFromFile;
 
-
 #endif
-
-
-

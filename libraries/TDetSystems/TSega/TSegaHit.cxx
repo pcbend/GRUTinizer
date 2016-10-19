@@ -170,12 +170,17 @@ int TSegaHit::GetMainSegnum() const {
   return output;
 }
 
-TVector3 TSegaHit::GetPosition(bool apply_array_offset) const {
+TVector3 TSegaHit::GetPosition(bool apply_array_offset, TVector3 array_offset) const {
   TVector3 array_pos = TSega::GetSegmentPosition(GetDetnum(), GetMainSegnum());
   if(apply_array_offset){
-    array_pos += TVector3(GValue::Value("Sega_X_offset"),
-                          GValue::Value("Sega_Y_offset"),
-                          GValue::Value("Sega_Z_offset"));
+    if(std::isnan(array_offset.X()) &&
+       std::isnan(array_offset.Y()) &&
+       std::isnan(array_offset.Z())) {
+      array_offset = TVector3(GValue::Value("Sega_X_offset"),
+                              GValue::Value("Sega_Y_offset"),
+                              GValue::Value("Sega_Z_offset"));
+    }
+    array_pos += array_offset;
   }
   return array_pos;
 }
@@ -194,7 +199,7 @@ double TSegaHit::GetDoppler(double beta,const TVector3& particle_vec, const TVec
   }
 
   double gamma = 1/(sqrt(1-pow(beta,2)));
-  TVector3 pos = GetPosition() + sega_offset;
+  TVector3 pos = GetPosition(true, sega_offset);
   double cos_angle = TMath::Cos(pos.Angle(particle_vec));
   double dc_en = GetEnergy()*gamma *(1 - beta*cos_angle);
   return dc_en;

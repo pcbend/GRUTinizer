@@ -176,31 +176,31 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
 
   // Find all fronts with a reasonable TDC value
   int best_front = -1;
-  int max_charge = -1;
+  double max_energy = -1e9;
   for(auto& elem : front_hits){
     TJanusHit& hit = elem.second;
     // if(hit.Time() > 50 && hit.Time() < 3900 &&
     //    hit.Charge() > max_charge){
-    if(hit.Charge() > max_charge &&
+    if(hit.GetEnergy() > max_energy &&
        hit.GetDetnum() >= 0 &&
        hit.GetDetnum() < 2){
       best_front = elem.first;
-      max_charge = hit.Charge();
+      max_energy = hit.Charge();
     }
   }
 
   // Find all backs with a reasonable TDC value
   int best_back = -1;
-  max_charge = -1;
+  max_energy = -1e9;
   for(auto& elem : back_hits){
     TJanusHit& hit = elem.second;
     // if(hit.Time() > 50 && hit.Time() < 3900 &&
     //    hit.Charge() > max_charge) {
-    if(hit.Charge() > max_charge &&
+    if(hit.GetEnergy() > max_energy &&
        hit.GetDetnum() >= 0 &&
        hit.GetDetnum() < 2){
       best_back = elem.first;
-      max_charge = hit.Charge();
+      max_energy = hit.Charge();
     }
   }
 

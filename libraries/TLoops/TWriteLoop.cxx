@@ -9,7 +9,6 @@
 #include "GValue.h"
 #include "TChannel.h"
 #include "THistogramLoop.h"
-#include "TS800.h"
 
 TWriteLoop* TWriteLoop::Get(std::string name, std::string output_filename){
   if(name.length()==0){

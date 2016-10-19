@@ -19,6 +19,8 @@ public:
   virtual void InsertHit(const TDetectorHit&);
   virtual TDetectorHit& GetHit(int i);
 
+  void SortHitsByTimestamp();
+
   virtual void SetRunStart(unsigned int unix_time);
 
   static TVector3 GetSegmentPosition(int detnum, int segnum);
