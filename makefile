@@ -86,8 +86,9 @@ run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  
                 rm -f $(2).log $(2).error
 endif
 
-all: include/GVersion.h $(EXECUTABLES) $(LIBRARY_OUTPUT) pcm_files bin/grutinizer-config bin/gadd_fast.py\
-     $(HISTOGRAM_SO) $(FILTER_SO) extras
+all: include/GVersion.h $(EXECUTABLES) $(LIBRARY_OUTPUT) pcm_files bin/gadd \
+           bin/grutinizer-config bin/gadd_fast.py\
+           $(HISTOGRAM_SO) $(FILTER_SO) extras
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
 
 pcm_files:
@@ -97,6 +98,10 @@ docs:
 
 bin/%: util/% | bin
 	@ln -sf ../$< $@
+
+.build/util/gadd.o: $(ROOTSYS)/main/src/hadd.cxx
+	@mkdir -p $(dir $@)
+	$(call run_and_test,sed s/hadd/gadd/g < $< | $(CPP) -x c++ -fPIC -c -o $@ $(CFLAGS) -,$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT) pcm_files bin
 	$(call run_and_test,$(CPP) $^ -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
