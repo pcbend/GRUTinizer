@@ -58,6 +58,10 @@ public:
                      const char *classnamey="",const char *methodnamey="",const char* paraym="");
 
   Int_t Fill(const TObject* objx,const TObject *objy=NULL);
+  Int_t Fill(Double_t x, Double_t y) { return TH2D::Fill(x,y); }
+  Int_t Fill(Double_t x, Double_t y, Double_t w) { return TH2D::Fill(x,y,w); }
+  Int_t Fill(const char *namex, Double_t y, Double_t w) { return TH2D::Fill(namex,y,w); }
+  Int_t Fill(const char *namex, const char *namey, Double_t w) { return TH2D::Fill(namex,namey,w); }
 
 private:
   

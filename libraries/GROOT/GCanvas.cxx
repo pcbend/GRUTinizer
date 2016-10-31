@@ -168,6 +168,16 @@ GCanvas::GCanvas(const char* name, const char* title, Int_t wtopx, Int_t wtopy, 
   }
 
 
+GCanvas::GCanvas(Int_t cols,Int_t rows,Bool_t build)
+  :TCanvas(build)  {
+    GCanvasInit();
+    this->Divide(cols,rows);
+    this->cd(1);
+  }
+
+
+
+
 GCanvas::~GCanvas() {
   //TCanvas::~TCanvas();
 }
