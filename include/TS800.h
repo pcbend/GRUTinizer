@@ -59,6 +59,9 @@ public:
   //Added 1/4/2016 for getting trigbit - BAE
   TTrigger      &GetTrigger()      const { return (TTrigger&)trigger;}
 
+  
+  float GetIonSum() const { return ion.GetSum(); }
+
   //Note c1 is the AFP correction and c2 is the XFP correction
   float GetTofE1_TAC(float c1=0.00,float c2=0.00)  const;
   float GetTofE1_TDC(float c1=0.00,float c2=0.00)  const;

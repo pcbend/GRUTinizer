@@ -128,7 +128,7 @@ float TIonChamber::GetAve(){
 }
 
 
-float TIonChamber::GetSum(){
+float TIonChamber::GetSum() const {
   float temp =0.0;
   //if(fdE==-1.0) {
   /*
