@@ -147,6 +147,7 @@ float TIonChamber::GetSum(){
   for(int x=0;x<Size();x++){
     TChannel *c = TChannel::GetChannel(Address(x));
     if(c){
+      //printf("I AM HERE!!!\n"); fflush(stdout);
       temp+=c->CalEnergy(GetData(x));
     }else{
       temp+=GetData(x);

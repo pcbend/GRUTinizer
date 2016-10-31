@@ -31,11 +31,15 @@ int GCutG::SaveTo(const char *cutname,const char* filename,Option_t* option) {
   GCutG *cut = (GCutG*)this->Clone(cname.c_str());
   cut->SetNameTitle(cname.c_str(),cname.c_str());
   TFile f(fname.c_str(),option);
+  //printf("Attepting to save %s to %s... ",cut->GetName(),f.GetName());
   if(f.Get(cname.c_str())) {
     f.cd();//Get(cname.c_str())->Delete();
     gDirectory->Delete(cname.c_str());
   }
-  return cut->Write(cname.c_str(),TObject::kOverwrite | TObject::kSingleKey);
+  //int bytes = cut->Write(cname.c_str(),TObject::kOverwrite | TObject::kSingleKey);
+  f.Add(cut,true);
+  //printf("%i\n",bytes);  fflush(stdout);
+  return f.Write();
 }
 
 
