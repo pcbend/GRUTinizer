@@ -1184,10 +1184,10 @@ float TS800::GetCorrTOF_OBJ() const {
 float TS800::GetCorrTOF_OBJ_MESY(int i) const {
   //static double f_afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
   //static double f_xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
-  if(fGlobalReset) {
+  //if(fGlobalReset) {
     f_mafp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
     f_mxfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
-  }
+  //}
   return GetTofE1_MTDC(f_mafp_cor,f_mxfp_cor,i);
 }
 

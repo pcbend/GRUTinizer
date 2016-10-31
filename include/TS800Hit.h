@@ -232,6 +232,16 @@ class TIonChamber : public TDetectorHit {
 
     int  Address(int i) const { return TDetectorHit::Address() + GetChannel(i); }
 
+
+    float GetCalData(int i) const {
+      TChannel *c = TChannel::GetChannel(Address(GetChannel(i)));
+      if(c){
+        return c->CalEnergy(GetData(i));
+      }else{
+       return (float)GetData(i);
+      }
+    }
+
     virtual void Copy(TObject&) const;
     virtual void Print(Option_t *opt="") const;
     virtual void Clear(Option_t *opt="");

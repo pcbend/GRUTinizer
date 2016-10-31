@@ -16,6 +16,7 @@ enum kDetectorSystems {
   BANK29     = 8,
   GRETINA_SIM= 11,
   S800_SIM   = 9,
+  LENDA      = 21,
 
   SEGA = 64,
   JANUS = 65,

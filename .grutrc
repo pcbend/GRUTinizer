@@ -13,7 +13,7 @@ GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
 GRUT.SnapshotExt: 
 GRUT.SnapshotDir: 
 
-#GRUT.DefaultCutFile: mycuts.root
+#GRUT.DefaultCutFile: mycuts.cuts
 
 #files to load at log in:
 Rint.Logon: $(GRUTSYS)/.grut_logon

@@ -78,6 +78,9 @@ GCutG *incoming_cl=0;
 
 GCutG *outgoing_44s=0;
 
+
+GCutG *blob=0;
+
 bool OutgoingS800(TRuntimeObjects &obj,TS800 *s800,GCutG *outgoing) {
 
    if(!s800)
@@ -93,7 +96,7 @@ bool OutgoingS800(TRuntimeObjects &obj,TS800 *s800,GCutG *outgoing) {
      dirname = "S800";
    }
    histname = "incoming";
-   obj.FillHistogram(dirname,histname,2000,-2500,-500,s800->GetOBJ_E1Raw_MESY(),
+   obj.FillHistogram(dirname,histname,2000,-3000,-1000,s800->GetOBJ_E1Raw_MESY(),
                                       2000,1500,4500, s800->GetXF_E1Raw_MESY());
 
 
@@ -109,55 +112,75 @@ bool IncomingS800(TRuntimeObjects &obj,TS800 *s800,GCutG *incoming) {
    
    std::string dirname;
    std::string histname;
-   if(incoming) {
-     if(!incoming->IsInside(s800->GetOBJ_E1Raw_MESY(),s800->GetXF_E1Raw_MESY()) )
-       return false;
-     dirname = Form("S800_%s",incoming->GetName());
-   } else {
+   //if(incoming) {
+   //  if(!incoming->IsInside(s800->GetOBJ_E1Raw_MESY(),s800->GetXF_E1Raw_MESY()) )
+   //    return false;
+   //  dirname = Form("S800_%s",incoming->GetName());
+   //} else {
      dirname = "S800";
-   }
-
+   //}
+   if(s800->GetOBJ_E1Raw_MESY()<-2800 ||
+      s800->GetOBJ_E1Raw_MESY()>-1800)
+     return false;
 
    TMTof &mtof = s800->GetMTof();
 
-   histname = "RefSize";
-   obj.FillHistogram(dirname,histname,20,0,0,mtof.RefSize(),
-                                      20,0,0,mtof.E1UpSize());
+  // histname = "RefSize";
+  // obj.FillHistogram(dirname,histname,20,0,0,mtof.RefSize(),
+  //                                    20,0,0,mtof.E1UpSize());
    
+   TIonChamber ion = s800->GetIonChamber();
+   histname = "ion_summary";
+   for(int i=0;i<ion.Size();i++) {
+       obj.FillHistogram(dirname,histname,16,0,16,ion.GetChannel(i),
+                                          2000,0,6000,ion.GetCalData(i));
+   }
+
+
    for(int i=0;i<mtof.E1UpSize();i++) {
      if(i<mtof.RefSize()) {
      //for(int j=0;j<mtof.E1UpSize();j++) {
        histname = "E1up";
-       obj.FillHistogram(dirname,histname,2000,0,0,mtof.fE1Up.at(i)-mtof.fRef.at(i));
+       obj.FillHistogram(dirname,histname,512,0,512,mtof.fE1Up.at(i)-mtof.fRef.at(i));
      }
      if(i<mtof.RfSize()) {
      //for(int j=0;j<mtof.RfSize();j++) {
        histname = "Rf";
-       obj.FillHistogram(dirname,histname,5000,0,0,mtof.fE1Up.at(i)-mtof.fRf.at(i));
+       obj.FillHistogram(dirname,histname,512,20000,22000,std::abs(mtof.fE1Up.at(i)-mtof.fRf.at(i)));
      }
      if(i<mtof.ObjSize()) {
      //for(int j=0;j<mtof.ObjSize();j++) {
        histname = "Obj";
-       obj.FillHistogram(dirname,histname,5000,0,5000,mtof.fE1Up.at(i)-mtof.fObj.at(i));
+       obj.FillHistogram(dirname,histname,512,1000,3000,mtof.fE1Up.at(i)-mtof.fObj.at(i));
      }
    }
+
+ 
+  histname = "GetOBJ_E1Raw";
+  obj.FillHistogram(dirname,histname,2000,-10000,10000,s800->GetOBJ_E1Raw_MESY());
+
+  histname = "GetXF_E1Raw";
+  obj.FillHistogram(dirname,histname,2000,-10000,10000,s800->GetXF_E1Raw_MESY());
+
+  histname = "GetTOF_OBJ";
+  obj.FillHistogram(dirname,histname,2000,-10000,10000,s800->GetCorrTOF_OBJ_MESY());
+
 
   histname = "incoming";
   obj.FillHistogram(dirname,histname,2000,-2500,-500,s800->GetOBJ_E1Raw_MESY(),
                                      2000,1500,4500, s800->GetXF_E1Raw_MESY());
-
   
   histname = "time_x";
-  obj.FillHistogram(dirname,histname,2000,0,0,s800->GetCorrTOF_OBJ_MESY(),
-                                     2000,0,0,s800->GetCrdc(0).GetDispersiveX());
+  obj.FillHistogram(dirname,histname,1000,-3000,-2000,s800->GetCorrTOF_OBJ_MESY(),
+                                     1000,-500,500,s800->GetCrdc(0).GetDispersiveX());
 
   histname = "time_afp";
-  obj.FillHistogram(dirname,histname,2000,0,0,s800->GetCorrTOF_OBJ_MESY(),
-                                     2000,0,0,s800->GetAFP());
+  obj.FillHistogram(dirname,histname,1000,-3000,-2000,s800->GetCorrTOF_OBJ_MESY(),
+                                     1000,-.1,.1,s800->GetAFP());
 
   histname = "time_charge";
-  obj.FillHistogram(dirname,histname,2000,0,0,s800->GetCorrTOF_OBJ_MESY(),
-                                     2000,0,0,s800->GetIonChamber().Charge());
+  obj.FillHistogram(dirname,histname,1000,-3000,-2000,s800->GetCorrTOF_OBJ_MESY(),
+                                     3000,22000,34000,s800->GetIonChamber().Charge());
 
 
 
@@ -179,29 +202,51 @@ bool IncomingS800(TRuntimeObjects &obj,TS800 *s800,GCutG *incoming) {
 
 bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,GCutG *outgoing,GCutG *time) {
 
-   if(!incoming || !outgoing)
-     return false;
    TGretina *gretina = obj.GetDetector<TGretina>();
+   
+   
+   std::string dirname = "gretina";
+   std::string histname = "summary";
+
+   for(unsigned int x=0;x<gretina->Size();x++) {
+     obj.FillHistogram(dirname,histname,4000,0,4000,gretina->GetGretinaHit(x).GetCoreEnergy(),
+                                        120,0,120,gretina->GetGretinaHit(x).GetCrystalId());
+   }
+
+
+
+   //if(!incoming || !outgoing)
+   if(!outgoing)
+     return false;
    TS800 *s800       = obj.GetDetector<TS800>();
    if(!gretina || !s800)
      return false;
 
-   if(!((s800->GetTrigger().GetRegistr()&0x0002)>>1))
-     return false;
+   //if(!((s800->GetTrigger().GetRegistr()&0x0002)>>1))
+   //  return false;
 
-   if(!incoming->IsInside(s800->GetOBJ_E1Raw_MESY(),s800->GetXF_E1Raw_MESY()) )
-     return false;
+   //if(!incoming->IsInside(s800->GetOBJ_E1Raw_MESY(),s800->GetXF_E1Raw_MESY()) )
+   //  return false;
    if(!outgoing->IsInside(s800->GetCorrTOF_OBJ_MESY(),s800->GetIonChamber().Charge()) )
      return false;
  
-   std::string dirname = Form("gretina_%s",outgoing->GetName());
+   dirname = Form("gretina_%s",outgoing->GetName());
 
-   for(int x=0;x<gretina->Size();x++) {
+   for(unsigned int x=0;x<gretina->Size();x++) {
      TGretinaHit hit = gretina->GetGretinaHit(x);
   
-     std::string histname = "doppler";
+     histname = "doppler";
      TVector3 track = s800->Track();
-     obj.FillHistogram(dirname,histname,4000,0,4000,hit.GetDoppler(0.354,&track));
+     obj.FillHistogram(dirname,histname,4000,0,4000,hit.GetDoppler(GValue::Value("BETA"),&track));
+   
+     histname = "doppler_beta";
+     double beta = .3;
+     while(beta<.4) {
+       obj.FillHistogram(dirname,histname,100,.3,.4,beta,
+                                          1000,0,4000,hit.GetDoppler(beta,&track));
+       beta+= 0.1/100.;
+     }
+   
    }
 
 
@@ -222,20 +267,24 @@ void MakeHistograms(TRuntimeObjects& obj) {
   int numobj = list->GetSize();
 
   TList *gates = &(obj.GetGates());
-  if(!incoming_p) {
-    incoming_p = (GCutG*)gates->FindObject("incoming_p");
-  }
-  if(!incoming_s) {
-    incoming_s = (GCutG*)gates->FindObject("incoming_s");
-  }
-  if(!incoming_cl) {
-    incoming_cl = (GCutG*)gates->FindObject("incoming_cl");
-  }
-  
-  if(!outgoing_44s) {
-    outgoing_44s = (GCutG*)gates->FindObject("outgoing_44s");
-  }
+// if(!incoming_p) {
+//   incoming_p = (GCutG*)gates->FindObject("incoming_p");
+// }
+// if(!incoming_s) {
+//   incoming_s = (GCutG*)gates->FindObject("incoming_s");
+// }
+// if(!incoming_cl) {
+//   incoming_cl = (GCutG*)gates->FindObject("incoming_cl");
+// }
+// 
+// if(!outgoing_44s) {
+//   outgoing_44s = (GCutG*)gates->FindObject("outgoing_44s");
+// }
 
+  if(!blob) {
+    blob = (GCutG*)gates->FindObject("blob");
+    //printf("found blob.\n"); fflush(stdout);
+  }
 
 
 
@@ -264,7 +313,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
   if(s800) {
     dirname = "S800";
 
-    IncomingS800(obj,s800,0);
+    if(!IncomingS800(obj,s800,0))
+      return;
+
+
     //IncomingS800(obj,s800,incoming_p);
     //IncomingS800(obj,s800,incoming_s);
     //IncomingS800(obj,s800,incoming_cl);
@@ -273,7 +325,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     if(gretina) {
       
-      HandleGretina(obj,incoming_s,outgoing_44s,0);
+      HandleGretina(obj,incoming_s,blob,0);
 
 
       dirname = "gretina";
@@ -281,18 +333,18 @@ void MakeHistograms(TRuntimeObjects& obj) {
           TGretinaHit hit = gretina->GetGretinaHit(i);
           histname = "dtime_all";
           obj.FillHistogram(dirname,histname,
-                  500,-250,250,s800->GetTimestamp()-hit.GetTimestamp(),
+                  250,-150,350,s800->GetTimestamp()-hit.GetTimestamp(),
                   1000,0,4000,hit.GetCoreEnergy());
           histname = "dtimet0_all";
           obj.FillHistogram(dirname,histname,
-                  500,-250,250,s800->GetTimestamp()-hit.GetTime(),
+                  500,-150,350,s800->GetTimestamp()-hit.GetTime(),
                   1000,0,4000,hit.GetCoreEnergy());
           unsigned short bits = s800->GetTrigger().GetRegistr();
           for(int j=0;j<5;j++) {
             if((bits>>j)&0x0001) {
               histname = Form("dtime_all_reg%i",j);
               obj.FillHistogram(dirname,histname,
-                      500,-250,250,s800->GetTimestamp()-hit.GetTimestamp(),
+                      250,-150,350,s800->GetTimestamp()-hit.GetTimestamp(),
                       1000,0,4000,hit.GetCoreEnergy());
               histname = Form("dtimet0_reg%i",j);
               obj.FillHistogram(dirname,histname,
