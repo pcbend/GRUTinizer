@@ -222,6 +222,9 @@ Int_t GH2D::Fill(const TRuntimeObjects *objs) {
   }
   TDetector *detx = objs->GetDetector(fXFillClass->GetName());
   TDetector *dety = objs->GetDetector(fYFillClass->GetName());
+  printf("detx = %s\n",detx->IsA()->GetName()); fflush(stdout);
+  printf("dety = %s\n",dety->IsA()->GetName()); fflush(stdout);
+
   return Fill(detx,dety);
 }
 
