@@ -106,3 +106,19 @@ void TUnpackedEvent::SetRunStart(unsigned int unix_time){
     det->SetRunStart(unix_time);
   }
 }
+
+
+TDetector* TUnpackedEvent::GetDetector(std::string detname) const {
+  for(auto det : detectors) {
+    if(detname.compare(det->IsA()->GetName())==0) {
+      TDetector* output = det;
+      if(output){
+        return output;
+      }
+    }
+  }
+  return NULL;
+}
+
+
+

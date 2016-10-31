@@ -7,6 +7,8 @@
 #include <TMethodCall.h>
 
 #include "GH1D.h"
+#include "GCutG.h"
+#include "TRuntimeObjects.h"
 
 ClassImp(GH2D)
 
@@ -198,6 +200,10 @@ Int_t GH2D::Fill(const TObject* objx,const TObject *objy) {
     //printf("%s \t %s\n", obj->Class()->GetName(),fFillClass->GetName());
     return -2;
   }
+  //for(auto gate : gates) {
+  //  if(!gate->IsInside())
+  //    return -3;
+  //}
   Double_t storagex;
   Double_t storagey;
   fXFillMethod->Execute((void*)(objx),storagex);
@@ -205,7 +211,32 @@ Int_t GH2D::Fill(const TObject* objx,const TObject *objy) {
   return TH2D::Fill(storagex,storagey);
 }
 
+Int_t GH2D::Fill(const TRuntimeObjects *objs) {
+  if(!fXFillClass || !fXFillMethod || !fYFillClass || !fYFillMethod) {
+    //printf("%p \t %p\n",fFillClass,fFillMethod);
+    return -1;
+  }
+  for(auto gate : gates) {
+    if(!gate->IsInside(objs))
+      return -3;
+  }
+  TDetector *detx = objs->GetDetector(fXFillClass->GetName());
+  TDetector *dety = objs->GetDetector(fYFillClass->GetName());
+  return Fill(detx,dety);
+}
 
 
+
+void GH2D::RemoveGate(GCutG *gate) {
+  unsigned int i=0;
+  for(auto g : gates) {
+    if(g==gate)
+      break;
+    i++;
+  };
+  if(i<gates.size()) {
+    gates.erase(gates.begin()+i);
+  }
+}
 
 

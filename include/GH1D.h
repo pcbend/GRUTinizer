@@ -11,6 +11,8 @@ class TClass;
 class TMethodCall;
 
 class GPeak;
+class GCutG;
+class TRuntimeObjects;
 
 class GH1D : public TH1D {
 public:
@@ -37,6 +39,7 @@ public:
   void SetProjectionAxis(int axis) { projection_axis = axis; }
 
   virtual Int_t Fill(const TObject* obj);
+  virtual Int_t Fill(const TRuntimeObjects* objs);
   virtual Int_t Fill(double x) { return TH1D::Fill(x); }
   virtual Int_t Fill(double x,double w) { return TH1D::Fill(x,w); }
   virtual Int_t Fill(const char *name,double w) { return TH1D::Fill(name,w); }
@@ -61,12 +64,9 @@ public:
                            kBackgroundSubtraction mode = kRegionBackground) const;
 
   void SetFillMethod(const char *classname,const char *methodname,const char* param="");
-  //void SetGateMethod(const char *classname,const char *methodnamex,const char* paramx="",
-  //                                         const char *methodnamey="",const char* paramy="");
-  //void SetGateMethod(const char *classname,const char *methodnamex,
-  //                   const char *classname,const char *methodnamey,
-  //                   const char* paramx="",const char* paramy="");
-  
+  void AddGate(GCutG *gate) { gates.push_back(gate); } 
+  void RemoveGate(GCutG *gate); 
+
 
   GPeak* DoPhotoPeakFit(double xlow,double xhigh,Option_t *opt=""); // *MENU* 
   GPeak* DoPhotoPeakFitNormBG(double xlow,double xhigh,Option_t *opt=""); // *MENU* 
@@ -83,6 +83,8 @@ private:
 
   double xl_last; //!
   double xh_last; //!
+  
+  std::vector<GCutG*> gates; //!
 
   ClassDef(GH1D,1)
 };

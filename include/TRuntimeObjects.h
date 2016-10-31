@@ -16,6 +16,8 @@ class TH2;
 class TFile;
 class TProfile;
 
+class TDetector;
+
 /// Object passed to the online histograms.
 /**
    For each event, an instance of this type will be passed to the custom histogrammer.
@@ -40,6 +42,9 @@ public:
   template<typename T>
   T* GetDetector(){
     return detectors->GetDetector<T>();
+  }
+  TDetector *GetDetector(std::string dname) const { 
+    return detectors->GetDetector(dname);
   }
 
   TCutG* GetCut(const std::string& name);
