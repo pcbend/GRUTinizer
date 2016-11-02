@@ -212,6 +212,9 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
     case 17: //PWall Mode2 equivlant.
       fOutputEvent->AddRawData(event, kDetectorSystems::PHOSWALL);
       break;
+    case 21: //lenda
+      fOutputEvent->AddRawData(event, kDetectorSystems::LENDA);
+      break;
     case 29: // Something.
       fOutputEvent->AddRawData(event, kDetectorSystems::BANK29);
       break;

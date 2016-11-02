@@ -168,6 +168,16 @@ GCanvas::GCanvas(const char* name, const char* title, Int_t wtopx, Int_t wtopy, 
   }
 
 
+GCanvas::GCanvas(Int_t cols,Int_t rows,Bool_t build)
+  :TCanvas(build)  {
+    GCanvasInit();
+    this->Divide(cols,rows);
+    this->cd(1);
+  }
+
+
+
+
 GCanvas::~GCanvas() {
   //TCanvas::~TCanvas();
 }
@@ -535,8 +545,10 @@ bool GCanvas::HandleMouseShiftPress(Int_t event,Int_t x,Int_t y) {
   TH1 *hist = 0;
   TIter iter(gPad->GetListOfPrimitives());
   while(TObject *obj = iter.Next()) {
-    if(obj->InheritsFrom(TH1::Class()))
+    if(obj->InheritsFrom(TH1::Class())) {
       hist = (TH1*)obj;
+      break;
+    }
   }
   if(!hist)
     return false;
@@ -545,11 +557,11 @@ bool GCanvas::HandleMouseShiftPress(Int_t event,Int_t x,Int_t y) {
   switch(hist->GetDimension()) {
     case 1:
       {
-        if(hist->InheritsFrom(GH1D::Class())) {
-          new GCanvas();
-          ((GH1D*)hist)->GetParent()->Draw("colz");
-          return true;
-        }
+        //if(hist->InheritsFrom(GH1D::Class())) {
+        //  new GCanvas();
+        //  ((GH1D*)hist)->GetParent()->Draw("colz");
+        //  return true;
+        //}
         std::vector<TH1*> hists = FindHists();
         new GCanvas();
         //options.Append("HIST");

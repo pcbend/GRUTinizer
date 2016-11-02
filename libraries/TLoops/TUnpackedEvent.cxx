@@ -15,6 +15,7 @@
 #include "TS800Scaler.h"
 #include "TSega.h"
 #include "TFastScint.h"
+#include "TLenda.h"
 
 TUnpackedEvent::TUnpackedEvent() { }
 
@@ -80,6 +81,10 @@ void TUnpackedEvent::Build() {
 
     case kDetectorSystems::NSCLSCALERS:
       GetDetector<TNSCLScalers>(true)->Build(raw_data);
+      break;
+    
+    case kDetectorSystems::LENDA:
+      GetDetector<TLenda>(true)->Build(raw_data);
       break;
 
     default:
