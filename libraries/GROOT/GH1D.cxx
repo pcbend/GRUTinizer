@@ -33,7 +33,7 @@ GH1D::GH1D(const TF1& function,Int_t nbinsx,Double_t xlow,Double_t xup) :
 
   for(int i=1;i<=nbinsx;i++) {
     double x = GetBinCenter(i);
-    Fill(x,function.Eval(x));
+    SetBinContent(i,function.Eval(x));
   }
   //f->Delete();
 }
@@ -43,9 +43,9 @@ bool GH1D::WriteDatFile(const char *outFile){
 
   std::ofstream out;
   out.open(outFile);
-  
+
   if(!(out.is_open())) return 0;
-  
+
   for(int i=0;i<GetNbinsX();i++){
     out << GetXaxis()->GetBinCenter(i) << "\t" << GetBinContent(i) << std::endl;
   }
@@ -240,8 +240,8 @@ void GH1D::SetFillMethod(const char *classname,const char *methodname,const char
   if(!fFillClass)
     return;
   fFillMethod = new TMethodCall(fFillClass,methodname,param);
-  //printf("class:  %s\n",fFillClass->GetName()); 
-  //printf("method: %s\n",fFillMethod->GetMethod()->GetPrototype()); 
+  //printf("class:  %s\n",fFillClass->GetName());
+  //printf("method: %s\n",fFillMethod->GetMethod()->GetPrototype());
 }
 
 
@@ -261,19 +261,15 @@ Int_t GH1D::Fill(const TObject* obj) {
 
 
 
-GPeak* GH1D::DoPhotoPeakFit(double xlow,double xhigh,Option_t *opt) { 
+GPeak* GH1D::DoPhotoPeakFit(double xlow,double xhigh,Option_t *opt) {
   xl_last = xlow;
   xh_last = xhigh;
   return PhotoPeakFit((TH1*)this,xlow,xhigh,opt);
 }
 
 
-GPeak* GH1D::DoPhotoPeakFitNormBG(double xlow,double xhigh,Option_t *opt) { 
+GPeak* GH1D::DoPhotoPeakFitNormBG(double xlow,double xhigh,Option_t *opt) {
   xl_last = xlow;
   xh_last = xhigh;
   return PhotoPeakFitNormBG((TH1*)this,xlow,xhigh,opt);
 }
-
-
-
-
