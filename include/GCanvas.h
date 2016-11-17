@@ -6,10 +6,12 @@
 #include "TRootCanvas.h"
 //#include "TPeak.h"
 
-#include "TH1.h"
 #include "TLine.h"
 
-#include "GH2I.h"
+class TF1;
+class TH1;
+class GH1;
+class GH2;
 
 class GMarker : public TObject{
 public:
@@ -88,11 +90,13 @@ private:
 
   bool fGuiEnabled;
 
+  GH1 *gHist;
+
   //bool fStatsDisplayed;
   bool fMarkerMode;
   std::vector<GMarker*> fMarkers;
   std::vector<GMarker*> fBackgroundMarkers;
-  kBackgroundSubtraction fBackgroundMode;
+  //kBackgroundSubtraction fBackgroundMode;
   void AddMarker(int,int,int dim=1);
   void RemoveMarker(Option_t *opt="");
   void OrderMarkers();
@@ -144,7 +148,6 @@ private:
   TRootCanvas *fRootCanvas;
 
   bool control_key;
-
   bool toggle_control() { control_key = !control_key; return control_key; }
 
   ClassDef(GCanvas,2);

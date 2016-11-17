@@ -11,42 +11,37 @@
 ClassImp(GH2D)
 
 GH2D::GH2D(const char *name,const char *title,Int_t nbinsx,const Double_t *xbins,Int_t nbinsy, const Double_t *ybins) :
-  TH2D(name,title,nbinsx,xbins,nbinsy,ybins), GH2Base(),
-  fXFillClass(0),fYFillClass(0),fXFillMethod(0),fYFillMethod(0) {
+  TH2D(name,title,nbinsx,xbins,nbinsy,ybins), GH2Base() {
 }
 
 
 GH2D::GH2D(const char *name,const char *title,Int_t nbinsx,const Float_t *xbins,Int_t nbinsy, const Float_t *ybins) :
-  TH2D(name,title,nbinsx,xbins,nbinsy,ybins), GH2Base(),
-  fXFillClass(0),fYFillClass(0),fXFillMethod(0),fYFillMethod(0) {
+  TH2D(name,title,nbinsx,xbins,nbinsy,ybins), GH2Base() {
 }
 
 
 GH2D::GH2D(const char *name,const char *title,Int_t nbinsx,const Double_t *xbins,
                                             Int_t nbinsy, Double_t ylow, Double_t yup) :
-  TH2D(name,title,nbinsx,xbins,nbinsy,ylow,yup), GH2Base(),
-  fXFillClass(0),fYFillClass(0),fXFillMethod(0),fYFillMethod(0) {
+  TH2D(name,title,nbinsx,xbins,nbinsy,ylow,yup), GH2Base() { 
 }
 
 
 GH2D::GH2D(const char *name,const char *title,Int_t nbinsx, Double_t xlow, Double_t xup,
                                             Int_t nbinsy, Double_t *ybins) :
-  TH2D(name,title,nbinsx,xlow,xup,nbinsy,ybins), GH2Base(),
-  fXFillClass(0),fYFillClass(0),fXFillMethod(0),fYFillMethod(0) {
+  TH2D(name,title,nbinsx,xlow,xup,nbinsy,ybins), GH2Base() { 
 }
 
 
 GH2D::GH2D(const char *name,const char *title,Int_t nbinsx, Double_t xlow, Double_t xup,
                                             Int_t nbinsy, Double_t ylow, Double_t yup) :
-  TH2D(name,title,nbinsx,xlow,xup,nbinsy,ylow,yup), GH2Base(),
-  fXFillClass(0),fYFillClass(0),fXFillMethod(0),fYFillMethod(0) {
+  TH2D(name,title,nbinsx,xlow,xup,nbinsy,ylow,yup), GH2Base() { 
 }
 
-GH2D::GH2D(const TObject &obj) {
-  if(obj.InheritsFrom(TH2::Class())){
-    obj.Copy(*this);
-  }
-}
+//GH2D::GH2D(const GH2I &obj) {
+  //if(obj.InheritsFrom(TH2::Class())){
+//    obj.Copy(*this);
+  //}
+//}
 
 GH2D::~GH2D() {  }
 
@@ -54,10 +49,10 @@ GH2D::~GH2D() {  }
 void GH2D::Copy(TObject &obj) const {
   TH2::Copy(obj);
   GH2D& g = (GH2D&)obj; 
-  g.fXFillClass = fXFillClass;
-  g.fYFillClass = fYFillClass;
-  g.fXFillMethod = fXFillMethod;
-  g.fYFillMethod = fYFillMethod;
+  //g.fXFillClass = fXFillClass;
+  //g.fYFillClass = fYFillClass;
+  //g.fXFillMethod = fXFillMethod;
+  //g.fYFillMethod = fYFillMethod;
  //fProjections->Copy(*(((GH2D&)obj).fProjections));
   //fSummaryProjections->Copy(*(((GH2D&)obj).fSummaryProjections));
 }
@@ -171,39 +166,39 @@ void GH2D::Streamer(TBuffer &b) {
 */
 
 
-void GH2D::SetFillMethod(const char *classnamex,const char *methodnamex,const char *paramx,
-                         const char *classnamey,const char *methodnamey,const char *paramy) {
-  fXFillClass = TClass::GetClass(classnamex);
-  if(!fXFillClass)
-    return;
-  fYFillClass = TClass::GetClass(classnamey);
-  if(!fYFillClass)
-    return;
-  fXFillMethod = new TMethodCall(fXFillClass,methodnamex,paramx);
-  fYFillMethod = new TMethodCall(fYFillClass,methodnamey,paramy);
+//void GH2D::SetFillMethod(const char *classnamex,const char *methodnamex,const char *paramx,
+//                         const char *classnamey,const char *methodnamey,const char *paramy) {
+//  fXFillClass = TClass::GetClass(classnamex);
+//  if(!fXFillClass)
+//    return;
+//  fYFillClass = TClass::GetClass(classnamey);
+//  if(!fYFillClass)
+//    return;
+//  fXFillMethod = new TMethodCall(fXFillClass,methodnamex,paramx);
+//  fYFillMethod = new TMethodCall(fYFillClass,methodnamey,paramy);
   //printf("class:  %s\n",fFillClass->GetName()); 
   //printf("method: %s\n",fFillMethod->GetMethod()->GetPrototype()); 
-}
+//}
 
 
-Int_t GH2D::Fill(const TObject* objx,const TObject *objy) {
-  if(!fXFillClass || !fXFillMethod || !fYFillClass || !fYFillMethod) {
-    //printf("%p \t %p\n",fFillClass,fFillMethod);
-    return -1;
-  }
-  if(!objy) {
-    objy=objx;
-  }
-  if(objx->IsA()!=fXFillClass || objy->IsA()!=fYFillClass ) {
-    //printf("%s \t %s\n", obj->Class()->GetName(),fFillClass->GetName());
-    return -2;
-  }
-  Double_t storagex;
-  Double_t storagey;
-  fXFillMethod->Execute((void*)(objx),storagex);
-  fYFillMethod->Execute((void*)(objy),storagey);
-  return TH2D::Fill(storagex,storagey);
-}
+//Int_t GH2D::Fill(const TObject* objx,const TObject *objy) {
+//  if(!fXFillClass || !fXFillMethod || !fYFillClass || !fYFillMethod) {
+//    //printf("%p \t %p\n",fFillClass,fFillMethod);
+//    return -1;
+//  }
+//  if(!objy) {
+//    objy=objx;
+//  }
+//  if(objx->IsA()!=fXFillClass || objy->IsA()!=fYFillClass ) {
+//    //printf("%s \t %s\n", obj->Class()->GetName(),fFillClass->GetName());
+//    return -2;
+//  }
+//  Double_t storagex;
+//  Double_t storagey;
+//  fXFillMethod->Execute((void*)(objx),storagex);
+//  fYFillMethod->Execute((void*)(objy),storagey);
+//  return TH2D::Fill(storagex,storagey);
+//}
 
 
 

@@ -15,42 +15,55 @@ GPopup::GPopup(const TGWindow *p,const TGWindow *main, UInt_t w,
        : TGTransientFrame(p,main,w,h,options) {
   SetCleanup(kDeepCleanup);
 
-  TGVerticalFrame   *vframe = new TGVerticalFrame(this,500,200);
+  //TGVerticalFrame   *vframe = new TGVerticalFrame(this,500,200);
 
-  TGListView        *listv  = new TGListView(vframe,500,200);
-  TGLVContainer     *listc  = new TGLVContainer(listv->GetViewPort(),500,200,
-                                                kHorizontalFrame,fgWhitePixel);
+  //TGListView        *listv  = new TGListView(vframe,500,200);
+  //TGLVContainer     *listc  = new TGLVContainer(listv->GetViewPort(),500,200,
+  //                                              kHorizontalFrame,fgWhitePixel);
                      //listc->Associate(this);
-                     listv->SetContainer(listc);
-                     listv->GetViewPort()->SetBackgroundColor(fgWhitePixel);
-                     listv->SetViewMode(kLVList);
+                     //listv->SetContainer(listc);
+                     //listv->GetViewPort()->SetBackgroundColor(fgWhitePixel);
+                     //listv->SetViewMode(kLVList);
                      //listv->SetIncremental(1,19);
     
-  vframe->AddFrame(listv,new TGLayoutHints(kLHintsExpandX|kLHintsExpandY));
+  //SetFrames();
+  //Init();
+
+  //vframe->AddFrame(listv,new TGLayoutHints(kLHintsExpandX|kLHintsExpandY));
   
 
-  TGHorizontalFrame *hframe = new TGHorizontalFrame(vframe,500,20);
-  TGTextButton      *b1     = new TGTextButton(hframe,"&button1");
-  TGTextButton      *b2     = new TGTextButton(hframe,"&button2");
-  b1->Connect("Clicked()","GPopup",this,"Print()");
-  b2->Connect("Clicked()","GPopup",this,"Print()");
+  //TGHorizontalFrame *hframe = new TGHorizontalFrame(vframe,500,20);
+  //TGTextButton      *b1     = new TGTextButton(hframe,"&button1");
+  //TGTextButton      *b2     = new TGTextButton(hframe,"&button2");
+  //b1->Connect("Clicked()","GPopup",this,"Print()");
+  //b2->Connect("Clicked()","GPopup",this,"Print()");
 
-  hframe->AddFrame(b1,new TGLayoutHints(kLHintsExpandX|kLHintsExpandY));
-  hframe->AddFrame(b2,new TGLayoutHints(kLHintsExpandX|kLHintsExpandY));
+  //hframe->AddFrame(b1,new TGLayoutHints(kLHintsExpandX|kLHintsExpandY));
+  //hframe->AddFrame(b2,new TGLayoutHints(kLHintsExpandX|kLHintsExpandY));
 
-  vframe->AddFrame(hframe,new TGLayoutHints(kLHintsExpandX));
+  //vframe->AddFrame(hframe,new TGLayoutHints(kLHintsExpandX));
 
-  this->AddFrame(vframe,new TGLayoutHints(kLHintsExpandX|kLHintsExpandY));
+  //this->AddFrame(vframe,new TGLayoutHints(kLHintsExpandX|kLHintsExpandY));
 
+  //MapSubwindows();
+  //Resize();   // resize to default size
+  // position relative to the parent's window
+  //CenterOnParent();
+  //SetWindowName("Dialog");
+  //MapWindow();
+  //fClient->WaitFor(this);    // otherwise canvas contextmenu does not work
+}
+
+void GPopup::Init() {
+  
   MapSubwindows();
   Resize();   // resize to default size
   // position relative to the parent's window
   CenterOnParent();
   //SetWindowName("Dialog");
   MapWindow();
-  //fClient->WaitFor(this);    // otherwise canvas contextmenu does not work
-}
 
+}
 
 GPopup::~GPopup() {
 

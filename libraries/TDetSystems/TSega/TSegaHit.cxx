@@ -9,6 +9,7 @@
 #include "GValue.h"
 #include "TSega.h"
 
+#include <GH1D.h>
 
 TSegaHit::TSegaHit() {
   Clear();
@@ -56,7 +57,7 @@ void TSegaHit::DrawTrace(int segnum) {
     return;
   }
 
-  TH1I hist("hist", "", trace->size(), 0, 10*trace->size());
+  GH1D hist("sega_wave", "", trace->size(), 0, 10*trace->size());
   hist.SetStats(false);
 
   if(segnum==0){

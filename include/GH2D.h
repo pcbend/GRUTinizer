@@ -21,7 +21,7 @@ class GH2D : public TH2D , public GH2Base {
 
 public:
   GH2D() { }
-  GH2D(const TObject&);
+  GH2D(const TObject&) { ;}
   GH2D(const char *name,const char *title,Int_t nbinsx,const Double_t *xbins,Int_t nbinsy, const Double_t *ybins);
   GH2D(const char *name,const char *title,Int_t nbinsx,const Float_t *xbins,Int_t nbinsy, const Float_t *ybins);
   GH2D(const char *name,const char *title,Int_t nbinsx,const Double_t *xbins,
@@ -33,7 +33,6 @@ public:
   ~GH2D();
 
   virtual void Draw(Option_t *opt="");
-  //virtual void Draw(TCutG*);
   TH1 *DrawCopy(Option_t *opt="") const;
   TH1 *DrawNormalized(Option_t *opt="",Double_t norm=1) const;
 
@@ -57,7 +56,6 @@ public:
   void SetFillMethod(const char *classnamex,const char *methodnamex,const char* paramx="",
                      const char *classnamey="",const char *methodnamey="",const char* paraym="");
 
-  Int_t Fill(const TObject* objx,const TObject *objy=NULL);
   Int_t Fill(Double_t x, Double_t y) { return TH2D::Fill(x,y); }
   Int_t Fill(Double_t x, Double_t y, Double_t w) { return TH2D::Fill(x,y,w); }
   Int_t Fill(const char *namex, Double_t y, Double_t w) { return TH2D::Fill(namex,y,w); }
@@ -65,10 +63,6 @@ public:
 
 private:
   
-  TClass      *fXFillClass;  //!
-  TClass      *fYFillClass;  //!
-  TMethodCall *fXFillMethod; //!
-  TMethodCall *fYFillMethod; //!
 
   ClassDef(GH2D,1)
 };

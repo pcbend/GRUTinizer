@@ -4,6 +4,7 @@
 #include <TVirtualFitter.h>
 #include <TFitResult.h>
 #include <TFitResultPtr.h>
+#include <TH1.h>
 
 
 #include "Globals.h"

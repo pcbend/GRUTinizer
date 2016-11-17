@@ -7,7 +7,7 @@
 #include "TDetector.h"
 #include "TGEBEvent.h"
 #include "TPhosWallHit.h"
-#include "TNucleus.h"
+//#include "TNucleus.h"
 
 #define MAXPIXEL 256
 
@@ -40,8 +40,8 @@ public:
   const TPhosWallHit& GetPhosWallHit(int i) const { return phoswall_hits.at(i); }
   TDetectorHit& GetHit(int i)                     { return phoswall_hits.at(i); }
 
-  void Draw(Option_t *opt="");
-  static void DrawPID(Option_t *gate="",Option_t *opt="BC",Long_t entries=kMaxLong,TChain *chain=0); 
+  //void Draw(Option_t *opt="");
+  //static void DrawPID(Option_t *gate="",Option_t *opt="BC",Long_t entries=kMaxLong,TChain *chain=0); 
 
   TVector3 GetHitPosition() 
     { if(fLargestHit>-1) return GetWallPosition(Pixel(fLargestHit)); else return TVector3(sqrt(-1),sqrt(-1),sqrt(-1)); }

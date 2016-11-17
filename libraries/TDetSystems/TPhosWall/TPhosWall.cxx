@@ -5,7 +5,7 @@
 
 #include "TH2.h"
 #include "TCutG.h"
-#include "GCanvas.h"
+//#include "GCanvas.h"
 #include "TMath.h"
 #include "TStyle.h"
 #include "TPaveStats.h"
@@ -268,6 +268,7 @@ TVector3 TPhosWall::GetWallPosition(int pixelnumber, double delta){
 //
 
 
+/*
 void TPhosWall::Draw(Option_t *opt) {
   TH2I hitpat[4];
   //std::string exef;
@@ -313,7 +314,8 @@ void TPhosWall::Draw(Option_t *opt) {
   gPad->Update();
   return;
 }
-
+*/
+/*
 void TPhosWall::DrawPID(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) {
   if(!chain)
     chain = gChain;
@@ -336,6 +338,7 @@ void TPhosWall::DrawPID(Option_t *gate,Option_t *opt,Long_t nentries,TChain *cha
   //TCanvas *C1 = new TCanvas("C1");
   //chain->Draw("phoswall_hits.C():phoswall_hits.B()","","colz",10000);
 }
+*/
 
 TVector3 TPhosWall::GetKinVector(Double_t E_ejec,Double_t E_beam,const char *beam,const char *recoil, const char *ejec) {
   TNucleus nbeam(beam);
