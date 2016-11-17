@@ -105,7 +105,6 @@ void TGRUTint::SplashPopNWait(bool flag) {
   //WaitLogo();
 }
 
-
 /*********************************/
 
 bool TGRUTInterruptHandler::Notify() {

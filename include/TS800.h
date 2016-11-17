@@ -103,6 +103,8 @@ public:
 
   
 
+  float GetCorrIonSum() const;
+
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 

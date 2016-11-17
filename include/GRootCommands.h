@@ -16,6 +16,8 @@ class GGaus;
 
 #include "TDirectory.h"
 
+#define ISPID 32
+
 extern TChain *gChain;
 
 int  LabelPeaks(TH1*,double,double,Option_t *opt="");
