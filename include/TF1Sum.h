@@ -26,6 +26,7 @@ class TF1Sum : public TNamed {
     void SetRange(double l,double h) { xlow =l; xhigh=h; }
     int  GetNpar() const  { return npars; }
 
+    operator TF1*() { return fFit;}
     TF1 *GetFunc() { return fFit; }
 
   private:

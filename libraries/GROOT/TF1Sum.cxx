@@ -26,7 +26,7 @@ void TF1Sum::AddTF1(TF1 *f) {
       f->GetParLimits(i,lmin,lmax);
       fParMin.push_back(lmin);          
       fParMax.push_back(lmax);
-      fParName.push_back(f->GetParName(i));
+      fParName.push_back(Form("%s_par%i_%s",f->GetName(),i,f->GetParName(i)));
     }
 
     if(fFit) {
@@ -37,9 +37,9 @@ void TF1Sum::AddTF1(TF1 *f) {
 		   xlow, xhigh, npars);
     for(int i=0;i<npars;i++) {
       fFit->SetParameter(i,fParam.at(i));
-      //          fFit->SetParError(i,fParErr.at(i));
-      //          fFit->SetParLimits(i,fParMin.at(i),fParMax.at(i));
-      //          fFit->SetParName(i,fParName.at(i).c_str());
+      fFit->SetParError(i,fParErr.at(i));
+      fFit->SetParLimits(i,fParMin.at(i),fParMax.at(i));
+      fFit->SetParName(i,fParName.at(i).c_str());
     }
   }  
 }
