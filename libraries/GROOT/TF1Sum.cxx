@@ -64,3 +64,26 @@ Double_t TF1Sum::EvalPar(const Double_t *x,const Double_t *params) {
   }
   return sum;
 }
+
+
+void TF1Sum::Draw(Option_t *opt) {
+  TString sopt = opt;
+  int poffset=0;
+  int color=2;
+  if(!fFit) {
+    return;
+  }
+  for(int i=0;i<fFit->GetNpar();i++) {
+    fParam[i] = fFit->GetParameter(i);
+  }
+  if(sopt.Contains("all")) { 
+    fFit->Draw(); 
+  } else {
+    for(unsigned int j=0;j<fTF1s.size();j++) {
+      fTF1s[j]->SetParameters(fParam.data()+poffset);
+      poffset += fTF1s[j]->GetNpar();
+      fTF1s[j]->SetLineColor(color++);
+      fTF1s[j]->Draw("same");
+    }
+  }
+}

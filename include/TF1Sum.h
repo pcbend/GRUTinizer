@@ -21,13 +21,16 @@ class TF1Sum : public TNamed {
     Double_t EvalPar(const Double_t *x,const Double_t *params=0);
 
     double operator()(double *x,double *p) { return EvalPar(x,p); }
-    
 
     void SetRange(double l,double h) { xlow =l; xhigh=h; }
     int  GetNpar() const  { return npars; }
 
     operator TF1*() { return fFit;}
+        
     TF1 *GetFunc() { return fFit; }
+
+    virtual void Draw(Option_t *opt="all");
+
 
   private:
     TF1 *fFit;
