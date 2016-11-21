@@ -55,7 +55,7 @@ CFLAGS    += $(shell root-config --cflags)
 CFLAGS    += -MMD -MP $(INCLUDES)
 LINKFLAGS += -Llib $(addprefix -l,$(LIBRARY_NAMES)) -Wl,-rpath,\$$ORIGIN/../lib
 LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lPyROOT -lMinuit
-LINKFLAGS := $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX) $(CFLAGS)
+LINKFLAGS := $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX)
 
 ROOT_LIBFLAGS := $(shell root-config --cflags)
 
@@ -88,7 +88,7 @@ endif
 
 all: include/GVersion.h $(EXECUTABLES) $(LIBRARY_OUTPUT) pcm_files bin/gadd \
            bin/grutinizer-config bin/gadd_fast.py\
-           $(HISTOGRAM_SO) $(FILTER_SO) extras
+           $(HISTOGRAM_SO) $(FILTER_SO) extras lib/libAllGrutinizer.so
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
 
 pcm_files:
@@ -114,6 +114,9 @@ bin lib:
 
 include/GVersion.h: .git/HEAD .git/index util/gen_version.sh
 	$(call run_and_test,util/gen_version.sh,$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
+
+lib/libAllGrutinizer.so: $(LIBRARY_OUTPUT)
+	$(call run_and_test,echo | $(CPP) -x c++ - -fPIC -o $@ $(SHAREDSWITCH)$(notdir $@) $(LINKFLAGS),$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 lib/lib%.so: .build/histos/%.o | lib
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
