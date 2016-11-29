@@ -18,21 +18,7 @@ void GCutG::Print(Option_t *opt) const {
 
 }
 
-void GCutG::Clear(Option_t *opt) { TCutG::Clear(opt); }
-
-void GCutG::Copy(const TObject &obj) { 
-  if(!obj.InheritsFrom(TCutG::Class()))
-    return;
-
-  fVarX    = ((TCutG&)obj).GetVarX();
-  fVarY    = ((TCutG&)obj).GetVarY();
-  fObjectX = ((TCutG&)obj).GetObjectX();
-  fObjectY = ((TCutG&)obj).GetObjectY();
-
-}
-
-
-int GCutG::SaveTo(const char *cutname,const char* filename,Option_t* option) { 
+int GCutG::SaveTo(const char *cutname,const char* filename,const char *tagname,Option_t* option) { 
   TPreserveGDirectory pd;
   std::string fname = filename;
   std::string cname = cutname;
@@ -44,6 +30,7 @@ int GCutG::SaveTo(const char *cutname,const char* filename,Option_t* option) {
     fname = gEnv->GetValue("GRUT.DefaultCutFile","");
   GCutG *cut = (GCutG*)this->Clone(cname.c_str());
   cut->SetNameTitle(cname.c_str(),cname.c_str());
+  cut->SetTag(tagname);
   TFile f(fname.c_str(),option);
   //printf("Attepting to save %s to %s... ",cut->GetName(),f.GetName());
   if(f.Get(cname.c_str())) {
@@ -57,60 +44,30 @@ int GCutG::SaveTo(const char *cutname,const char* filename,Option_t* option) {
 }
 
 
-//void GCutG::SetGateMethod(const char* xclass,const char* xmethod,
-//                          const char* yclass,const char* ymethod) {
-//  fXGateClass   = xclass; 
-//  fYGateClass   = yclass;  
-//  fXGateMethod  = xmethod; 
-//  fYGateMethod  = ymethod; 
 
-//}
+void GCutG::SetGateMethod(const char* xclass,const char* xmethod,
+                          const char* yclass,const char* ymethod) {
+  fXGateClass   = xclass; 
+  fYGateClass   = yclass;  
+  fXGateMethod  = xmethod; 
+  fYGateMethod  = ymethod; 
 
-//bool GCutG::IsInside(TObject *objx,TObject *objy) {
-//  if(!objy)
-//    objy = objx;
-//
-//  TClass *xclass = TClass::GetClass(fXGateClass.Data());
-//  TClass *yclass = TClass::GetClass(fYGateClass.Data());
-//
-//  TMethodCall *xmethod = new TMethodCall(xclass,fXGateMethod.Data(),"");
-//  TMethodCall *ymethod = new TMethodCall(yclass,fYGateMethod.Data(),"");
-//  Double_t storagex;
-//  Double_t storagey;
-//  xmethod->Execute((void*)(objx),storagex);
-//  ymethod->Execute((void*)(objy),storagey);
-//  return TCutG::IsInside(storagex,storagey);
-//  
-//}
-
-Int_t GCutG::IsInside(Double_t x, Double_t y) const {
-  //TObject::SetBit(kCutChecked);
-  return TCutG::IsInside(x,y);
 }
 
-Int_t GCutG::Test(Double_t x, Double_t y) {
-  if(Checked())
-    return Passed();
-  TObject::SetBit(kCutChecked);
-  int test = TCutG::IsInside(x,y);
-  if(test) TObject::SetBit(kCutPassed);
-  return test; 
+bool GCutG::IsInside(TObject *objx,TObject *objy) {
+  if(!objy)
+    objy = objx;
+
+  TClass *xclass = TClass::GetClass(fXGateClass.Data());
+  TClass *yclass = TClass::GetClass(fYGateClass.Data());
+
+  TMethodCall *xmethod = new TMethodCall(xclass,fXGateMethod.Data(),"");
+  TMethodCall *ymethod = new TMethodCall(yclass,fYGateMethod.Data(),"");
+  Double_t storagex;
+  Double_t storagey;
+  xmethod->Execute((void*)(objx),storagex);
+  ymethod->Execute((void*)(objy),storagey);
+  return TCutG::IsInside(storagex,storagey);
+  
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

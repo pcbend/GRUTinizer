@@ -8,7 +8,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class TDetectorEnv+;
-#pragma link C++ class TDetectorHit+;
-#pragma link C++ class TDetector+;
+#pragma link C++ class TDetectorHit-;
+#pragma link C++ class TDetector-;
 
 #endif

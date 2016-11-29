@@ -1,38 +1,46 @@
 
 #include <TLenda.h>
 
-#include <TGEBEvent.h>
+#include <TRawEvent.h>
+#include <DDASDataFormat.h>
 #include <DDASBanks.h>
 
 ClassImp(TLenda)
 
 
-int TLenda::BuildHits(std::vector<TRawEvent>& raw_data) { 
+int TLenda::BuildHits(std::vector<TRawEvent>& raw_data) {
   for(auto& event : raw_data){
-    TGEBEvent &geb = (TGEBEvent&)event;
-    SetTimestamp(geb.GetTimestamp());
+    SetTimestamp(event.GetTimestamp());
 
-    int total_size = *((int*)event.GetPayload());
-    int ptr = sizeof(int);
+    TSmartBuffer buf = event.GetPayloadBuffer();
 
-    while(ptr<total_size) {
+    int total_size = *(int*)buf.GetData();
+    const char* buffer_end = buf.GetData() + total_size;
+    buf.Advance(sizeof(int));
+    //int ptr = sizeof(int);
+
+    while(buf.GetData() < buffer_end) {
       TLendaHit hit;
-      DDASGEBHeader *head = (DDASGEBHeader*)(event.GetPayload()+4);
-      //head->print();
-      ptr+= sizeof(head);
-      hit.SetTrace(head->trace_length()/2,(const unsigned short*)(event.GetPayload()+ptr));
-      ptr+= 2*head->trace_length();
+
+      // Constructor advances the buffer to end of each channel
+      TDDASEvent<DDASGEBHeader> ddas(buf);
+
+      unsigned int address = 0x12341234;
+
+      hit.SetAddress(address);
+      hit.SetCharge(ddas.GetEnergy());
+      hit.SetTime(ddas.GetCFDTime());
+      hit.SetTimestamp(ddas.GetTimestamp());
+
       //InsertHit(hit);
       lenda_hits.push_back(hit);
     }
-    
+
 
   }
-  fSize = lenda_hits.size();  
-  
-  //printf("lenda build hits called\t%u\t%u\n",lenda_hits.size(),Size()); 
+  fSize = lenda_hits.size();
+
+  //printf("lenda build hits called\t%u\t%u\n",lenda_hits.size(),Size());
   //fflush(stdout);
   return fSize;
 }
-
-

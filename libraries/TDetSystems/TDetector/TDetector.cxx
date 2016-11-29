@@ -77,4 +77,12 @@ int TDetector::BuildHits(std::vector<TRawEvent*> &raw_data) {
 }
 
 
+void TDetector::Streamer(TBuffer &r_b) {
+  if(r_b.IsReading()) {
+    r_b.ReadClassBuffer(TDetector::Class(),this);
+  } else { 
+    r_b.WriteClassBuffer(TDetector::Class(),this);
+  }
+}
+
 

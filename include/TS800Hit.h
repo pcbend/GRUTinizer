@@ -226,7 +226,7 @@ class TIonChamber : public TDetectorHit {
     int GetData(int i)    const { if(i>=Size()) return -1; return fData.at(i); }
     int Size() const { return fChan.size(); }
     float GetdE();
-    float GetSum();
+    float GetSum() const;
     float GetAve();
     float GetdECorr(TCrdc*);
 

@@ -4,14 +4,14 @@
 #include <sstream>
 
 #include "TGretina.h"
-#include "GRootCommands.h"
-#include <TPad.h>
-#include <TROOT.h>
+//#include "GRootCommands.h"
+//#include <TPad.h>
+//#include <TROOT.h>
 
-#include "GH1D.h"
-#include "GH2I.h"
-#include "TGRUTOptions.h"
-#include "GCanvas.h"
+//#include "GH1D.h"
+//#include "GH2I.h"
+//#include "TGRUTOptions.h"
+//#include "GCanvas.h"
 
 #include "TGEBEvent.h"
 
@@ -311,7 +311,7 @@ void TGretina::Clear(Option_t *opt) {
   addback_hits.clear();
 }
 
-
+/*
 void TGretina::DrawDopplerGamma(Double_t Beta,Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain){
   TString OptString = opt;
   if(!chain)
@@ -411,3 +411,4 @@ void TGretina::DrawCoreSummary(Option_t *gate,Option_t *opt,Long_t nentries,TCha
   h->Draw(opt);
 
 }
+*/
