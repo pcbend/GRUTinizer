@@ -108,6 +108,16 @@ void MakeHistograms(TRuntimeObjects& obj) {
       dirname  = "Bank29";
       obj.FillHistogram(dirname,histname,
 			200,-200,200,bank29->Timestamp()-s800->Timestamp());
+      histname = "S800_Bank29_runtime";
+      obj.FillHistogram(dirname,histname,
+                        3600,0,3600,bank29->Timestamp()*1e-8,
+                        1000,-1000,1000,bank29->Timestamp()-s800->Timestamp());
+      histname = Form("S800_Bank29_runtime_Reg%i",s800->GetTrigger().GetRegistr());
+      obj.FillHistogram(dirname,histname,
+                        3600,0,3600,bank29->Timestamp()*1e-8,
+                        1000,-1000,1000,bank29->Timestamp()-s800->Timestamp());
+
+
     }
   }
   //std::cout << " After Bank29 Before bad gretina RETURN" << std::endl;

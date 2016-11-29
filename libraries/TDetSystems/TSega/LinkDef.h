@@ -7,7 +7,8 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class TDDASEvent+;
+#pragma link C++ class TDDASEvent<DDASHeader>+;
+#pragma link C++ class TDDASEvent<DDASGEBHeader>+;
 #pragma link C++ class TSegaSegmentHit+;
 #pragma link C++ class std::vector<TSegaSegmentHit>+;
 #pragma link C++ class TSegaHit+;

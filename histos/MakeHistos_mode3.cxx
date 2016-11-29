@@ -94,14 +94,14 @@ void MakeHistograms(TRuntimeObjects& obj) {
     std::string histname = Form("Q%i_detmap",hole); ////;channel;Charge/128.",hole);
     obj.FillHistogram(dirname,histname,
                       160,0,160,hit.GetAbsSegId(),
-                      4000,0,32000,hit.Charge());  // int division done in the mode3hit class.
+                      8000,0,32000,hit.Charge());  // int division done in the mode3hit class.
 
     if(hit.GetChannel()%9==0) {
       dirname  = Form("SummaryCore");
       histname = Form("Q%i_cores",hole); ////;channel;Charge/128.",hole);
       obj.FillHistogram(dirname,histname,
                         20,0,20,hit.GetCrystal()*4 + hit.GetVME(),
-                        4000,0,32000,hit.Charge());
+                        8000,0,32000,hit.Charge());
     }
 
 

@@ -255,27 +255,43 @@ int TCalibrator::AddData(TH1 *data,TNucleus *source, double sigma,double thresho
 
   TSpectrum spectrum;
   spectrum.Search(data,sigma,"",threshold);
-  std::vector<double> data_channels;
-  std::map<double,double> peak_area;; 
+  //std::vector<double> data_channels;
+  std::vector<double> peak_positions;
+  //std::map<double,double> peak_area;; 
   //std::vector<double> data;
   for(int x=0;x<spectrum.GetNPeaks();x++) {
-    double range = 8*data->GetXaxis()->GetBinWidth(1);
+    //double range = 8*data->GetXaxis()->GetBinWidth(1);
     //printf(DGREEN "\tlow %.02f \t high %.02f" RESET_COLOR "\n",spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range);
-    GPeak *fit = PhotoPeakFit(data,spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range,"no-print");
-    //data_channels
-    //data_channels.push_back(fit.GetCentroid());
-    //datatosource[fit->GetCentroid()] = sqrt(-1);
-    data_channels.push_back(fit->GetCentroid());
-    data->GetListOfFunctions()->Remove(fit);
-    peak_area[fit->GetCentroid()] = fit->GetSum();
+  
+    //GPeak *fit = PhotoPeakFit(data,spectrum.GetPositionX()[x]-range,spectrum.GetPositionX()[x]+range,"no-print");
+    //data_channels.push_back(fit->GetCentroid());
+    //data->GetListOfFunctions()->Remove(fit);
+    //peak_area[fit->GetCentroid()] = fit->GetSum();
+
+    peak_positions.push_back(spectrum.GetPositionX()[x]);
+    
+
   }
 
 
-  std::map<double,double> datatosource = Match(data_channels,source_energy);; 
+  //std::map<double,double> datatosource = Match(data_channels,source_energy);; 
+  std::map<double,double> datatosource = Match(peak_positions,source_energy);; 
 
   //PrintMap(datatosource);
+  double range = 8*data->GetXaxis()->GetBinWidth(1);
   for(auto it : datatosource) {
-    AddPeak(it.first,it.second,source->GetName(),peak_area.at(it.first),src_eng_int[it.second]);
+
+    double peak = it.first;
+    double eng  = it.second;
+
+    GPeak *fit = PhotoPeakFit(data,peak-range,peak+range,"no-print");
+    
+    //data_channels.push_back(fit->GetCentroid());
+    //data->GetListOfFunctions()->Remove(fit);
+    //peak_area[fit->GetCentroid()] = fit->GetSum();
+
+    //AddPeak(it.first,it.second,source->GetName(),peak_area.at(it.first),src_eng_int[it.second]);
+    AddPeak(peak,eng,source->GetName(),fit->GetSum(),src_eng_int[eng]);
   }
   
   //Print();

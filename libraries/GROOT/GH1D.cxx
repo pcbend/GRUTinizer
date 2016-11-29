@@ -274,10 +274,10 @@ Int_t GH1D::Fill(const TRuntimeObjects* objs) {
   if(!det) {
     return -3;
   }
-  for(auto gate : gates) {
-    if(!gate->IsInside(objs))
-      return -4;
-  }
+  //for(auto gate : gates) {
+    //if(!gate->IsInside(objs))
+    //  return -4;
+  //}
   Double_t storage;
   fFillMethod->Execute((void*)(det),storage);
   return Fill(storage);
