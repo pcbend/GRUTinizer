@@ -64,8 +64,6 @@ public:
 #endif
 #endif
 
-
-
   /// Clears the object.
   /**
     The object will be left in the same state

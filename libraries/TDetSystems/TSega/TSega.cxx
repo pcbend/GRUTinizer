@@ -54,7 +54,8 @@ int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
 
     SetTimestamp(nscl.GetTimestamp());
 
-    TDDASEvent ddas(nscl.GetPayloadBuffer());
+    TSmartBuffer buf = nscl.GetPayloadBuffer();
+    TDDASEvent<DDASHeader> ddas(buf);
 
     unsigned int address = ( (1<<24) +
                              (ddas.GetCrateID()<<16) +

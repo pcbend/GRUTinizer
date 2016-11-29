@@ -17,6 +17,9 @@ class GH1D;
 class TClass;
 class TMethodCall;
 
+class GCutG;
+class TRuntimeObjects;
+
 class GH2D : public TH2D , public GH2Base {
 
 public:
@@ -56,6 +59,10 @@ public:
 
   void SetFillMethod(const char *classnamex,const char *methodnamex,const char* paramx="",
                      const char *classnamey="",const char *methodnamey="",const char* paraym="");
+  void AddGate(GCutG *gate) { gates.push_back(gate); } 
+  void RemoveGate(GCutG *gate); 
+
+
 
   Int_t Fill(const TObject* objx,const TObject *objy=NULL);
   Int_t Fill(Double_t x, Double_t y) { return TH2D::Fill(x,y); }
@@ -63,12 +70,16 @@ public:
   Int_t Fill(const char *namex, Double_t y, Double_t w) { return TH2D::Fill(namex,y,w); }
   Int_t Fill(const char *namex, const char *namey, Double_t w) { return TH2D::Fill(namex,namey,w); }
 
+  Int_t Fill(const TRuntimeObjects*);
+
 private:
   
   TClass      *fXFillClass;  //!
   TClass      *fYFillClass;  //!
   TMethodCall *fXFillMethod; //!
   TMethodCall *fYFillMethod; //!
+
+  std::vector<GCutG*> gates; //!
 
   ClassDef(GH2D,1)
 };
