@@ -176,6 +176,10 @@ class TCrdc : public TDetectorHit {
     unsigned short anode;
     unsigned short time;
 
+    mutable bool has_cached_dispersive_x; //!
+    mutable double cached_dispersive_x; //!
+
+
     static TF1 *fgaus;
 
 
