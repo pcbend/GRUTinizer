@@ -8,12 +8,10 @@
 #include <TObject.h>
 #include <TMath.h>
 
-#include <TClonesArray.h>
+//#include <TClonesArray.h>
 
 #include "TDetector.h"
 #include "TGretinaHit.h"
-
-
 
 class TGretina : public TDetector {
 
@@ -39,16 +37,15 @@ public:
 
   void PrintHit(int i){ gretina_hits.at(i).Print(); }
 
-  static TVector3 CrystalToGlobal(int cryId,
-                                  Float_t localX=0,Float_t localY=0,Float_t localZ=0);
+  static TVector3 CrystalToGlobal(int cryId,Float_t localX=0,Float_t localY=0,Float_t localZ=0);
   static TVector3 GetSegmentPosition(int cryid,int segment); //return the position of the segemnt in the lab system
   static TVector3 GetCrystalPosition(int cryid); //return the position of the crysal in the lab system
 
-  static void DrawDopplerGamma(Double_t Beta=0.1,Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
-  static void DrawDopplerBeta(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
-  static void DrawEnVsTheta(Double_t Beta=0.1,Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
-  static void DrawCoreSummary(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
-
+  //static void DrawDopplerGamma(Double_t Beta=0.1,Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
+  //static void DrawDopplerBeta(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
+  //static void DrawEnVsTheta(Double_t Beta=0.1,Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
+  //static void DrawCoreSummary(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
+  //
   
 #ifndef __CINT__ 
   static void SetAddbackCondition(std::function<bool(const TGretinaHit&,const TGretinaHit&)> condition) {

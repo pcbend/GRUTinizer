@@ -18,6 +18,7 @@ public:
 
   template<typename T>
   T* GetDetector(bool make_if_not_found = false);
+  TDetector* GetDetector(std::string) const;
 
   std::vector<TDetector*>& GetDetectors() { return detectors; }
   void AddDetector(TDetector* det) { detectors.push_back(det); }
@@ -57,5 +58,8 @@ T* TUnpackedEvent::GetDetector(bool make_if_not_found) {
   }
 }
 #endif
+
+
+
 
 #endif /* _TUNPACKEDEVENT_H_ */
