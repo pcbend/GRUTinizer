@@ -36,8 +36,8 @@ public:
   TList* GetObjects();
   TList* GetGates();
 
-  size_t GetItemsPopped()  { return input_queue->ItemsPopped(); }
-  size_t GetItemsPushed()  { return input_queue->ItemsPushed(); }
+  size_t GetItemsPopped()  { return output_queue->ItemsPopped(); }
+  size_t GetItemsPushed()  { return output_queue->ItemsPushed(); }
   size_t GetItemsCurrent() { return 0; }
   size_t GetRate()         { return 0; }
 
