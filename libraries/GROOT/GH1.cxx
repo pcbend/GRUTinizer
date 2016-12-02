@@ -4,13 +4,14 @@
 #include <GH2.h>
 
 #include <TF1.h>
+#include <fstream>
 //#include <Math/ParamFunctor.h>
 
 
 GH1D *GH1::Project(int low,int high) {
-  if(!GetParent() || !GetParent()->InheritsFrom(GH2::Class()))
+  if(!GetHistParent() || !GetHistParent()->InheritsFrom(GH2::Class()))
     return 0;
-  GH2 *p = (GH2*)GetParent();
+  GH2 *p = (GH2*)GetHistParent();
   if(fProjectionAxis==kNoAxis)
     return 0;
   switch(fProjectionAxis) {
@@ -23,9 +24,9 @@ GH1D *GH1::Project(int low,int high) {
 }
 
 GH1D *GH1::Project(int low,int high,int bg_low,int bg_high,double scale) {
-  if(!GetParent() || !GetParent()->InheritsFrom(GH2::Class()))
+  if(!GetHistParent() || !GetHistParent()->InheritsFrom(GH2::Class()))
     return 0;
-  GH2 *p = (GH2*)GetParent();
+  GH2 *p = (GH2*)GetHistParent();
   if(fProjectionAxis==kNoAxis)
     return 0;
   switch(fProjectionAxis) {
@@ -97,11 +98,34 @@ TF1  *GH1::ConstructTF1() const {
 }
 
 
+bool GH1::WriteDatFile(const char *outFile){
+  if(strlen(outFile)<1) return 0;
+
+  std::ofstream out;
+  out.open(outFile);
+
+  if(!(out.is_open())) return 0;
+
+  for(int i=0;i<GetNbinsX();i++){
+    out << GetXaxis()->GetBinCenter(i) << "\t" << GetBinContent(i) << std::endl;
+  }
+  out << std::endl;
+  out.close();
+
+  return 1;
+}
 
 
 
-
-
+void GH1::Draw(Option_t *opt) {
+  TString sopt = opt;
+  if(GetDimension()==2) {
+    if(sopt.Length()==0)
+      sopt="colz";
+  }
+  TH1::Draw(sopt.Data());
+  return;
+}
 
 
 

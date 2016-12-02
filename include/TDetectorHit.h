@@ -30,20 +30,21 @@ public:
   void SetTimestamp(long timestamp) { fTimestamp = timestamp; }
 
   double GetEnergy() const; //applies TChannel ENERGYCOEFF to Charge
-  void SetEnergy(double energy);
   double GetTime() const;   //applies TChannel TIMECOEFF to Time()
 
+  void SetEnergy(double energy);
   void AddEnergy(double eng);
 
   static const TVector3 BeamUnitVec; //!
 
 protected:
-  Int_t fAddress;
+  Int_t   fAddress;
+  long    fTimestamp;
   Float_t fCharge;
-  Int_t fTime;
-  long fTimestamp;
-
+  Float_t fTime;
+  
   unsigned char fFlags;
+
 
   enum EHitFlags {
     kIsEnergy = BIT(0),

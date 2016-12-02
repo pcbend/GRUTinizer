@@ -289,16 +289,20 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
 
   // Pass the TFile to the python GUI.
   if(file && GUIIsRunning()){
-    TPython::Bind(file,"tdir");
-    ProcessLine("TPython::Exec(\"window.AddDirectory(tdir)\");");
+    std::string command = Form("TPython::Bind((TFile*)%luL, \"tdir\");"
+                               "TPython::Exec(\"window.AddDirectory(tdir)\");",
+                               (unsigned long)file);
+    ProcessLine(command.c_str());
   }
   return file;
 }
 
 void TGRUTint::LoadTCutG(TCutG* cutg) {
   if(GUIIsRunning()) {
-    TPython::Bind(cutg, "cutg");
-    ProcessLine("TPython::Exec(\"window.LoadCutG(cutg)\");");
+    std::string command = Form("TPython::Bind((TCutG*)%luL, \"cutg\");"
+			       "TPython::Exec(\"window.LoadCutG(cutg)\");",
+			       (unsigned long)cutg);
+    ProcessLine(command.c_str());
   }
 }
 

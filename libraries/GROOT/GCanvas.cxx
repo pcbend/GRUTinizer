@@ -559,7 +559,7 @@ bool GCanvas::HandleMouseShiftPress(Int_t event,Int_t x,Int_t y) {
       {
         //if(hist->InheritsFrom(GH1D::Class())) {
         //  new GCanvas();
-        //  ((GH1D*)hist)->GetParent()->Draw("colz");
+        //  ((GH1D*)hist)->GetHistParent()->Draw("colz");
         //  return true;
         //}
         std::vector<TH1*> hists = FindHists();
@@ -700,11 +700,11 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
           break;
         }
       }
-      if(gHist && gHist->IsSummary()  && gHist->GetParent() && gHist->GetParent()->InheritsFrom(GH2::Class())) {
-        next = ((GH2*)gHist->GetParent())->SummaryProjection(gHist,gHist->GetProjectionAxis(),
+      if(gHist && gHist->IsSummary()  && gHist->GetHistParent() && gHist->GetHistParent()->InheritsFrom(GH2::Class())) {
+        next = ((GH2*)gHist->GetHistParent())->SummaryProjection(gHist,gHist->GetProjectionAxis(),
                                                                   (int)GH2::kForward,false);
-      } else if(gHist && gHist->GetParent()) { 
-        next = ((GH2*)gHist->GetParent())->GetNext(gHist,(int)GH2::kForward);
+      } else if(gHist && gHist->GetHistParent()) { 
+        next = ((GH2*)gHist->GetHistParent())->GetNext(gHist,(int)GH2::kForward);
       }
       if(next) {
         next->GetXaxis()->SetRangeUser(gHist->GetXaxis()->GetBinLowEdge(gHist->GetXaxis()->GetFirst()),
@@ -726,11 +726,11 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
           break;
         }
       }
-      if(gHist && gHist->IsSummary()  && gHist->GetParent() && gHist->GetParent()->InheritsFrom(GH2::Class())) {
-        next = ((GH2*)gHist->GetParent())->SummaryProjection(gHist,gHist->GetProjectionAxis(),
+      if(gHist && gHist->IsSummary()  && gHist->GetHistParent() && gHist->GetHistParent()->InheritsFrom(GH2::Class())) {
+        next = ((GH2*)gHist->GetHistParent())->SummaryProjection(gHist,gHist->GetProjectionAxis(),
                                                                   (int)GH2::kBackward,false);
-      } else if(gHist && gHist->GetParent()) { 
-        next = ((GH2*)gHist->GetParent())->GetNext(gHist,(int)GH2::kBackward);
+      } else if(gHist && gHist->GetHistParent()) { 
+        next = ((GH2*)gHist->GetHistParent())->GetNext(gHist,(int)GH2::kBackward);
       }
       if(next) {
         next->GetXaxis()->SetRangeUser(gHist->GetXaxis()->GetBinLowEdge(gHist->GetXaxis()->GetFirst()),
@@ -790,8 +790,8 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
     case kKey_d:
       //printf("i am here.\n");
       if(hists.size()>0 && hists.at(0)->InheritsFrom(GH1::Class())) {
-        if(((GH1*)hists.at(0))->GetParent() && ((GH1*)hists.at(0))->GetParent()->InheritsFrom(GH2::Class())) {
-          //new GHistPopup((GH2*)((GH1*)hists.at(0))->GetParent());
+        if(((GH1*)hists.at(0))->GetHistParent() && ((GH1*)hists.at(0))->GetHistParent()->InheritsFrom(GH2::Class())) {
+          //new GHistPopup((GH2*)((GH1*)hists.at(0))->GetHistParent());
         }
       }
       break;
@@ -1019,8 +1019,8 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
                      }
                    }
 
-                   if(ghist && ghist->GetParent()) {
-                     ghist->GetParent()->Draw();
+                   if(ghist && ghist->GetHistParent()) {
+                     ghist->GetHistParent()->Draw();
                      edited=true;
                    }
                  }
@@ -1285,7 +1285,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
     case kKey_P: {
                    GH2D* ghist = NULL;
                    for(auto hist : hists){
-                     if(hist->InheritsFrom(GH2Base::Class())){
+                     if(hist->InheritsFrom(GH2::Class())){
                        ghist = (GH2D*)hist;
                        break;
                      }
@@ -1965,7 +1965,7 @@ TH1 *GCanvas::GetBackGroundHist(GMarker *addlow,GMarker *addhigh) {
                 return 0;
               Double_t bg_frac  = (addhigh->localx-addlow->localx +1)*const_bg->GetParameter(0)/pj_total;
               //GMemObj = *mobj = GRootObjectManager::Instance()->FindObject(hist->GetName());
-              //if(!mobj || !mobj->GetParent() || !mobj->GetParent()->InheritsFrom("TH2"))
+              //if(!mobj || !mobj->GetHistParent() || !mobj->GetHistParent()->InheritsFrom("TH2"))
               //   return 0;
               TH1 *temp  = (TH1*)hist->Clone(Form("%s_bg",hist->GetName()));
               temp ->SetTitle(Form(" - bg(frac %0.4f)",bg_frac));
@@ -1978,17 +1978,17 @@ TH1 *GCanvas::GetBackGroundHist(GMarker *addlow,GMarker *addhigh) {
                 return temp_bg;
               OrderBGMarkers();
               GMemObj *mobj = GRootObjectManager::Instance()->FindMemObject(hist->GetName());
-              if(!mobj || !mobj->GetParent() || !mobj->GetParent()->InheritsFrom("TH2"))
+              if(!mobj || !mobj->GetHistParent() || !mobj->GetHistParent()->InheritsFrom("TH2"))
                 return temp_bg;
               int bin0,bin1;
               if(!strcmp(mobj->GetOption(),"ProjY")) {
-                bin1 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(fBG_Markers.size()-1)->localx);
-                bin0 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(fBG_Markers.size()-2)->localx);
-                temp_bg = ((TH2*)mobj->GetParent())->ProjectionX(Form("%s_bg",hist->GetName()),bin0,bin1);
+                bin1 = ((TH2*)mobj->GetHistParent())->GetXaxis()->FindBin(fBG_Markers.at(fBG_Markers.size()-1)->localx);
+                bin0 = ((TH2*)mobj->GetHistParent())->GetXaxis()->FindBin(fBG_Markers.at(fBG_Markers.size()-2)->localx);
+                temp_bg = ((TH2*)mobj->GetHistParent())->ProjectionX(Form("%s_bg",hist->GetName()),bin0,bin1);
               } else {
-                bin1 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(fBG_Markers.size()-1)->localx);
-                bin0 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(fBG_Markers.size()-2)->localx);
-                temp_bg = ((TH2*)mobj->GetParent())->ProjectionY(Form("%s_bg",hist->GetName()),bin0,bin1);
+                bin1 = ((TH2*)mobj->GetHistParent())->GetXaxis()->FindBin(fBG_Markers.at(fBG_Markers.size()-1)->localx);
+                bin0 = ((TH2*)mobj->GetHistParent())->GetXaxis()->FindBin(fBG_Markers.at(fBG_Markers.size()-2)->localx);
+                temp_bg = ((TH2*)mobj->GetHistParent())->ProjectionY(Form("%s_bg",hist->GetName()),bin0,bin1);
               }
               temp_bg->SetTitle(Form(" - bg(%.0f to %.0f)",fBG_Markers.at(0)->localx,fBG_Markers.at(1)->localx));
               return temp_bg;
@@ -2001,23 +2001,23 @@ TH1 *GCanvas::GetBackGroundHist(GMarker *addlow,GMarker *addhigh) {
                 return temp_bg;
               OrderBGMarkers();
               GMemObj *mobj = GRootObjectManager::Instance()->FindMemObject(hist->GetName());
-              if(!mobj || !mobj->GetParent() || !mobj->GetParent()->InheritsFrom("TH2"))
+              if(!mobj || !mobj->GetHistParent() || !mobj->GetHistParent()->InheritsFrom("TH2"))
                 return temp_bg;
               int bin0,bin1;
               if(!strcmp(mobj->GetOption(),"ProjY")) {
-                bin1 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(0)->localx);
-                bin0 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(1)->localx);
-                temp_bg = ((TH2*)mobj->GetParent())->ProjectionX(Form("%s_bg",hist->GetName()),bin0,bin1);
-                bin1 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(2)->localx);
-                bin0 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(3)->localx);
-                temp_bg1 = ((TH2*)mobj->GetParent())->ProjectionX(Form("%s_bg",hist->GetName()),bin0,bin1);
+                bin1 = ((TH2*)mobj->GetHistParent())->GetXaxis()->FindBin(fBG_Markers.at(0)->localx);
+                bin0 = ((TH2*)mobj->GetHistParent())->GetXaxis()->FindBin(fBG_Markers.at(1)->localx);
+                temp_bg = ((TH2*)mobj->GetHistParent())->ProjectionX(Form("%s_bg",hist->GetName()),bin0,bin1);
+                bin1 = ((TH2*)mobj->GetHistParent())->GetXaxis()->FindBin(fBG_Markers.at(2)->localx);
+                bin0 = ((TH2*)mobj->GetHistParent())->GetXaxis()->FindBin(fBG_Markers.at(3)->localx);
+                temp_bg1 = ((TH2*)mobj->GetHistParent())->ProjectionX(Form("%s_bg",hist->GetName()),bin0,bin1);
               } else {
-                bin1 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(0)->localx);
-                bin0 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(1)->localx);
-                temp_bg = ((TH2*)mobj->GetParent())->ProjectionY(Form("%s_bg",hist->GetName()),bin0,bin1);
-                bin1 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(2)->localx);
-                bin0 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(3)->localx);
-                temp_bg1 = ((TH2*)mobj->GetParent())->ProjectionY(Form("%s_bg",hist->GetName()),bin0,bin1);
+                bin1 = ((TH2*)mobj->GetHistParent())->GetXaxis()->FindBin(fBG_Markers.at(0)->localx);
+                bin0 = ((TH2*)mobj->GetHistParent())->GetXaxis()->FindBin(fBG_Markers.at(1)->localx);
+                temp_bg = ((TH2*)mobj->GetHistParent())->ProjectionY(Form("%s_bg",hist->GetName()),bin0,bin1);
+                bin1 = ((TH2*)mobj->GetHistParent())->GetXaxis()->FindBin(fBG_Markers.at(2)->localx);
+                bin0 = ((TH2*)mobj->GetHistParent())->GetXaxis()->FindBin(fBG_Markers.at(3)->localx);
+                temp_bg1 = ((TH2*)mobj->GetHistParent())->ProjectionY(Form("%s_bg",hist->GetName()),bin0,bin1);
               }
               temp_bg->Add(temp_bg1,1);
               temp_bg->SetTitle(Form(" - bg(%.0f to %.0f and %.0f to %.0f)",fBG_Markers.at(0)->localx,fBG_Markers.at(1)->localx,
@@ -2031,17 +2031,17 @@ TH1 *GCanvas::GetBackGroundHist(GMarker *addlow,GMarker *addhigh) {
                 return temp_bg;
               OrderBGMarkers();
               GMemObj *mobj = GRootObjectManager::Instance()->FindMemObject(hist->GetName());
-              if(!mobj || !mobj->GetParent() || !mobj->GetParent()->InheritsFrom("TH2"))
+              if(!mobj || !mobj->GetHistParent() || !mobj->GetHistParent()->InheritsFrom("TH2"))
                 return temp_bg;
               int bin0,bin1;
               if(!strcmp(mobj->GetOption(),"ProjY")) {
-                bin1 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(0)->localx);
-                bin0 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(1)->localx);
-                temp_bg = ((TH2*)mobj->GetParent())->ProjectionX(Form("%s_bg",hist->GetName()),bin0,bin1);
+                bin1 = ((TH2*)mobj->GetHistParent())->GetXaxis()->FindBin(fBG_Markers.at(0)->localx);
+                bin0 = ((TH2*)mobj->GetHistParent())->GetXaxis()->FindBin(fBG_Markers.at(1)->localx);
+                temp_bg = ((TH2*)mobj->GetHistParent())->ProjectionX(Form("%s_bg",hist->GetName()),bin0,bin1);
               } else {
-                bin1 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(0)->localx);
-                bin0 = ((TH2*)mobj->GetParent())->GetXaxis()->FindBin(fBG_Markers.at(1)->localx);
-                temp_bg = ((TH2*)mobj->GetParent())->ProjectionY(Form("%s_bg",hist->GetName()),bin0,bin1);
+                bin1 = ((TH2*)mobj->GetHistParent())->GetXaxis()->FindBin(fBG_Markers.at(0)->localx);
+                bin0 = ((TH2*)mobj->GetHistParent())->GetXaxis()->FindBin(fBG_Markers.at(1)->localx);
+                temp_bg = ((TH2*)mobj->GetHistParent())->ProjectionY(Form("%s_bg",hist->GetName()),bin0,bin1);
               }
               temp_bg->SetTitle(Form(" - bg(%.0f to %.0f)",fBG_Markers.at(0)->localx,fBG_Markers.at(1)->localx));
               return temp_bg;

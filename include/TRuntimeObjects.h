@@ -11,8 +11,8 @@
 
 #include "TUnpackedEvent.h"
 
-class TH1;
-class TH2;
+class GH1;
+class GH2;
 class TFile;
 class TProfile;
 
@@ -58,10 +58,10 @@ public:
   TList* GetGatesPtr()      { return gates;     }
 
 
-  TH1* FillHistogram(const char* name,
+  GH1* FillHistogram(const char* name,
                      int bins, double low, double high, double value,
                      double weight=1);
-  TH2* FillHistogram(const char* name,
+  GH2* FillHistogram(const char* name,
                      int Xbins, double Xlow, double Xhigh, double Xvalue,
                      int Ybins, double Ylow, double Yhigh, double Yvalue,
                      double weight=1);
@@ -82,19 +82,19 @@ public:
   TProfile* FillProfileHist(const char* name,
 			    int Xbins, double Xlow, double Xhigh, double Xvalue,
 			    double Yvalue);
-  TH2* FillHistogramSym(const char* name,
+  GH2* FillHistogramSym(const char* name,
 			int Xbins, double Xlow, double Xhigh, double Xvalue,
 			int Ybins, double Ylow, double Yhigh, double Yvalue);
 
 
-  TH1* FillHistogram(const std::string& name,
+  GH1* FillHistogram(const std::string& name,
                      int bins, double low, double high, double value,
                      double weight=1){
     return FillHistogram(name.c_str(),
                          bins, low, high, value,
                          weight);
   }
-  TH2* FillHistogram(const std::string& name,
+  GH2* FillHistogram(const std::string& name,
                      int Xbins, double Xlow, double Xhigh, double Xvalue,
                      int Ybins, double Ylow, double Yhigh, double Yvalue,
                      double weight=1) {
@@ -110,7 +110,7 @@ public:
 			   Xbins, Xlow, Xhigh, Xvalue,
 			   Yvalue);
   }
-  TH2* FillHistogramSym(const std::string& name,
+  GH2* FillHistogramSym(const std::string& name,
                         int Xbins, double Xlow, double Xhigh, double Xvalue,
                         int Ybins, double Ylow, double Yhigh, double Yvalue) {
     return FillHistogramSym(name.c_str(),

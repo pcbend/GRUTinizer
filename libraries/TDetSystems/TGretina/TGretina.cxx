@@ -64,7 +64,7 @@ void TGretina::BuildAddback(int EngRange) const {
     for(unsigned int j=i+1; j<addback_hits.size(); j++) {
       TGretinaHit& other_hit = addback_hits[j];
       if(fAddbackCondition(current_hit, other_hit)) {
-	current_hit.AddToSelf(other_hit);
+	current_hit.Add(other_hit);
 	to_erase.push_back(j);
       }
     }
@@ -277,7 +277,7 @@ void TGretina::BuildAddbackHits(){
     for(int y=0;y<addback_hits->GetEntries();y++) {
       if(GetAddbackHit(y).CheckAddback(GetGretinaHit(x))) {
         used = true;
-        GetAddbackHit(y).AddToSelf(GetGretinaHit(x), max_energies[y]);
+        GetAddbackHit(y).Add(GetGretinaHit(x), max_energies[y]);
         break;
       }
     }

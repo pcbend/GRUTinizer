@@ -30,8 +30,7 @@ public:
   virtual void InsertHit(const TDetectorHit& hit);
   virtual TDetectorHit& GetHit(int i)            { return gretina_hits.at(i); }
 
-  //const TGretinaHit& GetGretinaHit(int i) const { return gretina_hits.at(i); }
-  TGretinaHit GetGretinaHit(int i) const { return gretina_hits.at(i); }
+  const TGretinaHit& GetGretinaHit(int i) const { return gretina_hits.at(i); }
   const TGretinaHit& GetAddbackHit(int i) const { return addback_hits.at(i); }
 
 
@@ -41,12 +40,6 @@ public:
   static TVector3 GetSegmentPosition(int cryid,int segment); //return the position of the segemnt in the lab system
   static TVector3 GetCrystalPosition(int cryid); //return the position of the crysal in the lab system
 
-  //static void DrawDopplerGamma(Double_t Beta=0.1,Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
-  //static void DrawDopplerBeta(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
-  //static void DrawEnVsTheta(Double_t Beta=0.1,Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
-  //static void DrawCoreSummary(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
-  //
-  
 #ifndef __CINT__ 
   static void SetAddbackCondition(std::function<bool(const TGretinaHit&,const TGretinaHit&)> condition) {
     fAddbackCondition = condition;

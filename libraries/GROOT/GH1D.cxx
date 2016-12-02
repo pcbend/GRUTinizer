@@ -77,27 +77,31 @@ void GH1D::SetBinsLength(int n) {
 
 
 
-void GH1D::Streamer(TBuffer &r__b) {
-  unsigned int r__s,r__c;
-  if(r__b.IsReading()) {
-    Version_t r__v = r__b.ReadVersion(&r__s,&r__c);
-    if(r__v<3) {
-      //printf("I AM HEER; version = %i\n",r__v);
-      TH1D h; 
-      r__b.ReadClassBuffer(TH1D::Class(),&h);
-      h.Copy(*this);
-      //printf("h->GetBinContent(80) = %.02f\n",h.GetBinContent(80) );
-      //h.DrawCopy();
-      //h.Streamer(r__b); 
-      //h.Copy(*this);
-    } else {
-      r__b.ReadClassBuffer(GH1D::Class(),this);
-      //GH1D::Class()->ReadBuffer(r__b, this);
-    }
-  } else {
-    GH1D::Class()->WriteBuffer(r__b,this);
-  }
-}
+//void GH1D::Streamer(TBuffer &r__b) {
+//  unsigned int r__s,r__c;
+//  if(r__b.IsReading()) {
+//    Version_t r__v = r__b.ReadVersion(&r__s,&r__c);
+//    printf("I AM HEER; version = %i\n",r__v);
+//    printf("r__b.GetParent()->GetName() = %s\n",r__b.GetParent()->GetName());
+//    if(r__v<3) {
+//      printf("I AM HEER; version = %i\n",r__v);
+//      TH1D h; 
+//      r__b.ReadClassBuffer(TH1D::Class(),&h);
+//      h.Copy(*this);
+//      //printf("h->GetBinContent(80) = %.02f\n",h.GetBinContent(80) );
+//      //h.DrawCopy();
+//      //h.Streamer(r__b); 
+//      //h.Copy(*this);
+//    } else {
+//      //r__b.ReadClassBuffer(GH1::Class(),this);
+//      r__b.ReadClassBuffer(GH1D::Class(),this);
+//      //GH1D::Class()->ReadBuffer(r__b, this);
+//    }
+//  } else {
+//    GH1::Class()->WriteBuffer(r__b,this);
+//    GH1D::Class()->WriteBuffer(r__b,this);
+//  }
+//}
 
 
 

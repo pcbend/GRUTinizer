@@ -31,7 +31,7 @@ class GH1 : public TH1 {
     GH1D *Project(int low=0,int high=-1);    
     GH1D *Project(int low,int high,int bg_low,int bg_high,double scale=-1);  
     
-    TObject *GetParent()    const          { return fParent.GetObject(); } 
+    TObject *GetHistParent()    const          { return fParent.GetObject(); } 
     void     SetParent(TObject *obj) { fParent = obj; }
     
     void SetProjectionAxis(int axis) { fProjectionAxis = axis; }
@@ -42,6 +42,11 @@ class GH1 : public TH1 {
 
     double FitEval(double *,double*);
     TF1  *ConstructTF1() const; 
+    
+    bool WriteDatFile(const char *outFile);
+  
+    void Draw(Option_t *opt="");
+
 
   private:
     TRef fParent;

@@ -2945,7 +2945,7 @@ GH1D *GH2::SummaryProjection(GH1 *hist,int axis,int direction,bool show_empty) c
     //printf("not a summary spectrum!\n");
     return 0;      
   }
-  //printf("is a summary spectrum!\n");
+  //printf("is a summary spectrum!  axis = %i\n",axis);
   int binnum=1;
   std::string name;
   if(hist) {
@@ -2960,8 +2960,10 @@ GH1D *GH2::SummaryProjection(GH1 *hist,int axis,int direction,bool show_empty) c
   int max_binnum;
   if(axis == kXaxis){
     max_binnum = GetXaxis()->GetNbins();
+    name = Form("%s_py",GetName());
   } else {
     max_binnum = GetYaxis()->GetNbins();
+    name = Form("%s_px",GetName());
   }
   if(binnum > max_binnum){
     binnum = 1;
@@ -2973,18 +2975,19 @@ GH1D *GH2::SummaryProjection(GH1 *hist,int axis,int direction,bool show_empty) c
   switch(axis) {
     case kXaxis:
       while(true) {
-        name =  Form("%s_%d",GetName(),binnum);
-        g = (GH1D*)fProjections.FindObject(name.c_str());
-        if(g && g->Integral() > 0) {
+        name =  Form("%s_%d",name.c_str(),binnum);
+        //g = (GH1D*)fProjections.FindObject(name.c_str());
+        //if(g && g->Integral() > 0) {
+        //  g->SetParent((TObject*)this);
+        //  g->SetSummary();
+        //  return g;
+        //}
+        g = ProjectionY(name.c_str(),binnum,binnum,"+");
+        if(g && g->Integral()>0) {
           g->SetParent((TObject*)this);
           g->SetSummary();
           return g;
         }
-        g = ProjectionY(name.c_str(),binnum,binnum,"+");
-        if(g && g->Integral()>0)
-          g->SetParent((TObject*)this);
-          g->SetSummary();
-          return g;
         if(direction==kForward) {
           binnum++;
         } else {
@@ -3001,18 +3004,19 @@ GH1D *GH2::SummaryProjection(GH1 *hist,int axis,int direction,bool show_empty) c
       break;
     case kYaxis:
       while(true) {
-        name =  Form("%s_%d",GetName(),binnum);
-        g = (GH1D*)fProjections.FindObject(name.c_str());
-        if(g && g->Integral() > 0) {
+        name =  Form("%s_%d",name.c_str(),binnum);
+        //g = (GH1D*)fProjections.FindObject(name.c_str());
+        //if(g && g->Integral() > 0) {
+        //  g->SetParent((TObject*)this);
+        //  g->SetSummary();
+        //  return g;
+        //}
+        g = ProjectionX(name.c_str(),binnum,binnum,"+");
+        if(g && g->Integral()>0) {
           g->SetParent((TObject*)this);
           g->SetSummary();
           return g;
         }
-        g = ProjectionX(name.c_str(),binnum,binnum,"+");
-        if(g && g->Integral()>0)
-          g->SetParent((TObject*)this);
-          g->SetSummary();
-          return g;
         if(direction==kForward) {
           binnum++;
         } else {
@@ -3034,6 +3038,9 @@ GH1D *GH2::SummaryProjection(GH1 *hist,int axis,int direction,bool show_empty) c
   }
   return g;
 }
+
+
+
 
 GH1 *GH2::GetNext(TObject *obj,int direction) const {
   GH1 *next=0;

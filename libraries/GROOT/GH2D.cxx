@@ -1,59 +1,157 @@
 #include "GH2D.h"
 
-#include <iostream>
 
-#include <TDirectory.h>
-#include <TClass.h>
-#include <TMethodCall.h>
-
-#include "GH1D.h"
 
 ClassImp(GH2D)
 
-GH2D::GH2D(const char *name,const char *title,Int_t nbinsx,const Double_t *xbins,Int_t nbinsy, const Double_t *ybins) :
-  TH2D(name,title,nbinsx,xbins,nbinsy,ybins), GH2Base() {
+GH2D::GH2D(): GH2(),TArrayI() {
+  SetBinsLength(9);
+  if(GH1::fgDefaultSumw2) Sumw2();
+}
+
+GH2D::GH2D(const char *name,const char *title,Int_t nbinsx,const Double_t *xbins,
+                                              Int_t nbinsy, const Double_t *ybins) :
+  GH2(name,title,nbinsx,xbins,nbinsy,ybins) { 
+  TArrayI::Set(fNcells);
+  if(GH1::fgDefaultSumw2) Sumw2();
 }
 
 
-GH2D::GH2D(const char *name,const char *title,Int_t nbinsx,const Float_t *xbins,Int_t nbinsy, const Float_t *ybins) :
-  TH2D(name,title,nbinsx,xbins,nbinsy,ybins), GH2Base() {
+GH2D::GH2D(const char *name,const char *title,Int_t nbinsx,const Float_t *xbins,
+                                              Int_t nbinsy, const Float_t *ybins) :
+  GH2(name,title,nbinsx,xbins,nbinsy,ybins) { 
+  TArrayI::Set(fNcells);
+  if(GH1::fgDefaultSumw2) Sumw2();
 }
 
 
 GH2D::GH2D(const char *name,const char *title,Int_t nbinsx,const Double_t *xbins,
-                                            Int_t nbinsy, Double_t ylow, Double_t yup) :
-  TH2D(name,title,nbinsx,xbins,nbinsy,ylow,yup), GH2Base() { 
+                                              Int_t nbinsy, Double_t ylow, Double_t yup) :
+  GH2(name,title,nbinsx,xbins,nbinsy,ylow,yup) {
+  TArrayI::Set(fNcells);
+  if(GH1::fgDefaultSumw2) Sumw2();
 }
 
 
 GH2D::GH2D(const char *name,const char *title,Int_t nbinsx, Double_t xlow, Double_t xup,
-                                            Int_t nbinsy, Double_t *ybins) :
-  TH2D(name,title,nbinsx,xlow,xup,nbinsy,ybins), GH2Base() { 
+                                              Int_t nbinsy, Double_t *ybins) :
+  GH2(name,title,nbinsx,xlow,xup,nbinsy,ybins) {
+  TArrayI::Set(fNcells);
+  if(GH1::fgDefaultSumw2) Sumw2();
 }
 
 
 GH2D::GH2D(const char *name,const char *title,Int_t nbinsx, Double_t xlow, Double_t xup,
-                                            Int_t nbinsy, Double_t ylow, Double_t yup) :
-  TH2D(name,title,nbinsx,xlow,xup,nbinsy,ylow,yup), GH2Base() { 
+                                              Int_t nbinsy, Double_t ylow, Double_t yup) :
+  GH2(name,title,nbinsx,xlow,xup,nbinsy,ylow,yup) {
+  TArrayI::Set(fNcells);
+  if(GH1::fgDefaultSumw2) Sumw2();
+  if(xlow>=xup||ylow>=yup) SetBuffer(fgBufferSize);
 }
 
-//GH2D::GH2D(const GH2I &obj) {
-  //if(obj.InheritsFrom(TH2::Class())){
-//    obj.Copy(*this);
-  //}
-//}
+GH2D::GH2D(const GH2D &obj) : GH2(), TArrayI() {
+    ((GH2D&)obj).Copy(*this);
+}
+
+GH2D::GH2D(const TH1 &h2d) : GH2(), TArrayI() {
+    ((TH1&)h2d).Copy(*this);
+}
+
 
 GH2D::~GH2D() {  }
+
+void GH2D::AddBinContent(int bin) {
+  if(fArray[bin] < 2147483647) fArray[bin]++;
+}
+
+void GH2D::AddBinContent(int bin,double w) {
+  long newvalue = fArray[bin] + int(w);
+  if(newvalue > -2147483647 && newvalue < 2147483647) {
+    fArray[bin] = int(newvalue);
+    return;
+  }
+  if(newvalue<-2147483647) fArray[bin] = -2147483647;
+  if(newvalue>2147483647)  fArray[bin] =  2147483647;
+}
+
+void GH2D::Copy(TObject &obj) const {
+  GH2::Copy((GH2D&)obj);
+}
+
+void GH2D::Reset(Option_t *opt) {
+  GH2::Reset(opt);
+  TArrayI::Reset();
+}
+
+void GH2D::SetBinsLength(int n) {
+  if(n<0) n = (fXaxis.GetNbins()+2)*(fYaxis.GetNbins()+2);
+  fNcells = n;
+  TArrayI::Set(n);
+}
+
+GH2D& GH2D::operator=(const GH2D &h1) {
+  if(this!=&h1) ((GH2D&)h1).Copy(*this);
+  return *this;
+}
+
+GH2D operator*(float c1,GH2D &h1) {
+  GH2D hnew = h1;
+  hnew.Scale(c1);
+  hnew.SetDirectory(0);
+  return hnew;
+}
+
+GH2D operator*(GH2D &h1,GH2D &h2) {
+  GH2D hnew = h1;
+  hnew.Multiply(&h2);
+  hnew.SetDirectory(0);
+  return hnew;
+}
+
+GH2D operator/(GH2D &h1,GH2D &h2) {
+  GH2D hnew = h1;
+  hnew.Divide(&h2);
+  hnew.SetDirectory(0);
+  return hnew;
+}
+
+GH2D operator+(GH2D &h1,GH2D &h2) {
+  GH2D hnew = h1;
+  hnew.Add(&h2);
+  hnew.SetDirectory(0);
+  return hnew;
+}
+
+GH2D operator-(GH2D &h1,GH2D &h2) {
+  GH2D hnew = h1;
+  hnew.Add(&h2,-1);
+  hnew.SetDirectory(0);
+  return hnew;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
 
 
 void GH2D::Copy(TObject &obj) const {
   TH2::Copy(obj);
-  GH2D& g = (GH2D&)obj; 
-  //g.fXFillClass = fXFillClass;
-  //g.fYFillClass = fYFillClass;
-  //g.fXFillMethod = fXFillMethod;
-  //g.fYFillMethod = fYFillMethod;
- //fProjections->Copy(*(((GH2D&)obj).fProjections));
+  //fProjections->Copy(*(((GH2D&)obj).fProjections));
   //fSummaryProjections->Copy(*(((GH2D&)obj).fSummaryProjections));
 }
 
@@ -67,7 +165,7 @@ TObject *GH2D::Clone(const char *newname) const {
 void GH2D::Clear(Option_t *opt) {
   TString sopt(opt);
   if(!sopt.Contains("projonly")){
-    TH2D::Clear(opt);
+    TH2I::Clear(opt);
   }
   GH2Clear();
 }
@@ -79,25 +177,15 @@ void GH2D::Draw(Option_t *opt) {
   if(option == ""){
     option = "colz";
   }
-  TH2D::Draw(option.c_str());
+  TH2I::Draw(option.c_str());
   if(gPad) {
     gPad->Update();
     gPad->GetFrame()->SetBit(TBox::kCannotMove);
   }
 }
 
-
-//void GH2D::Draw(TCutG *cut) {
-//  if(!cut)
-//    return;
-//  std::string option = Form("colz [%s]",cut->GetName());
-//  TH2D::Draw(option.c_str());
-//}
-
-
-
 TH1 *GH2D::DrawCopy(Option_t *opt) const {
-  TH1 *h = TH2D::DrawCopy(opt);
+  TH1 *h = TH2I::DrawCopy(opt);
   if(gPad) {
     gPad->Update();
     gPad->GetFrame()->SetBit(TBox::kCannotMove);
@@ -106,13 +194,20 @@ TH1 *GH2D::DrawCopy(Option_t *opt) const {
 }
 
 TH1 *GH2D::DrawNormalized(Option_t *opt,Double_t norm) const {
-  TH1 *h = TH2D::DrawNormalized(opt,norm);
+  TH1 *h = TH2I::DrawNormalized(opt,norm);
   if(gPad) {
     gPad->Update();
     gPad->GetFrame()->SetBit(TBox::kCannotMove);
   }
   return h;
 }
+
+
+
+
+
+
+
 
 
 
@@ -132,11 +227,11 @@ GH1D* GH2D::ProjectionY(const char* name,
   return GH2ProjectionY(name,firstbin,lastbin,option);
 }
 
-/*
+
 void GH2D::Streamer(TBuffer &b) {
   if(b.IsReading()) {
     Version_t v = b.ReadVersion(); 
-    TH2D::Streamer(b);
+    TH2I::Streamer(b);
     TDirectory *current = gDirectory;
     if(TDirectory::Cd(Form("%s_projections",this->GetName()))) { 
       TList *list = gDirectory->GetList();
@@ -152,7 +247,7 @@ void GH2D::Streamer(TBuffer &b) {
     current->cd();
   } else {
     b.WriteVersion(GH2D::IsA());
-    TH2D::Streamer(b);
+    TH2I::Streamer(b);
     if(fProjections.GetEntries()) {
       TDirectory *current = gDirectory;
       TDirectory *newdir  =  current->mkdir(Form("%s_projections",this->GetName());
@@ -166,39 +261,6 @@ void GH2D::Streamer(TBuffer &b) {
 */
 
 
-//void GH2D::SetFillMethod(const char *classnamex,const char *methodnamex,const char *paramx,
-//                         const char *classnamey,const char *methodnamey,const char *paramy) {
-//  fXFillClass = TClass::GetClass(classnamex);
-//  if(!fXFillClass)
-//    return;
-//  fYFillClass = TClass::GetClass(classnamey);
-//  if(!fYFillClass)
-//    return;
-//  fXFillMethod = new TMethodCall(fXFillClass,methodnamex,paramx);
-//  fYFillMethod = new TMethodCall(fYFillClass,methodnamey,paramy);
-  //printf("class:  %s\n",fFillClass->GetName()); 
-  //printf("method: %s\n",fFillMethod->GetMethod()->GetPrototype()); 
-//}
-
-
-//Int_t GH2D::Fill(const TObject* objx,const TObject *objy) {
-//  if(!fXFillClass || !fXFillMethod || !fYFillClass || !fYFillMethod) {
-//    //printf("%p \t %p\n",fFillClass,fFillMethod);
-//    return -1;
-//  }
-//  if(!objy) {
-//    objy=objx;
-//  }
-//  if(objx->IsA()!=fXFillClass || objy->IsA()!=fYFillClass ) {
-//    //printf("%s \t %s\n", obj->Class()->GetName(),fFillClass->GetName());
-//    return -2;
-//  }
-//  Double_t storagex;
-//  Double_t storagey;
-//  fXFillMethod->Execute((void*)(objx),storagex);
-//  fYFillMethod->Execute((void*)(objy),storagey);
-//  return TH2D::Fill(storagex,storagey);
-//}
 
 
 

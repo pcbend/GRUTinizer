@@ -220,7 +220,7 @@ typedef struct { // Decomposed GRETINA Data
    Float_t   tot_e;
    Int_t     core_e[4];
    Long_t    timestamp;
-   Long_t    trig_time;
+   Long_t    trig_time;  
    Float_t   t0;
    Float_t   cfd;
    Float_t   chisq;

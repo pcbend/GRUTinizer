@@ -28,7 +28,7 @@ class GH1D : public GH1, public TArrayD {
     virtual void   UpdateBinContent(int bin,double content) { fArray[bin]=content; }
 
   
-  ClassDef(GH1D,3)
+  ClassDef(GH1D,4)
 
   public:
     friend GH1D  operator*(double c1, const GH1D &h1);

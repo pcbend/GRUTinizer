@@ -57,6 +57,8 @@ void Version() {
   system(Form("%s/bin/grutinizer-config --version", getenv("GRUTSYS")));
 }
 
+
+/*
 bool GetProjectionX(GH2D *hist,double low, double high, double bg_low,double bg_high){
   if(!hist) return 0;
   GCanvas *C_projections = 0;
@@ -141,7 +143,7 @@ bool GetProjectionX(GH2D *hist,double low, double high, double bg_low,double bg_
   Proj_gated->Draw();
   return 1;
 }
-
+*/
 
 
 
@@ -1058,6 +1060,9 @@ bool GUIIsRunning() {
 
 
 
+
+/*
+
 TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
  TH2 *toreturn = 0;
  if(!mat)
@@ -1065,32 +1070,6 @@ TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
  //int dim = mat->GetDimension();
  int xmax = mat->GetXaxis()->GetNbins()+1;
  int ymax = mat->GetYaxis()->GetNbins()+1;
- /*
- switch(dim) {
-   case 3:
-     xmax = mat->GetXaxis()->GetNbins()+1;
-     ymax = mat->GetYaxis()->GetNbins()+1;
-     zmax = mat->GetZaxis()->GetNbins()+1;
-     break;
-   case 2:
-     if(axis>3) {
-       fprintf(stderr,"%s z-axis offest called on %s but has no z-axis",
-               __PRETTY_FUNCTION__,mat->GetName())
-       return toreturn;
-     }
-     xmax = mat->GetXaxis()->GetNbins()+1;
-     ymax = mat->GetYaxis()->GetNbins()+1;
-     break;
-   case 1:
-     if(axis!=1) {
-       fprintf(stderr,"%s offest called on %s with an axis it doesn't have.",
-               __PRETTY_FUNCTION__,mat->GetName())
-       return toreturn;
-     }
-     xmax = mat->GetXaxis()->GetNbins()+1;
-     break;
- };
- */
  toreturn = (TH2*)mat->Clone(Form("%s_offset",mat->GetName()));
  toreturn->Reset();
 
@@ -1109,7 +1088,7 @@ TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
   return toreturn;
 }
 
-
+*/
 
 
 
