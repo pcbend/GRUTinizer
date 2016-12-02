@@ -474,6 +474,8 @@ void TCrdc::Clear(Option_t *opt) {
   channel.clear();
   sample.clear();
   data.clear();
+  has_cached_dispersive_x = false;
+  cached_dispersive_x = std::sqrt(-1);
 }
 
 /*
@@ -574,9 +576,14 @@ bool TCrdc::IsGoodSample(int i) const {
 }
 
 float TCrdc::GetDispersiveX() const{
+  if(has_cached_dispersive_x) {
+    return cached_dispersive_x;
+  }
+
   int maxpad = GetMaxPad();
   //std::cout << " Before Max Pad Return " << std::endl;
   if (maxpad ==-1){
+    has_cached_dispersive_x = true;
     return sqrt(-1);
   }
   //std::cout << " After Max Pad Return " << std::endl;
@@ -632,7 +639,12 @@ float TCrdc::GetDispersiveX() const{
 
   // + 0.5 so that we take the middle of the pad, not the left edge.
   double mean_chan = weighted_sum/datasum + 0.5;
-  return (mean_chan*x_slope+x_offset);
+  double output = (mean_chan*x_slope+x_offset);
+
+  has_cached_dispersive_x = true;
+  cached_dispersive_x = output;
+
+  return output;
 }
 
 
