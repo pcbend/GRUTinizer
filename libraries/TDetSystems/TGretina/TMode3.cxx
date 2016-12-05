@@ -27,14 +27,19 @@ void TMode3::InsertHit(const TDetectorHit& hit){
 }
 
 int TMode3::BuildHits(std::vector<TRawEvent>& raw_data){
+  if(raw_data.size()<1)
+    return Size();
+  long smallest_time = 0x3fffffffffffffff;
   for(auto& event : raw_data){
-    SetTimestamp(event.GetTimestamp());
+    if(event.GetTimestamp()<smallest_time)
+      smallest_time=event.GetTimestamp();
     TMode3Hit hit;
     TSmartBuffer buf = event.GetPayloadBuffer();
     hit.BuildFrom(buf);
     hit.SetTimestamp(event.GetTimestamp());
     InsertHit(hit);
   }
+  SetTimestamp(smallest_time);
   return Size();
 }
 

@@ -108,7 +108,7 @@ public:
   
   bool operator<(const TGretinaHit &rhs) const { return fCoreEnergy > rhs.fCoreEnergy; }
 
-  double GetDoppler(double beta,const TVector3 *vec=0,int EngRange=-1) {
+  double GetDoppler(double beta,const TVector3 *vec=0,int EngRange=-1) const {
     if(Size()<1)
       return 0.0;
     if(vec==0) {

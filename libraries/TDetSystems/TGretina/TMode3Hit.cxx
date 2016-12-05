@@ -111,7 +111,7 @@ double TMode3Hit::AverageWave(int samples) {
 }
 
 
-void TMode3Hit::Draw(Option_t *opt)  {
+void TMode3Hit::Draw(Option_t *opt) const {
   if(!waveform.size())
     return;
   TString option = opt;
@@ -120,7 +120,7 @@ void TMode3Hit::Draw(Option_t *opt)  {
   } else {
     gPad->Clear();
   }
-  GH1D wave("wave","wave",(int)waveform.size(),0,(double)waveform.size());
+  GH1D wave("wave",Form("0x%08x",Address()),(int)waveform.size(),0,(double)waveform.size());
   for(unsigned int x=0;x<waveform.size();x++) 
     wave.Fill(x,waveform.at(x));
   wave.DrawCopy();
