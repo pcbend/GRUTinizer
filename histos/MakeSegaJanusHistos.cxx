@@ -23,6 +23,10 @@
 TCutG* pid_low = NULL;
 TCutG* pid_high = NULL;
 TCutG* time_energy = NULL;
+std::map<int, TCutG*> gates_455downstream;
+std::map<int, TCutG*> gates_455recon;
+std::map<int, TCutG*> gates_455upstream;
+
 bool has_455keV = false;
 
 void LoadGates(TRuntimeObjects& obj){
@@ -44,6 +48,42 @@ void LoadGates(TRuntimeObjects& obj){
     time_energy = obj.GetCut("time_energy");
     if(!time_energy){
       std::cout << "Warning: could not find cut \"time_energy\"" << std::endl;
+    }
+  }
+
+  if(gates_455downstream.size() == 0){
+    for(int ringnum=1; ringnum<25; ringnum++) {
+      std::string name = Form("downstream_ring%02d_455cut",ringnum);
+      TCutG* gate = obj.GetCut(name);
+      if(gate) {
+        gates_455downstream[ringnum] = gate;
+      } else {
+        std::cout << "Warning: could not find cut \"" << name << "\"" << std::endl;
+      }
+    }
+  }
+
+  if(gates_455recon.size() == 0){
+    for(int ringnum=1; ringnum<25; ringnum++) {
+      std::string name = Form("recon_ring%02d_455cut",ringnum);
+      TCutG* gate = obj.GetCut(name);
+      if(gate) {
+        gates_455recon[ringnum] = gate;
+      } else {
+        std::cout << "Warning: could not find cut \"" << name << "\"" << std::endl;
+      }
+    }
+  }
+
+  if(gates_455upstream.size() == 0){
+    for(int ringnum=1; ringnum<25; ringnum++) {
+      std::string name = Form("upstream_ring%02d_455cut",ringnum);
+      TCutG* gate = obj.GetCut(name);
+      if(gate) {
+        gates_455upstream[ringnum] = gate;
+      } else {
+        std::cout << "Warning: could not find cut \"" << name << "\"" << std::endl;
+      }
     }
   }
 }
@@ -82,6 +122,10 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega& sega, TJanus& janus)
 void MakeScalerHistograms(TRuntimeObjects& obj, TNSCLScalers& scalers);
 void MakeTimestampDiffs(TRuntimeObjects& obj, TSega* sega, TJanus* janus);
 
+void Make78Kr_455keVPlots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_hit,
+                          double dc_energy, double gamma_angle, std::string which_cut,
+                          std::string which_region);
+
 // Returns the timestamp in nanoseconds since the start of the first production run.
 // Minimum value: 0
 // Maximum value: 2.141e14 (End of Pb-208 target runs)
@@ -96,7 +140,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   TSega* sega = obj.GetDetector<TSega>();
   TJanus* janus = obj.GetDetector<TJanus>();
-  TNSCLScalers* scalers = obj.GetDetector<TNSCLScalers>();
+  //TNSCLScalers* scalers = obj.GetDetector<TNSCLScalers>();
 
 
   if(janus){
@@ -138,7 +182,7 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanus& janus, const char* dirnam
   }
 
 
-  MakeJanusChan64_70Histograms(obj, janus, dirname);
+  // MakeJanusChan64_70Histograms(obj, janus, dirname);
 
   // int num_adc = 0;
   // int num_tdc = 0;
@@ -191,6 +235,9 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanus& janus, const char* dirnam
                     256, 0, 256, janus.Size());
 
   for(auto& hit : janus.GetAllHits()){
+    bool in_pid_low = pid_low->IsInside(hit.GetFrontChannel(), hit.Charge());
+    bool in_pid_high = pid_high->IsInside(hit.GetFrontChannel(), hit.Charge());
+
     obj.FillHistogram(dirname,"hit_channel",
                       128, 0, 128, hit.GetFrontChannel());
     obj.FillHistogram(dirname,"hit_channel",
@@ -232,21 +279,37 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanus& janus, const char* dirnam
     obj.FillHistogram(dirname,Form("hit_det%d_sectornum",hit.GetDetnum()),
                       32, 1, 33, hit.GetSector());
 
-    if(pid_low->IsInside(hit.GetFrontChannel(), hit.Charge())) {
+    obj.FillHistogram(dirname,Form("hit_det%d_ringsector",hit.GetDetnum()),
+                      24, 1, 25, hit.GetRing(),
+                      32, 1, 33, hit.GetSector());
+
+    if(in_pid_low) {
       obj.FillHistogram(dirname,"channel_charge_forwardPb",
                         128, 0, 128, hit.GetFrontChannel(),
                         6000, -4, 6000, hit.Charge());
+
+      obj.FillHistogram(dirname,"ringsector_forward_pb",
+                        24, 1, 25, hit.GetRing(),
+                        32, 1, 33, hit.GetSector());
     }
-    if(pid_high->IsInside(hit.GetFrontChannel(), hit.Charge())) {
+    if(in_pid_high) {
       obj.FillHistogram(dirname,"channel_charge_forwardKr",
                         128, 0, 128, hit.GetFrontChannel(),
                         6000, -4, 6000, hit.Charge());
+
+      obj.FillHistogram(dirname,"ringsector_forward_kr",
+                        24, 1, 25, hit.GetRing(),
+                        32, 1, 33, hit.GetSector());
     }
     bool in_upstream_pid_low  = hit.GetDetnum() == 0 && !(hit.Charge() > 3600 || hit.GetADCOverflowBit());
     if(in_upstream_pid_low) {
       obj.FillHistogram(dirname,"channel_charge_backwardKr",
                         128, 0, 128, hit.GetFrontChannel(),
                         6000, -4, 6000, hit.Charge());
+
+      obj.FillHistogram(dirname,"ringsector_backward_kr",
+                        24, 1, 25, hit.GetRing(),
+                        32, 1, 33, hit.GetSector());
     }
   }
 
@@ -416,6 +479,13 @@ void Make78KrPlots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_hit, std:
                       2000, 0, 2000, dc_energy,
                       180, 0, 180, theta_deg);
 
+    if(dc_energy > 430 && dc_energy < 480) {
+      Make78Kr_455keVPlots(obj, s_hit, j_hit, dc_energy, theta_deg, "1d", "downstream");
+    }
+    if(gates_455downstream[j_hit.GetRing()]->IsInside(dc_energy, theta_deg)) {
+      Make78Kr_455keVPlots(obj, s_hit, j_hit, dc_energy, theta_deg, "2d", "downstream");
+    }
+
 
     double kr_theta = particle_position.Theta();
     //double kr_theta_deg = kr_theta * (180/3.1415926);
@@ -531,6 +601,13 @@ void Make78KrPlots_Reconstructed(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHi
 
     double kr_theta = particle_position.Theta();
     double kr_theta_deg = kr_theta * (180/3.1415926);
+
+    if(dc_energy > 430 && dc_energy < 480) {
+      Make78Kr_455keVPlots(obj, s_hit, j_hit, dc_energy, theta_deg, "1d", "recon");
+    }
+    if(gates_455recon[j_hit.GetRing()]->IsInside(dc_energy, theta_deg)) {
+      Make78Kr_455keVPlots(obj, s_hit, j_hit, dc_energy, theta_deg, "2d", "recon");
+    }
 
     // Angle-dependent beta
     {
@@ -720,53 +797,66 @@ void MakeUpstream78KrPlots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_h
       has_455keV = true;
     }
 
-    if(j_hit.GetRing() <= 8) {
-      obj.FillHistogram("upstream", Form("DCenergy_inner8rings_%s", cutname.c_str()),
-                        4000, 0, 4000, dc_energy);
+    // if(j_hit.GetRing() <= 8) {
+    //   obj.FillHistogram("upstream", Form("DCenergy_inner8rings_%s", cutname.c_str()),
+    //                     4000, 0, 4000, dc_energy);
+    // }
+
+
+    double theta_deg = s_hit.GetPosition().Angle(particle_position) * (180/3.1415926);
+    obj.FillHistogram("upstream",Form("energy_angle_%s", cutname.c_str()),
+                      2000, 0, 2000, s_hit.GetEnergy(),
+                      180, 0, 180, theta_deg);
+    obj.FillHistogram("upstream",Form("DCenergy_angle_%s",cutname.c_str()),
+                      2000, 0, 2000, dc_energy,
+                      180, 0, 180, theta_deg);
+
+    obj.FillHistogram("upstream",Form("DCenergy_angle_ring%02d_%s", j_hit.GetRing(), cutname.c_str()),
+                      2000, 0, 2000, dc_energy,
+                      180, 0, 180, theta_deg);
+
+    obj.FillHistogram("upstream",Form("janus_pos_%s", cutname.c_str()),
+                      100, -4, 4, j_hit.GetPosition().X(),
+                      100, -4, 4, j_hit.GetPosition().Y());
+
+    obj.FillHistogram("upstream",Form("janus_ringnum_%s", cutname.c_str()),
+                      40, -5, 35, j_hit.GetRing());
+
+    obj.FillHistogram("upstream",Form("janus_sectornum_%s", cutname.c_str()),
+                      40, -5, 35, j_hit.GetSector());
+
+    if(dc_energy > 430 && dc_energy < 480) {
+      Make78Kr_455keVPlots(obj, s_hit, j_hit, dc_energy, theta_deg, "1d", "upstream");
+    }
+    if(gates_455upstream[j_hit.GetRing()]->IsInside(dc_energy, theta_deg)) {
+      Make78Kr_455keVPlots(obj, s_hit, j_hit, dc_energy, theta_deg, "2d", "upstream");
     }
 
+    // // Scan along beta
+    // for(int beta_i = 0; beta_i<150; beta_i++) {
+    //   double beta = 0.0 + beta_i*((0.15-0.00)/150);
 
-    // double theta_deg = s_hit.GetPosition().Angle(particle_position) * (180/3.1415926);
-    // obj.FillHistogram("upstream","energy_angle",
-    //                   2000, 0, 2000, s_hit.GetEnergy(),
-    //                   180, 0, 180, theta_deg);
-    // obj.FillHistogram("upstream","DCenergy_angle",
-    //                   2000, 0, 2000, dc_energy,
-    //                   180, 0, 180, theta_deg);
+    //   obj.FillHistogram("upstream",Form("betascan_%s",cutname.c_str()),
+    //                     150, 0.0, 0.15, beta,
+    //                     8000, 0, 4000, s_hit.GetDoppler(beta, particle_position));
+    // }
 
+    double betamax = GValue::Value("betamax");
+    double dc_energy_angledep = s_hit.GetDoppler(get_beta(betamax, kr_theta,true), particle_position);
+    obj.FillHistogram("upstream", Form("DCenergy_angle_angledep_%s", cutname.c_str()),
+                      4000, 0, 4000, dc_energy_angledep);
 
-    // obj.FillHistogram("upstream",Form("janus_pos_%s", cutname.c_str()),
-    //                   100, -4, 4, j_hit.GetPosition().X(),
-    //                   100, -4, 4, j_hit.GetPosition().Y());
+    obj.FillHistogram("upstream", Form("DCenergy_angle_angledep_ring%02d_%s", j_hit.GetRing(), cutname.c_str()),
+                      4000, 0, 4000, dc_energy_angledep);
 
-    // obj.FillHistogram("upstream",Form("janus_ringnum_%s", cutname.c_str()),
-    //                   40, -5, 35, j_hit.GetRing());
-
-    // obj.FillHistogram("upstream",Form("janus_sectornum_%s", cutname.c_str()),
-    //                   40, -5, 35, j_hit.GetSector());
-
-    // // // Scan along beta
-    // // for(int beta_i = 0; beta_i<150; beta_i++) {
-    // //   double beta = 0.0 + beta_i*((0.15-0.00)/150);
-
-    // //   obj.FillHistogram("upstream",Form("betascan_%s",cutname.c_str()),
-    // //                     150, 0.0, 0.15, beta,
-    // //                     8000, 0, 4000, s_hit.GetDoppler(beta, particle_position));
-    // // }
-
-    // double betamax = GValue::Value("betamax");
-    // obj.FillHistogram("upstream", Form("gamma_energyDC_angledep_%s", cutname.c_str()),
-    //                   4000, 0, 4000, s_hit.GetDoppler(get_beta(betamax, kr_theta,true), particle_position));
-
-
-    // // // Scan along z
-    // // for(int z_i=-20; z_i<40; z_i++) {
-    // //   double z = z_i * 0.25;
-    // //   TVector3 offset(0,0,z);
-    // //   obj.FillHistogram("upstream","DCenergy_zscan",
-    // //                     60, -5, 10, z,
-    // //                     8000, 0, 4000, s_hit.GetDoppler(beta_nominal, particle_position, offset));
-    // // }
+    // // Scan along z
+    // for(int z_i=-20; z_i<40; z_i++) {
+    //   double z = z_i * 0.25;
+    //   TVector3 offset(0,0,z);
+    //   obj.FillHistogram("upstream","DCenergy_zscan",
+    //                     60, -5, 10, z,
+    //                     8000, 0, 4000, s_hit.GetDoppler(beta_nominal, particle_position, offset));
+    // }
   }
 }
 
@@ -845,25 +935,25 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega& sega, TJanus& janus)
     bool in_upstream_pid_low  = j_hit.GetDetnum() == 0 && !(j_hit.Charge() > 3600 || j_hit.GetADCOverflowBit());
     bool in_upstream_pid_high = j_hit.GetDetnum() == 0 &&  (j_hit.Charge() > 3600 || j_hit.GetADCOverflowBit());
 
-    bool is_chan64_low  = (j_hit.GetFrontChannel() == 64 &&
-                           j_hit.Charge() > 175 && j_hit.Charge() < 400);
-    bool is_chan64_mid  = (j_hit.GetFrontChannel() == 64 &&
-                           j_hit.Charge() > 700 && j_hit.Charge() < 900);
-    bool is_chan64_high = (j_hit.GetFrontChannel() == 64 &&
-                           j_hit.Charge() > 1120 && j_hit.Charge() < 1340);
+    // bool is_chan64_low  = (j_hit.GetFrontChannel() == 64 &&
+    //                        j_hit.Charge() > 175 && j_hit.Charge() < 400);
+    // bool is_chan64_mid  = (j_hit.GetFrontChannel() == 64 &&
+    //                        j_hit.Charge() > 700 && j_hit.Charge() < 900);
+    // bool is_chan64_high = (j_hit.GetFrontChannel() == 64 &&
+    //                        j_hit.Charge() > 1120 && j_hit.Charge() < 1340);
 
-    bool is_chan65_kr = (j_hit.GetFrontChannel() == 65 &&
-                         j_hit.Charge() > 1800 && j_hit.Charge() < 2500);
-    bool is_chan65_pb = (j_hit.GetFrontChannel() == 65 &&
-                         j_hit.Charge() > 213 && j_hit.Charge() < 560);
+    // bool is_chan65_kr = (j_hit.GetFrontChannel() == 65 &&
+    //                      j_hit.Charge() > 1800 && j_hit.Charge() < 2500);
+    // bool is_chan65_pb = (j_hit.GetFrontChannel() == 65 &&
+    //                      j_hit.Charge() > 213 && j_hit.Charge() < 560);
 
 
-    bool is_chan70_low  = (j_hit.GetFrontChannel() == 70 &&
-                           j_hit.Charge() > 300 && j_hit.Charge() < 600);
-    bool is_chan70_mid  = (j_hit.GetFrontChannel() == 70 &&
-                           j_hit.Charge() > 700 && j_hit.Charge() < 870);
-    bool is_chan70_high = (j_hit.GetFrontChannel() == 70 &&
-                           j_hit.Charge() > 1200 && j_hit.Charge() < 1340);
+    // bool is_chan70_low  = (j_hit.GetFrontChannel() == 70 &&
+    //                        j_hit.Charge() > 300 && j_hit.Charge() < 600);
+    // bool is_chan70_mid  = (j_hit.GetFrontChannel() == 70 &&
+    //                        j_hit.Charge() > 700 && j_hit.Charge() < 870);
+    // bool is_chan70_high = (j_hit.GetFrontChannel() == 70 &&
+    //                        j_hit.Charge() > 1200 && j_hit.Charge() < 1340);
 
 
     for(unsigned int i=0; i<sega.Size(); i++){
@@ -882,29 +972,29 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega& sega, TJanus& janus)
         MakeUpstream78KrPlots(obj, s_hit, j_hit, "high");
       }
 
-      if(is_chan64_low) {
-        Make78KrPlots(obj, s_hit, j_hit, "chan64_low");
-      } else if(is_chan64_mid) {
-        Make78KrPlots(obj, s_hit, j_hit, "chan64_mid");
-      } else if(is_chan64_high) {
-        Make78KrPlots(obj, s_hit, j_hit, "chan64_high");
-      } else if(is_chan70_low) {
-        Make78KrPlots(obj, s_hit, j_hit, "chan70_low");
-      } else if(is_chan70_mid) {
-        Make78KrPlots(obj, s_hit, j_hit, "chan70_mid");
-      } else if(is_chan70_high) {
-        Make78KrPlots(obj, s_hit, j_hit, "chan70_high");
-      } else if(is_chan65_kr) {
-        Make78KrPlots(obj, s_hit, j_hit, "chan65_kr");
-      } else if(is_chan65_pb) {
-        Make78KrPlots(obj, s_hit, j_hit, "chan65_pb");
-      }
+      // if(is_chan64_low) {
+      //   Make78KrPlots(obj, s_hit, j_hit, "chan64_low");
+      // } else if(is_chan64_mid) {
+      //   Make78KrPlots(obj, s_hit, j_hit, "chan64_mid");
+      // } else if(is_chan64_high) {
+      //   Make78KrPlots(obj, s_hit, j_hit, "chan64_high");
+      // } else if(is_chan70_low) {
+      //   Make78KrPlots(obj, s_hit, j_hit, "chan70_low");
+      // } else if(is_chan70_mid) {
+      //   Make78KrPlots(obj, s_hit, j_hit, "chan70_mid");
+      // } else if(is_chan70_high) {
+      //   Make78KrPlots(obj, s_hit, j_hit, "chan70_high");
+      // } else if(is_chan65_kr) {
+      //   Make78KrPlots(obj, s_hit, j_hit, "chan65_kr");
+      // } else if(is_chan65_pb) {
+      //   Make78KrPlots(obj, s_hit, j_hit, "chan65_pb");
+      // }
     }
   }
 
-  if(has_455keV) {
-    MakeJanusHistograms(obj, janus, "janus_455coinc");
-  }
+  // if(has_455keV) {
+  //   MakeJanusHistograms(obj, janus, "janus_455coinc");
+  // }
 }
 
 void MakeTimestampDiffs(TRuntimeObjects& obj, TSega* sega, TJanus* janus) {
@@ -1055,4 +1145,30 @@ void MakeJanusChan64_70Histograms(TRuntimeObjects& obj, TJanus& janus, const cha
                         6000, -4, 6000, chan.Charge());
     }
   }
+}
+
+void Make78Kr_455keVPlots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_hit,
+                          double dc_energy, double gamma_angle_deg, std::string which_cut,
+                          std::string which_region) {
+  obj.FillHistogram("cuts_compare", Form("DCenergy_angle_455_cut%s",which_cut.c_str()),
+                    2000, 0, 2000, dc_energy,
+                    180, 0, 180, gamma_angle_deg);
+  obj.FillHistogram("cuts_compare", Form("DCenergy_angle_455_%s_ring%02d_cut%s",
+                                         which_region.c_str(), j_hit.GetRing(), which_cut.c_str()),
+                    2000, 0, 2000, dc_energy,
+                    180, 0, 180, gamma_angle_deg);
+
+  obj.FillHistogram("cuts_compare", Form("DCenergy_455_cut%s",which_cut.c_str()),
+                    2000, 0, 2000, dc_energy);
+
+  obj.FillHistogram("cuts_compare", Form("channel_energy_455_cut%s",which_cut.c_str()),
+                    128, 0, 128, j_hit.GetFrontChannel(),
+                    4000, 0, 400e3, j_hit.GetEnergy());
+  obj.FillHistogram("cuts_compare", Form("channel_energy_455_cut%s",which_cut.c_str()),
+                    128, 0, 128, j_hit.GetBackChannel(),
+                    4000, 0, 400e3, j_hit.GetBackHit().GetEnergy());
+
+  obj.FillHistogram("cuts_compare", Form("ringsector_455_cut%s", which_cut.c_str()),
+                    24, 1, 25, j_hit.GetRing(),
+                    32, 1, 33, j_hit.GetSector());
 }
