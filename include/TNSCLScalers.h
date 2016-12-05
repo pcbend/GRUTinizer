@@ -16,7 +16,7 @@ public:
   virtual void Print(Option_t *opt="") const;
   virtual void Clear(Option_t *opt="");
 
-  unsigned int Size() const { return scalers.size(); }
+  size_t Size() const { return scalers.size(); }
   int GetScaler(int i) const { return scalers.at(i);  }
   int GetSourceID() const { return source_id; }
 

@@ -21,7 +21,7 @@ public:
 
   //virtual void          InsertHit(const TDetectorHit& hit) { return;       }
   //virtual TDetectorHit& GetHit(const int &i=0)             { return hit; }
-  //virtual int           Size()                             { return 1;     }
+  virtual size_t  Size()  const { return waveform.size();     }
   double AverageWave(int samples=-1);
 
   void     BuildFrom(TSmartBuffer& buf);
@@ -56,6 +56,7 @@ public:
 
   void Draw(Option_t *opt="") const;
 
+  bool operator<(const TMode3Hit &rhs) const { return GetSegmentId() < rhs.GetSegmentId(); }
 
 private:
   //virtual int BuildHits();

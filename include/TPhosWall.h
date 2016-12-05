@@ -27,7 +27,7 @@ public:
   virtual void InsertHit(const TDetectorHit& hit);
 
 
-  unsigned int Size()       const { return phoswall_hits.size(); }
+  size_t Size()    const { return phoswall_hits.size(); }
   int Pixel(int i) const { return phoswall_hits.at(i).Pixel(); }
   int A(int i)     const { return phoswall_hits.at(i).A(); }
   int B(int i)     const { return phoswall_hits.at(i).B(); }

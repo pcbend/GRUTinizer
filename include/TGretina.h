@@ -23,7 +23,7 @@ public:
   virtual void Print(Option_t *opt = "") const;
   virtual void Clear(Option_t *opt = "");
 
-  virtual UInt_t Size() const { return gretina_hits.size(); }
+  virtual size_t Size() const { return gretina_hits.size(); }
   virtual Int_t AddbackSize(int EngRange=-1) { BuildAddback(EngRange); return addback_hits.size(); }
   void ResetAddback() { addback_hits.clear();}
 

@@ -2,6 +2,10 @@
 
 #include "TGEBEvent.h"
 
+
+#include "GH1D.h"
+#include "GCanvas.h"
+
 TMode3::TMode3(){
   //mode3_hits = new TClonesArray("TMode3Hit");
   Clear();
@@ -40,6 +44,7 @@ int TMode3::BuildHits(std::vector<TRawEvent>& raw_data){
     InsertHit(hit);
   }
   SetTimestamp(smallest_time);
+  std::sort(mode3_hits.begin(),mode3_hits.end());
   return Size();
 }
 
@@ -49,3 +54,30 @@ void TMode3::Clear(Option_t *opt) {
   //TDetector::Clear(opt);
   mode3_hits.clear(); //->Clear(opt);//("TMode3Hit");
 }
+
+void TMode3::Draw(Option_t *opt) const {
+  if(!Size())
+    return;
+  TString option = opt;
+  if(!gPad || option.Contains("new",TString::kIgnoreCase)) {
+    new GCanvas;
+  } else {
+    gPad->Clear();
+  }
+  int total_bins =0;
+  std::vector<double> data;
+  for(auto i=0;i<Size();i++) {
+    TMode3Hit hit = GetMode3Hit(i);
+    for(auto j=0;j<hit.Size();j++) {
+      data.push_back(hit.GetWave().at(j));
+    }
+  }
+  GH1D g("hist","hist",data.size(),0,data.size());
+  for(auto i=0;i<data.size();i++) {
+    g.Fill(i,data.at(i));
+  }
+  g.DrawCopy(opt);
+
+}
+
+

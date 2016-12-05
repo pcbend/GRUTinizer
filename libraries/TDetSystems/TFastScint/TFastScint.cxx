@@ -64,9 +64,6 @@ void TFastScint::InsertHit(const TDetectorHit& hit){
   fs_hits.push_back((TFastScintHit)hit);
 }
 
-unsigned int TFastScint::Size() const {
-  return fs_hits.size(); //->GetEntries();
-}
 
 
 int TFastScint::GoodSize() const {
