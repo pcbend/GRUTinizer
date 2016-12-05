@@ -18,6 +18,9 @@
 #include "GH2I.h"
 #include "GH2D.h"
 #include "GRootCommands.h"
+#include "GCutG.h"
+
+#include "TRuntimeObjects.h"
 
 GH1D::GH1D(const TH1& source)
   : parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0)  {
@@ -259,6 +262,27 @@ Int_t GH1D::Fill(const TObject* obj) {
   return Fill(storage);
 }
 
+Int_t GH1D::Fill(const TRuntimeObjects* objs) {
+  if(!objs) { 
+    return -1;
+  }
+  if(!fFillClass || !fFillMethod) {
+    //printf("%p \t %p\n",fFillClass,fFillMethod);
+    return -2;
+  }
+  TDetector *det = objs->GetDetector(fFillClass->GetName());
+  if(!det) {
+    return -3;
+  }
+  //for(auto gate : gates) {
+    //if(!gate->IsInside(objs))
+    //  return -4;
+  //}
+  Double_t storage;
+  fFillMethod->Execute((void*)(det),storage);
+  return Fill(storage);
+  //return 0;
+}
 
 
 GPeak* GH1D::DoPhotoPeakFit(double xlow,double xhigh,Option_t *opt) {
