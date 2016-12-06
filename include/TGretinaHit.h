@@ -64,6 +64,10 @@ public:
 
 
   Double_t GetTime()            const { return (double)Timestamp() - (double)fWalkCorrection; } 
+  Float_t  GetT0()              const { return fWalkCorrection; }
+  Float_t  GetTFit()            const { return fWalkCorrection - fTOffset; }
+  Float_t  GetTOffset()         const { return fTOffset; }
+
   Int_t    GetCrystalId()       const { return fCrystalId;      }
   Int_t    GetHoleNumber()      const { return fCrystalId/4-1;  }
   Int_t    GetCrystalNumber()   const { return fCrystalId%4;    }
@@ -144,8 +148,6 @@ public:
   void Add(const TGretinaHit& other) {  }
   void SetCoreEnergy(float temp) const { fCoreEnergy = temp; }
  
-  float GetTFit() const { return fTFit; }
-
 private:
   void SortHits();
 /* All possible decomp information and
@@ -178,7 +180,7 @@ private:
   
   mutable Float_t fCoreEnergy;
   Float_t         fWalkCorrection;   //also called t0.
-  Float_t         fTFit; //  t0 = toffset + tFit
+  Float_t         fTOffset; //  t0 = toffset + tFit
 
   std::vector<interaction_point> fSegments;
   //std::vector<Int_t> fSegmentNumber; //[fNumberOfInteractions]

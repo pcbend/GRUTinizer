@@ -20,6 +20,7 @@ void TGretinaHit::Copy(TObject &rhs) const {
   TDetectorHit::Copy(rhs);
   ((TGretinaHit&)rhs).fWalkCorrection = fWalkCorrection;
   ((TGretinaHit&)rhs).fPad            = fPad;
+  ((TGretinaHit&)rhs).fTOffset           = fTOffset;
   ((TGretinaHit&)rhs).fCrystalId      = fCrystalId;
   ((TGretinaHit&)rhs).fCoreEnergy     = fCoreEnergy;
   ((TGretinaHit&)rhs).fCoreCharge[0]  = fCoreCharge[0];
@@ -99,7 +100,11 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
     pnt.fEng = raw.intpts[i].e;
     fSegments.push_back(pnt);
   }
-  fTFit = raw.intpts[MAX_INTPTS-1].z;
+  fTOffset = raw.intpts[MAX_INTPTS-1].z;
+  //std::cout << "[13].z :  " << raw.intpts[13].z << std::endl;
+  //std::cout << "[14].z :  " << raw.intpts[14].z << std::endl;
+  //std::cout << "[15].z :  " << raw.intpts[15].z << std::endl;
+  //std::cout << "fTOffset :  " << fTOffset             << std::endl;
 
   std::sort(fSegments.begin(),fSegments.end());
   //  Print("all");
@@ -359,7 +364,7 @@ void TGretinaHit::Clear(Option_t *opt) {
   fCoreCharge[2]  = -1;
   fCoreCharge[3]  = -1;
 
-  fTFit = sqrt(-1);
+  fTOffset = sqrt(-1);
   fPad  = 0;
 
   fNumberOfInteractions = 0;
