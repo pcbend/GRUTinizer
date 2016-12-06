@@ -66,11 +66,6 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
   const TRawEvent::GEBBankType1& raw = *(const TRawEvent::GEBBankType1*)buf.GetData();
 
   //std::cout << "GretinaHit: " << raw << std::endl;
-  //SetAddress(kDetectorSystems::GRETINA, 1, raw.crystal_id);
-  //                     HOLE          CRYSTAL     SEGMENT
-  //SetAddress(kDetectorSystems::GRETINA, 1, raw.crystal_id);
-
-  //std::cout << "-------------------------------------------------" << std::endl;
   //std::cout << raw << std::endl;
   Clear();
 
@@ -104,6 +99,8 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
     pnt.fEng = raw.intpts[i].e;
     fSegments.push_back(pnt);
   }
+  fTFit = raw.intpts[MAX_INTPTS-1].z;
+
   std::sort(fSegments.begin(),fSegments.end());
   //  Print("all");
 
@@ -362,7 +359,8 @@ void TGretinaHit::Clear(Option_t *opt) {
   fCoreCharge[2]  = -1;
   fCoreCharge[3]  = -1;
 
-  fPad = 0;
+  fTFit = sqrt(-1);
+  fPad  = 0;
 
   fNumberOfInteractions = 0;
 

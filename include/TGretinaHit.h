@@ -62,6 +62,7 @@ public:
 
   void BuildFrom(TSmartBuffer& raw);
 
+
   Double_t GetTime()            const { return (double)Timestamp() - (double)fWalkCorrection; } 
   Int_t    GetCrystalId()       const { return fCrystalId;      }
   Int_t    GetHoleNumber()      const { return fCrystalId/4-1;  }
@@ -142,7 +143,8 @@ public:
                                                 
   void Add(const TGretinaHit& other) {  }
   void SetCoreEnergy(float temp) const { fCoreEnergy = temp; }
-
+ 
+  float GetTFit() const { return fTFit; }
 
 private:
   void SortHits();
@@ -176,6 +178,7 @@ private:
   
   mutable Float_t fCoreEnergy;
   Float_t         fWalkCorrection;   //also called t0.
+  Float_t         fTFit; //  t0 = toffset + tFit
 
   std::vector<interaction_point> fSegments;
   //std::vector<Int_t> fSegmentNumber; //[fNumberOfInteractions]
