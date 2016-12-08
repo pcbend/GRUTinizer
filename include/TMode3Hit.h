@@ -22,7 +22,7 @@ public:
   //virtual void          InsertHit(const TDetectorHit& hit) { return;       }
   //virtual TDetectorHit& GetHit(const int &i=0)             { return hit; }
   virtual size_t  Size()  const { return waveform.size();     }
-  double AverageWave(int samples=-1);
+  double AverageWave(int samples=-1) const;
 
   void     BuildFrom(TSmartBuffer& buf);
 

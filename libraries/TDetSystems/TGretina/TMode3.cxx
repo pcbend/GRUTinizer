@@ -48,7 +48,21 @@ int TMode3::BuildHits(std::vector<TRawEvent>& raw_data){
   return Size();
 }
 
-void TMode3::Print(Option_t *opt) const { }
+void TMode3::Print(Option_t *opt) const { 
+  TString sopt(opt);
+  sopt.ToLower();
+ 
+  printf("TMode3;  %i total hits:\n",Size());
+  printf(" @ %lu \n",Timestamp());
+  
+  if(sopt.Contains("all")) {
+  for(size_t i=0;i<Size();i++) {
+    printf("\t");
+    GetMode3Hit(i).Print();
+  }
+  }
+
+}
 
 void TMode3::Clear(Option_t *opt) {
   //TDetector::Clear(opt);
@@ -65,18 +79,27 @@ void TMode3::Draw(Option_t *opt) const {
     gPad->Clear();
   }
   int total_bins =0;
-  std::vector<double> data;
-  for(auto i=0;i<Size();i++) {
+  std::vector<double> segdata;
+  std::vector<double> coredata;
+  for(size_t i=0;i<Size();i++) {
     TMode3Hit hit = GetMode3Hit(i);
-    for(auto j=0;j<hit.Size();j++) {
-      data.push_back(hit.GetWave().at(j));
-    }
+    if(hit.GetChannel()==9) {
+      for(size_t j=0;j<hit.Size();j++) {
+        coredata.push_back(hit.GetWave().at(j));
+      }
+    } else {
+      double avg = hit.AverageWave(10);
+      for(size_t j=0;j<hit.Size();j++) {
+        segdata.push_back(hit.GetWave().at(j)-avg);
+      }
+
+    } 
   }
-  GH1D g("hist","hist",data.size(),0,data.size());
-  for(auto i=0;i<data.size();i++) {
-    g.Fill(i,data.at(i));
+  GH1D seg("seghist","seghist",segdata.size(),0,segdata.size());
+  for(unsigned int i=0;i<segdata.size();i++) {
+    seg.Fill(i,segdata.at(i));
   }
-  g.DrawCopy(opt);
+  seg.DrawCopy(opt);
 
 }
 

@@ -69,7 +69,6 @@ void TMode3Hit::Copy(TObject& obj) const {
 
   TMode3Hit& mode3 = (TMode3Hit&)obj;
 
-
   mode3.board_id = board_id;
   mode3.led      = led;
   mode3.cfd      = cfd;
@@ -77,7 +76,12 @@ void TMode3Hit::Copy(TObject& obj) const {
 }
 
 
-void TMode3Hit::Print(Option_t *opt) const { }
+void TMode3Hit::Print(Option_t *opt) const {
+
+  printf("hole[%03i] xtal[%i] seg[%03i]:   %i\n",GetHole(),GetCrystal(),GetSegmentId(),GetCharge0());
+
+
+}
 
 void TMode3Hit::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
@@ -93,7 +97,7 @@ void TMode3Hit::Clear(Option_t *opt) {
   waveform.clear();
 }
 
-double TMode3Hit::AverageWave(int samples) {
+double TMode3Hit::AverageWave(int samples) const {
   if(waveform.size() == 0) {
     return 0.0;
   }
@@ -104,10 +108,11 @@ double TMode3Hit::AverageWave(int samples) {
   double sum = 0.0;
   double wsum = 0.0;
   for(int i=0;i<samples;i++) {
-    wsum += (double)i*(std::abs((double)waveform[i]));
+    //wsum += (double)i*(std::abs((double)waveform[i]));
     sum += waveform[i];
   }
-  return wsum/sum;
+  //return wsum/sum;
+  return sum / ((double)samples);
 }
 
 
@@ -120,6 +125,7 @@ void TMode3Hit::Draw(Option_t *opt) const {
   } else {
     gPad->Clear();
   }
+  //double avg = AverageWave(10);
   GH1D wave("wave",Form("0x%08x",Address()),(int)waveform.size(),0,(double)waveform.size());
   for(unsigned int x=0;x<waveform.size();x++) 
     wave.Fill(x,waveform.at(x));
