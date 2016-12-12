@@ -833,6 +833,7 @@ float TS800::MCorrelatedOBJ_E1(bool corrected) const{
       xfp_cor  = 0;
       time_off = 0;
     }
+    if(std::isnan(time_off)) time_off = 0;
     return (mtof.fObj.at(mtof.fCorrelatedOBJ)-mtof.fE1Up.at(mtof.fCorrelatedE1) + 
 	    afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX()
 	    +time_off);
@@ -852,7 +853,7 @@ float TS800::MCorrelatedOBJ_E1(bool corrected) const{
 
     if(std::isnan(afp_cor))  return 0;
     if(std::isnan(xfp_cor))  return 0;
-    if(std::isnan(time_off)) return 0;
+    if(std::isnan(time_off)) time_off = 0;
     if(std::isnan(OBJLow))   return 0;
     if(std::isnan(OBJHigh))  return 0;
     
@@ -887,7 +888,7 @@ float TS800::MCorrelatedOBJ_E1(bool corrected) const{
 
     if(std::isnan(afp_cor))   return 0;
     if(std::isnan(xfp_cor))   return 0;
-    if(std::isnan(time_off))  return 0;
+    if(std::isnan(time_off)) time_off = 0;
     if(std::isnan(OBJLow))    return 0;
     if(std::isnan(OBJHigh))   return 0;
     
