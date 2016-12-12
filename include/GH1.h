@@ -39,14 +39,11 @@ class GH1 : public TH1 {
 
     virtual bool IsSummary() const          { return TestBit(kIsSummary); }
 
-
     double FitEval(double *,double*);
     TF1  *ConstructTF1() const; 
-    
     bool WriteDatFile(const char *outFile);
-  
-    void Draw(Option_t *opt="");
 
+    void Draw(Option_t *opt="");
 
   private:
     TRef fParent;

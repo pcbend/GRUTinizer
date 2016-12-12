@@ -2982,7 +2982,7 @@ GH1D *GH2::SummaryProjection(GH1 *hist,int axis,int direction,bool show_empty) c
         //  g->SetSummary();
         //  return g;
         //}
-        g = ProjectionY(name.c_str(),binnum,binnum,"+");
+        g = ProjectionX(name.c_str(),binnum,binnum,"");
         if(g && g->Integral()>0) {
           g->SetParent((TObject*)this);
           g->SetSummary();
@@ -3011,7 +3011,7 @@ GH1D *GH2::SummaryProjection(GH1 *hist,int axis,int direction,bool show_empty) c
         //  g->SetSummary();
         //  return g;
         //}
-        g = ProjectionX(name.c_str(),binnum,binnum,"+");
+        g = ProjectionY(name.c_str(),binnum,binnum,"");
         if(g && g->Integral()>0) {
           g->SetParent((TObject*)this);
           g->SetSummary();
