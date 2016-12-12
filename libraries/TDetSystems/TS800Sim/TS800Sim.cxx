@@ -40,12 +40,15 @@ void TS800Sim::Clear(Option_t *opt) {
 
 void TS800Sim::BuildFrom(TGEBEvent &event){
   const char* data = event.GetPayload();
-  //std::cout << " IN HERE !!!! " << std::endl;
+  //  std::cout << " IN HERE !!!! " << std::endl;
   TRawEvent::G4S800* s800pack = (TRawEvent::G4S800*)data;
-  //event.Print("all");
-  //std::cout << *s800pack;
+  //  event.Print("all");
+  //  std::cout << *s800pack;
+
+  SetTimestamp(event.GetTimestamp());
   
- 
+  //  std::cout << "TS800Sim::BuildFrom: DTA =" << s800pack->GetDTA() << std::endl;
+
   TS800SimHit hit;
   hit.fATA = s800pack->GetATA(); 
   hit.fBTA = s800pack->GetBTA(); 

@@ -12,64 +12,25 @@
 #include "Globals.h"
 
 TSmartBuffer::TSmartBuffer()
-  : fAllocatedLocation(NULL), fData(NULL), fSize(0),
-    fReferenceCount(NULL) { }
+  : fData(NULL), fSize(0), fAllocatedData(nullptr) { }
 
 TSmartBuffer::TSmartBuffer(char* buffer, size_t size)
-  : fAllocatedLocation(buffer), fData(buffer), fSize(size) {
-  fReferenceCount = new std::atomic_int(1);
+  : fData(buffer), fSize(size) {
+
+  fAllocatedData = std::shared_ptr<char>(
+    buffer,
+    [](char* buffer) { free(buffer); }
+  );
 }
 
-TSmartBuffer::~TSmartBuffer() {
-  // This buffer didn't point to anything, so no need to clean anything up.
-  if(!fReferenceCount){
-    return;
-  }
-
-  (*fReferenceCount)--;
-
-  if(*fReferenceCount==0){
-    free(fAllocatedLocation);
-    delete fReferenceCount;
-  }
-}
-
-TSmartBuffer::TSmartBuffer(const TSmartBuffer& other)
-  : TObject(other),
-    fAllocatedLocation(other.fAllocatedLocation), fData(other.fData),
-    fSize(other.fSize), fReferenceCount(other.fReferenceCount) {
-
-
-  if(fReferenceCount){
-    (*fReferenceCount)++;
-  }
-}
-
-
-TSmartBuffer& TSmartBuffer::operator=(TSmartBuffer other) {
-  swap(other);
-  return *this;
-}
-
-TSmartBuffer::TSmartBuffer(TSmartBuffer&& other)
-  : TSmartBuffer() {
-  swap(other);
-}
+TSmartBuffer::~TSmartBuffer() { }
 
 void TSmartBuffer::Clear(){
   *this = TSmartBuffer();
 }
 
-void TSmartBuffer::swap(TSmartBuffer& other){
-  std::swap(fAllocatedLocation, other.fAllocatedLocation);
-  std::swap(fData, other.fData);
-  std::swap(fSize, other.fSize);
-  std::swap(fReferenceCount, other.fReferenceCount);
-}
-
 void TSmartBuffer::SetBuffer(char* buffer, size_t size){
-  TSmartBuffer temp(buffer, size);
-  swap(temp);
+  *this = TSmartBuffer(buffer, size);
 }
 
 TSmartBuffer TSmartBuffer::BufferSubset(size_t pos, size_t length) const {
@@ -96,13 +57,14 @@ void TSmartBuffer::Print(Option_t* opt) const {
   TString options(opt);
   //TRegexp regexp2("0x[0-9a-f][0-9a-f][0-9a-f][0-9a-f]");
   if(!options.Contains("bodyonly")) {
-    std::cout << "TSmartBuffer allocated at " << (void*)fAllocatedLocation << ", "
+    std::cout << "TSmartBuffer allocated at " << (void*)fAllocatedData.get() << ", "
               << "currently pointed at " << (void*)fData << ", "
               << "with a size of " << fSize << " bytes."
               << std::endl;
   }
-  if(fReferenceCount){
-    std::cout << "There are " << *fReferenceCount << " TSmartBuffers sharing this C-buffer"
+
+  if(fData){
+    std::cout << "There are " << fAllocatedData.use_count() << " TSmartBuffers sharing this C-buffer"
               << std::endl;
 
     // Find all regexes in the option string

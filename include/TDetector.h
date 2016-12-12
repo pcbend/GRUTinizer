@@ -2,6 +2,7 @@
 #define _TDETECTOR_H_
 
 #include <vector>
+#include <cmath>
 
 #include "TNamed.h"
 
@@ -29,7 +30,7 @@ public:
   virtual void InsertHit(const TDetectorHit&) = 0;
   virtual TDetectorHit& GetHit(int i)         = 0;
 
-  virtual unsigned int  Size() const { return fSize; }
+  virtual size_t Size() const { return (size_t)fSize; }
 
 
   Long_t Timestamp() const { return fTimestamp; }

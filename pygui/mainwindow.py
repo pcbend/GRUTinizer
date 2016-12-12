@@ -362,9 +362,6 @@ class MainWindow(object):
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="3 x 3",onvalue='3x3',
                                   variable=self.predefinedzones,command=self.set_zones)
-        zonesmenu.add_checkbutton(label="3 x 4",onvalue='3x4',
-                                  variable=self.predefinedzones,command=self.set_zones)
-
         zonesmenu.add_checkbutton(label="4 x 4",onvalue='4x4',
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="5 x 2",onvalue='5x2',
@@ -500,7 +497,8 @@ class MainWindow(object):
             opt.append('colz')
         self._SetOptStat()
         hist.SetLineColor(color)
-        hist.Draw(' '.join(opt))
+        #hist.Draw(' '.join(opt))
+        hist.Draw()
 
     def AddDirectory(self, tdir):
         if tdir:
@@ -514,6 +512,17 @@ class MainWindow(object):
     def LoadCutG(self, cutg):
         if cutg:
             self.tcut_tab.AddCut(cutg)
+
+    def LoadCutFile(self, cutfile):
+        #if cutname is None:
+        #    filename = tkFileDialog.askopenfilename(filetypes=(("Cuts File", "*.cuts"),
+        #                                                       ("Cuts File", "*.root")))
+        #if not filename:
+        #   return
+        
+	#filename = os.path.abspath(filename)
+        #tfile = ROOT.TFile(filename);                
+        self.tcut_tab.AddFile(cutfile)
 
     def LoadDataFile(self, filename = None):
         if filename is None:

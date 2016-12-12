@@ -33,15 +33,17 @@ public:
   void  Print(Option_t *opt="") const;
   void  Clear(Option_t *opt="");
 
-  int    GetEn()     const   { return fEnergy; }
-  double GetBeta()   const   { return fBeta; }
-  double GetX()      const   { return fPosit.X(); }
-  double GetY()      const   { return fPosit.Y(); }
-  double GetZ()      const   { return fPosit.Z(); }
+  int    GetEn() const   { return fEnergy; }
+  double GetBeta() const { return fBeta; }
+  /* double GetX()  const   { return fPosit.X(); } */
+  /* double GetY()  const   { return fPosit.Y(); } */
+  /* double GetZ()  const   { return fPosit.Z(); } */
+  double GetX()  const   { return fInteraction.X(); }
+  double GetY()  const   { return fInteraction.Y(); }
+  double GetZ()  const   { return fInteraction.Z(); }
   int    IsFEP()     const   { return fIsFull; }
   int    TotalHits() const   { return fTotalHits; }
   int    HitNum()    const   { return fHitNum; }
-  
 
   double GetDoppler(double sigma=1, const TVector3 *vec=0) {
 
@@ -55,6 +57,15 @@ public:
     return tmp;
   }
 
+  double GetPhi() {
+    double phi = fPosit.Phi();
+    if(phi<0) {
+      return TMath::TwoPi()+phi;
+    } else {
+      return phi;
+    }
+  }
+  double GetTheta()    const { return fPosit.Theta(); }
 
   /*
   double GetPhi(int id=0) {

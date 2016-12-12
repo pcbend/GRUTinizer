@@ -9,39 +9,15 @@
 #define FERA_TIMESTAMP_ID   0x2303
 #define FERA_ERROR_ID       0x23ff
 
-#define DEBUG_BRANDON 0
-
 /*
  *  INPUT:  Two TCaesarHit objects
  * OUTPUT:  True if the two TCaesarHit object are within the given distance and time window
  *PURPOSE:  This function determines whether two TCaesarHit variables can be added together
- *          to form a single Caesar Addback hit. The time and position variable should be chosen
- *          with careful consideration of what time and distance should separate events where
- *          the gamma compton scatters in one crystal but is fully absorbed in a neighboring crystal.
+ *          to form a single Caesar Addback hit based on whether they come within a certain
+ *          time window and they are in neighboring detectors
+ *.
  */
-
-bool DefaultAddback(const TCaesarHit& one,const TCaesarHit &two) {
-  TVector3 res = one.GetPosition()-two.GetPosition();
-
-  double neighbor_distance = 80;
-
-  //one hit in forward/backward rings, other hit in rings 2-7
-//if ((one.GetRingNumber() < 2  && two.GetRingNumber() >= 2)||
-//    (two.GetRingNumber() < 2  && one.GetRingNumber() >= 2)||
-//    (two.GetRingNumber() <= 7 && one.GetRingNumber() > 7) ||
-//    (one.GetRingNumber() <= 7 && two.GetRingNumber() > 7)){
-//  neighbor_distance =
-//}
-////both hits in forward/backward rings
-//else if ((one.GetRingNumber() < 2  && two.GetRingNumber() < 2)||
-//         (one.GetRingNumber() > 7 && two.GetRingNumber() > 7)){
-//}
-
-  return ((std::abs(one.GetTime()-two.GetTime()) < 200.0) &&
-           (res.Mag() < neighbor_distance) ) ;
-}
-
-bool DefaultAddbackTest(const TCaesarHit& one,const TCaesarHit &two){
+bool DefaultAddback(const TCaesarHit& one,const TCaesarHit &two){
   int ring = one.GetRingNumber();
   int det  = one.GetDetectorNumber();
 
@@ -49,10 +25,10 @@ bool DefaultAddbackTest(const TCaesarHit& one,const TCaesarHit &two){
   int poss_neigh_det  = two.GetDetectorNumber();
   int num_neighbors_total = TCaesar::num_neighbors[ring][det];
 
-
-//std::cout << "For ring = " << ring << "\tdet = " << det << std::endl;
-//std::cout << "poss_neigh_ring = " <<  poss_neigh_ring << "\tposs_neigh_det = " << poss_neigh_det << std::endl;
-//std::cout << "num_neighbors_total = " << num_neighbors_total << std::endl;
+  
+  if (TMath::Abs(one.GetTime()-two.GetTime()) > 100){
+    return false;
+  }
   for (int neigh = 0; neigh < num_neighbors_total; neigh++){
     int neigh_ring = TCaesar::neighbors[ring][det][neigh][0];
     int neigh_det  = TCaesar::neighbors[ring][det][neigh][1];
@@ -64,7 +40,7 @@ bool DefaultAddbackTest(const TCaesarHit& one,const TCaesarHit &two){
   return false;
 }
 
-std::function<bool(const TCaesarHit&,const TCaesarHit&)> TCaesar::fAddbackCondition = DefaultAddbackTest;
+std::function<bool(const TCaesarHit&,const TCaesarHit&)> TCaesar::fAddbackCondition = DefaultAddback;
 
 void TCaesar::BuildAddback() const {
   if( addback_hits.size() > 0 ||
@@ -72,7 +48,6 @@ void TCaesar::BuildAddback() const {
     return;
   }
 
-
   std::deque<const TCaesarHit*> hits;
   for(auto& hit : caesar_hits) {
     if (hit.IsValid()){
@@ -80,55 +55,6 @@ void TCaesar::BuildAddback() const {
     }
   }
   std::sort(hits.begin(), hits.end(), [](const TCaesarHit* a, const TCaesarHit* b) {
-      return a->GetEnergy() > b->GetEnergy();
-    });
-
-  while(hits.size()) {
-    addback_hits.push_back(*hits.front());
-    hits.pop_front();
-    TCaesarHit& new_hit = addback_hits.back();
-
-    for(int i=hits.size()-1; i>=0; i--) {
-      const TCaesarHit& other_hit = *hits[i];
-      if(fAddbackCondition(new_hit, other_hit)) {
-        new_hit.AddToSelf(other_hit);
-        hits.erase(hits.begin() + i);
-      }
-    }
-  }
-}
-
-//void TCaesar::AddHit(TCaesarHit &hit){
-//  caesar_hits.push_back(hit);
-//}
-void TCaesar::BuildAddbackTest() const {
-  if( addback_hits.size() > 0 ||
-      caesar_hits.size() == 0) {
-//  std::cout << "SOMETHING IS MISSING!" << std::endl;
-//  std::cout << "caesar_hits.size()  = " << caesar_hits.size() << std::endl;
-//  std::cout << "addback_hits.size()  = " << addback_hits.size() << std::endl;
-    return;
-  }
-
-//std::cout << "\n\n\n\n";
-//std::cout << "============ INSIDE BUILD ADDBACK TEST ========================" << std::endl;
-
-
-  std::deque<const TCaesarHit*> hits;
-//  std::cout << " Input Caesar Hits: " <<std::endl;
-  for(auto& hit : caesar_hits) {
-    if (hit.IsValid()){
-//      hit.Print();
-      hits.push_back(&hit);
-    }
-  }
-  std::sort(hits.begin(), hits.end(), [](const TCaesarHit* a, const TCaesarHit* b) {
-      //a->Print();
-      //fflush(stdout);
-      //b->Print();
-      //fflush(stdout);
-      //std::cout << "a->GetEnergy \t" << a->GetEnergy() << std::endl;
-      //std::cout << "b->GetEnergy \t" << b->GetEnergy() << std::endl;
       TChannel *ca = TChannel::GetChannel(a->Address());
       TChannel *cb = TChannel::GetChannel(b->Address());
       if(!ca && !cb) {
@@ -145,7 +71,6 @@ void TCaesar::BuildAddbackTest() const {
   });
 
   std::vector<int> neighbor_positions;
-//std::cout << "NUMBER OF HITS TO CHECK = " << hits.size() << std::endl;;
   while(hits.size()) {
 
     addback_hits.push_back(*hits.front());
@@ -162,7 +87,6 @@ void TCaesar::BuildAddbackTest() const {
       }
     }//loop over hits to possibly addback
     //Now do a switch based on number of neighbors!
-//  std::cout << "Number of neighbors: " << neighbor_positions.size() << std::endl;
     switch(neighbor_positions.size()){
       //No neighbors!
       case 0:
@@ -197,10 +121,6 @@ void TCaesar::BuildAddbackTest() const {
         break;
     }//switch over number of neighbors
   }//while there are still hits in event
-//std::cout << "Hits after valid check and sorting: "<< std::endl;
-//for(auto& ab_hit : addback_hits) {
-//  ab_hit.Print();
-//}
 }
 
 int  const TCaesar::det_per_ring[] = {10,14,24,24,24, 24, 24, 24, 14, 10};
@@ -294,71 +214,27 @@ void TCaesar::PrintAddback(Option_t *opt)  {
   printf("---------------------------------------\n");
 }
 
-//Now calculate doppler correction with GetDoppler() in TCaesarHit
-//Calculate E_cm = gamma *(1-beta*cos(angle))E_lab
-//double TCaesar::GetEnergyDC(TCaesarHit hit){
-//  double BETA = GValue::Value("BETA");
-//  double Z_SHIFT = GValue::Value("TARGET_SHIFT_Z");
-//
-//  if (!BETA){
-//    std::cout << "No Beta given, can't correct" << std::endl;
-//    return sqrt(-1);
-//  }
-//  if (!Z_SHIFT){
-//    std::cout << "Warning no Z-shift applied" << std::endl;
-//  }
-//  int ring = hit.GetRingNumber();
-//  int det = hit.GetDetectorNumber();
-//  double x = detector_positions[ring][det][0];
-//  double y = detector_positions[ring][det][1];
-//  double z = detector_positions[ring][det][2];
-//
-//  //cos_angle is equal to z/(z^2+x^2+y^2) where x,y,z have to be corrected for shift
-//  double cos_angle = (z-Z_SHIFT)/(sqrt(pow((z-Z_SHIFT),2)+x*x+y*y));
-//  double gamma = 1.0/(sqrt(1-BETA*BETA));
-//
-//  return (gamma*(1-BETA*cos_angle)*hit.GetEnergy());
-//}
-//
-//double TCaesar::GetEnergyDC(int ring, int det, double energy){
-//  double BETA = GValue::Value("BETA");
-//  double Z_SHIFT = GValue::Value("TARGET_SHIFT_Z");
-//
-//  if (!BETA){
-//    std::cout << "No Beta given, can't correct" << std::endl;
-//    return sqrt(-1);
-//  }
-//  if (!Z_SHIFT){
-//    std::cout << "Warning no Z-shift applied" << std::endl;
-//  }
-//  double x = detector_positions[ring][det][0];
-//  double y = detector_positions[ring][det][1];
-//  double z = detector_positions[ring][det][2];
-//
-//  //cos_angle is equal to z/(z^2+x^2+y^2) where x,y,z have to be corrected for shift
-//  double cos_angle = (z-Z_SHIFT)/(sqrt(pow((z-Z_SHIFT),2)+x*x+y*y));
-//  double gamma = 1.0/(sqrt(1-BETA*BETA));
-//
-//  return (gamma*(1-BETA*cos_angle)*energy);
-//}
 double TCaesar::GetCorrTime(TCaesarHit hit, TS800 *s800){
   if (!s800 || !hit.IsValid()){
     return sqrt(-1);
   }
   double caesar_time = hit.GetTime();
   double tac_obj = s800->GetTof().GetTacOBJ();
-  double s800source = s800->GetTrigger().GetS800Source();
-  return (caesar_time - ((s800source + tac_obj)*(0.1/0.25)));
+  double s800_source_time = s800->GetTrigger().GetS800Source();
+//  return (caesar_time - ((s800source + tac_obj)*(0.1/0.25)));
+  return GetCorrTime(caesar_time, s800_source_time, tac_obj);
 }
+
+double TCaesar::GetCorrTime(double caesar_time, double s800_source_time,
+                            double scint_time){
+  //CAESAR Timing 250 ps/channel
+  //S800   Timing 100 ps/channel
+  return (caesar_time - ((s800_source_time + scint_time)*(0.1/0.25)));
+}
+
 void TCaesar::Build_Single_Read(TSmartBuffer buf){
   const char* data = buf.GetData();
   const char* data_end = data + buf.GetSize();
-
-  if (DEBUG_BRANDON){
-    std::cout << "--------------------------------------------------\n\n" << std::endl;
-    buf.Print("all");
-  }
-
 
   TRawEvent::CAESARHeader* header = (TRawEvent::CAESARHeader*)data;
   data += sizeof(TRawEvent::CAESARHeader);
@@ -392,11 +268,6 @@ void TCaesar::Build_Single_Read(TSmartBuffer buf){
     const char* fera_end = data + fera_header->size*2;
     data += sizeof(TRawEvent::CAESARFeraHeader);
 
-    if (DEBUG_BRANDON){
-      std::cout << "fera_header->size = 0x" << (std::hex) << fera_header->size << std::endl;
-      std::cout << "fera_header->tag = 0x" << (std::hex) << fera_header->tag << std::endl;
-    }
-
     while(data < fera_end){
       //This should contain all the data until the end of the fera
       TRawEvent::CAESARFera* fera = (TRawEvent::CAESARFera*)data;
@@ -408,18 +279,8 @@ void TCaesar::Build_Single_Read(TSmartBuffer buf){
 
       //Now we have the first header and know the VSN and number of channels
       //We need to start grabbing CAESARFeraItems now
-      if (DEBUG_BRANDON){
-        std::cout << "fera->header = 0x" << (std::hex) << fera->header << std::endl;
-        std::cout << "fera->number_chans() = " << (std::dec) << fera->number_chans() << std::endl;
-        std::cout << "fera->vsn() = " <<  (std::dec) << fera->vsn() << std::endl;
-      }
       for(int i=0; i<nchan; i++){
         TRawEvent::CAESARFeraItem *item = (TRawEvent::CAESARFeraItem*)data;
-        if (DEBUG_BRANDON){
-          std::cout << "item->data = 0x"    << (std::hex)     << item->data    << std::endl;
-          std::cout << "item->channel() = " << (std::dec) << item->channel() << std::endl;
-          std::cout << "item->value() = "   << (std::dec) << item->value()   << std::endl;
-        }
 
 	if(fera_header->tag == FERA_ENERGY_ID){
 	  SetCharge(fera->vsn(), item->channel(), item->value());
@@ -428,9 +289,6 @@ void TCaesar::Build_Single_Read(TSmartBuffer buf){
 	}
         data += sizeof(TRawEvent::CAESARFeraItem);//just read in a single CAESARFeraItem
       }
-    }
-    if (DEBUG_BRANDON){
-      std::cout << "--------------------------------------------------\n\n" << std::endl;
     }
   }
 }
@@ -530,8 +388,6 @@ void TCaesar::ReadVSNMap(std::string in_file_name){
   TEnv *map = new TEnv(in_file_name.c_str());
   for(int ring=0; ring < N_RINGS; ring++){
     for(int det=1; det <= det_per_ring[ring]; det++){
-      //cout << Form("Fera.Ring.%c.chn_en.%d",ring_names[ring],det) << "\t";
-      //cout << map->GetValue(Form("Fera.Ring.%c.chn_en.%d",ring_names[ring],det),-1) << endl;
 
       int vsn_e = map->GetValue(Form("Fera.Ring.%c.vsn_en.%d",ring_names[ring],det),-1);
       int vsn_t = map->GetValue(Form("Fera.Ring.%c.vsn_ti.%d",ring_names[ring],det),-1);

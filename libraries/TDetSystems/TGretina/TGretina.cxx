@@ -4,14 +4,14 @@
 #include <sstream>
 
 #include "TGretina.h"
-#include "GRootCommands.h"
-#include <TPad.h>
-#include <TROOT.h>
+//#include "GRootCommands.h"
+//#include <TPad.h>
+//#include <TROOT.h>
 
-#include "GH1D.h"
-#include "GH2I.h"
-#include "TGRUTOptions.h"
-#include "GCanvas.h"
+//#include "GH1D.h"
+//#include "GH2I.h"
+//#include "TGRUTOptions.h"
+//#include "GCanvas.h"
 
 #include "TGEBEvent.h"
 
@@ -64,7 +64,7 @@ void TGretina::BuildAddback(int EngRange) const {
     for(unsigned int j=i+1; j<addback_hits.size(); j++) {
       TGretinaHit& other_hit = addback_hits[j];
       if(fAddbackCondition(current_hit, other_hit)) {
-	current_hit.AddToSelf(other_hit);
+	current_hit.Add(other_hit);
 	to_erase.push_back(j);
       }
     }
@@ -213,8 +213,12 @@ void TGretina::InsertHit(const TDetectorHit& hit){
 
 int TGretina::BuildHits(std::vector<TRawEvent>& raw_data){
   //printf("%s\n",__PRETTY_FUNCTION__);
+  if(raw_data.size()<1)
+    return Size();
+  long smallest_time = 0x3fffffffffffffff;
   for(auto& event : raw_data){
-    SetTimestamp(event.GetTimestamp());
+    if(event.GetTimestamp()<smallest_time)
+      smallest_time=event.GetTimestamp();
     // TGEBEvent* geb = (TGEBEvent*)&event;
     // const TRawEvent::GEBBankType1* raw = (const TRawEvent::GEBBankType1*)geb->GetPayloadBuffer().GetData();
     TGretinaHit hit;
@@ -222,6 +226,7 @@ int TGretina::BuildHits(std::vector<TRawEvent>& raw_data){
     hit.BuildFrom(buf);
     InsertHit(hit);
   }
+  SetTimestamp(smallest_time);
   //gretina_hits->At(0)->Print();
   //BuildAddbackHits();
 
@@ -277,7 +282,7 @@ void TGretina::BuildAddbackHits(){
     for(int y=0;y<addback_hits->GetEntries();y++) {
       if(GetAddbackHit(y).CheckAddback(GetGretinaHit(x))) {
         used = true;
-        GetAddbackHit(y).AddToSelf(GetGretinaHit(x), max_energies[y]);
+        GetAddbackHit(y).Add(GetGretinaHit(x), max_energies[y]);
         break;
       }
     }
@@ -311,7 +316,7 @@ void TGretina::Clear(Option_t *opt) {
   addback_hits.clear();
 }
 
-
+/*
 void TGretina::DrawDopplerGamma(Double_t Beta,Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain){
   TString OptString = opt;
   if(!chain)
@@ -411,3 +416,4 @@ void TGretina::DrawCoreSummary(Option_t *gate,Option_t *opt,Long_t nentries,TCha
   h->Draw(opt);
 
 }
+*/

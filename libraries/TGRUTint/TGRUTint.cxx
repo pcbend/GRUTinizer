@@ -105,7 +105,6 @@ void TGRUTint::SplashPopNWait(bool flag) {
   //WaitLogo();
 }
 
-
 /*********************************/
 
 bool TGRUTInterruptHandler::Notify() {
@@ -121,14 +120,14 @@ bool TGRUTInterruptHandler::Notify() {
 }
 
 // Copied from http://stackoverflow.com/a/24315631
-std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
-  size_t start_pos = 0;
-  while((start_pos = str.find(from, start_pos)) != std::string::npos) {
-    str.replace(start_pos, from.length(), to);
-    start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
-  }
-  return str;
-}
+//std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
+//  size_t start_pos = 0;
+//  while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+//    str.replace(start_pos, from.length(), to);
+//    start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+//  }
+//  return str;
+//}
 
 void TGRUTint::ApplyOptions() {
   TGRUTOptions* opt = TGRUTOptions::Get();
@@ -184,6 +183,9 @@ void TGRUTint::ApplyOptions() {
   // Sets up all the various loops for data analysis.
   // Note: Assumes that gChain has already been loaded.
   SetupPipeline();
+
+
+
 
   for(auto& filename : opt->MacroInputFiles()){
     RunMacroFile(filename);
@@ -287,16 +289,20 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
 
   // Pass the TFile to the python GUI.
   if(file && GUIIsRunning()){
-    TPython::Bind(file,"tdir");
-    ProcessLine("TPython::Exec(\"window.AddDirectory(tdir)\");");
+    std::string command = Form("TPython::Bind((TFile*)%luL, \"tdir\");"
+                               "TPython::Exec(\"window.AddDirectory(tdir)\");",
+                               (unsigned long)file);
+    ProcessLine(command.c_str());
   }
   return file;
 }
 
 void TGRUTint::LoadTCutG(TCutG* cutg) {
   if(GUIIsRunning()) {
-    TPython::Bind(cutg, "cutg");
-    ProcessLine("TPython::Exec(\"window.LoadCutG(cutg)\");");
+    std::string command = Form("TPython::Bind((TCutG*)%luL, \"cutg\");"
+			       "TPython::Exec(\"window.LoadCutG(cutg)\");",
+			       (unsigned long)cutg);
+    ProcessLine(command.c_str());
   }
 }
 
@@ -423,6 +429,11 @@ void TGRUTint::SetupPipeline() {
   for(auto filename : opt->CutsInputFiles()) {
     TFile* tfile = OpenRootFile(filename);
     cuts_files.push_back(tfile);
+    //printf("loading cuts, gui is running\n"); fflush(stdout);
+    if(tfile && GUIIsRunning()){
+      TPython::Bind(tfile,"tdir");
+      ProcessLine("TPython::Exec(\"window.LoadCutFile(tdir)\");");
+    }
   }
 
   // No need to set up all the loops if we are just opening the interpreter.
@@ -471,6 +482,7 @@ void TGRUTint::SetupPipeline() {
     fHistogramLoop = THistogramLoop::Get("6_hist_loop");
     fHistogramLoop->SetOutputFilename(output_hist_file);
     for(auto cut_file : cuts_files) {
+
       fHistogramLoop->AddCutFile(cut_file);
     }
     fHistogramLoop->InputQueue() = current_queue;

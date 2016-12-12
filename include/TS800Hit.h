@@ -176,6 +176,10 @@ class TCrdc : public TDetectorHit {
     unsigned short anode;
     unsigned short time;
 
+    mutable bool has_cached_dispersive_x; //!
+    mutable double cached_dispersive_x; //!
+
+
     static TF1 *fgaus;
 
 
@@ -226,11 +230,21 @@ class TIonChamber : public TDetectorHit {
     int GetData(int i)    const { if(i>=Size()) return -1; return fData.at(i); }
     int Size() const { return fChan.size(); }
     float GetdE();
-    float GetSum();
+    float GetSum() const;
     float GetAve();
     float GetdECorr(TCrdc*);
 
     int  Address(int i) const { return TDetectorHit::Address() + GetChannel(i); }
+
+
+    float GetCalData(int i) const {
+      TChannel *c = TChannel::GetChannel(Address(GetChannel(i)));
+      if(c){
+        return c->CalEnergy(GetData(i));
+      }else{
+       return (float)GetData(i);
+      }
+    }
 
     virtual void Copy(TObject&) const;
     virtual void Print(Option_t *opt="") const;
@@ -391,7 +405,6 @@ class TMTof : public TDetectorHit {
     std::vector<unsigned short> fRef;          // Channel 15, same as E1Up (different cable.)
 
     //std::vector<int> fGalotte;
-    //
     //
     virtual Int_t Charge() const  {return 0;}
     //

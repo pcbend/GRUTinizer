@@ -16,15 +16,16 @@ public:
   ~TMode3();
 
   virtual void Copy(TObject& obj) const;
-  virtual void Print(Option_t *opt = "") const;
+  virtual void Print(Option_t *opt = "all") const;
+  virtual void Draw(Option_t *opt = "") const;
   virtual void Clear(Option_t *opt = "");
-  virtual unsigned int Size() const { return mode3_hits.size(); }
+  virtual size_t Size() const { return mode3_hits.size(); }
 
   virtual void          InsertHit(const TDetectorHit& hit);
   virtual TDetectorHit& GetHit(int i)            { return mode3_hits.at(i); }
 
 
-  const TMode3Hit& GetMode3Hit(int i) { return mode3_hits.at(i); }
+  const TMode3Hit& GetMode3Hit(size_t i) const { return mode3_hits.at(i); }
   void PrintHit(int i){ mode3_hits.at(i).Print(); }
 
 

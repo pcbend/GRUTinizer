@@ -67,6 +67,11 @@ void LoadGRUTEnv() {
   if(file_exists(grut_path.c_str())){
     gEnv->ReadFile(grut_path.c_str(),kEnvChange);
   }
+  
+  grut_path = Form("%s/.grutrc",getenv("PWD"));
+  if(file_exists(grut_path.c_str())){
+    gEnv->ReadFile(grut_path.c_str(),kEnvChange);
+  }
 }
 
 void AclicUseCpp11() {

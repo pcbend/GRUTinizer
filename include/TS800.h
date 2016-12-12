@@ -59,6 +59,9 @@ public:
   //Added 1/4/2016 for getting trigbit - BAE
   TTrigger      &GetTrigger()      const { return (TTrigger&)trigger;}
 
+  
+  float GetIonSum() const { return ion.GetSum(); }
+
   //Note c1 is the AFP correction and c2 is the XFP correction
   float GetTofE1_TAC(float c1=0.00,float c2=0.00)  const;
   float GetTofE1_TDC(float c1=0.00,float c2=0.00)  const;
@@ -77,16 +80,22 @@ public:
   
   float GetOBJ_E1Raw_MESY(int i=0) const;
   float GetOBJ_E1Raw_MESY_Ch15(int i=0) const;
+
+  float GetXF_E1Raw_MESY(int i=0) const;
+  float GetXF_E1Raw_MESY_Ch15(int i=0) const;
  
   float GetRawOBJ_MESY(unsigned int i=0) const;
 
   float GetRawE1_MESY(unsigned int i=0) const;
   float GetRawE1_MESY_Ch15(unsigned int i=0) const;
   
-  float GetXF_E1Raw_MESY(int i=0) const;
-  float GetXF_E1Raw_MESY_Ch15(int i=0) const;
-  
   float GetRawXF_MESY(unsigned int i=0) const;
+
+  float GetMTOF_ObjE1(unsigned int i=0) const { return GetCorrTOF_OBJ_MESY(i); }
+  float GetMTOF_XfpE1(unsigned int i=0) const { return GetXF_E1Raw_MESY(i);    }
+  float GetMTOF_RfE1(unsigned int i=0)  const { return GetME1Up(i) - GetMRf(i);  }
+  float GetMTOF_ObjRf(unsigned int i=0) const { return GetMRf(i)   - GetMObj(i); }
+
 
   float MCorrelatedOBJ() const;
   float MCorrelatedXFP() const;
@@ -100,7 +109,29 @@ public:
   float MCorrelatedOBJ_E1_Ch15(bool corrected=true) const;
   float MCorrelatedXFP_E1_Ch15(bool corrected=true) const;
 
+
+  unsigned short GetME1Up(int i)       const {if(i<GetME1Size())   return mtof.fE1Up.at(i);  return sqrt(-1); }     
+  unsigned short GetME1Down(int i)     const {if(i<GetME1Size())   return mtof.fE1Down.at(i);return sqrt(-1); }    
+           int   GetME1Size()          const { return mtof.fE1Up.size();  }
+  unsigned short GetMXfp(int i)        const {if(i<GetMXfpSize())    return mtof.fXfp.at(i);   return sqrt(-1); }
+           int   GetMXfpSize()         const { return mtof.fXfp.size();  }
+  unsigned short GetMObj(int i)        const {if(i<GetMObjSize())    return mtof.fObj.at(i);   return sqrt(-1); }
+           int   GetMObjSize()         const { return mtof.fObj.size();  }
+  unsigned short GetMRf(int i)         const {if(i<GetMRfSize())     return mtof.fRf.at(i);    return sqrt(-1);  }
+           int   GetMRfSize()          const { return mtof.fRf.size();  }
+  unsigned short GetMCrdc1Anode(int i) const {if(i<GetMCrdc1AnodeSize()) return mtof.fCrdc1Anode.at(i);return sqrt(-1); }
+           int   GetMCrdc1AnodeSize()  const { return mtof.fCrdc1Anode.size();  }
+  unsigned short GetMCrdc2Anode(int i) const {if(i<GetMCrdc2AnodeSize()) return mtof.fCrdc2Anode.at(i);return sqrt(-1); }
+           int   GetMCrdc2AnodeSize()  const { return mtof.fCrdc2Anode.size();  }
+  unsigned short GetMHodoscope(int i)  const {if(i<GetMHodoscopeSize()) return mtof.fHodoscope.at(i);  return sqrt(-1);  }
+           int   GetMHodoscopeSize()   const { return mtof.fHodoscope.size();  }
+  unsigned short GetMRef(int i)        const {if(i<GetMRefSize())       return mtof.fRef.at(i);        return sqrt(-1);  }        
+           int   GetMRefSize()         const { return mtof.fRef.size();  }
+
   
+  int GetReg() const { return trigger.GetRegistr(); } 
+
+  float GetCorrIonSum() const;
 
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
@@ -123,6 +154,8 @@ private:
   //TMultiHitTof multi_tof;
   
   Long_t fEventCounter;
+  static bool fGlobalReset; //!
+
 
   public:
     static void DrawPID(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
@@ -134,6 +167,9 @@ private:
     static void DrawAFP_Mesy(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,int i=0,TChain *chain=0);
     static void DrawDispX_Mesy(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,int i=0,TChain *chain=0);
     static void DrawPID_Mesy_Tune(Long_t entries=kMaxLong,int i=0,TChain *chain=0);
+
+  void SetGlobalReset(bool flag=true) { fGlobalReset=flag; }  
+
 
   ClassDef(TS800,3);
 };

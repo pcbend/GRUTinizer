@@ -1,5 +1,6 @@
 #include "TSega.h"
 
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 
@@ -53,7 +54,8 @@ int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
 
     SetTimestamp(nscl.GetTimestamp());
 
-    TDDASEvent ddas(nscl.GetPayloadBuffer());
+    TSmartBuffer buf = nscl.GetPayloadBuffer();
+    TDDASEvent<DDASHeader> ddas(buf);
 
     unsigned int address = ( (1<<24) +
                              (ddas.GetCrateID()<<16) +
@@ -210,6 +212,12 @@ void TSega::InsertHit(const TDetectorHit& hit) {
 }
 
 void TSega::SetRunStart(unsigned int unix_time) {
+  // Only adjust times for production runs in e13701.
+  if(unix_time < 1453953420 ||
+     unix_time > 1454425200) {
+    return;
+  }
+
   // Wed Jan 27 22:57:09 2016
   unsigned int previous = fRunStart==0 ? 1453953429 : fRunStart;
   int tdiff = unix_time - previous;
@@ -219,4 +227,11 @@ void TSega::SetRunStart(unsigned int unix_time) {
   for(auto& hit : sega_hits) {
     hit.SetTimestamp(timestamp_diff + hit.Timestamp());
   }
+}
+
+void TSega::SortHitsByTimestamp() {
+  std::sort(sega_hits.begin(), sega_hits.end(),
+            [](const TSegaHit& a, const TSegaHit& b) {
+              return a.Timestamp() < b.Timestamp();
+            });
 }

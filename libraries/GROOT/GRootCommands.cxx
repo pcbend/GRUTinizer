@@ -57,6 +57,8 @@ void Version() {
   system(Form("%s/bin/grutinizer-config --version", getenv("GRUTSYS")));
 }
 
+
+/*
 bool GetProjectionX(GH2D *hist,double low, double high, double bg_low,double bg_high){
   if(!hist) return 0;
   GCanvas *C_projections = 0;
@@ -124,9 +126,7 @@ bool GetProjectionX(GH2D *hist,double low, double high, double bg_low,double bg_
   if(bg_low>0 && bg_high>0){
     BGHigh->Draw("same");
     BGLow->Draw("same");
-    Proj_gated = Proj_y_Clone->Project_Background(low,high,
-						  bg_low,bg_high,
-						  kRegionBackground);
+    Proj_gated = Proj_y_Clone->Project(low,high,bg_low,bg_high,kRegionBackground);
   }else{
     Proj_gated = Proj_y_Clone->Project(low,high);
   }
@@ -143,18 +143,22 @@ bool GetProjectionX(GH2D *hist,double low, double high, double bg_low,double bg_
   Proj_gated->Draw();
   return 1;
 }
+*/
 
+
+
+/*
 bool GetProjectionX(GH2D *hist,GH2D *hist2, 
 		   double low, double high, double bg_low,double bg_high,
 		   bool overlay, 
 		   double back_low,double back_high, double back_bg_low,
 		   double back_bg_high,
 		   bool back_overlay){
-  /* Note -> The first histogram, ie hist, is used to draw the total projection.
-             The second histogram, ie hist2, is used to draw the background
-	     subtracted spectrum. This way you can have different bins.
-
-   */
+  //Note -> The first histogram, ie hist, is used to draw the total projection.
+  //        The second histogram, ie hist2, is used to draw the background
+  //        subtracted spectrum. This way you can have different bins.
+  //
+  //
 
   if(!hist || !hist2) return 0;
 
@@ -388,8 +392,8 @@ bool GetProjectionX(GH2D *hist,GH2D *hist2,
 
   return 1;
 }
-
-
+*/
+/*
 bool GetProjectionY(GH2D *hist,double low, double high, double bg_low,double bg_high){
   if(!hist) return 0;
   GCanvas *C_projections = 0;
@@ -474,18 +478,19 @@ bool GetProjectionY(GH2D *hist,double low, double high, double bg_low,double bg_
   Proj_gated->Draw();
   return 1;
 }
-
+*/
+/*
 bool GetProjectionY(GH2D *hist,GH2D *hist2, 
 		   double low, double high, double bg_low,double bg_high,
 		   bool overlay, 
 		   double back_low,double back_high, double back_bg_low,
 		   double back_bg_high,
 		   bool back_overlay){
-  /* Note -> The first histogram, ie hist, is used to draw the total projection.
-             The second histogram, ie hist2, is used to draw the background
-	     subtracted spectrum. This way you can have different bins.
-
-   */
+  // Note -> The first histogram, ie hist, is used to draw the total projection.
+  //         The second histogram, ie hist2, is used to draw the background
+  //         subtracted spectrum. This way you can have different bins.
+  //
+  //
 
   if(!hist || !hist2) return 0;
 
@@ -719,6 +724,8 @@ bool GetProjectionY(GH2D *hist,GH2D *hist2,
 
   return 1;
 }
+*/
+
 
 int LabelPeaks(TH1 *hist,double sigma,double thresh,Option_t *opt) {
   TSpectrum::StaticSearch(hist,sigma,"Qnodraw",thresh);
@@ -1053,6 +1060,9 @@ bool GUIIsRunning() {
 
 
 
+
+/*
+
 TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
  TH2 *toreturn = 0;
  if(!mat)
@@ -1060,32 +1070,6 @@ TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
  //int dim = mat->GetDimension();
  int xmax = mat->GetXaxis()->GetNbins()+1;
  int ymax = mat->GetYaxis()->GetNbins()+1;
- /*
- switch(dim) {
-   case 3:
-     xmax = mat->GetXaxis()->GetNbins()+1;
-     ymax = mat->GetYaxis()->GetNbins()+1;
-     zmax = mat->GetZaxis()->GetNbins()+1;
-     break;
-   case 2:
-     if(axis>3) {
-       fprintf(stderr,"%s z-axis offest called on %s but has no z-axis",
-               __PRETTY_FUNCTION__,mat->GetName())
-       return toreturn;
-     }
-     xmax = mat->GetXaxis()->GetNbins()+1;
-     ymax = mat->GetYaxis()->GetNbins()+1;
-     break;
-   case 1:
-     if(axis!=1) {
-       fprintf(stderr,"%s offest called on %s with an axis it doesn't have.",
-               __PRETTY_FUNCTION__,mat->GetName())
-       return toreturn;
-     }
-     xmax = mat->GetXaxis()->GetNbins()+1;
-     break;
- };
- */
  toreturn = (TH2*)mat->Clone(Form("%s_offset",mat->GetName()));
  toreturn->Reset();
 
@@ -1104,7 +1088,7 @@ TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
   return toreturn;
 }
 
-
+*/
 
 
 

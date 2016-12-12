@@ -4,6 +4,7 @@
 #include <TVirtualFitter.h>
 #include <TFitResult.h>
 #include <TFitResultPtr.h>
+#include <TH1.h>
 
 
 #include "Globals.h"
@@ -356,7 +357,7 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   if(xlow>xhigh)
     std::swap(xlow,xhigh);
   fSum = fithist->Integral(fithist->GetXaxis()->FindBin(xlow),
-                           fithist->GetXaxis()->FindBin(xhigh)); //* fithist->GetBinWidth(1);
+                           fithist->GetXaxis()->FindBin(xhigh));// * fithist->GetBinWidth(1);
   printf("sum between markers: %02f\n",fSum);
   fDSum = TMath::Sqrt(fSum);
   fSum -= bgArea;
@@ -426,7 +427,7 @@ Bool_t GPeak::FitExclude(TH1 *fithist,double xlow,double xhigh,Option_t *opt) {
   //bgpars[5] = TF1::GetParameters()[7];
   fBGFit.SetParameters(bgpars);
 
-  fArea = this->Integral(xlow,xhigh) / fithist->GetBinWidth(1);
+  fArea = this->Integral(xlow,xhigh) /  fithist->GetBinWidth(1);
   double bgArea = fBGFit.Integral(xlow,xhigh) / fithist->GetBinWidth(1);
   fArea -= bgArea;
 
@@ -434,7 +435,7 @@ Bool_t GPeak::FitExclude(TH1 *fithist,double xlow,double xhigh,Option_t *opt) {
   if(xlow>xhigh)
     std::swap(xlow,xhigh);
   fSum = fithist->Integral(fithist->GetXaxis()->FindBin(xlow),
-                           fithist->GetXaxis()->FindBin(xhigh)); //* fithist->GetBinWidth(1);
+                           fithist->GetXaxis()->FindBin(xhigh)); // * fithist->GetBinWidth(1);
   printf("sum between markers: %02f\n",fSum);
   fDSum = TMath::Sqrt(fSum);
   fSum -= bgArea;

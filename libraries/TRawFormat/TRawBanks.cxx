@@ -35,6 +35,7 @@ std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBBankType1 &bank) 
    os << "bl poststep = "<< std::setw(8) << bank.poststep << std::endl;
    os << std::setprecision(ss);
    os << "pad (error) = "<< std::setw(8) << bank.pad << std::endl;
+   //for(int x=0;x<16;x++)
    for(int x=0;x<bank.num;x++)
       os << "\t" << bank.intpts[x];
    os << "************************" << std::endl;

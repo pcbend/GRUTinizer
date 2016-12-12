@@ -9,6 +9,7 @@
 #include <TGRUTUtilities.h>
 #include <GCanvas.h>
 
+#include <TH1.h>
 #include <TROOT.h>
 
 ClassImp(TPresetPad) 

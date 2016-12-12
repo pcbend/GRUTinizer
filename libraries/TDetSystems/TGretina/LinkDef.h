@@ -7,6 +7,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+#pragma link C++ class interaction_point+;
 #pragma link C++ class TGretinaHit+;
 #pragma link C++ class std::vector<TGretinaHit>+;
 #pragma link C++ class TGretina+;

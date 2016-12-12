@@ -1,4 +1,4 @@
-// GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GRootBrowser.h GCanvas.h GH2Base.h  GH2I.h GH2D.h  GPeak.h GGaus.h GValue.h GH1D.h GrutNotifier.h GPopup.h GSnapshot.h GCutG.h
+// GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GRootBrowser.h GCanvas.h  GH2I.h GH2D.h  GPeak.h GGaus.h GValue.h GH1D.h GrutNotifier.h  GSnapshot.h GCutG.h GH1.h GH2.h GPopup.h GHistPopup.h TF1Sum.h 
 
 
 #ifdef __CINT__
@@ -40,10 +40,11 @@
 
 #pragma link C++ enum EAxis;
 #pragma link C++ enum kBackgroundSubtraction;
-#pragma link C++ function AddOffset;
+//#pragma link C++ function AddOffset;
 
 
 #pragma link C++ class GPopup+;
+#pragma link C++ class GHistPopup+;
 
 #pragma link C++ class GCutG+;
 #pragma link C++ class GPeak+;
@@ -60,12 +61,16 @@
 #pragma link C++ class GRootGuiFactory+;
 
 
+#pragma link C++ class GH1+;
+#pragma link C++ class GH2+;
+
 #pragma link C++ class GH1D+;
-#pragma link C++ class GH2Base+;
 #pragma link C++ class GH2I+;
 #pragma link C++ class GH2D+;
 
 //#pragma link C++ class GEfficiency+;
+
+#pragma link C++ class TF1Sum+;
 
 #pragma link C++ class GrutNotifier+;
 

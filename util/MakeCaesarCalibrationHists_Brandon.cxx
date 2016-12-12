@@ -2,7 +2,7 @@
 #define MAX_DETS 24
 
 //CHANGE THIS
-#define NUM_FILES 6 
+#define NUM_FILES 4 
 #include <iostream>
 #include <string>
 #include <vector>
@@ -14,6 +14,7 @@
 #include "TChannel.h"
 #include "TFile.h"
 #include "TH1D.h"
+#include "TCutG.h"
 
 //Usage: makeCalibrationHists input_file_list.dat output_hists.root
 //input_file_list should contain the list of files that will be used for the calibration
@@ -30,14 +31,12 @@ int main(int argc, char *argv[]){
     "na22",
     "y88",
     "co60",
-    "cs137",
-    "ba133",
-    "bg"
+    "cs137"
   };
 
   //CHANGE THIS
   int run_numbers[NUM_FILES] = {
-    67,68,69,70,71,73
+    363,362,366,365 
   };
   int det_per_ring[N_RINGS] = {
     10, 14, 24, 24, 24,
@@ -47,7 +46,7 @@ int main(int argc, char *argv[]){
   std::vector<std::string> input_file_names;
   std::vector<TFile*> files;
   std::string line;
-  ifstream input_file;
+  std::ifstream input_file;
 
   TH1D* output_hists[NUM_FILES][N_RINGS][MAX_DETS];
   TFile *out_file = new TFile(argv[2], "recreate");
@@ -58,11 +57,26 @@ int main(int argc, char *argv[]){
   Int_t ring;
   Int_t n_gamma;
   Int_t n_entries;
-  Double_t energy;
+  Double_t charge;
+  Double_t time;
   
-  Int_t hist_high_x = 4096;
+  Int_t hist_high_x = 2048;
   Int_t hist_low_x = 0;
   Int_t hist_n_bins_x = hist_high_x;
+
+
+  //Open cut file for TCut
+  TFile *cut_file = new TFile("/mnt/analysis/pecan-gade/elman/source_runs_endofexperiment/tcut_file_endofexp.root","read");
+  if (!cut_file){
+    std::cout << "Failed to open cut file" << std::endl;
+    return 1;
+  }
+  TCutG *tcut = (TCutG*)cut_file->Get("sample_tcut");
+  if (!tcut){
+    std::cout << "Failed to get tcut file" << std::endl;
+    return 1;
+  }
+
   //Open list of files to parse
   input_file.open(argv[1]);
   if (!input_file.is_open()){
@@ -79,7 +93,7 @@ int main(int argc, char *argv[]){
     files.push_back(new TFile(input_file_names.at(i).c_str(),"read")); 
   }
   if (files.size() != NUM_FILES){
-    std::cout << "ERROR: Found incorrect number of files!" << std::endl;
+    std::cout << "ERROR: Found incorrect number of files ("<<files.size()<<")!" << std::endl;
   }
   
   //Make all histograms with format:
@@ -100,11 +114,13 @@ int main(int argc, char *argv[]){
     std::cout << "Currently parsing tree from: " << input_file_names.at(file) << std::endl;
     TTree *cur_tree = (TTree*)files.at(file)->Get("EventTree");
     cur_tree->SetBranchAddress("TCaesar", &caesar);
-    GValue *gvalues = (GValue*)files.at(file)->Get("GValue");
+
+//  GValue *gvalues = (GValue*)files.at(file)->Get("GValue");
     TChannel *tchannels = (TChannel*)files.at(file)->Get("TChannel");
-    if (!gvalues || !tchannels){
+    if (!tchannels){
       std::cout << "Missing GValue or TChannel for file = " << file << std::endl;
     }
+
     n_entries = cur_tree->GetEntries();
     for (int entry = 0; entry < n_entries; entry++){
       caesar->Clear();
@@ -112,17 +128,19 @@ int main(int argc, char *argv[]){
       if (!caesar){
         continue;
       }
-
       n_gamma = caesar->Size();
       for (int gamma = 0; gamma < n_gamma; gamma++){
         TCaesarHit hit = caesar->GetCaesarHit(gamma);
-        if (!hit.IsValid()){
+        if (!hit.IsValid() || hit.IsOverflow()){
           continue;
         }
-        energy = hit.Charge();//raw data, no calibrations
+        charge = hit.Charge();//raw data, no calibrations
+        time = hit.GetTime();
         det = hit.GetDetectorNumber();
         ring = hit.GetRingNumber();
-        output_hists[cur_source][ring][det]->Fill(energy);
+        if (tcut->IsInside(time, charge)){
+          output_hists[cur_source][ring][det]->Fill(charge);
+        }
       }//cycle through gamma multiplicity
     }//cycle through tree entries
     std::cout << "Finished with file: " << input_file_names.at(file) << std::endl;
