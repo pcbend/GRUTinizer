@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include <TClass.h>
+#include <TBuffer.h>
 #include "TRandom.h"
 
 ClassImp(TDetectorHit)

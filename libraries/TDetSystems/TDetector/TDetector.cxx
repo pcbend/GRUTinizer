@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include <TClass.h>
+#include <TBuffer.h>
 
 ClassImp(TDetector)
 
