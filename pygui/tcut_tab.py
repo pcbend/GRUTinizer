@@ -139,7 +139,7 @@ class TCutTab(object):
 
         cutg.SetName(self._increment_name())
         for prim in ROOT.gPad.GetListOfPrimitives():
-            if isinstance(prim, ROOT.TH2):
+            if isinstance(prim, ROOT.GH2):
                 title = prim.GetName()
                 det_type = title[:title.index('_')]
                 break

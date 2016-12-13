@@ -2959,10 +2959,10 @@ GH1D *GH2::SummaryProjection(GH1 *hist,int axis,int direction,bool show_empty) c
   }
   int max_binnum;
   if(axis == kXaxis){
-    max_binnum = GetXaxis()->GetNbins();
+    max_binnum = GetYaxis()->GetNbins();
     name = Form("%s_py",GetName());
   } else {
-    max_binnum = GetYaxis()->GetNbins();
+    max_binnum = GetXaxis()->GetNbins();
     name = Form("%s_px",GetName());
   }
   if(binnum > max_binnum){
@@ -3000,6 +3000,7 @@ GH1D *GH2::SummaryProjection(GH1 *hist,int axis,int direction,bool show_empty) c
         } else if(binnum==0) {
           binnum=max_binnum;
         }
+        //std::cout << "binnum " << binnum <<"\tmaxbinnum " << max_binnum << std::endl;
       }
       break;
     case kYaxis:
@@ -3029,6 +3030,7 @@ GH1D *GH2::SummaryProjection(GH1 *hist,int axis,int direction,bool show_empty) c
         } else if(binnum==0) {
           binnum=max_binnum;
         }
+        //std::cout << "binnum " << binnum <<"\tmaxbinnum " << max_binnum << std::endl;
       }
       break;
   }

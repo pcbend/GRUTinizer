@@ -285,6 +285,8 @@ class MainWindow(object):
 
         if cls.InheritsFrom(ROOT.TH2.Class()):
             return self.icons['h2_t']
+        elif cls.InheritsFrom(ROOT.GH2.Class()):
+            return self.icons['h2_t']
         elif cls.InheritsFrom(ROOT.TH1.Class()):
             return self.icons['h1_t']
         elif cls.InheritsFrom(ROOT.TFile.Class()):
