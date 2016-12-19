@@ -8,6 +8,7 @@
 #include <sstream>
 #include <utility>
 
+#include "TBuffer.h"
 #include "TRandom.h"
 
 #include "GRootFunctions.h"

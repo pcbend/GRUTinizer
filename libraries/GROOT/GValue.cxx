@@ -7,6 +7,8 @@
 #include <fstream>
 #include <sstream>
 
+#include "TBuffer.h"
+
 //std::string GValue::fValueData
 //std::map<unsigned int, GValue*> GValue::fValueMap;
 GValue *GValue::fDefaultValue = new GValue("GValue",sqrt(-1));
@@ -65,18 +67,18 @@ bool GValue::AppendValue(GValue *oldvalue) {
     if(strlen(this->GetName())) {
       oldvalue->SetName(this->GetName());
     }
-  
+
     if(this->GetValue() != -1) {
       oldvalue->SetValue(this->GetValue());
       oldvalue->fPriority = fPriority;
     }
-  
+
     if(strlen(this->GetInfo())) {
       oldvalue->SetInfo(this->GetInfo());
     }
     return true;
   }
-  
+
   return false;
 }
 

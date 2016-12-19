@@ -1,9 +1,11 @@
 #include "TDetector.h"
 
-#include <TRawEvent.h>
 #include <iostream>
 
-#include <TClass.h>
+#include "TRawEvent.h"
+
+#include "TBuffer.h"
+#include "TClass.h"
 
 ClassImp(TDetector)
 
@@ -67,7 +69,7 @@ int TDetector::Build() {
   return BuildHits(fRawData);
 }
 
-int TDetector::BuildHits(std::vector<TRawEvent*> &raw_data) { 
+int TDetector::BuildHits(std::vector<TRawEvent*> &raw_data) {
   //this is a debug hack added by pcb on 5/1/16
   std::vector<TRawEvent> event;
   for(auto it : fRawData) {
@@ -80,9 +82,7 @@ int TDetector::BuildHits(std::vector<TRawEvent*> &raw_data) {
 void TDetector::Streamer(TBuffer &r_b) {
   if(r_b.IsReading()) {
     r_b.ReadClassBuffer(TDetector::Class(),this);
-  } else { 
+  } else {
     r_b.WriteClassBuffer(TDetector::Class(),this);
   }
 }
-
-
