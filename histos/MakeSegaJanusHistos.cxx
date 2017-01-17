@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <tuple>
 #include <utility>
 
 #include "TFile.h"
@@ -20,14 +21,77 @@
 #include "TSega.h"
 #include "TSRIM.h"
 
+enum class WhichJanus {
+  Upstream,
+    Downstream,
+    Recon
+};
+
+std::string to_string(WhichJanus which_janus) {
+  switch(which_janus) {
+    case WhichJanus::Upstream:
+      return "upstream";
+
+    case WhichJanus::Downstream:
+      return "downstream";
+
+    case WhichJanus::Recon:
+      return "recon";
+
+    default:
+      return "";
+  }
+}
+
+enum class GammaSeen {
+  keV_455,
+    keV_561,
+    keV_665,
+    keV_691,
+    keV_857,
+    keV_1146,
+    keV_1298
+};
+
+std::string to_string(GammaSeen gamma_seen) {
+  switch(gamma_seen) {
+    case GammaSeen::keV_455:
+      return "0455";
+
+    case GammaSeen::keV_561:
+      return "0561";
+
+    case GammaSeen::keV_665:
+      return "0665";
+
+    case GammaSeen::keV_691:
+      return "0691";
+
+    case GammaSeen::keV_857:
+      return "0857";
+
+    case GammaSeen::keV_1146:
+      return "1146";
+
+    case GammaSeen::keV_1298:
+      return "1298";
+
+    default:
+      return "";
+  }
+}
+
+struct GammaEnergyCut {
+  int ring;
+  WhichJanus which_janus;
+  GammaSeen gamma_seen;
+  TCutG* DCgamma_angle_gate;
+};
+
 TCutG* pid_low = NULL;
 TCutG* pid_high = NULL;
 TCutG* time_energy = NULL;
-std::map<int, TCutG*> gates_455downstream;
-std::map<int, TCutG*> gates_455recon;
-std::map<int, TCutG*> gates_455upstream;
-
-bool has_455keV = false;
+std::vector<GammaEnergyCut> gates;
 
 void LoadGates(TRuntimeObjects& obj){
   if(!pid_low){
@@ -51,36 +115,35 @@ void LoadGates(TRuntimeObjects& obj){
     }
   }
 
-  if(gates_455downstream.size() == 0){
+  if(gates.size() == 0) {
     for(int ringnum=1; ringnum<25; ringnum++) {
       std::string name = Form("downstream_ring%02d_455cut",ringnum);
       TCutG* gate = obj.GetCut(name);
       if(gate) {
-        gates_455downstream[ringnum] = gate;
+        GammaEnergyCut cut{ringnum, WhichJanus::Downstream, GammaSeen::keV_455, gate};
+        gates.push_back(cut);
       } else {
         std::cout << "Warning: could not find cut \"" << name << "\"" << std::endl;
       }
     }
-  }
 
-  if(gates_455recon.size() == 0){
     for(int ringnum=1; ringnum<25; ringnum++) {
       std::string name = Form("recon_ring%02d_455cut",ringnum);
       TCutG* gate = obj.GetCut(name);
       if(gate) {
-        gates_455recon[ringnum] = gate;
+        GammaEnergyCut cut{ringnum, WhichJanus::Recon, GammaSeen::keV_455, gate};
+        gates.push_back(cut);
       } else {
         std::cout << "Warning: could not find cut \"" << name << "\"" << std::endl;
       }
     }
-  }
 
-  if(gates_455upstream.size() == 0){
     for(int ringnum=1; ringnum<25; ringnum++) {
       std::string name = Form("upstream_ring%02d_455cut",ringnum);
       TCutG* gate = obj.GetCut(name);
       if(gate) {
-        gates_455upstream[ringnum] = gate;
+        GammaEnergyCut cut{ringnum, WhichJanus::Upstream, GammaSeen::keV_455, gate};
+        gates.push_back(cut);
       } else {
         std::cout << "Warning: could not find cut \"" << name << "\"" << std::endl;
       }
@@ -122,9 +185,9 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega& sega, TJanus& janus)
 void MakeScalerHistograms(TRuntimeObjects& obj, TNSCLScalers& scalers);
 void MakeTimestampDiffs(TRuntimeObjects& obj, TSega* sega, TJanus* janus);
 
-void Make78Kr_455keVPlots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_hit,
-                          double dc_energy, double gamma_angle, std::string which_cut,
-                          std::string which_region);
+void Make78Kr_Gamma_Plots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_hit,
+                          double dc_energy, double gamma_angle,
+                          WhichJanus which_janus, GammaSeen gamma_seen);
 
 // Returns the timestamp in nanoseconds since the start of the first production run.
 // Minimum value: 0
@@ -445,10 +508,6 @@ void Make78KrPlots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_hit, std:
     // Doppler corrected energies, using janus
     double dc_energy = s_hit.GetDoppler(beta, particle_position);
 
-    if(dc_energy > 430 && dc_energy < 480) {
-      has_455keV = true;
-    }
-
     if(dc_energy > 440 && dc_energy < 465) {
       obj.FillHistogram(dir.c_str(),"janus_channel_time_455keV_coinc",
                         128, 0, 128, j_hit.GetFrontChannel(),
@@ -479,56 +538,61 @@ void Make78KrPlots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_hit, std:
                       2000, 0, 2000, dc_energy,
                       180, 0, 180, theta_deg);
 
-    if(dc_energy > 430 && dc_energy < 480) {
-      Make78Kr_455keVPlots(obj, s_hit, j_hit, dc_energy, theta_deg, "1d", "downstream");
-    }
-    if(gates_455downstream[j_hit.GetRing()]->IsInside(dc_energy, theta_deg)) {
-      Make78Kr_455keVPlots(obj, s_hit, j_hit, dc_energy, theta_deg, "2d", "downstream");
+    // if(dc_energy > 430 && dc_energy < 480) {
+    //   Make78Kr_455keVPlots(obj, s_hit, j_hit, dc_energy, theta_deg, "1d", "downstream");
+    // }
+    for(auto& gate : gates) {
+      if(gate.which_janus == WhichJanus::Downstream &&
+         gate.ring == j_hit.GetRing() &&
+         gate.DCgamma_angle_gate->IsInside(dc_energy, theta_deg)) {
+        Make78Kr_Gamma_Plots(obj, s_hit, j_hit, dc_energy, theta_deg,
+                             gate.which_janus, gate.gamma_seen);
+      }
     }
 
 
     double kr_theta = particle_position.Theta();
     //double kr_theta_deg = kr_theta * (180/3.1415926);
 
-    // Angle-dependent beta
-    {
-      double betamax = GValue::Value("betamax");
+    // // Angle-dependent beta
+    // {
+    //   double betamax = GValue::Value("betamax");
 
-      obj.FillHistogram(dir.c_str(),Form("DCenergy_angle_varybeta_ring%02d", j_hit.GetRing()),
-                        2000, 0, 2000, s_hit.GetDoppler(get_beta(betamax,kr_theta), particle_position),
-                        180, 0, 180, theta_deg);
+    //   obj.FillHistogram(dir.c_str(),Form("DCenergy_angle_varybeta_ring%02d", j_hit.GetRing()),
+    //                     2000, 0, 2000, s_hit.GetDoppler(get_beta(betamax,kr_theta), particle_position),
+    //                     180, 0, 180, theta_deg);
 
-      obj.FillHistogram(dir.c_str(),Form("DCenergy_angle_varybeta_Ecorr_ring%02d", j_hit.GetRing()),
-                        2000, 0, 2000, s_hit.GetDoppler(get_beta(betamax,kr_theta,true), particle_position),
-                        180, 0, 180, theta_deg);
+    //   obj.FillHistogram(dir.c_str(),Form("DCenergy_angle_varybeta_Ecorr_ring%02d", j_hit.GetRing()),
+    //                     2000, 0, 2000, s_hit.GetDoppler(get_beta(betamax,kr_theta,true), particle_position),
+    //                     180, 0, 180, theta_deg);
 
-      // phi_deg varies -180 to 180
-      double phi_deg = particle_position.Phi() * TMath::RadToDeg();
-      int quadrant;
-      if(phi_deg < -90) {
-        quadrant = 3;
-      } else if (phi_deg >= -90 && phi_deg < 0) {
-        quadrant = 4;
-      } else if (phi_deg >= 0 && phi_deg < 90) {
-        quadrant = 1;
-      } else {
-        quadrant = 2;
-      }
-      obj.FillHistogram(dir.c_str(),Form("DCenergy_angle_varybeta_Ecorr_ring%02d_quad%d", j_hit.GetRing(), quadrant),
-                        2000, 0, 2000, s_hit.GetDoppler(get_beta(betamax,kr_theta,true), particle_position),
-                        180, 0, 180, theta_deg);
+    //   // phi_deg varies -180 to 180
+    //   double phi_deg = particle_position.Phi() * TMath::RadToDeg();
+    //   int quadrant;
+    //   if(phi_deg < -90) {
+    //     quadrant = 3;
+    //   } else if (phi_deg >= -90 && phi_deg < 0) {
+    //     quadrant = 4;
+    //   } else if (phi_deg >= 0 && phi_deg < 90) {
+    //     quadrant = 1;
+    //   } else {
+    //     quadrant = 2;
+    //   }
+    //   obj.FillHistogram(dir.c_str(),Form("DCenergy_angle_varybeta_Ecorr_ring%02d_quad%d", j_hit.GetRing(), quadrant),
+    //                     2000, 0, 2000, s_hit.GetDoppler(get_beta(betamax,kr_theta,true), particle_position),
+    //                     180, 0, 180, theta_deg);
 
-      // //Scan along betamax
-      // for(int betamax_i = 0; betamax_i<150; betamax_i++) {
-      //   double betamax = 0.0 + betamax_i*((0.15-0.00)/150);
-      //   obj.FillHistogram(dir.c_str(),"DCenergy_varybeta_betascan",
-      //                     150, 0.0, 0.15, betamax,
-      //                     8000, 0, 4000, s_hit.GetDoppler(get_beta(betamax, kr_theta), particle_position));
-      //   obj.FillHistogram(dir.c_str(),"DCenergy_varybeta_betascan_Ecorr",
-      //                     150, 0.0, 0.15, betamax,
-      //                     8000, 0, 4000, s_hit.GetDoppler(get_beta(betamax, kr_theta,true), particle_position));
-      // }
-    }
+    //   // //Scan along betamax
+    //   // for(int betamax_i = 0; betamax_i<150; betamax_i++) {
+    //   //   double betamax = 0.0 + betamax_i*((0.15-0.00)/150);
+    //   //   obj.FillHistogram(dir.c_str(),"DCenergy_varybeta_betascan",
+    //   //                     150, 0.0, 0.15, betamax,
+    //   //                     8000, 0, 4000, s_hit.GetDoppler(get_beta(betamax, kr_theta), particle_position));
+    //   //   obj.FillHistogram(dir.c_str(),"DCenergy_varybeta_betascan_Ecorr",
+    //   //                     150, 0.0, 0.15, betamax,
+    //   //                     8000, 0, 4000, s_hit.GetDoppler(get_beta(betamax, kr_theta,true), particle_position));
+    //   // }
+    // }
 
     // // Scan along beta
     // for(int beta_i = 0; beta_i<150; beta_i++) {
@@ -574,9 +638,6 @@ void Make78KrPlots_Reconstructed(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHi
 
 
   if(time_energy->IsInside(energy, time_diff)){
-    if(dc_energy > 430 && dc_energy < 480) {
-      has_455keV = true;
-    }
 
     // Doppler corrected energies, using janus
     obj.FillHistogram("kr78_recon","energy",
@@ -602,41 +663,46 @@ void Make78KrPlots_Reconstructed(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHi
     double kr_theta = particle_position.Theta();
     double kr_theta_deg = kr_theta * (180/3.1415926);
 
-    if(dc_energy > 430 && dc_energy < 480) {
-      Make78Kr_455keVPlots(obj, s_hit, j_hit, dc_energy, theta_deg, "1d", "recon");
-    }
-    if(gates_455recon[j_hit.GetRing()]->IsInside(dc_energy, theta_deg)) {
-      Make78Kr_455keVPlots(obj, s_hit, j_hit, dc_energy, theta_deg, "2d", "recon");
-    }
-
-    // Angle-dependent beta
-    {
-      double betamax = GValue::Value("betamax");
-      obj.FillHistogram("kr78_recon",Form("DCenergy_angle_varybeta_ring%02d", j_hit.GetRing()),
-                        2000, 0, 2000, s_hit.GetDoppler(get_beta(betamax, kr_theta), particle_position),
-                        180, 0, 180, theta_deg);
-
-      obj.FillHistogram("kr78_recon",Form("DCenergy_angle_varybeta_Ecorr_ring%02d", j_hit.GetRing()),
-                        2000, 0, 2000, s_hit.GetDoppler(get_beta(betamax, kr_theta,true), particle_position),
-                        180, 0, 180, theta_deg);
-
-            // phi_deg varies -180 to 180
-      double phi_deg = particle_position.Phi() * TMath::RadToDeg();
-      int quadrant;
-      if(phi_deg < -90) {
-        quadrant = 3;
-      } else if (phi_deg >= -90 && phi_deg < 0) {
-        quadrant = 4;
-      } else if (phi_deg >= 0 && phi_deg < 90) {
-        quadrant = 1;
-      } else {
-        quadrant = 2;
+    // if(dc_energy > 430 && dc_energy < 480) {
+    //   Make78Kr_455keVPlots(obj, s_hit, j_hit, dc_energy, theta_deg, "1d", "recon");
+    // }
+    for(auto& gate : gates) {
+      if(gate.which_janus == WhichJanus::Recon &&
+         gate.ring == j_hit.GetRing() &&
+         gate.DCgamma_angle_gate->IsInside(dc_energy, theta_deg)) {
+        Make78Kr_Gamma_Plots(obj, s_hit, j_hit, dc_energy, theta_deg,
+                             gate.which_janus, gate.gamma_seen);
       }
-      obj.FillHistogram("kr78_recon",Form("DCenergy_angle_varybeta_Ecorr_ring%02d_quad%d", j_hit.GetRing(), quadrant),
-                        2000, 0, 2000, s_hit.GetDoppler(get_beta(betamax, kr_theta,true), particle_position),
-                        180, 0, 180, theta_deg);
-
     }
+
+    // // Angle-dependent beta
+    // {
+    //   double betamax = GValue::Value("betamax");
+    //   obj.FillHistogram("kr78_recon",Form("DCenergy_angle_varybeta_ring%02d", j_hit.GetRing()),
+    //                     2000, 0, 2000, s_hit.GetDoppler(get_beta(betamax, kr_theta), particle_position),
+    //                     180, 0, 180, theta_deg);
+
+    //   obj.FillHistogram("kr78_recon",Form("DCenergy_angle_varybeta_Ecorr_ring%02d", j_hit.GetRing()),
+    //                     2000, 0, 2000, s_hit.GetDoppler(get_beta(betamax, kr_theta,true), particle_position),
+    //                     180, 0, 180, theta_deg);
+
+    //         // phi_deg varies -180 to 180
+    //   double phi_deg = particle_position.Phi() * TMath::RadToDeg();
+    //   int quadrant;
+    //   if(phi_deg < -90) {
+    //     quadrant = 3;
+    //   } else if (phi_deg >= -90 && phi_deg < 0) {
+    //     quadrant = 4;
+    //   } else if (phi_deg >= 0 && phi_deg < 90) {
+    //     quadrant = 1;
+    //   } else {
+    //     quadrant = 2;
+    //   }
+    //   obj.FillHistogram("kr78_recon",Form("DCenergy_angle_varybeta_Ecorr_ring%02d_quad%d", j_hit.GetRing(), quadrant),
+    //                     2000, 0, 2000, s_hit.GetDoppler(get_beta(betamax, kr_theta,true), particle_position),
+    //                     180, 0, 180, theta_deg);
+
+    // }
 
     // //Scan along betamax
     // for(int betamax_i = 0; betamax_i<150; betamax_i++) {
@@ -793,10 +859,6 @@ void MakeUpstream78KrPlots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_h
     obj.FillHistogram("upstream", Form("DCenergy_%s", cutname.c_str()),
                       4000, 0, 4000, dc_energy);
 
-    if(dc_energy > 430 && dc_energy < 480) {
-      has_455keV = true;
-    }
-
     // if(j_hit.GetRing() <= 8) {
     //   obj.FillHistogram("upstream", Form("DCenergy_inner8rings_%s", cutname.c_str()),
     //                     4000, 0, 4000, dc_energy);
@@ -825,11 +887,17 @@ void MakeUpstream78KrPlots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_h
     obj.FillHistogram("upstream",Form("janus_sectornum_%s", cutname.c_str()),
                       40, -5, 35, j_hit.GetSector());
 
-    if(dc_energy > 430 && dc_energy < 480) {
-      Make78Kr_455keVPlots(obj, s_hit, j_hit, dc_energy, theta_deg, "1d", "upstream");
-    }
-    if(gates_455upstream[j_hit.GetRing()]->IsInside(dc_energy, theta_deg)) {
-      Make78Kr_455keVPlots(obj, s_hit, j_hit, dc_energy, theta_deg, "2d", "upstream");
+    // if(dc_energy > 430 && dc_energy < 480) {
+    //   Make78Kr_455keVPlots(obj, s_hit, j_hit, dc_energy, theta_deg, "1d", "upstream");
+    // }
+
+    for(auto& gate : gates) {
+      if(gate.which_janus == WhichJanus::Upstream &&
+         gate.ring == j_hit.GetRing() &&
+         gate.DCgamma_angle_gate->IsInside(dc_energy, theta_deg)) {
+        Make78Kr_Gamma_Plots(obj, s_hit, j_hit, dc_energy, theta_deg,
+                             gate.which_janus, gate.gamma_seen);
+      }
     }
 
     // // Scan along beta
@@ -909,15 +977,6 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega& sega, TJanus& janus)
 
   for(unsigned int i=0; i<janus.Size(); i++){
     TJanusHit& j_hit = janus.GetJanusHit(i);
-    // if(has_455keV){
-    //   obj.FillHistogram("coinc","janus_channel_energy_455keV_coinc",
-    //                     128, 0, 128, j_hit.GetFrontChannel(),
-    //                     6000, 0, 6000, j_hit.Charge());
-    //   obj.FillHistogram("coinc","janus_channel_energy_455keV_coinc",
-    //                     128, 0, 128, j_hit.GetBackChannel(),
-    //                     6000, 0, 6000, j_hit.GetBackHit().Charge());
-    // }
-
 
     obj.FillHistogram("coinc","janus_channel_energy",
                       128, 0, 128, j_hit.GetFrontChannel(),
@@ -927,7 +986,6 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega& sega, TJanus& janus)
                       6000, 0, 6000, j_hit.GetBackHit().Charge());
   }
 
-  has_455keV = false;
   for(auto& j_hit : janus.GetAllHits()) {
     bool in_pid_low = pid_low->IsInside(j_hit.GetFrontChannel(), j_hit.Charge());
     bool in_pid_high = pid_high->IsInside(j_hit.GetFrontChannel(), j_hit.Charge());
@@ -991,10 +1049,6 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega& sega, TJanus& janus)
       // }
     }
   }
-
-  // if(has_455keV) {
-  //   MakeJanusHistograms(obj, janus, "janus_455coinc");
-  // }
 }
 
 void MakeTimestampDiffs(TRuntimeObjects& obj, TSega* sega, TJanus* janus) {
@@ -1147,28 +1201,48 @@ void MakeJanusChan64_70Histograms(TRuntimeObjects& obj, TJanus& janus, const cha
   }
 }
 
-void Make78Kr_455keVPlots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_hit,
-                          double dc_energy, double gamma_angle_deg, std::string which_cut,
-                          std::string which_region) {
-  obj.FillHistogram("cuts_compare", Form("DCenergy_angle_455_cut%s",which_cut.c_str()),
+void Make78Kr_Gamma_Plots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_hit,
+                          double dc_energy, double gamma_angle,
+                          WhichJanus which_janus, GammaSeen gamma_seen) {
+  std::string det = to_string(which_janus);
+  std::string en = to_string(gamma_seen);
+
+  std::string dirname = Form("cut_%skeV",en.c_str());
+
+  obj.FillHistogram(dirname.c_str(), "DCenergy_angle",
                     2000, 0, 2000, dc_energy,
-                    180, 0, 180, gamma_angle_deg);
-  obj.FillHistogram("cuts_compare", Form("DCenergy_angle_455_%s_ring%02d_cut%s",
-                                         which_region.c_str(), j_hit.GetRing(), which_cut.c_str()),
+                    180, 0, 180, gamma_angle);
+  obj.FillHistogram(dirname.c_str(), Form("DCenergy_angle_ring%02d", j_hit.GetRing()),
                     2000, 0, 2000, dc_energy,
-                    180, 0, 180, gamma_angle_deg);
+                    180, 0, 180, gamma_angle);
 
-  obj.FillHistogram("cuts_compare", Form("DCenergy_455_cut%s",which_cut.c_str()),
-                    2000, 0, 2000, dc_energy);
-
-  obj.FillHistogram("cuts_compare", Form("channel_energy_455_cut%s",which_cut.c_str()),
-                    128, 0, 128, j_hit.GetFrontChannel(),
-                    4000, 0, 400e3, j_hit.GetEnergy());
-  obj.FillHistogram("cuts_compare", Form("channel_energy_455_cut%s",which_cut.c_str()),
-                    128, 0, 128, j_hit.GetBackChannel(),
-                    4000, 0, 400e3, j_hit.GetBackHit().GetEnergy());
-
-  obj.FillHistogram("cuts_compare", Form("ringsector_455_cut%s", which_cut.c_str()),
-                    24, 1, 25, j_hit.GetRing(),
-                    32, 1, 33, j_hit.GetSector());
+  obj.FillHistogram(dirname.c_str(), Form("ringsector_%s",det.c_str()),
+                    24,1,25,j_hit.GetRing(),
+                    32,1,33,j_hit.GetSector());
 }
+
+// void Make78Kr_455keVPlots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_hit,
+//                           double dc_energy, double gamma_angle_deg, std::string which_cut,
+//                           std::string which_region) {
+//   obj.FillHistogram("cuts_compare", Form("DCenergy_angle_455_cut%s",which_cut.c_str()),
+//                     2000, 0, 2000, dc_energy,
+//                     180, 0, 180, gamma_angle_deg);
+//   obj.FillHistogram("cuts_compare", Form("DCenergy_angle_455_%s_ring%02d_cut%s",
+//                                          which_region.c_str(), j_hit.GetRing(), which_cut.c_str()),
+//                     2000, 0, 2000, dc_energy,
+//                     180, 0, 180, gamma_angle_deg);
+
+//   obj.FillHistogram("cuts_compare", Form("DCenergy_455_cut%s",which_cut.c_str()),
+//                     2000, 0, 2000, dc_energy);
+
+//   obj.FillHistogram("cuts_compare", Form("channel_energy_455_cut%s",which_cut.c_str()),
+//                     128, 0, 128, j_hit.GetFrontChannel(),
+//                     4000, 0, 400e3, j_hit.GetEnergy());
+//   obj.FillHistogram("cuts_compare", Form("channel_energy_455_cut%s",which_cut.c_str()),
+//                     128, 0, 128, j_hit.GetBackChannel(),
+//                     4000, 0, 400e3, j_hit.GetBackHit().GetEnergy());
+
+//   obj.FillHistogram("cuts_compare", Form("ringsector_455_cut%s", which_cut.c_str()),
+//                     24, 1, 25, j_hit.GetRing(),
+//                     32, 1, 33, j_hit.GetSector());
+// }
