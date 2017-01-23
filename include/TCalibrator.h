@@ -29,6 +29,7 @@ public:
 
   TGraph& MakeCalibrationGraph(bool zerozero=false); //  double min_figure_of_merit = 0.001);
   TGraphErrors &MakeEffGraph(double secondsi=3600.,double bq=100000.,Option_t *opt="draw"); 
+  bool          SaveEffGraph(std::string datafile="",std::string fitfile=""); 
   std::vector<double> Calibrate(double min_figure_of_merit = 0.001);
 
   int AddData(TH1* source_data, std::string source,

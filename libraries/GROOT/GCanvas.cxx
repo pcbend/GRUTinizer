@@ -45,6 +45,7 @@
 
 #include <TMath.h>
 
+#include "TBuffer.h"
 #include "TGRUTint.h"
 
 #ifndef kArrowKeyPress
@@ -786,6 +787,10 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
     case kKey_B:
       edited = CycleBackgroundSubtraction();
       break;
+    case kKey_c:
+      //printf("c was pressed!\n");
+      break;
+
 
     case kKey_d:
       //printf("i am here.\n");
@@ -1170,6 +1175,37 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
   if(hists.size()<1)
     return edited;
   switch(*keysym) {
+    case kKey_c:
+      //printf("%s\n",this->IsA()->GetName());
+      {
+        double ymin,ymax,xmin,xmax;
+        int    islogz = gPad->GetLogz();
+        ymin = hists.back()->GetYaxis()->GetBinLowEdge(hists.back()->GetYaxis()->GetFirst());
+        ymax = hists.back()->GetYaxis()->GetBinUpEdge(hists.back()->GetYaxis()->GetLast());
+        xmin = hists.back()->GetXaxis()->GetBinLowEdge(hists.back()->GetXaxis()->GetFirst());
+        xmax = hists.back()->GetXaxis()->GetBinUpEdge(hists.back()->GetXaxis()->GetLast());
+        TIter iter(GetListOfPrimitives());
+        while(TObject *obj = iter.Next()) {
+          if(obj->InheritsFrom(TPad::Class())) {
+            ((TPad*)obj)->SetLogz(islogz);
+            TIter iter2(((TPad*)obj)->GetListOfPrimitives());
+            while(TObject *obj2 = iter2.Next()) {
+              //printf("%s \n",obj2->GetName());
+              if(obj2->InheritsFrom(TH1::Class())) {
+                //printf("dim = %i  @  0x%08x \n",((TH1*)obj2)->GetDimension() );
+
+                if(((TH1*)obj2)->GetDimension()==2) {
+                  ((TH1*)obj2)->GetYaxis()->SetRangeUser(ymin,ymax);
+                  ((TH1*)obj2)->GetXaxis()->SetRangeUser(xmin,xmax);
+                }
+              }
+            }
+          }
+        }
+      }
+      edited = true;
+      //printf("c was pressed!\n");
+      break;
     case kKey_e:
       if(GetNMarkers()<2)
         break;
@@ -2055,3 +2091,11 @@ TH1 *GCanvas::GetBackGroundHist(GMarker *addlow,GMarker *addhigh) {
   return 0;
 }
 */
+
+
+void GCanvas::Streamer(TBuffer &R__b)
+{
+   TCanvas::Streamer(R__b);
+}
+
+

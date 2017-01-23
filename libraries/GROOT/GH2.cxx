@@ -231,6 +231,7 @@ Int_t GH2::BufferFill(Double_t x, Double_t y, Double_t w)
 void GH2::Copy(TObject &obj) const
 {
    GH1::Copy(obj);
+   ((GH2&)obj).fDimension   = fDimension;
    ((GH2&)obj).fScalefactor = fScalefactor;
    ((GH2&)obj).fTsumwy      = fTsumwy;
    ((GH2&)obj).fTsumwy2     = fTsumwy2;

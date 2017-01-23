@@ -66,6 +66,8 @@ class GPeak : public TF1 {
     double fChi2;
     double fNdf;
 
+    void DetachBackground();
+
     Bool_t IsInitialized() const { return init_flag; }
     void SetInitialized(Bool_t flag = true) {init_flag = flag;}
     bool init_flag;

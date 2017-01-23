@@ -7,6 +7,7 @@
 #include <map>
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 
 #include <TH1.h>
 #include <TSpectrum.h>
@@ -104,7 +105,8 @@ TGraphErrors &TCalibrator::MakeEffGraph(double seconds,double bq,Option_t *opt) 
     //TNucleus n(it.nucleus.c_str());
     energy.push_back(it.energy);
     error_e.push_back(0.0);
-    observed.push_back((it.area/seconds)/ ((it.intensity/100)*bq) );
+    //observed.push_back((it.area/seconds) / ((it.intensity/100)*bq) );
+    observed.push_back(it.area / ((it.intensity/100)*bq*seconds)  );
     error_o.push_back( observed.back() * (sqrt(it.area)/it.area) );
   }
   
@@ -114,7 +116,7 @@ TGraphErrors &TCalibrator::MakeEffGraph(double seconds,double bq,Option_t *opt) 
   if(efffit)
     efffit->Delete();
   static int counter=0;
-  efffit = new TF1(Form("eff_fit_%i",counter++),GRootFunctions::GammaEff,0,1500,4); 
+  efffit = new TF1(Form("eff_fit_%i",counter++),GRootFunctions::GammaEff,0,4000,4); 
   eff_graph.Fit(efffit,fitopt.Data());
 
   if(option.Contains("draw",TString::kIgnoreCase)) {
@@ -131,6 +133,41 @@ TGraphErrors &TCalibrator::MakeEffGraph(double seconds,double bq,Option_t *opt) 
   }
   return eff_graph;
 }
+
+
+bool TCalibrator::SaveEffGraph(std::string datafile,std::string fitfile) { 
+  if(!efffit)
+    return false;
+      
+  if(datafile.length()==0)
+    datafile = Form("%s_data.dat",this->GetName());
+  if(fitfile.length()==0)
+    fitfile = Form("%s_fit.dat",this->GetName());
+
+  std::ofstream outfile;
+  outfile.open(datafile.c_str());
+  for(int i=0;i<eff_graph.GetN();i++) {
+     double x,y;
+     eff_graph.GetPoint(i,x,y);
+     outfile << x << "\t" << y << "\t" << eff_graph.GetErrorY(i) << std::endl;
+  }
+  outfile << std::endl;
+  outfile.close();
+  
+  outfile.open(fitfile.c_str());
+  double xmin,xmax;
+  efffit->GetRange(xmin,xmax);
+  double range = xmax-xmin;
+  while(xmin<xmax) {
+    outfile << xmin << "\t" << efffit->Eval(xmin) << std::endl;
+    xmin += range/10000.;
+  }
+  outfile << std::endl;
+  outfile.close();
+  return true;  
+
+}
+
 
 void TCalibrator::Clear(Option_t *opt) { 
   fit_graph.Clear(opt);
@@ -244,6 +281,8 @@ int TCalibrator::AddData(TH1 *data,TNucleus *source, double sigma,double thresho
   else
     name = Form("%s_%i_%i",source->GetName(),displayed_x_min,displayed_x_max);
 
+  TNamed::SetName(Form("%s%s",GetName(),name.c_str()));
+
   TIter iter(source->GetTransitionList());
   std::vector<double> source_energy;
   std::map<double,double> src_eng_int;
@@ -278,13 +317,17 @@ int TCalibrator::AddData(TH1 *data,TNucleus *source, double sigma,double thresho
   std::map<double,double> datatosource = Match(peak_positions,source_energy);; 
 
   //PrintMap(datatosource);
-  double range = 8*data->GetXaxis()->GetBinWidth(1);
+  double range = 8;//8*data->GetXaxis()->GetBinWidth(1);
   for(auto it : datatosource) {
 
     double peak = it.first;
     double eng  = it.second;
 
-    GPeak *fit = PhotoPeakFit(data,peak-range,peak+range,"no-print");
+    range = 0.02 * peak;
+    if(range < 8.)
+      range = 8.0;
+
+    GPeak *fit = PhotoPeakFit(data,peak-range,peak+range/2.,"no-print");
     
     //data_channels.push_back(fit->GetCentroid());
     //data->GetListOfFunctions()->Remove(fit);

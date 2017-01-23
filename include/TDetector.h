@@ -6,7 +6,9 @@
 
 #include "TNamed.h"
 
+#include "TBuffer.h"
 #include "TDetectorHit.h"
+
 
 #ifndef __CINT__
 class TRawEvent;

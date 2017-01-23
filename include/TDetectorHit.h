@@ -4,6 +4,7 @@
 #include "TChannel.h"
 #include "TObject.h"
 #include "TVector3.h"
+#include "TBuffer.h"
 
 class TDetectorHit : public TObject {
 public:

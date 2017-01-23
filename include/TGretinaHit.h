@@ -134,7 +134,10 @@ public:
 
 
   Int_t    NumberOfInteractions()        const { return fNumberOfInteractions; }
-  Int_t    GetSegmentId(const int &i)    const { return fSegments.at(i).fSeg;  }
+  Int_t    GetNSegments()                const { return (int)fSegments.size(); }
+  Int_t    GetSegmentId(int i=-1)        const { if(i>=GetNSegments()||GetNSegments()==0) return -1;
+                                                 if(i==-1) return fSegments.at(0).fSeg;
+                                                           return fSegments.at(i).fSeg;  }
   Float_t  GetSegmentEng(const int &i)   const { return fSegments.at(i).fEng;  }
 
   TVector3 GetIntPosition(unsigned int i)   const;  // position of the ith segment, Global coor.

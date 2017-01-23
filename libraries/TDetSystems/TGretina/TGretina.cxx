@@ -162,9 +162,13 @@ void TGretina::SetSegmentCRMAT() {
     if((seg+1)!=segread) {
       fprintf(stderr,"%s: seg[%i] read but seg[%i] expected.\n",__PRETTY_FUNCTION__,segread,seg+1);
     }
+    //printf("type[%i] : seg[%02i] : %.02f  %.02f  %.02f\n",type,seg,x,y,z);
     m_segpos[(type+1)%2][seg][0] = x;
     m_segpos[(type+1)%2][seg][1] = y;
     m_segpos[(type+1)%2][seg][2] = z;
+    //m_segpos[(type)%2][seg][0] = x;
+    //m_segpos[(type)%2][seg][1] = y;
+    //m_segpos[(type)%2][seg][2] = z;
     seg++;
   }
   
@@ -178,7 +182,15 @@ TVector3 TGretina::GetSegmentPosition(int cry_id,int segment) {
   float x = m_segpos[cry_id%2][segment][0];
   float y = m_segpos[cry_id%2][segment][1];
   float z = m_segpos[cry_id%2][segment][2];
-  return CrystalToGlobal(cry_id,x,y,z);
+  TVector3 v(x,y,z);
+  if((cry_id%2)==0) {
+    if(cry_id==96 || cry_id==98) {
+    } else {
+      v.RotateZ(-TMath::Pi()/3.);
+    }
+  }
+  //return CrystalToGlobal(cry_id,x,y,z);
+  return CrystalToGlobal(cry_id,v.X(),v.Y(),v.Z());
 }
 
 TVector3 TGretina::GetCrystalPosition(int cry_id) {
@@ -297,7 +309,7 @@ void TGretina::BuildAddbackHits(){
 */
 
 void TGretina::Print(Option_t *opt) const {
-  printf(BLUE "GRETINA: size = %i" RESET_COLOR "\n",Size());
+  printf(BLUE "GRETINA: size = %i" RESET_COLOR "\n",(int)Size());
   for(unsigned int x=0;x<Size();x++) {
     printf(DYELLOW);
     GetGretinaHit(x).Print(opt);

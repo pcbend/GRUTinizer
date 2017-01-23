@@ -91,6 +91,7 @@ all: include/GVersion.h $(EXECUTABLES) $(LIBRARY_OUTPUT) pcm_files bin/gadd \
            $(HISTOGRAM_SO) $(FILTER_SO) extras lib/libAllGrutinizer.so
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
 
+
 pcm_files:
 
 docs:

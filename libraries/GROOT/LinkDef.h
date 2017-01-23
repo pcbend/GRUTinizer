@@ -54,7 +54,7 @@
 #pragma link C++ class std::map<std::string,GValue*>+;
 #pragma link C++ class std::pair<std::string,GValue*>+;
 #pragma link C++ class GMarker+;
-#pragma link C++ class GCanvas+;
+#pragma link C++ class GCanvas-;
 #pragma link C++ class GRootCanvas+;
 #pragma link C++ class GRootBrowser+;
 #pragma link C++ class GBrowserPlugin+;

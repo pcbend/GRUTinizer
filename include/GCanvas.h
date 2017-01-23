@@ -7,11 +7,13 @@
 //#include "TPeak.h"
 
 #include "TLine.h"
+//#include "TBuffer.h"
 
 class TF1;
 class TH1;
 class GH1;
 class GH2;
+
 
 class GMarker : public TObject{
 public:
@@ -143,6 +145,8 @@ private:
   //bool PeakFitQ(GMarker *m1=0,GMarker *m2=0);
 
   //static int fBGSubtraction_type;
+  //
+  //void Streamer(TBuffer*);
 private:
   Window_t fCanvasWindowID;
   TRootCanvas *fRootCanvas;
@@ -150,7 +154,7 @@ private:
   bool control_key;
   bool toggle_control() { control_key = !control_key; return control_key; }
 
-  ClassDef(GCanvas,2);
+  ClassDef(GCanvas,10);
 };
 
 #endif
