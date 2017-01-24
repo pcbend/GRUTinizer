@@ -116,36 +116,50 @@ void LoadGates(TRuntimeObjects& obj){
   }
 
   if(gates.size() == 0) {
-    for(int ringnum=1; ringnum<25; ringnum++) {
-      std::string name = Form("downstream_ring%02d_455cut",ringnum);
-      TCutG* gate = obj.GetCut(name);
-      if(gate) {
-        GammaEnergyCut cut{ringnum, WhichJanus::Downstream, GammaSeen::keV_455, gate};
-        gates.push_back(cut);
-      } else {
-        std::cout << "Warning: could not find cut \"" << name << "\"" << std::endl;
-      }
-    }
+    std::vector<std::pair<GammaSeen, std::string> > pairs;
+    pairs.push_back({GammaSeen::keV_455, "455cut"});
+    pairs.push_back({GammaSeen::keV_561, "561cut"});
+    pairs.push_back({GammaSeen::keV_665, "665cut"});
+    pairs.push_back({GammaSeen::keV_691, "691cut"});
+    pairs.push_back({GammaSeen::keV_857, "857cut"});
+    pairs.push_back({GammaSeen::keV_1146, "1146cut"});
+    pairs.push_back({GammaSeen::keV_1298, "1298cut"});
 
-    for(int ringnum=1; ringnum<25; ringnum++) {
-      std::string name = Form("recon_ring%02d_455cut",ringnum);
-      TCutG* gate = obj.GetCut(name);
-      if(gate) {
-        GammaEnergyCut cut{ringnum, WhichJanus::Recon, GammaSeen::keV_455, gate};
-        gates.push_back(cut);
-      } else {
-        std::cout << "Warning: could not find cut \"" << name << "\"" << std::endl;
-      }
-    }
+    for(auto& pair : pairs) {
+      GammaSeen gamma = pair.first;
+      std::string name = pair.second;
 
-    for(int ringnum=1; ringnum<25; ringnum++) {
-      std::string name = Form("upstream_ring%02d_455cut",ringnum);
-      TCutG* gate = obj.GetCut(name);
-      if(gate) {
-        GammaEnergyCut cut{ringnum, WhichJanus::Upstream, GammaSeen::keV_455, gate};
-        gates.push_back(cut);
-      } else {
-        std::cout << "Warning: could not find cut \"" << name << "\"" << std::endl;
+      for(int ringnum=1; ringnum<25; ringnum++) {
+        std::string cut_name = Form("downstream_ring%02d_%s",ringnum,name.c_str());
+        TCutG* gate = obj.GetCut(cut_name);
+        if(gate) {
+          GammaEnergyCut cut{ringnum, WhichJanus::Downstream, gamma, gate};
+          gates.push_back(cut);
+        } else {
+          std::cout << "Warning: could not find cut \"" << cut_name << "\"" << std::endl;
+        }
+      }
+
+      for(int ringnum=1; ringnum<25; ringnum++) {
+        std::string cut_name = Form("recon_ring%02d_%s",ringnum,name.c_str());
+        TCutG* gate = obj.GetCut(cut_name);
+        if(gate) {
+          GammaEnergyCut cut{ringnum, WhichJanus::Recon, gamma, gate};
+          gates.push_back(cut);
+        } else {
+          std::cout << "Warning: could not find cut \"" << cut_name << "\"" << std::endl;
+        }
+      }
+
+      for(int ringnum=1; ringnum<25; ringnum++) {
+        std::string cut_name = Form("upstream_ring%02d_%s",ringnum,name.c_str());
+        TCutG* gate = obj.GetCut(cut_name);
+        if(gate) {
+          GammaEnergyCut cut{ringnum, WhichJanus::Upstream, gamma, gate};
+          gates.push_back(cut);
+        } else {
+          std::cout << "Warning: could not find cut \"" << cut_name << "\"" << std::endl;
+        }
       }
     }
   }
@@ -1212,7 +1226,7 @@ void Make78Kr_Gamma_Plots(TRuntimeObjects& obj, TSegaHit& s_hit, TJanusHit& j_hi
   obj.FillHistogram(dirname.c_str(), "DCenergy_angle",
                     2000, 0, 2000, dc_energy,
                     180, 0, 180, gamma_angle);
-  obj.FillHistogram(dirname.c_str(), Form("DCenergy_angle_ring%02d", j_hit.GetRing()),
+  obj.FillHistogram(dirname.c_str(), Form("DCenergy_angle_%s_ring%02d", det.c_str(), j_hit.GetRing()),
                     2000, 0, 2000, dc_energy,
                     180, 0, 180, gamma_angle);
 
