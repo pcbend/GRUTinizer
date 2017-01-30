@@ -4,6 +4,7 @@
 #ifndef __CINT__
 #include <atomic>
 #include <condition_variable>
+#include <mutex>
 #include <thread>
 #endif
 
@@ -64,6 +65,9 @@ public:
 
 protected:
   static std::map<std::string,StoppableThread*> fthreadmap;
+#ifndef __CINT__
+  static std::timed_mutex fthreadmap_mutex;
+#endif
 
   //long items_in;
   //long items_out;

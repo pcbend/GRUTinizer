@@ -10,6 +10,7 @@
 #include "TChainLoop.h"
 
 std::map<std::string,StoppableThread*> StoppableThread::fthreadmap;
+std::timed_mutex StoppableThread::fthreadmap_mutex;
 bool StoppableThread::status_thread_on = false;
 std::thread StoppableThread::status_thread;
 
@@ -19,7 +20,10 @@ int StoppableThread::GetNThreads() { return fthreadmap.size(); }
 StoppableThread::StoppableThread(std::string name)
   : fname(name), running(true), paused(true) {
   //TODO: check if a thread already exists and delete?
-  fthreadmap.insert(std::make_pair(fname,this));
+  {
+    std::lock_guard<std::timed_mutex> lock(fthreadmap_mutex);
+    fthreadmap.insert(std::make_pair(fname,this));
+  }
   thread = std::thread(&StoppableThread::Loop, this);
   if(!status_thread_on) {
     start_status_thread();
@@ -28,6 +32,7 @@ StoppableThread::StoppableThread(std::string name)
 
 
 bool StoppableThread::AnyThreadRunning() {
+  std::lock_guard<std::timed_mutex> lock(fthreadmap_mutex);
   for(auto& elem : fthreadmap){
     if(elem.second->IsRunning()){
       return true;
@@ -37,6 +42,7 @@ bool StoppableThread::AnyThreadRunning() {
 }
 
 std::string StoppableThread::AnyThreadStatus() {
+  std::lock_guard<std::timed_mutex> lock(fthreadmap_mutex);
   for(auto& elem : fthreadmap){
     if(elem.second->IsRunning()){
       return elem.second->Status();
@@ -46,12 +52,14 @@ std::string StoppableThread::AnyThreadStatus() {
 }
 
 void StoppableThread::PauseAll() {
+  std::lock_guard<std::timed_mutex> lock(fthreadmap_mutex);
   for(auto& elem : fthreadmap){
     elem.second->Pause();
   }
 }
 
 void StoppableThread::ResumeAll() {
+  std::lock_guard<std::timed_mutex> lock(fthreadmap_mutex);
   for(auto& elem : fthreadmap){
     elem.second->Resume();
   }
@@ -65,24 +73,31 @@ std::string StoppableThread::Status() {
 }
 
 void StoppableThread::StopAll() {
-  for(auto& elem : fthreadmap){
-    TDataLoop* data_loop = dynamic_cast<TDataLoop*>(elem.second);
-    TChainLoop* chain_loop = dynamic_cast<TChainLoop*>(elem.second);
-    if(data_loop || chain_loop){
-      std::cout << "Stopping thread " << elem.first << std::endl;
-      elem.second->Stop();
+  {
+    std::lock_guard<std::timed_mutex> lock(fthreadmap_mutex);
+    for(auto& elem : fthreadmap){
+      TDataLoop* data_loop = dynamic_cast<TDataLoop*>(elem.second);
+      TChainLoop* chain_loop = dynamic_cast<TChainLoop*>(elem.second);
+      if(data_loop || chain_loop){
+        std::cout << "Stopping thread " << elem.first << std::endl;
+        elem.second->Stop();
+      }
+    }
+
+    for(auto& elem : fthreadmap){
+      std::cout << "Joining thread " << elem.first << std::endl;
+      StoppableThread* thread = elem.second;
+      thread->Join();
     }
   }
 
-  for(auto& elem : fthreadmap){
-    std::cout << "Joining thread " << elem.first << std::endl;
-    StoppableThread* thread = elem.second;
-    thread->Join();
-  }
-
   while(fthreadmap.size()){
-    StoppableThread* thread = fthreadmap.begin()->second;
-    std::cout << "Deleting thread " << fthreadmap.begin()->first << std::endl;
+    StoppableThread* thread = NULL;
+    {
+      std::lock_guard<std::timed_mutex> lock(fthreadmap_mutex);
+      thread = fthreadmap.begin()->second;
+      std::cout << "Deleting thread " << fthreadmap.begin()->first << std::endl;
+    }
     delete thread;
   }
 
@@ -91,6 +106,7 @@ void StoppableThread::StopAll() {
 
 StoppableThread *StoppableThread::Get(std::string name) {
   StoppableThread *mythread = 0;
+  std::lock_guard<std::timed_mutex> lock(fthreadmap_mutex);
   if(fthreadmap.count(name)) {
     mythread = fthreadmap.at(name);
   }
@@ -99,6 +115,8 @@ StoppableThread *StoppableThread::Get(std::string name) {
 
 
 StoppableThread::~StoppableThread() {
+  std::lock_guard<std::timed_mutex> lock(fthreadmap_mutex);
+
   if(fthreadmap.count(fname)) {
      fthreadmap.erase(fname);
   }
@@ -162,6 +180,7 @@ void StoppableThread::Loop() {
 void StoppableThread::Print() {
   printf("%i Threads:\n",GetNThreads());
   int counter = 0;
+  std::lock_guard<std::timed_mutex> lock(fthreadmap_mutex);
   for(auto it=fthreadmap.begin();it!=fthreadmap.end();it++) {
     printf("  %i\t%s @ 0x%08lx\n",counter,it->first.c_str(),(unsigned long)it->second);
     counter++;
@@ -198,6 +217,11 @@ void StoppableThread::status_out_loop() {
 }
 
 void StoppableThread::status_out() {
+  std::unique_lock<std::timed_mutex> lock(fthreadmap_mutex, std::defer_lock_t());
+  lock.try_lock_for(std::chrono::seconds(1));
+  if(!lock.owns_lock()) {
+    return;
+  }
 
   std::ofstream outfile(Form("%s/.grut_thread",getenv("GRUTSYS")));
   outfile << "---------------------------------------------------------------\n"; // 64 -.
