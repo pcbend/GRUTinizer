@@ -80,7 +80,7 @@ bool GetProjectionX(GH2D *hist,double low, double high, double bg_low,double bg_
 
   C_projections->cd(1);
   GH1D *Proj_y = hist->ProjectionX("Gamma_Gamma_xProjection");
-  GH1D *Proj_y_Clone = (GH1D*)Proj_y->Clone(); 
+  GH1D *Proj_y_Clone = (GH1D*)Proj_y->Clone();
   GH1D *Proj_gated = 0;
 
   if(bg_high>0 && bg_low>0){
@@ -91,7 +91,7 @@ bool GetProjectionX(GH2D *hist,double low, double high, double bg_low,double bg_
 
   Proj_y->GetXaxis()->SetTitle("Energy [keV]");
   Proj_y->GetYaxis()->SetTitle("Counts");
-  
+
 
 
   double Grace = 300;
@@ -106,7 +106,7 @@ bool GetProjectionX(GH2D *hist,double low, double high, double bg_low,double bg_
   Proj_y->Draw();
   double Projy_Max = Proj_y->GetMaximum();
   double Projy_Min = Proj_y->GetMinimum();
- 
+
   TLine *CutLow  = new TLine(low,Projy_Min,low,Projy_Max);
   TLine *CutHigh = new TLine(high,Projy_Min,high,Projy_Max);
   TLine *BGLow   = new TLine(bg_low,Projy_Min,bg_low,Projy_Max);
@@ -130,7 +130,7 @@ bool GetProjectionX(GH2D *hist,double low, double high, double bg_low,double bg_
   }else{
     Proj_gated = Proj_y_Clone->Project(low,high);
   }
- 
+
   if(bg_high>0 && bg_low>0){
     Proj_gated->SetTitle(Form("Gate From [%.01f,%.01f] with Background [%.01f,%.01f]",low,high,bg_low,bg_high));
   }else{
@@ -138,7 +138,7 @@ bool GetProjectionX(GH2D *hist,double low, double high, double bg_low,double bg_
   }
   Proj_gated->GetXaxis()->SetTitle("Energy [keV]");
   Proj_gated->GetYaxis()->SetTitle("Counts");
- 
+
   C_projections->cd(2);
   Proj_gated->Draw();
   return 1;
@@ -146,11 +146,10 @@ bool GetProjectionX(GH2D *hist,double low, double high, double bg_low,double bg_
 */
 
 
-
 /*
-bool GetProjectionX(GH2D *hist,GH2D *hist2, 
+bool GetProjectionX(GH2D *hist,GH2D *hist2,
 		   double low, double high, double bg_low,double bg_high,
-		   bool overlay, 
+		   bool overlay,
 		   double back_low,double back_high, double back_bg_low,
 		   double back_bg_high,
 		   bool back_overlay){
@@ -163,7 +162,7 @@ bool GetProjectionX(GH2D *hist,GH2D *hist2,
   if(!hist || !hist2) return 0;
 
   gStyle->SetOptStat(0);
-  
+
   GCanvas *C_projections      = 0;
   GCanvas *C_gammagamma       = 0;
   if(gROOT->GetListOfCanvases()->FindObject("C_projections")){
@@ -173,7 +172,7 @@ bool GetProjectionX(GH2D *hist,GH2D *hist2,
       C_projections->Divide(2,2);
     else
       C_projections->Divide(1,2);
-    
+
   }
   else{
     C_projections = new GCanvas("C_projections","Projection Canvas",0,0,1675,900);
@@ -190,11 +189,11 @@ bool GetProjectionX(GH2D *hist,GH2D *hist2,
 
   C_gammagamma->cd();
   hist->Draw();
-  
+
   C_projections->cd(1);
   GH1D *Proj_y  = hist->ProjectionX("Gamma_Gamma_xProjection");
   GH1D *Proj_y2 = hist2->ProjectionX("Gamma_Gamma_xProjection2");
-  
+
   GH2D *hist_Clone  = (GH2D*)hist->Clone();
   GH2D *hist2_Clone = (GH2D*)hist2->Clone();
 
@@ -230,7 +229,7 @@ bool GetProjectionX(GH2D *hist,GH2D *hist2,
   Proj_y->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize));
   Proj_back_y->GetXaxis()->SetTitle("Energy [keV]");
   Proj_back_y->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize));
-  
+
 
 
   double Grace = 300;
@@ -245,7 +244,7 @@ bool GetProjectionX(GH2D *hist,GH2D *hist2,
   Proj_y->Draw();
   double Projy_Max = Proj_y->GetMaximum();
   double Projy_Min = Proj_y->GetMinimum();
- 
+
   TLine *CutLow  = new TLine(low,Projy_Min,low,Projy_Max);
   TLine *CutHigh = new TLine(high,Projy_Min,high,Projy_Max);
   TLine *BGLow   = new TLine(bg_low,Projy_Min,bg_low,Projy_Max);
@@ -275,7 +274,7 @@ bool GetProjectionX(GH2D *hist,GH2D *hist2,
     Proj_gated2 = Proj_y2_Clone2->Project(low,high);
     Proj_gated2->SetLineColor(2);
   }
- 
+
   if(bg_high>0 && bg_low>0){
     Proj_gated->SetTitle(Form("Gate From [%.01f,%.01f] with Background [%.01f,%.01f]",low,high,bg_low,bg_high));
     if(overlay)
@@ -288,8 +287,8 @@ bool GetProjectionX(GH2D *hist,GH2D *hist2,
   double binsize_gated = (Proj_gated->GetXaxis()->GetXmax()-Proj_gated->GetXaxis()->GetXmin())/Proj_gated->GetXaxis()->GetNbins();
   Proj_gated->GetXaxis()->SetTitle("Energy [keV]");
   Proj_gated->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize_gated));
-  
- 
+
+
   C_projections->cd(2);
   if(overlay){
     Proj_gated2->GetXaxis()->SetTitle("Energy [keV]");
@@ -309,7 +308,7 @@ bool GetProjectionX(GH2D *hist,GH2D *hist2,
   gPad->Clear();
   C_projections->cd(4);
   gPad->Clear();
-  
+
   if(back_low>0 && back_high>0){
     C_projections->cd(3);
     double back_ZoomHigh = back_high+Grace;
@@ -324,7 +323,7 @@ bool GetProjectionX(GH2D *hist,GH2D *hist2,
     Proj_back_y->Draw();
     double Proj_back_y_Max = Proj_back_y->GetMaximum();
     double Proj_back_y_Min = Proj_back_y->GetMinimum();
- 
+
     TLine *back_CutLow  = new TLine(back_low,Proj_back_y_Min,back_low,Proj_back_y_Max);
     TLine *back_CutHigh = new TLine(back_high,Proj_back_y_Min,back_high,Proj_back_y_Max);
     TLine *back_BGLow   = new TLine(back_bg_low,Proj_back_y_Min,back_bg_low,Proj_back_y_Max);
@@ -350,12 +349,12 @@ bool GetProjectionX(GH2D *hist,GH2D *hist2,
     }else{
       Proj_gated_back = Proj_back_y2_Clone->Project(back_low,back_high);
     }
- 
+
     if(back_overlay){
       Proj_gated_back2 = Proj_back_y2_Clone2->Project(back_low,back_high);
       Proj_gated_back2->SetLineColor(2);
     }
-    
+
     if(back_bg_high>0 && back_bg_low>0){
       Proj_gated_back->SetTitle(Form("Gate From [%.01f,%.01f] with Background [%.01f,%.01f]",
 				     back_low,back_high,back_bg_low,back_bg_high));
@@ -373,7 +372,7 @@ bool GetProjectionX(GH2D *hist,GH2D *hist2,
     double binsize_back_gated = (Proj_gated_back->GetXaxis()->GetXmax()-Proj_gated_back->GetXaxis()->GetXmin())/Proj_gated_back->GetXaxis()->GetNbins();
     Proj_gated_back->GetXaxis()->SetTitle("Energy [keV]");
     Proj_gated_back->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize_back_gated));
- 
+
     C_projections->cd(4);
     if(back_overlay){
       Proj_gated_back2->GetXaxis()->SetTitle("Energy [keV]");
@@ -412,10 +411,10 @@ bool GetProjectionY(GH2D *hist,double low, double high, double bg_low,double bg_
 
   C_gammagamma->cd();
   hist->Draw();
-  
+
   C_projections->cd(1);
   GH1D *Proj_y = hist->ProjectionY("Gamma_Gamma_yProjection");
-  GH1D *Proj_y_Clone = (GH1D*)Proj_y->Clone(); 
+  GH1D *Proj_y_Clone = (GH1D*)Proj_y->Clone();
   GH1D *Proj_gated = 0;
 
   if(bg_high>0 && bg_low>0){
@@ -426,7 +425,7 @@ bool GetProjectionY(GH2D *hist,double low, double high, double bg_low,double bg_
 
   Proj_y->GetXaxis()->SetTitle("Energy [keV]");
   Proj_y->GetYaxis()->SetTitle("Counts");
-  
+
   double Grace = 300;
   double ZoomHigh = high+Grace;
   double ZoomLow  = low-Grace;
@@ -439,7 +438,7 @@ bool GetProjectionY(GH2D *hist,double low, double high, double bg_low,double bg_
   Proj_y->Draw();
   double Projy_Max = Proj_y->GetMaximum();
   double Projy_Min = Proj_y->GetMinimum();
- 
+
   TLine *CutLow  = new TLine(low,Projy_Min,low,Projy_Max);
   TLine *CutHigh = new TLine(high,Projy_Min,high,Projy_Max);
   TLine *BGLow   = new TLine(bg_low,Projy_Min,bg_low,Projy_Max);
@@ -478,11 +477,11 @@ bool GetProjectionY(GH2D *hist,double low, double high, double bg_low,double bg_
   Proj_gated->Draw();
   return 1;
 }
-*/
-/*
-bool GetProjectionY(GH2D *hist,GH2D *hist2, 
+
+bool GetProjectionY(GH2D *hist,GH2D *hist2,
+
 		   double low, double high, double bg_low,double bg_high,
-		   bool overlay, 
+		   bool overlay,
 		   double back_low,double back_high, double back_bg_low,
 		   double back_bg_high,
 		   bool back_overlay){
@@ -495,7 +494,7 @@ bool GetProjectionY(GH2D *hist,GH2D *hist2,
   if(!hist || !hist2) return 0;
 
   gStyle->SetOptStat(0);
-  
+
   GCanvas *C_projections      = 0;
   GCanvas *C_gammagamma       = 0;
   if(gROOT->GetListOfCanvases()->FindObject("C_projections")){
@@ -505,7 +504,7 @@ bool GetProjectionY(GH2D *hist,GH2D *hist2,
       C_projections->Divide(2,2);
     else
       C_projections->Divide(1,2);
-    
+
   }
   else{
     C_projections = new GCanvas("C_projections","Projection Canvas",0,0,1675,900);
@@ -522,11 +521,11 @@ bool GetProjectionY(GH2D *hist,GH2D *hist2,
 
   C_gammagamma->cd();
   hist->Draw();
-  
+
   C_projections->cd(1);
   GH1D *Proj_y  = hist->ProjectionY("Gamma_Gamma_yProjection");
   GH1D *Proj_y2 = hist2->ProjectionY("Gamma_Gamma_yProjection2");
-  
+
   GH2D *hist_Clone  = (GH2D*)hist->Clone();
   GH2D *hist2_Clone = (GH2D*)hist2->Clone();
 
@@ -562,7 +561,7 @@ bool GetProjectionY(GH2D *hist,GH2D *hist2,
   Proj_y->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize));
   Proj_back_y->GetXaxis()->SetTitle("Energy [keV]");
   Proj_back_y->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize));
-  
+
 
 
   double Grace = 300;
@@ -577,7 +576,7 @@ bool GetProjectionY(GH2D *hist,GH2D *hist2,
   Proj_y->Draw();
   double Projy_Max = Proj_y->GetMaximum();
   double Projy_Min = Proj_y->GetMinimum();
- 
+
   TLine *CutLow  = new TLine(low,Projy_Min,low,Projy_Max);
   TLine *CutHigh = new TLine(high,Projy_Min,high,Projy_Max);
   TLine *BGLow   = new TLine(bg_low,Projy_Min,bg_low,Projy_Max);
@@ -607,7 +606,7 @@ bool GetProjectionY(GH2D *hist,GH2D *hist2,
     Proj_gated2 = Proj_y2_Clone2->Project(low,high);
     Proj_gated2->SetLineColor(2);
   }
- 
+
   if(bg_high>0 && bg_low>0){
     Proj_gated->SetTitle(Form("Gate From [%.01f,%.01f] with Background [%.01f,%.01f]",low,high,bg_low,bg_high));
     if(overlay)
@@ -620,8 +619,8 @@ bool GetProjectionY(GH2D *hist,GH2D *hist2,
   double binsize_gated = (Proj_gated->GetXaxis()->GetXmax()-Proj_gated->GetXaxis()->GetXmin())/Proj_gated->GetXaxis()->GetNbins();
   Proj_gated->GetXaxis()->SetTitle("Energy [keV]");
   Proj_gated->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize_gated));
-  
- 
+
+
   C_projections->cd(2);
   if(overlay){
     Proj_gated2->GetXaxis()->SetTitle("Energy [keV]");
@@ -641,7 +640,7 @@ bool GetProjectionY(GH2D *hist,GH2D *hist2,
   gPad->Clear();
   C_projections->cd(4);
   gPad->Clear();
-  
+
   if(back_low>0 && back_high>0){
     C_projections->cd(3);
     double back_ZoomHigh = back_high+Grace;
@@ -656,7 +655,7 @@ bool GetProjectionY(GH2D *hist,GH2D *hist2,
     Proj_back_y->Draw();
     double Proj_back_y_Max = Proj_back_y->GetMaximum();
     double Proj_back_y_Min = Proj_back_y->GetMinimum();
- 
+
     TLine *back_CutLow  = new TLine(back_low,Proj_back_y_Min,back_low,Proj_back_y_Max);
     TLine *back_CutHigh = new TLine(back_high,Proj_back_y_Min,back_high,Proj_back_y_Max);
     TLine *back_BGLow   = new TLine(back_bg_low,Proj_back_y_Min,back_bg_low,Proj_back_y_Max);
@@ -682,12 +681,12 @@ bool GetProjectionY(GH2D *hist,GH2D *hist2,
     }else{
       Proj_gated_back = Proj_back_y2_Clone->Project(back_low,back_high);
     }
- 
+
     if(back_overlay){
       Proj_gated_back2 = Proj_back_y2_Clone2->Project(back_low,back_high);
       Proj_gated_back2->SetLineColor(2);
     }
-    
+
     if(back_bg_high>0 && back_bg_low>0){
       Proj_gated_back->SetTitle(Form("Gate From [%.01f,%.01f] with Background [%.01f,%.01f]",
 				     back_low,back_high,back_bg_low,back_bg_high));
@@ -705,7 +704,7 @@ bool GetProjectionY(GH2D *hist,GH2D *hist2,
     double binsize_back_gated = (Proj_gated_back->GetXaxis()->GetXmax()-Proj_gated_back->GetXaxis()->GetXmin())/Proj_gated_back->GetXaxis()->GetNbins();
     Proj_gated_back->GetXaxis()->SetTitle("Energy [keV]");
     Proj_gated_back->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize_back_gated));
- 
+
     C_projections->cd(4);
     if(back_overlay){
       Proj_gated_back2->GetXaxis()->SetTitle("Energy [keV]");
@@ -833,7 +832,7 @@ TF1 *DoubleGausFit(TH1 *hist,double cent1,double cent2,double xlow, double xhigh
     std::swap(xlow,xhigh);
 
   //std::cout << "here." << std::endl;
-  
+
   GGaus *mypeak= new GGaus(xlow,xhigh);
   std::string options = opt;
   options.append("Q+");
@@ -854,10 +853,10 @@ TF1 *DoubleGausFit(TH1 *hist,double cent1,double cent2,double xlow, double xhigh
 
 
 
-/* 
-  
-  
-  
+/*
+
+
+
 =======
 
 
@@ -1044,8 +1043,13 @@ void StartGUI() {
                              std::istreambuf_iterator<char>());
   TPython::Exec(script_text.c_str());
 
-  TTimer* gui_timer = new TTimer("TPython::Exec(\"update()\");", 10, true);
-  gui_timer->TurnOn();
+  // TTimer* gui_timer = new TTimer("TPython::Exec(\"update()\");", 10, true);
+  // gui_timer->TurnOn();
+  TTimer* gui_timer = new TTimer();
+  DummyGuiCaller* dummy_gui_caller = new DummyGuiCaller;
+  gui_timer->Connect("Timeout()", "DummyGuiCaller",
+                     dummy_gui_caller, "CallUpdate()");
+  gui_timer->Start(10, false);
 
   gui_is_running = true;
   for(int i=0;i<gROOT->GetListOfFiles()->GetSize();i++) {
@@ -1056,6 +1060,10 @@ void StartGUI() {
 
 bool GUIIsRunning() {
   return gui_is_running;
+}
+
+void DummyGuiCaller::CallUpdate() {
+  TPython::Exec("update()");
 }
 
 
@@ -1087,12 +1095,4 @@ TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
    }
   return toreturn;
 }
-
 */
-
-
-
-
-
-
-
