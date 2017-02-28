@@ -31,6 +31,7 @@ public:
   virtual TDetectorHit& GetHit(int i)            { return gretina_hits.at(i); }
 
   const TGretinaHit& GetGretinaHit(int i) const { return gretina_hits.at(i); }
+        TGretinaHit& GetGretinaHit(int i)       { return gretina_hits.at(i); }
   const TGretinaHit& GetAddbackHit(int i) const { return addback_hits.at(i); }
 
 
@@ -51,6 +52,15 @@ public:
   const std::vector<TGretinaHit> &GetAllHits() const { return gretina_hits; }
 
   void  SortHits();
+
+  void  CleanHits(int i=0) { 
+    for(auto x=gretina_hits.begin();x!=gretina_hits.end();x++) {
+      x->TrimSegments(1);
+      x->SetCoreEnergy(x->GetCoreEnergy(i));
+    }
+  }
+  
+
 
 private:
   void BuildAddback(int EngRange=-1) const;

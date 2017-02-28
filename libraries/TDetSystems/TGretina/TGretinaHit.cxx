@@ -373,4 +373,30 @@ void TGretinaHit::Clear(Option_t *opt) {
 }
 
 
+void TGretinaHit::TrimSegments(int type) {
+  // 0: drop multiple ident int pnts.  1: make into wedge "data"
+  if(type==0) {
+    std::set<interaction_point,intpnt_compare> pset;
+    for(auto x=fSegments.begin();x!=fSegments.end();x++) {
+      pset.insert(*x);
+    }
+    fSegments.clear();
+    for(auto x=pset.begin();x!=pset.end();x++) {
+      fSegments.push_back(*x);
+    }
+    std::sort(fSegments.begin(),fSegments.end());
+    fNumberOfInteractions = fSegments.size();
+  } else if (type==1) {
+    std::set<interaction_point,intpnt_compare_wedge> pset;
+    for(auto x=fSegments.begin();x!=fSegments.end();x++) {
+      pset.insert(*x);
+    }
+    fSegments.clear();
+    for(auto x=pset.begin();x!=pset.end();x++) {
+      fSegments.push_back(*x);
+    }
+    std::sort(fSegments.begin(),fSegments.end());
+    fNumberOfInteractions = fSegments.size();
+  }
+}
 
