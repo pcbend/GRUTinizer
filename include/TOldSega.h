@@ -4,14 +4,15 @@
 
 #include <vector>
 
+#include <TVector3.h>
 
 #include <TDetector.h>
 #include <TOldSegaHit.h>
 
 class TOldSega : public TDetector {
   public:
-    TOldSega() { } 
-    TOldSega(const TOldSega &rhs) { rhs.Copy(*this); }
+    TOldSega() { SetPositions(); } 
+    TOldSega(const TOldSega &rhs) { SetPositions(); rhs.Copy(*this); }
     
     void Copy(TObject &rhs)      const; // { TDetector::Copy(rhs); }
     void Print(Option_t *opt="") const; // { TDetector::Print(opt); }
@@ -31,6 +32,8 @@ class TOldSega : public TDetector {
 
     TOldSega& operator=(const TOldSega& rhs) { rhs.Copy(*this); return *this;}
 
+    static TVector3& GetPosition(int det,int seg)    { return fSegaPositions[det]; }
+
 
   private:
     int  BuildHits(std::vector<TRawEvent>& raw_data)  { return sega_hits.size(); }
@@ -40,6 +43,10 @@ class TOldSega : public TDetector {
     unsigned short masterlive;
     unsigned short xfpscint;
     unsigned short rf;
+
+    void SetPositions();
+    static TVector3 fSegaPositions[30]; //!
+    static bool     fPositionsSet;
 
   ClassDef(TOldSega,1)
 };
