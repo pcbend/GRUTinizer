@@ -190,7 +190,12 @@ TVector3 TGretina::GetSegmentPosition(int cry_id,int segment) {
     } else {
       v.RotateZ(-TMath::Pi()/3.);
     }
+    //v.RotateX(TMath::Pi());
+  } else {
+    //v.RotateY(TMath::Pi());
   }
+  //v.RotateX(TMath::Pi());
+  //v.RotateY(TMath::Pi());
   //return CrystalToGlobal(cry_id,x,y,z);
   return CrystalToGlobal(cry_id,v.X(),v.Y(),v.Z());
 }

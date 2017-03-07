@@ -23,6 +23,8 @@
 
 #include <GH2.h>
 #include <GH1D.h>
+#include <GPeak.h>
+#include <GRootCommands.h>
 
 #include "TROOT.h"
 #include "TVirtualPad.h"
@@ -3063,5 +3065,57 @@ GH1 *GH2::GetNext(TObject *obj,int direction) const {
   };
   return next;
 }
+
+
+std::map<int,double> GH2::FitSummary(double low,double high,int axis,Option_t *opt) const {
+  std::map<int,double> chan_area;
+  int binlow,binhigh;
+  if(low>high)
+    std::swap(low,high);
+
+  //switch on option 
+  //TF1 *fit = PhotoPeakFitNormBG(h,low,high,"");
+
+  switch(axis) {
+    case kXaxis:
+      printf(" project onto x...\n");
+      binlow  = this->GetXaxis()->FindBin(low);
+      binhigh = this->GetXaxis()->FindBin(high);
+      for(int y=1;y<=this->GetNbinsY();y++) {
+        GH1D *p = this->ProjectionX("_px",y,y);//binlow,binhigh);
+        if(p->Integral(binlow,binhigh)<10)
+          continue;
+        GPeak *peak = PhotoPeakFitNormBG(p,low,high,"");
+        chan_area[y] = peak->GetSum();
+      }
+      break;
+    case kYaxis:
+      printf(" project onto y...\n");
+      binlow  = this->GetYaxis()->FindBin(low);
+      binhigh = this->GetYaxis()->FindBin(high);
+      for(int x=1;x<=this->GetNbinsY();x++) {
+        GH1D *p = this->ProjectionY("_py",x,x);//binlow,binhigh);
+        if(p->Integral(binlow,binhigh)<10)
+          continue;
+        GPeak *peak = PhotoPeakFitNormBG(p,low,high,"");
+        chan_area[x] = peak->GetSum();
+      }
+      break;
+  }
+
+  std::map<int,double>::iterator it;
+  printf("\n  %s  sum for %.02f to %.02f \n\n",this->GetName(),low,high);
+  for(it=chan_area.begin();it!=chan_area.end();it++) {
+    printf("\t% 4i\t\t% 8.2f\n",it->first,it->second);
+  }
+  printf("\n\n");
+  return chan_area;
+}
+
+
+
+
+
+
 
 

@@ -25,7 +25,8 @@ namespace GRootFunctions {
   Double_t LanGausHighRes(Double_t *dim,Double_t *par);
 
   Double_t GammaEff(Double_t *dim,Double_t *par);
-
+  Double_t AlignedAD(Double_t *x,Double_t *par);
+  Double_t AlignedAD_Norm(Double_t *x,Double_t *par);
 
   Double_t ComptonFormula(Double_t *x,Double_t *par);
   Double_t AnalyzingPower(Double_t *x,Double_t *par);

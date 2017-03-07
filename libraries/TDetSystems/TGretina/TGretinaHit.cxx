@@ -122,9 +122,13 @@ TVector3 TGretinaHit::GetIntPosition(unsigned int i) const {
     double zoffset = GValue::Value("GRETINA_Z_OFFSET");
     if(std::isnan(zoffset))
       zoffset=0.00;
-    return TGretina::CrystalToGlobal(fCrystalId,fSegments.at(i).fX + xoffset,
-                                                fSegments.at(i).fY + yoffset,
-                                                fSegments.at(i).fZ + zoffset);
+    TVector3 v = TGretina::CrystalToGlobal(fCrystalId,fSegments.at(i).fX + xoffset,
+                                                      fSegments.at(i).fY + yoffset,
+                                                      fSegments.at(i).fZ + zoffset);
+    //v.RotateX(TMath::Pi());
+    return v;  //TGretina::CrystalToGlobal(fCrystalId,fSegments.at(i).fX + xoffset,
+               //                                     fSegments.at(i).fY + yoffset,
+               //                                     fSegments.at(i).fZ + zoffset);
   } else {
     return TDetectorHit::BeamUnitVec;
   }

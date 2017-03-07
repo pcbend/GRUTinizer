@@ -60,7 +60,9 @@ public:
     }
   }
   
-
+  float MSegPos(int type,int seg,int coord) const {
+    return m_segpos[type][seg][coord];
+  }
 
 private:
   void BuildAddback(int EngRange=-1) const;

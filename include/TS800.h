@@ -133,6 +133,10 @@ public:
 
   float GetCorrIonSum() const;
 
+
+public:
+  int BuildHits(UShort_t size,UShort_t *dptr,Long64_t timestamp); 
+
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 
