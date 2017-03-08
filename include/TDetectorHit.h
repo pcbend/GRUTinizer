@@ -22,7 +22,7 @@ public:
 
   Int_t  Address()   const      { return fAddress; }
   virtual Int_t  Charge() const;
-  Int_t  Time() const           { return fTime; }
+  virtual Int_t  Time() const           { return fTime; }
   long   Timestamp() const      { return fTimestamp; }
 
   void SetAddress(int address)      { fAddress = address; }
