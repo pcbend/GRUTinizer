@@ -10,11 +10,11 @@
 #include "GRootFunctions.h"
 #include "GCanvas.h"
 
-ClassImp(GGaus)
+ClassImp(GGaus);
 
 GGaus::GGaus(Double_t xlow,Double_t xhigh,Option_t *opt)
-      : TF1("gausbg","gaus(0)+pol1(3)",xlow,xhigh),
-        fBGFit("background","pol1",xlow,xhigh)  {
+  : TF1("gausbg","gaus(0)+pol1(3)",xlow,xhigh,TF1::EAddToList::kNo),
+    fBGFit("background","pol1",xlow,xhigh,TF1::EAddToList::kNo)  {
   Clear("");
   if(xlow>xhigh)
     std::swap(xlow,xhigh);
@@ -43,7 +43,7 @@ GGaus::GGaus(Double_t xlow,Double_t xhigh,TF1 *bg,Option_t *opt)
   InitNames();
 
   if(bg) {
-    fBGFit.Clear(); 
+    fBGFit.Clear();
     fBGFit.Copy(*bg);
   } else {
     fBGFit = TF1("BGFit","pol1",xlow,xhigh);
@@ -77,7 +77,7 @@ GGaus::~GGaus() {
 }
 
 //void GGaus::Fcn(Int_t &npar,Double_t *gin,Double_T &f,Double_t *par,Int_t iflag) {
-  //chisquared calculator 
+  //chisquared calculator
   //
 //  int i=0;
 //  double chisq = 0;
@@ -155,13 +155,13 @@ bool GGaus::InitParams(TH1 *fithist){
   // - par[2]: sigma
   // - par[3]: bg constent
   // - par[4]: bg slope
- 
-  //limits. 
+
+  //limits.
   TF1::SetParLimits(0,0,largesty*2);
   TF1::SetParLimits(1,xlow,xhigh);
   TF1::SetParLimits(2,0,xhigh-xlow);
   //TF1::SetParLimits(3,0.0,40);
-  //TF1::SetParLimits(4,0.01,5); 
+  //TF1::SetParLimits(4,0.01,5);
 
   //Make initial guesses
   TF1::SetParameter(0,largesty);         //fithist->GetBinContent(bin));
@@ -196,9 +196,9 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
   if(noprint) {
     options.ReplaceAll("no-print","");
   }
- 
 
-  if(fithist->GetSumw2()->fN!=fithist->GetNbinsX()+2) 
+
+  if(fithist->GetSumw2()->fN!=fithist->GetNbinsX()+2)
     fithist->Sumw2();
 
   TFitResultPtr fitres = fithist->Fit(this,Form("%sRSME",options.Data()));
@@ -246,7 +246,7 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
   //Intgrate the background.
   //GGaus *tmppeak = new GGaus;
   //this->Copy(*tmppeak);
-  
+
   //tmppeak->SetParameter("bg_offset",0.0);
   //tmppeak->SetRange(int_low,int_high);//This will help get the true area of the gaussian 200 ~ infinity in a gaus
   //tmppeak->SetName("tmppeak");
@@ -293,7 +293,7 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
     printf("GetProb():       %.4f\n", TF1::GetProb());*/
     //TF1::Print();
   }
-  
+
   Copy(*fithist->GetListOfFunctions()->FindObject(GetName()));
   fithist->GetListOfFunctions()->Add(fBGFit.Clone());
 

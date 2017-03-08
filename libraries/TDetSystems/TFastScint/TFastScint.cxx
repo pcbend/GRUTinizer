@@ -50,11 +50,17 @@ void TFastScint::Print(Option_t *opt) const {
 
 
 int TFastScint::BuildHits(std::vector<TRawEvent>& raw_data){
-  for(auto& event : raw_data){
-    TNSCLEvent& nscl = (TNSCLEvent&)event;
-    SetTimestamp(nscl.GetTimestamp());
-    errors+=Build_From(nscl,true);
-  }
+
+  for(auto& event : raw_data) { // should only be one..
+    SetTimestamp(event.GetTimestamp());
+    //event.Print("all");
+    errors+=Build_From(event,true);
+  } 
+  //for(auto& event : raw_data){
+  //  TNSCLEvent& nscl = (TNSCLEvent&)event;
+  //  SetTimestamp(nscl.GetTimestamp());
+  //  errors+=Build_From(nscl,true);
+  //}
   return (int)Size();
 }
 
@@ -105,7 +111,8 @@ TDetectorHit& TFastScint::GetHit(int i){
 }
 
 // This is where the unpacking happens:
-int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
+//int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
+int TFastScint::Build_From(TRawEvent &event,bool Zero_Suppress){
   bool DEBUG = false;
   Zero_Suppress = true;
   bool isQ = false;
@@ -115,12 +122,13 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
   //Int_t detNumber = -1;
 
   // Payload size in 32 bit words.
-  Int_t PayloadSize = event.GetPayloadSize()/4.0;
+  //Int_t PayloadSize = event.GetPayloadSize()/4.0;
 
-  if(PayloadSize == 1)
-    return 1;
+  //if(PayloadSize == 1)
+  //  return 1;
 
   const char* data = event.GetPayload();
+  Int_t PayloadSize = *data - 2; //event.GetPayloadSize()/4.0;
 
   // NOTE -> buffer_size is 2*PayloadSize.
   // UShort_t buffer_size = *((UShort_t*)(data));
@@ -145,7 +153,7 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
       else if(Mhead->isTDC()){
         isQ = false; isT = true;
       }
-      else std::cout << " *** Error -- Not QDC or TDC *** " << std::endl; 
+      //else std::cout << " *** Error -- Not QDC or TDC *** " << std::endl; 
 
     }// end if is header
     else if(Mword->isData()){ // Data
@@ -239,7 +247,7 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 
       else{ // If not QDC or TDC
 
-        std::cout << " *** Not TDC or QDC **** " << std::endl;
+        //std::cout << " *** Not TDC or QDC **** " << std::endl;
       }
     }// end elif is data
     else if(Mword->isETS()){
@@ -276,6 +284,9 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
 }
 
 TVector3 &TFastScint::GetPosition(int detector) { 
+  static TVector3 v(-68.5,210.8,-137.0);
+  return v;
+
   static std::map<int,TVector3> fFastScintDetectorMap;
   if(fFastScintDetectorMap.size()==0) {
     fFastScintDetectorMap[16] = TVector3(0,0,1);

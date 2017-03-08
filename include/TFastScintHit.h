@@ -2,6 +2,8 @@
 #define _TFASTSCINTDETECTORHIT_H_
 
 #include "TDetectorHit.h"
+#include <TMath.h>
+
 
 class TFastScintHit : public TDetectorHit {
 public:
@@ -25,6 +27,19 @@ public:
   //float GetEnergy()    const { return fEnergy;    }
   //
   TVector3 &GetPosition() const;
+
+
+  //double GetEnergy() const { return (Charge()*0.5181 ) - 0.268; } 
+
+  double GetDoppler(double beta,const TVector3 *vec=0) const {
+    if(vec==0) {
+      vec = &BeamUnitVec;
+    }
+    double tmp = 0.0;
+    double gamma = 1/(sqrt(1-pow(beta,2)));
+    tmp = GetEnergy()*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*vec)));
+    return tmp;
+  } 
 
 
 private:

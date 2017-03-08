@@ -45,6 +45,9 @@ class GH1 : public TH1 {
 
     void Draw(Option_t *opt="");
 
+    void Calibrate(double offset,double gain,int axis=1); // *MENU*
+
+
   private:
     TRef fParent;
     int  fProjectionAxis; //!

@@ -91,7 +91,7 @@ public:
   
   float GetRawXF_MESY(unsigned int i=0) const;
 
-  float GetMTOF_ObjE1(unsigned int i=0) const { return GetCorrTOF_OBJ_MESY(i); }
+  float GetMTOF_ObjE1(unsigned int i=0,bool find_best=true) const; // { return GetCorrTOF_OBJ_MESY(i); }
   float GetMTOF_XfpE1(unsigned int i=0) const { return GetXF_E1Raw_MESY(i);    }
   float GetMTOF_RfE1(unsigned int i=0)  const { return GetME1Up(i) - GetMRf(i);  }
   float GetMTOF_ObjRf(unsigned int i=0) const { return GetMRf(i)   - GetMObj(i); }

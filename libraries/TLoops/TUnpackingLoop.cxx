@@ -215,6 +215,9 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
     case 21: //lenda
       fOutputEvent->AddRawData(event, kDetectorSystems::LENDA);
       break;
+    case 22: //lenda
+      fOutputEvent->AddRawData(event, kDetectorSystems::FASTSCINT);
+      break;
     case 29: // Something.
       fOutputEvent->AddRawData(event, kDetectorSystems::BANK29);
       break;
