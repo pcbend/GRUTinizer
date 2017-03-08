@@ -20,6 +20,7 @@ class TOldSega : public TDetector {
     void InsertHit(const TDetectorHit &hit) { sega_hits.push_back((TOldSegaHit&)hit); }
     TDetectorHit& GetHit(int i)             { return sega_hits.at(i); }
     TOldSegaHit&  GetSegaHit(int i)         { return sega_hits.at(i); }
+    size_t Size() const                     { return sega_hits.size(); }
  
     unsigned short GetMasterLive() const { return masterlive; }
     unsigned short GetXfpScint()   const { return xfpscint; }
