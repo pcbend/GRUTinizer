@@ -51,7 +51,7 @@ public:
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 
-  int Build_From(TNSCLEvent &event,bool Zero_Suppress = false);
+  int Build_From(TRawEvent &event);
 
   //TClonesArray* fs_hits; //->
   std::vector<TFastScintHit> fs_hits;

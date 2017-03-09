@@ -59,9 +59,9 @@ int TFastScint::BuildHits(std::vector<TRawEvent>& raw_data){
   //static TStopwatch sw;
   //sw.Start();
   for(auto& event : raw_data){
-    TNSCLEvent& nscl = (TNSCLEvent&)event;
-    SetTimestamp(nscl.GetTimestamp());
-    errors+=Build_From(nscl,true);
+    //TNSCLEvent& nscl = (TNSCLEvent&)event;
+    SetTimestamp(event.GetTimestamp());
+    errors+=Build_From(event);
   }
   std::sort(fs_hits.begin(),fs_hits.end());
   //std::cout << "sw.CpuTime\t" << sw.CpuTime() << std::endl;
@@ -124,9 +124,24 @@ void TFastScint::SetRefTime(int refTime){
 
 
 // This is where the unpacking happens:
-int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
+int TFastScint::Build_From(TRawEvent &event){
+
+  //event.Print("all");
+
+  //printf("body:     0x%04x\n",*((unsigned short*)event.GetBody()));
+  //printf("payload:  0x%04x\n",*((unsigned short*)event.GetPayload()));
+
+
+  //int total_words = *((unsigned short*)event.GetPayload())/2;
+  //int *data = (int*)(event.GetPaylad()+2);
+
+
+  //return 0;
+
+  
+  
   bool DEBUG = false;
-  Zero_Suppress = false;
+  //Zero_Suppress = false;
   bool isQ = false;
   bool isT = false;
   
@@ -134,7 +149,8 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
   //Int_t detNumber = -1;
 
   // Payload size in 32 bit words.
-  Int_t PayloadSize = event.GetPayloadSize()/4.0;
+  //Int_t PayloadSize = event.GetPayload()   /4.0;
+  Int_t PayloadSize = *((unsigned short*)event.GetPayload())/2;
 
   if(PayloadSize == 1)
     return 1;
@@ -215,6 +231,7 @@ int TFastScint::Build_From(TNSCLEvent &event,bool Zero_Suppress){
   // std::cout << " Energy = " << CheckHit->GetEnergy() << std::endl;
   
   return 0;
+  
 }
 
 TVector3 &TFastScint::GetPosition(int detector) { 
