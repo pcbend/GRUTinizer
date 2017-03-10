@@ -64,6 +64,11 @@ TF1 *GrabFit(int i=0); //return the ith fit from the current canvas.
 void StartGUI();
 bool GUIIsRunning();
 
+class DummyGuiCaller {
+public:
+  void CallUpdate(); //*SIGNAL*
+};
+
 //enum EAxis {kXAxis = 1,kYAxis = 2,kXYaxis = 3,kZaxis = 4,kXZaxis = 5,kYZAxis = 6,kXYZAxis=7};
 enum EAxis {kXAxis = 1,kYAxis = 2};
 

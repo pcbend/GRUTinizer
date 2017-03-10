@@ -42,12 +42,30 @@ class interaction_point {
     return fSeg<other.fSeg;
   }
   void Print(Option_t *opt="") const { 
-    printf("Seg[%02i]\tEng: % 4.2f / % 4.2f  \t(X,Y,Z) % 3.2f % 3.2f % 3.2f\n",
-            fSeg,fEng,fFrac,fX,fY,fZ);
+    printf("Seg[%02i]\tWedge[%i]\tEng: % 4.2f / % 4.2f  \t(X,Y,Z) % 3.2f % 3.2f % 3.2f\n",
+            fSeg,(fSeg%6),fEng,fFrac,fX,fY,fZ);
   
   };
   ClassDef(interaction_point,1)
 };
+
+#ifndef __CINT__ 
+
+struct intpnt_compare {
+  bool operator()(const interaction_point &p1,const interaction_point &p2) {
+    return p1.fSeg < p2.fSeg;
+  }
+};
+
+struct intpnt_compare_wedge {
+  bool operator()(const interaction_point &p1,const interaction_point &p2) {
+    return (p1.fSeg%6) < (p2.fSeg%6);
+  }
+};
+
+
+
+#endif
 
 
 
@@ -150,7 +168,11 @@ public:
                                                 
   void Add(const TGretinaHit& other) {  }
   void SetCoreEnergy(float temp) const { fCoreEnergy = temp; }
- 
+
+  void TrimSegments(int type); // 0: drop multiple ident int pnts.  1: make into wedge "data"
+  bool IsClean() const { return !fPad; }
+
+  
 private:
   void SortHits();
 /* All possible decomp information and

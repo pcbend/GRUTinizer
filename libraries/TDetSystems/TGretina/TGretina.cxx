@@ -2,6 +2,8 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <set>
+
 
 #include "TGretina.h"
 //#include "GRootCommands.h"
@@ -188,7 +190,12 @@ TVector3 TGretina::GetSegmentPosition(int cry_id,int segment) {
     } else {
       v.RotateZ(-TMath::Pi()/3.);
     }
+    //v.RotateX(TMath::Pi());
+  } else {
+    //v.RotateY(TMath::Pi());
   }
+  //v.RotateX(TMath::Pi());
+  //v.RotateY(TMath::Pi());
   //return CrystalToGlobal(cry_id,x,y,z);
   return CrystalToGlobal(cry_id,v.X(),v.Y(),v.Z());
 }
@@ -429,3 +436,7 @@ void TGretina::DrawCoreSummary(Option_t *gate,Option_t *opt,Long_t nentries,TCha
 
 }
 */
+
+
+
+

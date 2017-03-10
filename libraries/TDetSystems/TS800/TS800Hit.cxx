@@ -576,9 +576,9 @@ bool TCrdc::IsGoodSample(int i) const {
 }
 
 float TCrdc::GetDispersiveX() const{
-  if(has_cached_dispersive_x) {
-    return cached_dispersive_x;
-  }
+  //if(has_cached_dispersive_x) {
+  //  return cached_dispersive_x;
+  //}
 
   int maxpad = GetMaxPad();
   //std::cout << " Before Max Pad Return " << std::endl;

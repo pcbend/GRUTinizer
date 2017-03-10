@@ -19,7 +19,7 @@ public:
   virtual void Clear(Option_t* opt = "");
 
   virtual void InsertHit(const TDetectorHit&);
-  virtual TFastScintHit GetLaBrHit(int i) const;
+  virtual const TFastScintHit& GetLaBrHit(int i) const;
   virtual TDetectorHit& GetHit(int i);
           TFastScintHit* FindHit(int);
   virtual size_t Size() const  { return fs_hits.size(); }
@@ -41,14 +41,17 @@ public:
   int GetErrors() {return errors; };
 
   void SetTrigTime(UShort_t time) { trig_time = time; }
-  int GetTrigTime()	      { return trig_time; }
+  int GetTrigTime() const { return trig_time; }
+
+  void SetRefTime(int refTime); 
+  int GetRefTime() const {return fReferenceTime;}
 
   static TVector3& GetPosition(int); 
 
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 
-  int Build_From(TRawEvent &event,bool Zero_Suppress = false);
+  int Build_From(TRawEvent &event);
 
   //TClonesArray* fs_hits; //->
   std::vector<TFastScintHit> fs_hits;
@@ -57,6 +60,7 @@ private:
   int tdc_TS;
 
   int trig_time;
+  int fReferenceTime;
 
   static int errors; //!
 

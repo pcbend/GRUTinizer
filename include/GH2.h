@@ -1,6 +1,7 @@
 #ifndef __GH2_H_
 #define __GH2_H_
 
+#include <map>
 
 #include <GH1.h>
 #include <TRef.h>
@@ -129,6 +130,8 @@ class GH2 : public GH1 {
     GH1  *GetNext(TObject *obj=0,int direction=GH2::kForward) const;
 
     TList *GetProjections() const { return &fProjections; }
+
+    std::map<int,double> FitSummary(double low,double high,int axis=1,Option_t *opt="PhotoPeak") const;
 
   private:
     void    AddToProjections(GH1 *hist) const { fProjections.Add(hist); hist->SetDirectory(0); }

@@ -236,30 +236,92 @@ TGraph* TKinematics::Evslab_graph(double thmin, double thmax, double size, int p
   double rad2deg=180.0/PI;
   double deg2rad=PI/180.0;
 
-  int steps = ((int)(thmax+1) - (int)thmin) / (int)size;   // when is size ever needed to be a double?? pcb.
+  int steps = ((int)(thmax+1) - (int)thmin) / 1.0;   // when is size ever needed to be a double?? pcb.
                                                            // i am under the impression that size should always be 1.0;
-                                                           //
+  size = size/steps;                                                       
   //for(int i=0;i<((thmax-thmin)/size);i++){
+  std::cout << "steps = " << steps << std::endl;
   for(int i=0;i<steps;i++){
     Final((thmin+i*size)*deg2rad,2);//part);   //2);
-    double tmpangle = GetThetalab(part)*(1/deg2rad);
+    double lab = (thmin+i*size);
+    double tmpangle = GetThetalab(part);//*(1/deg2rad);
     double tmpeng   = GetTlab(part) * 1000;
-    //printf("step[%i] \t tmpangle = %.02f \t tmpeng = %.02f\n",i,tmpangle,tmpeng);
-    if(tmpangle<1 || tmpangle > (GetMaxAngle(fVcm[part])*rad2deg) -1)
+    //printf("step[%i] \t lab = %.02f \t tmpangle = %.02f \t tmpeng = %.02f\n",i, tmpangle,tmpeng);
+    if(tmpangle<1 || tmpangle > (GetMaxAngle(fVcm[part])*rad2deg) -1) {
+      std::cout << " angle fail?" << std::endl;
       continue;
-    if(tmpeng>1e15||tmpeng<0.0)
+    }
+    if(tmpeng>1e15||tmpeng<0.0) {
+      std::cout << " energy fail?" << std::endl;
       continue;
-
+    }
     angle.push_back(GetThetalab(part)* (1/deg2rad));
     energy.push_back(GetTlab(part) * 1000); 
-
+    //std::cout << GetThetalab(part)* (1/deg2rad) << "\t" << GetTlab(part) * 1000 << std::endl;
   }
 
 
-  TGraph *graph = new TGraph(angle.size(), angle.data(), energy.data());
+  //TGraph *graph = new TGraph(angle.size(), angle.data(), energy.data());
+  TGraph *graph = new TGraph(angle.size(), &(angle[0]), &(energy[0]));
   //TSpline3* spline = new TSpline3("ETh_lab",&graph);
   return graph;
 }
+
+
+TGraph* TKinematics::Evslab_graph_reverse(double thmin, double thmax, double size, int part){
+  //double* energy = new double[(int)((thmax-thmin)/size)+1];
+  //double* angle = new double[(int)((thmax-thmin)/size)+1];
+
+  if(part<2||part>3) {
+    printf(ALERTTEXT "WARNING: the function Evslab_graph should use nuclei after the reaction (part 2 or part 3)" RESET_COLOR "\n");
+    return 0;
+  }
+
+  std::vector<double> energy;
+  std::vector<double> angle;
+
+  double rad2deg=180.0/PI;
+  double deg2rad=PI/180.0;
+
+  int steps = ((int)(thmax+1) - (int)thmin) / 1.0;   // when is size ever needed to be a double?? pcb.
+                                                           // i am under the impression that size should always be 1.0;
+  size = size/steps;                                                       
+  //for(int i=0;i<((thmax-thmin)/size);i++){
+  std::cout << "steps = " << steps << std::endl;
+  for(int i=0;i<steps;i++){
+    Final((thmin+i*size)*deg2rad,2);//part);   //2);
+    double lab = (thmin+i*size);
+    double tmpangle = GetThetalab(part);//*(1/deg2rad);
+    double tmpeng   = GetTlab(part) * 1000;
+    printf("step[%i] \t lab = %.02f \t tmpangle = %.02f \t tmpeng = %.02f\n",i, lab,tmpangle,tmpeng);
+    if(tmpangle*rad2deg<1 || tmpangle > (GetMaxAngle(fVcm[part])*rad2deg) -1) {
+      std::cout << " angle fail?" << std::endl;
+      continue;
+    }
+    if(tmpeng>1e15||tmpeng<10.0) {
+      std::cout << " energy fail?" << std::endl;
+      continue;
+    }
+    angle.push_back(-1*(GetThetalab(part)* (1/deg2rad)) + 180);
+    energy.push_back(GetTlab(part) * 1000); 
+    //std::cout << GetThetalab(part)* (1/deg2rad) << "\t" << GetTlab(part) * 1000 << std::endl;
+  }
+
+  //TGraph *graph = new TGraph(angle.size(), angle.data(), energy.data());
+  TGraph *graph = new TGraph(angle.size(), &(angle[0]), &(energy[0]));
+  //TSpline3* spline = new TSpline3("ETh_lab",&graph);
+  return graph;
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

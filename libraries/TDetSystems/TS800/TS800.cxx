@@ -300,6 +300,101 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
   return 1;
 }
 
+int TS800::BuildHits(UShort_t eventsize,UShort_t *dptr,Long64_t timestamp) {  //std::vector<TRawEvent>& raw_data){
+  SetTimestamp(timestamp);
+  //int ptr = 0;
+  //const TRawEvent::GEBS800Header *head = ((const TRawEvent::GEBS800Header*)event.GetPayload());
+  //ptr += sizeof(TRawEvent::GEBS800Header);
+
+  //Here, we are now pointing at the size of the next S800 thing.  Inclusive in shorts.
+  //std::string toprint = "all";
+  
+  unsigned short *data = dptr+2; //unsigned short*)(event.GetPayload()+ptr);
+  size_t x = 0;
+  //printf(" new s800 event\n"); fflush(stdout);
+  while(x<eventsize) { //(head->total_size-sizeof(TRawEvent::GEBS800Header)+16)) {  //total size is inclusive.
+    int size             = *(data+x);
+    unsigned short *dptr = (data+x+1);
+    //toprint.append(Form("0x%04x",*dptr));
+    x+=size;
+    if(x>eventsize) {
+      //std::cout << "x is oor." << std::endl;
+      return -1;
+    }
+    if(size==0) {
+      std::cout << "size is zero." << std::endl;\
+      return -1;
+    //  geb->Print(toprint.c_str());
+    //  printf("head size = %i\n",sizeof(head));
+    //  exit(0);
+    }
+    int sizeleft = size-2;
+    //ptr +=  (*((unsigned short*)(geb->GetPayload()+ptr))*2);
+    //printf(" x [0x%04x] at %i\n",*dptr,x); fflush(stdout);
+    switch(*dptr) {
+    case 0x5801:  //S800 TriggerPacket.
+      HandleTrigPacket(dptr+1,sizeleft);
+      break;
+    case 0x5802:  // S800 TOF.
+      //event.Print("all0x5802");
+      HandleTOFPacket(dptr+1,sizeleft);
+      break;
+    case 0x5810:  // S800 Scint
+      //event.Print("all0x5810");
+      HandleScintPacket(dptr+1,sizeleft);
+      break;
+    case 0x5820:  // S800 Ion Chamber
+      //event.Print("all0x5820");
+      HandleIonCPacket(dptr+1,sizeleft);
+      break;
+    case 0x5840:  // CRDC Packet
+      //event.Print("all0x58400x5845");
+      HandleCRDCPacket(dptr+1,sizeleft);
+      break;
+    case 0x5850:  // II CRDC Packet
+      break;
+    case 0x5860:  // TA Pin Packet
+      break;
+    case 0x5870:  // II Track Packet
+      break;
+    case 0x5880:  // II PPAC
+      break;
+    case 0x5890:  // Obj Scint
+      break;
+    case 0x58a0:  // Obj Pin Packet
+      //end of s800 tag!
+      x += size +1;
+      break;
+    case 0x58b0:  // S800 Hodoscope
+      break;
+    case 0x58c0:  // VME ADC
+      break;
+    case 0x58d0:  // Galotte
+      break;
+    case 0x58e0:
+      break;
+    case 0x58f0:
+      HandleMTDCPacket(dptr+1,sizeleft);
+      break;
+    
+    default:
+      //fprintf(stderr,"unknown data S800 type: 0x%04x  @ x = %i \n",*dptr,x);
+      return 0;
+    };
+  }
+  //SetEventCounter(head->GetEventNumber());
+  //geb->Print(toprint.c_str());
+  
+  return 1;
+}
+
+
+
+
+
+
+
+
 bool TS800::HandleTrigPacket(unsigned short *data,int size) {
   if(size<1){
     static int i=0;

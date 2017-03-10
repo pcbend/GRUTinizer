@@ -2,6 +2,10 @@
 #include "GRootFunctions.h"
 #include "TF1.h"
 
+#include <Math/Math.h>
+#include <Math/SpecFuncMathMore.h>
+
+
 NamespaceImp(GRootFunctions)
 
 
@@ -247,6 +251,18 @@ Double_t GRootFunctions::GammaEff(Double_t *x,Double_t *par) {
   double temp =  par[0] + par[1]*logE + par[2]*logE*logE +par[3]/(x[0]*x[0]);
   return pow(10,temp);
 
+}
+
+Double_t GRootFunctions::AlignedAD(Double_t *x,Double_t *par) {
+  double p2 = ::ROOT::Math::legendre(2,TMath::Cos(TMath::DegToRad()*x[0]));
+  double p4 = ::ROOT::Math::legendre(4,TMath::Cos(TMath::DegToRad()*x[0]));
+  return par[0] + par[1]*p2 + par[2]*p4;
+}
+
+Double_t GRootFunctions::AlignedAD_Norm(Double_t *x,Double_t *par) {
+  double p2 = ::ROOT::Math::legendre(2,TMath::Cos(TMath::DegToRad()*x[0]));
+  double p4 = ::ROOT::Math::legendre(4,TMath::Cos(TMath::DegToRad()*x[0]));
+  return par[0] * (1 + par[1]*p2 + par[2]*p4);
 }
 
 

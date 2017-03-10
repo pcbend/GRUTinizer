@@ -43,6 +43,7 @@ public:
 
 
   TGraph* Evslab_graph(double thmin, double thmax, double size, int part = 2);
+  TGraph* Evslab_graph_reverse(double thmin, double thmax, double size, int part=2);
 
   double GetCmEnergy(double eBeam);
   double GetCmEnergy();
