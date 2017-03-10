@@ -923,6 +923,20 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
         printf( RESET_COLOR );
       }
       break;
+    case kKey_k:
+      gHist=0;
+      for(auto hist : hists){
+        if(hist->InheritsFrom(GH1::Class())){
+          gHist = (GH1D*)hist;
+          break;
+        }
+      }
+      if(gHist) {
+        GetContextMenu()->Action(gHist,gHist->Class()->GetMethodAny("Calibrate"));
+        edited = true;
+      }
+
+      break;
     case kKey_l:
       if(GetLogy()){
         // Show full y range, not restricted to positive values.

@@ -12,6 +12,7 @@
 #include "TRandom.h"
 
 #include "GRootFunctions.h"
+#include "TGRUTUtilities.h"
 
 std::map<unsigned int,TChannel*> TChannel::fChannelMap;
 TChannel *TChannel::fDefaultChannel = new TChannel("TChannel",0xffffffff);
@@ -245,22 +246,6 @@ int TChannel::DeleteAllChannels()  {
   return count;
 }
 
-
-
-void TChannel::trim(std::string * line, const std::string & trimChars) {
-   //Removes the the string "trimCars" from the start or end of 'line'
-  if(line->length() == 0)
-    return;
-
-  std::size_t found = line->find_first_not_of(trimChars);
-  if(found != std::string::npos)
-    *line = line->substr(found, line->length());
-
-  found = line->find_last_not_of(trimChars);
-  if(found != std::string::npos)
-    *line = line->substr(0, found + 1);
-}
-
 void TChannel::ClearCalibrations() {
   ClearEnergyCoeff();
   ClearEfficiencyCoeff();
@@ -485,7 +470,7 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
 
   while(std::getline(infile,line)) {
     linenumber++;
-    trim(&line);
+    trim(line);
     size_t comment = line.find("//");
     if(comment != std::string::npos) {
        line = line.substr(0,comment);
@@ -524,7 +509,7 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
     if(openbrace != std::string::npos) {
        brace_open = true;
        name = line.substr(0,openbrace).c_str();
-       trim(&name);
+       trim(name);
        channel = new TChannel(name.c_str());
     }
     //=============================================//
@@ -532,14 +517,14 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
       if(colon != std::string::npos) {
         // Type is everything up to the colon
         std::string type = line.substr(0,colon);
-        trim(&type);
+        trim(type);
         for(unsigned int i=0; i<type.length(); i++){
           type[i] = toupper(type[i]);
         }
 
         // The payload is everything after the colon
         line = line.substr(colon+1,line.length());
-        trim(&line);
+        trim(line);
         std::istringstream ss(line);
 
         if(type == "NAME") {

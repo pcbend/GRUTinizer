@@ -129,9 +129,20 @@ void GH1::Draw(Option_t *opt) {
 
 
 
+void GH1::Calibrate(double offset,double gain,int axis) {
+  if(this->GetDimension()!=1) {
+    printf("%s  currently only works for 1d histograms.\n",__PRETTY_FUNCTION__);
+  }
+  double low  = this->GetXaxis()->GetBinLowEdge(1)*gain + offset;
+  double high = this->GetXaxis()->GetBinUpEdge(this->GetNbinsX())*gain + offset;
+  
+  this->GetXaxis()->SetLimits(low,high);
 
+  //for(int x=1;x<=this->GetNbinsX();x++) {
+  //  this->GetXaxis()->SetBinLabel(x,Form("%g",(x-1)*gain + offset));
+  //}
 
-
+}
 
 
 

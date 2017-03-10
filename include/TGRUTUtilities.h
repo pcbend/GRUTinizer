@@ -29,5 +29,6 @@ std::vector<int> MakeVectorFromFile(const char *fname);
 
 std::string ReplaceAll(std::string str, const std::string& from, const std::string& to);
 
+void trim(std::string& line, const std::string & trimChars = " \f\n\r\t\v");
 
 #endif

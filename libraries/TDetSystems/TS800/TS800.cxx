@@ -1501,3 +1501,23 @@ void TS800::DrawPID_Mesy_Tune(Long_t nentries,int i,TChain *chain){
 
 
 }
+
+
+float TS800::GetMTOF_ObjE1(unsigned int i,bool find_best) const { 
+  if(!find_best) 
+    return GetCorrTOF_OBJ_MESY(i); 
+  double target = GValue::Value("MTOF_ObjE1");
+  if(std::isnan(target)) 
+    return GetCorrTOF_OBJ_MESY(i); 
+  double value;
+  for(int i=0;i<mtof.fObj.size();i++) {    
+    double newvalue = GetMTOF_ObjE1(i,0);
+    if(std::abs(target - newvalue) < std::abs(target - value)) {
+      value = newvalue;
+    }
+  }
+  return value;
+}
+
+
+

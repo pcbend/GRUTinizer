@@ -99,6 +99,29 @@ struct G4S800 {
 friend std::ostream& operator<<(std::ostream& os, const G4S800 &s800pack);
 
 
+struct MQDCHeader {
+  UInt_t datum;
+  UInt_t signature() const { return (datum&0xc0000000)>>30; }
+  UInt_t subheader() const { return (datum&0x3f000000)>>24; }
+  UInt_t moduleid()  const { return (datum&0x00ff0000)>>16; }
+  UInt_t outformat() const { return (datum&0x00008000)>>15; }
+  UInt_t adcres()    const { return (datum&0x00007000)>>12; }
+  UInt_t size()      const { return (datum&0x00000fff)>>0;  }
+};  
+
+struct MTDCHeader {
+  UInt_t datum;
+  UInt_t signature() const { return (datum&0xc0000000)>>30; }
+  UInt_t subheader() const { return (datum&0x3f000000)>>24; }
+  UInt_t moduleid()  const { return (datum&0x00ff0000)>>16; }
+  UInt_t tdcres()    const { return (datum&0x0000f000)>>12; }
+  UInt_t size()      const { return (datum&0x00000fff)>>0;  }
+};  
+
+
+
+
+
 // General Mesytec Stuff:
 struct Mesy_Word{
   // This is 2x16 bits = 32 bits.  The MQDC talks in 32 bit words.

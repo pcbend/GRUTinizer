@@ -87,7 +87,6 @@ public:
 public:
   static int  ParseInputData(std::string &input,Option_t *opt="");
   static int  WriteToBuffer(Option_t *opt="");
-  static void trim(std::string *, const std::string &trimChars=" \f\n\r\t\v");
   static std::vector<double> ParseListOfDoubles(std::istream& ss);
 
   static double Calibrate(int value, const std::vector<double>& coeff);
