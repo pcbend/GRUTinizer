@@ -1,0 +1,246 @@
+
+
+
+Sega00:  {
+   Address:	0x5e6a0200
+   Number:	2
+   Info:	
+   System:	
+   Position:	
+   Subposition:	
+   Segment:	32
+   Pedestal:	0
+   EnergyCoeff:	0	1
+   TimeCoeff:
+   EfficiencyCoeff:
+}
+-----------------------------------
+
+Sega01:  {
+   Address:	0x5e6a0300
+   Number:	3
+   Info:	
+   System:	
+   Position:	
+   Subposition:	
+   Segment:	32
+   Pedestal:	0
+   EnergyCoeff:	0	1
+   TimeCoeff:
+   EfficiencyCoeff:
+}
+
+
+Sega02:  {
+   Address:	0x5e6a0400
+   Number:	4
+   Info:	
+   System:	
+   Position:	
+   Subposition:	
+   Segment:	32
+   Pedestal:	0
+   EnergyCoeff:	0	1
+   TimeCoeff:
+   EfficiencyCoeff:
+}
+
+Sega03:  {
+   Address:	0x5e6a0500
+   Number:	5
+   Info:	
+   System:	
+   Position:	
+   Subposition:	
+   Segment:	32
+   Pedestal:	0
+   EnergyCoeff:	0	1
+   TimeCoeff:
+   EfficiencyCoeff:
+}
+
+Sega04:  {
+   Address:	0x5e6a0600
+   Number:	6
+   Info:	
+   System:	
+   Position:	
+   Subposition:	
+   Segment:	32
+   Pedestal:	0
+   EnergyCoeff:	0	1
+   TimeCoeff:
+   EfficiencyCoeff:
+}
+-----------------------------------
+
+Sega05:  {
+   Address:	0x5e6a0900
+   Number:	9
+   Info:	
+   System:	
+   Position:	
+   Subposition:	
+   Segment:	32
+   Pedestal:	0
+   EnergyCoeff:	0	1
+   TimeCoeff:
+   EfficiencyCoeff:
+}
+
+
+Sega06:  {
+   Address:	0x5e6a0a00
+   Number:	10
+   Info:	
+   System:	
+   Position:	
+   Subposition:	
+   Segment:	32
+   Pedestal:	0
+   EnergyCoeff:	0	1
+   TimeCoeff:
+   EfficiencyCoeff:
+}
+
+Sega07:  {
+   Address:	0x5e6a0b00
+   Number:	11
+   Info:	
+   System:	
+   Position:	
+   Subposition:	
+   Segment:	32
+   Pedestal:	0
+   EnergyCoeff:	0	1
+   TimeCoeff:
+   EfficiencyCoeff:
+}
+Sega08:  {
+   Address:	0x5e6a0c00
+   Number:	12
+   Info:	
+   System:	
+   Position:	
+   Subposition:	
+   Segment:	32
+   Pedestal:	0
+   EnergyCoeff:	0	1
+   TimeCoeff:
+   EfficiencyCoeff:
+}
+-----------------------------------
+
+Sega09:  {
+   Address:	0x5e6a0d00
+   Number:	13
+   Info:	
+   System:	
+   Position:	
+   Subposition:	
+   Segment:	32
+   Pedestal:	0
+   EnergyCoeff:	0	1
+   TimeCoeff:
+   EfficiencyCoeff:
+}
+
+
+Sega10:  {
+   Address:	0x5e6a0e00
+   Number:	14
+   Info:	
+   System:	
+   Position:	
+   Subposition:	
+   Segment:	32
+   Pedestal:	0
+   EnergyCoeff:	0	1
+   TimeCoeff:
+   EfficiencyCoeff:
+}
+
+Sega11:  {
+   Address:	0x5e6a1100
+   Number:	17
+   Info:	
+   System:	
+   Position:	
+   Subposition:	
+   Segment:	32
+   Pedestal:	0
+   EnergyCoeff:	0	1
+   TimeCoeff:
+   EfficiencyCoeff:
+}
+Sega12:  {
+   Address:	0x5e6a1200
+   Number:	18
+   Info:	
+   System:	
+   Position:	
+   Subposition:	
+   Segment:	32
+   Pedestal:	0
+   EnergyCoeff:	0	1
+   TimeCoeff:
+   EfficiencyCoeff:
+}
+-----------------------------------
+
+Sega13:  {
+   Address:	0x5e6a1300
+   Number:	19
+   Info:	
+   System:	
+   Position:	
+   Subposition:	
+   Segment:	32
+   Pedestal:	0
+   EnergyCoeff:	0	1
+   TimeCoeff:
+   EfficiencyCoeff:
+}
+
+
+Sega14:  {
+   Address:	0x5e6a1400
+   Number:	20
+   Info:	
+   System:	
+   Position:	
+   Subposition:	
+   Segment:	32
+   Pedestal:	0
+   EnergyCoeff:	0	1
+   TimeCoeff:
+   EfficiencyCoeff:
+}
+
+Sega15:  {
+   Address:	0x5e6a1500
+   Number:	21
+   Info:	
+   System:	
+   Position:	
+   Subposition:	
+   Segment:	32
+   Pedestal:	0
+   EnergyCoeff:	0	1
+   TimeCoeff:
+   EfficiencyCoeff:
+}
+
+Sega16:  {
+   Address:	0x5e6a1600
+   Number:	22
+   Info:	
+   System:	
+   Position:	
+   Subposition:	
+   Segment:	32
+   Pedestal:	0
+   EnergyCoeff:	0	1
+   TimeCoeff:
+   EfficiencyCoeff:
+}

@@ -11,8 +11,8 @@
 
 class TOldSega : public TDetector {
   public:
-    TOldSega() { SetPositions(); } 
-    TOldSega(const TOldSega &rhs) { SetPositions(); rhs.Copy(*this); }
+    TOldSega() {  } 
+    TOldSega(const TOldSega &rhs) { rhs.Copy(*this); }
     
     void Copy(TObject &rhs)      const; // { TDetector::Copy(rhs); }
     void Print(Option_t *opt="") const; // { TDetector::Print(opt); }
@@ -33,7 +33,7 @@ class TOldSega : public TDetector {
 
     TOldSega& operator=(const TOldSega& rhs) { rhs.Copy(*this); return *this;}
 
-    static TVector3& GetPosition(int det,int seg)    { return fSegaPositions[det]; }
+    //static TVector3& GetPosition(int det,int seg)    { return fSegaPositions[det]; }
 
 
   private:
@@ -45,11 +45,10 @@ class TOldSega : public TDetector {
     unsigned short xfpscint;
     unsigned short rf;
 
-    void SetPositions();
-    static TVector3 fSegaPositions[30]; //!
-    static bool     fPositionsSet;
+  public:
+    static TVector3 GetGlobalSegmentPosition(int det,int seg);
 
-  ClassDef(TOldSega,1)
+  ClassDef(TOldSega,2)
 };
 
 
