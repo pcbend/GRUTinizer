@@ -266,24 +266,99 @@ Double_t GRootFunctions::AlignedAD_Norm(Double_t *x,Double_t *par) {
 }
 
 
-Double_t GRootFunctions::ComptonFormula(Double_t *x,Double_t *par) {
+Double_t GRootFunctions::AlignedADPol_Norm(Double_t *x,Double_t *par) {
+  double p2 = ::ROOT::Math::legendre(2,TMath::Cos(TMath::DegToRad()*x[0]));
+  double p4 = ::ROOT::Math::legendre(4,TMath::Cos(TMath::DegToRad()*x[0]));
+  double ap2 = ::ROOT::Math::assoc_legendre(2,2,TMath::Cos(TMath::DegToRad()*x[0]));
+  double ap4 = ::ROOT::Math::assoc_legendre(4,2,TMath::Cos(TMath::DegToRad()*x[0]));
 
+  double phi = TMath::DegToRad()*x[1];
+
+  double part2 =  par[1]*(p2 +(1./2.)*TMath::Cos(2*phi)*ap2);
+  double part4 =  par[2]*(p4 -(1./12.)*TMath::Cos(2*phi)*ap4);
+
+  return par[0] * (1 + part2 + part4);
+}
+
+
+
+
+
+
+
+
+
+
+Double_t GRootFunctions::ComptonEnergy(Double_t *x,Double_t *par) {
   //par[0] = inital gamma energy; in keV.
-
   double lower = 1 + (par[0]/511.)*(1-TMath::Cos(TMath::DegToRad()*x[0]));
   return par[0]/lower;
+
+}
+
+Double_t GRootFunctions::ComptonAngle(Double_t *x,Double_t *par) {
+  //par[0] = inital gamma energy; in keV.
+  if(x[0]>par[0])
+    return 0.00;
+  
+  double inside = (1./x[0] - 1./par[0]);
+  inside*=511.;
+  inside+= -1;
+  //printf("inside[%.02f]  = %.023f\n",x[0],inside);
+  return TMath::ACos(inside)*TMath::RadToDeg();
 
 }
 
 Double_t GRootFunctions::AnalyzingPower(Double_t *x,Double_t *par) {
 
   //par[0] = inital gamma energy; in keV.
-  double scattered = ComptonFormula(x,par);
+  double scattered = ComptonEnergy(x,par);
 
   double sin2 = (TMath::Sin(TMath::DegToRad()*x[0]))*(TMath::Sin(TMath::DegToRad()*x[0]));
   double lower = scattered/par[0] + par[0]/scattered  - sin2;
   return sin2/lower;
 }
+
+Double_t GRootFunctions::KN2(Double_t *x,Double_t *par)  {
+  //ok... par[0] = initial gamma energy in keV.
+  //2d plot, scattered energy vs phi.
+  double initial_gamma   = par[0];
+  double scattered_gamma = x[1];
+  double scattered_phi   = x[0];
+  double scattered_theta = ComptonAngle(&x[1],par);
+  
+  double part1  = (scattered_gamma/initial_gamma)*(scattered_gamma/initial_gamma);
+  double part2  = scattered_gamma/initial_gamma + initial_gamma/scattered_gamma;
+         part2 += -2*TMath::Power(TMath::Sin(TMath::DegToRad()*scattered_theta),2)
+                    *TMath::Power(TMath::Cos(TMath::DegToRad()*scattered_phi),2);
+
+  return part1*part2;
+}
+
+Double_t GRootFunctions::KN(Double_t *x, Double_t *par) {
+
+  double theta = x[0]*TMath::DegToRad();
+  double egam  = par[0];
+
+  double part1 = 3./(16.*TMath::Pi());
+  double part2 = 1 + egam*TMath::Power((1-TMath::Cos(theta)),2);
+  double part3 = egam*(1-TMath::Cos(theta));
+  double part4 = 1 + egam*(1-TMath::Cos(theta));
+  double part5 = TMath::Power(TMath::Cos(theta),2);
+
+  return part1 * 1./part2 * ( part3 + 1/part4 + part5);
+
+
+}
+
+
+
+
+
+
+
+
+
 
 
 

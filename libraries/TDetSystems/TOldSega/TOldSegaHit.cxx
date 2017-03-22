@@ -1,6 +1,6 @@
 
 #include <TString.h>
-
+#include <TOldSega.h>
 #include <TOldSegaHit.h>
 
 
@@ -40,11 +40,13 @@ void TOldSegaHit::AddSegment(int id, float charge) {
   hit.SetTimestamp(-1);
   segments.push_back(hit);
 
-};
+}
 
 
+TVector3 TOldSegaHit::GetPosition() const {
+  
+  return TOldSega::GetGlobalSegmentPosition(GetDetNum(),GetSegId());
 
-
-
+}
 
 

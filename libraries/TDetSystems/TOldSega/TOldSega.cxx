@@ -3,9 +3,6 @@
 #include <TMath.h>
 
 
-bool TOldSega::fPositionsSet = false;
-TVector3 TOldSega::fSegaPositions[30]; 
-
 void TOldSega::Clear(Option_t *opt) {
   sega_hits.clear();
 
@@ -42,42 +39,89 @@ void TOldSega::Print(Option_t *opt) const {
 }
 
 
-void TOldSega::SetPositions() {
-  if(fPositionsSet==true) return;
+TVector3 TOldSega::GetGlobalSegmentPosition(int det,int seg) {
+  double distance = 230;
+  int layer = seg/4;
+  int quad  = seg%4; 
 
+  double theta[] = {
+    37.0,
+    37.0,
+    37.0,
+    37.0,
+    37.0,
+    37.0,
+    37.0,
+    90.0,
+    90.0,
+    90.0,
+    90.0,
+    90.0,
+    90.0,
+    90.0,
+    90.0,
+    90.0,
+    90.0
+  };
+  double phi[] = {
+    45,
+    90,
+    135,
+    180,
+    225,
+    270,
+    315,
+    0,
+    36,
+    72,
+    108,
+    144,
+    180,
+    216,
+    252,
+    288,
+    324
+  };
 
-  fSegaPositions[0].SetMagThetaPhi(1,0,0);
-  fSegaPositions[1].SetMagThetaPhi(1,0,0);
-  fSegaPositions[2].SetMagThetaPhi(23,TMath::DegToRad()*32.1,TMath::DegToRad()*45.);
-  fSegaPositions[3].SetMagThetaPhi(23,TMath::DegToRad()*32.1,TMath::DegToRad()*90.);
-  fSegaPositions[4].SetMagThetaPhi(23,TMath::DegToRad()*32.1,TMath::DegToRad()*135.);
-  fSegaPositions[5].SetMagThetaPhi(23,TMath::DegToRad()*32.1,TMath::DegToRad()*180.);
-  fSegaPositions[6].SetMagThetaPhi(23,TMath::DegToRad()*32.1,TMath::DegToRad()*225.);
-  fSegaPositions[7].SetMagThetaPhi(1,0,0);
-  fSegaPositions[8].SetMagThetaPhi(1,0,0);
-  fSegaPositions[9].SetMagThetaPhi(23,TMath::DegToRad()*32.1,TMath::DegToRad()*270.);
-  fSegaPositions[10].SetMagThetaPhi(23,TMath::DegToRad()*32.1,TMath::DegToRad()*315.);
-  fSegaPositions[11].SetMagThetaPhi(23,TMath::DegToRad()*84.8,TMath::DegToRad()*0.);
-  fSegaPositions[12].SetMagThetaPhi(23,TMath::DegToRad()*84.8,TMath::DegToRad()*36.);
-  fSegaPositions[13].SetMagThetaPhi(23,TMath::DegToRad()*84.8,TMath::DegToRad()*72.);
-  fSegaPositions[14].SetMagThetaPhi(23,TMath::DegToRad()*84.8,TMath::DegToRad()*108.);
-  fSegaPositions[15].SetMagThetaPhi(1,0,0);
-  fSegaPositions[16].SetMagThetaPhi(1,0,0);
-  fSegaPositions[17].SetMagThetaPhi(23,TMath::DegToRad()*84.8,TMath::DegToRad()*144.);
-  fSegaPositions[18].SetMagThetaPhi(23,TMath::DegToRad()*84.8,TMath::DegToRad()*180.);
-  fSegaPositions[19].SetMagThetaPhi(23,TMath::DegToRad()*84.8,TMath::DegToRad()*216.);
-  fSegaPositions[20].SetMagThetaPhi(23,TMath::DegToRad()*84.8,TMath::DegToRad()*252.);
-  fSegaPositions[21].SetMagThetaPhi(23,TMath::DegToRad()*84.8,TMath::DegToRad()*288.);
-  fSegaPositions[22].SetMagThetaPhi(23,TMath::DegToRad()*84.8,TMath::DegToRad()*324.);
-  fSegaPositions[23].SetMagThetaPhi(1,0,0);
-  fSegaPositions[24].SetMagThetaPhi(1,0,0);
-  fSegaPositions[25].SetMagThetaPhi(1,0,0);
-  fSegaPositions[26].SetMagThetaPhi(1,0,0);
-  fSegaPositions[27].SetMagThetaPhi(1,0,0);
-  fSegaPositions[28].SetMagThetaPhi(1,0,0);
-  fSegaPositions[29].SetMagThetaPhi(1,0,0);
-  fPositionsSet = true;
+  double x,y,z;
+  z = distance;
+
+  switch(quad) {
+    case 0:
+      y = 17.5;
+      z+= 17.5;
+      break;
+    case 1:
+      y = -17.5;
+      z+= 17.5;
+      break;
+    case 2:
+      y = -17.5;
+      z-= 17.5;
+      break;
+    case 3:
+      y = 17.5;
+      z-= 17.5;
+      break;
+  };    
+  x = (35.0 - layer*10.0);
+  TVector3 vec(x,y,z);
+  TVector3 unit(0,0,1);
+  unit.SetMagThetaPhi(1,theta[det]*TMath::RadToDeg(),phi[det]*TMath::RadToDeg());
+  vec.RotateUz(unit.Unit());
+  return vec;
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

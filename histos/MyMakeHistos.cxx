@@ -276,6 +276,9 @@ bool HandleLaBr(TRuntimeObjects &obj,GCutG *outgoing=0) {
       obj.FillHistogram(dirname,histname,130,0,3600,labr->Timestamp()/(double)1e8,
                                          4000,0,4000,labr->GetLaBrHit(x).Charge());
 
+     histname="chan_15_time_energy";
+      obj.FillHistogram(dirname,histname,16000,0,64000,labr->GetRefTime() - labr->GetLaBrHit(x).GetTime(),
+                                         4000,0,4000,labr->GetLaBrHit(x).Charge());
      TGretina *gretina = obj.GetDetector<TGretina>();
      if(gretina) {
        std::string gdirname = "gretina";
@@ -306,7 +309,7 @@ bool HandleLaBr(TRuntimeObjects &obj,GCutG *outgoing=0) {
                                        32,0,32,labr->GetLaBrHit(x).GetChannel());
   
     histname="summary_time";
-    obj.FillHistogram(dirname,histname,16000,0,64000,labr->GetLaBrHit(x).GetTime(),
+    obj.FillHistogram(dirname,histname,8000,0,64000,labr->GetLaBrHit(x).GetTime(),
                                        32,0,32,labr->GetLaBrHit(x).GetChannel());
 
     //if(labr->GetRefTime() >100 && labr->GetLaBrHit(x).GetTime() >100 ) {
