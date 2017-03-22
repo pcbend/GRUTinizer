@@ -18,7 +18,7 @@ class TOldSega : public TDetector {
     void Print(Option_t *opt="") const; // { TDetector::Print(opt); }
     void Clear(Option_t *opt=""); 
 
-    void InsertHit(const TDetectorHit &hit) { sega_hits.push_back((TOldSegaHit&)hit); }
+    void InsertHit(const TDetectorHit &hit) { TOldSegaHit &oshit = (TOldSegaHit&)hit; oshit.Sort(); sega_hits.push_back(oshit); }
     TDetectorHit& GetHit(int i)             { return sega_hits.at(i); }
     TOldSegaHit&  GetSegaHit(int i)         { return sega_hits.at(i); }
     size_t Size() const                     { return sega_hits.size(); }

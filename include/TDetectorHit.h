@@ -38,6 +38,8 @@ public:
 
   static const TVector3 BeamUnitVec; //!
 
+  bool operator< (const TDetectorHit &rhs) const { return GetEnergy() > rhs.GetEnergy(); }
+
 protected:
   Int_t   fAddress;
   long    fTimestamp;
