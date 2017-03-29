@@ -110,7 +110,7 @@ const char* TDetectorHit::GetName() const {
 
 void TDetectorHit::Streamer(TBuffer &r_b) {
   if(r_b.IsReading()) {
-    std::cout << "streamer\tin!" << std::endl;
+    //std::cout << "streamer\tin!" << std::endl;
     r_b.ReadClassBuffer(TDetectorHit::Class(),this);
   } else {
     //std::cout << "streamer\tout!" << std::endl;
