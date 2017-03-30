@@ -185,7 +185,7 @@ TVector3 TSegaHit::GetPosition(bool apply_array_offset, TVector3 array_offset) c
   return array_pos;
 }
 
-Int_t TSegaHit::Charge() const {
+float TSegaHit::RawCharge() const {
   if(fCharge > 30000) {
     return fCharge - 32768;
   } else {

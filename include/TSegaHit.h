@@ -17,7 +17,7 @@ public:
   virtual void Print(Option_t *opt = "") const;
   virtual void Draw(Option_t* opt = "");
 
-  virtual Int_t Charge() const;
+  virtual float RawCharge() const;
 
   int GetDetnum() const;
   int GetMainSegnum() const;

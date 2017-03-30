@@ -54,19 +54,19 @@ Int_t  TDetectorHit::Charge() const {
   if(fFlags & kIsEnergy) {
     return 0;
   } else {
-    return fCharge;
+    return RawCharge();
   }
 }
 
 double TDetectorHit::GetEnergy() const {
   if(fFlags & kIsEnergy) {
-    return fCharge;
+    return RawCharge();
   } else {
     TChannel* chan = TChannel::GetChannel(fAddress);
     if(!chan){
       return fCharge;
     } else {
-      return chan->CalEnergy(fCharge, fTimestamp);
+      return chan->CalEnergy(RawCharge(), fTimestamp);
     }
   }
 }

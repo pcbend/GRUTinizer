@@ -66,7 +66,7 @@ int TSegaSegmentHit::GetChannel() const {
   return (fAddress&0x000000ff)>>0;
 }
 
-Int_t TSegaSegmentHit::Charge() const {
+float TSegaSegmentHit::RawCharge() const {
   if(fCharge > 30000) {
     return fCharge - 32768;
   } else {

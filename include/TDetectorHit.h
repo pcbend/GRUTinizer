@@ -20,7 +20,8 @@ public:
   virtual void  Print(Option_t *opt = "" ) const;
 
   Int_t  Address()   const      { return fAddress; }
-  virtual Int_t  Charge() const;
+  virtual Int_t Charge() const;
+  virtual float RawCharge() const { return fCharge; }
   Int_t  Time() const           { return fTime; }
   long   Timestamp() const      { return fTimestamp; }
 
@@ -57,6 +58,7 @@ protected:
   };
 
   ClassDef(TDetectorHit,4)
+
 };
 
 #endif
