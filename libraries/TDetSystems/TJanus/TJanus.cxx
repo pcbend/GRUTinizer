@@ -185,7 +185,7 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
        hit.GetDetnum() >= 0 &&
        hit.GetDetnum() < 2){
       best_front = elem.first;
-      max_energy = hit.Charge();
+      max_energy = hit.GetEnergy();
     }
   }
 
@@ -200,7 +200,7 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
        hit.GetDetnum() >= 0 &&
        hit.GetDetnum() < 2){
       best_back = elem.first;
-      max_energy = hit.Charge();
+      max_energy = hit.GetEnergy();
     }
   }
 
