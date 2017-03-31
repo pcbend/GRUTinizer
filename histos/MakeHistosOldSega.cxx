@@ -93,25 +93,6 @@ bool IncomingBeam(TRuntimeObjects& obj,GCutG *outgoing) {
   return true;
 }
 
-
-int HandleOldSega(TRuntimeObjects& obj,GCutG *incoming,GCutG *outgoing) {
-
-  TS800     *s800 = obj.GetDetector<TS800>();
-  TOldSega  *sega = obj.GetDetector<TOldSega>();
-  if(!s800 || !sega)
-    return false;
-
-  for(unsigned int i=0;i<sega->Size();i++) {
-    TOldSegaHit hit = sega->GetSegaHit(i);
-
-    obj.FillHistogram("Gated","Charge",
-                    4096,0,4096,hit.Charge(),
-                    30,0,30,hit.GetDetId());
-  } 
-
-  return 0;
-}
-
 int HandleUngatedOldSega(TRuntimeObjects& obj) {
 
   //TS800     *s800 = obj.GetDetector<TS800>();
@@ -119,6 +100,7 @@ int HandleUngatedOldSega(TRuntimeObjects& obj) {
   //if(!s800 || !sega)
     //return false;
 
+  std::string dirname;
   std::string histname;
 
   for(unsigned int i=0;i<sega->Size();i++) {
@@ -127,6 +109,10 @@ int HandleUngatedOldSega(TRuntimeObjects& obj) {
     obj.FillHistogram("Ungated","Charge_Det",
                     4096,0,4096,hit.Charge(),
                     30,0,30,hit.GetDetId());
+    obj.FillHistogram("Ungated","Charge_Energy",
+                    4096,0,4096,hit.GetEnergy(),
+                    30,0,30,hit.GetDetId());
+    
     for(int j=0; j<hit.Size(); j++) {
       histname = Form("SegCharge_Det%02i",hit.GetDetId());
       obj.FillHistogram("Ungated",histname,
@@ -134,6 +120,44 @@ int HandleUngatedOldSega(TRuntimeObjects& obj) {
                         40,0,40,hit.GetSegId(j));
     } 
   }
+
+  return 0;
+}
+
+int HandleOldSega(TRuntimeObjects& obj,GCutG *incoming,GCutG *outgoing) {
+
+  TS800     *s800 = obj.GetDetector<TS800>();
+  TOldSega  *sega = obj.GetDetector<TOldSega>();
+  if(!s800 || !sega)
+    return false;
+
+  std::string dirname;
+  std::string histname;
+
+  dirname = Form("sega_%s",outgoing->GetName());
+
+   //this enforces that the outgoing PID blob (AX_from_BY_incoming) is in the incoming gate (BY_incoming)
+  const char *outgoing_name = outgoing->GetName();
+  const char *toRemove = outgoing->GetTitle(); //going to remove AX from name
+  size_t length = strlen(toRemove); //length of AX (can be 23Al or 26P, for example)
+  outgoing_name += length+6; //remove AX_from_  
+  if(strcmp(outgoing_name,incoming->GetName()) != 0)
+    return false;
+
+  double beta = GValue::Value(Form("BETA_%s",outgoing->GetTitle()));
+  //printf("beta = %f\n",beta);
+
+  for(unsigned int i=0;i<sega->Size();i++) {
+    TOldSegaHit hit = sega->GetSegaHit(i);
+
+    obj.FillHistogram(dirname,"Energy_Time",
+                    1000,0,30000,hit.GetTime(),
+                    1024,0,4096,hit.GetEnergy());
+
+    obj.FillHistogram(dirname,"Doppler_Det",
+                    4096,0,4096,hit.GetDoppler(beta),
+                    30,0,30,hit.GetDetId());
+  }  
 
   return 0;
 }
