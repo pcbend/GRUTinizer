@@ -42,6 +42,7 @@ namespace GRootFunctions {
 
   Double_t W_pol(Double_t *x, Double_t *par);
   Double_t W_pol_dirk(Double_t *x, Double_t *par);
+  Double_t W_pol_dirk2(Double_t *x, Double_t *par);
   Double_t W_pol_norm(Double_t *x, Double_t *par);
   Double_t W_pol2(Double_t *x, Double_t *par);
   Double_t W_pol3(Double_t *x, Double_t *par);
@@ -49,6 +50,10 @@ namespace GRootFunctions {
   Double_t W_pol5(Double_t *x, Double_t *par);
   Double_t W_pol6(Double_t *x, Double_t *par);
   Double_t W_pol7(Double_t *x, Double_t *par);
+
+  Double_t W_pol_test(Double_t *x, Double_t *par);
+  Double_t W_pol_diff(Double_t *x, Double_t *par);
+
 
   Double_t Q_pol(Double_t *x, Double_t *par);
 

@@ -488,16 +488,38 @@ Double_t GRootFunctions::W_pol_dirk(Double_t *x, Double_t *par) {
   //par[2] a4
   //par[3] Inital gamma energy;
   //par[4] compton scattering angle;
-  //par[5] scaling.
+  //par[5] phi - shift. 
 
   //x[0] theta, from beam axis;
   //x[1] angle between the reaction plane and the compton scattering plane;
 
-  double y[3] = { x[0],par[4],x[1] };
-  double y2[3] = { x[0],par[4],x[1]+60 };
+  double y[3]  = { x[0],par[4],x[1] };
+  double y2[3] = { x[0],par[4],x[1]+par[5] };
 
   return  (GRootFunctions::W_pol(y,par) - GRootFunctions::W_pol(y2,par)) / 
           (GRootFunctions::W_pol(y,par) + GRootFunctions::W_pol(y2,par));
+  
+  //return 1e15*par[5]*GRootFunctions::W_pol(y,par);
+  //return par[5]*GRootFunctions::W_pol(y,par);
+}
+
+Double_t GRootFunctions::W_pol_dirk2(Double_t *x, Double_t *par) {
+  
+  //par[0] A0
+  //par[1] a2
+  //par[2] a4
+  //par[3] Inital gamma energy;
+  //par[4] compton scattering angle;
+  //par[5] phi - shift. 
+
+  //x[0] theta, from beam axis;
+  //x[1] angle between the reaction plane and the compton scattering plane;
+
+  double y[3]  = { x[0],par[4],x[1] };
+  double y2[3] = { x[0],par[4],x[1]+par[5] };
+
+  return  (GRootFunctions::W_pol(y,par) / 
+           GRootFunctions::W_pol(y2,par));
   
   //return 1e15*par[5]*GRootFunctions::W_pol(y,par);
   //return par[5]*GRootFunctions::W_pol(y,par);
@@ -537,7 +559,7 @@ Double_t GRootFunctions::W_pol4(Double_t *x,Double_t *par) {
   //par[1] a2
   //par[2] a4
   //par[3] Inital gamma energy;
-  //par[4] compton scattering angle;
+  //par[4] overall scaling.  compton scattering angle;
   //par[5] scaling on cos(2*zeta) term..
 
   //x[0] theta, from beam axis;
@@ -546,8 +568,9 @@ Double_t GRootFunctions::W_pol4(Double_t *x,Double_t *par) {
   double y[3] = { x[0],par[4],x[1] };
 
   double w  = AlignedAD_Norm(&y[0],par);
-  double kn = KN_unpol(&y[1],&par[3]);
-  double an = AnalyzingPower(&y[1],&par[3]);
+  //double kn = KN_unpol(&y[1],&par[3]);
+  double kn = par[4];
+  //double an = AnalyzingPower(&y[1],&par[3]);
   double p  = Polarization(&y[0],par);
 
   return w*kn*(1-0.5*p*par[5]*TMath::Cos(2*y[2]*TMath::DegToRad()));
@@ -590,16 +613,69 @@ Double_t GRootFunctions::W_pol6(Double_t *x,Double_t *par) {
 
   double y[3] = { x[0],par[4],x[1] };
 
+  //double //w  = AlignedAD_Norm(&y[0],par);
+  //double   w  = 1.0;
+  //double //kn = KN_unpol(&y[1],&par[3]);
+  //double   kn = 1.0;
+  //double //an = AnalyzingPower(&y[1],&par[3]);
+  double p  = Polarization(&x[0],par);
+
+  //return par[5]*w*kn*(1-0.5*p*an*TMath::Cos(2*y[2]*TMath::DegToRad()));
+  return par[5]*(1-0.5*p*par[4]*TMath::Cos(2*x[1]*TMath::DegToRad()));
+
+}
+
+
+Double_t GRootFunctions::W_pol_test(Double_t *x,Double_t *par) {
+  //par[0] A0
+  //par[1] a2
+  //par[2] a4
+  //par[3] Inital gamma energy;
+  //par[4] analizing power scale;
+  //par[5] overall scale.
+
+  //par[6] turn off angular distribution.
+
+  //x[0] theta, from beam axis;
+  //x[1] angle between the reaction plane and the compton scattering plane;
+
+  double y[3] = { x[0],par[4],x[1] };
+
   double w  = AlignedAD_Norm(&y[0],par);
-         w  = 1.0;
-  double kn = KN_unpol(&y[1],&par[3]);
-         kn = 1.0;
-  double an = AnalyzingPower(&y[1],&par[3]);
+  if(par[6]>0) w =1.0;
+  double kn = 1.0; // KN_unpol(&y[1],&par[3]);
+  double an = par[4];                 //AnalyzingPower(&y[1],&par[3]);
   double p  = Polarization(&y[0],par);
 
   return par[5]*w*kn*(1-0.5*p*an*TMath::Cos(2*y[2]*TMath::DegToRad()));
-
 }
+
+Double_t GRootFunctions::W_pol_diff(Double_t *x,Double_t *par) {
+  //par[0] A0
+  //par[1] a2
+  //par[2] a4
+  //par[3] Inital gamma energy;
+  //par[4] analizing power scale;
+  //par[5] overall scale.
+  //par[6] turn off angular distribution.
+
+  //x[0] theta, from beam axis;
+  //x[1] angle between the reaction plane and the compton scattering plane;
+
+  double par2[7];
+         par2[0] =  par[0];
+         par2[1] =  par[1];
+         par2[2] =  par[2];
+         par2[3] =  par[3];
+         par2[4] = -par[4];
+         par2[5] =  par[5];
+         par2[6] =  par[6];
+
+  return W_pol_test(x,par) - W_pol_test(x,par2);
+}
+
+
+
 
 
 Double_t GRootFunctions::PolarizationAsymmetry(Double_t *x,Double_t *par) {
