@@ -32,10 +32,30 @@ namespace GRootFunctions {
 
   Double_t ComptonEnergy(Double_t *x,Double_t *par);
   Double_t ComptonAngle(Double_t *x,Double_t *par);
+  Double_t ComptonRatio(Double_t *x,Double_t *par);
   Double_t AnalyzingPower(Double_t *x,Double_t *par);
+  Double_t Polarization(Double_t *x,Double_t *par);
+  Double_t PolarizationAsymmetry(Double_t *x,Double_t *par);
+  Double_t KN_unpol(Double_t *x,Double_t *par);
+  Double_t KN_unpol_norm(Double_t *x,Double_t *par);
+  Double_t KN_pol(Double_t *x,Double_t *par);
 
-  Double_t KN(Double_t *x,Double_t *par);
-  Double_t KN2(Double_t *x,Double_t *par);
+  Double_t W_pol(Double_t *x, Double_t *par);
+  Double_t W_pol_dirk(Double_t *x, Double_t *par);
+  Double_t W_pol_dirk2(Double_t *x, Double_t *par);
+  Double_t W_pol_norm(Double_t *x, Double_t *par);
+  Double_t W_pol2(Double_t *x, Double_t *par);
+  Double_t W_pol3(Double_t *x, Double_t *par);
+  Double_t W_pol4(Double_t *x, Double_t *par);
+  Double_t W_pol5(Double_t *x, Double_t *par);
+  Double_t W_pol6(Double_t *x, Double_t *par);
+  Double_t W_pol7(Double_t *x, Double_t *par);
+
+  Double_t W_pol_test(Double_t *x, Double_t *par);
+  Double_t W_pol_diff(Double_t *x, Double_t *par);
+
+
+  Double_t Q_pol(Double_t *x, Double_t *par);
 
 }
 

@@ -2493,15 +2493,16 @@ GH1D *GH2::ProjectionX(const char *name, Int_t firstybin, Int_t lastybin, Option
                                               firstybin,xlow,lastybin,xhigh);
   }
   std::string actual_name = name;
-  if(actual_name == "_px"){
+  if( !actual_name.compare("_px") || !actual_name.length()){
     if(total)
       actual_name = title;
     else
       actual_name  = Form("%s_px_%d_%d",GetName(),firstybin,lastybin);
   }
   GH1D *project = DoProjection(true, actual_name.c_str(), firstybin, lastybin, options.Data());
-  project->SetTitle(title.c_str());
-  project->SetProjectionAxis(kXaxis);
+  project->SetNameTitle(actual_name.c_str(),title.c_str());
+  //project->SetProjectionAxis(kXaxis);
+ 
   if(add_to_proj_list) { 
     if(project->Integral()>0 || keep) {
       project->SetParent((TObject*)this);
@@ -2569,15 +2570,15 @@ GH1D *GH2::ProjectionY(const char *name, Int_t firstxbin, Int_t lastxbin, Option
                                               firstxbin,xlow,lastxbin,xhigh);
   }
   std::string actual_name = name;
-  if(actual_name == "_py"){
+  if(!actual_name.compare("_py") || !actual_name.length()){
     if(total)
       actual_name = title;
     else
       actual_name  = Form("%s_py_%d_%d",GetName(),firstxbin,lastxbin);
   }
   GH1D *project = DoProjection(false, actual_name.c_str(), firstxbin, lastxbin, options.Data());
-  project->SetTitle(title.c_str());
-  project->SetProjectionAxis(kXaxis);
+  project->SetNameTitle(actual_name.c_str(),title.c_str());
+  //project->SetProjectionAxis(kXaxis);
   if(add_to_proj_list) { 
     if(project->Integral()>0 || keep) {
       project->SetParent((TObject*)this);

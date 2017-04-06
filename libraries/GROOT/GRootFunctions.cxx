@@ -267,6 +267,7 @@ Double_t GRootFunctions::AlignedAD_Norm(Double_t *x,Double_t *par) {
 
 
 Double_t GRootFunctions::AlignedADPol_Norm(Double_t *x,Double_t *par) {
+  
   double p2 = ::ROOT::Math::legendre(2,TMath::Cos(TMath::DegToRad()*x[0]));
   double p4 = ::ROOT::Math::legendre(4,TMath::Cos(TMath::DegToRad()*x[0]));
   double ap2 = ::ROOT::Math::assoc_legendre(2,2,TMath::Cos(TMath::DegToRad()*x[0]));
@@ -282,10 +283,24 @@ Double_t GRootFunctions::AlignedADPol_Norm(Double_t *x,Double_t *par) {
 
 
 
+Double_t GRootFunctions::Polarization(Double_t *x,Double_t *par) {
+
+  //par[0] = Ao
+  //par[1] = a2
+  //par[2] = a4
+
+  double p2 = ::ROOT::Math::legendre(2,TMath::Cos(TMath::DegToRad()*x[0]));
+  double p4 = ::ROOT::Math::legendre(4,TMath::Cos(TMath::DegToRad()*x[0]));
+  double ap2 = ::ROOT::Math::assoc_legendre(2,2,TMath::Cos(TMath::DegToRad()*x[0]));
+  double ap4 = ::ROOT::Math::assoc_legendre(4,2,TMath::Cos(TMath::DegToRad()*x[0]));
 
 
+  double k2 = (1./2.);
+  double k4 = (-1./12);
 
+  return (1/par[0]) * ( par[1]*k2*ap2 + par[2]*k4*ap4 ) / ( 1 + par[1]*p2 + par[2]*p4 );
 
+}
 
 
 
@@ -309,9 +324,76 @@ Double_t GRootFunctions::ComptonAngle(Double_t *x,Double_t *par) {
 
 }
 
+Double_t GRootFunctions::ComptonRatio(Double_t *x,Double_t *par) {
+  //no parameters 
+  //x[0] = Initial Energy
+  //x[1] = Scattering Angle (deg) 
+  //returns E'/E
+
+  double temp = 1 + (x[0]/511.)*(1-TMath::Cos(x[1]*TMath::DegToRad()));
+  return 1/temp;
+}
+
+Double_t GRootFunctions::KN_unpol(Double_t *x,Double_t *par) {
+
+  //par[0] = energy of the intial gamma;
+  //x[0]   = compton scattering angle;
+
+  double e0    =  8.854187817620E-12;
+  double J2KeV =  6.242e+12;
+  double me    =  0.511046 / J2KeV;
+  double re    =  (1/(4.*TMath::Pi()*e0)) * (TMath::Qe()*TMath::Qe())/me;
+
+  double y[2] = {par[0],x[0]};
+  double cr   = ComptonRatio(y,0);
+
+  return  0.5*re * (cr)*(cr) * ( (1/cr)  + cr - TMath::Power(TMath::Sin(x[0]*TMath::DegToRad()),2) ); 
+  //return   0.5*((4.*TMath::Pi()))* (cr)*(cr) * ( (1/cr)  + cr - TMath::Power(TMath::Sin(x[0]*TMath::DegToRad()),2) ); 
+
+}
+
+Double_t GRootFunctions::KN_unpol_norm(Double_t *x,Double_t *par) {
+
+  //par[0] = energy of the intial gamma;
+  //par[1] = energy of the normalization gamma;
+  //x[0]   = compton scattering angle;
+
+  return KN_unpol(x,&par[0]) / KN_unpol(x,&par[1]);
+
+}
+
+
+
+
+
+
+Double_t GRootFunctions::KN_pol(Double_t *x,Double_t *par) {
+
+  //par[0] = energy of the intial gamma;
+  //x[0]   = compton scattering angle;
+  //x[1]   = angle between electric field vector and scattering plane
+
+  double e0    =  8.854187817620E-12;
+  double J2KeV =  6.242e+12;
+  double me    =  0.511046 / J2KeV;
+  double re    =  (1/(4.*TMath::Pi()*e0)) * (TMath::Qe()*TMath::Qe())/me;
+
+  double y[2] = {par[0],x[0]};
+  double cr   = ComptonRatio(y,0);
+
+  return  0.5*re * (cr)*(cr) * ( (1/cr)  + cr - 
+          2 * TMath::Power(TMath::Sin(x[0]*TMath::DegToRad()),2) 
+            * TMath::Power(TMath::Cos(x[1]*TMath::DegToRad()),2) ); 
+
+}
+
+
+
+
 Double_t GRootFunctions::AnalyzingPower(Double_t *x,Double_t *par) {
 
   //par[0] = inital gamma energy; in keV.
+  //x[0]   = compton scattering angle.
   double scattered = ComptonEnergy(x,par);
 
   double sin2 = (TMath::Sin(TMath::DegToRad()*x[0]))*(TMath::Sin(TMath::DegToRad()*x[0]));
@@ -319,46 +401,294 @@ Double_t GRootFunctions::AnalyzingPower(Double_t *x,Double_t *par) {
   return sin2/lower;
 }
 
-Double_t GRootFunctions::KN2(Double_t *x,Double_t *par)  {
-  //ok... par[0] = initial gamma energy in keV.
-  //2d plot, scattered energy vs phi.
-  double initial_gamma   = par[0];
-  double scattered_gamma = x[1];
-  double scattered_phi   = x[0];
-  double scattered_theta = ComptonAngle(&x[1],par);
+
+Double_t GRootFunctions::W_pol(Double_t *x, Double_t *par) {
+  //par[0] A0
+  //par[1] a2
+  //par[2] a4
+  //par[3] Inital gamma energy;
+
+  //x[0] theta, from beam axis;
+  //x[1] compton scattering angle;  
+  //x[2] angle between the reaction plane and the compton scattering plane;  zeta
+
+
+  double w  = AlignedAD_Norm(&x[0],par);
+  double kn = KN_unpol(&x[1],&par[3]);
+         kn = 1.0;
+  double an = AnalyzingPower(&x[1],&par[3]); 
+  double p  = Polarization(&x[0],par); 
   
-  double part1  = (scattered_gamma/initial_gamma)*(scattered_gamma/initial_gamma);
-  double part2  = scattered_gamma/initial_gamma + initial_gamma/scattered_gamma;
-         part2 += -2*TMath::Power(TMath::Sin(TMath::DegToRad()*scattered_theta),2)
-                    *TMath::Power(TMath::Cos(TMath::DegToRad()*scattered_phi),2);
-
-  return part1*part2;
-}
-
-Double_t GRootFunctions::KN(Double_t *x, Double_t *par) {
-
-  double theta = x[0]*TMath::DegToRad();
-  double egam  = par[0];
-
-  double part1 = 3./(16.*TMath::Pi());
-  double part2 = 1 + egam*TMath::Power((1-TMath::Cos(theta)),2);
-  double part3 = egam*(1-TMath::Cos(theta));
-  double part4 = 1 + egam*(1-TMath::Cos(theta));
-  double part5 = TMath::Power(TMath::Cos(theta),2);
-
-  return part1 * 1./part2 * ( part3 + 1/part4 + part5);
-
+  return w*kn*(1-0.5*an*p*TMath::Cos(2*x[2]*TMath::DegToRad()));
 
 }
 
+Double_t GRootFunctions::W_pol_norm(Double_t *x, Double_t *par) {
+  //par[0] A0
+  //par[1] a2
+  //par[2] a4
+  //par[3] Inital gamma energy;
+  //par[4] Normalizedd gamma energy;
+
+  //x[0] theta, from beam axis;
+  //x[1] compton scattering angle;  
+  //x[2] angle between the reaction plane and the compton scattering plane;  zeta
+
+
+  double w  = AlignedAD_Norm(&x[0],par);
+  double kn = KN_unpol(&x[1],&par[3]);
+  double kn_norm = KN_unpol(&x[1],&par[4]);
+  double an = AnalyzingPower(&x[1],&par[3]); 
+  double p  = Polarization(&x[0],par); 
+  
+  return w*kn*(1-0.5*an*p*TMath::Cos(2*x[2]*TMath::DegToRad()));
+
+}
+
+Double_t GRootFunctions::Q_pol(Double_t *x, Double_t *par) {
+  //par[0] A0
+  //par[1] a2
+  //par[2] a4
+  //par[3] Inital gamma energy;
+  //par[4] Compton Scattering Angle;
+ 
+  //x[0] theta, from beam axis;
+  //x[1] angle between the reaction plane and the compton scattering plane;  zeta
+ 
+  double y[3] = { x[0],par[4],x[1] };
+  double w        = W_pol(y,par);
+  double w_unpol  = AlignedAD_Norm(&x[0],par);
+  double p        = Polarization(&y[0],par);
+
+  return (1-w/w_unpol)/p;
+}
+
+
+Double_t GRootFunctions::W_pol2(Double_t *x, Double_t *par) {
+  
+  //par[0] A0
+  //par[1] a2
+  //par[2] a4
+  //par[3] Inital gamma energy;
+  //par[4] compton scattering angle;
+  //par[5] scaling.
+
+  //x[0] theta, from beam axis;
+  //x[1] angle between the reaction plane and the compton scattering plane;
+
+  double y[3] = { x[0],par[4],x[1] };
+  //return 1e15*par[5]*GRootFunctions::W_pol(y,par);
+  return par[5]*GRootFunctions::W_pol(y,par);
+}
+
+Double_t GRootFunctions::W_pol_dirk(Double_t *x, Double_t *par) {
+  
+  //par[0] A0
+  //par[1] a2
+  //par[2] a4
+  //par[3] Inital gamma energy;
+  //par[4] compton scattering angle;
+  //par[5] phi - shift. 
+
+  //x[0] theta, from beam axis;
+  //x[1] angle between the reaction plane and the compton scattering plane;
+
+  double y[3]  = { x[0],par[4],x[1] };
+  double y2[3] = { x[0],par[4],x[1]+par[5] };
+
+  return  (GRootFunctions::W_pol(y,par) - GRootFunctions::W_pol(y2,par)) / 
+          (GRootFunctions::W_pol(y,par) + GRootFunctions::W_pol(y2,par));
+  
+  //return 1e15*par[5]*GRootFunctions::W_pol(y,par);
+  //return par[5]*GRootFunctions::W_pol(y,par);
+}
+
+Double_t GRootFunctions::W_pol_dirk2(Double_t *x, Double_t *par) {
+  
+  //par[0] A0
+  //par[1] a2
+  //par[2] a4
+  //par[3] Inital gamma energy;
+  //par[4] compton scattering angle;
+  //par[5] phi - shift. 
+
+  //x[0] theta, from beam axis;
+  //x[1] angle between the reaction plane and the compton scattering plane;
+
+  double y[3]  = { x[0],par[4],x[1] };
+  double y2[3] = { x[0],par[4],x[1]+par[5] };
+
+  return  (GRootFunctions::W_pol(y,par) / 
+           GRootFunctions::W_pol(y2,par));
+  
+  //return 1e15*par[5]*GRootFunctions::W_pol(y,par);
+  //return par[5]*GRootFunctions::W_pol(y,par);
+}
 
 
 
 
 
 
+Double_t GRootFunctions::W_pol3(Double_t *x,Double_t *par) {
+  
+  //par[0] A0
+  //par[1] a2
+  //par[2] a4
+  //par[3] Inital gamma energy;
+  //par[4] compton scattering angle;
+  //par[5] scaling on cos(2*zeta) term..
+
+  //x[0] theta, from beam axis;
+  //x[1] angle between the reaction plane and the compton scattering plane;
+
+  double y[3] = { x[0],par[4],x[1] };
+
+  double w  = AlignedAD_Norm(&y[0],par);
+  double kn = KN_unpol(&y[1],&par[3]);
+  double an = AnalyzingPower(&y[1],&par[3]);
+  double p  = Polarization(&y[0],par);
+
+  return w*kn*(1-0.5*an*p*par[5]*TMath::Cos(2*y[2]*TMath::DegToRad()));
+
+
+}
+
+Double_t GRootFunctions::W_pol4(Double_t *x,Double_t *par) {
+  //par[0] A0
+  //par[1] a2
+  //par[2] a4
+  //par[3] Inital gamma energy;
+  //par[4] overall scaling.  compton scattering angle;
+  //par[5] scaling on cos(2*zeta) term..
+
+  //x[0] theta, from beam axis;
+  //x[1] angle between the reaction plane and the compton scattering plane;
+
+  double y[3] = { x[0],par[4],x[1] };
+
+  double w  = AlignedAD_Norm(&y[0],par);
+  //double kn = KN_unpol(&y[1],&par[3]);
+  double kn = par[4];
+  //double an = AnalyzingPower(&y[1],&par[3]);
+  double p  = Polarization(&y[0],par);
+
+  return w*kn*(1-0.5*p*par[5]*TMath::Cos(2*y[2]*TMath::DegToRad()));
+
+}
+
+Double_t GRootFunctions::W_pol5(Double_t *x,Double_t *par) {
+  //par[0] A0
+  //par[1] a2
+  //par[2] a4
+  //par[3] Inital gamma energy;
+  //par[4] compton scattering angle;
+  //  //par[5] scaling on cos(2*zeta) term..
+
+  //x[0] theta, from beam axis;
+  //x[1] angle between the reaction plane and the compton scattering plane;
+
+  double y[3] = { x[0],par[4],x[1] };
+
+  double w  = AlignedAD_Norm(&y[0],par);
+  double kn = KN_unpol(&y[1],&par[3]);
+         kn = 1.0;
+  double an = AnalyzingPower(&y[1],&par[3]);
+  double p  = Polarization(&y[0],par);
+
+  return par[5]*w*kn*(1-0.5*p*an*TMath::Cos(2*y[2]*TMath::DegToRad()));
+
+}
+
+Double_t GRootFunctions::W_pol6(Double_t *x,Double_t *par) {
+  //par[0] A0
+  //par[1] a2
+  //par[2] a4
+  //par[3] Inital gamma energy;
+  //par[4] compton scattering angle;
+  //  //par[5] scaling on cos(2*zeta) term..
+
+  //x[0] theta, from beam axis;
+  //x[1] angle between the reaction plane and the compton scattering plane;
+
+  double y[3] = { x[0],par[4],x[1] };
+
+  //double //w  = AlignedAD_Norm(&y[0],par);
+  //double   w  = 1.0;
+  //double //kn = KN_unpol(&y[1],&par[3]);
+  //double   kn = 1.0;
+  //double //an = AnalyzingPower(&y[1],&par[3]);
+  double p  = Polarization(&x[0],par);
+
+  //return par[5]*w*kn*(1-0.5*p*an*TMath::Cos(2*y[2]*TMath::DegToRad()));
+  return par[5]*(1-0.5*p*par[4]*TMath::Cos(2*x[1]*TMath::DegToRad()));
+
+}
+
+
+Double_t GRootFunctions::W_pol_test(Double_t *x,Double_t *par) {
+  //par[0] A0
+  //par[1] a2
+  //par[2] a4
+  //par[3] Inital gamma energy;
+  //par[4] analizing power scale;
+  //par[5] overall scale.
+
+  //par[6] turn off angular distribution.
+
+  //x[0] theta, from beam axis;
+  //x[1] angle between the reaction plane and the compton scattering plane;
+
+  double y[3] = { x[0],par[4],x[1] };
+
+  double w  = AlignedAD_Norm(&y[0],par);
+  if(par[6]>0) w =1.0;
+  double kn = 1.0; // KN_unpol(&y[1],&par[3]);
+  double an = par[4];                 //AnalyzingPower(&y[1],&par[3]);
+  double p  = Polarization(&y[0],par);
+
+  return par[5]*w*kn*(1-0.5*p*an*TMath::Cos(2*y[2]*TMath::DegToRad()));
+}
+
+Double_t GRootFunctions::W_pol_diff(Double_t *x,Double_t *par) {
+  //par[0] A0
+  //par[1] a2
+  //par[2] a4
+  //par[3] Inital gamma energy;
+  //par[4] analizing power scale;
+  //par[5] overall scale.
+  //par[6] turn off angular distribution.
+
+  //x[0] theta, from beam axis;
+  //x[1] angle between the reaction plane and the compton scattering plane;
+
+  double par2[7];
+         par2[0] =  par[0];
+         par2[1] =  par[1];
+         par2[2] =  par[2];
+         par2[3] =  par[3];
+         par2[4] = -par[4];
+         par2[5] =  par[5];
+         par2[6] =  par[6];
+
+  return W_pol_test(x,par) - W_pol_test(x,par2);
+}
 
 
 
+
+
+Double_t GRootFunctions::PolarizationAsymmetry(Double_t *x,Double_t *par) {
+  // par[0]  -> overall constant ( includes integral of the analyizing power over the observed compton scattering angle)
+  // par[1]  -> Ao
+  // par[2]  -> a2
+  // par[3]  -> a4
+
+  // x[0] = theta;
+  // x[1] = angle between the reaction plane and the compton scattered plane.
+
+  return par[0] * Polarization(&x[0],&(par[1])) * TMath::Cos(2*TMath::DegToRad()*x[1]);
+
+}
 
 

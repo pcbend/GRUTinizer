@@ -378,7 +378,8 @@ void TGretinaHit::Clear(Option_t *opt) {
 
 
 void TGretinaHit::TrimSegments(int type) {
-  // 0: drop multiple ident int pnts.  1: make into wedge "data"
+  // 0: drop multiple ident int pnts.  
+  // 1: make into wedge "data"
   if(type==0) {
     std::set<interaction_point,intpnt_compare> pset;
     for(auto x=fSegments.begin();x!=fSegments.end();x++) {

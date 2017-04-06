@@ -4,6 +4,7 @@
 #include <map>
 
 #include <GH1.h>
+#include <TH2.h>
 #include <TRef.h>
 #include <TList.h>
 
@@ -45,6 +46,8 @@ class GH2 : public GH1 {
     GH2& operator=(const GH2&); // Not implemented
 
   public:
+    operator TH2*() {return (TH2*)((TH1*)this) ;  }
+    
     virtual ~GH2();
     virtual Int_t    BufferEmpty(Int_t action=0);
     virtual void     Copy(TObject &hnew) const;
