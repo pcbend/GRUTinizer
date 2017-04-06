@@ -229,8 +229,8 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *outgoing=0) {
     histname="singles";
     obj.FillHistogram(dirname,histname,12000,0,6000,gretina->GetGretinaHit(x).GetCoreEnergy());
   
-    histname="singles";
-    obj.FillHistogram(dirname,histname,12000,0,6000,gretina->GetGretinaHit(x).GetCoreEnergy());
+    //histname="singles";
+    //obj.FillHistogram(dirname,histname,12000,0,6000,gretina->GetGretinaHit(x).GetCoreEnergy());
   
     histname="position";
     obj.FillHistogram(dirname,histname,180,0,180,gretina->GetGretinaHit(x).GetThetaDeg(),
