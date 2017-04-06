@@ -276,9 +276,14 @@ bool HandleLaBr(TRuntimeObjects &obj,GCutG *outgoing=0) {
       obj.FillHistogram(dirname,histname,130,0,3600,labr->Timestamp()/(double)1e8,
                                          4000,0,4000,labr->GetLaBrHit(x).Charge());
 
-     histname="chan_15_time_energy";
-      obj.FillHistogram(dirname,histname,16000,0,64000,labr->GetRefTime() - labr->GetLaBrHit(x).GetTime(),
-                                         4000,0,4000,labr->GetLaBrHit(x).Charge());
+     for(unsigned int z=0;z<labr->Size();z++) {
+      if(labr->GetLaBrHit(z).GetChannel()==15)
+         continue;
+      histname=Form("chan_15_charge_chan_%i_charge",labr->GetLaBrHit(z).GetChannel());
+      obj.FillHistogram(dirname,histname,4000,0,4000,labr->GetLaBrHit(x).Charge(),
+                                         4000,0,4000,labr->GetLaBrHit(z).Charge());
+     }
+
      TGretina *gretina = obj.GetDetector<TGretina>();
      if(gretina) {
        std::string gdirname = "gretina";
@@ -318,9 +323,14 @@ bool HandleLaBr(TRuntimeObjects &obj,GCutG *outgoing=0) {
       obj.FillHistogram(dirname,histname,16000,0,64000,labr->GetRefTime() - labr->GetLaBrHit(x).GetTime(),
                                          32,0,32,labr->GetLaBrHit(x).GetChannel());
 
-      histname=Form("timeref_energy_chan_%i",labr->GetLaBrHit(x).GetChannel());
-      obj.FillHistogram(dirname,histname,16000,0,64000,labr->GetRefTime() - labr->GetLaBrHit(x).GetTime(),
-                                         4000,0,4000,labr->GetLaBrHit(x).GetEnergy());
+    histname = Form("chan_%i_time_charge",labr->GetLaBrHit(x).GetChannel());
+    obj.FillHistogram(dirname,histname,16000,0,64000,labr->GetRefTime() - labr->GetLaBrHit(x).GetTime(),
+                                       4000,0,4000,labr->GetLaBrHit(x).Charge());
+
+    histname = Form("chan_%i_time_energy",labr->GetLaBrHit(x).GetChannel());
+    obj.FillHistogram(dirname,histname,16000,0,64000,labr->GetRefTime() - labr->GetLaBrHit(x).GetTime(),
+                                       4000,0,4000,labr->GetLaBrHit(x).GetEnergy());   
+
     }
   }
 
