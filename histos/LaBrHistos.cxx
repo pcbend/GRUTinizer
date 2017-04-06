@@ -276,19 +276,24 @@ bool HandleLaBr(TRuntimeObjects &obj,GCutG *outgoing=0) {
       obj.FillHistogram(dirname,histname,130,0,3600,labr->Timestamp()/(double)1e8,
                                          4000,0,4000,labr->GetLaBrHit(x).Charge());
 
-     histname="chan_15_time_energy";
-      obj.FillHistogram(dirname,histname,16000,0,64000,labr->GetRefTime() - labr->GetLaBrHit(x).GetTime(),
-                                         4000,0,4000,labr->GetLaBrHit(x).Charge());
+     for(unsigned int z=0;z<labr->Size();z++) {
+      if(labr->GetLaBrHit(z).GetChannel()==15)
+         continue;
+      histname=Form("chan_15_charge_chan_%i_charge",labr->GetLaBrHit(z).GetChannel());
+      obj.FillHistogram(dirname,histname,4000,0,4000,labr->GetLaBrHit(x).Charge(),
+                                         4000,0,4000,labr->GetLaBrHit(z).Charge());
+     }
+
      TGretina *gretina = obj.GetDetector<TGretina>();
      if(gretina) {
        std::string gdirname = "gretina";
        histname = "labr_gretina";
-       for(int y=0;y<gretina->Size();y++) {
+       for(unsigned int y=0;y<gretina->Size();y++) {
          obj.FillHistogram(gdirname,histname,4000,0,8000,gretina->GetGretinaHit(y).GetCoreEnergy(),
                                              4000,0,4000,labr->GetLaBrHit(x).Charge());
 
 
-        }
+       }
      }
     }
     if(labr->GetLaBrHit(x).GetChannel()==0) {
@@ -298,15 +303,13 @@ bool HandleLaBr(TRuntimeObjects &obj,GCutG *outgoing=0) {
       histname="chan_0_time";
       obj.FillHistogram(dirname,histname,130,0,3600,labr->Timestamp()/(double)1e8,
                                          4000,0,4000,labr->GetLaBrHit(x).Charge());
-    
-    
+     
     }
 
-
-    histname="summary";
+    histname="summary_charge";
     obj.FillHistogram(dirname,histname,4000,0,4000,labr->GetLaBrHit(x).Charge(),
                                        32,0,32,labr->GetLaBrHit(x).GetChannel());
-    histname="summary_cal";
+    histname="summary_energy";
     obj.FillHistogram(dirname,histname,4000,0,4000,labr->GetLaBrHit(x).GetEnergy(),
                                        32,0,32,labr->GetLaBrHit(x).GetChannel());
   
@@ -316,9 +319,18 @@ bool HandleLaBr(TRuntimeObjects &obj,GCutG *outgoing=0) {
 
     //if(labr->GetRefTime() >100 && labr->GetLaBrHit(x).GetTime() >100 ) {
     if(labr->GetRefTime() >100 && labr->GetLaBrHit(x).GetTime() >100 &&  labr->GetLaBrHit(x).Charge() >100 ) {
-      histname="summary_time_ref";
-      obj.FillHistogram(dirname,histname,8000,0,64000,labr->GetRefTime() - labr->GetLaBrHit(x).GetTime(),
+      histname="summary_timeref";
+      obj.FillHistogram(dirname,histname,16000,0,64000,labr->GetRefTime() - labr->GetLaBrHit(x).GetTime(),
                                          32,0,32,labr->GetLaBrHit(x).GetChannel());
+
+    histname = Form("chan_%i_time_charge",labr->GetLaBrHit(x).GetChannel());
+    obj.FillHistogram(dirname,histname,16000,0,64000,labr->GetRefTime() - labr->GetLaBrHit(x).GetTime(),
+                                       4000,0,4000,labr->GetLaBrHit(x).Charge());
+
+    histname = Form("chan_%i_time_energy",labr->GetLaBrHit(x).GetChannel());
+    obj.FillHistogram(dirname,histname,16000,0,64000,labr->GetRefTime() - labr->GetLaBrHit(x).GetTime(),
+                                       4000,0,4000,labr->GetLaBrHit(x).GetEnergy());   
+
     }
   }
 
@@ -343,7 +355,7 @@ bool HandleS800(TRuntimeObjects &obj,GCutG *outgoing=0) {
   if(gretina) {
     std::string gdirname = "gretina";
     histname = "e1_gretina";
-    for(int y=0;y<gretina->Size();y++) {
+    for(unsigned int y=0;y<gretina->Size();y++) {
       obj.FillHistogram(gdirname,histname,4000,0,8000,gretina->GetGretinaHit(y).GetCoreEnergy(),
                                           2000,0,2000,s800->GetScint().GetEUp());
 
@@ -484,7 +496,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
                         1000,-1000,1000,bank29->Timestamp()-s800->Timestamp());
     }
     if(gretina) {
-      for(int i=0;i<gretina->Size();i++) {
+      for(unsigned int i=0;i<gretina->Size();i++) {
         TGretinaHit hit = gretina->GetGretinaHit(i);
         histname = "Gretina_Bank29_time";
         obj.FillHistogram(dirname,histname,
