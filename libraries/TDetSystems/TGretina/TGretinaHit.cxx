@@ -399,6 +399,7 @@ void TGretinaHit::TrimSegments(int type) {
     fSegments.clear();
     for(auto x=pset.begin();x!=pset.end();x++) {
       fSegments.push_back(*x);
+      fSegments.back().fSeg = (fSegments.back().fSeg%6);
     }
     std::sort(fSegments.begin(),fSegments.end());
     fNumberOfInteractions = fSegments.size();

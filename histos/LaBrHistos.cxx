@@ -260,7 +260,9 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *outgoing=0) {
 
 bool HandleLaBr(TRuntimeObjects &obj,GCutG *outgoing=0) {
 
+
   TFastScint *labr = obj.GetDetector<TFastScint>();
+  TS800      *s800 = obj.GetDetector<TS800>();
   if(!labr)
     return false;
  
@@ -277,11 +279,15 @@ bool HandleLaBr(TRuntimeObjects &obj,GCutG *outgoing=0) {
                                          4000,0,4000,labr->GetLaBrHit(x).Charge());
 
      for(unsigned int z=0;z<labr->Size();z++) {
-      if(labr->GetLaBrHit(z).GetChannel()==15)
+      if(z==x)
+        continue;
+      if(labr->GetLaBrHit(z).GetChannel()>=15)
          continue;
+      if(labr->GetLaBrHit(x).Charge()<100)
+        continue;
       histname=Form("chan_15_charge_chan_%i_charge",labr->GetLaBrHit(z).GetChannel());
-      obj.FillHistogram(dirname,histname,4000,0,4000,labr->GetLaBrHit(x).Charge(),
-                                         4000,0,4000,labr->GetLaBrHit(z).Charge());
+      obj.FillHistogram(dirname,histname,1000,0,4000,labr->GetLaBrHit(x).Charge(),
+                                         1000,0,4000,labr->GetLaBrHit(z).Charge());
      }
 
      TGretina *gretina = obj.GetDetector<TGretina>();
@@ -289,8 +295,8 @@ bool HandleLaBr(TRuntimeObjects &obj,GCutG *outgoing=0) {
        std::string gdirname = "gretina";
        histname = "labr_gretina";
        for(unsigned int y=0;y<gretina->Size();y++) {
-         obj.FillHistogram(gdirname,histname,4000,0,8000,gretina->GetGretinaHit(y).GetCoreEnergy(),
-                                             4000,0,4000,labr->GetLaBrHit(x).Charge());
+         obj.FillHistogram(gdirname,histname,4000,0,4000,gretina->GetGretinaHit(y).GetCoreEnergy(),
+                                             1000,0,4000,labr->GetLaBrHit(x).Charge());
 
 
        }
@@ -306,6 +312,27 @@ bool HandleLaBr(TRuntimeObjects &obj,GCutG *outgoing=0) {
      
     }
 
+    if(labr->GetRefTime() >100 && labr->GetLaBrHit(x).GetTime() >100 &&  labr->GetLaBrHit(x).Charge() >100 && s800->GetReg()==1 ) {
+      histname="channel_numtimes";
+      obj.FillHistogram(dirname,histname,32,0,32,labr->GetLaBrHit(x).GetChannel(),
+                                         32,0,32,labr->GetLaBrHit(x).GetNumTimes());
+    histname = Form("junk_%02i_gated",labr->GetLaBrHit(x).GetChannel());
+    for(int j=0;j<labr->GetLaBrHit(x).GetNumTimes();j++) {
+      obj.FillHistogram(dirname,histname,32,0,32,j,
+                                         4000,0,64000,labr->GetRefTime() - labr->GetLaBrHit(x).GetMTime(j));         
+    }
+    }
+    histname = Form("junk_%02i",labr->GetLaBrHit(x).GetChannel());
+    for(int j=0;j<labr->GetLaBrHit(x).GetNumTimes();j++) {
+      if(labr->GetLaBrHit(x).GetChannel()>0 && labr->GetLaBrHit(x).GetChannel()<15 && j>0) {
+        std::cout << " multi hit in " << labr->GetLaBrHit(x).GetChannel() << "!!!!!" << std::endl;
+      }
+      obj.FillHistogram(dirname,histname,32,0,32,j,
+                                         4000,0,64000,labr->GetRefTime() - labr->GetLaBrHit(x).GetMTime(j));         
+    }
+
+
+
     histname="summary_charge";
     obj.FillHistogram(dirname,histname,4000,0,4000,labr->GetLaBrHit(x).Charge(),
                                        32,0,32,labr->GetLaBrHit(x).GetChannel());
@@ -314,24 +341,28 @@ bool HandleLaBr(TRuntimeObjects &obj,GCutG *outgoing=0) {
                                        32,0,32,labr->GetLaBrHit(x).GetChannel());
   
     histname="summary_time";
-    obj.FillHistogram(dirname,histname,8000,0,64000,labr->GetLaBrHit(x).GetTime(),
+    obj.FillHistogram(dirname,histname,4000,0,64000,labr->GetLaBrHit(x).GetTime(),
                                        32,0,32,labr->GetLaBrHit(x).GetChannel());
-
-    //if(labr->GetRefTime() >100 && labr->GetLaBrHit(x).GetTime() >100 ) {
-    if(labr->GetRefTime() >100 && labr->GetLaBrHit(x).GetTime() >100 &&  labr->GetLaBrHit(x).Charge() >100 ) {
-      histname="summary_timeref";
-      obj.FillHistogram(dirname,histname,16000,0,64000,labr->GetRefTime() - labr->GetLaBrHit(x).GetTime(),
+    if(s800) {
+      histname=Form("summary_time_%i",s800->GetReg());
+      obj.FillHistogram(dirname,histname,4000,0,64000,labr->GetLaBrHit(x).GetTime(),
                                          32,0,32,labr->GetLaBrHit(x).GetChannel());
-
-    histname = Form("chan_%i_time_charge",labr->GetLaBrHit(x).GetChannel());
-    obj.FillHistogram(dirname,histname,16000,0,64000,labr->GetRefTime() - labr->GetLaBrHit(x).GetTime(),
-                                       4000,0,4000,labr->GetLaBrHit(x).Charge());
-
-    histname = Form("chan_%i_time_energy",labr->GetLaBrHit(x).GetChannel());
-    obj.FillHistogram(dirname,histname,16000,0,64000,labr->GetRefTime() - labr->GetLaBrHit(x).GetTime(),
-                                       4000,0,4000,labr->GetLaBrHit(x).GetEnergy());   
-
     }
+    //if(labr->GetRefTime() >100 && labr->GetLaBrHit(x).GetTime() >100 ) {
+   if(labr->GetRefTime() >100 && labr->GetLaBrHit(x).GetTime() >100 &&  labr->GetLaBrHit(x).Charge() >100 ) {
+     histname=Form("summary_timeref_%i",s800->GetReg());
+     obj.FillHistogram(dirname,histname,3000,11000,14000,labr->GetRefTime() - labr->GetLaBrHit(x).GetTime(),
+                                        32,0,32,labr->GetLaBrHit(x).GetChannel());
+
+   histname = Form("chan_%i_time_charge",labr->GetLaBrHit(x).GetChannel());
+   obj.FillHistogram(dirname,histname,3000,11000,14000,labr->GetRefTime() - labr->GetLaBrHit(x).GetTime(),
+                                      1000,0,4000,labr->GetLaBrHit(x).Charge());
+
+  // histname = Form("chan_%i_time_energy",labr->GetLaBrHit(x).GetChannel());
+  // obj.FillHistogram(dirname,histname,3000,11000,14000,labr->GetRefTime() - labr->GetLaBrHit(x).GetTime(),
+  //                                    4000,0,4000,labr->GetLaBrHit(x).GetEnergy());   
+
+   }
   }
 
 
@@ -364,7 +395,7 @@ bool HandleS800(TRuntimeObjects &obj,GCutG *outgoing=0) {
  }
 
 
-
+  return true;
 }
 
 

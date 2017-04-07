@@ -27,6 +27,14 @@ class TFastScintHit : public TDetectorHit {
 
     const std::vector<unsigned short>& GetAllTimes() const { return fTimes; }
     size_t GetNumTimes() const { return fTimes.size(); }
+    int GetMTime(size_t j) const { 
+      //if(GetNumTimes()<j) {
+	return fTimes[j]; 
+      //} else {
+	//return -1;
+      //}
+    }
+
 
     bool operator<(const TFastScintHit &rhs) { return Charge()>rhs.Charge(); } //  fAddress<rhs.fAddress; }
 

@@ -41,6 +41,7 @@ class interaction_point {
     }
     return fSeg<other.fSeg;
   }
+
   void Print(Option_t *opt="") const { 
     printf("Seg[%02i]\tWedge[%i]\tEng: % 4.2f / % 4.2f  \t(X,Y,Z) % 3.2f % 3.2f % 3.2f\n",
             fSeg,(fSeg%6),fEng,fFrac,fX,fY,fZ);
