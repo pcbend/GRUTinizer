@@ -20,11 +20,11 @@ ifeq ($(PLATFORM),Darwin)
 export __APPLE__:= 1
 CFLAGS     += -DOS_DARWIN -DHAVE_ZLIB
 CFLAGS     += -I/opt/X11/include -Qunused-arguments
-CPP        = clang++
+CXX        = clang++
 SHAREDSWITCH = -install_name # ENDING SPACE
 else
 export __LINUX__:= 1
-CPP        = g++
+CXX        = g++
 LINKFLAGS_PREFIX += -Wl,--no-as-needed
 SHAREDSWITCH = -shared -Wl,-soname,# NO ENDING SPACE
 endif
@@ -101,13 +101,13 @@ bin/%: util/% | bin
 
 .build/util/gadd.o: $(ROOTSYS)/main/src/hadd.cxx
 	@mkdir -p $(dir $@)
-	$(call run_and_test,sed s/hadd/gadd/g < $< | $(CPP) -x c++ -fPIC -c -o $@ $(CFLAGS) -,$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,sed s/hadd/gadd/g < $< | $(CXX) -x c++ -fPIC -c -o $@ $(CFLAGS) -,$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT) pcm_files bin
-	$(call run_and_test,$(CPP) $^ -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,$(CXX) $^ -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 bin/%: .build/util/%.o | $(LIBRARY_OUTPUT) pcm_files bin
-	$(call run_and_test,$(CPP) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,$(CXX) $< -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 bin lib:
 	@mkdir -p $@
@@ -116,13 +116,13 @@ include/GVersion.h: .git/HEAD .git/index util/gen_version.sh
 	$(call run_and_test,util/gen_version.sh,$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 lib/libAllGrutinizer.so: $(LIBRARY_OUTPUT)
-	$(call run_and_test,echo | $(CPP) -x c++ - -fPIC -o $@ $(SHAREDSWITCH)$(notdir $@) $(LINKFLAGS),$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,echo | $(CXX) -x c++ - -fPIC -o $@ $(SHAREDSWITCH)$(notdir $@) $(LINKFLAGS),$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 lib/lib%.so: .build/histos/%.o | lib
-	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,$(CXX) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 lib/lib%.so: .build/filters/%.o | lib
-	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,$(CXX) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 # Functions for determining the files included in a library.
 # All src files in the library directory are included.
@@ -139,11 +139,11 @@ lib_pcm         = $(if \
                      lib/$(1)Dict_rdict.pcm)
 
 lib/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%) | lib
-	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,$(CXX) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
 .build/%.o: %.$(SRC_SUFFIX)
 	@mkdir -p $(dir $@)
-	$(call run_and_test,$(CPP) -fPIC -c $< -o $@ $(CFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
+	$(call run_and_test,$(CXX) -fPIC -c $< -o $@ $(CFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 dict_header_files = $(addprefix $(PWD)/include/,$(subst //,,$(shell head $(1) -n 1 2> /dev/null)))
 find_linkdef = $(shell find $(1) -name "*LinkDef.h")
@@ -157,7 +157,7 @@ define library_template
 	$$(call run_and_test,rootcint -f $$@ -c $$(INCLUDES) -p $$(notdir $$(filter-out $$<,$$^)) $$<,$$@,$$(COM_COLOR),$$(BLD_STRING) ,$$(OBJ_COLOR))
 
 .build/$(1)/LibDictionary.o: .build/$(1)/$(notdir $(1))Dict.cxx
-	$$(call run_and_test,$$(CPP) -fPIC -c $$< -o $$@ $$(CFLAGS),$$@,$$(COM_COLOR),$$(COM_STRING),$$(OBJ_COLOR) )
+	$$(call run_and_test,$$(CXX) -fPIC -c $$< -o $$@ $$(CFLAGS),$$@,$$(COM_COLOR),$$(COM_STRING),$$(OBJ_COLOR) )
 
 
 lib/$(notdir $(1))Dict_rdict.pcm: .build/$(1)/$(notdir $(1))Dict_rdict.pcm | lib
