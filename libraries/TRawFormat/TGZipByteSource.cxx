@@ -4,7 +4,7 @@
 
 TGZipByteSource::TGZipByteSource(const std::string& filename)
   : fFilename(filename) {
-  fFile = fopen(filename.c_str(),"rb");
+  fFile = fopen64(filename.c_str(),"rb");
   fGzFile = new gzFile;
   *fGzFile = gzdopen(fileno(fFile),"rb");
 }
