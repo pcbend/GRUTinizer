@@ -65,6 +65,8 @@ public:
 
   bool LongFileDescription() const { return fLongFileDescription; }
 
+  bool SuppressErrors() const { return fSuppressErrors; }
+
 
   void SetStartGUI(bool flag=true) { fStartGui=flag; }
 
@@ -106,6 +108,7 @@ private:
   bool fStartGui;
   bool fMakeHistos;
   bool fSortMultiple;
+  bool fSuppressErrors;
 
   bool fTimeSortInput;
   int fTimeSortDepth;

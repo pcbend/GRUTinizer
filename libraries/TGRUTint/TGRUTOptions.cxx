@@ -49,6 +49,7 @@ void TGRUTOptions::Clear(Option_t* opt) {
   fSortMultiple = false;
 
   fShouldExit = false;
+  fSuppressErrors = false;
 }
 
 void TGRUTOptions::Print(Option_t* opt) const { }
@@ -137,6 +138,8 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .description("Show this help message");
   parser.option("v version", &fShowedVersion)
     .description("Show version information");
+  parser.option("suppress-errors", &fSuppressErrors)
+    .description("Suppress errors");
 
 
   // Look for any arguments ending with .info, pass to parser.

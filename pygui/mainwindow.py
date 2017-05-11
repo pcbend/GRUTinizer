@@ -30,6 +30,8 @@ class MainWindow(object):
         self.files = {}
 
         self._setup_GUI()
+        self. _setup_keybindings()
+        
 
     def LoadGuiFile(self, filename):
         with open(filename) as f:
@@ -189,6 +191,10 @@ class MainWindow(object):
 
         status = ThreadStatusFrame(self.window)
         status.pack()
+
+    def _setup_keybindings(self):
+        self.window.bind("<BackSpace>",self.close_all_canvases)
+        #self.window.bind("<BackSpace>",self._keybindings)
 
 
     def _setup_status_bar(self, parent):
@@ -584,7 +590,7 @@ class MainWindow(object):
     def Snapshot(self):
         ROOT.GSnapshot.Get().Snapshot()
 
-    def close_all_canvases(self):
+    def close_all_canvases(self,event=0):
         canvases = ROOT.gROOT.GetListOfCanvases()
         for canvas in canvases:
             canvas.Close()

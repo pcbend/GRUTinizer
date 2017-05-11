@@ -30,7 +30,8 @@ class HistTab(object):
         # Map from treeview name to ROOT object
         self.hist_lookup = TKeyDict()
         self.treeview.bind("<Double-1>", self.OnHistClick)
-
+        self.treeview.bind("<space>", self.OnHistButton)
+        
         scrollbar = ttk.Scrollbar(parent)
         scrollbar.pack(side=tk.LEFT,fill=tk.Y)
         self.treeview.configure(yscrollcommand=scrollbar.set)
@@ -58,6 +59,11 @@ class HistTab(object):
                     color+=1
 
         update_tcanvases()
+
+    def OnHistButton(self,event):
+        self.OnHistClick(event)
+        self.main.window.lift()
+
 
     def _dump_to_tfile(self):
         for key in self.hist_lookup:

@@ -779,7 +779,10 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
     case kKey_Control:
       toggle_control();
       break;
-
+    case kKey_F3:
+      hists.at(0)->DrawPanel();
+      edited = false;
+      break;
     case kKey_b:
       edited = SetBackgroundMarkers();
       break;
@@ -1307,10 +1310,43 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
       edited = true;
       RemoveMarker("all");
       break;
+    case kKey_i:
+      if(gPad) {
+        for(unsigned int i=0;i<hists.size();i++) {
+          TIter iter(gPad->GetListOfPrimitives());
+          while(TObject *obj =iter.Next()) {
+            if(obj->InheritsFrom(TCutG::Class())) {
+              TH2* h = (TH2*)hists.at(i);
+              double sum = ((TCutG*)obj)->IntegralHist(h);
+              printf(CYAN "\t%s:\t %.02f" RESET_COLOR "\n",obj->GetName(),sum);
+            }
+          }
+        }
+      }
+      break;
     case kKey_n:
       RemoveMarker("all");
       //for(unsigned int i=0;i<hists.size();i++)
       //  hists.at(i)->GetListOfFunctions()->Delete();
+      RemovePeaks(hists.data(),hists.size());
+      for(unsigned int ii=0;ii<hists.size();ii++)
+        hists[ii]->Sumw2(false);
+      edited = true;
+      break;
+    case kKey_N:
+      RemoveMarker("all");
+      { 
+        std::vector<std::string> toremove;
+        TList *mylist = gPad->GetListOfPrimitives();
+        for(int i=0;i<mylist->GetSize();i++) {
+          if(mylist->At(i)->InheritsFrom(TCutG::Class())) {
+            toremove.push_back(mylist->At(i)->GetName());
+          }
+        }
+        for(int i=0;i<toremove.size();i++) {
+          mylist->Remove(mylist->FindObject(toremove.at(i).c_str()));
+        }
+      }
       RemovePeaks(hists.data(),hists.size());
       for(unsigned int ii=0;ii<hists.size();ii++)
         hists[ii]->Sumw2(false);
