@@ -811,12 +811,12 @@ float TS800::GetTofE1_MTDC(float c1,float c2,int i) const {
   for(unsigned int x=0;x<mtof.fObj.size();x++) {
     for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
       result.push_back( mtof.fObj.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
-      }
     }
+  }
 
-   if(result.size()>(unsigned int)i)
-     return result.at(i);
-   return sqrt(-1.0);
+  if(result.size()>(unsigned int)i)
+    return result.at(i);
+  return sqrt(-1.0);
 }
 
 float TS800::GetOBJRaw_TAC() const {
