@@ -30,8 +30,8 @@ class MainWindow(object):
         self.files = {}
 
         self._setup_GUI()
-        self. _setup_keybindings()
-        
+        self._setup_keybindings()
+
 
     def LoadGuiFile(self, filename):
         with open(filename) as f:
@@ -195,6 +195,20 @@ class MainWindow(object):
     def _setup_keybindings(self):
         self.window.bind("<BackSpace>",self.close_all_canvases)
         #self.window.bind("<BackSpace>",self._keybindings)
+        self.window.bind("<KP_Space>",self._handleKeyPad)
+        self.window.bind("<KP_Decimal>",self._handleKeyPad)
+        self.window.bind("<KP_Enter>",self._handleKeyPad)
+        self.window.bind("<KP_Add>",self._handleKeyPad)
+        self.window.bind("<KP_0>",self._handleKeyPad)
+        self.window.bind("<KP_1>",self._handleKeyPad)
+        self.window.bind("<KP_2>",self._handleKeyPad)
+        self.window.bind("<KP_3>",self._handleKeyPad)
+        self.window.bind("<KP_4>",self._handleKeyPad)
+        self.window.bind("<KP_5>",self._handleKeyPad)
+        self.window.bind("<KP_6>",self._handleKeyPad)
+        self.window.bind("<KP_7>",self._handleKeyPad)
+        self.window.bind("<KP_8>",self._handleKeyPad)
+        self.window.bind("<KP_9>",self._handleKeyPad)
 
 
     def _setup_status_bar(self, parent):
@@ -529,9 +543,9 @@ class MainWindow(object):
         #                                                       ("Cuts File", "*.root")))
         #if not filename:
         #   return
-        
+
 	#filename = os.path.abspath(filename)
-        #tfile = ROOT.TFile(filename);                
+        #tfile = ROOT.TFile(filename);
         self.tcut_tab.AddFile(cutfile)
 
     def LoadDataFile(self, filename = None):
@@ -623,3 +637,47 @@ class MainWindow(object):
         #ROOT.PyGUIThread.join(0.1)
 
         self.canvases.append(canvas)
+
+
+    def _handleKeyPad(self,event):
+        canvas_sizes = dict(KP_1=(1,1),
+                            KP_2=(2,1),
+                            KP_3=(3,1),
+                            KP_4=(1,2),
+                            KP_5=(2,2),
+                            KP_6=(3,2),
+                            KP_7=(1,3),
+                            KP_8=(2,3),
+                            KP_9=(3,3))
+        if event.keysym in canvas_sizes:
+            x,y = canvas_sizes[event.keysym]
+            self.open_canvas('',x,y)
+
+        canvas_mod = dict(KP_Add=+1,
+                          KP_Enter=-1)
+        if event.keysym in canvas_mod:
+            shift = canvas_mod[event.keysym]
+            if ROOT.gPad:
+                padnum = ROOT.gPad.GetNumber()
+                canvas = ROOT.gPad.GetCanvas()
+
+                if padnum+shift == 0:
+                    # Ugly way to find the maximum pad
+                    target_num = 1
+                    while True:
+                        if not canvas.GetPad(target_num+1):
+                            break
+                        target_num += 1
+                elif canvas.GetPad(padnum+shift):
+                    target_num = padnum+shift
+                else:
+                    target_num = 1
+
+                canvas.cd(target_num)
+
+                ROOT.gPad.Modified()
+                ROOT.gPad.Update()
+
+
+
+        self.window.lift()
