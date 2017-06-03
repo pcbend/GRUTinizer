@@ -261,6 +261,15 @@ void GH2D::Streamer(TBuffer &b) {
 */
 
 
+//Int_t GH2D::Write(const char *name,Int_t option,Int_t bufsize) const {
+//  TH2D hist;
+  //hist.Copy(*this);
+//  this->Copy(hist);
+//  hist.SetNameTitle(this->GetName(),this->GetTitle());
+  //return 
+//  hist.Write();
+//  return bufsize;
+//}
 
 
 

@@ -193,7 +193,7 @@ class MainWindow(object):
         status.pack()
 
     def _setup_keybindings(self):
-        self.window.bind("<BackSpace>",self.close_all_canvases)
+        #self.window.bind("<BackSpace>",self.close_all_canvases)
         #self.window.bind("<BackSpace>",self._keybindings)
         self.window.bind("<KP_Space>",self._handleKeyPad)
         self.window.bind("<KP_Decimal>",self._handleKeyPad)

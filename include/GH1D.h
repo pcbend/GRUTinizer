@@ -23,6 +23,9 @@ class GH1D : public GH1, public TArrayD {
     virtual void Reset(Option_t *opt="");
     virtual void SetBinsLength(int n=-1);
 
+    //Int_t Write(const char *name="",Int_t option=0,Int_t bufsize=0) const;  
+
+
   protected:
     virtual double RetrieveBinContent(int bin) const { return fArray[bin]; }
     virtual void   UpdateBinContent(int bin,double content) { fArray[bin]=content; }

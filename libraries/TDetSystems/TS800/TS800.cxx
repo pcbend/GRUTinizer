@@ -223,7 +223,8 @@ void TS800::Clear(Option_t* opt){
 
 int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
   if(raw_data.size() != 1){
-    std::cout << "Data buffers: " << raw_data.size() << std::endl;
+    std::cout << "Trying to combine multiple (" <<  raw_data.size() <<"s800 buffers: " << std::endl;
+    return 0;
   }
   for(auto& event : raw_data) { // should only be one..
     SetTimestamp(event.GetTimestamp());

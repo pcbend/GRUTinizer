@@ -48,6 +48,7 @@ class GH1 : public TH1 {
     void Calibrate(double offset,double gain,int axis=1); // *MENU*
 
 
+
   private:
     TRef fParent;
     int  fProjectionAxis; //!
