@@ -27,7 +27,7 @@
 #define Q1 15
 #define Q2 7
 #define Q3 11
-#define Q4 -1
+#define Q4 1
 #define Q5 22
 #define Q6 14
 #define Q7 12
@@ -73,23 +73,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   TList *list = &(obj.GetObjects());
   int numobj = list->GetSize();
-  
-  if(gretSim){
-    if(gretSim->Size() > 0){
-      obj.FillHistogram("sim","beta",
-			500, 0, 0.5,
-			gretSim->GetGretinaSimHit(0).GetBeta());
-      obj.FillHistogram("sim","z",
-			1000,-5,5.,
-			gretSim->GetGretinaSimHit(0).GetZ());
-      obj.FillHistogram("sim","beta_z",
-			1000,-5,5.,
-			gretSim->GetGretinaSimHit(0).GetZ(),
-			300, 0.2, 0.5,
-			gretSim->GetGretinaSimHit(0).GetBeta());
-    }
-  }
-  
+    
   if(!s800Sim)
     return;
 
@@ -105,7 +89,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
      
      // std::cout << std::flush;
 
-     Double_t dta = s800Sim->GetS800SimHit(0).GetDTA()*100.;
+     Double_t dta = s800Sim->GetS800SimHit(0).GetDTA();
 
      // std::cout << "                      ATA = "
      //  	      << s800Sim->GetS800SimHit(0).GetATA() << std::endl;
@@ -116,14 +100,27 @@ void MakeHistograms(TRuntimeObjects& obj) {
      // std::cout << "                      DTA = "
      //  	      << dta << std::endl;
     
-     // Rough dta acceptance cut
-     //     if(dta < -6. || dta > 6.)
-     //       return;
-  
+
      obj.FillHistogram("s800","dta",
-		       4096, -10, 10,
+		       200, -0.10, 0.10,
 		       dta);
 
+     // Rough dta acceptance cut
+     if(dta < -0.06 || dta > 0.06)
+       return;
+  
+     obj.FillHistogram("s800","dta_cut",
+		       200, -0.10, 0.10,
+		       dta);
+
+     obj.FillHistogram("s800","ata",
+		       200, -100, 100,
+		       s800Sim->GetS800SimHit(0).GetATA());
+
+     obj.FillHistogram("s800","bta",
+		       200, -100, 100,
+		       s800Sim->GetS800SimHit(0).GetBTA());
+     
      Double_t xsin, ysin, scatter;
 
      xsin =  sin(s800Sim->GetS800SimHit(0).GetATA()/1000.);
@@ -133,6 +130,22 @@ void MakeHistograms(TRuntimeObjects& obj) {
      obj.FillHistogram("s800","scatter",
 		       4096, 0, 300,
 		       scatter);
+     if(gretSim){
+       if(gretSim->Size() > 0){
+	 obj.FillHistogram("sim","beta",
+			   300, 0.2, 0.5,
+			   gretSim->GetGretinaSimHit(0).GetBeta());
+	 obj.FillHistogram("sim","z",
+			   1000,-50,50.,
+			   gretSim->GetGretinaSimHit(0).GetZ());
+	 obj.FillHistogram("sim","beta_z",
+			   1000,-50.,50.,
+			   gretSim->GetGretinaSimHit(0).GetZ(),
+			   300, 0.2, 0.5,
+			   gretSim->GetGretinaSimHit(0).GetBeta());
+       }
+     }
+
   }
   
   if(!gretina)

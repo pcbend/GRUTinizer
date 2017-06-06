@@ -4,8 +4,9 @@ Unix.*.Root.MacroPath: .:$(GRUTSYS)/util:$(ROOTSYS)/macros
 #default MakeHistos library
 
 #GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistosSourcesSim.so
-#GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistosInBeam.so
-GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistos_e10010.so
+GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistosInBeamLH.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistos_e10010_p43.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistos_e10010_p41.so
 
 GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
 

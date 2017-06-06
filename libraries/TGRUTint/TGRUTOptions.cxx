@@ -60,6 +60,7 @@ void TGRUTOptions::Load(int argc, char** argv) {
   if(compiled_histogram_file.length() == 0){
     compiled_histogram_file = std::string(getenv("GRUTSYS")) + "/libraries/libMakeHistos.so";
   }
+  printf("Using histogram library: %s\n", compiled_histogram_file.c_str());
 
   s800_inverse_map_file = "";//"invmap.inv";
 
