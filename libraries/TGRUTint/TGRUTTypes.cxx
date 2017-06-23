@@ -6,6 +6,7 @@
 #include "TGretSim.h"
 #include "TGretina.h"
 #include "TJanus.h"
+#include "TJanusDDAS.h"
 #include "TLenda.h"
 #include "TMode3.h"
 #include "TNSCLScalers.h"
@@ -31,6 +32,7 @@ std::map<std::string, kDetectorSystems> detector_system_map{
 
   {"Sega",        kDetectorSystems::SEGA},
   {"Janus",       kDetectorSystems::JANUS},
+  {"JanusDDAS",   kDetectorSystems::JANUS_DDAS},
   {"FastScint",   kDetectorSystems::FASTSCINT},
 
   {"Caesar",      kDetectorSystems::CAESAR},
@@ -54,6 +56,7 @@ std::map<kDetectorSystems, TDetectorFactoryBase*> detector_factory_map {
 
   {kDetectorSystems::SEGA,        new TDetectorFactory<TSega>() },
   {kDetectorSystems::JANUS,       new TDetectorFactory<TJanus>() },
+  {kDetectorSystems::JANUS_DDAS,  new TDetectorFactory<TJanusDDAS>() },
   {kDetectorSystems::FASTSCINT,   new TDetectorFactory<TFastScint>() },
 
   {kDetectorSystems::CAESAR,      new TDetectorFactory<TCaesar>() },

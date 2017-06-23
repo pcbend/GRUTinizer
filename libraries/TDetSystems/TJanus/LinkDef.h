@@ -1,4 +1,4 @@
-// TJanus.h TJanusHit.h
+// TJanus.h TJanusHit.h TJanusDDAS.h TJanusDDASHit.h
 
 #ifdef __CINT__
 
@@ -10,5 +10,8 @@
 #pragma link C++ class TJanusHit+;
 #pragma link C++ class std::vector<TJanusHit>+;
 #pragma link C++ class TJanus+;
+#pragma link C++ class TJanusDDASHit+;
+#pragma link C++ class std::vector<TJanusDDASHit>+;
+#pragma link C++ class TJanusDDAS+;
 
 #endif
