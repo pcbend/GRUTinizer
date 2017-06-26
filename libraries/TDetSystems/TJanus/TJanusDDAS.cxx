@@ -72,6 +72,25 @@ void TJanusDDAS::UnpackChannels(std::vector<TRawEvent>& raw_data) {
     janus_chan.SetAddress(address);
 
     janus_channels.push_back(janus_chan);
+
+
+    // static int shown = 0;
+    // if(shown < 10) {
+    //   std::cout << "-------------------\n";
+    //   std::cout << "Charge = " << ddas.GetEnergy() << "\n";
+
+    //   for(int i=0; i<ddas.GetTraceLength(); i++) {
+    //     std::cout << ddas.trace[i] << "\t";
+    //     if(i%8 == 0) {
+    //       std::cout << "\n";
+    //     }
+    //   }
+
+    //   std::cout << "\n";
+
+    //   std::cout << std::flush;
+    //   shown++;
+    // }
   }
 }
 

@@ -53,6 +53,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 }
 
 void MakeJanusHistograms(TRuntimeObjects& obj, TJanusDDAS& janus) {
+
   obj.FillHistogram("janus", "num_channels",
                     150, -10, 140, janus.GetAllChannels().size());
   obj.FillHistogram("janus", "num_hits",
@@ -65,6 +66,10 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanusDDAS& janus) {
     obj.FillHistogram("janus", "energy_summary",
                       128, 0, 128, chan.GetFrontChannel(),
                       1200, -20, 100, chan.GetEnergy());
+
+
+    obj.FillHistogram("janus", "channel_detnum",
+                      15,-5,10, chan.GetDetnum());
   }
 
   for(auto& hit : janus.GetAllHits()) {
@@ -89,11 +94,19 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanusDDAS& janus) {
                       1200, -20, 100, hit.GetBackHit().GetEnergy());
 
     obj.FillHistogram("janus", Form("det%d_ringnum_sectornum", hit.GetDetnum()),
-                      24, 0, 24, hit.GetRing(),
-                      24, 0, 24, hit.GetSector());
+                      30, 0, 30, hit.GetRing(),
+                      40, 0, 40, hit.GetSector());
+
+    obj.FillHistogram("janus", Form("det%d_ringnum", hit.GetDetnum()),
+                      30, 0, 30, hit.GetRing());
 
     obj.FillHistogram("janus", "frontback_tdiff",
                       2000, -1000, 1000, hit.Timestamp() - hit.GetBackHit().Timestamp());
+
+
+    obj.FillHistogram("janus",Form("det%d_xy", hit.GetDetnum()),
+                      100,-4,4,hit.GetPosition().X(),
+                      100,-4,4,hit.GetPosition().Y());
   }
 }
 
