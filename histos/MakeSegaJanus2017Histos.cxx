@@ -100,13 +100,19 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanusDDAS& janus) {
     obj.FillHistogram("janus", Form("det%d_ringnum", hit.GetDetnum()),
                       30, 0, 30, hit.GetRing());
 
-    obj.FillHistogram("janus", "frontback_tdiff",
-                      2000, -1000, 1000, hit.Timestamp() - hit.GetBackHit().Timestamp());
+    auto tdiff = hit.Timestamp() - hit.GetBackHit().Timestamp();
+    obj.FillHistogram("janus", Form("det%d_frontback_tdiff", hit.GetDetnum()),
+                      2000, -1000, 1000, tdiff);
 
 
     obj.FillHistogram("janus",Form("det%d_xy", hit.GetDetnum()),
-                      100,-4,4,hit.GetPosition().X(),
-                      100,-4,4,hit.GetPosition().Y());
+                      200,-4,4,hit.GetPosition().X(),
+                      200,-4,4,hit.GetPosition().Y());
+
+    if(hit.GetRing() == 1) {
+      obj.FillHistogram("janus", Form("det%d_charge_innermost_ring", hit.GetDetnum()),
+                        4200, -100, 4100, hit.Charge());
+    }
   }
 }
 
@@ -191,4 +197,28 @@ void MakeScalerHistograms(TRuntimeObjects& obj, TNSCLScalers& scalers) {
 }
 
 void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega& sega, TJanusDDAS& janus) {
+  for(auto& j_hit : janus.GetAllHits()) {
+    if(j_hit.GetDetnum()==1 && j_hit.GetRing()==1) {
+      const char* iso = NULL;
+      if(j_hit.Charge()>1450 && j_hit.Charge() < 1570) {
+        iso = "239Pu";
+      } else if(j_hit.Charge()>1570 && j_hit.Charge() < 1690) {
+        iso = "241Am";
+      } else if(j_hit.Charge()>1690 && j_hit.Charge() < 1800) {
+        iso = "244Cm";
+      }
+
+      if(iso) {
+        for(unsigned int i=0; i<sega.Size(); i++) {
+          TSegaHit& s_hit = sega.GetSegaHit(i);
+          obj.FillHistogram("coinc",Form("charge_summary_%s", iso),
+                            18, 1, 19, s_hit.GetDetnum(),
+                            32768, 0, 32768, s_hit.Charge());
+          obj.FillHistogram("coinc",Form("energy_summary_%s", iso),
+                            18, 1, 19, s_hit.GetDetnum(),
+                            8000, 0, 4000, s_hit.GetEnergy());
+        }
+      }
+    }
+  }
 }
