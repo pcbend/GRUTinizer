@@ -10,6 +10,8 @@ public:
 
   TJanusDDASHit& operator=(const TJanusDDASHit& hit);
 
+  virtual float RawCharge() const;
+
   void Clear(Option_t* opt = "");
   void Print(Option_t* opt = "") const;
   void Copy(TObject& obj) const;

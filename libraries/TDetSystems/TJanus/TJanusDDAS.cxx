@@ -96,9 +96,9 @@ void TJanusDDAS::UnpackChannels(std::vector<TRawEvent>& raw_data) {
 
 void TJanusDDAS::BuildCorrelatedHits() {
   for(const auto& chan_ring : janus_channels) {
-    if(chan_ring.IsRing()) {
+    if(chan_ring.IsRing() && chan_ring.RawCharge() > 500) {
       for(const auto& chan_sector : janus_channels) {
-        if(chan_sector.IsSector()) {
+        if(chan_sector.IsSector() && chan_sector.RawCharge() > 500) {
           if(chan_ring.GetDetnum() == chan_sector.GetDetnum()) {
             MakeHit(chan_ring, chan_sector);
           }
@@ -119,6 +119,7 @@ void TJanusDDAS::MakeHit(const TJanusDDASHit& chan_ring,
   back.SetTimestamp(chan_sector.Timestamp());
 
   janus_hits.push_back(correlated_hit);
+  fSize++;
 }
 
 TJanusDDASHit& TJanusDDAS::GetJanusHit(int i){

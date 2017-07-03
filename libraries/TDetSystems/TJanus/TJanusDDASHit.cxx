@@ -23,6 +23,14 @@ void TJanusDDASHit::Clear(Option_t* opt) {
   TDetectorHit::Clear(opt);
 }
 
+float TJanusDDASHit::RawCharge() const {
+  if(fCharge > 30000) {
+    return fCharge - 32768;
+  } else {
+    return fCharge;
+  }
+}
+
 int TJanusDDASHit::GetFrontChannel() const {
   int address = Address();
 

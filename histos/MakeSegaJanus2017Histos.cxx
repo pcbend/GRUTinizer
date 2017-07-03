@@ -23,6 +23,8 @@
 void MakeSegaHistograms(TRuntimeObjects& obj, TSega& sega);
 void MakeJanusHistograms(TRuntimeObjects& obj, TJanusDDAS& janus);
 void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega& sega, TJanusDDAS& janus);
+void MakeCoincidenceHistogramsAlphaSource(TRuntimeObjects& obj, TSega& sega, TJanusDDAS& janus);
+void MakeCoincidenceHistogramsFissionSource(TRuntimeObjects& obj, TSega& sega, TJanusDDAS& janus);
 void MakeScalerHistograms(TRuntimeObjects& obj, TNSCLScalers& scalers);
 
 // extern "C" is needed to prevent name mangling.
@@ -62,7 +64,7 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanusDDAS& janus) {
   for(auto& chan : janus.GetAllChannels()) {
     obj.FillHistogram("janus", "charge_summary",
                       128, 0, 128, chan.GetFrontChannel(),
-                      4200, -100, 4100, chan.Charge());
+                      32768, 0, 32768, chan.Charge());
     obj.FillHistogram("janus", "energy_summary",
                       128, 0, 128, chan.GetFrontChannel(),
                       1200, -20, 100, chan.GetEnergy());
@@ -75,23 +77,30 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanusDDAS& janus) {
   for(auto& hit : janus.GetAllHits()) {
     obj.FillHistogram("janus", "charge_summary_hit",
                       128, 0, 128, hit.GetFrontChannel(),
-                      4200, -100, 4100, hit.Charge());
+                      32768, 0, 32768, hit.Charge());
     obj.FillHistogram("janus", "charge_summary_hit",
                       128, 0, 128, hit.GetBackChannel(),
-                      4200, -100, 4100, hit.GetBackHit().Charge());
+                      32768, 0, 32768, hit.GetBackHit().Charge());
     obj.FillHistogram("janus", "energy_summary_hit",
                       128, 0, 128, hit.GetFrontChannel(),
-                      1200, -20, 100, hit.GetEnergy());
+                      1200, -20, 100e3, hit.GetEnergy());
     obj.FillHistogram("janus", "energy_summary_hit",
                       128, 0, 128, hit.GetBackChannel(),
-                      1200, -20, 100, hit.GetBackHit().GetEnergy());
+                      1200, -20, 100e3, hit.GetBackHit().GetEnergy());
 
-    obj.FillHistogram("janus", "charge_frontback",
-                      4200, -100, 4100, hit.Charge(),
-                      4200, -100, 4100, hit.GetBackHit().Charge());
+    obj.FillHistogram("janus", Form("det%d_ringsummary_charge", hit.GetDetnum()),
+                      35, -5, 30, hit.GetRing(),
+                      32768, 0, 32768, hit.Charge());
+    obj.FillHistogram("janus", Form("det%d_ringsummary_energy", hit.GetDetnum()),
+                      35, -5, 30, hit.GetRing(),
+                      2000, 0, 20e3, hit.GetEnergy());
+
+    // obj.FillHistogram("janus", "charge_frontback",
+    //                   32768, 0, 32768, hit.Charge(),
+    //                   32768, 0, 32768, hit.GetBackHit().Charge());
     obj.FillHistogram("janus", "energy_frontback",
-                      1200, -20, 100, hit.GetEnergy(),
-                      1200, -20, 100, hit.GetBackHit().GetEnergy());
+                      1200, -20, 100e3, hit.GetEnergy(),
+                      1200, -20, 100e3, hit.GetBackHit().GetEnergy());
 
     obj.FillHistogram("janus", Form("det%d_ringnum_sectornum", hit.GetDetnum()),
                       30, 0, 30, hit.GetRing(),
@@ -111,7 +120,28 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanusDDAS& janus) {
 
     if(hit.GetRing() == 1) {
       obj.FillHistogram("janus", Form("det%d_charge_innermost_ring", hit.GetDetnum()),
-                        4200, -100, 4100, hit.Charge());
+                        32768, 0, 32768, hit.Charge());
+    }
+  }
+
+
+  for(int i=0; i<janus.Size(); i++) {
+    for(int j=i+1; j<janus.Size(); j++) {
+      auto& hit1 = janus.GetJanusHit(i);
+      auto& hit2 = janus.GetJanusHit(j);
+
+      auto pos1 = hit1.GetPosition();
+      auto pos2 = hit2.GetPosition();
+
+      double angle = pos1.Angle(pos2);
+      obj.FillHistogram("janus", "relative_angle",
+                        200, 0, 200, (180/3.1415926)*angle);
+
+      if(hit1.GetEnergy() > 6500 &&
+         hit2.GetEnergy() > 6500) {
+        obj.FillHistogram("janus", "fission_relative_angle",
+                          200, 0, 200, (180/3.1415926)*angle);
+      }
     }
   }
 }
@@ -135,6 +165,9 @@ void MakeSegaHistograms(TRuntimeObjects& obj, TSega& sega) {
     obj.FillHistogram("sega","energy_summary",
                       18, 1, 19, hit_detnum,
                       8000, 0, 4000, energy);
+
+    obj.FillHistogram("sega","detnum",
+                      18, 1, 19, hit_detnum);
 
     obj.FillHistogram("sega","numsegments",
                       16, 1, 17, hit_detnum,
@@ -197,6 +230,11 @@ void MakeScalerHistograms(TRuntimeObjects& obj, TNSCLScalers& scalers) {
 }
 
 void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega& sega, TJanusDDAS& janus) {
+  MakeCoincidenceHistogramsAlphaSource(obj, sega, janus);
+  MakeCoincidenceHistogramsFissionSource(obj, sega, janus);
+}
+
+void MakeCoincidenceHistogramsAlphaSource(TRuntimeObjects& obj, TSega& sega, TJanusDDAS& janus) {
   for(auto& j_hit : janus.GetAllHits()) {
     if(j_hit.GetDetnum()==1 && j_hit.GetRing()==1) {
       const char* iso = NULL;
@@ -218,6 +256,30 @@ void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega& sega, TJanusDDAS& ja
                             18, 1, 19, s_hit.GetDetnum(),
                             8000, 0, 4000, s_hit.GetEnergy());
         }
+      }
+    }
+  }
+}
+
+void MakeCoincidenceHistogramsFissionSource(TRuntimeObjects& obj, TSega& sega, TJanusDDAS& janus) {
+  for(auto& j_hit : janus.GetAllHits()) {
+    if(j_hit.GetEnergy() > 6500) {
+      for(unsigned int i=0; i<sega.Size(); i++) {
+        TSegaHit& s_hit = sega.GetSegaHit(i);
+
+        auto s_pos = s_hit.GetPosition();
+        auto j_pos = j_hit.GetPosition();
+
+        auto angle = s_pos.Angle(j_pos);
+
+        double s_energy = s_hit.GetEnergy();
+
+        obj.FillHistogram("coinc", "fission_energy_angle",
+                          4000, 0, 4000, s_energy,
+                          180, 0, 180, (180/3.1415926)*angle);
+
+        obj.FillHistogram("coinc", "fission_gamma_energy",
+                          4000, 0, 4000, s_energy);
       }
     }
   }

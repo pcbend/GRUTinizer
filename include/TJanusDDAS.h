@@ -28,8 +28,8 @@ public:
   iterator begin() { return janus_hits.begin(); }
   iterator end() { return janus_hits.end(); }
 
-  static double GetBeta(double betamax, double kr_angle_rad, bool energy_loss=false, double collision_pos=0.5);
-  static double SimAngle();
+  // static double GetBeta(double betamax, double kr_angle_rad, bool energy_loss=false, double collision_pos=0.5);
+  // static double SimAngle();
 
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
