@@ -1,4 +1,4 @@
-// GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GRootBrowser.h GCanvas.h  GH2I.h GH2D.h  GPeak.h GGaus.h GValue.h GH1D.h GrutNotifier.h  GSnapshot.h GCutG.h GH1.h GH2.h GPopup.h GHistPopup.h TF1Sum.h  GGraph.h GGraph2D.h
+// GRootGuiFactory.h GRootFunctions.h GRootCommands.h GRootCanvas.h GRootBrowser.h GCanvas.h  GH2I.h GH2D.h  GPeak.h GGaus.h GValue.h GH1D.h GrutNotifier.h  GSnapshot.h GCutG.h GH1.h GH2.h GPopup.h GHistPopup.h TF1Sum.h  GGraph.h GGraph2D.h GDoubleGaus.h
 
 
 #ifdef __CINT__
@@ -23,6 +23,7 @@
 #pragma link C++ function RemovePeaks;
 #pragma link C++ function PhotoPeakFit;
 #pragma link C++ function GausFit;
+#pragma link C++ function DoubleGausFit;
 
 #pragma link C++ function MergeStrings;
 
@@ -50,6 +51,7 @@
 #pragma link C++ class GCutG+;
 #pragma link C++ class GPeak+;
 #pragma link C++ class GGaus+;
+#pragma link C++ class GDoubleGaus+;
 
 #pragma link C++ class GValue-;
 #pragma link C++ class std::map<std::string,GValue*>+;

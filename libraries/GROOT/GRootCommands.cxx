@@ -29,6 +29,7 @@
 #include <GCanvas.h>
 #include <GPeak.h>
 #include <GGaus.h>
+#include <GDoubleGaus.h>
 #include <GH2D.h>
 #include <GH1D.h>
 //#include <GRootObjectManager.h>
@@ -825,7 +826,7 @@ GGaus *GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
 }
 
 
-TF1 *DoubleGausFit(TH1 *hist,double cent1,double cent2,double xlow, double xhigh,Option_t *opt) {
+GDoubleGaus *DoubleGausFit(TH1 *hist,double cent1,double cent2,double xlow, double xhigh,Option_t *opt) {
   if(!hist)
     return 0;
   if(xlow>xhigh)
@@ -833,10 +834,10 @@ TF1 *DoubleGausFit(TH1 *hist,double cent1,double cent2,double xlow, double xhigh
 
   //std::cout << "here." << std::endl;
 
-  GGaus *mypeak= new GGaus(xlow,xhigh);
+  GDoubleGaus *mypeak= new GDoubleGaus(cent1,cent2,xlow,xhigh);
   std::string options = opt;
   options.append("Q+");
-  mypeak->Fit(hist,options.c_str());
+  mypeak->Fit(hist,cent1,cent2,options.c_str());
   //mypeak->Background()->Draw("SAME");
   TF1 *bg = new TF1(*mypeak->Background());
   hist->GetListOfFunctions()->Add(bg);
