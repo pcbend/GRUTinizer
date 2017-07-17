@@ -91,15 +91,21 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
   fNumberOfInteractions = raw.num;
   fPad = raw.pad;
 
-  for(int i=0; i<fNumberOfInteractions; i++) {
-    interaction_point pnt; 
-    pnt.fSeg = raw.intpts[i].seg;
-    pnt.fX   = raw.intpts[i].x;
-    pnt.fY   = raw.intpts[i].y;
-    pnt.fZ   = raw.intpts[i].z;
-    pnt.fEng = raw.intpts[i].e;
-    fSegments.push_back(pnt);
-  }
+  //std::cout<< "pad\t" << fPad << "\tints\t" << fNumberOfInteractions << std::endl; 
+    for(int i=0; i<fNumberOfInteractions; i++) {
+      try {
+        interaction_point pnt; 
+        pnt.fSeg = raw.intpts[i].seg;
+        pnt.fX   = raw.intpts[i].x;
+        pnt.fY   = raw.intpts[i].y;
+        pnt.fZ   = raw.intpts[i].z;
+        pnt.fEng = raw.intpts[i].e;
+        fSegments.push_back(pnt);
+      } catch(...) {
+        std::cout << "in try catch block!" << std::endl;
+      }
+
+    }
   fTOffset = raw.intpts[MAX_INTPTS-1].z;
   //std::cout << "[13].z :  " << raw.intpts[13].z << std::endl;
   //std::cout << "[14].z :  " << raw.intpts[14].z << std::endl;

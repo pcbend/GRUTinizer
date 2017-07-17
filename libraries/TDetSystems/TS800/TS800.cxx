@@ -1510,8 +1510,8 @@ float TS800::GetMTOF_ObjE1(unsigned int i,bool find_best) const {
   double target = GValue::Value("MTOF_ObjE1");
   if(std::isnan(target)) 
     return GetCorrTOF_OBJ_MESY(i); 
-  double value;
-  for(int i=0;i<mtof.fObj.size();i++) {    
+  double value = GetMTOF_ObjE1(0,0);
+  for(int i=1;i<mtof.fObj.size();i++) {    
     double newvalue = GetMTOF_ObjE1(i,0);
     if(std::abs(target - newvalue) < std::abs(target - value)) {
       value = newvalue;

@@ -345,7 +345,12 @@ void GRootCanvas::CreateCanvas(const char *name)
    if (!img) {
       Int_t sav = gErrorIgnoreLevel;
       gErrorIgnoreLevel = kFatal;
-      img = TImage::Create() ? 1 : -1;
+      TImage* itmp = TImage::Create();
+      img = itmp ? 1 : -1;
+      if (itmp) {
+         delete itmp;
+         itmp=NULL;
+      }
       gErrorIgnoreLevel = sav;
    }
    if (img > 0) {
@@ -1496,19 +1501,23 @@ void GRootCanvas::ShowEditor(Bool_t show)
          if (show && (!fEditor || !((TGedEditor *)fEditor)->IsMapped())) {
          printf("I am here GRootCanvas 1476.\n");
             if (!browser->GetTabLeft()->GetTabTab("Pad Editor")) {
-               browser->StartEmbedding(TRootBrowser::kLeft);
-               if (!fEditor)
-                  fEditor = TVirtualPadEditor::GetPadEditor(kTRUE);
-               else {
-                  ((TGedEditor *)fEditor)->ReparentWindow(fClient->GetRoot());
-                  ((TGedEditor *)fEditor)->MapWindow();
-               }
-               browser->StopEmbedding("Pad Editor");
-               fEditor->SetGlobal(kFALSE);
-               gROOT->GetListOfCleanups()->Remove((TGedEditor *)fEditor);
-               if (fEditor) {
-                  ((TGedEditor *)fEditor)->SetCanvas(fCanvas);
-                  ((TGedEditor *)fEditor)->SetModel(fCanvas, fCanvas, kButton1Down);
+               if (browser->GetActFrame()) { //already in edit mode
+                  TTimer::SingleShot(200, "TRootCanvas", this, "ShowEditor(=kTRUE)");
+               } else {
+                  browser->StartEmbedding(TRootBrowser::kLeft);
+                  if (!fEditor)
+                     fEditor = TVirtualPadEditor::GetPadEditor(kTRUE);
+                  else {
+                     ((TGedEditor *)fEditor)->ReparentWindow(fClient->GetRoot());
+                     ((TGedEditor *)fEditor)->MapWindow();
+                  }
+                  browser->StopEmbedding("Pad Editor");
+                  if (fEditor) {
+                     fEditor->SetGlobal(kFALSE);
+                     gROOT->GetListOfCleanups()->Remove((TGedEditor *)fEditor);
+                     ((TGedEditor *)fEditor)->SetCanvas(fCanvas);
+                     ((TGedEditor *)fEditor)->SetModel(fCanvas, fCanvas, kButton1Down);
+                  }
                }
             }
             else
