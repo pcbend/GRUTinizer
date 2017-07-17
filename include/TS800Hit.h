@@ -383,12 +383,19 @@ class TMTof : public TDetectorHit {
     int RefSize()        const { return fRef.size(); }
 
 
-
+    bool Correlate() const;
+    bool CorrelateE1Up() const;
+    bool CorrelateObj()  const;
+    bool CorrelateXfp()  const;
+    
+    int  GetCorrelatedXfp()  const { return fCorrelatedXFP; }  //!
+    int  GetCorrelatedObj()  const { return fCorrelatedOBJ; }  //!
+    int  GetCorrelatedE1Up() const { return fCorrelatedE1Up;  }  //!
 
   //private:
     mutable int fCorrelatedXFP;   //!
     mutable int fCorrelatedOBJ;   //!
-    mutable int fCorrelatedE1;    //!
+    mutable int fCorrelatedE1Up;    //!
     mutable int fCorrelatedXFP_Ch15;   //!
     mutable int fCorrelatedOBJ_Ch15;   //!
     mutable int fCorrelatedE1_Ch15;    //!

@@ -768,13 +768,90 @@ void TMTof::Clear(Option_t *opt) {
   fHodoscope.clear();
   fRef.clear();
 
-  fCorrelatedXFP=-1;
-  fCorrelatedOBJ=-1;
-  fCorrelatedE1=-1;
-  fCorrelatedXFP_Ch15=-1;
-  fCorrelatedOBJ_Ch15=-1;
-  fCorrelatedE1_Ch15=-1;
+  fCorrelatedXFP=0xffffffff;
+  fCorrelatedOBJ=0xffffffff;
+  fCorrelatedE1Up=0xffffffff;
+  fCorrelatedXFP_Ch15=0xffffffff;
+  fCorrelatedOBJ_Ch15=0xffffffff;
+  fCorrelatedE1_Ch15=0xffffffff;
   
 }
+
+bool TMTof::Correlate() const {
+  CorrelateE1Up();
+  CorrelateObj();
+  CorrelateXfp();
+  return true;
+}
+
+
+bool TMTof::CorrelateE1Up() const{
+//Determines correlated time-of-flights based on TARGET_MTOF_# GValues
+//Values are set in TMTof as fCorrelatedXFP, fCorrelatedE1Up, etc.
+//Note that if the GValues are not set, the first value in each time-of-flight 
+//is taken.
+  double target = GValue::Value("TARGET_MTOF_E1Up");
+  if(fE1Up.size() && !std::isnan(target)){
+    fCorrelatedE1Up = fE1Up.at(0);
+    for(int i=1;i<fE1Up.size();i++) {     
+      double newvalue = fE1Up.at(i);
+      if(std::abs(target - newvalue) < std::abs(target - fCorrelatedE1Up)) {
+        fCorrelatedE1Up = newvalue;
+      } 
+    }  
+  } else if(fE1Up.size()) {
+    fCorrelatedE1Up = fE1Up.at(0);
+  } else {
+    fCorrelatedE1Up = 0xffffffff;
+  }
+  return true;
+}
+
+bool TMTof::CorrelateObj() const{
+//Determines correlated time-of-flights based on TARGET_MTOF_# GValues
+//Values are set in TMTof as fCorrelatedXFP, fCorrelatedObj, etc.
+//Note that if the GValues are not set, the first value in each time-of-flight 
+//is taken.
+  double target = GValue::Value("TARGET_MTOF_Obj");
+  if(fObj.size() && !std::isnan(target)){
+    fCorrelatedOBJ = fObj.at(0);
+    for(int i=1;i<fObj.size();i++) {     
+      double newvalue = fObj.at(i);
+      if(std::abs(target - newvalue) < std::abs(target - fCorrelatedOBJ)) {
+        fCorrelatedOBJ = newvalue;
+      } 
+    }  
+  } else if(fObj.size()) {
+    fCorrelatedOBJ = fObj.at(0);
+  } else {
+    fCorrelatedOBJ = 0xffffffff;
+  }
+  return true;
+}
+
+bool TMTof::CorrelateXfp() const{
+//Determines correlated time-of-flights based on TARGET_MTOF_# GValues
+//Values are set in TMTof as fCorrelatedXfp, fCorrelatedXfp, etc.
+//Note that if the GValues are not set, the first value in each time-of-flight 
+//is taken.
+  double target = GValue::Value("TARGET_MTOF_Xfp");
+  if(fXfp.size() && !std::isnan(target)){
+    fCorrelatedXFP = fXfp.at(0);
+    for(int i=1;i<fXfp.size();i++) {     
+      double newvalue = fXfp.at(i);
+      if(std::abs(target - newvalue) < std::abs(target - fCorrelatedXFP)) {
+        fCorrelatedXFP = newvalue;
+      } 
+    }  
+  } else if(fXfp.size()) {
+    fCorrelatedXFP = fXfp.at(0);
+  } else {
+    fCorrelatedXFP = 0xffffffff;
+  }
+  return true;
+}
+
+
+
 
 void TMTof::Print(Option_t *opt) const {    }
