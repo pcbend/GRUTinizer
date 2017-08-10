@@ -257,8 +257,8 @@ bool IncomingBeam(TRuntimeObjects& obj,GCutG *outgoing) {
     for(int y=0;x<s800->GetMTof().XfpSize();x++) {
       if(s800->GetMTof().ObjSize() && s800->GetMTof().XfpSize()) {
         histname = "obj_xfp_2d";
-        obj.FillHistogram(dirname,histname,6000,8000,14000,s800->GetMTof().fObj[x],
-                                           8000,12000,20000,s800->GetMTof().fXfp[y]);
+        obj.FillHistogram(dirname,histname,2500,11500,14000,s800->GetMTof().fObj[x],
+                                           3000,16000,19000,s800->GetMTof().fXfp[y]);
 
         if (s800->GetTrigger().GetRegistr()&0x0002) {
           histname = "obj_xfp_2d_coinc";
