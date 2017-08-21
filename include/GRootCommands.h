@@ -2,7 +2,10 @@
 #define GROOTCOMMANDS__H
 
 #include <string>
+#include <vector>
+
 #include <TChain.h>
+
 class TTree;
 class TH1;
 class TH2;
@@ -25,6 +28,11 @@ bool RemovePeaks(TH1**,unsigned int);
 GPeak *PhotoPeakFit(TH1*,double,double,Option_t *opt="");
 GPeak *PhotoPeakFitNormBG(TH1*,double,double,Option_t *opt="");
 GGaus *GausFit(TH1*,double,double,Option_t *opt="");
+
+GGaus *DirkGausFit(TH1* hist, double low, double high,
+                   std::vector<double> background_regions,
+                   Option_t *opt="");
+
 TF1   *DoubleGausFit(TH1*,double,double,double,double,Option_t *opt="");
 
 std::string MergeStrings(const std::vector<std::string>& strings, char split='\n');

@@ -818,6 +818,113 @@ GGaus *GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
   return mypeak;
 }
 
+namespace {
+  class BackgroundFitter {
+  public:
+    BackgroundFitter(std::vector<double> regions)
+      : regions(regions) { }
+
+    double operator()(double* x, double* par) {
+      bool is_in_background = false;
+      for(unsigned int i=0; i+1<regions.size(); i+=2) {
+        double bg_low = regions[i];
+        double bg_high = regions[i+1];
+
+        if(x[0] >= bg_low && x[0] < bg_high) {
+          is_in_background = true;
+          break;
+        }
+      }
+      if(!is_in_background) {
+        TF1::RejectPoint();
+      } else {
+      }
+
+      return par[0] + x[0]*par[1];
+    }
+
+  private:
+    std::vector<double> regions;
+  };
+}
+
+GGaus *DirkGausFit(TH1* hist, double low, double high,
+                   std::vector<double> background_regions,
+                   Option_t *opt) {
+  if(!hist)
+    return 0;
+
+  if(low>high) {
+    std::swap(low,high);
+  }
+
+  double max_x = -std::numeric_limits<double>::infinity();
+  double min_x = +std::numeric_limits<double>::infinity();
+
+  // Clamp all background regions to bin edges
+  for(double& val : background_regions) {
+    val = hist->GetXaxis()->GetBinLowEdge(hist->FindBin(val));
+    max_x = std::max(max_x, val);
+    min_x = std::min(min_x, val);
+  }
+
+  // Order each region
+  for(unsigned int i=0; i+1<background_regions.size(); i+= 2) {
+    if(background_regions[i] > background_regions[i+1]) {
+      std::swap(background_regions[i], background_regions[i+1]);
+    }
+  }
+
+  max_x = std::max(max_x, high);
+  min_x = std::min(min_x, low);
+
+  double slope = 0;
+  double offset = 0;
+
+  {
+    TF1* first_bg_fit = new TF1("first_bg_fit", "pol1", min_x, min_x);
+    std::string options = opt;
+    options.append("N0Q");
+    hist->Fit(first_bg_fit, options.c_str());
+    slope = first_bg_fit->GetParameter(1);
+    offset = first_bg_fit->GetParameter(0);
+    delete first_bg_fit;
+  }
+
+
+  {
+    TF1* bg_fit = new TF1("bg_fit", BackgroundFitter(background_regions), min_x, max_x, 2);
+    bg_fit->SetParameter(0, offset);
+    bg_fit->SetParameter(1, slope);
+    std::string options = opt;
+    options.append("N0Q");
+    hist->Fit(bg_fit, options.c_str());
+    slope = bg_fit->GetParameter(1);
+    offset = bg_fit->GetParameter(0);
+    delete bg_fit;
+  }
+
+  std::cout << "Slope: " << slope << "\tOffset: " << offset << std::endl;
+
+
+
+  std::cout << "Slope: " << slope << "\tOffset: " << offset << std::endl;
+
+  GGaus *mypeak= new GGaus(low,high);
+  std::string options = opt;
+  options.append("Q+");
+
+  mypeak->FixParameter(3,offset);
+  mypeak->FixParameter(4,slope);
+
+  mypeak->Fit(hist,options.c_str());
+  TF1 *bg = new TF1(*mypeak->Background());
+  bg->SetRange(min_x, max_x);
+  hist->GetListOfFunctions()->Add(bg);
+
+  return mypeak;
+}
+
 
 TF1 *DoubleGausFit(TH1 *hist,double cent1,double cent2,double xlow, double xhigh,Option_t *opt) {
   if(!hist)

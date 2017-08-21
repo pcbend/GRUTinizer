@@ -71,6 +71,7 @@ class GGaus : public TF1 {
     void SetInitialized(Bool_t flag = true) {init_flag = flag;}
     bool init_flag;
 
+
     TF1 fBGFit;
     TF1 fBGHist;
 

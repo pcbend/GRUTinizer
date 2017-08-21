@@ -309,11 +309,11 @@ bool GCanvas::SetBackgroundMarkers() {
     return false;
   }
 
-  // Delete previous background, if any.
-  for(auto marker : fBackgroundMarkers){
-    delete marker;
-  }
-  fBackgroundMarkers.clear();
+  // // Delete previous background, if any.
+  // for(auto marker : fBackgroundMarkers){
+  //   delete marker;
+  // }
+  // fBackgroundMarkers.clear();
 
   // Push last two markers into the background.
   fBackgroundMarkers.push_back(fMarkers.back());
@@ -878,8 +878,30 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
 
 
     case kKey_g:
-      if(GausFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx))
-        edited = true;
+      if(fMarkers.size()==2) {
+        if(fBackgroundMarkers.size()==0) {
+          if(GausFit(hists.back(),
+                     fMarkers.at(fMarkers.size()-2)->localx,
+                     fMarkers.back()->localx,
+                     "L")) {
+            hists.back()->Sumw2(false);
+            edited = true;
+          }
+        } else {
+          std::vector<double> background_areas;
+          for(auto marker : fBackgroundMarkers) {
+            background_areas.push_back(marker->localx);
+          }
+          if(DirkGausFit(hists.back(),
+                         fMarkers.at(fMarkers.size()-2)->localx,
+                         fMarkers.at(fMarkers.size()-1)->localx,
+                         background_areas,
+                         "L")) {
+               hists.back()->Sumw2(false);
+               edited = true;
+          }
+        }
+      }
       break;
 
       //case kKey_G:
@@ -1174,6 +1196,12 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
                   RemoveMarker("all");
                 }
                 break;
+
+    case kKey_v:
+      RemoveMarker();
+      edited = true;
+      break;
+
     case kKey_F9:{
                    int color =  hists.at(0)->GetLineColor() + 1;
                    if(color>9)

@@ -25,6 +25,9 @@ GGaus::GGaus(Double_t xlow,Double_t xhigh,Option_t *opt)
   fBGFit.SetLineStyle(2);
   fBGFit.SetLineColor(kBlack);
 
+
+
+
   // Changing the name here causes an infinite loop when starting the FitEditor
   //SetName(Form("gaus_%d_to_%d",(Int_t)(xlow),(Int_t)(xhigh)));
   InitNames();
@@ -269,16 +272,20 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
   fBGFit.SetParameters(bgpars);
   //fithist->GetListOfFunctions()->Print();
 
+  int bin_low = fithist->GetXaxis()->FindBin(xlow);
+  int bin_high = fithist->GetXaxis()->FindBin(xhigh);
+
+  xlow = fithist->GetXaxis()->GetBinLowEdge(bin_low);
+  xhigh = fithist->GetXaxis()->GetBinLowEdge(bin_high);
+
 
   fArea = this->Integral(xlow,xhigh) / fithist->GetBinWidth(1);
   double bgArea = fBGFit.Integral(xlow,xhigh) / fithist->GetBinWidth(1);;
   fArea -= bgArea;
 
-
   if(xlow>xhigh)
     std::swap(xlow,xhigh);
-  fSum = fithist->Integral(fithist->GetXaxis()->FindBin(xlow),
-                           fithist->GetXaxis()->FindBin(xhigh)); //* fithist->GetBinWidth(1);
+  fSum = fithist->Integral(bin_low, bin_high-1);
   printf("sum between markers: %02f\n",fSum);
   fDSum = TMath::Sqrt(fSum);
   fSum -= bgArea;
