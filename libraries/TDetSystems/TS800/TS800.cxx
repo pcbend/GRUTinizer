@@ -1531,8 +1531,9 @@ float TS800::GetMTOF_XfpE1(unsigned int i,bool find_best) const {
   double target = GValue::Value("MTOF_XfpE1");
   if(std::isnan(target)) {
     target = GValue::Value("TARGET_MTOF_XfpE1");
+    //std::cout << target << std::endl;
     if(std::isnan(target)) {
-      return GetRawXF_MESY(i); 
+      return GetRawXF_MESY(i);
     }
   }
   double value = GetMTOF_XfpE1(0,0);
