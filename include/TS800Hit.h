@@ -383,24 +383,29 @@ class TMTof : public TDetectorHit {
     int RefSize()        const { return fRef.size(); }
 
 
-    bool Correlate() const;
-    bool CorrelateE1Up() const;
-    bool CorrelateObj()  const;
-    bool CorrelateXfp()  const;
+    //bool Correlate()     const;
+    //bool CorrelateE1Up() const;
+    //bool CorrelateObj()  const;
+    //bool CorrelateXfp()  const;
     
-    int  GetCorrelatedXfp()  const { return fCorrelatedXFP; }  //!
-    int  GetCorrelatedObj()  const { return fCorrelatedOBJ; }  //!
-    int  GetCorrelatedE1Up() const { return fCorrelatedE1Up;  }  //!
+    double  GetCorrelatedXfp()  const; //{ return fCorrelatedXFP; }  //!
+    double  GetCorrelatedObj()  const; //{ return fCorrelatedOBJ; }  //!
+    double  GetCorrelatedE1Up() const; //{ return fCorrelatedE1Up;  }  //!
 
-  //private:
-    mutable int fCorrelatedXFP;   //!
-    mutable int fCorrelatedOBJ;   //!
-    mutable int fCorrelatedE1Up;    //!
-    mutable int fCorrelatedXFP_Ch15;   //!
-    mutable int fCorrelatedOBJ_Ch15;   //!
-    mutable int fCorrelatedE1_Ch15;    //!
+    double  GetCorrelatedXfpE1()  const { return GetCorrelatedXfp()-GetCorrelatedE1Up(); }  //!
+    double  GetCorrelatedObjE1()  const { return GetCorrelatedObj()-GetCorrelatedE1Up(); }  //!
 
 
+
+  private:
+    mutable double fCorrelatedXFP;   //!
+    mutable double fCorrelatedOBJ;   //!
+    mutable double fCorrelatedE1Up;    //!
+    //mutable int fCorrelatedXFP_Ch15;   //!
+    //mutable int fCorrelatedOBJ_Ch15;   //!
+    //mutable int fCorrelatedE1_Ch15;    //!
+
+  public:
     std::vector<unsigned short> fE1Up;         // Channel 0
     std::vector<unsigned short> fE1Down;       // Channel 1
     std::vector<unsigned short> fXfp;          // Channel 2

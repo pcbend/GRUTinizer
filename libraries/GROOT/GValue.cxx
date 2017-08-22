@@ -19,10 +19,18 @@ GValue::GValue()
   : fValue(0.00), fPriority(kUnset) { }
 
 GValue::GValue(const char *name,double value, EPriority priority)
-  : TNamed(name,name), fValue(value), fPriority(priority) { }
+  : fValue(value), fPriority(priority) {
+    std::string sname = name;
+    std::transform(sname.begin(),sname.end(),sname.begin(),::toupper);
+    SetNameTitle(sname.c_str(),sname.c_str());
+  }
 
 GValue::GValue(const char *name)
-  : TNamed(name,name), fValue(0.00), fPriority(kUnset) { }
+  : fValue(0.00), fPriority(kUnset) { 
+    std::string sname = name;
+    std::transform(sname.begin(),sname.end(),sname.begin(),::toupper);
+    SetNameTitle(sname.c_str(),sname.c_str());
+}
 
 GValue::GValue(const GValue &val)
   : TNamed(val) {
@@ -36,6 +44,7 @@ void GValue::Copy(TObject &obj) const {
 }
 
 double GValue::Value(std::string name) {
+  std::transform(name.begin(),name.end(),name.begin(),::toupper);
   if(!fValueVector.count(name))
     return sqrt(-1);
   return fValueVector.at(name)->GetValue();
@@ -43,6 +52,7 @@ double GValue::Value(std::string name) {
 
 void GValue::SetReplaceValue(std::string name, double value,
 			     EPriority priority) {
+  std::transform(name.begin(),name.end(),name.begin(),::toupper);
   GValue* gvalue = FindValue(name);
   if(!gvalue) {
     gvalue = new GValue(name.c_str(), value, priority);
@@ -54,6 +64,7 @@ void GValue::SetReplaceValue(std::string name, double value,
 }
 
 GValue* GValue::FindValue(std::string name){
+  std::transform(name.begin(),name.end(),name.begin(),::toupper);
   GValue* value = 0;
   if(!name.length())
     return GetDefaultValue();
@@ -254,6 +265,7 @@ int GValue::ParseInputData(std::string input, EPriority priority, Option_t *opt)
        brace_open = true;
        name = line.substr(0,openbrace).c_str();
        trim(&name);
+       std::transform(name.begin(),name.end(),name.begin(),::toupper);
        value = new GValue(name.c_str());
     }
     //=============================================//

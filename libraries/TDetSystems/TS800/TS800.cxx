@@ -909,21 +909,9 @@ float TS800::GetXF_E1Raw_MESY_Ch15(int i) const {
   return sqrt(-1.0);
 }
 
-float TS800::MCorrelatedOBJ() const{
-  if(mtof.fCorrelatedOBJ>-1) return mtof.fObj.at(mtof.fCorrelatedOBJ);
-  else return 0;
-}
 
-float TS800::MCorrelatedXFP() const{
-  if(mtof.fCorrelatedXFP>-1) return mtof.fXfp.at(mtof.fCorrelatedXFP);
-  else return 0;
-}
 
-float TS800::MCorrelatedE1() const{
-  if(mtof.fCorrelatedE1Up>-1) return mtof.fE1Up.at(mtof.fCorrelatedE1Up);
-  else return 0;
-}
-
+/*
 float TS800::MCorrelatedOBJ_E1(bool corrected) const{
   if(!(mtof.fE1Up.size()==1)) {
     mtof.fCorrelatedOBJ = -1;
@@ -1006,7 +994,9 @@ float TS800::MCorrelatedOBJ_E1(bool corrected) const{
 
   return 0;
 }
+*/
 
+/*
 float TS800::MCorrelatedXFP_E1(bool corrected) const{
   if(!(mtof.fE1Up.size()==1)) {
     mtof.fCorrelatedXFP = -1;
@@ -1084,8 +1074,9 @@ float TS800::MCorrelatedXFP_E1(bool corrected) const{
   }
   return 0;
 }
+*/
 
-
+/*
 float TS800::MCorrelatedOBJ_Ch15() const{
   if(mtof.fCorrelatedOBJ_Ch15>-1) return mtof.fObj.at(mtof.fCorrelatedOBJ_Ch15);
   else return 0;
@@ -1261,7 +1252,7 @@ float TS800::MCorrelatedXFP_E1_Ch15(bool corrected) const{
   }
   return 0;
 }
-
+*/
 
 float TS800::GetCorrTOF_OBJTAC() const {
   double afp_cor = GValue::Value("OBJTAC_TOF_CORR_AFP");
@@ -1504,6 +1495,37 @@ void TS800::DrawPID_Mesy_Tune(Long_t nentries,int i,TChain *chain){
 }
 
 
+double TS800::GetMTofObjE1() const {
+  // I return the correlated gvalue corrected time-of-flight obj to e1.
+  double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+  double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+  if(std::isnan(afp_cor) || std::isnan(xfp_cor)) {
+    printf(ALERTTEXT "Attmepting to do mtof obj correction without values!" RESET_COLOR "\n");
+    fflush(stdout);
+    return sqrt(-1);
+  }
+  return(GetMTof().GetCorrelatedObjE1()
+         + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+
+}
+
+double TS800::GetMTofXfpE1() const {
+  // I return the correlated gvalue corrected time-of-flight xfp to e1.
+  double afp_cor = GValue::Value("XFP_MTOF_CORR_AFP");
+  double xfp_cor = GValue::Value("XFP_MTOF_CORR_XFP");
+  if(std::isnan(afp_cor) || std::isnan(xfp_cor)) {
+    printf(ALERTTEXT "Attmepting to do mtof xfp correction without values!" RESET_COLOR "\n");
+    fflush(stdout);
+    return sqrt(-1);
+  }
+  return(GetMTof().GetCorrelatedXfpE1()
+         + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+
+
+}
+
+
+/*
 float TS800::GetMTOF_ObjE1(unsigned int i,bool find_best) const { 
   if(!find_best) 
     return GetCorrTOF_OBJ_MESY(i); 
@@ -1545,4 +1567,4 @@ float TS800::GetMTOF_XfpE1(unsigned int i,bool find_best) const {
   }
   return value;
 }
-
+*/
