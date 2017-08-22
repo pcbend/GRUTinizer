@@ -161,6 +161,35 @@ public:
                          bins, low, high, value,
                          weight);
   }
+
+
+  TDirectory* FillHistogram(const std::string& dirname,const std::string& name,
+                            int bins, double low, double high, std::vector<float> values,
+                            double weight=1) {
+    TDirectory *d = 0;
+    for(size_t i=0;i<values.size();i++) {
+      d= FillHistogram(dirname.c_str(), name.c_str(),
+                                  bins, low, high, values.at(i),
+                                  weight);
+    }
+    return d;
+  }
+  
+  TDirectory* FillHistogram(const std::string& dirname,const std::string& name,
+                            int bins, double low, double high, std::vector<double> values,
+                            double weight=1) {
+    TDirectory *d = 0;
+    for(size_t i=0;i<values.size();i++) {
+      d= FillHistogram(dirname.c_str(), name.c_str(),
+                                  bins, low, high, values.at(i),
+                                  weight);
+    }
+    return d;
+  }
+
+
+
+
   TDirectory* FillHistogram(const std::string& dirname,const std::string& name,
                             int bins, double low, double high, const char *value,
                             double weight=1) {
