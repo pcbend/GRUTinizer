@@ -162,6 +162,60 @@ public:
                          weight);
   }
 
+  TDirectory* FillHistogram(const std::string& dirname,const std::string& name,
+                            int bins, double low, double high, std::vector<short> values,
+                            double weight=1) {
+    TDirectory *d = 0;
+    for(size_t i=0;i<values.size();i++) {
+      d= FillHistogram(dirname.c_str(), name.c_str(),
+                                  bins, low, high, values.at(i),
+                                  weight);
+    }
+    return d;
+  }
+ 
+
+
+  TDirectory* FillHistogram(const std::string& dirname,const std::string& name,
+                            int bins, double low, double high, std::vector<int> values,
+                            double weight=1) {
+    TDirectory *d = 0;
+    for(size_t i=0;i<values.size();i++) {
+      d= FillHistogram(dirname.c_str(), name.c_str(),
+                                  bins, low, high, values.at(i),
+                                  weight);
+    }
+    return d;
+  }
+ 
+
+
+  TDirectory* FillHistogram(const std::string& dirname,const std::string& name,
+                            int bins, double low, double high, std::vector<unsigned short> values,
+                            double weight=1) {
+    TDirectory *d = 0;
+    for(size_t i=0;i<values.size();i++) {
+      d= FillHistogram(dirname.c_str(), name.c_str(),
+                                  bins, low, high, values.at(i),
+                                  weight);
+    }
+    return d;
+  }
+ 
+
+
+  TDirectory* FillHistogram(const std::string& dirname,const std::string& name,
+                            int bins, double low, double high, std::vector<unsigned int> values,
+                            double weight=1) {
+    TDirectory *d = 0;
+    for(size_t i=0;i<values.size();i++) {
+      d= FillHistogram(dirname.c_str(), name.c_str(),
+                                  bins, low, high, values.at(i),
+                                  weight);
+    }
+    return d;
+  }
+ 
 
   TDirectory* FillHistogram(const std::string& dirname,const std::string& name,
                             int bins, double low, double high, std::vector<float> values,
@@ -174,7 +228,8 @@ public:
     }
     return d;
   }
-  
+ 
+
   TDirectory* FillHistogram(const std::string& dirname,const std::string& name,
                             int bins, double low, double high, std::vector<double> values,
                             double weight=1) {
