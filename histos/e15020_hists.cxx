@@ -37,8 +37,8 @@ bool HandleTiming(TRuntimeObjects &obj) {
   TS800 *s800  = obj.GetDetector<TS800>();
   //TBank29 *bank29  = obj.GetDetector<TBank29>();
   
-  //if(!s800 || s800->GetMTof().E1UpSize() != 1)
-  //  {return false;}
+  if(!s800) //|| s800->GetMTof().E1UpSize() != 1)
+    {return false;}
 
   int E1UpSize = s800->GetMTof().E1UpSize();
   int XfpSize = s800->GetMTof().XfpSize();
