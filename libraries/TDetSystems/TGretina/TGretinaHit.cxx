@@ -128,9 +128,17 @@ TVector3 TGretinaHit::GetIntPosition(unsigned int i) const {
     double zoffset = GValue::Value("GRETINA_Z_OFFSET");
     if(std::isnan(zoffset))
       zoffset=0.00;
-    TVector3 v = TGretina::CrystalToGlobal(fCrystalId,fSegments.at(i).fX + xoffset,
-                                                      fSegments.at(i).fY + yoffset,
-                                                      fSegments.at(i).fZ + zoffset);
+
+    TVector3 v;
+    if(!this->IsAddback()) {
+      v = TGretina::CrystalToGlobal(fCrystalId,fSegments.at(i).fX + xoffset,
+                                               fSegments.at(i).fY + yoffset,
+                                               fSegments.at(i).fZ + zoffset);
+    } else {
+      v.SetXYZ(fSegments.at(i).fX,fSegments.at(i).fY,fSegments.at(i).fZ);
+      v += TVector3(xoffset,yoffset,zoffset);
+    }
+
     //v.RotateX(TMath::Pi());
     return v;  //TGretina::CrystalToGlobal(fCrystalId,fSegments.at(i).fX + xoffset,
                //                                     fSegments.at(i).fY + yoffset,
@@ -259,58 +267,92 @@ void TGretinaHit::SortHits(){
 //       First and second may be assigned across crystal boundaries.
 
 
-/*
-void TGretinaHit::AddToSelf(const TGretinaHit& rhs) {
 
-  // qStash all interaction points
-  std::set<interaction_point> ips;
-  for(int i=0; i<fNumberOfInteractions; i++){
-    ips.insert(interaction_point(fSegmentNumber[i],
-                                 fGlobalInteractionPosition[i],
-                                 fLocalInteractionPosition[i],
-                                 fInteractionEnergy[i]));
-  }
-  for(int i=0; i<rhs.fNumberOfInteractions; i++){
-    ips.insert(interaction_point(rhs.fSegmentNumber[i],
-                                 rhs.fGlobalInteractionPosition[i],
-                                 rhs.fLocalInteractionPosition[i],
-                                 rhs.fInteractionEnergy[i]));
-  }
+void TGretinaHit::Add(const TGretinaHit& rhs) {
+
 
   // Copy other information to self if needed
   double my_core_energy = fCoreEnergy;
+  std::vector<interaction_point> ips;
+  
+  
   if(fCoreEnergy < rhs.fCoreEnergy) {
-    rhs.Copy(*this);
+    rhs.Copy(*this);    // this sets the fCrystalId to the rhs detector.
     fCoreEnergy += my_core_energy;
+  
+    for(size_t i=0; i<rhs.fSegments.size(); i++){
+      if(IsAddback()) {
+        ips.push_back(rhs.fSegments.at(i));
+      } else {
+        TVector3 v = TGretina::CrystalToGlobal(rhs.fCrystalId,rhs.fSegments.at(i).fX,
+                                                              rhs.fSegments.at(i).fY,
+                                                              rhs.fSegments.at(i).fZ);
+        ips.push_back(interaction_point(rhs.fSegments.at(i).fSeg,
+                                        v.X(),v.Y(),v.Z(),
+                                        rhs.fSegments.at(i).fEng,rhs.fSegments.at(i).fFrac));
+      }
+    }
+    
+    for(size_t i=0; i<fSegments.size(); i++){
+      if(IsAddback()) {
+        ips.push_back(fSegments.at(i));
+      } else {
+        TVector3 v = TGretina::CrystalToGlobal(fCrystalId,fSegments.at(i).fX,
+                                                          fSegments.at(i).fY,
+                                                          fSegments.at(i).fZ);
+        ips.push_back(interaction_point(fSegments.at(i).fSeg,
+                                        v.X(),v.Y(),v.Z(),
+                                        fSegments.at(i).fEng,fSegments.at(i).fFrac));
+      }
+    }
+   
+  
+  
   } else {
     fCoreEnergy += rhs.fCoreEnergy;
-  }
-
-  // Fill all interaction points
-  fNumberOfInteractions = 0;
-  fSegmentNumber.clear();
-  fGlobalInteractionPosition.clear();
-  fLocalInteractionPosition.clear();
-  fInteractionEnergy.clear();
-  fInteractionFraction.clear();
-  for(auto& point : ips){
-    if(fNumberOfInteractions >= MAXHPGESEGMENTS){
-      break;
+    
+    for(size_t i=0; i<fSegments.size(); i++){
+      if(IsAddback()) {
+        ips.push_back(fSegments.at(i));
+      } else {
+        TVector3 v = TGretina::CrystalToGlobal(fCrystalId,fSegments.at(i).fX,
+                                                          fSegments.at(i).fY,
+                                                          fSegments.at(i).fZ);
+        ips.push_back(interaction_point(fSegments.at(i).fSeg,
+                                        v.X(),v.Y(),v.Z(),
+                                        fSegments.at(i).fEng,fSegments.at(i).fFrac));
+      }
+    }
+    
+    for(size_t i=0; i<rhs.fSegments.size(); i++){
+      if(IsAddback()) {
+        ips.push_back(rhs.fSegments.at(i));
+      } else {
+        TVector3 v = TGretina::CrystalToGlobal(rhs.fCrystalId,rhs.fSegments.at(i).fX,
+                                                              rhs.fSegments.at(i).fY,
+                                                              rhs.fSegments.at(i).fZ);
+        ips.push_back(interaction_point(rhs.fSegments.at(i).fSeg,
+                                        v.X(),v.Y(),v.Z(),
+                                        rhs.fSegments.at(i).fEng,rhs.fSegments.at(i).fFrac));
+      }
     }
 
-    fSegmentNumber.push_back(point.segnum);
-    fGlobalInteractionPosition.push_back(point.pos);
-    fLocalInteractionPosition.push_back(point.local_pos);
-    fInteractionEnergy.push_back(point.energy);
-    fInteractionFraction.push_back(point.energy_fraction);
-    fNumberOfInteractions++;
   }
+  this->SetBit(31,true);  // set addback bit
+
+
+  // qStash all interaction points
+
+
+  // Fill all interaction points
+  fNumberOfInteractions = fSegments.size();
+  //fSegmentNumber.clear();
 
   // Because they are now sorted
-  fFirstInteraction = 0;
-  fSecondInteraction = 1;
+  //fFirstInteraction = 0;
+  //fSecondInteraction = 1;
 }
-*/
+
 
 /*
 TGretinaHit& TGretinaHit::operator+=(const TGretinaHit& rhs) {
@@ -380,6 +422,7 @@ void TGretinaHit::Clear(Option_t *opt) {
   fNumberOfInteractions = 0;
 
   fSegments.clear();
+  SetBit(31,false);
 }
 
 

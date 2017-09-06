@@ -167,13 +167,14 @@ public:
   TVector3 GetCrystalPosition()           const; 
   //TVector3 GetSegmentPosition()           const; 
                                                 
-  void Add(const TGretinaHit& other) {  }
+  void Add(const TGretinaHit& other); 
   void SetCoreEnergy(float temp) const { fCoreEnergy = temp; }
 
   void TrimSegments(int type); // 0: drop multiple ident int pnts.  1: make into wedge "data"
   bool IsClean() const { return !fPad; }
 
-  
+  bool IsAddback() const { return this->TestBit(31); }
+
 private:
   void SortHits();
 /* All possible decomp information and
