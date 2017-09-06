@@ -382,24 +382,24 @@ class TMTof : public TDetectorHit {
     int HodoSize()       const { return fHodoscope.size(); }
     int RefSize()        const { return fRef.size(); }
 
+    //Return scintillator-reference timing closest to GValues
+    //TARGET_MTOF_OBJE1, TARGET_MTOF_XFPE1, etc. This is before any corrections
+    //for CRDC 1 X and AFP are done.
+    double CorrelateObjE1() const;
+    double CorrelateObjRef() const;
+    double CorrelateXfpE1() const;
+    double CorrelateXfpRef() const;
 
-    bool Correlate() const;
-    bool CorrelateE1Up() const;
-    bool CorrelateObj()  const;
-    bool CorrelateXfp()  const;
-    
-    int  GetCorrelatedXfp()  const { return fCorrelatedXFP; }  //!
-    int  GetCorrelatedObj()  const { return fCorrelatedOBJ; }  //!
-    int  GetCorrelatedE1Up() const { return fCorrelatedE1Up;  }  //!
+    //These functions return a vector of  all combinations of subtracted hits
+    //of the named scintillator (obj or xfp) and reference (E1Up and Ref, which are also
+    //known as Channel 1 and 15, respectively).
+    std::vector<float> GetObjE1() const;
+    std::vector<float> GetXfpE1() const;
+    std::vector<float> GetObjRef() const;
+    std::vector<float> GetXfpRef() const;
+
 
   //private:
-    mutable int fCorrelatedXFP;   //!
-    mutable int fCorrelatedOBJ;   //!
-    mutable int fCorrelatedE1Up;    //!
-    mutable int fCorrelatedXFP_Ch15;   //!
-    mutable int fCorrelatedOBJ_Ch15;   //!
-    mutable int fCorrelatedE1_Ch15;    //!
-
 
     std::vector<unsigned short> fE1Up;         // Channel 0
     std::vector<unsigned short> fE1Down;       // Channel 1
@@ -410,12 +410,7 @@ class TMTof : public TDetectorHit {
     std::vector<unsigned short> fCrdc2Anode;   // Channel 7
     std::vector<unsigned short> fHodoscope;    // Channel 12
     std::vector<unsigned short> fRef;          // Channel 15, same as E1Up (different cable.)
-
-    //std::vector<int> fGalotte;
-    //
     virtual Int_t Charge() const  {return 0;}
-    //
-    //
   ClassDef(TMTof,1)
 };
 

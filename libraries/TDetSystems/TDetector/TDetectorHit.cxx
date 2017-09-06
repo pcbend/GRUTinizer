@@ -117,3 +117,33 @@ void TDetectorHit::Streamer(TBuffer &r_b) {
   }
 }
 
+int   TDetectorHit::GetNumber() const {
+  TChannel* chan = TChannel::GetChannel(fAddress);
+  if(chan){
+    return chan->GetNumber();
+  } else {
+    return -1;
+  }
+}
+    
+const char* TDetectorHit::GetInfo()   const {
+  TChannel* chan = TChannel::GetChannel(fAddress);
+  if(chan){
+    return chan->GetInfo();
+  } else {
+    return "";
+  }
+}
+
+const char* TDetectorHit::GetSystem() const {
+  TChannel* chan = TChannel::GetChannel(fAddress);
+  if(chan){
+    return chan->GetSystem();
+  } else {
+    return "";
+  }
+}
+
+
+
+

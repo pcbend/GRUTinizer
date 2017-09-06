@@ -150,6 +150,24 @@ TVector3 TGretinaHit::GetLocalPosition(unsigned int i) const {
   }
 }
 
+
+double TGretinaHit::GetDopplerYta(double beta, double yta, const TVector3 *vec, int EngRange) const {
+    if(Size()<1)
+        return 0.0;
+    if(vec==0) {
+        vec = &BeamUnitVec;
+    }
+    double tmp = 0.0;
+    double gamma = 1./(sqrt(1.-pow(beta,2.)));
+    TVector3 gret_pos = GetPosition();
+    //yta points left in GRETINA frame, but opposite direction in S800 frame.
+    gret_pos.SetY(gret_pos.Y() + yta);
+    if(EngRange>0) 
+        tmp = GetCoreEnergy(EngRange)*gamma *(1 - beta*TMath::Cos(gret_pos.Angle(*vec)));
+    else
+        tmp = fCoreEnergy*gamma *(1 - beta*TMath::Cos(gret_pos.Angle(*vec)));
+    return tmp;
+}
 /*
 double TGretinaHit::GetDoppler_dB(double beta, const TVector3 *vec,double Dta){
   if(Size()<1)
@@ -259,22 +277,16 @@ void TGretinaHit::SortHits(){
 //       First and second may be assigned across crystal boundaries.
 
 
-/*
-void TGretinaHit::AddToSelf(const TGretinaHit& rhs) {
+
+void TGretinaHit::Add(const TGretinaHit& rhs) {
 
   // qStash all interaction points
   std::set<interaction_point> ips;
-  for(int i=0; i<fNumberOfInteractions; i++){
-    ips.insert(interaction_point(fSegmentNumber[i],
-                                 fGlobalInteractionPosition[i],
-                                 fLocalInteractionPosition[i],
-                                 fInteractionEnergy[i]));
+  for(int i=0; i<fSegments.size(); i++){
+    ips.insert(fSegments[i]);
   }
-  for(int i=0; i<rhs.fNumberOfInteractions; i++){
-    ips.insert(interaction_point(rhs.fSegmentNumber[i],
-                                 rhs.fGlobalInteractionPosition[i],
-                                 rhs.fLocalInteractionPosition[i],
-                                 rhs.fInteractionEnergy[i]));
+  for(int i=0; i<rhs.fSegments.size(); i++){
+    ips.insert(rhs.fSegments[i]);
   }
 
   // Copy other information to self if needed
@@ -288,29 +300,15 @@ void TGretinaHit::AddToSelf(const TGretinaHit& rhs) {
 
   // Fill all interaction points
   fNumberOfInteractions = 0;
-  fSegmentNumber.clear();
-  fGlobalInteractionPosition.clear();
-  fLocalInteractionPosition.clear();
-  fInteractionEnergy.clear();
-  fInteractionFraction.clear();
+  fSegments.clear();
   for(auto& point : ips){
     if(fNumberOfInteractions >= MAXHPGESEGMENTS){
       break;
     }
-
-    fSegmentNumber.push_back(point.segnum);
-    fGlobalInteractionPosition.push_back(point.pos);
-    fLocalInteractionPosition.push_back(point.local_pos);
-    fInteractionEnergy.push_back(point.energy);
-    fInteractionFraction.push_back(point.energy_fraction);
+    fSegments.push_back(point);
     fNumberOfInteractions++;
   }
-
-  // Because they are now sorted
-  fFirstInteraction = 0;
-  fSecondInteraction = 1;
 }
-*/
 
 /*
 TGretinaHit& TGretinaHit::operator+=(const TGretinaHit& rhs) {
