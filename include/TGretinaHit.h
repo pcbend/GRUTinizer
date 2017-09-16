@@ -171,7 +171,8 @@ public:
   void TrimSegments(int type); // 0: drop multiple ident int pnts.  1: make into wedge "data"
   bool IsClean() const { return !fPad; }
 
-  
+  bool IsAddback() const { return this->TestBit(31); }
+
 private:
   void SortHits();
 /* All possible decomp information and

@@ -768,126 +768,90 @@ void TMTof::Clear(Option_t *opt) {
   fHodoscope.clear();
   fRef.clear();
 
-//fCorrelatedXFP=0xffffffff;
-//fCorrelatedOBJ=0xffffffff;
-//fCorrelatedE1Up=0xffffffff;
-//fCorrelatedXFP_Ch15=0xffffffff;
-//fCorrelatedOBJ_Ch15=0xffffffff;
-//fCorrelatedE1_Ch15=0xffffffff;
-//fCorrelatedXFP=-1;
-//fCorrelatedOBJ=-1;
-//fCorrelatedE1Up=-1;
-//fCorrelatedXFP_Ch15=-1;
-//fCorrelatedOBJ_Ch15=-1;
-//fCorrelatedE1_Ch15=-1;
-//fCorrelated = false;
+  fCorrelatedXFP=sqrt(-1);
+  fCorrelatedOBJ=sqrt(-1);
+  fCorrelatedE1Up=sqrt(-1);
+  //fCorrelatedXFP_Ch15=0xffffffff;
+  //fCorrelatedOBJ_Ch15=0xffffffff;
+  //fCorrelatedE1_Ch15=0xffffffff;
   
 }
 
-double TMTof::CorrelateObjE1() const{
-    double target = GValue::Value("TARGET_MTOF_OBJE1");
-    std::vector<float> values = GetObjE1();
-    if (std::isnan(target)){
-        return sqrt(-1);
-    }
-    double fCorrelatedOBJ = 64000.0;
-    for (size_t x = 0; x < values.size(); x++){
-        if(std::abs(target - fCorrelatedOBJ) > std::abs(target - values.at(x))){
-            fCorrelatedOBJ = values.at(x);
-        } 
-    }
+//bool TMTof::Correlate() const {
+//  CorrelateE1Up();
+//  CorrelateObj();
+//  CorrelateXfp();
+//  return true;
+//}
 
-    return fCorrelatedOBJ;
+
+double TMTof::GetCorrelatedE1Up() const{
+//Determines correlated time-of-flights based on TARGET_MTOF_# GValues
+//Values are set in TMTof as fCorrelatedXFP, fCorrelatedE1Up, etc.
+//Note that if the GValues are not set, the first value in each time-of-flight 
+//is taken.
+  double target = GValue::Value("TARGET_MTOF_E1Up");
+  if(fE1Up.size() && !std::isnan(target)){
+    fCorrelatedE1Up = fE1Up.at(0);
+    for(size_t i=1;i<fE1Up.size();i++) {     
+      double newvalue = fE1Up.at(i);
+      if(std::abs(target - newvalue) < std::abs(target - fCorrelatedE1Up)) {
+        fCorrelatedE1Up = newvalue;
+      } 
+    }  
+  } else if(fE1Up.size()) {
+    fCorrelatedE1Up = fE1Up.at(0);
+  } else {
+    fCorrelatedE1Up =sqrt(-1);
+  }
+  return fCorrelatedE1Up;
+}
+
+double TMTof::GetCorrelatedObj() const{
+//Determines correlated time-of-flights based on TARGET_MTOF_# GValues
+//Values are set in TMTof as fCorrelatedXFP, fCorrelatedObj, etc.
+//Note that if the GValues are not set, the first value in each time-of-flight 
+//is taken.
+  double target = GValue::Value("TARGET_MTOF_Obj");
+  if(fObj.size() && !std::isnan(target)){
+    fCorrelatedOBJ = fObj.at(0);
+    for(size_t i=1;i<fObj.size();i++) {     
+      double newvalue = fObj.at(i);
+      if(std::abs(target - newvalue) < std::abs(target - fCorrelatedOBJ)) {
+        fCorrelatedOBJ = newvalue;
+      } 
+    }  
+  } else if(fObj.size()) {
+    fCorrelatedOBJ = fObj.at(0);
+  } else {
+    fCorrelatedOBJ = sqrt(-1);
+  }
+  return fCorrelatedOBJ;
+}
+
+double TMTof::GetCorrelatedXfp() const{
+//Determines correlated time-of-flights based on TARGET_MTOF_# GValues
+//Values are set in TMTof as fCorrelatedXfp, fCorrelatedXfp, etc.
+//Note that if the GValues are not set, the first value in each time-of-flight 
+//is taken.
+  double target = GValue::Value("TARGET_MTOF_Xfp");
+  if(fXfp.size() && !std::isnan(target)){
+    fCorrelatedXFP = fXfp.at(0);
+    for(size_t i=1;i<fXfp.size();i++) {     
+      double newvalue = fXfp.at(i);
+      if(std::abs(target - newvalue) < std::abs(target - fCorrelatedXFP)) {
+        fCorrelatedXFP = newvalue;
+      } 
+    }  
+  } else if(fXfp.size()) {
+    fCorrelatedXFP = fXfp.at(0);
+  } else {
+    fCorrelatedXFP = sqrt(-1);
+  }
+  return fCorrelatedXFP;
 }
 
 
-double TMTof::CorrelateXfpE1() const{
-    double target = GValue::Value("TARGET_MTOF_XFPE1");
-    std::vector<float> values = GetXfpE1();
-    if (std::isnan(target)){
-        return sqrt(-1);
-    }
-    double fCorrelatedXFP = 64000.0;
-    for (size_t x = 0; x < values.size(); x++){
-        if(std::abs(target - fCorrelatedXFP) > std::abs(target - values.at(x))){
-            fCorrelatedXFP = values.at(x);
-        } 
-    }
-    return fCorrelatedXFP;
-}
 
-double TMTof::CorrelateObjRef() const{
-    double target = GValue::Value("TARGET_MTOF_OBJREF");
-    std::vector<float> values = GetObjRef();
-    if (std::isnan(target)){
-        return sqrt(-1);
-    }
-    double fCorrelatedOBJ = 64000.0;
-    for (size_t x = 0; x < values.size(); x++){
-        if(std::abs(target - fCorrelatedOBJ) > std::abs(target - values.at(x))){
-            fCorrelatedOBJ = values.at(x);
-        } 
-    }
-    return fCorrelatedOBJ;
-}
-
-
-double TMTof::CorrelateXfpRef() const{
-    double target = GValue::Value("TARGET_MTOF_XFPREF");
-    std::vector<float> values = GetXfpRef();
-    if (std::isnan(target)){
-        return sqrt(-1);
-    }
-    double fCorrelatedXFP = 64000.0;
-    for (size_t x = 0; x < values.size(); x++){
-
-        if(std::abs(target - fCorrelatedXFP) > std::abs(target - values.at(x))){
-            fCorrelatedXFP = values.at(x);
-        } 
-    }
-    return fCorrelatedXFP;
-}
-
-
-
-std::vector<float> TMTof::GetObjE1()  const {
-    std::vector<float> result;    
-    for(size_t x=0;x<fObj.size();x++) {
-        for(size_t y=0;y<fE1Up.size();y++) {
-            result.push_back(fObj.at(x) - fE1Up.at(y));
-        }
-    }
-
-    return result;
-}
-std::vector<float> TMTof::GetXfpE1()  const {
-    std::vector<float> result;    
-    for(size_t x=0;x<fXfp.size();x++) {
-        for(size_t y=0;y<fE1Up.size();y++) {
-            result.push_back(fXfp.at(x) - fE1Up.at(y));
-        }
-    }
-
-    return result;
-}
-std::vector<float> TMTof::GetObjRef()  const {
-    std::vector<float> result;    
-    for(size_t x=0;x<fObj.size();x++) {
-        for(size_t y=0;y<fRef.size();y++) {
-            result.push_back(fObj.at(x) - fRef.at(y));
-        }
-    }
-
-    return result;
-}
-std::vector<float> TMTof::GetXfpRef()  const {
-    std::vector<float> result;    
-    for(size_t x=0;x<fXfp.size();x++) {
-        for(size_t y=0;y<fRef.size();y++) {
-            result.push_back(fXfp.at(x) - fRef.at(y));
-        }
-    }
-    return result;
-}
 
 void TMTof::Print(Option_t *opt) const {    }

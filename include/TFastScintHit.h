@@ -36,7 +36,7 @@ class TFastScintHit : public TDetectorHit {
     }
 
 
-    bool operator<(const TFastScintHit &rhs) { return Charge()>rhs.Charge(); } //  fAddress<rhs.fAddress; }
+    bool operator<(const TFastScintHit &rhs) const { return Charge()>rhs.Charge(); } //  fAddress<rhs.fAddress; }
 
   private:
 

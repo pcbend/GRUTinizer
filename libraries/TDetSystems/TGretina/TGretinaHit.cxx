@@ -78,9 +78,9 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
   //fAddress = (1<<24) + (fCrystalId<<16);
   //fAddress = (1<<24) + ( raw.board_id );
   int board_id = ((fCrystalId/4) << 8) ;  //hole  number : 0x1f00
-//    board_id =                       ;  //card  number : 0x0030  information not available here.
-      board_id += ((fCrystalId%4) << 6) ;  //x-tal number : 0x00c0
-      board_id += 9;                       //chan  number : 0x000f  information not available here(assume core).
+  //    board_id =                       ;  //card  number : 0x0030  information not available here.
+  board_id += ((fCrystalId%4) << 6) ;  //x-tal number : 0x00c0
+  board_id += 9;                       //chan  number : 0x000f  information not available here(assume core).
   SetAddress((1<<24) + board_id);
 
 
@@ -92,20 +92,20 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
   fPad = raw.pad;
 
   //std::cout<< "pad\t" << fPad << "\tints\t" << fNumberOfInteractions << std::endl; 
-    for(int i=0; i<fNumberOfInteractions; i++) {
-      try {
-        interaction_point pnt; 
-        pnt.fSeg = raw.intpts[i].seg;
-        pnt.fX   = raw.intpts[i].x;
-        pnt.fY   = raw.intpts[i].y;
-        pnt.fZ   = raw.intpts[i].z;
-        pnt.fEng = raw.intpts[i].e;
-        fSegments.push_back(pnt);
-      } catch(...) {
-        std::cout << "in try catch block!" << std::endl;
-      }
-
+  for(int i=0; i<fNumberOfInteractions; i++) {
+    try {
+      interaction_point pnt; 
+      pnt.fSeg = raw.intpts[i].seg;
+      pnt.fX   = raw.intpts[i].x;
+      pnt.fY   = raw.intpts[i].y;
+      pnt.fZ   = raw.intpts[i].z;
+      pnt.fEng = raw.intpts[i].e;
+      fSegments.push_back(pnt);
+    } catch(...) {
+      std::cout << "in try catch block!" << std::endl;
     }
+
+  }
   fTOffset = raw.intpts[MAX_INTPTS-1].z;
   //std::cout << "[13].z :  " << raw.intpts[13].z << std::endl;
   //std::cout << "[14].z :  " << raw.intpts[14].z << std::endl;
@@ -118,52 +118,52 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
 }
 
 TVector3 TGretinaHit::GetIntPosition(unsigned int i) const {
-    if(i<fSegments.size()){
-        double xoffset = GValue::Value("GRETINA_X_OFFSET");
-        if(std::isnan(xoffset))
-            xoffset=0.00;
-        double yoffset = GValue::Value("GRETINA_Y_OFFSET");
-        if(std::isnan(yoffset))
-            yoffset=0.00;
-        double zoffset = GValue::Value("GRETINA_Z_OFFSET");
-        if(std::isnan(zoffset))
-            zoffset=0.00;
-        TVector3 v = TGretina::CrystalToGlobal(fCrystalId,fSegments.at(i).fX + xoffset,
-                fSegments.at(i).fY + yoffset,
-                fSegments.at(i).fZ + zoffset);
-        return v; 
-    } else {
-        return TDetectorHit::BeamUnitVec;
-    }
+  if(i<fSegments.size()){
+    double xoffset = GValue::Value("GRETINA_X_OFFSET");
+    if(std::isnan(xoffset))
+      xoffset=0.00;
+    double yoffset = GValue::Value("GRETINA_Y_OFFSET");
+    if(std::isnan(yoffset))
+      yoffset=0.00;
+    double zoffset = GValue::Value("GRETINA_Z_OFFSET");
+    if(std::isnan(zoffset))
+      zoffset=0.00;
+    TVector3 v = TGretina::CrystalToGlobal(fCrystalId,fSegments.at(i).fX + xoffset,
+        fSegments.at(i).fY + yoffset,
+        fSegments.at(i).fZ + zoffset);
+    return v; 
+  } else {
+    return TDetectorHit::BeamUnitVec;
+  }
 }
 
 TVector3 TGretinaHit::GetLocalPosition(unsigned int i) const {
-    if(i<fSegments.size()){
-        return TVector3(fSegments.at(i).fX,
-                fSegments.at(i).fY,
-                fSegments.at(i).fZ);
-    } else {
-        return TVector3(0,0,1);
-    }
+  if(i<fSegments.size()){
+    return TVector3(fSegments.at(i).fX,
+        fSegments.at(i).fY,
+        fSegments.at(i).fZ);
+  } else {
+    return TVector3(0,0,1);
+  }
 }
 
 
 double TGretinaHit::GetDopplerYta(double beta, double yta, const TVector3 *vec, int EngRange) const {
-    if(Size()<1)
-        return 0.0;
-    if(vec==0) {
-        vec = &BeamUnitVec;
-    }
-    double tmp = 0.0;
-    double gamma = 1./(sqrt(1.-pow(beta,2.)));
-    TVector3 gret_pos = GetPosition();
-    //yta points left in GRETINA frame, but opposite direction in S800 frame.
-    gret_pos.SetY(gret_pos.Y() + yta);
-    if(EngRange>0) 
-        tmp = GetCoreEnergy(EngRange)*gamma *(1 - beta*TMath::Cos(gret_pos.Angle(*vec)));
-    else
-        tmp = fCoreEnergy*gamma *(1 - beta*TMath::Cos(gret_pos.Angle(*vec)));
-    return tmp;
+  if(Size()<1)
+    return 0.0;
+  if(vec==0) {
+    vec = &BeamUnitVec;
+  }
+  double tmp = 0.0;
+  double gamma = 1./(sqrt(1.-pow(beta,2.)));
+  TVector3 gret_pos = GetPosition();
+  //yta points left in GRETINA frame, but opposite direction in S800 frame.
+  gret_pos.SetY(gret_pos.Y() + yta);
+  if(EngRange>0) 
+    tmp = GetCoreEnergy(EngRange)*gamma *(1 - beta*TMath::Cos(gret_pos.Angle(*vec)));
+  else
+    tmp = fCoreEnergy*gamma *(1 - beta*TMath::Cos(gret_pos.Angle(*vec)));
+  return tmp;
 }
 /*
    double TGretinaHit::GetDoppler_dB(double beta, const TVector3 *vec,double Dta){
@@ -272,45 +272,43 @@ fSecondInteraction = 1;
 //       Right now, the "first interaction point" is the one with the highest energy,
 //       and the "second" is the one with the second highest energy.
 //       First and second may be assigned across crystal boundaries.
-
 void TGretinaHit::Add(const TGretinaHit& rhs) {
 
-    // qStash all interaction points
-    std::set<interaction_point> ips;
-    // Copy other information to self if needed
-    double my_core_energy = fCoreEnergy;
-    if(fCoreEnergy < rhs.fCoreEnergy) {
-        for(unsigned int i=0; i<rhs.fSegments.size(); i++){
-            ips.insert(rhs.fSegments[i]);
-        }
-
-        for(unsigned int i=0; i<fSegments.size(); i++){
-            ips.insert(fSegments[i]);
-        }
-        rhs.Copy(*this);
-        fCoreEnergy += my_core_energy;
-    } else {
-        for(unsigned int i=0; i<fSegments.size(); i++){
-            ips.insert(fSegments[i]);
-        }
-        for(unsigned int i=0; i<rhs.fSegments.size(); i++){
-            ips.insert(rhs.fSegments[i]);
-        }
-        fCoreEnergy += rhs.fCoreEnergy;
+  // qStash all interaction points
+  std::set<interaction_point> ips;
+  // Copy other information to self if needed
+  double my_core_energy = fCoreEnergy;
+  if(fCoreEnergy < rhs.fCoreEnergy) {
+    for(unsigned int i=0; i<rhs.fSegments.size(); i++){
+      ips.insert(rhs.fSegments[i]);
     }
 
-    // Fill all interaction points
-    fNumberOfInteractions = 0;
-    fSegments.clear();
-    for(auto& point : ips){
-        if(fNumberOfInteractions >= MAXHPGESEGMENTS){
-            break;
-        }
-        fSegments.push_back(point);
-        fNumberOfInteractions++;
+    for(unsigned int i=0; i<fSegments.size(); i++){
+      ips.insert(fSegments[i]);
     }
+    rhs.Copy(*this);
+    fCoreEnergy += my_core_energy;
+  } else {
+    for(unsigned int i=0; i<fSegments.size(); i++){
+      ips.insert(fSegments[i]);
+    }
+    for(unsigned int i=0; i<rhs.fSegments.size(); i++){
+      ips.insert(rhs.fSegments[i]);
+    }
+    fCoreEnergy += rhs.fCoreEnergy;
+  }
+
+  // Fill all interaction points
+  fNumberOfInteractions = 0;
+  fSegments.clear();
+  for(auto& point : ips){
+    if(fNumberOfInteractions >= MAXHPGESEGMENTS){
+      break;
+    }
+    fSegments.push_back(point);
+    fNumberOfInteractions++;
+  }
 }
-
 /*
    TGretinaHit& TGretinaHit::operator+=(const TGretinaHit& rhs) {
    AddToSelf(rhs);
@@ -326,88 +324,88 @@ void TGretinaHit::Add(const TGretinaHit& rhs) {
 
 
 TVector3 TGretinaHit::GetLastPosition() const {
-    if(fSegments.size()<1)
-        return TDetectorHit::BeamUnitVec;
-    return GetIntPosition(fSegments.size()-1);
+  if(fSegments.size()<1)
+    return TDetectorHit::BeamUnitVec;
+  return GetIntPosition(fSegments.size()-1);
 }
 
 
 void TGretinaHit::Print(Option_t *opt) const {
 
-    std::cout << "TGretinaHit:" <<  std::endl;
-    //std::cout << "\tAddress:        \t0x" << std::hex << fAddress << std::dec << std::endl;
-    printf("\tAddress:        \t0x%08x\n",Address());
-    std::cout << "\tHole:           \t" << GetHoleNumber()               << std::endl;
-    std::cout << "\tCrystalNum      \t" << GetCrystalNumber()            << std::endl;
-    std::cout << "\tCrystalId:      \t" << GetCrystalId()                << std::endl;
+  std::cout << "TGretinaHit:" <<  std::endl;
+  //std::cout << "\tAddress:        \t0x" << std::hex << fAddress << std::dec << std::endl;
+  printf("\tAddress:        \t0x%08x\n",Address());
+  std::cout << "\tHole:           \t" << GetHoleNumber()               << std::endl;
+  std::cout << "\tCrystalNum      \t" << GetCrystalNumber()            << std::endl;
+  std::cout << "\tCrystalId:      \t" << GetCrystalId()                << std::endl;
 
-    std::cout << "\tLocal Timestamp:\t" << Timestamp()                   << std::endl;
-    std::cout << "\tCorrected time: \t" << GetTime()                     << std::endl;
-    std::cout << "\tDecomp Energy:  \t" << fCoreEnergy                   << std::endl;
-    if(!strcmp(opt,"all")) {
-        for(int i=0;i<4;i++)
-            std::cout << "\tCharge[" << i << "]:       \t" << fCoreCharge[i] << std::endl;
-    }
-    std::cout << "\tErrorCode:       \t" << fPad                         << std::endl;
-    std::cout << "\tInteractions:    \t" << fSegments.size()             << std::endl;
+  std::cout << "\tLocal Timestamp:\t" << Timestamp()                   << std::endl;
+  std::cout << "\tCorrected time: \t" << GetTime()                     << std::endl;
+  std::cout << "\tDecomp Energy:  \t" << fCoreEnergy                   << std::endl;
+  if(!strcmp(opt,"all")) {
+    for(int i=0;i<4;i++)
+      std::cout << "\tCharge[" << i << "]:       \t" << fCoreCharge[i] << std::endl;
+  }
+  std::cout << "\tErrorCode:       \t" << fPad                         << std::endl;
+  std::cout << "\tInteractions:    \t" << fSegments.size()             << std::endl;
 
-    if(!strcmp(opt,"all")) {
-        for(int i=0;i<fNumberOfInteractions;i++) {
-            printf("\t\t");
-            fSegments.at(i).Print();
-        }
+  if(!strcmp(opt,"all")) {
+    for(int i=0;i<fNumberOfInteractions;i++) {
+      printf("\t\t");
+      fSegments.at(i).Print();
     }
-    std::cout << "------------------------------"  << std::endl;
+  }
+  std::cout << "------------------------------"  << std::endl;
 
 }
 
 void TGretinaHit::Clear(Option_t *opt) {
-    TDetectorHit::Clear(opt);
+  TDetectorHit::Clear(opt);
 
-    fWalkCorrection = sqrt(-1);
+  fWalkCorrection = sqrt(-1);
 
-    fCrystalId      = -1;
-    fCoreEnergy     = sqrt(-1);
-    fCoreCharge[0]  = -1;
-    fCoreCharge[1]  = -1;
-    fCoreCharge[2]  = -1;
-    fCoreCharge[3]  = -1;
+  fCrystalId      = -1;
+  fCoreEnergy     = sqrt(-1);
+  fCoreCharge[0]  = -1;
+  fCoreCharge[1]  = -1;
+  fCoreCharge[2]  = -1;
+  fCoreCharge[3]  = -1;
 
-    fTOffset = sqrt(-1);
-    fPad  = 0;
+  fTOffset = sqrt(-1);
+  fPad  = 0;
 
-    fNumberOfInteractions = 0;
+  fNumberOfInteractions = 0;
 
-    fSegments.clear();
+  fSegments.clear();
 }
 
 
 void TGretinaHit::TrimSegments(int type) {
-    // 0: drop multiple ident int pnts.  
-    // 1: make into wedge "data"
-    if(type==0) {
-        std::set<interaction_point,intpnt_compare> pset;
-        for(auto x=fSegments.begin();x!=fSegments.end();x++) {
-            pset.insert(*x);
-        }
-        fSegments.clear();
-        for(auto x=pset.begin();x!=pset.end();x++) {
-            fSegments.push_back(*x);
-        }
-        std::sort(fSegments.begin(),fSegments.end());
-        fNumberOfInteractions = fSegments.size();
-    } else if (type==1) {
-        std::set<interaction_point,intpnt_compare_wedge> pset;
-        for(auto x=fSegments.begin();x!=fSegments.end();x++) {
-            pset.insert(*x);
-        }
-        fSegments.clear();
-        for(auto x=pset.begin();x!=pset.end();x++) {
-            fSegments.push_back(*x);
-            fSegments.back().fSeg = (fSegments.back().fSeg%6);
-        }
-        std::sort(fSegments.begin(),fSegments.end());
-        fNumberOfInteractions = fSegments.size();
+  // 0: drop multiple ident int pnts.  
+  // 1: make into wedge "data"
+  if(type==0) {
+    std::set<interaction_point,intpnt_compare> pset;
+    for(auto x=fSegments.begin();x!=fSegments.end();x++) {
+      pset.insert(*x);
     }
+    fSegments.clear();
+    for(auto x=pset.begin();x!=pset.end();x++) {
+      fSegments.push_back(*x);
+    }
+    std::sort(fSegments.begin(),fSegments.end());
+    fNumberOfInteractions = fSegments.size();
+  } else if (type==1) {
+    std::set<interaction_point,intpnt_compare_wedge> pset;
+    for(auto x=fSegments.begin();x!=fSegments.end();x++) {
+      pset.insert(*x);
+    }
+    fSegments.clear();
+    for(auto x=pset.begin();x!=pset.end();x++) {
+      fSegments.push_back(*x);
+      fSegments.back().fSeg = (fSegments.back().fSeg%6);
+    }
+    std::sort(fSegments.begin(),fSegments.end());
+    fNumberOfInteractions = fSegments.size();
+  }
 }
 

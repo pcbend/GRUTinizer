@@ -28,23 +28,21 @@ public:
   Long_t GetTimestamp()    { return Timestamp(); }
 
   TVector3 CRDCTrack();  // not a finished method
-  TVector3 ExitTargetVect(int order=5);
-  Float_t Azita(int order=5);
+  TVector3 ExitTargetVect(int order=6);
+  Float_t Azita(int order=6);
 
-  //Track returns the s800 track with respect to the optical axis with shifts
-  //sata, sbta applied to ata and bta respectively. Note that the GValues
-  //ATA_SHIFT and BTA_SHIFT will also be applied.
-  TVector3 Track(double sata=0.000,double sbta=0.000) const;
+  //TVector3 Track() const;  //  s800 track with respect to optical axis
+  TVector3 Track(double ata=0.000,double bta=0.000) const; // s800 track with respect to vector with ata,bta.
 
   float GetXFP(int i=0) const; // x position in the first(second) CRDC (mm)
   float GetYFP(int i=0) const; // y position in the first(second) CRDC (mm)
   float GetAFP() const; // x-angle in the focal plane (rad)
   float GetBFP() const; // y-angle in the focal plane (rad)
 
-  Float_t GetAta(int i=5) const; // x-angle at the target (rad)
-  Float_t GetYta(int i=5) const; // y-offset at the target (mm)
-  Float_t GetBta(int i=5) const; // y-angle at the target (rad)
-  Float_t GetDta(int i=5) const; // dE/E of outgoing particle, relative to the central b-rho
+  Float_t GetAta(int i=6) const; // x-angle at the target (rad)
+  Float_t GetYta(int i=6) const; // y-offset at the target (mm)
+  Float_t GetBta(int i=6) const; // y-angle at the target (rad)
+  Float_t GetDta(int i=6) const; // dE/E of outgoing particle, relative to the central b-rho
 
   float AdjustedBeta(float) const;
 
@@ -93,25 +91,29 @@ public:
   
   float GetRawXF_MESY(unsigned int i=0) const;
 
+  //float GetMTOF_ObjE1(unsigned int i=0,bool find_best=true) const; // { return GetCorrTOF_OBJ_MESY(i); }
+  //float GetMTOF_XfpE1(unsigned int i=0,bool find_best=true) const; // { return GetXF_E1Raw_MESY(i);    }
+  //float GetMTOF_RfE1(unsigned int i=0)  const { return GetME1Up(i) - GetMRf(i);  }
+  //float GetMTOF_ObjRf(unsigned int i=0) const { return GetMRf(i)   - GetMObj(i); }
 
-  float GetMTOF_ObjE1(unsigned int i=0,bool find_best=true) const; // { return GetCorrTOF_OBJ_MESY(i); }
-  float GetMTOF_XfpE1(unsigned int i=0,bool find_best=true) const; // { return GetXF_E1Raw_MESY(i);    }
-  float GetMTOF_RfE1(unsigned int i=0)  const { return GetME1Up(i) - GetMRf(i);  }
-  float GetMTOF_ObjRf(unsigned int i=0) const { return GetMRf(i)   - GetMObj(i); }
+  double MCorrelatedOBJ() const { return GetMTof().GetCorrelatedObj(); }
+  double MCorrelatedXFP() const { return GetMTof().GetCorrelatedXfp(); }
+  double MCorrelatedE1() const  { return GetMTof().GetCorrelatedE1Up();  }
+  
+  double GetMTofObjE1() const ; // I return the correlated gvalue corrected time-of-flight obj to e1.
+  double GetMTofXfpE1() const ; // I return the correlated gvalue corrected time-of-flight xfp to e1.
 
-  //GetCorrectedXfpTof() returns the correlated XFP Scintillator timing minus
-  //the E1 timing with AFP and XFP corrections applied. Note that the GValues
-  //OBJ_MTOF_CORR_XFP and OBJ_MTOF_CORR_AFP will be used as the respective
-  //correction values. The XFP hit used will be the one closest to the GValue
-  //TARGET_MTOF_OBJE1 (which should be based on the largest peak in OBJ-E1).
-  float GetCorrectedXfpTof() const;
+  
+  
+  //float MCorrelatedOBJ_E1(bool corrected=true) const;
+  //float MCorrelatedXFP_E1(bool corrected=true) const;
 
-  //GetCorrectedObjTof() returns the correlated OBJ Scintillator timing minus
-  //the E1 timing with AFP and XFP corrections applied. Note that the GValues
-  //XFP_MTOF_CORR_XFP and XFP_MTOF_CORR_AFP will be used as the respective
-  //correction values. The XFP hit used will be the one closest to the GValue
-  //TARGET_MTOF_XFPE1 (which should be based on the largest peak in XFP-E1). 
-  float GetCorrectedObjTof() const;
+  //float MCorrelatedOBJ_Ch15() const;
+  //float MCorrelatedXFP_Ch15() const;
+  //float MCorrelatedE1_Ch15() const;
+  //float MCorrelatedOBJ_E1_Ch15(bool corrected=true) const;
+  //float MCorrelatedXFP_E1_Ch15(bool corrected=true) const;
+
 
   unsigned short GetME1Up(int i)       const {if(i<GetME1Size())   return mtof.fE1Up.at(i);  return sqrt(-1); }     
   unsigned short GetME1Down(int i)     const {if(i<GetME1Size())   return mtof.fE1Down.at(i);return sqrt(-1); }    

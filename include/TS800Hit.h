@@ -382,25 +382,30 @@ class TMTof : public TDetectorHit {
     int HodoSize()       const { return fHodoscope.size(); }
     int RefSize()        const { return fRef.size(); }
 
-    //Return scintillator-reference timing closest to GValues
-    //TARGET_MTOF_OBJE1, TARGET_MTOF_XFPE1, etc. This is before any corrections
-    //for CRDC 1 X and AFP are done.
-    double CorrelateObjE1() const;
-    double CorrelateObjRef() const;
-    double CorrelateXfpE1() const;
-    double CorrelateXfpRef() const;
 
-    //These functions return a vector of  all combinations of subtracted hits
-    //of the named scintillator (obj or xfp) and reference (E1Up and Ref, which are also
-    //known as Channel 1 and 15, respectively).
-    std::vector<float> GetObjE1() const;
-    std::vector<float> GetXfpE1() const;
-    std::vector<float> GetObjRef() const;
-    std::vector<float> GetXfpRef() const;
+    //bool Correlate()     const;
+    //bool CorrelateE1Up() const;
+    //bool CorrelateObj()  const;
+    //bool CorrelateXfp()  const;
+    
+    double  GetCorrelatedXfp()  const; //{ return fCorrelatedXFP; }  //!
+    double  GetCorrelatedObj()  const; //{ return fCorrelatedOBJ; }  //!
+    double  GetCorrelatedE1Up() const; //{ return fCorrelatedE1Up;  }  //!
+
+    double  GetCorrelatedXfpE1()  const { return GetCorrelatedXfp()-GetCorrelatedE1Up(); }  //!
+    double  GetCorrelatedObjE1()  const { return GetCorrelatedObj()-GetCorrelatedE1Up(); }  //!
 
 
-  //private:
 
+  private:
+    mutable double fCorrelatedXFP;   //!
+    mutable double fCorrelatedOBJ;   //!
+    mutable double fCorrelatedE1Up;    //!
+    //mutable int fCorrelatedXFP_Ch15;   //!
+    //mutable int fCorrelatedOBJ_Ch15;   //!
+    //mutable int fCorrelatedE1_Ch15;    //!
+
+  public:
     std::vector<unsigned short> fE1Up;         // Channel 0
     std::vector<unsigned short> fE1Down;       // Channel 1
     std::vector<unsigned short> fXfp;          // Channel 2
@@ -410,7 +415,12 @@ class TMTof : public TDetectorHit {
     std::vector<unsigned short> fCrdc2Anode;   // Channel 7
     std::vector<unsigned short> fHodoscope;    // Channel 12
     std::vector<unsigned short> fRef;          // Channel 15, same as E1Up (different cable.)
+
+    //std::vector<int> fGalotte;
+    //
     virtual Int_t Charge() const  {return 0;}
+    //
+    //
   ClassDef(TMTof,1)
 };
 
