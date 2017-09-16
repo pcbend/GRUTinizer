@@ -118,36 +118,33 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
 }
 
 TVector3 TGretinaHit::GetIntPosition(unsigned int i) const {
-  if(i<fSegments.size()){
-    double xoffset = GValue::Value("GRETINA_X_OFFSET");
-    if(std::isnan(xoffset))
-      xoffset=0.00;
-    double yoffset = GValue::Value("GRETINA_Y_OFFSET");
-    if(std::isnan(yoffset))
-      yoffset=0.00;
-    double zoffset = GValue::Value("GRETINA_Z_OFFSET");
-    if(std::isnan(zoffset))
-      zoffset=0.00;
-    TVector3 v = TGretina::CrystalToGlobal(fCrystalId,fSegments.at(i).fX + xoffset,
-                                                      fSegments.at(i).fY + yoffset,
-                                                      fSegments.at(i).fZ + zoffset);
-    //v.RotateX(TMath::Pi());
-    return v;  //TGretina::CrystalToGlobal(fCrystalId,fSegments.at(i).fX + xoffset,
-               //                                     fSegments.at(i).fY + yoffset,
-               //                                     fSegments.at(i).fZ + zoffset);
-  } else {
-    return TDetectorHit::BeamUnitVec;
-  }
+    if(i<fSegments.size()){
+        double xoffset = GValue::Value("GRETINA_X_OFFSET");
+        if(std::isnan(xoffset))
+            xoffset=0.00;
+        double yoffset = GValue::Value("GRETINA_Y_OFFSET");
+        if(std::isnan(yoffset))
+            yoffset=0.00;
+        double zoffset = GValue::Value("GRETINA_Z_OFFSET");
+        if(std::isnan(zoffset))
+            zoffset=0.00;
+        TVector3 v = TGretina::CrystalToGlobal(fCrystalId,fSegments.at(i).fX + xoffset,
+                fSegments.at(i).fY + yoffset,
+                fSegments.at(i).fZ + zoffset);
+        return v; 
+    } else {
+        return TDetectorHit::BeamUnitVec;
+    }
 }
 
 TVector3 TGretinaHit::GetLocalPosition(unsigned int i) const {
-  if(i<fSegments.size()){
-    return TVector3(fSegments.at(i).fX,
-                    fSegments.at(i).fY,
-                    fSegments.at(i).fZ);
-  } else {
-    return TVector3(0,0,1);
-  }
+    if(i<fSegments.size()){
+        return TVector3(fSegments.at(i).fX,
+                fSegments.at(i).fY,
+                fSegments.at(i).fZ);
+    } else {
+        return TVector3(0,0,1);
+    }
 }
 
 
@@ -169,52 +166,52 @@ double TGretinaHit::GetDopplerYta(double beta, double yta, const TVector3 *vec, 
     return tmp;
 }
 /*
-double TGretinaHit::GetDoppler_dB(double beta, const TVector3 *vec,double Dta){
-  if(Size()<1)
-    return 0.0;
-  if(vec==0) {
-    vec = &BeamUnitVec;
-  }
-  double tmp = 0.0;
-  double gamma = 1.0/(sqrt(1.0-pow(beta,2.0)));
-  // Do beta correction here.
-  double dp_p = gamma/(1.0+gamma)*Dta;
-  beta *= (1.0+dp_p/(gamma*gamma));
-  double TheGamma = 1.0/TMath::Sqrt(1.0-beta*beta);
-  tmp = fCoreEnergy*TheGamma *(1.0 - beta*TMath::Cos(GetPosition().Angle(*vec)));
-  return tmp;
+   double TGretinaHit::GetDoppler_dB(double beta, const TVector3 *vec,double Dta){
+   if(Size()<1)
+   return 0.0;
+   if(vec==0) {
+   vec = &BeamUnitVec;
+   }
+   double tmp = 0.0;
+   double gamma = 1.0/(sqrt(1.0-pow(beta,2.0)));
+// Do beta correction here.
+double dp_p = gamma/(1.0+gamma)*Dta;
+beta *= (1.0+dp_p/(gamma*gamma));
+double TheGamma = 1.0/TMath::Sqrt(1.0-beta*beta);
+tmp = fCoreEnergy*TheGamma *(1.0 - beta*TMath::Cos(GetPosition().Angle(*vec)));
+return tmp;
 }
 */
 
 
 /*
-double TGretinaHit::GetDoppler(const TS800 *s800,bool doDTAcorr,int EngRange) {
-  if(!s800 || Size()<1)
-    return 0.0;
-  double beta  = GValue::Value("BETA");
-  if(std::isnan(beta))
-    return 0.0;
-  double gata =  GValue::Value("GRETINA_ATA_OFFSET");
-  if(std::isnan(gata))
-    gata = 0.0;
-  else 
-    gata = gata*TMath::DegToRad();
-  double gbta =  GValue::Value("GRETINA_BTA_OFFSET");
-  if(std::isnan(gbta))
-    gbta = 0.0;
-  else 
-    gbta = gata*TMath::DegToRad();
-  if(doDTAcorr){
-    double gamma = 1.0/(sqrt(1.-beta*beta));
-    double dp_p = gamma/(1.+gamma) * s800->GetDta();
-    beta *=(1.+dp_p/(gamma*gamma));
-  }
-  TVector3 track = s800->Track(gata,gbta);  //(TMath::Sin(s800->GetAta()),-TMath::Sin(s800->GetBta()),1);
-  if(EngRange>-1)
-    return GetDoppler(EngRange,beta,&track);
-  return GetDoppler(beta,&track);
-}
-*/
+   double TGretinaHit::GetDoppler(const TS800 *s800,bool doDTAcorr,int EngRange) {
+   if(!s800 || Size()<1)
+   return 0.0;
+   double beta  = GValue::Value("BETA");
+   if(std::isnan(beta))
+   return 0.0;
+   double gata =  GValue::Value("GRETINA_ATA_OFFSET");
+   if(std::isnan(gata))
+   gata = 0.0;
+   else 
+   gata = gata*TMath::DegToRad();
+   double gbta =  GValue::Value("GRETINA_BTA_OFFSET");
+   if(std::isnan(gbta))
+   gbta = 0.0;
+   else 
+   gbta = gata*TMath::DegToRad();
+   if(doDTAcorr){
+   double gamma = 1.0/(sqrt(1.-beta*beta));
+   double dp_p = gamma/(1.+gamma) * s800->GetDta();
+   beta *=(1.+dp_p/(gamma*gamma));
+   }
+   TVector3 track = s800->Track(gata,gbta);  //(TMath::Sin(s800->GetAta()),-TMath::Sin(s800->GetBta()),1);
+   if(EngRange>-1)
+   return GetDoppler(EngRange,beta,&track);
+   return GetDoppler(beta,&track);
+   }
+   */
 
 
 //TVector3 TGretinaHit::GetCrystalPosition(int i) const {
@@ -222,52 +219,52 @@ double TGretinaHit::GetDoppler(const TS800 *s800,bool doDTAcorr,int EngRange) {
 //}
 
 /*
-void TGretinaHit::SortHits(){
-  // sets are sorted, so this will sort all properties together.
-  //
-  // !! When multiple interactions are assigned to a single
-  //    segment, the first interaction is currenlty assigned
-  //    to that segment!
-  //
+   void TGretinaHit::SortHits(){
+// sets are sorted, so this will sort all properties together.
+//
+// !! When multiple interactions are assigned to a single
+//    segment, the first interaction is currenlty assigned
+//    to that segment!
+//
 
-  std::vector<interaction_point> ips;
-  for(int i=0; i<fNumberOfInteractions; i++){
-    ips.push_back(interaction_point(fSegmentNumber[i],
-				    fGlobalInteractionPosition[i],
-				    fLocalInteractionPosition[i],
-				    fInteractionEnergy[i],
-				    fInteractionFraction[i]));
-  }
-  //printf("ips.size() == %i\n",ips.size());
-  // Fill all interaction points
-  //
-  fSegmentNumber.clear();
-  fGlobalInteractionPosition.clear();
-  fLocalInteractionPosition.clear();
-  fInteractionEnergy.clear();
-  fInteractionFraction.clear();
-  //
-  fNumberOfInteractions = 0;
+std::vector<interaction_point> ips;
+for(int i=0; i<fNumberOfInteractions; i++){
+ips.push_back(interaction_point(fSegmentNumber[i],
+fGlobalInteractionPosition[i],
+fLocalInteractionPosition[i],
+fInteractionEnergy[i],
+fInteractionFraction[i]));
+}
+//printf("ips.size() == %i\n",ips.size());
+// Fill all interaction points
+//
+fSegmentNumber.clear();
+fGlobalInteractionPosition.clear();
+fLocalInteractionPosition.clear();
+fInteractionEnergy.clear();
+fInteractionFraction.clear();
+//
+fNumberOfInteractions = 0;
 
-  std::sort(ips.begin(), ips.end());
-  
-  for(auto& point : ips){
-    if(fNumberOfInteractions >= MAXHPGESEGMENTS){
-      break;
-    }
-    fSegmentNumber.push_back(point.segnum);
-    fGlobalInteractionPosition.push_back(point.pos);
-    fLocalInteractionPosition.push_back(point.local_pos);
-    fInteractionEnergy.push_back(point.energy);
-    fInteractionFraction.push_back(point.energy_fraction);
-    fNumberOfInteractions++;
-  }
+std::sort(ips.begin(), ips.end());
 
-  //Print("all");
-  // Because they are now sorted
-  fFirstInteraction = 0;
-  if(fNumberOfInteractions>1)
-    fSecondInteraction = 1;
+for(auto& point : ips){
+if(fNumberOfInteractions >= MAXHPGESEGMENTS){
+break;
+}
+fSegmentNumber.push_back(point.segnum);
+fGlobalInteractionPosition.push_back(point.pos);
+fLocalInteractionPosition.push_back(point.local_pos);
+fInteractionEnergy.push_back(point.energy);
+fInteractionFraction.push_back(point.energy_fraction);
+fNumberOfInteractions++;
+}
+
+//Print("all");
+// Because they are now sorted
+fFirstInteraction = 0;
+if(fNumberOfInteractions>1)
+fSecondInteraction = 1;
 }
 */
 
@@ -276,137 +273,141 @@ void TGretinaHit::SortHits(){
 //       and the "second" is the one with the second highest energy.
 //       First and second may be assigned across crystal boundaries.
 
-
-
 void TGretinaHit::Add(const TGretinaHit& rhs) {
 
-  // qStash all interaction points
-  std::set<interaction_point> ips;
-  for(int i=0; i<fSegments.size(); i++){
-    ips.insert(fSegments[i]);
-  }
-  for(int i=0; i<rhs.fSegments.size(); i++){
-    ips.insert(rhs.fSegments[i]);
-  }
+    // qStash all interaction points
+    std::set<interaction_point> ips;
+    // Copy other information to self if needed
+    double my_core_energy = fCoreEnergy;
+    if(fCoreEnergy < rhs.fCoreEnergy) {
+        for(unsigned int i=0; i<rhs.fSegments.size(); i++){
+            ips.insert(rhs.fSegments[i]);
+        }
 
-  // Copy other information to self if needed
-  double my_core_energy = fCoreEnergy;
-  if(fCoreEnergy < rhs.fCoreEnergy) {
-    rhs.Copy(*this);
-    fCoreEnergy += my_core_energy;
-  } else {
-    fCoreEnergy += rhs.fCoreEnergy;
-  }
-
-  // Fill all interaction points
-  fNumberOfInteractions = 0;
-  fSegments.clear();
-  for(auto& point : ips){
-    if(fNumberOfInteractions >= MAXHPGESEGMENTS){
-      break;
+        for(unsigned int i=0; i<fSegments.size(); i++){
+            ips.insert(fSegments[i]);
+        }
+        rhs.Copy(*this);
+        fCoreEnergy += my_core_energy;
+    } else {
+        for(unsigned int i=0; i<fSegments.size(); i++){
+            ips.insert(fSegments[i]);
+        }
+        for(unsigned int i=0; i<rhs.fSegments.size(); i++){
+            ips.insert(rhs.fSegments[i]);
+        }
+        fCoreEnergy += rhs.fCoreEnergy;
     }
-    fSegments.push_back(point);
-    fNumberOfInteractions++;
-  }
+
+    // Fill all interaction points
+    fNumberOfInteractions = 0;
+    fSegments.clear();
+    for(auto& point : ips){
+        if(fNumberOfInteractions >= MAXHPGESEGMENTS){
+            break;
+        }
+        fSegments.push_back(point);
+        fNumberOfInteractions++;
+    }
 }
 
 /*
-TGretinaHit& TGretinaHit::operator+=(const TGretinaHit& rhs) {
-  AddToSelf(rhs);
-  return *this;
-}
+   TGretinaHit& TGretinaHit::operator+=(const TGretinaHit& rhs) {
+   AddToSelf(rhs);
+   return *this;
+   }
 
-TGretinaHiti& TGretinaHit::operator+(TGretinaHit lhs,const TGretinaHit& rhs) {
+   TGretinaHiti& TGretinaHit::operator+(TGretinaHit lhs,const TGretinaHit& rhs) {
 
-  lhs += rhs;
-  return lhs;
-}
-*/
+   lhs += rhs;
+   return lhs;
+   }
+   */
 
 
 TVector3 TGretinaHit::GetLastPosition() const {
-  if(fSegments.size()<1)
-    return TDetectorHit::BeamUnitVec;
-  return GetIntPosition(fSegments.size()-1);
+    if(fSegments.size()<1)
+        return TDetectorHit::BeamUnitVec;
+    return GetIntPosition(fSegments.size()-1);
 }
 
 
 void TGretinaHit::Print(Option_t *opt) const {
 
-  std::cout << "TGretinaHit:" <<  std::endl;
-  //std::cout << "\tAddress:        \t0x" << std::hex << fAddress << std::dec << std::endl;
-  printf("\tAddress:        \t0x%08x\n",Address());
-  std::cout << "\tHole:           \t" << GetHoleNumber()               << std::endl;
-  std::cout << "\tCrystalNum      \t" << GetCrystalNumber()            << std::endl;
-  std::cout << "\tCrystalId:      \t" << GetCrystalId()                << std::endl;
+    std::cout << "TGretinaHit:" <<  std::endl;
+    //std::cout << "\tAddress:        \t0x" << std::hex << fAddress << std::dec << std::endl;
+    printf("\tAddress:        \t0x%08x\n",Address());
+    std::cout << "\tHole:           \t" << GetHoleNumber()               << std::endl;
+    std::cout << "\tCrystalNum      \t" << GetCrystalNumber()            << std::endl;
+    std::cout << "\tCrystalId:      \t" << GetCrystalId()                << std::endl;
 
-  std::cout << "\tLocal Timestamp:\t" << Timestamp()                   << std::endl;
-  std::cout << "\tCorrected time: \t" << GetTime()                     << std::endl;
-  std::cout << "\tDecomp Energy:  \t" << fCoreEnergy                   << std::endl;
-  if(!strcmp(opt,"all")) {
-    for(int i=0;i<4;i++)
-      std::cout << "\tCharge[" << i << "]:       \t" << fCoreCharge[i] << std::endl;
-  }
-  std::cout << "\tErrorCode:       \t" << fPad                         << std::endl;
-  std::cout << "\tInteractions:    \t" << fSegments.size()             << std::endl;
-
-  if(!strcmp(opt,"all")) {
-    for(int i=0;i<fNumberOfInteractions;i++) {
-      printf("\t\t");
-      fSegments.at(i).Print();
+    std::cout << "\tLocal Timestamp:\t" << Timestamp()                   << std::endl;
+    std::cout << "\tCorrected time: \t" << GetTime()                     << std::endl;
+    std::cout << "\tDecomp Energy:  \t" << fCoreEnergy                   << std::endl;
+    if(!strcmp(opt,"all")) {
+        for(int i=0;i<4;i++)
+            std::cout << "\tCharge[" << i << "]:       \t" << fCoreCharge[i] << std::endl;
     }
-  }
-  std::cout << "------------------------------"  << std::endl;
+    std::cout << "\tErrorCode:       \t" << fPad                         << std::endl;
+    std::cout << "\tInteractions:    \t" << fSegments.size()             << std::endl;
+
+    if(!strcmp(opt,"all")) {
+        for(int i=0;i<fNumberOfInteractions;i++) {
+            printf("\t\t");
+            fSegments.at(i).Print();
+        }
+    }
+    std::cout << "------------------------------"  << std::endl;
 
 }
 
 void TGretinaHit::Clear(Option_t *opt) {
-  TDetectorHit::Clear(opt);
+    TDetectorHit::Clear(opt);
 
-  fWalkCorrection = sqrt(-1);
+    fWalkCorrection = sqrt(-1);
 
-  fCrystalId      = -1;
-  fCoreEnergy     = sqrt(-1);
-  fCoreCharge[0]  = -1;
-  fCoreCharge[1]  = -1;
-  fCoreCharge[2]  = -1;
-  fCoreCharge[3]  = -1;
+    fCrystalId      = -1;
+    fCoreEnergy     = sqrt(-1);
+    fCoreCharge[0]  = -1;
+    fCoreCharge[1]  = -1;
+    fCoreCharge[2]  = -1;
+    fCoreCharge[3]  = -1;
 
-  fTOffset = sqrt(-1);
-  fPad  = 0;
+    fTOffset = sqrt(-1);
+    fPad  = 0;
 
-  fNumberOfInteractions = 0;
+    fNumberOfInteractions = 0;
 
-  fSegments.clear();
+    fSegments.clear();
 }
 
 
 void TGretinaHit::TrimSegments(int type) {
-  // 0: drop multiple ident int pnts.  
-  // 1: make into wedge "data"
-  if(type==0) {
-    std::set<interaction_point,intpnt_compare> pset;
-    for(auto x=fSegments.begin();x!=fSegments.end();x++) {
-      pset.insert(*x);
+    // 0: drop multiple ident int pnts.  
+    // 1: make into wedge "data"
+    if(type==0) {
+        std::set<interaction_point,intpnt_compare> pset;
+        for(auto x=fSegments.begin();x!=fSegments.end();x++) {
+            pset.insert(*x);
+        }
+        fSegments.clear();
+        for(auto x=pset.begin();x!=pset.end();x++) {
+            fSegments.push_back(*x);
+        }
+        std::sort(fSegments.begin(),fSegments.end());
+        fNumberOfInteractions = fSegments.size();
+    } else if (type==1) {
+        std::set<interaction_point,intpnt_compare_wedge> pset;
+        for(auto x=fSegments.begin();x!=fSegments.end();x++) {
+            pset.insert(*x);
+        }
+        fSegments.clear();
+        for(auto x=pset.begin();x!=pset.end();x++) {
+            fSegments.push_back(*x);
+            fSegments.back().fSeg = (fSegments.back().fSeg%6);
+        }
+        std::sort(fSegments.begin(),fSegments.end());
+        fNumberOfInteractions = fSegments.size();
     }
-    fSegments.clear();
-    for(auto x=pset.begin();x!=pset.end();x++) {
-      fSegments.push_back(*x);
-    }
-    std::sort(fSegments.begin(),fSegments.end());
-    fNumberOfInteractions = fSegments.size();
-  } else if (type==1) {
-    std::set<interaction_point,intpnt_compare_wedge> pset;
-    for(auto x=fSegments.begin();x!=fSegments.end();x++) {
-      pset.insert(*x);
-    }
-    fSegments.clear();
-    for(auto x=pset.begin();x!=pset.end();x++) {
-      fSegments.push_back(*x);
-      fSegments.back().fSeg = (fSegments.back().fSeg%6);
-    }
-    std::sort(fSegments.begin(),fSegments.end());
-    fNumberOfInteractions = fSegments.size();
-  }
 }
 

@@ -7,10 +7,8 @@
 #include <TMath.h>
 #include <TChain.h>
 
-
 #include <cmath>
 
-//#include "TGEBEvent.h"
 #include "TDetectorHit.h"
 
 #define MAXHPGESEGMENTS 36
@@ -166,7 +164,6 @@ public:
   TVector3 GetLastPosition()                const;
 
   TVector3 GetCrystalPosition()           const; 
-  //TVector3 GetSegmentPosition()           const; 
                                                 
   void Add(const TGretinaHit& other);
   void SetCoreEnergy(float temp) const { fCoreEnergy = temp; }
@@ -210,10 +207,6 @@ private:
   Float_t         fTOffset; //  t0 = toffset + tFit
 
   std::vector<interaction_point> fSegments;
-  //std::vector<Int_t> fSegmentNumber; //[fNumberOfInteractions]
-  //std::vector<Float_t>  fInteractionEnergy;         //[fNumberOfInteractions]
-  //std::vector<Float_t>  fInteractionFraction;       //[fNumberOfInteractions]
-  //std::vector<TVector3> fLocalInteractionPosition;  //[fNumberOfInteractions]
   ClassDef(TGretinaHit,5)
 };
 
