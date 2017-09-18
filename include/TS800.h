@@ -28,11 +28,15 @@ public:
   Long_t GetTimestamp()    { return Timestamp(); }
 
   TVector3 CRDCTrack();  // not a finished method
-  TVector3 ExitTargetVect(int order=6);
+  TVector3 ExitTargetVect(int order=6); //DEPRECATED/BROKEN. Use TS800::Track() instead.
   Float_t Azita(int order=6);
 
-  //TVector3 Track() const;  //  s800 track with respect to optical axis
-  TVector3 Track(double ata=0.000,double bta=0.000) const; // s800 track with respect to vector with ata,bta.
+  //S800 track determined from inverse map with shifts sata, sbta for ata and
+  //bta, respectively. Note these shifts are applied in addition to the shifts
+  //from GValues ATA_SHIFT and BTA_SHIFT. Also, the flip in direction for the
+  //non-dispersive direction to be in the GRETINA reference frame is already
+  //applied in this function. 
+  TVector3 Track(double sata=0.000,double sbta=0.000) const; 
 
   float GetXFP(int i=0) const; // x position in the first(second) CRDC (mm)
   float GetYFP(int i=0) const; // y position in the first(second) CRDC (mm)
