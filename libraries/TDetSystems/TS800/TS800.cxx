@@ -57,7 +57,7 @@ Float_t TS800::GetAta(int i) const {
   //float Shift_ata = 0;
   float ata = TInverseMap::Get()->Ata(i,this);
   if(!std::isnan(GValue::Value("ATA_SHIFT"))) {
-    ata += GValue::Value("ATA_SHIFT")*TMath::DegToRad();
+    ata += GValue::Value("ATA_SHIFT");
   }
   return ata;
 
@@ -66,7 +66,7 @@ Float_t TS800::GetAta(int i) const {
 Float_t TS800::GetBta(int i) const {
   float bta = TInverseMap::Get()->Bta(i,this);
   if(!std::isnan(GValue::Value("BTA_SHIFT"))) {
-    bta += GValue::Value("BTA_SHIFT") *TMath::DegToRad();
+    bta += GValue::Value("BTA_SHIFT");
   }
   return bta;
 }
