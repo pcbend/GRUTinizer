@@ -272,6 +272,9 @@ int TCrdc::GetMaxPad() const {
 
     }*/
 
+    if (data.at(i) <= 0){
+      continue;
+    }
     if(!IsGoodSample(i)) {
       continue;
     }
@@ -345,7 +348,7 @@ int TCrdc::GetMaxPadSum() const{
     }
   }
   //return (float)(channel.at(place))+gRandom->Uniform();
-  return maxd; 
+  return maxd/sample_width; 
 }
 
 void TCrdc::DrawChannels(Option_t *opt,bool calibrate) const {
@@ -461,6 +464,7 @@ void TCrdc::Clear(Option_t *opt) {
   fId   = -1;
   anode = 0;
   time  = 0;
+  sample_width = 0;
   channel.clear();
   sample.clear();
   data.clear();
