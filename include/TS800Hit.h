@@ -129,7 +129,6 @@ class TCrdc : public TDetectorHit {
     short GetAnode() { return anode; }
     short GetTime()  { return time;  }
     float GetTimeRand()  { return ((float)(time)+gRandom->Uniform());  }
-    int GetSampleWidth() { return sample_width; } 
 
     int  Size()        const { return channel.size(); }
     int  GetNSamples() const { return sample.size(); }
@@ -137,7 +136,6 @@ class TCrdc : public TDetectorHit {
     void SetId(short id)    { fId = id;  }
     void SetAnode(short an) {anode = an; }
     void SetTime(short ti)  {time = ti;  }
-    void SetSampleWidth(int wi) { sample_width = wi; } 
 
 
     int  Address(int i) const { return TDetectorHit::Address() + channel.at(i); }
@@ -177,7 +175,6 @@ class TCrdc : public TDetectorHit {
 
     unsigned short anode;
     unsigned short time;
-    int sample_width;
 
     mutable bool has_cached_dispersive_x; //!
     mutable double cached_dispersive_x; //!
