@@ -103,9 +103,17 @@ public:
   double MCorrelatedOBJ() const { return GetMTof().GetCorrelatedObj(); }
   double MCorrelatedXFP() const { return GetMTof().GetCorrelatedXfp(); }
   double MCorrelatedE1() const  { return GetMTof().GetCorrelatedE1Up();  }
-  
-  double GetMTofObjE1() const ; // I return the correlated gvalue corrected time-of-flight obj to e1.
-  double GetMTofXfpE1() const ; // I return the correlated gvalue corrected time-of-flight xfp to e1.
+
+  // Return the correlated gvalue corrected time-of-flight obj to e1.
+  // If no corrections are passed, GValues OBJ_MTOF_CORR_AFP and 
+  // OBJ_MTOF_CORR_XFP are used
+  double GetMTofObjE1() const ; 
+  double GetMTofObjE1(double afp_cor, double xfp_cor) const ; 
+  // Return the correlated gvalue corrected time-of-flight xfp to e1.
+  // If no corrections are passed, GValues XFP_MTOF_CORR_AFP and 
+  // XFP_MTOF_CORR_XFP are used
+  double GetMTofXfpE1() const ; 
+  double GetMTofXfpE1(double afp_cor, double xfp_cor) const ; 
 
   
   

@@ -1504,10 +1504,15 @@ double TS800::GetMTofObjE1() const {
     fflush(stdout);
     return sqrt(-1);
   }
+  return GetMTofObjE1(afp_cor, xfp_cor);
+}
+
+double TS800::GetMTofObjE1(double afp_cor, double xfp_cor) const {
+  // I return the correlated gvalue corrected time-of-flight obj to e1.
   return(GetMTof().GetCorrelatedObjE1()
          + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
-
 }
+
 
 double TS800::GetMTofXfpE1() const {
   // I return the correlated gvalue corrected time-of-flight xfp to e1.
@@ -1518,11 +1523,15 @@ double TS800::GetMTofXfpE1() const {
     fflush(stdout);
     return sqrt(-1);
   }
+  GetMTofXfpE1(afp_cor, xfp_cor);
+}
+
+double TS800::GetMTofXfpE1(double afp_cor, double xfp_cor) const {
+  // I return the correlated gvalue corrected time-of-flight xfp to e1.
   return(GetMTof().GetCorrelatedXfpE1()
          + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
-
-
 }
+
 
 
 /*
