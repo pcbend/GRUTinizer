@@ -758,13 +758,8 @@ void TMTof::Clear(Option_t *opt) {
   fHodoscope.clear();
   fRef.clear();
 
-  fCorrelatedXFP=sqrt(-1);
-  fCorrelatedOBJ=sqrt(-1);
-  fCorrelatedE1Up=sqrt(-1);
-  //fCorrelatedXFP_Ch15=0xffffffff;
-  //fCorrelatedOBJ_Ch15=0xffffffff;
-  //fCorrelatedE1_Ch15=0xffffffff;
-  
+  fCorrelatedXFPE1=sqrt(-1);
+  fCorrelatedOBJE1=sqrt(-1);
 }
 
 //bool TMTof::Correlate() const {
@@ -774,74 +769,46 @@ void TMTof::Clear(Option_t *opt) {
 //  return true;
 //}
 
-
-double TMTof::GetCorrelatedE1Up() const{
-//Determines correlated time-of-flights based on TARGET_MTOF_# GValues
-//Values are set in TMTof as fCorrelatedXFP, fCorrelatedE1Up, etc.
-//Note that if the GValues are not set, the first value in each time-of-flight 
-//is taken.
-  double target = GValue::Value("TARGET_MTOF_E1Up");
-  if(fE1Up.size() && !std::isnan(target)){
-    fCorrelatedE1Up = fE1Up.at(0);
-    for(size_t i=1;i<fE1Up.size();i++) {     
-      double newvalue = fE1Up.at(i);
-      if(std::abs(target - newvalue) < std::abs(target - fCorrelatedE1Up)) {
-        fCorrelatedE1Up = newvalue;
-      } 
-    }  
-  } else if(fE1Up.size()) {
-    fCorrelatedE1Up = fE1Up.at(0);
-  } else {
-    fCorrelatedE1Up =sqrt(-1);
+double TMTof::GetCorrelatedObjE1() const{
+  double target = GValue::Value("TARGET_MTOF_OBJE1");
+  if (std::isnan(target)){
+    std::cout << "TARGET_MTOF_OBJE1 not defined! Use fObj.at(0) if you want first.\n";
+    fCorrelatedOBJE1 = sqrt(-1);
+    return fCorrelatedOBJE1 = sqrt(-1);
   }
-  return fCorrelatedE1Up;
+  if(fObj.size() && fE1Up.size()){
+    fCorrelatedOBJE1 = std::numeric_limits<double>::max(); 
+    for(size_t i=0;i<fObj.size();i++) {     
+      for (size_t j=0; j < fE1Up.size(); j++){
+        double newvalue = fObj.at(i)-fE1Up.at(j);
+        if(std::abs(target - newvalue) < std::abs(target - fCorrelatedOBJE1)) {
+          fCorrelatedOBJE1 = newvalue;
+        }
+      }
+    }
+  }
+  return fCorrelatedOBJE1;
 }
 
-double TMTof::GetCorrelatedObj() const{
-//Determines correlated time-of-flights based on TARGET_MTOF_# GValues
-//Values are set in TMTof as fCorrelatedXFP, fCorrelatedObj, etc.
-//Note that if the GValues are not set, the first value in each time-of-flight 
-//is taken.
-  double target = GValue::Value("TARGET_MTOF_Obj");
-  if(fObj.size() && !std::isnan(target)){
-    fCorrelatedOBJ = fObj.at(0);
-    for(size_t i=1;i<fObj.size();i++) {     
-      double newvalue = fObj.at(i);
-      if(std::abs(target - newvalue) < std::abs(target - fCorrelatedOBJ)) {
-        fCorrelatedOBJ = newvalue;
-      } 
-    }  
-  } else if(fObj.size()) {
-    fCorrelatedOBJ = fObj.at(0);
-  } else {
-    fCorrelatedOBJ = sqrt(-1);
+double TMTof::GetCorrelatedXfpE1() const{
+  double target = GValue::Value("TARGET_MTOF_XFPE1");
+  if (std::isnan(target)){
+    std::cout << "TARGET_MTOF_XFPE1 not defined! Use fXfp.at(0) if you want first.\n";
+    fCorrelatedXFPE1 = sqrt(-1);
+    return fCorrelatedXFPE1;
   }
-  return fCorrelatedOBJ;
-}
-
-double TMTof::GetCorrelatedXfp() const{
-//Determines correlated time-of-flights based on TARGET_MTOF_# GValues
-//Values are set in TMTof as fCorrelatedXfp, fCorrelatedXfp, etc.
-//Note that if the GValues are not set, the first value in each time-of-flight 
-//is taken.
-  double target = GValue::Value("TARGET_MTOF_Xfp");
-  if(fXfp.size() && !std::isnan(target)){
-    fCorrelatedXFP = fXfp.at(0);
-    for(size_t i=1;i<fXfp.size();i++) {     
-      double newvalue = fXfp.at(i);
-      if(std::abs(target - newvalue) < std::abs(target - fCorrelatedXFP)) {
-        fCorrelatedXFP = newvalue;
-      } 
-    }  
-  } else if(fXfp.size()) {
-    fCorrelatedXFP = fXfp.at(0);
-  } else {
-    fCorrelatedXFP = sqrt(-1);
+  if(fXfp.size() && fE1Up.size()){
+    fCorrelatedXFPE1 = std::numeric_limits<double>::max(); 
+    for(size_t i=0;i<fXfp.size();i++) {     
+      for (size_t j=0; j < fE1Up.size(); j++){
+        double newvalue = fXfp.at(i)-fE1Up.at(j);
+        if(std::abs(target - newvalue) < std::abs(target - fCorrelatedXFPE1)) {
+          fCorrelatedXFPE1 = newvalue;
+        }
+      }
+    }
   }
-  return fCorrelatedXFP;
+  return fCorrelatedXFPE1;
 }
-
-
-
 
 void TMTof::Print(Option_t *opt) const {    }

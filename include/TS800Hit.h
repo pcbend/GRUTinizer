@@ -386,22 +386,14 @@ class TMTof : public TDetectorHit {
     //TARGET_MTOF_# GValues. Values are set in TMTof as fCorrelatedXfp,
     //fCorrelatedXfp, etc.  Note that if the GValues are not set, the first
     //value in each time-of-flight is taken.
-   double  GetCorrelatedXfp()  const; 
-    double  GetCorrelatedObj()  const;
-    double  GetCorrelatedE1Up() const;
-
-    double  GetCorrelatedXfpE1()  const { return GetCorrelatedXfp()-GetCorrelatedE1Up(); }  //!
-    double  GetCorrelatedObjE1()  const { return GetCorrelatedObj()-GetCorrelatedE1Up(); }  //!
+    double  GetCorrelatedXfpE1()  const;   //!
+    double  GetCorrelatedObjE1()  const;   //!
 
 
 
   private:
-    mutable double fCorrelatedXFP;   //!
-    mutable double fCorrelatedOBJ;   //!
-    mutable double fCorrelatedE1Up;    //!
-    //mutable int fCorrelatedXFP_Ch15;   //!
-    //mutable int fCorrelatedOBJ_Ch15;   //!
-    //mutable int fCorrelatedE1_Ch15;    //!
+    mutable double fCorrelatedXFPE1;   //!
+    mutable double fCorrelatedOBJE1;   //!
 
   public:
     std::vector<unsigned short> fE1Up;         // Channel 0
