@@ -154,9 +154,6 @@ double TGretinaHit::GetDopplerYta(double beta, double yta, const TVector3 *vec, 
   if(vec==0) {
     vec = &BeamUnitVec;
   }
-  double tmp = 0.0;
-  double gamma = 1./(sqrt(1.-pow(beta,2.)));
-  TVector3 gret_pos = GetPosition();
   //Target offsets determine new reference point in lab frame
   double xoffset = GValue::Value("TARGET_X_OFFSET");
   if(std::isnan(xoffset))
@@ -167,8 +164,20 @@ double TGretinaHit::GetDopplerYta(double beta, double yta, const TVector3 *vec, 
   double zoffset = GValue::Value("TARGET_Z_OFFSET");
   if(std::isnan(zoffset))
       zoffset=0.00; 
+  return GetDopplerYta(beta, yta, xoffset, yoffset, zoffset, vec, EngRange);
+}
 
+double TGretinaHit::GetDopplerYta(double beta, double yta, double xoffset, double yoffset, double zoffset, const TVector3 *vec, int EngRange) const {
+  if(Size()<1)
+    return 0.0;
+  if(vec==0) {
+    vec = &BeamUnitVec;
+  }
+  double tmp = 0.0;
+  double gamma = 1./(sqrt(1.-pow(beta,2.)));
+  TVector3 gret_pos = GetPosition();
 
+  //Target offsets determine new reference point in lab frame
   gret_pos.SetX(gret_pos.X() - xoffset);
   gret_pos.SetY(gret_pos.Y() - (yoffset - yta));
   gret_pos.SetZ(gret_pos.Z() - zoffset);

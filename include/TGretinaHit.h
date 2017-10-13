@@ -146,6 +146,7 @@ public:
   } 
   
   double GetDopplerYta(double beta , double yta, const TVector3 *vec=0, int EngRange =-1) const;
+  double GetDopplerYta(double beta , double yta, double target_x_shift, double target_y_shift, double target_z_shift, const TVector3 *vec=0, int EngRange =-1) const;
   double GetDoppler(const TS800 *s800,bool doDTAcorr=false,int EngRange=-1);
   double GetDoppler_dB(double beta,const TVector3 *vec=0, double Dta=0);
 
