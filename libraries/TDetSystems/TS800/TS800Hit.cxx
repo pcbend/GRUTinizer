@@ -776,11 +776,19 @@ double TMTof::GetCorrelatedObjE1() const{
     fCorrelatedOBJE1 = sqrt(-1);
     return fCorrelatedOBJE1 = sqrt(-1);
   }
+
+  //shift allows "shifting" of TOF to line up different runs. Necessary when,
+  //e.g., the voltage on a scintillator changes during an experiment
+  double shift = GValue::Value("SHIFT_MTOF_OBJE1");
+  
   if(fObj.size() && fE1Up.size()){
     fCorrelatedOBJE1 = std::numeric_limits<double>::max(); 
     for(size_t i=0;i<fObj.size();i++) {     
       for (size_t j=0; j < fE1Up.size(); j++){
         double newvalue = fObj.at(i)-fE1Up.at(j);
+        if (!std::isnan(shift)){
+          newvalue += shift;
+        }
         if(std::abs(target - newvalue) < std::abs(target - fCorrelatedOBJE1)) {
           fCorrelatedOBJE1 = newvalue;
         }
