@@ -717,7 +717,66 @@ void TCrdcPad::Copy(TObject &obj) const {
 
 }
 
+THodoscope::THodoscope() { Clear(); }
+THodoscope::~THodoscope() { Clear(); }
+THodoscope::THodoscope(const THodoscope &hodoscope) { 
+  hodoscope.Copy(*this); 
+}
 
+void THodoscope::Copy(TObject &obj) const {
+  TDetectorHit::Copy(obj);
+  THodoscope &hodo = (THodoscope&)obj;
+  hodo.hodo_hits = hodo_hits;
+}
+
+void THodoscope::Clear(Option_t *opt){
+  TDetectorHit::Clear(opt);
+  hodo_hits.clear();
+}
+
+void THodoscope::Print(Option_t *opt) const {
+  printf("Number of Hits: %zu\n",Size());
+  for(unsigned int i=0;i<Size();i++) {
+    printf("\t");
+    GetHodoHit(i).Print();
+  }
+  printf("---------------------------------------\n");
+}
+
+
+void THodoscope::InsertHit(const TDetectorHit& hit){
+  hodo_hits.emplace_back((THodoHit&)hit);
+}
+
+TDetectorHit& THodoscope::GetHit(int i){
+  return hodo_hits.at(i);
+}
+
+const THodoHit& THodoscope::GetHodoHit(int i) const {
+  return hodo_hits.at(i);
+}
+
+THodoHit& THodoscope::GetHodoHit(int i) {
+  return hodo_hits.at(i);
+}
+
+THodoHit::THodoHit(const THodoHit &hit){
+  hit.Copy(*this);
+}
+
+void THodoHit::Copy(TObject &obj) const {
+  TDetectorHit::Copy(obj);
+  THodoHit &hit = (THodoHit&)obj;
+  hit.fChannel = fChannel;
+}
+
+void THodoHit::Print(Option_t *opt) const{
+  printf("Channel: %d Charge: %d\n", GetChannel(), GetCharge());
+}
+void THodoHit::Clear(Option_t *opt){
+  TDetectorHit::Clear(opt);
+  fChannel = -1;
+}
 
 TMTof::TMTof() { Clear(); }
 

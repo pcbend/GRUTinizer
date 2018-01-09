@@ -25,6 +25,7 @@
 #pragma link C++ class TIonChamber+;
 #pragma link C++ class TCrdcPad+;
 #pragma link C++ class THodoHit+;
+#pragma link C++ class THodoscope+;
 
 
 #pragma link C++ class TInverseMap+;

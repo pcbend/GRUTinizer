@@ -291,7 +291,7 @@ class TTOFHit :  public TS800Channel {
   ClassDef(TTOFHit,1);
 };
 
-
+/*
 class THodoHit : public TS800Channel {
   public:
     THodoHit() { Clear(); }
@@ -312,6 +312,7 @@ class THodoHit : public TS800Channel {
 
   ClassDef(THodoHit,1)
 };
+*/
 
 
 class TFPScint :  public TS800Channel {
@@ -361,6 +362,52 @@ class TIonChamber : public TS800Channel {
 
 };
 */
+class THodoHit : public TDetectorHit{
+  public:
+    THodoHit() { Clear(); }
+    THodoHit(const THodoHit&);
+
+    virtual void Copy(TObject &) const;
+    virtual void Print(Option_t *opt="") const;
+    virtual void Clear(Option_t *opt="");
+
+
+    void SetChannel(int channel) { fChannel = channel;} 
+    
+    int GetCharge() const { return Charge(); }
+    int GetChannel() const { return fChannel; }
+  private:
+    int fChannel;
+
+    ClassDef(THodoHit, 1); 
+};
+
+class THodoscope : public TDetectorHit {
+  public:
+    THodoscope();
+    virtual ~THodoscope();
+    THodoscope(const THodoscope&);
+
+    virtual void Copy(TObject&) const;
+    virtual void Print(Option_t *opt="") const;
+    virtual void Clear(Option_t *opt="");
+
+    void InsertHit(const TDetectorHit&);
+
+    TDetectorHit& GetHit(int i);
+    THodoHit& GetHodoHit(int i);
+    const THodoHit& GetHodoHit(int i) const;
+    std::vector<THodoHit> GetHodoHits() const { return hodo_hits; } ;
+    
+    size_t Size() const { return hodo_hits.size(); } 
+    
+
+    std::vector<THodoHit> hodo_hits;
+
+    ClassDef(THodoscope, 1); 
+
+};
+
 
 class TMTof : public TDetectorHit {
   public:

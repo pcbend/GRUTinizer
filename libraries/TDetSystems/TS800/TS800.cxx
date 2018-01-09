@@ -50,6 +50,7 @@ void TS800::Copy(TObject& obj) const {
   ion.Copy(other.ion);
   crdc1.Copy(other.crdc1);
   crdc2.Copy(other.crdc2);
+  hodo.Copy(other.hodo);
 }
 
 
@@ -218,6 +219,7 @@ void TS800::Clear(Option_t* opt){
   trigger.Clear();
   ion.Clear();
 
+  hodo.Clear();
 
 }
 
@@ -265,7 +267,7 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
 	break;
       case 0x5840:  // CRDC Packet
 	//event.Print("all0x58400x5845");
-        HandleCRDCPacket(dptr+1,sizeleft);
+  HandleCRDCPacket(dptr+1,sizeleft);
 	break;
       case 0x5850:  // II CRDC Packet
 	break;
@@ -280,6 +282,7 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
       case 0x58a0:  // Obj Pin Packet
 	break;
       case 0x58b0:  // S800 Hodoscope
+  HandleHodoPacket(dptr+1, sizeleft);
 	break;
       case 0x58c0:  // VME ADC
 	break;
@@ -367,6 +370,7 @@ int TS800::BuildHits(UShort_t eventsize,UShort_t *dptr,Long64_t timestamp) {  //
       x += size +1;
       break;
     case 0x58b0:  // S800 Hodoscope
+      HandleHodoPacket(dptr+1, sizeleft);
       break;
     case 0x58c0:  // VME ADC
       break;
@@ -682,8 +686,43 @@ bool TS800::HandleIonCPacket(unsigned short* data, int size){
   return true;
 }
 
+
+//Hodoscope packets are described in detail on the following website:
+//https://wikihost.nscl.msu.edu/S800Doc/doku.php?id=event_filter#hodoscope_packet
+bool TS800::HandleHodoPacket(unsigned short *data,int size) {
+  if(!size)
+    return false;
+  
+  //ID is the Hodoscope Sub-pcket "Energy" tag
+  //If ID == 0, then we are dealing with channels (0,15), if ID == 1, then we
+  //are dealing with channels (16,31)
+  int id = *data; ++data;
+  size -= 1;
+
+  if (id == 2){
+    ++data; ++data; 
+    size -= 2;//skipping hit pattern events
+  }
+  while (size){
+    if (id == 2 && size != 0){
+      std::cout << "Que? Not properly skipping hit registers\n";
+    }
+    unsigned short cur_packet = *data; ++data; size -= 1; 
+    //Energy values are 16-bit integers, where the 13th bit is the channel number
+    //(0,15) and the first 12 bits are the energy.
+    unsigned short charge = cur_packet & 0x0fff;
+    unsigned short channel = id*16 + (cur_packet >> 12);
+
+    THodoHit hit;
+    hit.SetChannel(channel);
+    hit.SetCharge(charge);
+    hodo.InsertHit(hit);
+  }
+
+  return true;
+}
 /*
-bool TS800::HandleHODOPacket(char *data,unsigned short size) {
+bool TS800::HandleHODOPacket(unsigned short *data,int size) {
   if(!size)
     return false;
   //printf("HODO id: 0x%04x\n",(*((unsigned short*)data)));
@@ -714,7 +753,6 @@ bool TS800::HandleHODOPacket(char *data,unsigned short size) {
   return true;
 }
 */
-
 bool TS800::HandleMTDCPacket(unsigned short *data,int size) {
   int x = 0;
   while(x<size){
@@ -1162,7 +1200,7 @@ double TS800::GetMTofXfpE1() const {
     fflush(stdout);
     return sqrt(-1);
   }
-  GetMTofXfpE1(afp_cor, xfp_cor);
+  return GetMTofXfpE1(afp_cor, xfp_cor);
 }
 
 double TS800::GetMTofXfpE1(double afp_cor, double xfp_cor) const {

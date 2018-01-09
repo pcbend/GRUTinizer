@@ -62,6 +62,7 @@ public:
   TScintillator &GetScint(int x=0) const { return (TScintillator&)scint[x]; }
   //Added 1/4/2016 for getting trigbit - BAE
   TTrigger      &GetTrigger()      const { return (TTrigger&)trigger;}
+  THodoscope &GetHodoscope() const { return (THodoscope&)hodo;}
 
   
   float GetIonSum() const { return ion.GetSum(); }
@@ -142,6 +143,7 @@ private:
   bool HandleIonCPacket(unsigned short*,int);     //!
   bool HandleCRDCPacket(unsigned short*,int);     //!
   bool HandleMTDCPacket(unsigned short*,int);     //!
+  bool HandleHodoPacket(unsigned short*,int);     //!
 
   TScintillator scint[3];
   TTrigger     trigger;
@@ -150,7 +152,7 @@ private:
   TIonChamber  ion;
   TCrdc        crdc1;
   TCrdc        crdc2;
-  //THodoscope   hodo[32];
+  THodoscope   hodo;
   //TMultiHitTof multi_tof;
   
   Long_t fEventCounter;
