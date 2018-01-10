@@ -1,4 +1,5 @@
 #include "TNSCLEvent.h"
+#include "TGRUTOptions.h"
 
 #include <cassert>
 
@@ -23,6 +24,11 @@ Int_t TNSCLEvent::GetBodyHeaderSize() const {
 
 long TNSCLEvent::GetTimestamp() const {
   if(GetBodyHeaderSize() > 4) {
+    if(TGRUTOptions::Get()->UseFSU()) {
+      Long_t tl = *((Int_t*)(GetBody()+8));
+      Long_t th = *((Int_t*)(GetBody()+12));
+      return ((th<<32) + tl);
+    }
     return *((Long_t*)(GetBody()+4));
   } else {
     return -1;

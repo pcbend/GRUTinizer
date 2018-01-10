@@ -49,6 +49,7 @@ public:
   bool MakeHistos()         const { return fMakeHistos; }
   bool SortMultiple()       const { return fSortMultiple; }
 
+  bool UseFSU()             const { return fFSU; }
 
   bool IsOnline()           const { return fIsOnline; }
 
@@ -109,6 +110,8 @@ private:
   bool fMakeHistos;
   bool fSortMultiple;
   bool fSuppressErrors;
+
+  bool fFSU;
 
   bool fTimeSortInput;
   int fTimeSortDepth;

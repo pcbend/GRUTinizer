@@ -24,6 +24,8 @@ enum kDetectorSystems {
 
   CAESAR = 80,
 
+  FSU = 99,
+
   PHOSWALL = 17,
 
   NSCLSCALERS = 100

@@ -16,6 +16,7 @@
 #include "TSega.h"
 #include "TFastScint.h"
 #include "TLenda.h"
+#include "TFSU.h"
 
 TUnpackedEvent::TUnpackedEvent() { }
 
@@ -86,6 +87,9 @@ void TUnpackedEvent::Build() {
     case kDetectorSystems::LENDA:
       GetDetector<TLenda>(true)->Build(raw_data);
       break;
+
+    case kDetectorSystems::FSU:
+      GetDetector<TFSU>(true)->Build(raw_data);
 
     default:
       break;

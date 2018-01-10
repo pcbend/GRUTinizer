@@ -12,7 +12,8 @@ std::map<std::string, kDetectorSystems> detector_system_map{
   {"Phoswall",        kDetectorSystems::PHOSWALL},
   {"S800",            kDetectorSystems::S800},
   {"S800_SIM",        kDetectorSystems::S800_SIM},
-  {"FastScint",       kDetectorSystems::FASTSCINT}
+  {"FastScint",       kDetectorSystems::FASTSCINT},
+  {"FSU",             kDetectorSystems::FSU}
 };
 
 

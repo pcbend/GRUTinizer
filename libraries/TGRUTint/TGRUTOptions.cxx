@@ -48,6 +48,8 @@ void TGRUTOptions::Clear(Option_t* opt) {
   fMakeHistos = false;
   fSortMultiple = false;
 
+  fFSU = false;
+
   fShouldExit = false;
   fSuppressErrors = false;
 }
@@ -140,6 +142,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .description("Show version information");
   parser.option("suppress-errors", &fSuppressErrors)
     .description("Suppress errors");
+  parser.option("fsu",&fFSU)
+    .description("use FSU style DDAS format")
+    .default_value(false);
 
 
   // Look for any arguments ending with .info, pass to parser.
