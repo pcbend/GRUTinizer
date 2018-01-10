@@ -5,6 +5,7 @@
 
 #include "TRawEvent.h"
 #include "TRawSource.h"
+#include "TString.h"
 
 class TOrderedRawFile : public TRawEventSource {
 
@@ -16,8 +17,22 @@ public:
   size_t GetDepth() const { return depth; }
   virtual void Reset() { unordered->Reset(); }
 
-  virtual std::string SourceDescription() const { return unordered->SourceDescription(); }
-  virtual std::string Status()            const { return unordered->Status(); }
+  virtual std::string SourceDescription(bool long_description = false) const {
+    return unordered->SourceDescription(long_description);
+  }
+  virtual std::string Status(bool long_description = false) const {
+    static bool returnonce = false;
+    if(unordered->IsFinished()) {
+      if(!returnonce) {
+        printf("\n");
+        returnonce=true;
+      }
+      return Form("  %lu left to sort...          \r",event_queue.size());
+
+    } else {
+      return unordered->Status(long_description);
+    }
+  }
   virtual int GetLastErrno()              const { return unordered->GetLastErrno(); }
   virtual std::string GetLastError()      const { return unordered->GetLastError(); }
 

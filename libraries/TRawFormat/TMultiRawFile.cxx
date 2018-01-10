@@ -47,6 +47,18 @@ int TMultiRawFile::GetEvent(TRawEvent& outevent){
     return -1;
   }
 
+  static TRawEventSource* stalled_source = nullptr;
+  if (stalled_source) {
+    FileEvent next;
+    int bytes_read = stalled_source->Read(next.next_event);
+    if (bytes_read > 0) {
+      next.file = stalled_source;
+      fFileEvents.insert(next);
+      stalled_source = nullptr;
+    }
+    return -1;
+  }
+
   // Pop the event, place in output
   FileEvent output = *fFileEvents.begin();
   fFileEvents.erase(fFileEvents.begin());
@@ -58,7 +70,9 @@ int TMultiRawFile::GetEvent(TRawEvent& outevent){
   int bytes_read = next.file->Read(next.next_event);
   if(bytes_read > 0){
     fFileEvents.insert(next);
-  } else {
+  } else if (!TGRUTOptions::Get()->ExitAfterSorting()) {
+    stalled_source = next.file;
+  } else { // otherwise delete the source from the file list
     std::lock_guard<std::mutex> lock(fFileListMutex);
     delete output.file;
     fFileList.erase(output.file);
@@ -75,20 +89,20 @@ void TMultiRawFile::Reset() {
   }
 }
 
-std::string TMultiRawFile::SourceDescription() const{
+std::string TMultiRawFile::SourceDescription(bool long_description) const{
   std::lock_guard<std::mutex> lock(fFileListMutex);
 
   std::stringstream ss;
   ss << "Multi file: ";
   int i=0;
   for(auto& file : fFileList){
-    ss << i << " = (" << file->SourceDescription() << ") ";
+    ss << i << " = (" << file->SourceDescription(long_description) << ") ";
     i++;
   }
   return ss.str();
 }
 
-std::string TMultiRawFile::Status() const{
+std::string TMultiRawFile::Status(bool long_description) const{
   std::lock_guard<std::mutex> lock(fFileListMutex);
 
   std::stringstream ss;
@@ -101,7 +115,7 @@ std::string TMultiRawFile::Status() const{
 
   size_t max_length = 0;
   for(auto& file : fFileList){
-    max_length = std::max(max_length, file->SourceDescription().length());
+    max_length = std::max(max_length, file->SourceDescription(long_description).length());
   }
 
   for(auto& file : fFileList){

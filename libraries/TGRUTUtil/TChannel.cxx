@@ -8,7 +8,10 @@
 #include <sstream>
 #include <utility>
 
+#include "TBuffer.h"
 #include "TRandom.h"
+
+#include "GRootFunctions.h"
 
 std::map<unsigned int,TChannel*> TChannel::fChannelMap;
 TChannel *TChannel::fDefaultChannel = new TChannel("TChannel",0xffffffff);
@@ -51,7 +54,7 @@ std::ostream& operator<<(std::ostream& out, const TChannel& chan) {
       << "   Position:\t" << chan.array_position << "\n"
       << "   Subposition:\t" << chan.array_subposition << "\n"
       << "   Segment:\t" << chan.segment << "\n"
-      << "   Collected_Charge:\t" << chan.collected_charge << "\n"
+      //<< "   Collected_Charge:\t" << chan.collected_charge << "\n"
       << "   Pedestal:\t" << chan.pedestal << "\n";
 
   // Print out each energy coefficient
@@ -303,6 +306,11 @@ double TChannel::CalEnergy(double charge, double timestamp) const {
   return Calibrate(charge-pedestal, GetEnergyCoeff(timestamp));
 }
 
+double TChannel::CalEfficiency(double energy) const {
+  return Efficiency(energy,GetEfficiencyCoeff());
+}
+
+
 const std::vector<double>& TChannel::GetTimeCoeff(double timestamp) const {
   for(auto& tc : time_coeff) {
     if(timestamp >= tc.start_time) {
@@ -370,6 +378,19 @@ double TChannel::Calibrate(double value, const std::vector<double>& coeff) {
   return cal_value;
 }
 
+double TChannel::Efficiency(double energy,const std::vector<double>& coeff) {
+  // EFF = 10^(A0 + A1*LOG(E) + A2*LOG(E)^2 + A3/E^2);
+  if(coeff.size()<4) {
+    return 0.0;
+  }
+  return GRootFunctions::GammaEff(&energy,const_cast<double*>(&coeff[0]));
+}
+
+
+
+
+
+
 int TChannel::ReadCalFile(const char* filename,Option_t *opt) {
   std::string infilename = filename;
   if(infilename.length()==0)
@@ -417,7 +438,7 @@ int TChannel::WriteCalFile(std::string outfilename,Option_t *opt) {
   //}
   int count =0;
   if(outfilename.length()>0) {
-    ofstream calout;
+    std::ofstream calout;
     calout.open(outfilename.c_str());
     for(auto &iter : chanvec) {
       calout << iter.PrintToString(opt);

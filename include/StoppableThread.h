@@ -4,6 +4,7 @@
 #ifndef __CINT__
 #include <atomic>
 #include <condition_variable>
+#include <mutex>
 #include <thread>
 #endif
 
@@ -15,7 +16,6 @@
 class StoppableThread {
 public:
   static void StopAll();
-  static void StopAllClean();
   static bool AnyThreadRunning();
   static std::string AnyThreadStatus();
 
@@ -43,10 +43,10 @@ public:
   //protected:
   virtual bool Iteration() = 0;
 
-  virtual size_t GetItemsPopped()   = 0; //{ return items_in; }
-  virtual size_t GetItemsPushed()   = 0; //{ return items_out; }
-  virtual size_t GetItemsCurrent()  = 0; //{ return items_in; }
-  virtual size_t GetRate()          = 0; //{ return rate; }
+  virtual size_t GetItemsPopped()   { return -1; };
+  virtual size_t GetItemsPushed()   { return -1; };
+  virtual size_t GetItemsCurrent()  { return -1; };
+  virtual size_t GetRate()          { return -1; };
 
   static int GetNThreads();
 
@@ -65,6 +65,9 @@ public:
 
 protected:
   static std::map<std::string,StoppableThread*> fthreadmap;
+#ifndef __CINT__
+  static std::timed_mutex fthreadmap_mutex;
+#endif
 
   //long items_in;
   //long items_out;

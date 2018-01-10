@@ -4,24 +4,15 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#ifndef __CINT__
+  #include <memory>
+#endif
 
 #include "TNamed.h"
 #include "TMath.h"
 #include "TGraph.h"
 
 #include "TNucleus.h"
-
-#ifndef PI
-#define PI (3.14159265358979312e+00)
-#endif
-
-#ifndef R2D
-#define R2D (5.72957795130823229e+01)
-#endif
-
-#ifndef D2R
-#define D2R (1.74532925199432955e-02)
-#endif
 
 // *********** *********** *********** *********** *********** *********** *********** //
 //
@@ -56,12 +47,18 @@
 
 class TReaction : public TNamed {
 public:
-  TReaction(const char *beam, const char *targ, const char *ejec, const char *reco, double ebeam=0.0, double ex3=0.0, bool inverse=false);
+  TReaction(const char *beam, const char *targ, const char *ejec, const char *reco,
+            double ebeam=0.0, double ex3=0.0, bool inverse=false);
+#ifndef __CINT__
+  TReaction(std::shared_ptr<TNucleus> beam, std::shared_ptr<TNucleus> targ,
+            std::shared_ptr<TNucleus> ejec, std::shared_ptr<TNucleus> reco,
+            double ebeam=0.0, double ex3=0.0, bool inverse=false);
+#endif
 
   void InitReaction();
 
   // returns reaction input parameters
-  TNucleus *GetNucleus(int part) { return fNuc[part];}
+  TNucleus *GetNucleus(int part);
   double GetM(int part) {  return fM[part]; }
   double GetExc() { return fExc; }
   double GetQVal() { return fQVal; }
@@ -151,7 +148,9 @@ private:
   void SetCmFrame(double exc); // enables the reaction to be modified using excitation energy
 
   // USER INPUTS
-  TNucleus* fNuc[4];
+#ifndef __CINT__
+  std::shared_ptr<TNucleus> fNuc[4];
+#endif
   double fTBeam;
   bool fInverse;
   double fExc;

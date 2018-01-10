@@ -15,12 +15,15 @@ public:
 
   void Copy(TObject& obj) const;
 
+  virtual void Print(Option_t* opt = "") const;
   virtual void Clear(Option_t* opt = "");
 
   virtual void InsertHit(const TDetectorHit&);
-  virtual TFastScintHit*    GetLaBrHit(int i);
+  virtual TFastScintHit GetLaBrHit(int i) const;
   virtual TDetectorHit& GetHit(int i);
-  virtual int Size();
+          TFastScintHit* FindHit(int);
+  virtual unsigned int Size() const;
+  virtual int GoodSize() const;
 
   int GetDetNumberIn_fs_hits(Int_t det);
   
@@ -37,6 +40,11 @@ public:
   //int GetQDC_Count()  {return qdc_channels; }
   int GetErrors() {return errors; };
 
+  void SetTrigTime(UShort_t time) { trig_time = time; }
+  int GetTrigTime()	      { return trig_time; }
+
+  static TVector3& GetPosition(int); 
+
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 
@@ -47,6 +55,8 @@ private:
 
   int qdc_TS;
   int tdc_TS;
+
+  int trig_time;
 
   static int errors; //!
 

@@ -17,7 +17,7 @@ public:
   virtual void Print(Option_t *opt) const;
   virtual void Clear(Option_t *opt);
 
-  int Size()           const { return scalers.size(); }
+  unsigned int Size()           const { return scalers.size(); }
   int GetScaler(int i) const { return scalers.at(i);  }
 
   // These functions are needed to satisfy TDetector's requirements.

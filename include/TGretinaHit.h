@@ -16,11 +16,13 @@
 #define MAXHPGESEGMENTS 36
 
 class TSmartBuffer;
+class TS800;
 
 class TGretinaHit : public TDetectorHit {
 
 public:
   TGretinaHit();
+  TGretinaHit(const TGretinaHit& hit){ hit.Copy(*this); }
   ~TGretinaHit();
 
   void Copy(TObject& obj) const;
@@ -44,6 +46,15 @@ public:
 
   void  Print(Option_t *opt="") const;
   void  Clear(Option_t *opt="");
+  Int_t Compare(const TObject *obj) const { 
+    TGretinaHit *other = (TGretinaHit*)obj;
+    if(this->GetCoreEnergy()>other->GetCoreEnergy())
+      return -1;
+    else if(this->GetCoreEnergy()<other->GetCoreEnergy())
+      return 1;  //sort largest to smallest.
+    return 0;
+  }
+  
   Int_t Size() const { return fNumberOfInteractions; }//fSegmentNumber.size(); }
 
   double GetX() const { return GetPosition().X(); }
@@ -65,8 +76,26 @@ public:
   bool HasInteractions() { return fNumberOfInteractions; }
   //TGretinaHit& operator+=(const TGretinaHit&);
   //TGretinaHit& operator+(const TGretinaHit&);
+  bool operator<(const TGretinaHit &rhs) const { return fCoreEnergy > rhs.fCoreEnergy; }
 
 
+
+  double GetDopplerSim(double beta, double en,const TVector3 *gvec=0, const TVector3 *vec=0){
+    if(Size()<1)
+      return 0.0;
+    if(vec==0) {
+      vec = &BeamUnitVec;
+    }
+    TVector3 vechold = GetPosition();
+    if(gvec==0){
+      gvec = &vechold;
+    }
+    
+    double tmp = 0.0;
+    double gamma = 1/(sqrt(1-pow(beta,2)));
+    tmp = en*gamma *(1 - beta*TMath::Cos(gvec->Angle(*vec)));
+    return tmp;
+  }
   double GetDoppler(double beta,const TVector3 *vec=0) {
     if(Size()<1)
       return 0.0;
@@ -77,8 +106,19 @@ public:
     double gamma = 1/(sqrt(1-pow(beta,2)));
     tmp = fCoreEnergy*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*vec)));
     return tmp;
-  }
-  
+  } 
+  double GetDoppler_2(double beta,const TVector3 *vec=0) {
+    if(Size()<1)
+      return 0.0;
+    if(vec==0) {
+      vec = &BeamUnitVec;
+    }
+    double tmp = 0.0;
+    double gamma = 1/(sqrt(1-pow(beta,2)));
+    tmp = fCoreEnergy*gamma *(1 - beta*TMath::Cos(GetPosition_2().Angle(*vec)));
+    return tmp;
+  } 
+  double GetDoppler(const TS800 *s800,bool doDTAcorr=false,int EngRange=-1);
   double GetDoppler(int EngRange, double beta,const TVector3 *vec=0) {
     if(Size()<1)
       return 0.0;
@@ -90,9 +130,6 @@ public:
     tmp = GetCoreEnergy(EngRange)*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*vec)));
     return tmp;
   }
-
-
-
 
 
 
@@ -109,6 +146,8 @@ public:
   TVector3 GetLocalPosition(int i) const;
   //TVector3 GetCrystalPosition(int i)     const { return TVector3(0,0,1): }
   TVector3 GetPosition()                  const { return GetFirstIntPosition(); }
+  TVector3 GetPosition_2()                const { return GetFirstIntPosition_2(); }
+  TVector3 GetLastPosition()              const;
 
   TVector3 GetCrystalPosition()           const; 
   TVector3 GetSegmentPosition()           const; 
@@ -116,18 +155,18 @@ public:
 
 
   TVector3 GetFirstIntPosition() const;
+  TVector3 GetFirstIntPosition_2() const;
   TVector3 GetSecondIntPosition() const;
 
-  bool CheckAddback(const TGretinaHit&) const;
-  void AddToSelf(const TGretinaHit& other, double& max_energy);
+  void AddToSelf(const TGretinaHit& other);
 
   //void SetPosition(TVector3 &vec) { fCorePosition = vec; }
 
 
+  void   SetCoreEnergy(float temp) const { fCoreEnergy = temp; }
 
 
-
-private:
+//private:
   void SortHits();
 
   Long_t  fTimeStamp;
@@ -135,7 +174,7 @@ private:
 
   Int_t   fAddress;
   Int_t   fCrystalId;
-  Float_t fCoreEnergy;
+  mutable Float_t fCoreEnergy;
   Int_t   fCoreCharge[4];
 
   Int_t   fPad;

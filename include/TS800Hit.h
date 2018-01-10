@@ -60,11 +60,11 @@ class TTrigger : public TDetectorHit {
     void SetExternalSource2(short sou)  { fexternalsource2=sou; }
     void SetSecondarySource(short sou)  { fsecondarysource=sou; }
 
-    unsigned short GetRegistr() { return fregistr; }
-    short GetS800Source()       { return fs800source; }
-    short GetExternalSource1()  { return fexternalsource1; }
-    short GetExternalSource2()  { return fexternalsource2; }
-    short GetSecondarySource()  { return fsecondarysource; }
+    unsigned short GetRegistr() const { return fregistr; }
+    short GetS800Source()       const { return fs800source; }
+    short GetExternalSource1()  const { return fexternalsource1; }
+    short GetExternalSource2()  const { return fexternalsource2; }
+    short GetSecondarySource()  const { return fsecondarysource; }
 
     virtual void Copy(TObject &)         const;
     virtual void Print(Option_t *opt="") const;
@@ -165,6 +165,9 @@ class TCrdc : public TDetectorHit {
 
   private:
     virtual int Charge() const { return 0; }
+
+    bool IsGoodSample(int i) const;
+    
     short fId;
     std::vector<int> channel;
     std::vector<int> sample;
@@ -223,11 +226,21 @@ class TIonChamber : public TDetectorHit {
     int GetData(int i)    const { if(i>=Size()) return -1; return fData.at(i); }
     int Size() const { return fChan.size(); }
     float GetdE();
-    float GetSum();
+    float GetSum() const;
     float GetAve();
     float GetdECorr(TCrdc*);
 
     int  Address(int i) const { return TDetectorHit::Address() + GetChannel(i); }
+
+
+    float GetCalData(int i) const {
+      TChannel *c = TChannel::GetChannel(Address(GetChannel(i)));
+      if(c){
+        return c->CalEnergy(GetData(i));
+      }else{
+       return (float)GetData(i);
+      }
+    }
 
     virtual void Copy(TObject&) const;
     virtual void Print(Option_t *opt="") const;
@@ -388,7 +401,6 @@ class TMTof : public TDetectorHit {
     std::vector<unsigned short> fRef;          // Channel 15, same as E1Up (different cable.)
 
     //std::vector<int> fGalotte;
-    //
     //
     virtual Int_t Charge() const  {return 0;}
     //

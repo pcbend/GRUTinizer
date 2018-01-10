@@ -1,9 +1,11 @@
 #include "TDetector.h"
 
-#include <TRawEvent.h>
 #include <iostream>
 
-#include <TClass.h>
+#include "TRawEvent.h"
+
+#include "TBuffer.h"
+#include "TClass.h"
 
 ClassImp(TDetector)
 
@@ -26,6 +28,7 @@ void TDetector::Clear(Option_t *opt) {
   fTimestamp = -1;
   fSize = 0;
   fRunStart = 0;
+  fRawData.clear();
 }
 
 void TDetector::Print(Option_t *opt) const { }
@@ -52,8 +55,34 @@ int TDetector::Compare(const TObject& obj) const {
 
 int TDetector::Build(std::vector<TRawEvent>& raw_data){
   int output = BuildHits(raw_data);
-  if(output>0){
-    SetBit(kUnbuilt,0);
-  }
+  //if(output>0){
+  SetBit(kUnbuilt,0);  // if we called build on it, assume it is built whether or not it actually made any hits.  pcb.
+  //}
   return output;
+}
+
+
+
+
+int TDetector::Build() {
+  //this is a debug hack added by pcb on 5/1/16
+  return BuildHits(fRawData);
+}
+
+int TDetector::BuildHits(std::vector<TRawEvent*> &raw_data) {
+  //this is a debug hack added by pcb on 5/1/16
+  std::vector<TRawEvent> event;
+  for(auto it : fRawData) {
+    event.push_back(*it);
+  }
+  return BuildHits(event);
+}
+
+
+void TDetector::Streamer(TBuffer &r_b) {
+  if(r_b.IsReading()) {
+    r_b.ReadClassBuffer(TDetector::Class(),this);
+  } else {
+    r_b.WriteClassBuffer(TDetector::Class(),this);
+  }
 }

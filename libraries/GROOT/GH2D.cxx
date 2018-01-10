@@ -3,36 +3,45 @@
 #include <iostream>
 
 #include <TDirectory.h>
+#include <TClass.h>
+#include <TMethodCall.h>
 
 #include "GH1D.h"
+#include "GCutG.h"
+#include "TRuntimeObjects.h"
 
 ClassImp(GH2D)
 
 GH2D::GH2D(const char *name,const char *title,Int_t nbinsx,const Double_t *xbins,Int_t nbinsy, const Double_t *ybins) :
-  TH2D(name,title,nbinsx,xbins,nbinsy,ybins), GH2Base() { 
+  TH2D(name,title,nbinsx,xbins,nbinsy,ybins), GH2Base(),
+  fXFillClass(0),fYFillClass(0),fXFillMethod(0),fYFillMethod(0) {
 }
 
 
 GH2D::GH2D(const char *name,const char *title,Int_t nbinsx,const Float_t *xbins,Int_t nbinsy, const Float_t *ybins) :
-  TH2D(name,title,nbinsx,xbins,nbinsy,ybins), GH2Base() {
+  TH2D(name,title,nbinsx,xbins,nbinsy,ybins), GH2Base(),
+  fXFillClass(0),fYFillClass(0),fXFillMethod(0),fYFillMethod(0) {
 }
 
 
 GH2D::GH2D(const char *name,const char *title,Int_t nbinsx,const Double_t *xbins,
                                             Int_t nbinsy, Double_t ylow, Double_t yup) :
-  TH2D(name,title,nbinsx,xbins,nbinsy,ylow,yup), GH2Base() {
+  TH2D(name,title,nbinsx,xbins,nbinsy,ylow,yup), GH2Base(),
+  fXFillClass(0),fYFillClass(0),fXFillMethod(0),fYFillMethod(0) {
 }
 
 
 GH2D::GH2D(const char *name,const char *title,Int_t nbinsx, Double_t xlow, Double_t xup,
                                             Int_t nbinsy, Double_t *ybins) :
-  TH2D(name,title,nbinsx,xlow,xup,nbinsy,ybins), GH2Base() {
+  TH2D(name,title,nbinsx,xlow,xup,nbinsy,ybins), GH2Base(),
+  fXFillClass(0),fYFillClass(0),fXFillMethod(0),fYFillMethod(0) {
 }
 
 
 GH2D::GH2D(const char *name,const char *title,Int_t nbinsx, Double_t xlow, Double_t xup,
                                             Int_t nbinsy, Double_t ylow, Double_t yup) :
-  TH2D(name,title,nbinsx,xlow,xup,nbinsy,ylow,yup), GH2Base() {
+  TH2D(name,title,nbinsx,xlow,xup,nbinsy,ylow,yup), GH2Base(),
+  fXFillClass(0),fYFillClass(0),fXFillMethod(0),fYFillMethod(0) {
 }
 
 GH2D::GH2D(const TObject &obj) {
@@ -46,7 +55,12 @@ GH2D::~GH2D() {  }
 
 void GH2D::Copy(TObject &obj) const {
   TH2::Copy(obj);
-  //fProjections->Copy(*(((GH2D&)obj).fProjections));
+  GH2D& g = (GH2D&)obj; 
+  g.fXFillClass = fXFillClass;
+  g.fYFillClass = fYFillClass;
+  g.fXFillMethod = fXFillMethod;
+  g.fYFillMethod = fYFillMethod;
+ //fProjections->Copy(*(((GH2D&)obj).fProjections));
   //fSummaryProjections->Copy(*(((GH2D&)obj).fSummaryProjections));
 }
 
@@ -78,6 +92,16 @@ void GH2D::Draw(Option_t *opt) {
     gPad->GetFrame()->SetBit(TBox::kCannotMove);
   }
 }
+
+
+//void GH2D::Draw(TCutG *cut) {
+//  if(!cut)
+//    return;
+//  std::string option = Form("colz [%s]",cut->GetName());
+//  TH2D::Draw(option.c_str());
+//}
+
+
 
 TH1 *GH2D::DrawCopy(Option_t *opt) const {
   TH1 *h = TH2D::DrawCopy(opt);
@@ -149,8 +173,73 @@ void GH2D::Streamer(TBuffer &b) {
 */
 
 
+void GH2D::SetFillMethod(const char *classnamex,const char *methodnamex,const char *paramx,
+                         const char *classnamey,const char *methodnamey,const char *paramy) {
+  fXFillClass = TClass::GetClass(classnamex);
+  if(!fXFillClass)
+    return;
+  fYFillClass = TClass::GetClass(classnamey);
+  if(!fYFillClass)
+    return;
+  fXFillMethod = new TMethodCall(fXFillClass,methodnamex,paramx);
+  fYFillMethod = new TMethodCall(fYFillClass,methodnamey,paramy);
+  //printf("class:  %s\n",fFillClass->GetName()); 
+  //printf("method: %s\n",fFillMethod->GetMethod()->GetPrototype()); 
+}
+
+
+Int_t GH2D::Fill(const TObject* objx,const TObject *objy) {
+  if(!fXFillClass || !fXFillMethod || !fYFillClass || !fYFillMethod) {
+    //printf("%p \t %p\n",fFillClass,fFillMethod);
+    return -1;
+  }
+  if(!objy) {
+    objy=objx;
+  }
+  if(objx->IsA()!=fXFillClass || objy->IsA()!=fYFillClass ) {
+    //printf("%s \t %s\n", obj->Class()->GetName(),fFillClass->GetName());
+    return -2;
+  }
+  //for(auto gate : gates) {
+  //  if(!gate->IsInside())
+  //    return -3;
+  //}
+  Double_t storagex;
+  Double_t storagey;
+  fXFillMethod->Execute((void*)(objx),storagex);
+  fYFillMethod->Execute((void*)(objy),storagey);
+  return TH2D::Fill(storagex,storagey);
+}
+
+Int_t GH2D::Fill(const TRuntimeObjects *objs) {
+  if(!fXFillClass || !fXFillMethod || !fYFillClass || !fYFillMethod) {
+    //printf("%p \t %p\n",fFillClass,fFillMethod);
+    return -1;
+  }
+  //for(auto gate : gates) {
+  //  if(!gate->IsInside(objs))
+  //    return -3;
+  //}
+  TDetector *detx = objs->GetDetector(fXFillClass->GetName());
+  TDetector *dety = objs->GetDetector(fYFillClass->GetName());
+  //printf("detx = %s\n",detx->IsA()->GetName()); fflush(stdout);
+  //printf("dety = %s\n",dety->IsA()->GetName()); fflush(stdout);
+
+  return Fill(detx,dety);
+}
 
 
 
+void GH2D::RemoveGate(GCutG *gate) {
+  unsigned int i=0;
+  for(auto g : gates) {
+    if(g==gate)
+      break;
+    i++;
+  };
+  if(i<gates.size()) {
+    gates.erase(gates.begin()+i);
+  }
+}
 
 

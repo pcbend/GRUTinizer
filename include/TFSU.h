@@ -17,7 +17,7 @@ class TFSU: public TDetector {
     void Copy(TObject& obj) const;
 
     TFSUHit &GetFSUHit(int i) { return fFSUHits.at(i); }
-    Int_t Size() const        { return fFSUHits.size(); }
+    unsigned int Size() const        { return fFSUHits.size(); }
  
     virtual void InsertHit(const TDetectorHit &hit) { fFSUHits.emplace_back((TFSUHit&)hit); fSize++; }
     virtual TDetectorHit& GetHit(int i)             { return fFSUHits.at(i);   }

@@ -51,6 +51,12 @@ void TPhosWall::Clear(Option_t *opt) {
 
 }
 
+void TPhosWall::SortHits() {
+  std::sort(phoswall_hits.begin(),phoswall_hits.end());
+}
+
+
+
 void TPhosWall::Print(Option_t *opt) const {
   TString option(opt);
   std::cout << "TPhosWall:  "  << fTimestamp << "    " <<  fLargestHit << std::endl;
@@ -61,7 +67,7 @@ void TPhosWall::Print(Option_t *opt) const {
     }
   }
   std::cout << "             A       B       C     Time"  << std::endl;
-  for(int i = 0; i<Size(); i++) {
+  for(int i = 0; i<int(Size()); i++) {
     if(i==fLargestHit)
       std::cout << DMAGENTA;
     GetPhosWallHit(i).Print(opt);
@@ -79,12 +85,13 @@ int TPhosWall::BuildHits(std::vector<TRawEvent>& raw_data) {
     for(int j=0;j<(geb.GetBodySize()-8); j+=sizeof(TRawEvent::PWHit)) {
       TPhosWallHit hit((TRawEvent::PWHit*)(geb.GetPayload() + j));
       hit.SetTimestamp(geb.GetTimestamp());
+      hit.SetAddress(0xbaff0000 + hit.Pixel());
       InsertHit(hit);
       if(hit.Pixel()>255)
         geb.Print("all");
     }
   }
-
+  SortHits();
   return Size();
 }
 
@@ -264,7 +271,7 @@ TVector3 TPhosWall::GetWallPosition(int pixelnumber, double delta){
 void TPhosWall::Draw(Option_t *opt) {
   TH2I hitpat[4];
   //std::string exef;
-  //std::string exex = ".x "; 
+  //std::string exex = ".x ";
   //if(strlen(opt)!=0) {
   //  exef.append(opt);
   //  exex.append(opt);
@@ -276,11 +283,11 @@ void TPhosWall::Draw(Option_t *opt) {
     hitpat[x].GetYaxis()->SetNdivisions(8);
     hitpat[x].SetStats(false);
   }
-  for(int x=0;x<Size();x++) {
+  for(unsigned int x=0;x<Size();x++) {
     int hist = Pixel(x)/64;
     int row  = (Pixel(x)-(hist*64))%8;
     int col  = (Pixel(x)-(hist*64))/8;
-    hitpat[hist].Fill(row,col,B(x)); 
+    hitpat[hist].Fill(row,col,B(x));
     printf("\t\tPixel[%03i | %02i]  r[%02i] c[%02i]    %i\n",Pixel(x),Pixel(x)-hist*64,row,col,B(x));
   }
   if(!gPad || !gPad->IsEditable())  {
@@ -320,7 +327,7 @@ void TPhosWall::DrawPID(Option_t *gate,Option_t *opt,Long_t nentries,TChain *cha
   }
   std::string name = Form("%s_PID",Class()->GetName()); //_%s",opt);
   //const char *name = "phoswall_pid";
-  GH2I *h = new GH2I(name.c_str(),name.c_str(),2048,0,8192,2048,0,8192);  
+  GH2I *h = new GH2I(name.c_str(),name.c_str(),2048,0,8192,2048,0,8192);
   chain->Project(name.c_str(),"phoswall_hits.C():phoswall_hits.B()",gate,"",nentries);
   //chain->Draw("phoswall_hits.C():phoswall_hits.B()>>h","","colz",10000); //nentries);
   h->GetXaxis()->SetTitle("Largest B");
@@ -338,17 +345,17 @@ TVector3 TPhosWall::GetKinVector(Double_t E_ejec,Double_t E_beam,const char *bea
 }
 
 TVector3 TPhosWall::GetKinVector(Double_t E_ejec,Double_t E_beam,TNucleus &beam,TNucleus &recoil, TNucleus &ejec) {
-  
+
   double v_beam = sqrt(2*E_beam/beam.GetMass());
   double p_beam = beam.GetMass()*v_beam;
-  
+
   double v_ejec = sqrt(2*E_ejec/ejec.GetMass());
   double p_ejec = ejec.GetMass()*v_ejec;
 
   double p_recoil     = sqrt(pow(p_beam-p_ejec*GetHitPosition().CosTheta(),2) + pow(p_ejec*TMath::Sin(GetHitPosition().Theta()),2));
   double theta_recoil = TMath::ASin((p_ejec/p_recoil)*TMath::Sin(GetHitPosition().Theta()));
   double phi_recoil   = GetHitPosition().Phi();
-  if(phi_recoil<TMath::Pi()) 
+  if(phi_recoil<TMath::Pi())
     phi_recoil += TMath::Pi();
   else if(phi_recoil > TMath::Pi())
     phi_recoil -= TMath::Pi();
@@ -358,7 +365,7 @@ TVector3 TPhosWall::GetKinVector(Double_t E_ejec,Double_t E_beam,TNucleus &beam,
 }
 
 int TPhosWall::IsInside(Option_t *opt) const {
-  if(!gates.GetSize() || !Size()) 
+  if(!gates.GetSize() || !Size())
     return 0;
   TIter iter(&gates);
   int counter =1;
@@ -429,5 +436,3 @@ void TPhosWall::DrawXY(Option_t *opt) {
   return;
 }
 */
-
-

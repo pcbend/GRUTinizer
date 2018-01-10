@@ -25,19 +25,47 @@
 #define BIT29TO16MASK      0x3FFF0000  // Bits 29 through 16
 #define BIT28TO16MASK      0x1FFF0000  // Bits 28 through 16
 
-
-class TDDASEvent : public TObject {
-public:
 #include "DDASBanks.h"
 
-  TDDASEvent(const TSmartBuffer& buf);
+template<typename HeaderType>
+class TDDASEvent : public TObject {
+public:
+  TDDASEvent(TSmartBuffer& buf)
+    : qdc_sum(NULL), energy_sum(NULL), trace(NULL),
+      header(NULL), buf(buf) {
+    header = (HeaderType*)buf.GetData();
+    buf.Advance(sizeof(HeaderType));
+
+    if(HasQDCSum()){
+      qdc_sum = (DDAS_QDC_Sum*)buf.GetData();
+      buf.Advance(sizeof(DDAS_QDC_Sum));
+    }
+
+    if(HasEnergySum()){
+      energy_sum = (DDAS_Energy_Sum*)buf.GetData();
+      buf.Advance(sizeof(DDAS_Energy_Sum));
+    }
+
+    if(GetTraceLength()){
+      trace = (unsigned short*)buf.GetData();
+      buf.Advance(GetTraceLength()*sizeof(unsigned short));
+    }
+  }
 
   DDAS_QDC_Sum* qdc_sum;
   DDAS_Energy_Sum* energy_sum;
   unsigned short* trace;
 
-  bool HasQDCSum() const;
-  bool HasEnergySum() const;
+  bool HasQDCSum() const {
+    return (GetChannelHeaderLength() == 8 ||
+            GetChannelHeaderLength() == 16);
+  }
+
+
+  bool HasEnergySum() const {
+    return (GetChannelHeaderLength() == 12 ||
+            GetChannelHeaderLength() == 16);
+  }
 
   unsigned int GetSize()        const { return header->size; }
   unsigned short GetFrequency() const { return header->frequency; }
@@ -63,14 +91,21 @@ public:
   int GetEnergy()                  const { return (header->energy_tracelength & LOWER16BITMASK);       }
   int GetTraceLength()             const { return (header->energy_tracelength & UPPER16BITMASK) >> 16; }
 
+  friend std::ostream& operator<<(std::ostream& out, const TDDASEvent& event) {
+    out << "DDAS Channel: \n";
+    return out;
+  }
+
 private:
-  DDASHeader* header;
+  HeaderType* header;
 
   TSmartBuffer buf;
 
   ClassDef(TDDASEvent, 0);
 };
 
-std::ostream& operator<<(std::ostream& out, const TDDASEvent& event);
+
+
+
 
 #endif /* _DDASDATAFORMAT_H_ */

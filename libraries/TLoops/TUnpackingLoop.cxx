@@ -10,7 +10,6 @@
 #include "TGRUTOptions.h"
 #include "TNSCLEvent.h"
 
-#include "TBuildingLoop.h"
 #include "TDetectorEnv.h"
 #include "TUnpackedEvent.h"
 
@@ -18,36 +17,37 @@
 
 ClassImp(TUnpackingLoop)
 
-TUnpackingLoop *TUnpackingLoop::Get(std::string name,TBuildingLoop *input) {
-  if(name.length()==0 && input) {
+TUnpackingLoop *TUnpackingLoop::Get(std::string name) {
+  if(name.length() == 0) {
     name = "unpack_loop";
   }
   TUnpackingLoop *loop = (TUnpackingLoop*)StoppableThread::Get(name);
-  if(!loop && input)
-    loop = new TUnpackingLoop(name,input);
+  if(!loop) {
+    loop = new TUnpackingLoop(name);
+  }
   return loop;
 }
 
-TUnpackingLoop::TUnpackingLoop(std::string name,TBuildingLoop *input) :
-  StoppableThread(name),input_source(input),fOutputEvent(NULL),
-  fRunStart(0) { }
+TUnpackingLoop::TUnpackingLoop(std::string name)
+  : StoppableThread(name),
+    fOutputEvent(NULL), fRunStart(0),
+    input_queue(std::make_shared<ThreadsafeQueue<std::vector<TRawEvent> > >()),
+    output_queue(std::make_shared<ThreadsafeQueue<TUnpackedEvent*> >()) { }
 
-
-TUnpackingLoop::~TUnpackingLoop(){
-  //delete next_event;
-}
+TUnpackingLoop::~TUnpackingLoop() { }
 
 bool TUnpackingLoop::Iteration(){
   std::vector<TRawEvent> event;
 
-  //static int counter = 0;
-  //if(counter++>100000)
-  //  return true;
-
-  int error = input_source->Pop(event);///input_queue.Pop(event);
+  int error = input_queue->Pop(event);
   if(error < 0){
-    // Stop if the parent has stopped and the queue is empty.
-    return input_source->IsRunning();
+    if(input_queue->IsFinished()) {
+      output_queue->SetFinished();
+      return false;
+    } else {
+      std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+      return true;
+    }
   }
 
   fOutputEvent = new TUnpackedEvent;
@@ -78,16 +78,21 @@ bool TUnpackingLoop::Iteration(){
   fOutputEvent->SetRunStart(fRunStart);
 
   if(fOutputEvent->GetDetectors().size() != 0){
-    output_queue.Push(fOutputEvent);
+    output_queue->Push(fOutputEvent);
     fOutputEvent = NULL;
   }
   return true;
 }
 
 void TUnpackingLoop::ClearQueue() {
-  while(output_queue.Size()){
+  std::vector<TRawEvent> raw_event;
+  while(input_queue->Size()) {
+    input_queue->Pop(raw_event);
+  }
+
+  while(output_queue->Size()){
     TUnpackedEvent* event = NULL;
-    output_queue.Pop(event);
+    output_queue->Pop(event);
     if(event){
       delete event;
     }
@@ -159,10 +164,10 @@ void TUnpackingLoop::HandleGEBMode3(TGEBEvent& event, kDetectorSystems system){
 
 void TUnpackingLoop::HandleNSCLPeriodicScalers(TNSCLEvent& event){
   TUnpackedEvent* scaler_event = new TUnpackedEvent;
-  scaler_event->AddRawData(event, kDetectorSystems::S800SCALER);
+  scaler_event->AddRawData(event, kDetectorSystems::NSCLSCALERS);
   scaler_event->Build();
   scaler_event->SetRunStart(fRunStart);
-  output_queue.Push(scaler_event);
+  output_queue->Push(scaler_event);
 }
 
 void TUnpackingLoop::HandleS800Scaler(TGEBEvent& event){
@@ -170,7 +175,7 @@ void TUnpackingLoop::HandleS800Scaler(TGEBEvent& event){
   scaler_event->AddRawData(event, kDetectorSystems::S800SCALER);
   scaler_event->Build();
   scaler_event->SetRunStart(fRunStart);
-  output_queue.Push(scaler_event);
+  output_queue->Push(scaler_event);
 }
 
 void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
@@ -206,6 +211,9 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
       break;
     case 17: //PWall Mode2 equivlant.
       fOutputEvent->AddRawData(event, kDetectorSystems::PHOSWALL);
+      break;
+    case 21: //lenda
+      fOutputEvent->AddRawData(event, kDetectorSystems::LENDA);
       break;
     case 29: // Something.
       fOutputEvent->AddRawData(event, kDetectorSystems::BANK29);

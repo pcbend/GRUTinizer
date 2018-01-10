@@ -1,36 +1,62 @@
 #include "GH1D.h"
 
 #include <iostream>
+#include <fstream>
+#include <cstring>
 
 #include "TVirtualPad.h"
-#include "GH2I.h"
-#include "GH2D.h"
-
+#include "TString.h"
 #include "TF1.h"
-
 #include "TFrame.h"
+#include "TClass.h"
+#include "TFunction.h"
+#include "TMethodCall.h"
 //#include "TROOT.h"
 //#include "TSystem.h"
 
+#include "GCanvas.h"
+#include "GH2I.h"
+#include "GH2D.h"
+#include "GRootCommands.h"
+#include "GCutG.h"
+
+#include "TRuntimeObjects.h"
+
 GH1D::GH1D(const TH1& source)
-  : parent(NULL), projection_axis(-1) {
+  : parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0)  {
   source.Copy(*this);
 }
 
 
 GH1D::GH1D(const TF1& function,Int_t nbinsx,Double_t xlow,Double_t xup) :
-  TH1D(Form("%s_hist",function.GetName()),Form("%s_hist",function.GetName()),nbinsx, xlow, xup), parent(NULL), projection_axis(-1) {
+  TH1D(Form("%s_hist",function.GetName()),Form("%s_hist",function.GetName()),nbinsx, xlow, xup), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0) {
 
-  TF1 *f = (TF1*)function.Clone();
-  f->SetRange(xlow,xup);
+  //TF1 *f = (TF1*)function.Clone();
+  //f->SetRange(xlow,xup);
 
-  for(int i=0;i<nbinsx;i++) {
+  for(int i=1;i<=nbinsx;i++) {
     double x = GetBinCenter(i);
-    Fill(x,f->Eval(x));
+    SetBinContent(i,function.Eval(x));
   }
-  f->Delete();
+  //f->Delete();
 }
 
+bool GH1D::WriteDatFile(const char *outFile){
+  if(strlen(outFile)<1) return 0;
+
+  std::ofstream out;
+  out.open(outFile);
+
+  if(!(out.is_open())) return 0;
+
+  for(int i=0;i<GetNbinsX();i++){
+    out << GetXaxis()->GetBinCenter(i) << "\t" << GetBinContent(i) << std::endl;
+  }
+  out << std::endl;
+  out.close();
+
+  return 1;
+}
 
 
 /*
@@ -75,7 +101,12 @@ void GH1D::Copy(TObject& obj) const {
 
 
 void GH1D::Draw(Option_t* opt) {
-  TH1D::Draw(opt);
+  TString option(opt);
+  if(option.Contains("new",TString::kIgnoreCase)) {
+    option.ReplaceAll("new","");
+    new GCanvas;
+  }
+  TH1D::Draw(option.Data());
   if(gPad) {
     gPad->Update();
     gPad->GetFrame()->SetBit(TBox::kCannotMove);
@@ -207,3 +238,62 @@ GH1D *GH1D::Project(int bins) {
   return proj;
 }
 
+void GH1D::SetFillMethod(const char *classname,const char *methodname,const char *param) {
+  fFillClass = TClass::GetClass(classname);
+  if(!fFillClass)
+    return;
+  fFillMethod = new TMethodCall(fFillClass,methodname,param);
+  //printf("class:  %s\n",fFillClass->GetName());
+  //printf("method: %s\n",fFillMethod->GetMethod()->GetPrototype());
+}
+
+
+Int_t GH1D::Fill(const TObject* obj) {
+  if(!fFillClass || !fFillMethod) {
+    //printf("%p \t %p\n",fFillClass,fFillMethod);
+    return -1;
+  }
+  if(obj->IsA()!=fFillClass) {
+    //printf("%s \t %s\n", obj->Class()->GetName(),fFillClass->GetName());
+    return -2;
+  }
+  Double_t storage;
+  fFillMethod->Execute((void*)(obj),storage);
+  return Fill(storage);
+}
+
+Int_t GH1D::Fill(const TRuntimeObjects* objs) {
+  if(!objs) { 
+    return -1;
+  }
+  if(!fFillClass || !fFillMethod) {
+    //printf("%p \t %p\n",fFillClass,fFillMethod);
+    return -2;
+  }
+  TDetector *det = objs->GetDetector(fFillClass->GetName());
+  if(!det) {
+    return -3;
+  }
+  //for(auto gate : gates) {
+    //if(!gate->IsInside(objs))
+    //  return -4;
+  //}
+  Double_t storage;
+  fFillMethod->Execute((void*)(det),storage);
+  return Fill(storage);
+  //return 0;
+}
+
+
+GPeak* GH1D::DoPhotoPeakFit(double xlow,double xhigh,Option_t *opt) {
+  xl_last = xlow;
+  xh_last = xhigh;
+  return PhotoPeakFit((TH1*)this,xlow,xhigh,opt);
+}
+
+
+GPeak* GH1D::DoPhotoPeakFitNormBG(double xlow,double xhigh,Option_t *opt) {
+  xl_last = xlow;
+  xh_last = xhigh;
+  return PhotoPeakFitNormBG((TH1*)this,xlow,xhigh,opt);
+}

@@ -17,8 +17,6 @@ public:
   TS800();
   virtual ~TS800();
 
-  static void ReadInverseMap(const char *mapfile="");
-
   //////////////////////////////////////////////
   virtual void InsertHit(const TDetectorHit&);
   virtual TDetectorHit& GetHit(int i);
@@ -31,19 +29,25 @@ public:
 
   TVector3 CRDCTrack();  // not a finished method
   TVector3 ExitTargetVect(int order=6);
-  float GetAFP() const;
-  float GetBFP() const;
-  float MapCalc(int calcorder,int parameter,float *input);
+  Float_t Azita(int order=6);
 
-  Float_t GetAta(int i=6);
-  Float_t GetYta(int i=6);
-  Float_t GetBta(int i=6);
-  Float_t GetDta(int i=6);
+  //TVector3 Track() const;  //  s800 track with respect to optical axis
+  TVector3 Track(double ata=0.000,double bta=0.000) const; // s800 track with respect to vector with ata,bta.
 
-  //bool InvMapLoaded()      { return fMapLoaded; }
+  float GetXFP(int i=0) const; // x position in the first(second) CRDC (mm)
+  float GetYFP(int i=0) const; // y position in the first(second) CRDC (mm)
+  float GetAFP() const; // x-angle in the focal plane (rad)
+  float GetBFP() const; // y-angle in the focal plane (rad)
+
+  Float_t GetAta(int i=6) const; // x-angle at the target (rad)
+  Float_t GetYta(int i=6) const; // y-offset at the target (mm)
+  Float_t GetBta(int i=6) const; // y-angle at the target (rad)
+  Float_t GetDta(int i=6) const; // dE/E of outgoing particle, relative to the central b-rho
+
+  float AdjustedBeta(float) const;
 
   virtual void Copy(TObject& obj)        const;
-  //virtual void Print(Option_t *opt = "") const;
+  virtual void Print(Option_t *opt = "") const {;}
   virtual void Clear(Option_t* opt = "");
 
   TCrdc         &GetCrdc(int x=0)  const { if(x==0) return (TCrdc&)crdc1;
@@ -55,9 +59,8 @@ public:
   //Added 1/4/2016 for getting trigbit - BAE
   TTrigger      &GetTrigger()      const { return (TTrigger&)trigger;}
 
-  //float GetAFP() const {
-  //    return  TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1000.0);
-  //}
+  
+  float GetIonSum() const { return ion.GetSum(); }
 
   //Note c1 is the AFP correction and c2 is the XFP correction
   float GetTofE1_TAC(float c1=0.00,float c2=0.00)  const;
@@ -73,24 +76,26 @@ public:
   float GetXF_E1Raw() const;
   //===================================================  
 
-
-
-
-
-
   float GetCorrTOF_OBJ_MESY(int i=0) const;
   
   float GetOBJ_E1Raw_MESY(int i=0) const;
   float GetOBJ_E1Raw_MESY_Ch15(int i=0) const;
- 
-  float GetRawOBJ_MESY(int i=0) const;
 
-  float GetRawE1_MESY(int i=0) const;
-  
   float GetXF_E1Raw_MESY(int i=0) const;
   float GetXF_E1Raw_MESY_Ch15(int i=0) const;
+ 
+  float GetRawOBJ_MESY(unsigned int i=0) const;
+
+  float GetRawE1_MESY(unsigned int i=0) const;
+  float GetRawE1_MESY_Ch15(unsigned int i=0) const;
   
-  float GetRawXF_MESY(int i=0) const;
+  float GetRawXF_MESY(unsigned int i=0) const;
+
+  float GetMTOF_ObjE1(unsigned int i=0) const { return GetCorrTOF_OBJ_MESY(i); }
+  float GetMTOF_XfpE1(unsigned int i=0) const { return GetXF_E1Raw_MESY(i);    }
+  float GetMTOF_RfE1(unsigned int i=0)  const { return GetME1Up(i) - GetMRf(i);  }
+  float GetMTOF_ObjRf(unsigned int i=0) const { return GetMRf(i)   - GetMObj(i); }
+
 
   float MCorrelatedOBJ() const;
   float MCorrelatedXFP() const;
@@ -104,23 +109,29 @@ public:
   float MCorrelatedOBJ_E1_Ch15(bool corrected=true) const;
   float MCorrelatedXFP_E1_Ch15(bool corrected=true) const;
 
+
+  unsigned short GetME1Up(int i)       const {if(i<GetME1Size())   return mtof.fE1Up.at(i);  return sqrt(-1); }     
+  unsigned short GetME1Down(int i)     const {if(i<GetME1Size())   return mtof.fE1Down.at(i);return sqrt(-1); }    
+           int   GetME1Size()          const { return mtof.fE1Up.size();  }
+  unsigned short GetMXfp(int i)        const {if(i<GetMXfpSize())    return mtof.fXfp.at(i);   return sqrt(-1); }
+           int   GetMXfpSize()         const { return mtof.fXfp.size();  }
+  unsigned short GetMObj(int i)        const {if(i<GetMObjSize())    return mtof.fObj.at(i);   return sqrt(-1); }
+           int   GetMObjSize()         const { return mtof.fObj.size();  }
+  unsigned short GetMRf(int i)         const {if(i<GetMRfSize())     return mtof.fRf.at(i);    return sqrt(-1);  }
+           int   GetMRfSize()          const { return mtof.fRf.size();  }
+  unsigned short GetMCrdc1Anode(int i) const {if(i<GetMCrdc1AnodeSize()) return mtof.fCrdc1Anode.at(i);return sqrt(-1); }
+           int   GetMCrdc1AnodeSize()  const { return mtof.fCrdc1Anode.size();  }
+  unsigned short GetMCrdc2Anode(int i) const {if(i<GetMCrdc2AnodeSize()) return mtof.fCrdc2Anode.at(i);return sqrt(-1); }
+           int   GetMCrdc2AnodeSize()  const { return mtof.fCrdc2Anode.size();  }
+  unsigned short GetMHodoscope(int i)  const {if(i<GetMHodoscopeSize()) return mtof.fHodoscope.at(i);  return sqrt(-1);  }
+           int   GetMHodoscopeSize()   const { return mtof.fHodoscope.size();  }
+  unsigned short GetMRef(int i)        const {if(i<GetMRefSize())       return mtof.fRef.at(i);        return sqrt(-1);  }        
+           int   GetMRefSize()         const { return mtof.fRef.size();  }
+
   
+  int GetReg() const { return trigger.GetRegistr(); } 
 
 private:
-
-  //---------------------
-  static std::vector<short> fmaxcoefficient;                      //!
-  static std::vector<std::vector<short> > forder;                 //!
-  static std::vector<std::vector<std::vector<short> > > fexponent;//!
-  static std::vector<std::vector<float> > fcoefficient;           //!
-  static short fmaxorder;                                         //!
-  static float fbrho;                                             //!
-  static int fmass;                                               //!
-  static int fcharge;                                             //!
-  static bool fMapLoaded;                                         //!
-  //---------------------
-
-  static bool ReadMap(std::string filename);
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 
   bool HandleTrigPacket(unsigned short*,int);     //!
@@ -140,43 +151,8 @@ private:
   //THodoscope   hodo[32];
   //TMultiHitTof multi_tof;
   
-  //std::map<int,Float_t> fAta;
-  //std::map<int,Float_t> fYta;
-  //std::map<int,Float_t> fBta;
-  //std::map<int,Float_t> fDta;
-  
-  Float_t fAtaTCL1;
-  Float_t fYtaTCL1;
-  Float_t fBtaTCL1;
-  Float_t fDtaTCL1;
-
-  Float_t fAtaTCL2;
-  Float_t fYtaTCL2;
-  Float_t fBtaTCL2;
-  Float_t fDtaTCL2;
-
-  Float_t fAtaTCL3;
-  Float_t fYtaTCL3;
-  Float_t fBtaTCL3;
-  Float_t fDtaTCL3;
-
-  Float_t fAtaTCL4;
-  Float_t fYtaTCL4;
-  Float_t fBtaTCL4;
-  Float_t fDtaTCL4;
-
-  Float_t fAtaTCL5;
-  Float_t fYtaTCL5;
-  Float_t fBtaTCL5;
-  Float_t fDtaTCL5;
-
-  Float_t fAtaTCL6;
-  Float_t fYtaTCL6;
-  Float_t fBtaTCL6;
-  Float_t fDtaTCL6;
-  
-
   Long_t fEventCounter;
+  static bool fGlobalReset; //!
 
 
   public:
@@ -190,150 +166,10 @@ private:
     static void DrawDispX_Mesy(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,int i=0,TChain *chain=0);
     static void DrawPID_Mesy_Tune(Long_t entries=kMaxLong,int i=0,TChain *chain=0);
 
-  ClassDef(TS800,1);
+  void SetGlobalReset(bool flag=true) { fGlobalReset=flag; }  
+
+
+  ClassDef(TS800,3);
 };
-
-//S8OO PIN
-//  -- e
-//  -- t
-//  -- ecorr
-//  -- dE
-//
-
-//S800 PPAC
-//  -- u
-//  -- d
-//  -- l
-//  -- r
-//  -- a
-//  -- t
-//  -- sumx
-//  -- sumy
-//  -- x
-//  -- y
-//  --
-//  -- z
-//
-
-
-
-
-
-//S800 Focal Plane
-//  -- FpScintillator E1
-//  -- FpScintillator E2  <-- most likely does not exist
-//  -- FpScintillator E3  <-- most likely does not exist
-//  -- FpIonChamber
-//  -- FpCRDC  crdc1
-//  -- FpCRDC  crdc2
-//  -- FpTrack track
-//  -- FpHodo  hodo
-
-
-//S800 Target
-//  -- PPac ppac2 (why 2?) <-- class
-//  -- PIN  pin1 <-- class
-//  -- PIN  pin2 <-- class
-//  -- E
-
-//S800 Image
-//  -- Classic PPAC ppac1
-//  -- Classic PPAC ppac2
-//  -- double x
-//  -- double theta
-//  -- double y
-//  -- double phi
-//  -- double dp
-//  --        z
-//  --        gap
-//  --        dpphi
-//  --
-//  -- bool trigger
-//  -- char *gate
-
-//S800 Object
-//  -- PIN   <-- class
-
-//S800 Trigger
-//  -- registr
-//  -- s800
-//  -- external1
-//  -- external2
-//  -- secondary
-//  -- timestamp
-
-//S800 Time Of Flight
-//  -- rf
-//  -- obj
-//  -- xfp
-//  -- xfp_obj
-//  -- rfe1
-//  -- obje1
-//  -- xfpe1
-//  -- obje2
-//  -- xfpe2
-//  -- tac_obj
-//  -- tac_obje1
-//  -- tac_xfp
-//  -- tac_xfpe1
-//  -- tac_xfpobj
-//  -- tacobj_obj
-//  -- tacxfp_xfp
-//  --
-//  -- mesyhit
-//  -- me1up
-//  -- me1dwn
-//  -- mobj
-//  -- mxfp
-//  -- mrf
-//  -- mcrdc1
-//  -- mcrdc2
-//  -- mhoth
-//  -- mref
-//  -- mobje1
-//  -- mxfpe1
-//  -- mrfe1
-//  --
-//  -- diaor
-//  -- dia1
-//  -- dia2
-//  -- dia3
-//  -- dia4
-//  -- dia1RF
-//  -- dia2RF
-//  -- dia3RF
-//  -- dia4RF
-//  -- diaRF
-//  -- dia1Cor
-//  -- dia2Cor
-//  -- dia3Cor
-//  -- dia4Cor
-//  -- diaCor
-//  --
-//  -- obj_shift
-//  -- xfp_shift
-//  -- rf_shift
-//  -- tac_obj_shift
-//  -- tac_xfp_shift
-//  --
-//  --              // sc800.h +1253
-//
-
-
-//S800 LaBr
-//  -- eraw
-//  -- ecal
-//  -- traw
-//  -- tcal
-//  -- e_a0
-//  -- e_a1
-//  -- e_a2
-//  -- t_a0
-//
-//
-//
-
-
-
 
 #endif

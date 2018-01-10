@@ -21,28 +21,11 @@
 #include "TObject.h"
 #include "TFastScint.h"
 
-TH1 *GetHistogram(TList *list, std::string histname,int xbins,double xlow,double xhigh) {
-  //TList *list = &(obj.GetObjects());
-  TH1   *hist = (TH1*)list->FindObject(histname.c_str());
-  if(!hist) {
-    hist= new TH1I(histname.c_str(),histname.c_str(),xbins,xlow,xhigh);
-    list->Add(hist);
-  }
-  return hist;
-}
-
-TH2 *GetMatrix(TList *list, std::string histname,int xbins, double xlow,double xhigh,
-                                                 int ybins, double ylow,double yhigh) {
-  //TList *list = &(obj.GetObjects());
-  TH2   *mat  = (TH2*)list->FindObject(histname.c_str());
-  if(!mat) {
-    mat = new TH2I(histname.c_str(),histname.c_str(),xbins,xlow,xhigh,
-                                                     ybins,ylow,yhigh);
-    list->Add(mat);
-  }
-  return mat;
-}
-
+float gamma1 = 1173;
+float gamma2 = 1332;
+float tol1 = 30;
+float tol2 = 30;
+int   eventnum = 0;
 
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
@@ -51,14 +34,112 @@ void MakeHistograms(TRuntimeObjects& obj) {
   if(!fast)
     return;
 
+  eventnum++;
   TList *list = &(obj.GetObjects());
   int numobj = list->GetSize();
- 
-  for(int i=0;i<fast->Size();i++) {
-    TFastScintHit *hit = fast->GetLaBrHit(i);
-    TH2 *chan_eng = GetMatrix(list,"ChannelCharge",8000,0,64000,20,0,20);
-    chan_eng->Fill(hit->Charge(),hit->GetChannel());
-  }
+
+  std::string histname;
+
+  histname = "Multiplicity";
+  obj.FillHistogram(histname,20,0,20,fast->Size());
+
+  for(unsigned int i=0;i<fast->Size();i++) {
+    TFastScintHit hit = fast->GetLaBrHit(i);
+
+    histname = "Multiplicity_detId";
+    obj.FillHistogram(histname,20,0,20,hit.GetChannel(),
+                               20,0,20,fast->Size());
+
+    histname = "ChannelCharge";
+    obj.FillHistogram(histname,4000,0,4000,hit.Charge(),
+        20,0,20,hit.GetChannel());
+
+    histname = "ChannelTime-Uncalibrated";
+    obj.FillHistogram(histname,64100,-100,64000,hit.Time(),
+        20,0,20,hit.GetChannel());
+
+    histname = "ChannelEnergy";
+    obj.FillHistogram(histname,4000,0,4000,hit.GetEnergy(),
+        20,0,20,hit.GetChannel());
+
+    histname = Form("ChannelEnergy_multi%02i",fast->Size());
+    obj.FillHistogram(histname,4000,0,4000,hit.GetEnergy(),
+                                20,0,20,hit.GetChannel());
+
+    histname = "ChannelTime-Calibrated";
+    obj.FillHistogram(histname,64100,-100,64000,hit.GetTime(),
+                               20,0,20,hit.GetChannel());
+
+    histname = Form("ChannelTime-Calibrated_mult%02i",fast->Size());
+    obj.FillHistogram(histname,64100,-100,64000,hit.GetTime(),
+                               20,0,20,hit.GetChannel());
+
+
+
+    for(unsigned int j=0;j<fast->Size();j++) {
+      if(i==j)
+        continue;
+      TFastScintHit hit2 = fast->GetLaBrHit(j);
+      histname = "gamma_gamma";
+      std::string dirname = "energy_mat";
+      obj.FillHistogram(dirname,histname,4000,0,4000,hit.GetEnergy(),
+                                 4000,0,4000,hit2.GetEnergy());
+
+      histname = Form("gamma_gamma_mult%i",fast->Size());
+      obj.FillHistogram(dirname,histname,4000,0,4000,hit.GetEnergy(),
+                                 4000,0,4000,hit2.GetEnergy());
+
+      dirname = "time_mat";
+      histname = "time_time";
+      obj.FillHistogram(dirname,histname,4000,0,4000,hit.GetTime(),
+                                 4000,0,4000,hit2.GetTime());
+
+      histname = Form("time_time_multi%i",fast->Size());
+      obj.FillHistogram(dirname,histname,4000,0,4000,hit.GetTime(),
+                                 4000,0,4000,hit2.GetTime());
+
+      histname = "dtime_all";
+      obj.FillHistogram(dirname,histname,4000,-2000,2000,hit.GetTime() - hit2.GetTime());
+
+      //histname = Form("dtime_%i_%i",hit.GetChannel(),hit2.GetChannel());
+      //obj.FillHistogram(dirname,histname,4000,-2000,2000,hit.GetTime() - hit2.GetTime());
+
+      //dirname = "energy_mat";
+      //histname = Form("eng%i_eng%i",hit.GetChannel(),hit2.GetChannel());    
+      //obj.FillHistogram(dirname,histname,4000,0,4000,hit.GetEnergy(),
+      //                           4000,0,4000,hit2.GetEnergy());
+
+      if(abs(hit.GetEnergy() - gamma1) < tol1){
+         dirname = "coincidence_energy_gated";
+         histname = Form("%5.1f_in_channel_%i__dtime_vs_energy_in_channel_%i",gamma1,hit.GetChannel(),hit2.GetChannel());
+         obj.FillHistogram(dirname,histname,4000,-2000,2000,hit.GetTime() - hit2.GetTime(),
+                                            4000,0,4000,hit2.GetEnergy());
+
+      }//end if correct energy in first detector
+
+      if(abs(hit2.GetEnergy() - gamma1) < tol1){
+         dirname = "coincidence_energy_gated";
+         histname = Form("%5.1f_in_channel_%i__dtime_vs_energy_in_channel_%i",gamma1,hit2.GetChannel(),hit.GetChannel());
+         obj.FillHistogram(dirname,histname,4000,-2000,2000,hit2.GetTime() - hit.GetTime(),
+                                            4000,0,4000,hit.GetEnergy());
+
+      }//end if correct energy in second detector
+
+      if((abs(hit.GetEnergy() - gamma1) < tol1) && (abs(hit2.GetEnergy() - gamma2) < tol2)){
+
+         dirname = "coincidence_energy_gated";
+         histname = Form("dtime_energies_%5.1f_and_%5.1f___channels_%i_%i",gamma1,gamma2,hit.GetChannel(),hit2.GetChannel());
+         obj.FillHistogram(dirname,histname,4000,-2000,2000,hit.GetTime() - hit2.GetTime());
+
+         histname = "dtime_vs_eventnum";
+         obj.FillHistogram(dirname,histname,4000,-2000,2000,hit.GetTime() - hit2.GetTime(),
+                                            20000000/200000,0,20000000, eventnum);
+
+
+      }//end if correct energies in two coincident detectros   
+
+    }//end for loop over j
+  }//end for loop over i
   if(numobj!=list->GetSize())
     list->Sort();
 }

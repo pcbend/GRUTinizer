@@ -23,9 +23,14 @@
 #include <TPython.h>
 #include <TTimer.h>
 #include <TF1.h>
+#include <TROOT.h>
+#include <TStyle.h>
 
 #include <GCanvas.h>
 #include <GPeak.h>
+#include <GGaus.h>
+#include <GH2D.h>
+#include <GH1D.h>
 //#include <GRootObjectManager.h>
 #include <TGRUTOptions.h>
 //#include <TGRUTInt.h>
@@ -39,7 +44,7 @@ public:
     gChain->SetNotify(GrutNotifier::Get());
   }
 } temp_thing;
-  
+
 
 
 void Help()     { printf("This is helpful information.\n"); }
@@ -47,6 +52,673 @@ void Help()     { printf("This is helpful information.\n"); }
 void Commands() { printf("this is a list of useful commands.\n");}
 
 void Prompt() { Getlinem(EGetLineMode::kInit,((TRint*)gApplication)->GetPrompt()); }
+
+void Version() {
+  system(Form("%s/bin/grutinizer-config --version", getenv("GRUTSYS")));
+}
+
+bool GetProjectionX(GH2D *hist,double low, double high, double bg_low,double bg_high){
+  if(!hist) return 0;
+  GCanvas *C_projections = 0;
+  GCanvas *C_gammagamma  = 0;
+  if(gROOT->GetListOfCanvases()->FindObject("C_projections"))
+    C_projections = (GCanvas*)gROOT->GetListOfCanvases()->FindObject("C_projections");
+  else{
+    C_projections = new GCanvas("C_projections","Projection Canvas",0,0,1450,600);
+    C_projections->Divide(2,1);
+  }
+
+  if(gROOT->GetListOfCanvases()->FindObject("C_gammagamma"))
+    C_gammagamma = (GCanvas*)gROOT->GetListOfCanvases()->FindObject("C_gammagamma");
+  else
+    C_gammagamma = new GCanvas("C_gammagamma","Gamma-Gamma Canvas",1700,0,650,650);
+
+  C_gammagamma->cd();
+  hist->Draw();
+
+  C_projections->cd(1);
+  GH1D *Proj_y = hist->ProjectionX("Gamma_Gamma_xProjection");
+  GH1D *Proj_y_Clone = (GH1D*)Proj_y->Clone();
+  GH1D *Proj_gated = 0;
+
+  if(bg_high>0 && bg_low>0){
+    Proj_y->SetTitle(Form("Projection with Gate From [%.01f,%.01f] and Background [%.01f,%.01f]",low,high,bg_low,bg_high));
+  }else{
+    Proj_y->SetTitle(Form("Projection with Gate From [%.01f,%.01f] NO background",low,high));
+  }
+
+  Proj_y->GetXaxis()->SetTitle("Energy [keV]");
+  Proj_y->GetYaxis()->SetTitle("Counts");
+
+
+
+  double Grace = 300;
+  double ZoomHigh = high+Grace;
+  double ZoomLow  = low-Grace;
+  if(bg_high>0 && bg_high>high)
+    ZoomHigh = bg_high+Grace;
+  if(bg_low>0 && bg_low<low)
+    ZoomLow = bg_low-Grace;
+
+  Proj_y->GetXaxis()->SetRangeUser(ZoomLow,ZoomHigh);
+  Proj_y->Draw();
+  double Projy_Max = Proj_y->GetMaximum();
+  double Projy_Min = Proj_y->GetMinimum();
+
+  TLine *CutLow  = new TLine(low,Projy_Min,low,Projy_Max);
+  TLine *CutHigh = new TLine(high,Projy_Min,high,Projy_Max);
+  TLine *BGLow   = new TLine(bg_low,Projy_Min,bg_low,Projy_Max);
+  TLine *BGHigh  = new TLine(bg_high,Projy_Min,bg_high,Projy_Max);
+  CutLow->SetLineColor(kRed);
+  CutHigh->SetLineColor(kRed);
+  CutLow->SetLineWidth(2);
+  CutHigh->SetLineWidth(2);
+  BGLow->SetLineColor(kBlue);
+  BGHigh->SetLineColor(kBlue);
+  BGLow->SetLineWidth(2);
+  BGHigh->SetLineWidth(2);
+  BGLow->SetLineStyle(kDashed);
+  BGHigh->SetLineStyle(kDashed);
+  CutLow->Draw("same");
+  CutHigh->Draw("same");
+  if(bg_low>0 && bg_high>0){
+    BGHigh->Draw("same");
+    BGLow->Draw("same");
+    Proj_gated = Proj_y_Clone->Project_Background(low,high,
+						  bg_low,bg_high,
+						  kRegionBackground);
+  }else{
+    Proj_gated = Proj_y_Clone->Project(low,high);
+  }
+
+  if(bg_high>0 && bg_low>0){
+    Proj_gated->SetTitle(Form("Gate From [%.01f,%.01f] with Background [%.01f,%.01f]",low,high,bg_low,bg_high));
+  }else{
+    Proj_gated->SetTitle(Form("Gate From [%.01f,%.01f] NO Background",low,high));
+  }
+  Proj_gated->GetXaxis()->SetTitle("Energy [keV]");
+  Proj_gated->GetYaxis()->SetTitle("Counts");
+
+  C_projections->cd(2);
+  Proj_gated->Draw();
+  return 1;
+}
+
+bool GetProjectionX(GH2D *hist,GH2D *hist2,
+		   double low, double high, double bg_low,double bg_high,
+		   bool overlay,
+		   double back_low,double back_high, double back_bg_low,
+		   double back_bg_high,
+		   bool back_overlay){
+  /* Note -> The first histogram, ie hist, is used to draw the total projection.
+             The second histogram, ie hist2, is used to draw the background
+	     subtracted spectrum. This way you can have different bins.
+
+   */
+
+  if(!hist || !hist2) return 0;
+
+  gStyle->SetOptStat(0);
+
+  GCanvas *C_projections      = 0;
+  GCanvas *C_gammagamma       = 0;
+  if(gROOT->GetListOfCanvases()->FindObject("C_projections")){
+    C_projections = (GCanvas*)gROOT->GetListOfCanvases()->FindObject("C_projections");
+    C_projections->Clear();
+    if(back_low>0 && back_high>0)
+      C_projections->Divide(2,2);
+    else
+      C_projections->Divide(1,2);
+
+  }
+  else{
+    C_projections = new GCanvas("C_projections","Projection Canvas",0,0,1675,900);
+    if(back_low>0 && back_high>0)
+      C_projections->Divide(2,2);
+    else
+      C_projections->Divide(1,2);
+  }
+
+  if(gROOT->GetListOfCanvases()->FindObject("C_gammagamma"))
+    C_gammagamma = (GCanvas*)gROOT->GetListOfCanvases()->FindObject("C_gammagamma");
+  else
+    C_gammagamma = new GCanvas("C_gammagamma","Gamma-Gamma Canvas",1700,0,650,650);
+
+  C_gammagamma->cd();
+  hist->Draw();
+
+  C_projections->cd(1);
+  GH1D *Proj_y  = hist->ProjectionX("Gamma_Gamma_xProjection");
+  GH1D *Proj_y2 = hist2->ProjectionX("Gamma_Gamma_xProjection2");
+
+  GH2D *hist_Clone  = (GH2D*)hist->Clone();
+  GH2D *hist2_Clone = (GH2D*)hist2->Clone();
+
+  GH1D *Proj_back_y  = hist_Clone->ProjectionX("Gamma_Gamma_xProjection_back");
+  GH1D *Proj_back_y2 = hist2_Clone->ProjectionX("Gamma_Gamma_xProjection2_back");
+
+
+  //  GH1D *Proj_x_Clone = (GH1D*)Proj_x->Clone();
+  GH1D *Proj_y2_Clone       = (GH1D*)Proj_y2->Clone();
+  GH1D *Proj_y2_Clone2      = (GH1D*)Proj_y2->Clone();
+  GH1D *Proj_back_y2_Clone  = (GH1D*)Proj_back_y2->Clone();
+  GH1D *Proj_back_y2_Clone2 = (GH1D*)Proj_back_y2->Clone();
+  GH1D *Proj_gated          = 0;
+  GH1D *Proj_gated2         = 0;
+  GH1D *Proj_gated_back     = 0;
+  GH1D *Proj_gated_back2    = 0;
+
+  if(bg_high>0 && bg_low>0){
+    Proj_y->SetTitle(Form("Projection with Gate From [%.01f,%.01f] and Background [%.01f,%.01f]",low,high,bg_low,bg_high));
+  }else{
+    Proj_y->SetTitle(Form("Projection with Gate From [%.01f,%.01f] NO background",low,high));
+  }
+
+  if(back_bg_high>0 && back_bg_low>0 && back_low>0 && back_high>0){
+    Proj_back_y->SetTitle(Form("Projection with Gate From [%.01f,%.01f] and Background [%.01f,%.01f]",back_low,back_high,back_bg_low,back_bg_high));
+  }else if(back_low>0 && back_high>0){
+    Proj_back_y->SetTitle(Form("Projection with Gate From [%.01f,%.01f] NO background",back_low,back_high));
+  }
+
+
+  double binsize = (Proj_y->GetXaxis()->GetXmax()-Proj_y->GetXaxis()->GetXmin())/Proj_y->GetXaxis()->GetNbins();
+  Proj_y->GetXaxis()->SetTitle("Energy [keV]");
+  Proj_y->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize));
+  Proj_back_y->GetXaxis()->SetTitle("Energy [keV]");
+  Proj_back_y->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize));
+
+
+
+  double Grace = 300;
+  double ZoomHigh = high+Grace;
+  double ZoomLow  = low-Grace;
+  if(bg_high>0 && bg_high>high)
+    ZoomHigh = bg_high+Grace;
+  if(bg_low>0 && bg_low<low)
+    ZoomLow = bg_low-Grace;
+
+  Proj_y->GetXaxis()->SetRangeUser(ZoomLow,ZoomHigh);
+  Proj_y->Draw();
+  double Projy_Max = Proj_y->GetMaximum();
+  double Projy_Min = Proj_y->GetMinimum();
+
+  TLine *CutLow  = new TLine(low,Projy_Min,low,Projy_Max);
+  TLine *CutHigh = new TLine(high,Projy_Min,high,Projy_Max);
+  TLine *BGLow   = new TLine(bg_low,Projy_Min,bg_low,Projy_Max);
+  TLine *BGHigh  = new TLine(bg_high,Projy_Min,bg_high,Projy_Max);
+  CutLow->SetLineColor(kRed);
+  CutHigh->SetLineColor(kRed);
+  CutLow->SetLineWidth(2);
+  CutHigh->SetLineWidth(2);
+  BGLow->SetLineColor(kBlue);
+  BGHigh->SetLineColor(kBlue);
+  BGLow->SetLineWidth(2);
+  BGHigh->SetLineWidth(2);
+  BGLow->SetLineStyle(kDashed);
+  BGHigh->SetLineStyle(kDashed);
+  CutLow->Draw("same");
+  CutHigh->Draw("same");
+  if(bg_low>0 && bg_high>0){
+    BGHigh->Draw("same");
+    BGLow->Draw("same");
+    Proj_gated = Proj_y2_Clone->Project_Background(low,high,
+						  bg_low,bg_high,
+						  kRegionBackground);
+  }else{
+    Proj_gated = Proj_y2_Clone->Project(low,high);
+  }
+  if(overlay){
+    Proj_gated2 = Proj_y2_Clone2->Project(low,high);
+    Proj_gated2->SetLineColor(2);
+  }
+
+  if(bg_high>0 && bg_low>0){
+    Proj_gated->SetTitle(Form("Gate From [%.01f,%.01f] with Background [%.01f,%.01f]",low,high,bg_low,bg_high));
+    if(overlay)
+      Proj_gated2->SetTitle(Form("Gate From [%.01f,%.01f] with Background [%.01f,%.01f]",low,high,bg_low,bg_high));
+  }else{
+    Proj_gated->SetTitle(Form("Gate From [%.01f,%.01f] NO Background",low,high));
+    if(overlay)
+      Proj_gated2->SetTitle(Form("Gate From [%.01f,%.01f] NO Background",low,high));
+  }
+  double binsize_gated = (Proj_gated->GetXaxis()->GetXmax()-Proj_gated->GetXaxis()->GetXmin())/Proj_gated->GetXaxis()->GetNbins();
+  Proj_gated->GetXaxis()->SetTitle("Energy [keV]");
+  Proj_gated->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize_gated));
+
+
+  C_projections->cd(2);
+  if(overlay){
+    Proj_gated2->GetXaxis()->SetTitle("Energy [keV]");
+    Proj_gated2->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize_gated));
+
+    Proj_gated2->Draw();
+    Proj_gated->Draw("same");
+  } else
+    Proj_gated->Draw();
+  if(back_low<0 && back_high<0)
+    return 1;
+
+
+  //---------------------------------------------------------------------------
+
+  C_projections->cd(3);
+  gPad->Clear();
+  C_projections->cd(4);
+  gPad->Clear();
+
+  if(back_low>0 && back_high>0){
+    C_projections->cd(3);
+    double back_ZoomHigh = back_high+Grace;
+    double back_ZoomLow  = back_low-Grace;
+    if(back_bg_high>0 && back_bg_high>high)
+      back_ZoomHigh = back_bg_high+Grace;
+    if(back_bg_low>0 && back_bg_low<low)
+      back_ZoomLow = back_bg_low-Grace;
+
+
+    Proj_back_y->GetXaxis()->SetRangeUser(back_ZoomLow,back_ZoomHigh);
+    Proj_back_y->Draw();
+    double Proj_back_y_Max = Proj_back_y->GetMaximum();
+    double Proj_back_y_Min = Proj_back_y->GetMinimum();
+
+    TLine *back_CutLow  = new TLine(back_low,Proj_back_y_Min,back_low,Proj_back_y_Max);
+    TLine *back_CutHigh = new TLine(back_high,Proj_back_y_Min,back_high,Proj_back_y_Max);
+    TLine *back_BGLow   = new TLine(back_bg_low,Proj_back_y_Min,back_bg_low,Proj_back_y_Max);
+    TLine *back_BGHigh  = new TLine(back_bg_high,Proj_back_y_Min,back_bg_high,Proj_back_y_Max);
+    back_CutLow->SetLineColor(kRed);
+    back_CutHigh->SetLineColor(kRed);
+    back_CutLow->SetLineWidth(2);
+    back_CutHigh->SetLineWidth(2);
+    back_BGLow->SetLineColor(kBlue);
+    back_BGHigh->SetLineColor(kBlue);
+    back_BGLow->SetLineWidth(2);
+    back_BGHigh->SetLineWidth(2);
+    back_BGLow->SetLineStyle(kDashed);
+    back_BGHigh->SetLineStyle(kDashed);
+    back_CutLow->Draw("same");
+    back_CutHigh->Draw("same");
+    if(back_bg_low>0 && back_bg_high>0){
+      back_BGHigh->Draw("same");
+      back_BGLow->Draw("same");
+      Proj_gated_back = Proj_back_y2_Clone->Project_Background(back_low,back_high,
+							       back_bg_low,back_bg_high,
+							       kRegionBackground);
+    }else{
+      Proj_gated_back = Proj_back_y2_Clone->Project(back_low,back_high);
+    }
+
+    if(back_overlay){
+      Proj_gated_back2 = Proj_back_y2_Clone2->Project(back_low,back_high);
+      Proj_gated_back2->SetLineColor(2);
+    }
+
+    if(back_bg_high>0 && back_bg_low>0){
+      Proj_gated_back->SetTitle(Form("Gate From [%.01f,%.01f] with Background [%.01f,%.01f]",
+				     back_low,back_high,back_bg_low,back_bg_high));
+      if(back_overlay){
+      Proj_gated_back2->SetTitle(Form("Gate From [%.01f,%.01f] with Background [%.01f,%.01f]",
+				     back_low,back_high,back_bg_low,back_bg_high));
+      }
+    }else{
+      Proj_gated_back->SetTitle(Form("Gate From [%.01f,%.01f] NO Background",back_low,back_high));
+      if(back_overlay){
+	Proj_gated_back2->SetTitle(Form("Gate From [%.01f,%.01f] NO Background",back_low,back_high));
+      }
+
+    }
+    double binsize_back_gated = (Proj_gated_back->GetXaxis()->GetXmax()-Proj_gated_back->GetXaxis()->GetXmin())/Proj_gated_back->GetXaxis()->GetNbins();
+    Proj_gated_back->GetXaxis()->SetTitle("Energy [keV]");
+    Proj_gated_back->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize_back_gated));
+
+    C_projections->cd(4);
+    if(back_overlay){
+      Proj_gated_back2->GetXaxis()->SetTitle("Energy [keV]");
+      Proj_gated_back2->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize_back_gated));
+
+      Proj_gated_back2->Draw();
+      Proj_gated_back->Draw("same");
+    } else{
+      Proj_gated_back->Draw();
+    }
+  }
+
+
+
+
+
+  return 1;
+}
+
+
+bool GetProjectionY(GH2D *hist,double low, double high, double bg_low,double bg_high){
+  if(!hist) return 0;
+  GCanvas *C_projections = 0;
+  GCanvas *C_gammagamma  = 0;
+  if(gROOT->GetListOfCanvases()->FindObject("C_projections"))
+    C_projections = (GCanvas*)gROOT->GetListOfCanvases()->FindObject("C_projections");
+  else{
+    C_projections = new GCanvas("C_projections","Projection Canvas",0,0,1450,600);
+    C_projections->Divide(2,1);
+  }
+
+  if(gROOT->GetListOfCanvases()->FindObject("C_gammagamma"))
+    C_gammagamma = (GCanvas*)gROOT->GetListOfCanvases()->FindObject("C_gammagamma");
+  else
+    C_gammagamma = new GCanvas("C_gammagamma","Gamma-Gamma Canvas",1700,0,650,650);
+
+  C_gammagamma->cd();
+  hist->Draw();
+
+  C_projections->cd(1);
+  GH1D *Proj_y = hist->ProjectionY("Gamma_Gamma_yProjection");
+  GH1D *Proj_y_Clone = (GH1D*)Proj_y->Clone();
+  GH1D *Proj_gated = 0;
+
+  if(bg_high>0 && bg_low>0){
+    Proj_y->SetTitle(Form("Projection with Gate From [%.01f,%.01f] and Background [%.01f,%.01f]",low,high,bg_low,bg_high));
+  }else{
+    Proj_y->SetTitle(Form("Projection with Gate From [%.01f,%.01f] NO background",low,high));
+  }
+
+  Proj_y->GetXaxis()->SetTitle("Energy [keV]");
+  Proj_y->GetYaxis()->SetTitle("Counts");
+
+  double Grace = 300;
+  double ZoomHigh = high+Grace;
+  double ZoomLow  = low-Grace;
+  if(bg_high>0 && bg_high>high)
+    ZoomHigh = bg_high+Grace;
+  if(bg_low>0 && bg_low<low)
+    ZoomLow = bg_low-Grace;
+
+  Proj_y->GetXaxis()->SetRangeUser(ZoomLow,ZoomHigh);
+  Proj_y->Draw();
+  double Projy_Max = Proj_y->GetMaximum();
+  double Projy_Min = Proj_y->GetMinimum();
+
+  TLine *CutLow  = new TLine(low,Projy_Min,low,Projy_Max);
+  TLine *CutHigh = new TLine(high,Projy_Min,high,Projy_Max);
+  TLine *BGLow   = new TLine(bg_low,Projy_Min,bg_low,Projy_Max);
+  TLine *BGHigh  = new TLine(bg_high,Projy_Min,bg_high,Projy_Max);
+  CutLow->SetLineColor(kRed);
+  CutHigh->SetLineColor(kRed);
+  CutLow->SetLineWidth(2);
+  CutHigh->SetLineWidth(2);
+  BGLow->SetLineColor(kBlue);
+  BGHigh->SetLineColor(kBlue);
+  BGLow->SetLineWidth(2);
+  BGHigh->SetLineWidth(2);
+  BGLow->SetLineStyle(kDashed);
+  BGHigh->SetLineStyle(kDashed);
+  CutLow->Draw("same");
+  CutHigh->Draw("same");
+  if(bg_low>0 && bg_high>0){
+    BGHigh->Draw("same");
+    BGLow->Draw("same");
+    Proj_gated = Proj_y_Clone->Project_Background(low,high,
+						  bg_low,bg_high,
+						  kRegionBackground);
+  }else{
+    Proj_gated = Proj_y_Clone->Project(low,high);
+  }
+
+  if(bg_high>0 && bg_low>0){
+    Proj_gated->SetTitle(Form("Gate From [%.01f,%.01f] with Background [%.01f,%.01f]",low,high,bg_low,bg_high));
+  }else{
+    Proj_gated->SetTitle(Form("Gate From [%.01f,%.01f] NO Background",low,high));
+  }
+  Proj_gated->GetXaxis()->SetTitle("Energy [keV]");
+  Proj_gated->GetYaxis()->SetTitle("Counts");
+
+  C_projections->cd(2);
+  Proj_gated->Draw();
+  return 1;
+}
+
+bool GetProjectionY(GH2D *hist,GH2D *hist2,
+		   double low, double high, double bg_low,double bg_high,
+		   bool overlay,
+		   double back_low,double back_high, double back_bg_low,
+		   double back_bg_high,
+		   bool back_overlay){
+  /* Note -> The first histogram, ie hist, is used to draw the total projection.
+             The second histogram, ie hist2, is used to draw the background
+	     subtracted spectrum. This way you can have different bins.
+
+   */
+
+  if(!hist || !hist2) return 0;
+
+  gStyle->SetOptStat(0);
+
+  GCanvas *C_projections      = 0;
+  GCanvas *C_gammagamma       = 0;
+  if(gROOT->GetListOfCanvases()->FindObject("C_projections")){
+    C_projections = (GCanvas*)gROOT->GetListOfCanvases()->FindObject("C_projections");
+    C_projections->Clear();
+    if(back_low>0 && back_high>0)
+      C_projections->Divide(2,2);
+    else
+      C_projections->Divide(1,2);
+
+  }
+  else{
+    C_projections = new GCanvas("C_projections","Projection Canvas",0,0,1675,900);
+    if(back_low>0 && back_high>0)
+      C_projections->Divide(2,2);
+    else
+      C_projections->Divide(1,2);
+  }
+
+  if(gROOT->GetListOfCanvases()->FindObject("C_gammagamma"))
+    C_gammagamma = (GCanvas*)gROOT->GetListOfCanvases()->FindObject("C_gammagamma");
+  else
+    C_gammagamma = new GCanvas("C_gammagamma","Gamma-Gamma Canvas",1700,0,650,650);
+
+  C_gammagamma->cd();
+  hist->Draw();
+
+  C_projections->cd(1);
+  GH1D *Proj_y  = hist->ProjectionY("Gamma_Gamma_yProjection");
+  GH1D *Proj_y2 = hist2->ProjectionY("Gamma_Gamma_yProjection2");
+
+  GH2D *hist_Clone  = (GH2D*)hist->Clone();
+  GH2D *hist2_Clone = (GH2D*)hist2->Clone();
+
+  GH1D *Proj_back_y  = hist_Clone->ProjectionY("Gamma_Gamma_yProjection_back");
+  GH1D *Proj_back_y2 = hist2_Clone->ProjectionY("Gamma_Gamma_yProjection2_back");
+
+
+  //  GH1D *Proj_x_Clone = (GH1D*)Proj_x->Clone();
+  GH1D *Proj_y2_Clone       = (GH1D*)Proj_y2->Clone();
+  GH1D *Proj_y2_Clone2      = (GH1D*)Proj_y2->Clone();
+  GH1D *Proj_back_y2_Clone  = (GH1D*)Proj_back_y2->Clone();
+  GH1D *Proj_back_y2_Clone2 = (GH1D*)Proj_back_y2->Clone();
+  GH1D *Proj_gated          = 0;
+  GH1D *Proj_gated2         = 0;
+  GH1D *Proj_gated_back     = 0;
+  GH1D *Proj_gated_back2    = 0;
+
+  if(bg_high>0 && bg_low>0){
+    Proj_y->SetTitle(Form("Projection with Gate From [%.01f,%.01f] and Background [%.01f,%.01f]",low,high,bg_low,bg_high));
+  }else{
+    Proj_y->SetTitle(Form("Projection with Gate From [%.01f,%.01f] NO background",low,high));
+  }
+
+  if(back_bg_high>0 && back_bg_low>0 && back_low>0 && back_high>0){
+    Proj_back_y->SetTitle(Form("Projection with Gate From [%.01f,%.01f] and Background [%.01f,%.01f]",back_low,back_high,back_bg_low,back_bg_high));
+  }else if(back_low>0 && back_high>0){
+    Proj_back_y->SetTitle(Form("Projection with Gate From [%.01f,%.01f] NO background",back_low,back_high));
+  }
+
+
+  double binsize = (Proj_y->GetXaxis()->GetXmax()-Proj_y->GetXaxis()->GetXmin())/Proj_y->GetXaxis()->GetNbins();
+  Proj_y->GetXaxis()->SetTitle("Energy [keV]");
+  Proj_y->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize));
+  Proj_back_y->GetXaxis()->SetTitle("Energy [keV]");
+  Proj_back_y->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize));
+
+
+
+  double Grace = 300;
+  double ZoomHigh = high+Grace;
+  double ZoomLow  = low-Grace;
+  if(bg_high>0 && bg_high>high)
+    ZoomHigh = bg_high+Grace;
+  if(bg_low>0 && bg_low<low)
+    ZoomLow = bg_low-Grace;
+
+  Proj_y->GetXaxis()->SetRangeUser(ZoomLow,ZoomHigh);
+  Proj_y->Draw();
+  double Projy_Max = Proj_y->GetMaximum();
+  double Projy_Min = Proj_y->GetMinimum();
+
+  TLine *CutLow  = new TLine(low,Projy_Min,low,Projy_Max);
+  TLine *CutHigh = new TLine(high,Projy_Min,high,Projy_Max);
+  TLine *BGLow   = new TLine(bg_low,Projy_Min,bg_low,Projy_Max);
+  TLine *BGHigh  = new TLine(bg_high,Projy_Min,bg_high,Projy_Max);
+  CutLow->SetLineColor(kRed);
+  CutHigh->SetLineColor(kRed);
+  CutLow->SetLineWidth(2);
+  CutHigh->SetLineWidth(2);
+  BGLow->SetLineColor(kBlue);
+  BGHigh->SetLineColor(kBlue);
+  BGLow->SetLineWidth(2);
+  BGHigh->SetLineWidth(2);
+  BGLow->SetLineStyle(kDashed);
+  BGHigh->SetLineStyle(kDashed);
+  CutLow->Draw("same");
+  CutHigh->Draw("same");
+  if(bg_low>0 && bg_high>0){
+    BGHigh->Draw("same");
+    BGLow->Draw("same");
+    Proj_gated = Proj_y2_Clone->Project_Background(low,high,
+						  bg_low,bg_high,
+						  kRegionBackground);
+  }else{
+    Proj_gated = Proj_y2_Clone->Project(low,high);
+  }
+  if(overlay){
+    Proj_gated2 = Proj_y2_Clone2->Project(low,high);
+    Proj_gated2->SetLineColor(2);
+  }
+
+  if(bg_high>0 && bg_low>0){
+    Proj_gated->SetTitle(Form("Gate From [%.01f,%.01f] with Background [%.01f,%.01f]",low,high,bg_low,bg_high));
+    if(overlay)
+      Proj_gated2->SetTitle(Form("Gate From [%.01f,%.01f] with Background [%.01f,%.01f]",low,high,bg_low,bg_high));
+  }else{
+    Proj_gated->SetTitle(Form("Gate From [%.01f,%.01f] NO Background",low,high));
+    if(overlay)
+      Proj_gated2->SetTitle(Form("Gate From [%.01f,%.01f] NO Background",low,high));
+  }
+  double binsize_gated = (Proj_gated->GetXaxis()->GetXmax()-Proj_gated->GetXaxis()->GetXmin())/Proj_gated->GetXaxis()->GetNbins();
+  Proj_gated->GetXaxis()->SetTitle("Energy [keV]");
+  Proj_gated->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize_gated));
+
+
+  C_projections->cd(2);
+  if(overlay){
+    Proj_gated2->GetXaxis()->SetTitle("Energy [keV]");
+    Proj_gated2->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize_gated));
+
+    Proj_gated2->Draw();
+    Proj_gated->Draw("same");
+  } else
+    Proj_gated->Draw();
+  if(back_low<0 && back_high<0)
+    return 1;
+
+
+  //---------------------------------------------------------------------------
+
+  C_projections->cd(3);
+  gPad->Clear();
+  C_projections->cd(4);
+  gPad->Clear();
+
+  if(back_low>0 && back_high>0){
+    C_projections->cd(3);
+    double back_ZoomHigh = back_high+Grace;
+    double back_ZoomLow  = back_low-Grace;
+    if(back_bg_high>0 && back_bg_high>high)
+      back_ZoomHigh = back_bg_high+Grace;
+    if(back_bg_low>0 && back_bg_low<low)
+      back_ZoomLow = back_bg_low-Grace;
+
+
+    Proj_back_y->GetXaxis()->SetRangeUser(back_ZoomLow,back_ZoomHigh);
+    Proj_back_y->Draw();
+    double Proj_back_y_Max = Proj_back_y->GetMaximum();
+    double Proj_back_y_Min = Proj_back_y->GetMinimum();
+
+    TLine *back_CutLow  = new TLine(back_low,Proj_back_y_Min,back_low,Proj_back_y_Max);
+    TLine *back_CutHigh = new TLine(back_high,Proj_back_y_Min,back_high,Proj_back_y_Max);
+    TLine *back_BGLow   = new TLine(back_bg_low,Proj_back_y_Min,back_bg_low,Proj_back_y_Max);
+    TLine *back_BGHigh  = new TLine(back_bg_high,Proj_back_y_Min,back_bg_high,Proj_back_y_Max);
+    back_CutLow->SetLineColor(kRed);
+    back_CutHigh->SetLineColor(kRed);
+    back_CutLow->SetLineWidth(2);
+    back_CutHigh->SetLineWidth(2);
+    back_BGLow->SetLineColor(kBlue);
+    back_BGHigh->SetLineColor(kBlue);
+    back_BGLow->SetLineWidth(2);
+    back_BGHigh->SetLineWidth(2);
+    back_BGLow->SetLineStyle(kDashed);
+    back_BGHigh->SetLineStyle(kDashed);
+    back_CutLow->Draw("same");
+    back_CutHigh->Draw("same");
+    if(back_bg_low>0 && back_bg_high>0){
+      back_BGHigh->Draw("same");
+      back_BGLow->Draw("same");
+      Proj_gated_back = Proj_back_y2_Clone->Project_Background(back_low,back_high,
+							       back_bg_low,back_bg_high,
+							       kRegionBackground);
+    }else{
+      Proj_gated_back = Proj_back_y2_Clone->Project(back_low,back_high);
+    }
+
+    if(back_overlay){
+      Proj_gated_back2 = Proj_back_y2_Clone2->Project(back_low,back_high);
+      Proj_gated_back2->SetLineColor(2);
+    }
+
+    if(back_bg_high>0 && back_bg_low>0){
+      Proj_gated_back->SetTitle(Form("Gate From [%.01f,%.01f] with Background [%.01f,%.01f]",
+				     back_low,back_high,back_bg_low,back_bg_high));
+      if(back_overlay){
+      Proj_gated_back2->SetTitle(Form("Gate From [%.01f,%.01f] with Background [%.01f,%.01f]",
+				     back_low,back_high,back_bg_low,back_bg_high));
+      }
+    }else{
+      Proj_gated_back->SetTitle(Form("Gate From [%.01f,%.01f] NO Background",back_low,back_high));
+      if(back_overlay){
+	Proj_gated_back2->SetTitle(Form("Gate From [%.01f,%.01f] NO Background",back_low,back_high));
+      }
+
+    }
+    double binsize_back_gated = (Proj_gated_back->GetXaxis()->GetXmax()-Proj_gated_back->GetXaxis()->GetXmin())/Proj_gated_back->GetXaxis()->GetNbins();
+    Proj_gated_back->GetXaxis()->SetTitle("Energy [keV]");
+    Proj_gated_back->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize_back_gated));
+
+    C_projections->cd(4);
+    if(back_overlay){
+      Proj_gated_back2->GetXaxis()->SetTitle("Energy [keV]");
+      Proj_gated_back2->GetYaxis()->SetTitle(Form("Counts / %.0f keV",binsize_back_gated));
+
+      Proj_gated_back2->Draw();
+      Proj_gated_back->Draw("same");
+    } else{
+      Proj_gated_back->Draw();
+    }
+  }
+
+
+
+
+
+  return 1;
+}
 
 int LabelPeaks(TH1 *hist,double sigma,double thresh,Option_t *opt) {
   TSpectrum::StaticSearch(hist,sigma,"Qnodraw",thresh);
@@ -67,10 +739,17 @@ int LabelPeaks(TH1 *hist,double sigma,double thresh,Option_t *opt) {
     return n;
   TText *text;
   double *x = pm->GetX();
-  double *y = pm->GetY();
+  //  double *y = pm->GetY();
   for(int i=0;i<n;i++) {
-    y[i] += 20.0;
-    text = new TText(x[i],y[i],Form("%.1f",x[i]));
+    //y[i] += y[i]*0.15;
+    double y = 0;
+    for(int i_x = x[i]-3;i_x<x[i]+3;i_x++){
+      if((hist->GetBinContent(hist->GetXaxis()->FindBin(i_x)))>y){
+	y = hist->GetBinContent(hist->GetXaxis()->FindBin(i_x));
+      }
+    }
+    y+=y*0.1;
+    text = new TText(x[i],y,Form("%.1f",x[i]));
     text->SetTextSize(0.025);
     text->SetTextAngle(90);
     text->SetTextAlign(12);
@@ -83,6 +762,7 @@ int LabelPeaks(TH1 *hist,double sigma,double thresh,Option_t *opt) {
   hist->GetListOfFunctions()->Add(array);
   return n;
 }
+
 
 
 bool ShowPeaks(TH1 **hists,unsigned int nhists,double sigma,double thresh) {
@@ -117,7 +797,171 @@ bool RemovePeaks(TH1 **hists,unsigned int nhists) {
 //  TString option = opt;
 //}
 
-bool GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
+GGaus *GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
+  //bool edit = false;
+  if(!hist)
+    return 0;
+  if(xlow>xhigh)
+    std::swap(xlow,xhigh);
+
+  //std::cout << "here." << std::endl;
+
+  GGaus *mypeak= new GGaus(xlow,xhigh);
+  std::string options = opt;
+  options.append("Q+");
+  mypeak->Fit(hist,options.c_str());
+  //mypeak->Background()->Draw("SAME");
+  TF1 *bg = new TF1(*mypeak->Background());
+  hist->GetListOfFunctions()->Add(bg);
+  //edit = true;
+
+  return mypeak;
+}
+
+namespace {
+  class BackgroundFitter {
+  public:
+    BackgroundFitter(std::vector<double> regions)
+      : regions(regions) { }
+
+    double operator()(double* x, double* par) {
+      bool is_in_background = false;
+      for(unsigned int i=0; i+1<regions.size(); i+=2) {
+        double bg_low = regions[i];
+        double bg_high = regions[i+1];
+
+        if(x[0] >= bg_low && x[0] < bg_high) {
+          is_in_background = true;
+          break;
+        }
+      }
+      if(!is_in_background) {
+        TF1::RejectPoint();
+      } else {
+      }
+
+      return par[0] + x[0]*par[1];
+    }
+
+  private:
+    std::vector<double> regions;
+  };
+}
+
+GGaus *DirkGausFit(TH1* hist, double low, double high,
+                   std::vector<double> background_regions,
+                   Option_t *opt) {
+  if(!hist)
+    return 0;
+
+  if(low>high) {
+    std::swap(low,high);
+  }
+
+  double max_x = -std::numeric_limits<double>::infinity();
+  double min_x = +std::numeric_limits<double>::infinity();
+
+  // Clamp all background regions to bin edges
+  for(double& val : background_regions) {
+    val = hist->GetXaxis()->GetBinLowEdge(hist->FindBin(val));
+    max_x = std::max(max_x, val);
+    min_x = std::min(min_x, val);
+  }
+
+  // Order each region
+  for(unsigned int i=0; i+1<background_regions.size(); i+= 2) {
+    if(background_regions[i] > background_regions[i+1]) {
+      std::swap(background_regions[i], background_regions[i+1]);
+    }
+  }
+
+  max_x = std::max(max_x, high);
+  min_x = std::min(min_x, low);
+
+  double slope = 0;
+  double offset = 0;
+
+  {
+    TF1* first_bg_fit = new TF1("first_bg_fit", "pol1", min_x, min_x);
+    std::string options = opt;
+    options.append("N0Q");
+    hist->Fit(first_bg_fit, options.c_str());
+    slope = first_bg_fit->GetParameter(1);
+    offset = first_bg_fit->GetParameter(0);
+    delete first_bg_fit;
+  }
+
+
+  {
+    TF1* bg_fit = new TF1("bg_fit", BackgroundFitter(background_regions), min_x, max_x, 2);
+    bg_fit->SetParameter(0, offset);
+    bg_fit->SetParameter(1, slope);
+    std::string options = opt;
+    options.append("N0Q");
+    hist->Fit(bg_fit, options.c_str());
+    slope = bg_fit->GetParameter(1);
+    offset = bg_fit->GetParameter(0);
+    delete bg_fit;
+  }
+
+  std::cout << "Slope: " << slope << "\tOffset: " << offset << std::endl;
+
+
+
+  std::cout << "Slope: " << slope << "\tOffset: " << offset << std::endl;
+
+  GGaus *mypeak= new GGaus(low,high);
+  std::string options = opt;
+  options.append("Q+");
+
+  mypeak->FixParameter(3,offset);
+  mypeak->FixParameter(4,slope);
+
+  mypeak->Fit(hist,options.c_str());
+  TF1 *bg = new TF1(*mypeak->Background());
+  bg->SetRange(min_x, max_x);
+  hist->GetListOfFunctions()->Add(bg);
+
+  return mypeak;
+}
+
+
+TF1 *DoubleGausFit(TH1 *hist,double cent1,double cent2,double xlow, double xhigh,Option_t *opt) {
+  if(!hist)
+    return 0;
+  if(xlow>xhigh)
+    std::swap(xlow,xhigh);
+
+  //std::cout << "here." << std::endl;
+
+  GGaus *mypeak= new GGaus(xlow,xhigh);
+  std::string options = opt;
+  options.append("Q+");
+  mypeak->Fit(hist,options.c_str());
+  //mypeak->Background()->Draw("SAME");
+  TF1 *bg = new TF1(*mypeak->Background());
+  hist->GetListOfFunctions()->Add(bg);
+  //edit = true;
+
+  return mypeak;
+}
+
+
+
+
+
+
+
+
+
+/*
+
+
+
+=======
+
+
+
   bool edit = false;
   if(!hist)
     return edit;
@@ -170,36 +1014,62 @@ bool GausFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
   printf(GREEN "Resolution: %.02f %%" RESET_COLOR "\n",TMath::Abs(param[2]*2.35)/param[1]*100.0);
 
   edit = true;
-  
+
   TIter it(hist->GetListOfFunctions());
   while(TObject *obj=it.Next()) {
     if(!hist->InheritsFrom(TF1::Class()))
       continue;
     ((TF1*)obj)->Draw("same");
   }
-  
-  
+
+
   return edit;
 
 }
+*/
 
-bool PhotoPeakFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
-  bool edit = false;
+
+GPeak *PhotoPeakFit(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
+  //bool edit = 0;
   if(!hist)
-    return edit;
+    return 0;
   if(xlow>xhigh)
     std::swap(xlow,xhigh);
 
   //std::cout << "here." << std::endl;
 
   GPeak *mypeak= new GPeak((xlow+xhigh)/2.0,xlow,xhigh);
-  mypeak->Fit(hist,"Q+");
+  std::string options = opt;
+  options.append("Q+");
+  mypeak->Fit(hist,options.c_str());
   //mypeak->Background()->Draw("SAME");
   TF1 *bg = new TF1(*mypeak->Background());
   hist->GetListOfFunctions()->Add(bg);
-  edit = true;
+  //edit = true;
 
-  return edit;
+  return mypeak;
+}
+
+GPeak *PhotoPeakFitNormBG(TH1 *hist,double xlow, double xhigh,Option_t *opt) {
+  //bool edit = 0;
+  if(!hist)
+    return 0;
+  if(xlow>xhigh)
+    std::swap(xlow,xhigh);
+
+  //std::cout << "here." << std::endl;
+
+  GPeak *mypeak= new GPeak((xlow+xhigh)/2.0,xlow,xhigh);
+  std::string options = opt;
+  options.append("Q+");
+  mypeak->Fit(hist,options.c_str());
+  mypeak->FitExclude(hist,xlow,xhigh);
+  //mypeak->Background()->Draw("SAME");
+  //TF1 *bg = new TF1(*mypeak->Background());
+  //hist->GetListOfFunctions()->Add(bg);
+  //edit = true;
+
+  return mypeak;
 }
 
 std::string MergeStrings(const std::vector<std::string>& strings, char split) {
@@ -274,8 +1144,13 @@ void StartGUI() {
                              std::istreambuf_iterator<char>());
   TPython::Exec(script_text.c_str());
 
-  TTimer* gui_timer = new TTimer("TPython::Exec(\"update()\");", 10, true);
-  gui_timer->TurnOn();
+  // TTimer* gui_timer = new TTimer("TPython::Exec(\"update()\");", 10, true);
+  // gui_timer->TurnOn();
+  TTimer* gui_timer = new TTimer();
+  DummyGuiCaller* dummy_gui_caller = new DummyGuiCaller;
+  gui_timer->Connect("Timeout()", "DummyGuiCaller",
+                     dummy_gui_caller, "CallUpdate()");
+  gui_timer->Start(10, false);
 
   gui_is_running = true;
   for(int i=0;i<gROOT->GetListOfFiles()->GetSize();i++) {
@@ -286,6 +1161,10 @@ void StartGUI() {
 
 bool GUIIsRunning() {
   return gui_is_running;
+}
+
+void DummyGuiCaller::CallUpdate() {
+  TPython::Exec("update()");
 }
 
 
@@ -340,10 +1219,3 @@ TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
    }
   return toreturn;
 }
-
-
-
-
-
-
-

@@ -6,6 +6,15 @@
 #include "TJanus.h"
 #include "TReaction.h"
 
+TJanusHit::TJanusHit(const TJanusHit& hit) {
+  hit.Copy(*this);
+}
+
+TJanusHit& TJanusHit::operator=(const TJanusHit& hit) {
+  hit.Copy(*this);
+  return *this;
+}
+
 void TJanusHit::Copy(TObject& obj) const {
   TDetectorHit::Copy(obj);
 
@@ -16,6 +25,8 @@ void TJanusHit::Copy(TObject& obj) const {
 
   hit.fTimeOverflowBit  = fTimeOverflowBit;
   hit.fTimeUnderflowBit = fTimeUnderflowBit;
+
+  back_hit.Copy(hit.back_hit);
 }
 
 void TJanusHit::Clear(Option_t* opt) {

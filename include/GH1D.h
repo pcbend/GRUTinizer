@@ -7,18 +7,24 @@
 #include "GH2I.h"
 
 class TF1;
+class TClass;
+class TMethodCall;
+
+class GPeak;
+class GCutG;
+class TRuntimeObjects;
 
 class GH1D : public TH1D {
 public:
-  GH1D() : TH1D(), parent(NULL), projection_axis(-1) { }
+  GH1D() : TH1D(), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0) { }
   GH1D(const TVectorD& v)
-    : TH1D(v), parent(NULL), projection_axis(-1) { }
+    : TH1D(v), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0) { }
   GH1D(const char* name, const char* title, Int_t nbinsx, const Float_t* xbins)
-    : TH1D(name, title, nbinsx, xbins), parent(NULL), projection_axis(-1) { }
+    : TH1D(name, title, nbinsx, xbins), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0) { }
   GH1D(const char* name, const char* title, Int_t nbinsx, const Double_t* xbins)
-    : TH1D(name, title, nbinsx, xbins), parent(NULL), projection_axis(-1) { }
+    : TH1D(name, title, nbinsx, xbins), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0) { }
   GH1D(const char* name, const char* title, Int_t nbinsx, Double_t xlow, Double_t xup)
-    : TH1D(name, title, nbinsx, xlow, xup), parent(NULL), projection_axis(-1) { }
+    : TH1D(name, title, nbinsx, xlow, xup), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0) { }
 
   GH1D(const TF1& function,Int_t nbinsx,Double_t xlow,Double_t xup);
 
@@ -32,6 +38,12 @@ public:
   int GetProjectionAxis() const { return projection_axis; }
   void SetProjectionAxis(int axis) { projection_axis = axis; }
 
+  virtual Int_t Fill(const TObject* obj);
+  virtual Int_t Fill(const TRuntimeObjects* objs);
+  virtual Int_t Fill(double x) { return TH1D::Fill(x); }
+  virtual Int_t Fill(double x,double w) { return TH1D::Fill(x,w); }
+  virtual Int_t Fill(const char *name,double w) { return TH1D::Fill(name,w); }
+
   void Clear(Option_t* opt="");
   void Print(Option_t* opt="") const;
   void Copy(TObject& obj) const;
@@ -39,6 +51,8 @@ public:
   TH1 *DrawCopy(Option_t *opt="") const;
   TH1 *DrawNormalized(Option_t *opt="",Double_t norm=1) const;
 
+  bool WriteDatFile(const char *outFile);
+  
   GH1D* Project(int bins=-1);
 
   GH1D* GetPrevious(bool DrawEmpty=false) const;
@@ -49,9 +63,27 @@ public:
                            double bg_bin_low, double bg_bin_high,
                            kBackgroundSubtraction mode = kRegionBackground) const;
 
+  void SetFillMethod(const char *classname,const char *methodname,const char* param="");
+  void AddGate(GCutG *gate) { gates.push_back(gate); } 
+
+
+  GPeak* DoPhotoPeakFit(double xlow,double xhigh,Option_t *opt=""); // *MENU* 
+  GPeak* DoPhotoPeakFitNormBG(double xlow,double xhigh,Option_t *opt=""); // *MENU* 
+
+  double GetLastXlow()  const { return xl_last;}
+  double GetLastXhigh() const { return xh_last;}
+
 private:
   TRef parent;
   int projection_axis;
+
+  TClass      *fFillClass;  //!
+  TMethodCall *fFillMethod; //!
+
+  double xl_last; //!
+  double xh_last; //!
+  
+  std::vector<GCutG*> gates; //!
 
   ClassDef(GH1D,1)
 };

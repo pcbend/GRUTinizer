@@ -132,7 +132,7 @@ class MainWindow(object):
                            text='Load Root File',fg="black",bg="goldenrod",
                            command=self.LoadRootFile)
         button.pack(side=tk.LEFT)
-        
+
         button = tk.Button(frame,
                            text='Load Window File',fg="black",bg="goldenrod",
                            command=self.LoadWindowFile)
@@ -160,6 +160,11 @@ class MainWindow(object):
         button = tk.Button(frame,
                            text='Resort Data',fg="black",bg="goldenrod",
                            command=self.ResortDataFile)
+        button.pack(side=tk.LEFT)
+
+        button = tk.Button(frame,
+                           text='Snapshot',fg="black",bg="goldenrod",
+                           command=self.Snapshot)
         button.pack(side=tk.LEFT)
 
         frame.pack(fill=tk.X,expand=False)
@@ -259,7 +264,6 @@ class MainWindow(object):
         filemenu.add_separator()
         filemenu.add_command(label="Close All Canvases",command=self.close_all_canvases)
         filemenu.add_separator()
-        filemenu.add_command(label="Open GUI",command=self.hello)
         filemenu.add_command(label="Save GUI",command=self._save_gui_file)
         filemenu.add_command(label="Dump ROOT Config",
                              command=lambda :self._dump_root_file(include_histograms=False))
@@ -493,7 +497,8 @@ class MainWindow(object):
             opt.append('colz')
         self._SetOptStat()
         hist.SetLineColor(color)
-        hist.Draw(' '.join(opt))
+        #hist.Draw(' '.join(opt))
+        hist.Draw()
 
     def AddDirectory(self, tdir):
         if tdir:
@@ -507,6 +512,17 @@ class MainWindow(object):
     def LoadCutG(self, cutg):
         if cutg:
             self.tcut_tab.AddCut(cutg)
+
+    def LoadCutFile(self, cutfile):
+        #if cutname is None:
+        #    filename = tkFileDialog.askopenfilename(filetypes=(("Cuts File", "*.cuts"),
+        #                                                       ("Cuts File", "*.root")))
+        #if not filename:
+        #   return
+        
+	#filename = os.path.abspath(filename)
+        #tfile = ROOT.TFile(filename);                
+        self.tcut_tab.AddFile(cutfile)
 
     def LoadDataFile(self, filename = None):
         if filename is None:
@@ -561,8 +577,8 @@ class MainWindow(object):
                                         '..','libraries',library_name)
         ROOT.gSystem.Load(library_name)
 
-    def hello(self):
-        print "hello!"
+    def Snapshot(self):
+        ROOT.GSnapshot.Get().Snapshot()
 
     def close_all_canvases(self):
         canvases = ROOT.gROOT.GetListOfCanvases()

@@ -11,7 +11,6 @@
 #include "TList.h"
 
 #include "DynamicLibrary.h"
-#include "TDetector.h"
 #include "TRuntimeObjects.h"
 
 #include "TUnpackedEvent.h"
@@ -22,7 +21,6 @@ class TCompiledHistograms : public TObject {
 public:
   TCompiledHistograms();
   TCompiledHistograms(std::string libname);
-  ~TCompiledHistograms();
 
   void Load(std::string libname);
   void Fill(TUnpackedEvent& detectors);
@@ -30,17 +28,12 @@ public:
 
   std::string GetLibraryName() const { return libname; }
 
-  //TList* GetVariables();
-  void SetReplaceVariable(const char* name, double value);
-  void RemoveVariable(const char* name);
-
   void SetDefaultDirectory(TDirectory* dir);
   TDirectory* GetDefaultDirectory() { return default_directory; }
 
   void ClearHistograms();
 
   TList* GetObjects()   { return &objects;   }
-  TList* GetVariables() { return &variables; }
   TList* GetGates()     { return &gates;     }
 
   void AddCutFile(TFile* cut_file);
@@ -66,12 +59,11 @@ private:
 
   TList objects;
   TList gates;
-  TList variables;
   std::vector<TFile*> cut_files;
 
   TDirectory* default_directory;
 
-  TRuntimeObjects *obj;
+  TRuntimeObjects obj;
 
   ClassDef(TCompiledHistograms, 0);
 };

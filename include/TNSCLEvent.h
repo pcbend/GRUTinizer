@@ -39,7 +39,7 @@ class TNSCLEvent : public TRawEvent {
   ClassDef(TNSCLEvent,0);
 };
 
-class TNSCLScaler : public TNSCLEvent {
+class TRawNSCLScalers : public TNSCLEvent {
 public:
   // Seconds since the previous scaler read
   Int_t GetIntervalStartOffset();
@@ -61,7 +61,7 @@ public:
 
   Int_t GetScalerValue(size_t scaler_num);
 
-  ClassDef(TNSCLScaler,0);
+  ClassDef(TRawNSCLScalers,0);
 };
 
 class TNSCLFragment : public TObject {

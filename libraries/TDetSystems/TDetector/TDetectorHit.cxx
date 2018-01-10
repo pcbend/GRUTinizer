@@ -1,9 +1,11 @@
 #include "TDetectorHit.h"
 
 #include <iostream>
+#include <cmath>
 
-#include <TClass.h>
+#include "TClass.h"
 #include "TRandom.h"
+#include "TBuffer.h"
 
 ClassImp(TDetectorHit)
 
@@ -22,6 +24,7 @@ void TDetectorHit::Clear(Option_t *opt) {
   fCharge = -1;
   fTime = -1;
   fTimestamp = -1;
+  fFlags = 0;
 }
 
 void TDetectorHit::Print(Option_t *opt) const { }
@@ -34,15 +37,46 @@ void TDetectorHit::Copy(TObject& obj) const {
   hit.fCharge = fCharge;
   hit.fTime = fTime;
   hit.fTimestamp = fTimestamp;
+  hit.fFlags = fFlags;
+}
+
+void TDetectorHit::SetCharge(int charge) {
+  fCharge = charge + gRandom->Uniform();
+  fFlags &= ~kIsEnergy;
+}
+
+void TDetectorHit::SetEnergy(double energy) {
+  fCharge = energy;
+  fFlags |= kIsEnergy;
+}
+
+Int_t  TDetectorHit::Charge() const {
+  if(fFlags & kIsEnergy) {
+    return 0;
+  } else {
+    return RawCharge();
+  }
 }
 
 double TDetectorHit::GetEnergy() const {
-  TChannel* chan = TChannel::GetChannel(fAddress);
-  if(!chan){
-    return Charge() + gRandom->Uniform();
+  if(fFlags & kIsEnergy) {
+    return RawCharge();
+  } else {
+    TChannel* chan = TChannel::GetChannel(fAddress);
+    if(!chan){
+      return fCharge;
+    } else {
+      return chan->CalEnergy(RawCharge(), fTimestamp);
+    }
   }
-  return chan->CalEnergy(Charge(), fTimestamp);
 }
+
+void TDetectorHit::AddEnergy(double eng) {
+  SetEnergy(eng + GetEnergy());
+}
+
+
+
 
 double TDetectorHit::GetTime() const {
   TChannel* chan = TChannel::GetChannel(fAddress);
@@ -70,5 +104,16 @@ const char* TDetectorHit::GetName() const {
     return chan->GetName();
   } else {
     return "";
+  }
+}
+
+
+void TDetectorHit::Streamer(TBuffer &r_b) {
+  if(r_b.IsReading()) {
+    //std::cout << "streamer\tin!" << std::endl;
+    r_b.ReadClassBuffer(TDetectorHit::Class(),this);
+  } else {
+    //std::cout << "streamer\tout!" << std::endl;
+    r_b.WriteClassBuffer(TDetectorHit::Class(),this);
   }
 }

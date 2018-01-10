@@ -19,6 +19,7 @@ public:
   virtual void Copy(TObject& obj) const;
   virtual void Print(Option_t *opt = "") const;
   virtual void Clear(Option_t *opt = "");
+  virtual UInt_t Size() const { return gretsim_hits.size(); }
 
   virtual void          InsertHit(const TDetectorHit& hit);
   virtual TDetectorHit& GetHit(int i)            { return gretsim_hits.at(i); }

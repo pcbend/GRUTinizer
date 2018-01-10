@@ -5,6 +5,7 @@
 #ifndef __ROOTMACRO__
 #   include <mutex>
 #   include <atomic>
+#   include <memory>
 #endif
 #endif
 //class  std::mutex;
@@ -47,20 +48,21 @@ public:
    */
   ~TSmartBuffer();
 
-  /// Copy constructor
-  TSmartBuffer(const TSmartBuffer& other);
-
-  /// Assignment operator
-  TSmartBuffer& operator=(TSmartBuffer other);
 
 #ifndef __CINT__
 #ifndef __ROOTMACRO__
+  /// Copy constructor
+  TSmartBuffer(const TSmartBuffer& other) = default;
+
+  /// Assignment operator
+  TSmartBuffer& operator=(const TSmartBuffer& other) = default;
+
   /// Move constructor
-  TSmartBuffer(TSmartBuffer&& other);
+  TSmartBuffer(TSmartBuffer&& other) = default;
+
+  TSmartBuffer& operator=(TSmartBuffer&& other) = default;
 #endif
 #endif
-
-
 
   /// Clears the object.
   /**
@@ -128,22 +130,15 @@ private:
    */
   void swap(TSmartBuffer& other);
 
-  /// The pointer that was allocated by malloc().
-  /**
-    free() will be called on this location only when the last reference to it is deleted.
-    All buffer subsets share this value.
-   */
-  char* fAllocatedLocation;
-
   /// The pointer to the current data
   char* fData;
 
   /// The size of the current subset of the data.
   size_t fSize;
+
 #ifndef __CINT__
 #ifndef __ROOTMACRO__
-  /// The location of the reference count.
-  std::atomic_int* fReferenceCount;
+  std::shared_ptr<char> fAllocatedData;
 #endif
 #endif
 

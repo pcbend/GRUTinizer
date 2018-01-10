@@ -1,23 +1,14 @@
 #ifndef _TWRITELOOP_H_
 #define _TWRITELOOP_H_
 
-#ifndef __CINT__
-#include <atomic>
-#endif
-
 #include <map>
-#include <vector>
 
 #include "TClass.h"
-#include "TDirectory.h"
 #include "TTree.h"
 
-#include "TUnpackingLoop.h"
 #include "StoppableThread.h"
 #include "ThreadsafeQueue.h"
 #include "TUnpackedEvent.h"
-
-class THistogramLoop;
 
 class TWriteLoop : public StoppableThread {
 public:
@@ -25,7 +16,12 @@ public:
 
   virtual ~TWriteLoop();
 
-  void Connect(TUnpackingLoop* input_queue);
+#ifndef __CINT__
+  std::shared_ptr<ThreadsafeQueue<TUnpackedEvent*> >& InputQueue() { return input_queue; }
+  std::shared_ptr<ThreadsafeQueue<TUnpackedEvent*> >& OutputQueue() { return output_queue; }
+#endif
+
+  virtual void ClearQueue();
 
   void Write();
 
@@ -34,8 +30,6 @@ public:
   size_t GetItemsCurrent() { return 0;      }
   size_t GetRate()         { return 0; }
 
-  bool AttachHistogramLoop(THistogramLoop *loop) {hist_loop = loop; return loop; }
-
 protected:
   bool Iteration();
 
@@ -43,18 +37,17 @@ private:
   TWriteLoop(std::string name, std::string output_file);
   void AddBranch(TClass* cls);
 
-  //ThreadsafeQueue<TUnpackedEvent*> input_queue;
-
-#ifndef __CINT__
-  void WriteEvent(TUnpackedEvent* event);
-  THistogramLoop *hist_loop;
+  void WriteEvent(TUnpackedEvent& event);
   TFile* output_file;
-  std::mutex input_queue_mutex;
-  std::vector<TUnpackingLoop*> input_queues;
   TTree* event_tree;
   std::map<TClass*, TDetector**> det_map;
+  std::map<TClass*, TDetector*> default_dets;
 
   size_t items_handled;
+
+#ifndef __CINT__
+  std::shared_ptr<ThreadsafeQueue<TUnpackedEvent*> > input_queue;
+  std::shared_ptr<ThreadsafeQueue<TUnpackedEvent*> > output_queue;
 #endif
 
   ClassDef(TWriteLoop, 0);

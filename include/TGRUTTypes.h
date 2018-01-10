@@ -6,6 +6,8 @@
 
 #include <Rtypes.h>
 
+#include "TDetectorFactory.h"
+
 enum kDetectorSystems {
   UNKNOWN_SYSTEM = -1,
 
@@ -16,16 +18,20 @@ enum kDetectorSystems {
   BANK29     = 8,
   GRETINA_SIM= 11,
   S800_SIM   = 9,
+  LENDA      = 21,
 
   SEGA = 64,
   JANUS = 65,
+  JANUS_DDAS = 66,
   FASTSCINT =4,
 
   CAESAR = 80,
 
   FSU = 99,
 
-  PHOSWALL = 17
+  PHOSWALL = 17,
+
+  NSCLSCALERS = 100
 };
 
 extern std::map<std::string, kDetectorSystems> detector_system_map;
@@ -43,11 +49,14 @@ enum kFileType {
   DETECTOR_ENVIRONMENT = 1024,
   GUI_HIST_FILE = 2048,
   COMPILED_HISTOGRAMS = 2049,
+  COMPILED_FILTER = 2053,
   CONFIG_FILE = 2050,
   S800_INVMAP = 2051,
   CUTS_FILE = 2052
 };
 
 extern std::map<std::string, EColor> color_system_map;
+
+extern std::map<kDetectorSystems, TDetectorFactoryBase*> detector_factory_map;
 
 #endif /* _TGRUTTYPES_H_ */

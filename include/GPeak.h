@@ -21,6 +21,7 @@ class GPeak : public TF1 {
     void InitNames();
     bool InitParams(TH1* fithist = 0);
     bool Fit(TH1*,Option_t *opt="");
+    bool FitExclude(TH1*,double low, double high,Option_t *opt="");
     void DrawResiduals(TH1*) const;
     //void DrawResiduals(); // *MENU*
 
@@ -31,6 +32,8 @@ class GPeak : public TF1 {
     Double_t GetCentroidErr() const  { return GetParError(GetParNumber("centroid")); }
     Double_t GetArea() const         { return fArea; }
     Double_t GetAreaErr() const      { return fDArea; }
+    Double_t GetSum() const          { return fSum; }
+    Double_t GetSumErr() const       { return fDSum; }
     Double_t GetFWHM() const         { return GetParameter("sigma")*2.3548;}
     Double_t GetFWHMErr() const      { return GetParError(GetParNumber("sigma"))*2.3548;}
     //Double_t GetIntegralArea();
@@ -39,8 +42,10 @@ class GPeak : public TF1 {
     //Double_t GetIntegralAreaErr(Double_t int_low, Double_t int_high);
 
   protected:
-    void SetArea(Double_t a) { fArea = a; }
+    void SetArea(Double_t a)      { fArea = a; }
     void SetAreaErr(Double_t d_a) { fDArea = d_a; }
+    void SetSum(Double_t a)       { fSum = a; }
+    void SetSumErr(Double_t d_a)  { fDSum = d_a; }
     void SetArea(Double_t a, Double_t dA) { SetArea(a); SetAreaErr(dA);}
     void SetChi2(Double_t chi2)   { fChi2 = chi2; }
     void SetNdf(Double_t Ndf)     { fNdf  = Ndf; }
@@ -56,6 +61,8 @@ class GPeak : public TF1 {
   private:
     double fArea;
     double fDArea;
+    double fSum;
+    double fDSum;
     double fChi2;
     double fNdf;
 
@@ -64,9 +71,9 @@ class GPeak : public TF1 {
     bool init_flag;
 
     TF1 fBGFit;
-    TF1 fBGHist;
+    //    TF1 fBGHist;
 
-  ClassDef(GPeak,2)
+  ClassDef(GPeak,3)
 };
 
 

@@ -2,13 +2,20 @@
 
 #include <cassert>
 #include <iostream>
+#include <memory>
 
 #include "TMath.h"
+#include "TRandom.h"
 
 #include "JanusDataFormat.h"
 #include "TNSCLEvent.h"
+#include "TNucleus.h"
+#include "TReaction.h"
+#include "TSRIM.h"
 
-TJanus::TJanus() { }
+TJanus::TJanus() {
+  Clear();
+}
 
 TJanus::~TJanus(){ }
 
@@ -23,15 +30,20 @@ void TJanus::Clear(Option_t* opt){
   TDetector::Clear(opt);
 
   janus_hits.clear();
+  stack_triggered = -1;
+  num_packets = -1;
+  total_bytes = -1;
 }
 
 int TJanus::BuildHits(std::vector<TRawEvent>& raw_data){
+  //assert(raw_data.size() == 1);
+
   for(auto& event : raw_data){
     TNSCLEvent& nscl = (TNSCLEvent&)event;
     SetTimestamp(nscl.GetTimestamp());
     Build_VMUSB_Read(nscl.GetPayloadBuffer());
   }
-  return janus_hits.size();
+  return janus_hits.size() + janus_channels.size();
 }
 
 TJanusHit& TJanus::GetJanusHit(int i){
@@ -44,10 +56,22 @@ TDetectorHit& TJanus::GetHit(int i){
 
 
 void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
+  total_bytes = buf.GetSize();
+  // Events with all ADCs have 1166 bytes without zero-suppression, about 850 with zero-suppression
+  // Events with missing ADCs have 690 bytes (first event of run), 418 bytes (other events),
+  //    or ~200 bytes (zero suppression).
+  // Very large events are caused when the VM-USB reads incorrectly.
+  //   These are very rare, but Jeromy doesn't know what causes it.
+  if(total_bytes < 750 ||
+     total_bytes > 1300) {
+    return;
+  }
+
   const char* data = buf.GetData();
 
   const VMUSB_Header* vmusb_header = (VMUSB_Header*)data;
   data += sizeof(VMUSB_Header);
+
 
   // This value should ALWAYS be zero, because that corresponds to the i1 trigger of the VMUSB.
   // If it is not, it is a malformed event.
@@ -61,16 +85,11 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   const VME_Timestamp* vme_timestamp = (VME_Timestamp*)(data + num_packets*sizeof(CAEN_DataPacket));
   long timestamp = vme_timestamp->ts1() * 20;
 
-  // std::cout << "JANUS timestamp at " << timestamp << std::endl;
-
-  //buf.Print("all");
-
   std::map<unsigned int,TJanusHit> front_hits;
   std::map<unsigned int,TJanusHit> back_hits;
   for(int i=0; i<num_packets; i++){
     const CAEN_DataPacket* packet = (CAEN_DataPacket*)data;
     data += sizeof(CAEN_DataPacket);
-
 
     if(!packet->IsValid()){
       continue;
@@ -93,11 +112,11 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
     static int lines_displayed = 0;
     if(!chan){
       if(lines_displayed < 1000) {
-        // std::cout << "Unknown analog (slot, channel): ("
-        //           << adc_cardnum << ", " << packet->channel_num()
-        //           << "), address = 0x"
-        //           << std::hex << address << std::dec
-        //           << std::endl;
+        std::cout << "Unknown analog (slot, channel): ("
+                  << adc_cardnum << ", " << packet->channel_num()
+                  << "), address = 0x"
+                  << std::hex << address << std::dec
+                  << std::endl;
       } else if(lines_displayed==1000){
         std::cout << "I'm going to stop telling you that the channel was unknown,"
                   << " you should probably stop the program." << std::endl;
@@ -120,10 +139,22 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
       hit->SetTDCOverflowBit(packet->overflow());
       hit->SetTDCUnderflowBit(packet->underflow());
       hit->SetTime(packet->adcvalue());
+
+      // //if(packet->adcvalue() > 150 && packet->adcvalue() < 4000) {
+      //   int channel_number = (adc_cardnum-5)*32 + packet->channel_num();
+      //   std::cout << "TDC, channel=" << channel_number << "\tvalue=" << packet->adcvalue()
+      //             << std::endl;
+      //   //}
     } else {
       hit->SetADCOverflowBit(packet->overflow());
       hit->SetADCUnderflowBit(packet->underflow());
       hit->SetCharge(packet->adcvalue());
+
+      // //if(packet->adcvalue() > 150 && packet->adcvalue() < 4000) {
+      //   int channel_number = (adc_cardnum-5)*32 + packet->channel_num();
+      //   std::cout << "ADC, channel=" << channel_number << "\tvalue=" << packet->adcvalue()
+      //             << std::endl;
+      //   //}
     }
   }
 
@@ -134,16 +165,25 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
   for(auto& elem : back_hits){
     TJanusHit& hit = elem.second;
     janus_channels.emplace_back(hit);
+
+    // if(hit.Time() > 50 && hit.Time() < 4000) {
+    //   std::cout << "address: 0x" << std::hex << hit.Address() << std::dec
+    //             << "\tvalue: " << hit.Time()
+    //             << "\tvalue: " << janus_channels.back().Time()
+    //             << std::endl;
+    // }
   }
 
   // Find all fronts with a reasonable TDC value
   int best_front = -1;
-  int max_charge = -1;
+  double max_charge = -1e9;
   for(auto& elem : front_hits){
     TJanusHit& hit = elem.second;
-    // if(hit.Time() > 200 && hit.Time() < 3900 &&
+    // if(hit.Time() > 50 && hit.Time() < 3900 &&
     //    hit.Charge() > max_charge){
-    if(hit.Charge() > max_charge){
+    if(hit.Charge() > max_charge &&
+       hit.GetDetnum() >= 0 &&
+       hit.GetDetnum() < 2){
       best_front = elem.first;
       max_charge = hit.Charge();
     }
@@ -151,12 +191,14 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
 
   // Find all backs with a reasonable TDC value
   int best_back = -1;
-  max_charge = -1;
+  max_charge = -1e9;
   for(auto& elem : back_hits){
     TJanusHit& hit = elem.second;
-    // if(hit.Time() > 200 && hit.Time() < 3900 &&
+    // if(hit.Time() > 50 && hit.Time() < 3900 &&
     //    hit.Charge() > max_charge) {
-    if(hit.Charge() > max_charge) {
+    if(hit.Charge() > max_charge &&
+       hit.GetDetnum() >= 0 &&
+       hit.GetDetnum() < 2){
       best_back = elem.first;
       max_charge = hit.Charge();
     }
@@ -176,6 +218,15 @@ void TJanus::Build_VMUSB_Read(TSmartBuffer buf){
     hit.GetBackHit().SetCharge(back.Charge());
     hit.GetBackHit().SetTime(back.Time());
     hit.GetBackHit().SetTimestamp(back.Timestamp());
+
+    // std::cout << "Front chan: " << hit.GetFrontChannel() << ", ADC=" << front.Charge() << ", TDC=" << front.Time()
+    //           << "\tBack chan: " << hit.GetBackChannel() << ", ADC=" << back.Charge() << ", TDC=" << back.Time()
+    //           << std::endl;
+
+    // std::cout << "Back hit is channel: " << hit.GetBackChannel()
+    //           << " with TDC = " << hit.GetBackHit().Time()
+    //           << ", ADC = " << hit.GetBackHit().Charge()
+    //           << std::endl;
 
   } //else {
 //   static bool message_displayed = false;
@@ -255,7 +306,7 @@ void TJanus::InsertHit(const TDetectorHit& hit) {
 void TJanus::Print(Option_t *opt) const {
   printf("TJanus @ %lu\n",Timestamp());
   printf(" Size: %i\n",Size());
-  for(int i=0;i<Size();i++) {
+  for(unsigned int i=0;i<Size();i++) {
     printf("\t"); janus_hits.at(i).Print(); printf("\n");
   }
   printf("---------------------------\n");
@@ -272,4 +323,57 @@ void TJanus::SetRunStart(unsigned int unix_time) {
   for(auto& hit : janus_hits) {
     hit.SetTimestamp(timestamp_diff + hit.Timestamp());
   }
+}
+
+double TJanus::GetBeta(double betamax, double kr_angle_rad, bool energy_loss, double collision_pos) {
+  // Factors of 1e3 are because TNucleus and TReaction use MeV, while TSRIM uses keV.
+
+  static auto kr = std::make_shared<TNucleus>("78Kr");
+  static auto pb = std::make_shared<TNucleus>("208Pb");
+  static TSRIM srim("kr78_in_pb208");
+
+  double thickness = (0.75 / 11342.0) * 1e4; // (0.75 mg/cm^2) / (11342 mg/cm^3) * (10^4 um/cm)
+
+  double pre_collision_energy_MeV = kr->GetEnergyFromBeta(betamax);
+  if(energy_loss) {
+    pre_collision_energy_MeV = srim.GetAdjustedEnergy(pre_collision_energy_MeV*1e3, thickness*collision_pos)/1e3;
+  }
+
+  TReaction reac(kr, pb, kr, pb, pre_collision_energy_MeV);
+
+  double post_collision_energy_MeV = reac.GetTLab(kr_angle_rad, 2);
+
+  if(energy_loss) {
+    double distance_travelled;
+    if(kr_angle_rad < TMath::Pi()/2) {
+      // Forward scattering, must make it out the front of the target.
+      distance_travelled = thickness*(1-collision_pos)/std::abs(std::cos(kr_angle_rad));
+    } else {
+      // Backward scattering, must make it out the back of the target.
+      distance_travelled = thickness*collision_pos/std::abs(std::cos(kr_angle_rad));
+    }
+    post_collision_energy_MeV = srim.GetAdjustedEnergy(post_collision_energy_MeV*1e3, distance_travelled)/1e3;
+  }
+
+  double beta = kr->GetBetaFromEnergy(post_collision_energy_MeV);
+  return beta;
+}
+
+double TJanus::SimAngle() {
+  static auto kr = std::make_shared<TNucleus>("78Kr");
+  static auto pb = std::make_shared<TNucleus>("208Pb");
+  static TSRIM srim("kr78_in_pb208");
+  double thickness = (0.75 / 11342.0) * 1e4; // (0.75 mg/cm^2) / (11342 mg/cm^3) * (10^4 um/cm)
+
+  double collision_pos = gRandom->Uniform();
+
+  double collision_energy = srim.GetAdjustedEnergy(3.9*78*1e3, thickness*collision_pos)/1e3;
+  double energy_mid = srim.GetAdjustedEnergy(3.9*78*1e3, thickness*0.5)/1e3;
+
+  TReaction reac(kr, pb, kr, pb, collision_energy);
+  TReaction reac_mid(kr, pb, kr, pb, energy_mid);
+
+  double pb_angle_rad = reac.ConvertThetaLab(90 * (3.1415926/180), 2, 3);
+  double kr_angle_rad_recon = reac_mid.ConvertThetaLab(pb_angle_rad, 3, 2);
+  return kr_angle_rad_recon;
 }

@@ -1,6 +1,10 @@
 #ifndef TGRETINA_H
 #define TGRETINA_H
 
+#ifndef __CINT__
+#include <functional>
+#endif
+
 #include <TObject.h>
 #include <TMath.h>
 
@@ -8,6 +12,8 @@
 
 #include "TDetector.h"
 #include "TGretinaHit.h"
+
+
 
 class TGretina : public TDetector {
 
@@ -19,13 +25,18 @@ public:
   virtual void Print(Option_t *opt = "") const;
   virtual void Clear(Option_t *opt = "");
 
-  virtual Int_t Size() { return gretina_hits.size(); }
+  virtual UInt_t Size() const { return gretina_hits.size(); }
+  virtual Int_t AddbackSize(int EngRange=-1) { BuildAddback(EngRange); return addback_hits.size(); }
+  void ResetAddback() { addback_hits.clear();}
 
   virtual void InsertHit(const TDetectorHit& hit);
   virtual TDetectorHit& GetHit(int i)            { return gretina_hits.at(i); }
 
-  const TGretinaHit& GetGretinaHit(int i) { return gretina_hits.at(i); }
-  //const TGretinaHit& GetAddbackHit(int i) { return *(TGretinaHit*)addback_hits.at(i); }
+  //const TGretinaHit& GetGretinaHit(int i) const { return gretina_hits.at(i); }
+  TGretinaHit GetGretinaHit(int i) const { return gretina_hits.at(i); }
+  const TGretinaHit& GetAddbackHit(int i) const { return addback_hits.at(i); }
+
+
   void PrintHit(int i){ gretina_hits.at(i).Print(); }
 
   static TVector3 CrystalToGlobal(int cryId,
@@ -38,14 +49,28 @@ public:
   static void DrawEnVsTheta(Double_t Beta=0.1,Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
   static void DrawCoreSummary(Option_t *gate="",Option_t *opt="",Long_t entries=kMaxLong,TChain *chain=0);
 
+  
+#ifndef __CINT__ 
+  static void SetAddbackCondition(std::function<bool(const TGretinaHit&,const TGretinaHit&)> condition) {
+    fAddbackCondition = condition;
+  }
+  static std::function<bool(const TGretinaHit&,const TGretinaHit&)> GetAddbackCondition() {
+    return fAddbackCondition;
+  }
+#endif
+  const std::vector<TGretinaHit> &GetAllHits() const { return gretina_hits; }
 
+  void  SortHits();
 
 private:
+  void BuildAddback(int EngRange=-1) const;
+#ifndef __CINT__ 
+  static std::function<bool(const TGretinaHit&,const TGretinaHit&)> fAddbackCondition;  
+#endif
   virtual int BuildHits(std::vector<TRawEvent>& raw_data);
-  //void BuildAddbackHits();
 
   std::vector<TGretinaHit> gretina_hits;
-  //TClonesArray* addback_hits;//("TGretinaHit");
+  mutable std::vector<TGretinaHit> addback_hits; //!
 
   static Float_t crmat[32][4][4][4];
   static Float_t m_segpos[2][36][3];

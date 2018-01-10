@@ -44,8 +44,8 @@ class TNucleus : public TNamed{
   void SetSymbol(const char*);  			// Sets the atomic symbol for the nucleus
 
 
-  // void AddTransition(Double_t energy, Double_t intensity, Double_t energy_uncertainty = 0.0, Double_t intensity_uncertainty = 0.0);
-  // void AddTransition(TTransition *tran);
+   void AddTransition(Double_t energy, Double_t intensity, Double_t energy_uncertainty = 0.0, Double_t intensity_uncertainty = 0.0);
+   void AddTransition(TTransition *tran);
   //Bool_t RemoveTransition(Int_t idx);
   //TGRSITransition *GetTransition(Int_t idx);
 
@@ -59,25 +59,27 @@ class TNucleus : public TNamed{
 
   // Returns total kinetic energy in MeV
   double GetEnergyFromBeta(double beta);
+  double GetBetaFromEnergy(double energy_MeV);
 
-  void AddTransition(Double_t energy, Double_t intensity, Double_t energy_uncertainty = 0.0, Double_t intensity_uncertainty = 0.0);
-  void AddTransition(TTransition *tran);
   //Bool_t RemoveTransition(Int_t idx);
   TTransition *GetTransition(Int_t idx);
 
   Int_t NTransitions() const { return TransitionList.GetSize();};
+  Int_t GetNTransitions() const { return TransitionList.GetSize();};
   double GetRadius() const;
   int GetZfromSymbol(char*);
 
-  TList TransitionList;
   //bool SetSourceData();
 
   void Print(Option_t *opt = "") const;
   void WriteSourceFile(std::string outfilename = "");
 
-
+  TList *GetTransitionList() { return &TransitionList; }
 
  private:
+   
+  void SetName();
+  
    int fA; 						// Number of nucleons (Z + N)
    int fN;						// Number of neutrons (N)
    int fZ;						// Number of protons (Z)
@@ -85,8 +87,8 @@ class TNucleus : public TNamed{
    double fMassExcess;					// Mass excess (in MeV)
    std::string fSymbol;					// Atomic symbol (ex. Ba, C, O, N)
    //std::string fName;                                    // Name, whatever user inputs (ex. 9C, 9c);
-
-   //JAB
+   
+   TList TransitionList;
    bool LoadTransitionFile();
 
    ClassDef(TNucleus,1);				// Creates a nucleus with corresponding nuclear information
