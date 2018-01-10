@@ -167,6 +167,7 @@ kDetectorSystems TDetectorEnv::DetermineSystem(TRawEvent& event) const {
   default:
     break;
   }
-
+  if( TGRUTOptions::Get()->UseFSU())  
+    source_id=0;
   return DetermineSystem(source_id);
 }

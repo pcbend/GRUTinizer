@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <TGRUTOptions.h>
+
 TNSCLEvent::TNSCLEvent() { }
 
 TNSCLEvent::TNSCLEvent(const TRawEvent &raw) {
@@ -23,6 +25,12 @@ Int_t TNSCLEvent::GetBodyHeaderSize() const {
 
 long TNSCLEvent::GetTimestamp() const {
   if(GetBodyHeaderSize() > 4) {
+    if(TGRUTOptions::Get()->UseFSU()) { 
+      Long_t tl = *((Int_t*)(GetBody()+8));
+      Long_t th = *((Int_t*)(GetBody()+12));
+      //std::cout << std::hex << t << std::dec << std::endl; 
+      return ((th<<32) + tl);
+    }
     return *((Long_t*)(GetBody()+4));
   } else {
     return -1;

@@ -14,6 +14,7 @@
 #include "TS800Scaler.h"
 #include "TSega.h"
 #include "TFastScint.h"
+#include "TFSU.h"
 
 TUnpackedEvent::TUnpackedEvent() { }
 
@@ -77,6 +78,10 @@ void TUnpackedEvent::Build() {
       GetDetector<TPhosWall>(true)->Build(raw_data);
       break;
 
+    case kDetectorSystems::FSU:
+      GetDetector<TFSU>(true)->Build(raw_data);
+      break;
+      
     default:
       break;
     }

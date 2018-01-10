@@ -45,6 +45,8 @@ void TGRUTOptions::Clear(Option_t* opt) {
   fMakeHistos = false;
   fSortMultiple = false;
 
+  fFSU = false;
+
   fShouldExit = false;
 }
 
@@ -122,6 +124,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .default_value(false);
   parser.option("w gretina-waves",&fExtractWaves)
     .description("Extract wave forms to data class when available.")
+    .default_value(false);
+  parser.option("fsu",&fFSU)
+    .description("use FSU style DDAS format")
     .default_value(false);
   parser.option("q quit", &fExitAfterSorting)
     .description("Run in batch mode");
