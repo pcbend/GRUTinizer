@@ -693,32 +693,34 @@ bool TS800::HandleHodoPacket(unsigned short *data,int size) {
   if(!size)
     return false;
   
+  //note: size is size left after subtracting out length of packet size and packet tag
+  
+
   //ID is the Hodoscope Sub-pcket "Energy" tag
   //If ID == 0, then we are dealing with channels (0,15), if ID == 1, then we
   //are dealing with channels (16,31)
-  int id = *data; ++data;
-  size -= 1;
-
-  if (id == 2){
-    ++data; ++data; 
-    size -= 2;//skipping hit pattern events
-  }
-  while (size){
-    if (id == 2 && size != 0){
-      std::cout << "Que? Not properly skipping hit registers\n";
+  int x = 0;
+  int id = *(data+x); x += 1;
+  while (x < size){
+    if (id == 2){
+//    hit_reg1 = *(data+x);
+//    hit_reg2 = *(data+x+1);
+//    tac = *(data+x+2);
+      x += 3;
+      break;
     }
-    unsigned short cur_packet = *data; ++data; size -= 1; 
+//    unsigned short cur_packet = *data; ++data; size -= 1; 
     //Energy values are 16-bit integers, where the 13th bit is the channel number
     //(0,15) and the first 12 bits are the energy.
-    unsigned short charge = cur_packet & 0x0fff;
-    unsigned short channel = id*16 + (cur_packet >> 12);
+    unsigned short charge = (*(data+x)) & 0x0fff;
+    unsigned short channel = id*16 + (*(data+x) >> 12); 
+    x += 1;
 
     THodoHit hit;
     hit.SetChannel(channel);
     hit.SetCharge(charge);
     hodo.InsertHit(hit);
-  }
-
+  }//x < size
   return true;
 }
 /*

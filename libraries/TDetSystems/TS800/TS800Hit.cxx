@@ -775,7 +775,7 @@ void THodoHit::Print(Option_t *opt) const{
 }
 void THodoHit::Clear(Option_t *opt){
   TDetectorHit::Clear(opt);
-  fChannel = -1;
+  fChannel = sqrt(-1);
 }
 
 TMTof::TMTof() { Clear(); }
