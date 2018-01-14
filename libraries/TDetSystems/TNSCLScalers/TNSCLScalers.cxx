@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "TNSCLEvent.h"
+#include "TGRUTOptions.h"
 
 TNSCLScalers::TNSCLScalers() {
   Clear();
