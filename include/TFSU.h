@@ -22,12 +22,20 @@ class TFSU: public TDetector {
     virtual void InsertHit(const TDetectorHit &hit) { fFSUHits.emplace_back((TFSUHit&)hit); fSize++; }
     virtual TDetectorHit& GetHit(int i)             { return fFSUHits.at(i);   }
 
+    TFSUHit GetDeltaE() const { return fDeltaE; }
+    TFSUHit GetE()      const { return fEnergy; }
+
+    bool GoodParticle() const { if(fDeltaE.Charge()<1 || fEnergy.Charge()<1) return false; return true; }
+
   private:
     int  BuildHits(std::vector<TRawEvent>& raw_data);
-
     std::vector<TFSUHit> fFSUHits;
 
-  ClassDef(TFSU,1)
+    TFSUHit fDeltaE;
+    TFSUHit fEnergy;
+
+
+  ClassDef(TFSU,2)
 };
 
 

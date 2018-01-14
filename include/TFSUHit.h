@@ -2,6 +2,7 @@
 #define __TFSUHIT_H__
 
 #include <TDetectorHit.h>
+#include <TVector3.h>
 
 class TFSUHit : public TDetectorHit {
   public:
@@ -16,6 +17,12 @@ class TFSUHit : public TDetectorHit {
     Int_t Channel() const {return ((fAddress&0x0000000f)); }
 
     Int_t Id()      const {return (Slot()*16+Channel()); }
+
+    TVector3 GetPosition() const;
+  
+    double GetDoppler(const TVector3 *recoil_vec=0) const;
+
+    double GetDoppler(double beta) const;
 
   ClassDef(TFSUHit,1)
 };

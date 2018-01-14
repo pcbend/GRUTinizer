@@ -91,6 +91,12 @@ std::ostream& operator<<(std::ostream& out, const TChannel& chan) {
   }
   out << "\n";
 
+  //if(chan.GetChannelPosition().Mag()>0) {
+    out << "   X:\t" << chan.GetChannelPosition().X() << "\n";
+    out << "   Y:\t" << chan.GetChannelPosition().Y() << "\n";
+    out << "   Z:\t" << chan.GetChannelPosition().Z() << "\n";
+  //}
+
   // Close out the rest
   out << "}\n-----------------------------------\n";
 
@@ -121,6 +127,7 @@ void TChannel::Copy(TObject &rhs) const {
   ((TChannel&)rhs).time_coeff = time_coeff;
   ((TChannel&)rhs).efficiency_coeff = efficiency_coeff;
   ((TChannel&)rhs).pedestal = pedestal;
+  ((TChannel&)rhs).fPosition = fPosition;
 }
 
 void TChannel::Clear(Option_t *opt) {
@@ -135,6 +142,7 @@ void TChannel::Clear(Option_t *opt) {
   array_subposition = "";
   collected_charge = "";
   pedestal = 0;
+  fPosition.Clear();
 }
 
 //void TChannel::Compare(const TObject &rhs) const { }
@@ -577,7 +585,17 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
 
         } else if(type == "SEGMENT") {
           ss >> channel->segment;
+        } else if(type == "X") {
+          double val = 0; ss >> val;
+          channel->SetChannelX(val);
+        } else if(type == "Y") {
+          double val = 0; ss >> val;
+          channel->SetChannelY(val);
+        } else if(type == "Z") {
+          double val = 0; ss >> val;
+          channel->SetChannelZ(val);
         }
+
       }
     }
   }
