@@ -6,7 +6,7 @@
 #include "TS800Scaler.h"
 #include "TDetector.h"
 
-void getScalerCounts(char *input_root_file_name){
+void getScalerCounts(char *input_root_file_name, int final_entry){
   TFile *input_root_file = new TFile(input_root_file_name, "read");
   if (!input_root_file){
     std::cout << "Failed to open the input root file!"<<std::endl;
@@ -26,6 +26,9 @@ void getScalerCounts(char *input_root_file_name){
   std::vector<int> scaler_32_overflows(32);//periodic scaler overflow check. adds 2^24 to result
 
   int n_entries = in_tree->GetEntries();
+  if (final_entry != 0){
+    n_entries = final_entry;//forces readout to stop wherever final entry is
+  }
 
   double prev_live_trig = 0;
   double prev_raw_trig  = 0;
@@ -60,14 +63,13 @@ void getScalerCounts(char *input_root_file_name){
     }
   }//loop over tree
 
-  for (int i = 0; i < scaler_32.size(); i++){
+  for (unsigned int i = 0; i < scaler_32.size(); i++){
     scaler_32.at(i) += scaler_32_overflows.at(i)*pow(2.,24.);
   }
   int live_clock = scaler_32.at(12);
   int raw_clock = scaler_32.at(11);
   int live_trigger = scaler_32.at(10);
   int raw_trigger = scaler_32.at(9);
-  int second_source = scaler_32.at(1);
 
 //live_clock     += scaler_32_overflows.at(12)*pow(2.,24.);
 //raw_clock      += scaler_32_overflows.at(11)*pow(2.,24.);
@@ -87,9 +89,14 @@ void getScalerCounts(char *input_root_file_name){
 int main(int argc, char**argv){
    
   if (argc < 2){
-    std::cout << "USAGE: getScalerCounts INPUT_FILE_NAME" << std::endl;
+    std::cout << "USAGE: getScalerCounts INPUT_FILE_NAME [ENTRY TO STOP AT]" << std::endl;
   }
-  getScalerCounts(argv[1]);
+  
+  int final_entry = 0;
+  if (argc == 3){
+    final_entry = std::stoi(argv[2]);
+  }
+  getScalerCounts(argv[1], final_entry);
   return 0;
 }
 
