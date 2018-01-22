@@ -25,6 +25,35 @@ void getScalerCounts(char *input_root_file_name, int final_entry){
   std::vector<int> scaler_32(32);//periodic scaler
   std::vector<int> scaler_32_overflows(32);//periodic scaler overflow check. adds 2^24 to result
 
+  std::map<int, std::string> chan_map;
+
+  chan_map[0] = "S800.Source";
+  chan_map[1] = "Second.Source";
+
+  chan_map[2] = "Ext1.Source";
+  chan_map[3] = "Ext2.Source";
+  chan_map[4] = "S800.Trigger";
+  chan_map[5] = "Coinc.Trigger";
+  chan_map[6] = "Ext1.Trigger";
+  chan_map[7] = "Ext2.Trigger";
+  chan_map[8] = "Second.Trigger";
+  chan_map[9] = "Raw.Trigger";
+  chan_map[10] = "Live.Trigger";
+  chan_map[11] = "Raw.Clock";
+  chan_map[12] = "Live.Clock";
+  chan_map[14] = "10Hz";
+  chan_map[15] = "1Hz";
+  chan_map[16] = "E1.Up";
+  chan_map[17] = "E1.Down";
+  chan_map[18] = "XFP.Scint";
+  chan_map[19] = "OBJ.Scint";
+  chan_map[21] = "Galotte";
+  chan_map[22] = "CRDC1.Anode";
+  chan_map[23] = "CRDC2.Anode";
+  chan_map[24] = "XFP.classic";
+  chan_map[25] = "OBJ.classic";
+  chan_map[28] = "Hodo";
+
   int n_entries = in_tree->GetEntries();
   if (final_entry != 0){
     n_entries = final_entry;//forces readout to stop wherever final entry is
@@ -49,7 +78,6 @@ void getScalerCounts(char *input_root_file_name, int final_entry){
           if (scalers->GetScaler(9) != prev_raw_trig|| scalers->GetScaler(10) != prev_live_trig){
             if (scalers->GetScaler(i) < scaler_32.at(i)){
               scaler_32_overflows.at(i) += 1;
-              std::cout << "incrementing overflow on channel " << i << " for event " << entry << "\n";
             }
             scaler_32.at(i) = scalers->GetScaler(i);
           }//if triggers are no longer chanigng, we stop.
@@ -66,22 +94,13 @@ void getScalerCounts(char *input_root_file_name, int final_entry){
   for (unsigned int i = 0; i < scaler_32.size(); i++){
     scaler_32.at(i) += scaler_32_overflows.at(i)*pow(2.,24.);
   }
-  int live_clock = scaler_32.at(12);
-  int raw_clock = scaler_32.at(11);
-  int live_trigger = scaler_32.at(10);
-  int raw_trigger = scaler_32.at(9);
 
-//live_clock     += scaler_32_overflows.at(12)*pow(2.,24.);
-//raw_clock      += scaler_32_overflows.at(11)*pow(2.,24.);
-//live_trigger   += scaler_32_overflows.at(10)*pow(2.,24.);
-//raw_trigger    += scaler_32_overflows.at(9)*pow(2.,24.);
-//second_source  += scaler_32_overflows.at(1)*pow(2.,24.);
-  std::cout << "raw.clock\tlive.clock\traw.trigger\tlive.trigger" << std::endl;
-  std::cout << raw_clock   << "\t" << live_clock   <<"\t"
-            << raw_trigger << "\t" << live_trigger << "\n";
+//for (unsigned int i = 0; i < scaler_32.size(); i++){
+//  std::cout << chan_map[i] << ": " << scaler_32.at(i) << "\n";
+//}
 
-  for (unsigned int i = 0; i < scaler_32.size(); i++){
-    std::cout << "Channel " << i << ": " << scaler_32.at(i) << "\n";
+  for (std::map<int, std::string>::iterator iter = chan_map.begin(); iter != chan_map.end(); ++iter){
+    std::cout << iter->second << ": " << scaler_32.at(iter->first) << "\n";
   }
 }
 #ifndef __CINT__
