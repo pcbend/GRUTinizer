@@ -52,7 +52,7 @@ void getScalerCounts(const char *input_root_file_name, const int final_entry){
   in_tree->SetBranchAddress("TS800Scaler", &scalers);
   std::vector<int> scaler_32(32);//periodic scaler
   std::vector<int> scaler_32_overflows(32);//periodic scaler overflow check. adds 2^24 to result
-  std::vector<int> init_scaler_32;
+  std::vector<int> init_scaler_32(32);
 
   std::map<int, std::string> chan_map;
   initialize_map(chan_map);
@@ -74,7 +74,6 @@ void getScalerCounts(const char *input_root_file_name, const int final_entry){
       //ignoring incremental scalers for now
       continue;
     }
-
 
     if (scalers->Size() == 32){
       for (int i = 31; i > 0;i--){
@@ -99,7 +98,9 @@ void getScalerCounts(const char *input_root_file_name, const int final_entry){
       prev_raw_trig = scaler_32.at(9);
       prev_live_trig = scaler_32.at(10);
       if (!found_init){
-        init_scaler_32 = scaler_32;
+        for (unsigned int i = 0; i < 32; i++){
+          init_scaler_32[i] = scalers->GetScaler(i);
+        }
       }
     }//size 32
     if (entry % 100000 == 0){
@@ -107,17 +108,22 @@ void getScalerCounts(const char *input_root_file_name, const int final_entry){
     }
   }//loop over tree
 
-  //subtracts init_scaler_32 from scaler_32 and places result in scaler_32
-  std::transform(scaler_32.begin(), scaler_32.end(), init_scaler_32.begin(), 
-                 scaler_32.begin(), std::minus<int>());
+  std::cout << "============================Init Scalers======================\n";
+  for (std::map<int, std::string>::iterator iter = chan_map.begin(); iter != chan_map.end(); ++iter){
+    std::cout << iter->second << ": " << init_scaler_32.at(iter->first) << "\n";
+  }
+  std::cout << "==========================End Init Schalers===================\n";
+
   for (unsigned int i = 0; i < scaler_32.size(); i++){
     scaler_32.at(i) += scaler_32_overflows.at(i)*pow(2.,24.);
+    scaler_32.at(i) -= init_scaler_32.at(i);
   }
 
-  std::cout << "\n";
+  std::cout << "===========================Final Scalers=======================\n";
   for (std::map<int, std::string>::iterator iter = chan_map.begin(); iter != chan_map.end(); ++iter){
     std::cout << iter->second << ": " << scaler_32.at(iter->first) << "\n";
   }
+  std::cout << "==========================End Final Schalers===================\n";
 }
 #ifndef __CINT__
 
