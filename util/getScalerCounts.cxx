@@ -6,30 +6,10 @@
 #include "TS800Scaler.h"
 #include "TDetector.h"
 
-void getScalerCounts(char *input_root_file_name, int final_entry){
-  TFile *input_root_file = new TFile(input_root_file_name, "read");
-  if (!input_root_file){
-    std::cout << "Failed to open the input root file!"<<std::endl;
-    return;
-  }
-  
-  TTree *in_tree = (TTree*)input_root_file->Get("EventTree");
-  if (!in_tree){
-    std::cout << "Failed to open the input tree file!"<<std::endl;
-    return;
-  }
 
-  TS800Scaler *scalers= 0; 
-  in_tree->SetBranchAddress("TS800Scaler", &scalers);
-  std::vector<int> scaler_250(250);//incremental scalers
-  std::vector<int> scaler_32(32);//periodic scaler
-  std::vector<int> scaler_32_overflows(32);//periodic scaler overflow check. adds 2^24 to result
-
-  std::map<int, std::string> chan_map;
-
+void initialize_map(std::map<int, std::string> &chan_map){
   chan_map[0] = "S800.Source";
   chan_map[1] = "Second.Source";
-
   chan_map[2] = "Ext1.Source";
   chan_map[3] = "Ext2.Source";
   chan_map[4] = "S800.Trigger";
@@ -53,6 +33,29 @@ void getScalerCounts(char *input_root_file_name, int final_entry){
   chan_map[24] = "XFP.classic";
   chan_map[25] = "OBJ.classic";
   chan_map[28] = "Hodo";
+}
+
+void getScalerCounts(const char *input_root_file_name, const int final_entry){
+  TFile *input_root_file = new TFile(input_root_file_name, "read");
+  if (!input_root_file){
+    std::cout << "Failed to open the input root file!"<<std::endl;
+    return;
+  }
+  
+  TTree *in_tree = (TTree*)input_root_file->Get("EventTree");
+  if (!in_tree){
+    std::cout << "Failed to open the input tree file!"<<std::endl;
+    return;
+  }
+
+  TS800Scaler *scalers= 0; 
+  in_tree->SetBranchAddress("TS800Scaler", &scalers);
+  std::vector<int> scaler_32(32);//periodic scaler
+  std::vector<int> scaler_32_overflows(32);//periodic scaler overflow check. adds 2^24 to result
+  std::vector<int> init_scaler_32;
+
+  std::map<int, std::string> chan_map;
+  initialize_map(chan_map);
 
   int n_entries = in_tree->GetEntries();
   if (final_entry != 0){
@@ -61,6 +64,8 @@ void getScalerCounts(char *input_root_file_name, int final_entry){
 
   double prev_live_trig = 0;
   double prev_raw_trig  = 0;
+
+  bool found_init = false;//looking for i
   for (int entry = 0; entry < n_entries; entry++){
     scalers->Clear("");
     in_tree->GetEntry(entry);
@@ -68,10 +73,9 @@ void getScalerCounts(char *input_root_file_name, int final_entry){
     if (scalers->Size() == 250){
       //ignoring incremental scalers for now
       continue;
-//    for (int i = 0; i < 250;i++){
-//      scaler_250.at(i) += scalers->GetScaler(i);
-//    }
     }
+
+
     if (scalers->Size() == 32){
       for (int i = 31; i > 0;i--){
         if (scalers->GetScaler(12) != scalers->GetScaler(11)){
@@ -80,25 +84,37 @@ void getScalerCounts(char *input_root_file_name, int final_entry){
               scaler_32_overflows.at(i) += 1;
             }
             scaler_32.at(i) = scalers->GetScaler(i);
-          }//if triggers are no longer chanigng, we stop.
-        }//if raw clock = live clock, we're in the startup phase
+          }//if triggers are no longer changing, we stop.
+        }//if raw clock == live clock, we're in the startup phase
       }//loop over scaler channels
+      if (!found_init && prev_live_trig == 0 && scaler_32.at(10) != 0){
+        //initialization events can be in middle of run file. This occurs
+        //because the scaler packets at the start of a run are assigned
+        //timestamp 0 during initialization, but packets with timestamp 0 are
+        //assigned a timestamp when they enter the event builder.  The events
+        //in the last initialization packet must be subtracted from the others.
+        std::cout << "Found final initialization packets at entry " << entry << "\n";
+        found_init = true;
+      }
       prev_raw_trig = scaler_32.at(9);
       prev_live_trig = scaler_32.at(10);
+      if (!found_init){
+        init_scaler_32 = scaler_32;
+      }
     }//size 32
     if (entry % 100000 == 0){
-      std::cout << "Completed " << entry << " entries\n";
+      std::cout << "Completed " << entry << " entries\r" << std::flush;
     }
   }//loop over tree
 
+  //subtracts init_scaler_32 from scaler_32 and places result in scaler_32
+  std::transform(scaler_32.begin(), scaler_32.end(), init_scaler_32.begin(), 
+                 scaler_32.begin(), std::minus<int>());
   for (unsigned int i = 0; i < scaler_32.size(); i++){
     scaler_32.at(i) += scaler_32_overflows.at(i)*pow(2.,24.);
   }
 
-//for (unsigned int i = 0; i < scaler_32.size(); i++){
-//  std::cout << chan_map[i] << ": " << scaler_32.at(i) << "\n";
-//}
-
+  std::cout << "\n";
   for (std::map<int, std::string>::iterator iter = chan_map.begin(); iter != chan_map.end(); ++iter){
     std::cout << iter->second << ": " << scaler_32.at(iter->first) << "\n";
   }
