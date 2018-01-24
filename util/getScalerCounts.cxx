@@ -64,6 +64,7 @@ void getScalerCounts(const char *input_root_file_name, const int final_entry){
 
   double prev_live_trig = 0;
   double prev_raw_trig  = 0;
+  double prev_10hz = 0;//handles initialization packets being out of order
 
   bool found_init = false;//looking for i
   for (int entry = 0; entry < n_entries; entry++){
@@ -78,7 +79,7 @@ void getScalerCounts(const char *input_root_file_name, const int final_entry){
     if (scalers->Size() == 32){
       for (int i = 31; i > 0;i--){
         if (scalers->GetScaler(12) != scalers->GetScaler(11)){
-          if (scalers->GetScaler(9) != prev_raw_trig|| scalers->GetScaler(10) != prev_live_trig){
+          if (scalers->GetScaler(9) != prev_raw_trig || scalers->GetScaler(10) != prev_live_trig){
             if (scalers->GetScaler(i) < scaler_32.at(i)){
               scaler_32_overflows.at(i) += 1;
             }
@@ -97,10 +98,11 @@ void getScalerCounts(const char *input_root_file_name, const int final_entry){
       }
       prev_raw_trig = scaler_32.at(9);
       prev_live_trig = scaler_32.at(10);
-      if (!found_init){
+      if (!found_init && scalers->GetScaler(14) > prev_10hz){
         for (unsigned int i = 0; i < 32; i++){
           init_scaler_32[i] = scalers->GetScaler(i);
         }
+        prev_10hz = scalers->GetScaler(14);
       }
     }//size 32
     if (entry % 100000 == 0){
