@@ -77,7 +77,7 @@ void getScalerCounts(const char *input_root_file_name, const int final_entry){
     }
 
     if (scalers->Size() == 32){
-      for (int i = 31; i > 0;i--){
+      for (int i = 31; i >= 0;i--){
         if (scalers->GetScaler(12) != scalers->GetScaler(11)){
           if (scalers->GetScaler(9) != prev_raw_trig || scalers->GetScaler(10) != prev_live_trig){
             if (scalers->GetScaler(i) < scaler_32.at(i)){
