@@ -110,12 +110,6 @@ void getScalerCounts(const char *input_root_file_name, const int final_entry){
     }
   }//loop over tree
 
-  std::cout << "============================Init Scalers======================\n";
-  for (std::map<int, std::string>::iterator iter = chan_map.begin(); iter != chan_map.end(); ++iter){
-    std::cout << iter->second << ": " << init_scaler_32.at(iter->first) << "\n";
-  }
-  std::cout << "==========================End Init Schalers===================\n";
-
   for (unsigned int i = 0; i < scaler_32.size(); i++){
     scaler_32.at(i) += scaler_32_overflows.at(i)*pow(2.,24.);
     scaler_32.at(i) -= init_scaler_32.at(i);
