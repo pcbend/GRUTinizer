@@ -694,7 +694,6 @@ bool TS800::HandleHodoPacket(unsigned short *data,int size) {
     return false;
   
   //note: size is size left after subtracting out length of packet size and packet tag
-  
 
   //ID is the Hodoscope Sub-pcket "Energy" tag
   //If ID == 0, then we are dealing with channels (0,15), if ID == 1, then we
@@ -719,6 +718,7 @@ bool TS800::HandleHodoPacket(unsigned short *data,int size) {
     THodoHit hit;
     hit.SetChannel(channel);
     hit.SetCharge(charge);
+    hit.SetAddress((0x58<<24) + (4<<16) + (4<<8) + channel);
     hodo.InsertHit(hit);
   }//x < size
   return true;

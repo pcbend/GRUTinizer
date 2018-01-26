@@ -391,16 +391,17 @@ class THodoscope : public TDetectorHit {
     virtual void Copy(TObject&) const;
     virtual void Print(Option_t *opt="") const;
     virtual void Clear(Option_t *opt="");
-
     void InsertHit(const TDetectorHit&);
 
+    int  Address(int i) const { return TDetectorHit::Address() + GetChannel(i); }
+
+    int GetChannel(int i) const { return GetHodoHit(i).GetChannel();} 
     TDetectorHit& GetHit(int i);
     THodoHit& GetHodoHit(int i);
     const THodoHit& GetHodoHit(int i) const;
     std::vector<THodoHit> GetHodoHits() const { return hodo_hits; } ;
     
     size_t Size() const { return hodo_hits.size(); } 
-    
 
     std::vector<THodoHit> hodo_hits;
 
