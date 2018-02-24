@@ -6,6 +6,8 @@
 
 #include <Rtypes.h>
 
+#include "TDetectorFactory.h"
+
 enum kDetectorSystems {
   UNKNOWN_SYSTEM = -1,
 
@@ -20,6 +22,7 @@ enum kDetectorSystems {
 
   SEGA = 64,
   JANUS = 65,
+  JANUS_DDAS = 66,
   FASTSCINT =4,
 
   CAESAR = 80,
@@ -51,5 +54,7 @@ enum kFileType {
 };
 
 extern std::map<std::string, EColor> color_system_map;
+
+extern std::map<kDetectorSystems, TDetectorFactoryBase*> detector_factory_map;
 
 #endif /* _TGRUTTYPES_H_ */
