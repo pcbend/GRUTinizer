@@ -66,7 +66,7 @@ int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
     static int lines_displayed = 0;
     if(!chan){
       if(lines_displayed < 10) {
-        std::cout << "Unknown (crate, slot, channel): ("
+        std::cout << "Unknown SeGA (crate, slot, channel): ("
                   << ddas.GetCrateID() << ", " << ddas.GetSlotID()
                   << ", " << ddas.GetChannelID() << ")" << std::endl;
       }//  else if(lines_displayed==1000){

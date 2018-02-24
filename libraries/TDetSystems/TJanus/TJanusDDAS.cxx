@@ -44,6 +44,8 @@ void TJanusDDAS::UnpackChannels(std::vector<TRawEvent>& raw_data) {
     TSmartBuffer buf = event.GetPayloadBuffer();
     TDDASEvent<DDASHeader> ddas(buf);
 
+    //std::cout << "In Janus Unpack Channels" << std::endl;
+
     unsigned int address = ( (5<<24) +
                              (ddas.GetCrateID()<<16) +
                              (ddas.GetSlotID()<<8) +
@@ -53,7 +55,7 @@ void TJanusDDAS::UnpackChannels(std::vector<TRawEvent>& raw_data) {
     static int lines_displayed = 0;
     if(!chan){
       if(lines_displayed < 10) {
-        std::cout << "Unknown (crate, slot, channel): ("
+        std::cout << "Unknown JANUS (crate, slot, channel): ("
                   << ddas.GetCrateID() << ", " << ddas.GetSlotID()
                   << ", " << ddas.GetChannelID() << ")" << std::endl;
       }

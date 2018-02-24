@@ -107,6 +107,8 @@ double BinCenters::iterator::operator*() const {
 
 void MakeJanusHistograms(TRuntimeObjects& obj, TJanusDDAS& janus) {
 
+  //std::cout << "Inside MakeJanusHistograms" << std::endl;
+
   obj.FillHistogram("janus", "num_channels",
                     150, -10, 140, janus.GetAllChannels().size());
   obj.FillHistogram("janus", "num_hits",
@@ -132,7 +134,7 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanusDDAS& janus) {
     if(hit.GetEnergy() > 6500) {
       has_fission = true;
     }
-  }
+  } 
   if(has_fission) {
     obj.FillHistogram("janus", "fission_num_hits",
                       150, -10, 140, janus.GetAllHits().size());
@@ -223,6 +225,8 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanusDDAS& janus) {
 
 
 void MakeSegaHistograms(TRuntimeObjects& obj, TSega& sega) {
+
+  //std::cout << "Inside MakeSegaHistograms" << std::endl;
   obj.FillHistogram("sega","num_hits",
                     256,0,256,sega.Size());
 
@@ -239,7 +243,7 @@ void MakeSegaHistograms(TRuntimeObjects& obj, TSega& sega) {
                       32768, 0, 32768, hit.Charge());
     obj.FillHistogram("sega","energy_summary",
                       18, 1, 19, hit_detnum,
-                      8000, 0, 4000, energy);
+                      8000, 0, 8000, energy);
 
     obj.FillHistogram("sega","detnum",
                       18, 1, 19, hit_detnum);
@@ -256,9 +260,12 @@ void MakeSegaHistograms(TRuntimeObjects& obj, TSega& sega) {
     //                   214100/60, 0, 2.141e14, hit.Timestamp(),
     //                   1000, 0, 2000, energy);
 
-    // obj.FillHistogram("sega", Form("charge_det%02d_ts", hit_detnum),
-    //                   214100/60, 0, 2.141e14, hit.Timestamp(),
-    //                   22000, 0, 22000, hit.Charge());
+    //obj.FillHistogram("sega", Form("charge_det%02d_ts", hit_detnum),
+    //                  214100/60, -1, 1, hit.Timestamp()/1e14,
+    //                  22000, 0, 22000, hit.Charge());
+
+    //std::cout << "ts is: " << hit.Timestamp() << std::endl;
+    //std::cout << "det is: " << hit.GetDetnum() << std::endl;
 
 
     for(unsigned int segi=0; segi<hit.GetNumSegments(); segi++){
@@ -275,17 +282,23 @@ void MakeSegaHistograms(TRuntimeObjects& obj, TSega& sega) {
                         32768, 0, 32768, seg.Charge());
     }
 
-    if(hit.GetCrate()==1){
+    if(hit.GetCrate()==1 && hit.GetSlot()==2){
       cc_timestamp = hit.Timestamp();
-    } else if (hit.GetCrate()==3) {
+    } else
       segment_timestamp = hit.Timestamp();
-    }
-  }
 
+  
+}
+
+    //obj.FillHistogram("sega",Form("energy_segment_core_tdiff_Det%i",hit.GetDetnum()),
+    //                  1000,-5000,5000, cc_timestamp - segment_timestamp,
+    //                  1000,0,8000,hit.GetEnergy()); 
 
   if(cc_timestamp>0 && segment_timestamp>0){
     obj.FillHistogram("sega","segment_core_tdiff",
-                      1000, -5000, 5000, cc_timestamp - segment_timestamp);
+                      1000,-5000, 5000, cc_timestamp - segment_timestamp);
+
+    
   }
 }
 
@@ -305,7 +318,7 @@ void MakeScalerHistograms(TRuntimeObjects& obj, TNSCLScalers& scalers) {
 }
 
 void MakeCoincidenceHistograms(TRuntimeObjects& obj, TSega& sega, TJanusDDAS& janus) {
-  MakeCoincidenceHistogramsAlphaSource(obj, sega, janus);
+  //MakeCoincidenceHistogramsAlphaSource(obj, sega, janus);
   MakeCoincidenceHistogramsFissionSource(obj, sega, janus);
 }
 
@@ -338,7 +351,8 @@ void MakeCoincidenceHistogramsAlphaSource(TRuntimeObjects& obj, TSega& sega, TJa
 
 void MakeCoincidenceHistogramsFissionSource(TRuntimeObjects& obj, TSega& sega, TJanusDDAS& janus) {
   for(auto& j_hit : janus.GetAllHits()) {
-    if(j_hit.GetEnergy() > 6500) {
+    //if(j_hit.GetEnergy() > 6500) {
+    if(j_hit.GetEnergy() > -1) {
       for(unsigned int i=0; i<sega.Size(); i++) {
         TSegaHit& s_hit = sega.GetSegaHit(i);
 
@@ -349,14 +363,23 @@ void MakeCoincidenceHistogramsFissionSource(TRuntimeObjects& obj, TSega& sega, T
 
         double s_energy = s_hit.GetEnergy();
 
+        auto tdiff = s_hit.Timestamp() - j_hit.Timestamp();
+
         obj.FillHistogram("coinc", "fission_energy_angle",
                           4000, 0, 4000, s_energy,
                           180, 0, 180, (180/3.1415926)*angle);
 
+        //obj.FillHistogram("coinc", Form("fission_energy_angle_Det%s",s_hit.GetDetnum()),
+        //                4000, 0, 4000, s_energy,
+        //              180, 0, 180, (180/3.1415926)*angle);
+
+        obj.FillHistogram("coinc", Form("egam_tdiff_Det_%i",s_hit.GetDetnum()),
+                          200, 0, 2000, tdiff,
+                          4000, 0, 4000, s_energy);
+
         obj.FillHistogram("coinc", "fission_gamma_energy",
                           4000, 0, 4000, s_energy);
 
-        auto tdiff = s_hit.Timestamp() - j_hit.Timestamp();
         obj.FillHistogram("coinc", "tdiff_fission",
                           200, 0, 2000, tdiff);
 
