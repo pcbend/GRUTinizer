@@ -55,6 +55,7 @@ void TNSCLScalers::Clear(Option_t *opt) {
 }
 
 int TNSCLScalers::BuildHits(std::vector<TRawEvent>& raw_data) {
+  return 0;
   for(auto& event : raw_data){
     SetTimestamp(event.GetTimestamp());
     source_id = ((TNSCLEvent&)event).GetSourceID();

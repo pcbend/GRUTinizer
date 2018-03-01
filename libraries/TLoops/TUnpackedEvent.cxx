@@ -26,73 +26,18 @@ TUnpackedEvent::~TUnpackedEvent() {
 }
 
 void TUnpackedEvent::Build() {
+  //printf("i am called\n"); fflush(stdout);
+  int counter =0;
   for(auto& item : raw_data_map) {
+    //printf("counter = %i\n",counter++);
     kDetectorSystems detector = item.first;
     std::vector<TRawEvent>& raw_data = item.second;
-
+ 
+    //printf("det %s\n",GetDetector(detector, true)->Class()->GetName());
     GetDetector(detector, true)->Build(raw_data);
 
-    // switch(detector){
-    // case kDetectorSystems::GRETINA:
-    //   GetDetector<TGretina>(true)->Build(raw_data);
-    //   break;
-
-    // case kDetectorSystems::GRETINA_SIM:
-    //   GetDetector<TGretSim>(true)->Build(raw_data);
-    //   break;
-
-    // case kDetectorSystems::MODE3:
-    //   GetDetector<TMode3>(true)->Build(raw_data);
-    //   break;
-
-    // case kDetectorSystems::S800:
-    //   GetDetector<TS800>(true)->Build(raw_data);
-    //   break;
-
-    // case kDetectorSystems::S800_SIM:
-    //   GetDetector<TS800Sim>(true)->Build(raw_data);
-    //   break;
-
-    // case kDetectorSystems::S800SCALER:
-    //   GetDetector<TS800Scaler>(true)->Build(raw_data);
-    //   break;
-
-    // case kDetectorSystems::BANK29:
-    //   GetDetector<TBank29>(true)->Build(raw_data);
-    //   break;
-
-    // case kDetectorSystems::SEGA:
-    //   GetDetector<TSega>(true)->Build(raw_data);
-    //   break;
-
-    // case kDetectorSystems::JANUS:
-    //   GetDetector<TJanus>(true)->Build(raw_data);
-    //   break;
-
-    // case kDetectorSystems::FASTSCINT:
-    //   GetDetector<TFastScint>(true)->Build(raw_data);
-    //   break;
-
-    // case kDetectorSystems::CAESAR:
-    //   GetDetector<TCaesar>(true)->Build(raw_data);
-    //   break;
-
-    // case kDetectorSystems::PHOSWALL:
-    //   GetDetector<TPhosWall>(true)->Build(raw_data);
-    //   break;
-
-    // case kDetectorSystems::NSCLSCALERS:
-    //   GetDetector<TNSCLScalers>(true)->Build(raw_data);
-    //   break;
-    
-    // case kDetectorSystems::LENDA:
-    //   GetDetector<TLenda>(true)->Build(raw_data);
-    //   break;
-
-    // default:
-    //   break;
-    // }
   }
+  
 }
 
 void TUnpackedEvent::AddRawData(const TRawEvent& event, kDetectorSystems detector) {

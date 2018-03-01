@@ -138,10 +138,10 @@ void TJanusDDAS::BuildCorrelatedHits() {
       if(chan_ring.GetDetnum() != chan_sector.GetDetnum()) continue;
         //check gross charge window
         if(chan_sector.Charge()<minimum_charge && chan_sector.Charge()>=maximum_charge) continue;
-        int cdiff = abs(chan_ring.Charge() - chan_sector.Charge());
+        float ediff = fabs(chan_ring.GetEnergy() - chan_sector.GetEnergy());
         int tdiff = abs(chan_ring.Timestamp() - chan_sector.Timestamp());
 
-        if(cdiff < (chan_ring.Charge()*.35)) { //build.....
+        if(ediff < (chan_ring.GetEnergy()*.35)) { //build.....
           if(tdiff < (2000))                  { //build.....
           MakeHit(chan_ring, chan_sector);
 

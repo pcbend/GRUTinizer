@@ -38,7 +38,6 @@ TUnpackingLoop::~TUnpackingLoop() { }
 
 bool TUnpackingLoop::Iteration(){
   std::vector<TRawEvent> event;
-
   int error = input_queue->Pop(event);
   if(error < 0){
     if(input_queue->IsFinished()) {
@@ -49,10 +48,12 @@ bool TUnpackingLoop::Iteration(){
       return true;
     }
   }
-
+  int counter=0;
+  //printf("here 1\n"); fflush(stdout);
   fOutputEvent = new TUnpackedEvent;
   for(unsigned int i=0;i<event.size();i++) {
     TRawEvent& raw_event = event[i];
+    //printf("counter %i\t%i\n",counter++, raw_event.GetFileType()); fflush(stdout);
     switch(raw_event.GetFileType()){
       case kFileType::NSCL_EVT:
       {
@@ -70,6 +71,7 @@ bool TUnpackingLoop::Iteration(){
         break;
 
       default:
+        //printf("default\n"); fflush(stdout);
         break;
     }
   }
@@ -100,6 +102,7 @@ void TUnpackingLoop::ClearQueue() {
 }
 
 void TUnpackingLoop::HandleNSCLData(TNSCLEvent& event) {
+  //printf("in handle nscl\t%i\n",event.GetEventType()); fflush(stdout);
   switch(event.GetEventType()) {
     case kNSCLEventType::BEGIN_RUN:            // 0x0001
     {
@@ -120,7 +123,7 @@ void TUnpackingLoop::HandleNSCLData(TNSCLEvent& event) {
     case kNSCLEventType::FIRST_USER_ITEM_CODE: // 0x8000
       break;
     case kNSCLEventType::PERIODIC_SCALERS:     // 0x0014
-      HandleNSCLPeriodicScalers(event);
+      //HandleNSCLPeriodicScalers(event);
       break;
     case kNSCLEventType::PHYSICS_EVENT:        // 0x001E
       if(event.IsBuiltData()){
@@ -137,8 +140,9 @@ void TUnpackingLoop::HandleBuiltNSCLData(TNSCLEvent& event){
   TNSCLBuiltRingItem built(event);
 
   //printf("i am being called!!!\n"); fflush(stdout);
-
+  int counter=0;
   for(unsigned int i=0; i<built.NumFragments(); i++){
+    //printf("\tcounter = %i\n",counter++); fflush(stdout);
     TNSCLFragment& fragment = built.GetFragment(i);
     int source_id = fragment.GetFragmentSourceID();
     kDetectorSystems detector = TDetectorEnv::Get().DetermineSystem(source_id);
@@ -150,6 +154,7 @@ void TUnpackingLoop::HandleBuiltNSCLData(TNSCLEvent& event){
     }
     fOutputEvent->AddRawData(frag_event, detector);
   }
+  //printf("i am also here\n");
 }
 
 void TUnpackingLoop::HandleUnbuiltNSCLData(TNSCLEvent& event){
