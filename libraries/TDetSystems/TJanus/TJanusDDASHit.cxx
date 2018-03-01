@@ -79,9 +79,8 @@ int TJanusDDASHit::GetSector() const {
 }
 
 void TJanusDDASHit::Print(Option_t *opt) const {
-  printf("JanusDDASHit[%03i,%03i]  Ring: %02i  Sector: %02i  Charge: %i   Energy: %.02f\n",
-          GetFrontChannel(),GetBackChannel(),GetRing(),GetSector(),Charge(),GetEnergy());
-
+  printf("Det %i JanusDDASHit[%03i,%03i]  Ring: %02i  Sector: %02i  Charge: %i   Energy: %.02f\n",
+          GetDetnum(),GetFrontChannel(),GetBackChannel(),GetRing(),GetSector(),Charge(),GetEnergy());
 }
 
 

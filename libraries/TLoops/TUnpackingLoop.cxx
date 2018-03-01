@@ -135,6 +135,9 @@ void TUnpackingLoop::HandleNSCLData(TNSCLEvent& event) {
 
 void TUnpackingLoop::HandleBuiltNSCLData(TNSCLEvent& event){
   TNSCLBuiltRingItem built(event);
+
+  //printf("i am being called!!!\n"); fflush(stdout);
+
   for(unsigned int i=0; i<built.NumFragments(); i++){
     TNSCLFragment& fragment = built.GetFragment(i);
     int source_id = fragment.GetFragmentSourceID();

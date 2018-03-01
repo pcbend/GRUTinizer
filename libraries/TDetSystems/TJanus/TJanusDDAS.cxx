@@ -34,12 +34,24 @@ void TJanusDDAS::Clear(Option_t* opt){
 int TJanusDDAS::BuildHits(std::vector<TRawEvent>& raw_data){
   UnpackChannels(raw_data);
   BuildCorrelatedHits();
+  /*
+  printf("**************************\n");
+  printf("**************************\n");
+  printf("**************************\n");
+  Print("channels");
+  Print();
+  printf("**************************\n");
+  printf("**************************\n");
+  printf("**************************\n");
+  */
   return janus_hits.size() + janus_channels.size();
 }
 
 void TJanusDDAS::UnpackChannels(std::vector<TRawEvent>& raw_data) {
+
+  unsigned long smallest_timestamp = 0x7fffffffffffffff;
   for(auto& event : raw_data){
-    SetTimestamp(event.GetTimestamp());
+    //SetTimestamp(event.GetTimestamp());
 
     TSmartBuffer buf = event.GetPayloadBuffer();
     TDDASEvent<DDASHeader> ddas(buf);
@@ -70,7 +82,8 @@ void TJanusDDAS::UnpackChannels(std::vector<TRawEvent>& raw_data) {
     TJanusDDASHit janus_chan;
     janus_chan.SetCharge(ddas.GetEnergy());
     janus_chan.SetTime(ddas.GetCFDTime());
-    janus_chan.SetTimestamp(ddas.GetTimestamp());
+    janus_chan.SetTimestamp(ddas.GetTimestamp()*8); // this are more 
+    if(janus_chan.Timestamp()<smallest_timestamp) { smallest_timestamp = janus_chan.Timestamp(); }
     janus_chan.SetAddress(address);
 
     janus_channels.push_back(janus_chan);
@@ -94,20 +107,66 @@ void TJanusDDAS::UnpackChannels(std::vector<TRawEvent>& raw_data) {
     //   shown++;
     // }
   }
+
+  SetTimestamp(smallest_timestamp);
 }
 
 void TJanusDDAS::BuildCorrelatedHits() {
-  for(const auto& chan_ring : janus_channels) {
-    if(chan_ring.IsRing() && chan_ring.RawCharge() > 150) {
-      for(const auto& chan_sector : janus_channels) {
-        if(chan_sector.IsSector() && chan_sector.RawCharge() > 150) {
-          if(chan_ring.GetDetnum() == chan_sector.GetDetnum()) {
-            MakeHit(chan_ring, chan_sector);
+  int minimum_charge = 149;
+  int maximum_charge = 32738;
+ 
+  //printf("janus size() = %lu\n",janus_channels.size());
+  std::vector<bool> used;
+  used.resize(janus_channels.size());
+  std::fill(used.begin(),used.end(),false);
+  //printf("used size() = %lu\n",used.size());
+  for(size_t x=0;x<janus_channels.size();x++) {
+    //printf("x is %lu\n",x);
+    //printf("here 1\n",x);
+    if(used.at(x)) continue;
+    //printf("here 2\n",x);
+    TJanusDDASHit &chan_ring = GetJanusChannel(x);
+    //printf("here 3\n",x);
+    if(!chan_ring.IsRing()) continue;
+    //check gross charge window
+    if(chan_ring.Charge()<minimum_charge && chan_ring.Charge()>=maximum_charge) continue;
+    for(size_t y=0;y<janus_channels.size();y++) {
+      if(x==y) continue;
+      if(used.at(y)) continue;
+      TJanusDDASHit &chan_sector = GetJanusChannel(y);
+      if(!chan_sector.IsSector()) continue;
+      if(chan_ring.GetDetnum() != chan_sector.GetDetnum()) continue;
+        //check gross charge window
+        if(chan_sector.Charge()<minimum_charge && chan_sector.Charge()>=maximum_charge) continue;
+        int cdiff = abs(chan_ring.Charge() - chan_sector.Charge());
+        int tdiff = abs(chan_ring.Timestamp() - chan_sector.Timestamp());
+
+        if(cdiff < (chan_ring.Charge()*.35)) { //build.....
+          if(tdiff < (2000))                  { //build.....
+          MakeHit(chan_ring, chan_sector);
+
+          //printf("x,y is %lu \t %lu \n",x,y);
+          used[x] = true;
+          used[y] = true;
+          break;
           }
         }
-      }
     }
   }
+
+
+
+ // for(const auto& chan_ring : janus_channels) {
+ //   if(chan_ring.IsRing() && chan_ring.RawCharge() > 150) {
+ //     for(const auto& chan_sector : janus_channels) {
+ //       if(chan_sector.IsSector() && chan_sector.RawCharge() > 150) {
+ //         if(chan_ring.GetDetnum() == chan_sector.GetDetnum()) {
+ //           MakeHit(chan_ring, chan_sector);
+ //         }
+ //       }
+ //     }
+ //   }
+ // }
 }
 
 void TJanusDDAS::MakeHit(const TJanusDDASHit& chan_ring,
@@ -126,6 +185,10 @@ void TJanusDDAS::MakeHit(const TJanusDDASHit& chan_ring,
 
 TJanusDDASHit& TJanusDDAS::GetJanusHit(int i){
   return janus_hits.at(i);
+}
+
+TJanusDDASHit& TJanusDDAS::GetJanusChannel(int i){
+  return janus_channels.at(i);
 }
 
 TDetectorHit& TJanusDDAS::GetHit(int i){
@@ -343,10 +406,47 @@ void TJanusDDAS::InsertHit(const TDetectorHit& hit) {
 }
 
 void TJanusDDAS::Print(Option_t *opt) const {
+  TString sopt(opt);
+  if(sopt.Contains("channels")){
+   PrintChannels(opt); 
+  } else {
+   PrintHits(opt); 
+  }
+}
+
+
+void TJanusDDAS::PrintHits(Option_t *opt) const {
   printf("TJanusDDAS @ %lu\n",Timestamp());
-  printf(" Size: %i\n",Size());
+  printf(" Size: %i\n",janus_hits.size());
   for(unsigned int i=0;i<Size();i++) {
     printf("\t"); janus_hits.at(i).Print(); printf("\n");
   }
   printf("---------------------------\n");
+  fflush(stdout);
 }
+
+void TJanusDDAS::PrintChannels(Option_t *opt) const {
+  printf("JANUS Channels!\n");
+  printf("TJanusDDAS @ %lu\n",Timestamp());
+  printf(" Size: %i\n",janus_channels.size());
+  for(unsigned int i=0;i<janus_channels.size();i++) {
+    TJanusDDASHit hit = janus_channels.at(i);
+    TChannel *c = TChannel::GetChannel(hit.Address());
+    if(c) {
+       printf("\t%s\tDet: %i \tChannel: %02i\tChg: %i\tTime: %lu\n",
+               c->GetName(),hit.GetDetnum(),hit.GetFrontChannel(),hit.Charge(),hit.Timestamp());
+    } else {
+       printf("\tjanus_channel 0x%08x, no channel.\n",hit.Address());
+    }
+  }
+  printf("---------------------------\n");
+  fflush(stdout);
+}
+
+
+
+
+
+
+
+

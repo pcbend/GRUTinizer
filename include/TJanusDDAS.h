@@ -12,10 +12,11 @@ public:
   void Copy(TObject& obj) const;
 
   virtual void Clear(Option_t* opt = "");
-  virtual void Print(Option_t* opt = "") const;
+  virtual void Print(Option_t* opt = "hits") const;
   virtual void InsertHit(const TDetectorHit&);
 
   virtual TJanusDDASHit&    GetJanusHit(int i);
+  virtual TJanusDDASHit&    GetJanusChannel(int i);
   virtual TDetectorHit& GetHit(int i);
 
   std::vector<TJanusDDASHit>& GetAllChannels() { return janus_channels; }
@@ -30,6 +31,9 @@ public:
 
   // static double GetBeta(double betamax, double kr_angle_rad, bool energy_loss=false, double collision_pos=0.5);
   // static double SimAngle();
+  
+  virtual void PrintChannels(Option_t* opt = "") const;
+  virtual void PrintHits(Option_t* opt = "") const;
 
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
