@@ -33,6 +33,8 @@ public:
   std::map<kDetectorSystems, std::vector<TRawEvent> >& GetRawData() { return raw_data_map; }
 
 private:
+  TDetector* GetDetector(kDetectorSystems detector, bool make_if_not_found = false);
+
   std::vector<TDetector*> detectors;
   std::map<kDetectorSystems, std::vector<TRawEvent> > raw_data_map;
 };
@@ -56,6 +58,8 @@ T* TUnpackedEvent::GetDetector(bool make_if_not_found) {
   } else {
     return NULL;
   }
+
+  return NULL;
 }
 #endif
 

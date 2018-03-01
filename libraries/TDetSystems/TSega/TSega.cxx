@@ -7,6 +7,7 @@
 #include "DDASDataFormat.h"
 #include "TNSCLEvent.h"
 #include "TChannel.h"
+#include "TRawEvent.h" // added Mark
 
 std::map<int,TSega::Transformation> TSega::detector_positions;
 
@@ -49,12 +50,20 @@ TDetectorHit& TSega::GetHit(int i){
 }
 
 int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
-  for(auto& event : raw_data){
-    TNSCLEvent& nscl = (TNSCLEvent&)event;
+  
 
-    SetTimestamp(nscl.GetTimestamp());
+      //for(auto& event : raw_data){
+     //TNSCLEvent& nscl = (TNSCLEvent&)event;
+    //SetTimestamp(nscl.GetTimestamp()); uncommented Mark
+    
+for(auto& event : raw_data){
+    SetTimestamp(event.GetTimestamp());
 
-    TSmartBuffer buf = nscl.GetPayloadBuffer();
+    //TSmartBuffer buf = nscl.GetPayloadBuffer();
+    //TDDASEvent<DDASHeader> ddas(buf);
+
+
+    TSmartBuffer buf = event.GetPayloadBuffer();
     TDDASEvent<DDASHeader> ddas(buf);
 
     unsigned int address = ( (1<<24) +
@@ -101,7 +110,8 @@ int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
 
     if(segnum==0){
       hit->SetAddress(address);
-      hit->SetTimestamp(nscl.GetTimestamp());
+      //hit->SetTimestamp(nscl.GetTimestamp());
+      hit->SetTimestamp(ddas.GetTimestamp());
       hit->SetCharge(ddas.GetEnergy());
       hit->SetTrace(ddas.GetTraceLength(), ddas.trace);
     } else {

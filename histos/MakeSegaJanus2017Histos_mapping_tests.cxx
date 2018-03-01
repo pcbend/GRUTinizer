@@ -44,13 +44,13 @@ void MakeHistograms(TRuntimeObjects& obj) {
     MakeJanusHistograms(obj, *janus);
   }
   if(sega){
-    MakeSegaHistograms(obj, *sega);
+    //MakeSegaHistograms(obj, *sega);
   }
   if(sega && janus){
     MakeCoincidenceHistograms(obj, *sega, *janus);
   }
   if(scalers){
-    MakeScalerHistograms(obj, *scalers);
+    //MakeScalerHistograms(obj, *scalers);
   }
 }
 
@@ -133,7 +133,7 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanusDDAS& janus) {
 
   bool has_fission = false;
   for(auto& hit : janus.GetAllHits()) {
-    if(hit.GetEnergy() > 6500) {
+    if(hit.GetEnergy() > 3500) {
       has_fission = true;
     }
   } 
@@ -187,9 +187,6 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanusDDAS& janus) {
                       128, 0, 128, hit.GetBackChannel(),
                       32768, 0, 32768, hit.GetBackHit().Charge());
 
-    // obj.FillHistogram("janus", "charge_frontback",
-    //                   32768, 0, 32768, hit.Charge(),
-    //                   32768, 0, 32768, hit.GetBackHit().Charge());
     obj.FillHistogram("janus", "energy_frontback",
                       1200, -20, 100e3, hit.GetEnergy(),
                       1200, -20, 100e3, hit.GetBackHit().GetEnergy());
@@ -213,16 +210,6 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanusDDAS& janus) {
     obj.FillHistogram("janus",Form("det%d_phitheta", hit.GetDetnum()),
                       400,-4,4,hit.GetPosition().Theta(),
                       400,-4,4,hit.GetPosition().Phi());
-
-    obj.FillHistogram("janus","RingEnergy_v_Angle",
-                      200,0,200,hit.GetPosition().Theta()*(180./TMath::Pi()),
-                      3000,0,30000,hit.GetEnergy()
-                       );
-
-    obj.FillHistogram("janus","SectorEnergy_v_Angle",
-                      200,0,200,hit.GetPosition().Theta()*(180./TMath::Pi()),
-                      3000,0,30000,hit.GetBackHit().GetEnergy()
-                       );
 
     
 
@@ -538,17 +525,8 @@ void MakeCoincidenceHistogramsFissionSource(TRuntimeObjects& obj, TSega& sega, T
         obj.FillHistogram("coinc", "fission_gamma_energy",
                           4000, 0, 4000, s_energy);
 
-        for(double beta : BinCenters(60, 0.000, 0.060)) {
-
-          obj.FillHistogram("coinc", "gamma_DCenergy_vs_beta",
-                            4000, 0, 4000, s_hit.GetDoppler(beta, j_pos));
-
-          obj.FillHistogram("coinc", Form("gamma_DCenergy_vs_beta_det%i", s_hit.GetDetnum()),
-                            4000, 0, 4000, s_hit.GetDoppler(beta, j_pos));
-        }
-
-        //obj.FillHistogram("coinc", "gamma_DCenergy",
-                            //4000, 0, 4000, s_hit.GetDoppler(beta, j_pos));
+        obj.FillHistogram("coinc", "fission_gamma_DCenergy",
+                          4000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta"), j_pos));
                         
         obj.FillHistogram("coinc", "tdiff_fission",
                           1000, -500, 500, tdiff);
@@ -566,6 +544,16 @@ void MakeCoincidenceHistogramsFissionSource(TRuntimeObjects& obj, TSega& sega, T
                             4000, 0, 4000, s_energy);
  
           obj.FillHistogram("coinc", "fission_gamma_DCenergy_timegated",
+                            4000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta"), j_pos));
+	  if(j_hit.GetDetnum() == 0){
+              obj.FillHistogram("coinc", "fission_gamma_DCenergy_upstream", 
+                              4000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta"), j_pos));
+          }
+         if(j_hit.GetDetnum() == 1){
+              obj.FillHistogram("coinc", "fission_gamma_DCenergy_upstream", 
+                              4000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta"), j_pos));
+	  }
+	  obj.FillHistogram("coinc", "fission_gamma_DCenergy_upstream", 
                             4000, 0, 4000, s_hit.GetDoppler(GValue::Value("beta"), j_pos));
         }
       }
@@ -594,46 +582,46 @@ void MakeCoincidenceHistogramsFissionSource(TRuntimeObjects& obj, TSega& sega, T
       pos_1 = hit2.GetPosition();
     }
 
-    //for(double zpos : BinCenters(120, -10, 20)) {
-    
-      //TVector3 pos_1scan(pos_1.X(),pos_1.Y(),pos_1.Z()+zpos);
-      //TVector3 pos_2scan(pos_2.X(),pos_2.Y(),pos_2.Z()+zpos);
+//  for(double zpos : BinCenters(120, -10, 20)) {
+//  
+//    TVector3 pos_1scan(pos_1.X(),pos_1.Y(),pos_1.Z()+zpos);
+//    TVector3 pos_2scan(pos_2.X(),pos_2.Y(),pos_2.Z()+zpos);
 
-      //obj.FillHistogram("coinc", "relative_angle_2hitsabove2000_vs_zpos",
-      //                      120,-10,20 ,zpos,
-      //                      180,0,180, 180./TMath::Pi()*(pos_1scan.Angle(pos_2scan)));
-    //}
+//    obj.FillHistogram("coinc", "relative_angle_2hitsabove2000_vs_zpos",
+//                          120,-10,20 ,zpos,
+//                          180,0,180, 180./TMath::Pi()*(pos_1scan.Angle(pos_2scan)));
+//  }
 
-    //for(double zpos : BinCenters(120, -10, 20)) {
-    
-      //TVector3 pos_1scan(pos_1.X(),pos_1.Y()+zpos,pos_1.Z());
-      //TVector3 pos_2scan(pos_2.X(),pos_2.Y()+zpos,pos_2.Z());
+//  for(double zpos : BinCenters(120, -10, 20)) {
+//  
+//    TVector3 pos_1scan(pos_1.X(),pos_1.Y()+zpos,pos_1.Z());
+//    TVector3 pos_2scan(pos_2.X(),pos_2.Y()+zpos,pos_2.Z());
 
-      //obj.FillHistogram("coinc", "relative_angle_2hitsabove2000_vs_ypos",
-      //                      120,-10,20 ,zpos,
-      //                      180,0,180, 180./TMath::Pi()*(pos_1scan.Angle(pos_2scan)));
-    //}
+//    obj.FillHistogram("coinc", "relative_angle_2hitsabove2000_vs_ypos",
+//                          120,-10,20 ,zpos,
+//                          180,0,180, 180./TMath::Pi()*(pos_1scan.Angle(pos_2scan)));
+//  }
 
-    //for(double zpos : BinCenters(120, -10, 20)) {
-    
-      //TVector3 pos_1scan(pos_1.X()+zpos,pos_1.Y(),pos_1.Z());
-      //TVector3 pos_2scan(pos_2.X()+zpos,pos_2.Y(),pos_2.Z());
+//  for(double zpos : BinCenters(120, -10, 20)) {
+//  
+//    TVector3 pos_1scan(pos_1.X()+zpos,pos_1.Y(),pos_1.Z());
+//    TVector3 pos_2scan(pos_2.X()+zpos,pos_2.Y(),pos_2.Z());
 
-      //obj.FillHistogram("coinc", "relative_angle_2hitsabove2000_vs_xpos",
-      //                      120,-10,20 ,zpos,
-      //                      180,0,180, 180./TMath::Pi()*(pos_1scan.Angle(pos_2scan)));
-    //}
+//    obj.FillHistogram("coinc", "relative_angle_2hitsabove2000_vs_xpos",
+//                          120,-10,20 ,zpos,
+//                          180,0,180, 180./TMath::Pi()*(pos_1scan.Angle(pos_2scan)));
+//  }
 
-    //for(double phi : BinCenters(360, -180, 180)) {
-    
-      //TVector3 pos_1scan(pos_1.X(),pos_1.Y(),pos_1.Z());
-      //pos_1scan.SetPhi(pos_1.Phi()+phi*TMath::Pi()/180.);
-      //TVector3 pos_2scan(pos_2.X(),pos_2.Y(),pos_2.Z());
+//  for(double phi : BinCenters(360, -180, 180)) {
+//  
+//    TVector3 pos_1scan(pos_1.X(),pos_1.Y(),pos_1.Z());
+//    pos_1scan.SetPhi(pos_1.Phi()+phi*TMath::Pi()/180.);
+//    TVector3 pos_2scan(pos_2.X(),pos_2.Y(),pos_2.Z());
 
-      //obj.FillHistogram("coinc", "relative_angle_2hitsabove2000_vs_phi",
-       //                     360,-180,180 ,phi,
-       //                     180,0,180, 180./TMath::Pi()*(pos_1scan.Angle(pos_2scan)));
-    //}
+//    obj.FillHistogram("coinc", "relative_angle_2hitsabove2000_vs_phi",
+//                          360,-180,180 ,phi,
+//                          180,0,180, 180./TMath::Pi()*(pos_1scan.Angle(pos_2scan)));
+//  }
 
     for(unsigned int i=0; i<sega.Size(); i++) {    
       TSegaHit& s_hit = sega.GetSegaHit(i);

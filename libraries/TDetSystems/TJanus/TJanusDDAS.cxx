@@ -98,9 +98,9 @@ void TJanusDDAS::UnpackChannels(std::vector<TRawEvent>& raw_data) {
 
 void TJanusDDAS::BuildCorrelatedHits() {
   for(const auto& chan_ring : janus_channels) {
-    if(chan_ring.IsRing() && chan_ring.RawCharge() > 500) {
+    if(chan_ring.IsRing() && chan_ring.RawCharge() > 150) {
       for(const auto& chan_sector : janus_channels) {
-        if(chan_sector.IsSector() && chan_sector.RawCharge() > 500) {
+        if(chan_sector.IsSector() && chan_sector.RawCharge() > 150) {
           if(chan_ring.GetDetnum() == chan_sector.GetDetnum()) {
             MakeHit(chan_ring, chan_sector);
           }
@@ -307,9 +307,9 @@ TVector3 TJanusDDAS::GetPosition(int detnum, int ring_num, int sector_num){
     return TVector3(std::sqrt(-1),std::sqrt(-1),std::sqrt(-1));
   }
 
-  TVector3 origin = TVector3(0,0,3);
+  TVector3 origin = TVector3(0,0,3.);
   // Phi of sector 1 of downstream detector
-  double phi_offset = 2*3.1415926535*(0.25);
+  double phi_offset = 2.*3.1415926535*(0.25);
 
   // Winding direction of sectors.
   bool clockwise = true;
@@ -317,15 +317,15 @@ TVector3 TJanusDDAS::GetPosition(int detnum, int ring_num, int sector_num){
   double janus_outer_radius = 3.5;
   double janus_inner_radius = 1.1;
 
-  TVector3 position(1,0,0);  // Not (0,0,0), because otherwise SetPerp and SetPhi fail.
-  double rad_slope = (janus_outer_radius - janus_inner_radius) /24;
+  TVector3 position(1.,0,0);  // Not (0,0,0), because otherwise SetPerp and SetPhi fail.
+  double rad_slope = (janus_outer_radius - janus_inner_radius) /24.;
   double rad_offset = janus_inner_radius;
   double perp_num = ring_num - 0.5; // Shift to 0.5-23.5
   position.SetPerp(perp_num*rad_slope + rad_offset);
   double phi_num = sector_num;
   double phi =
     phi_offset +
-    (clockwise ? -1 : 1) * 2*3.1415926/32 * (phi_num - 1);
+    (clockwise ? -1 : 1) * 2.*3.1415926/32. * (phi_num - 1);
   position.SetPhi(phi);
 
   position += origin;
