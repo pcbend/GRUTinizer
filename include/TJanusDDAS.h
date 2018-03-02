@@ -35,6 +35,8 @@ public:
   virtual void PrintChannels(Option_t* opt = "") const;
   virtual void PrintHits(Option_t* opt = "") const;
 
+  size_t Size() const { return janus_hits.size(); } 
+
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 

@@ -445,6 +445,24 @@ void TJanusDDAS::PrintChannels(Option_t *opt) const {
 
 
 
+double TJanusDDAS::SimAngle(const char *beamname,const char *targetname) {
+  //static auto kr = std::make_shared<TNucleus>("78Kr");
+  static auto pb = std::make_shared<TNucleus>("208Pb");
+  static TSRIM srim("kr78_in_pb208");
+  double thickness = (0.75 / 11342.0) * 1e4; // (0.75 mg/cm^2) / (11342 mg/cm^3) * (10^4 um/cm)
+
+  double collision_pos = gRandom->Uniform();
+
+  double collision_energy = srim.GetAdjustedEnergy(3.9*78*1e3, thickness*collision_pos)/1e3;
+  double energy_mid = srim.GetAdjustedEnergy(3.9*78*1e3, thickness*0.5)/1e3;
+
+  TReaction reac(kr, pb, kr, pb, collision_energy);
+  TReaction reac_mid(kr, pb, kr, pb, energy_mid);
+
+  double pb_angle_rad = reac.ConvertThetaLab(90 * (3.1415926/180), 2, 3);
+  double kr_angle_rad_recon = reac_mid.ConvertThetaLab(pb_angle_rad, 3, 2);
+  return kr_angle_rad_recon;
+}
 
 
 

@@ -83,17 +83,17 @@ void MakeHistograms(TRuntimeObjects& obj) {
     if(janus){
         MakeJanusHistograms(obj, *janus);
     }
-//  if(sega){
-//      MakeSegaHistograms(obj, *sega);
-//  }
+  if(sega){
+      MakeSegaHistograms(obj, *sega);
+  }
     if(sega && janus){
         MakeCoincidenceHistograms(obj, *sega, *janus);
-        if (scatteredRb&&tcut){
-            MakeGatedCoincidenceHistograms(obj, *sega, *janus, tcut, scatteredRb, 0);
+        /*if (scatteredRb){
+            //MakeGatedCoincidenceHistograms(obj, *sega, *janus, tcut, scatteredRb, 0);
         }
         for (auto sectorCut : sectorGates){
-            MakeGatedCoincidenceHistograms(obj, *sega, *janus, tcut, scatteredRb, sectorCut);
-        }
+            //MakeGatedCoincidenceHistograms(obj, *sega, *janus, tcut, scatteredRb, sectorCut);
+        }*/
     }
 
 //  if(scalers){
@@ -201,7 +201,7 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanusDDAS& janus) {
         obj.FillHistogram("janus", "energy_summary_hit",
                 128, 0, 128, hit.GetBackChannel(),
                 32768, 0, 32768, hit.GetBackHit().GetEnergy());
-
+ /*
 
         auto tdiff = hit.Timestamp() - hit.GetBackHit().Timestamp();
         obj.FillHistogram("janus", Form("det%d_frontback_tdiff_ringenergy", hit.GetDetnum()),
@@ -212,26 +212,26 @@ void MakeJanusHistograms(TRuntimeObjects& obj, TJanusDDAS& janus) {
                 3000,0,30000, hit.GetBackHit().GetEnergy());
         obj.FillHistogram("janus", Form("det%d_frontback_tdiff", hit.GetDetnum()),
                 2000, -1000, 1000, tdiff);
-
+*/
         obj.FillHistogram("janus",Form("det%d_xy", hit.GetDetnum()),
                 200,-4,4,hit.GetPosition().X(),
                 200,-4,4,hit.GetPosition().Y());
 
         if (tdiff < 100 && tdiff > -50){
             obj.FillHistogram("janus","RingEnergy_v_Angle_tdiff_neg50_100",
-                    200,0,200,hit.GetPosition().Theta()*(180./TMath::Pi()),
+                    100,0,200,hit.GetPosition().Theta()*(180./TMath::Pi()),
                     3000,0,30000,hit.GetEnergy());
 
             obj.FillHistogram("janus","SectorEnergy_v_Angle_tdiff_neg50_100",
-                    200,0,200,hit.GetPosition().Theta()*(180./TMath::Pi()),
+                    100,0,200,hit.GetPosition().Theta()*(180./TMath::Pi()),
                     3000,0,30000,hit.GetBackHit().GetEnergy());
         }
         obj.FillHistogram("janus","RingEnergy_v_Angle",
-                200,0,200,hit.GetPosition().Theta()*(180./TMath::Pi()),
+                100,0,200,hit.GetPosition().Theta()*(180./TMath::Pi()),
                 3000,0,30000,hit.GetEnergy());
 
         obj.FillHistogram("janus","SectorEnergy_v_Angle",
-                200,0,200,hit.GetPosition().Theta()*(180./TMath::Pi()),
+                100,0,200,hit.GetPosition().Theta()*(180./TMath::Pi()),
                 3000,0,30000,hit.GetBackHit().GetEnergy());
 
 

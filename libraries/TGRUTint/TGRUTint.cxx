@@ -42,6 +42,7 @@
 #include "TTerminalLoop.h"
 #include "TUnpackingLoop.h"
 #include "TWriteLoop.h"
+#include "TPresetCanvas.h"
 
 ClassImp(TGRUTint)
 
@@ -171,6 +172,11 @@ void TGRUTint::ApplyOptions() {
 
   if(opt->StartGUI()){
     StartGUI();
+    for(int x=0;x<opt->WinInputFiles().size();x++) {
+      TPresetCanvas *c = new TPresetCanvas();
+      c->ReadWinFile(opt->WinInputFiles().at(x).c_str());
+      c->Draw();
+    }
   }
 
   //ok now, if told not to sort open any raw files as _data# (rootish like??)
