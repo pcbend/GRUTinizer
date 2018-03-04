@@ -49,13 +49,13 @@ private:
                const TJanusDDASHit& chan_sector);
 
   void ClearCorrelatedHits()  { janus_hits.clear(); };
-  void BuildRingSectors(); 
+  //void BuildRingSectors(); 
 
 
-  std::vector<TJanusDDASHit> d0_rings;    //!
-  std::vector<TJanusDDASHit> d0_sectors;  //!
-  std::vector<TJanusDDASHit> d1_rings;    //!
-  std::vector<TJanusDDASHit> d1_sectors;  //!
+  //std::vector<TJanusDDASHit> d0_rings;    //!
+  //std::vector<TJanusDDASHit> d0_sectors;  //!
+  //std::vector<TJanusDDASHit> d1_rings;    //!
+  //std::vector<TJanusDDASHit> d1_sectors;  //!
   
   
   std::vector<TJanusDDASHit> janus_channels;

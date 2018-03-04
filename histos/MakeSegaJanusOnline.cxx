@@ -139,6 +139,9 @@ void MakeCalJanus(TRuntimeObjects &obj) {
     obj.FillHistogram("janus_kin",90,0,180,jhit.GetPosition(0).Theta()*TMath::RadToDeg(),
         1800,0,18000,jhit.GetEnergy());
 
+    obj.FillHistogram(Form("janus_ring_E_det%i",jhit.GetDetnum()),24,0,24,jhit.GetRing()-1,
+                                                1800,0,18000,jhit.GetEnergy());
+
     obj.FillHistogram(Form("janus_fb_dtime_det%i",jhit.GetDetnum()),2000,-10000,10000,jhit.Timestamp()-jhit.GetBackHit().Timestamp());
     obj.FillHistogram(Form("janus_fb_energy_det%i",jhit.GetDetnum()),512,0,16384,jhit.GetEnergy(),
         512,0,16384,jhit.GetBackHit().GetEnergy());
@@ -252,7 +255,10 @@ void MakeCalJanus(TRuntimeObjects &obj) {
                 1000,0,3000,shit.GetDoppler(b,jhit.GetPosition()));                                              
             obj.FillHistogram(Form("doppler_e_Si_e_%s",cut->GetName()),512,0,2048,shit.GetDoppler(b,jhit.GetPosition()),
                 256,0,16384,jhit.GetEnergy());
-            for(int zz=y+1;zz<sega->Size();zz++) {
+            obj.FillHistogram(Form("energy_angle_%s",cut->GetName()),
+                90,0,180,shit.GetPosition().Angle(jhit.GetPosition())*TMath::RadToDeg(),
+                1000,0,3000,shit.GetEnergy());
+           for(int zz=y+1;zz<sega->Size();zz++) {
               TSegaHit shit2 = sega->GetSegaHit(zz);
               obj.FillHistogramSym(Form("dmat_%s",cut->GetName()),
                   1000,0,3000,shit.GetDoppler(b,jhit.GetPosition()),

@@ -31,10 +31,10 @@ void TJanusDDAS::Copy(TObject& obj) const {
 void TJanusDDAS::Clear(Option_t* opt){
   TDetector::Clear(opt);
 
-  d0_rings.clear();  
-  d0_sectors.clear();
-  d1_rings.clear();  
-  d1_sectors.clear();
+  //d0_rings.clear();  
+  //d0_sectors.clear();
+  //d1_rings.clear();  
+  //d1_sectors.clear();
 
 
   janus_channels.clear();
@@ -122,7 +122,7 @@ void TJanusDDAS::UnpackChannels(std::vector<TRawEvent>& raw_data) {
 }
 
 
-
+/*
 void TJanusDDAS::BuildRingSectors() { 
   for(size_t x=0;x<janus_channels.size();x++) {
     TJanusDDASHit hit = janus_channel[x];
@@ -141,7 +141,8 @@ void TJanusDDAS::BuildRingSectors() {
     }
   }
 }
-
+*/
+/*
 void CleanRingScetors(std::vector<TJanusDDASHit> rings,std::vector<TJanusDDASHit> sectors) {
   std::vector<bool> r_passed;
   std::vector<bool> s_passed;
@@ -181,13 +182,13 @@ void CleanRingScetors(std::vector<TJanusDDASHit> rings,std::vector<TJanusDDASHit
     counter++;
   }
 }
-
+*/
 
 
 
 void TJanusDDAS::BuildCorrelatedHits(double EDiff, double TDiff) {
   int minimum_charge = 149;
-  int maximum_charge = 32738;
+  int maximum_charge = 32000;//738;
 
   ClearCorrelatedHits();
 
@@ -279,7 +280,7 @@ void TJanusDDAS::BuildCorrelatedHits(double EDiff, double TDiff) {
       float ediff = fabs(chan_ring.GetEnergy() - chan_sector.GetEnergy());
       int tdiff = abs(chan_ring.Timestamp() - chan_sector.Timestamp());
 
-      if(ediff < EDiff) { //build.....
+      if(ediff < EDiff && ediff/chan_ring.GetEnergy()<0.1) { //build.....
         if(tdiff < TDiff)                  { //build.....
           MakeHit(chan_ring, chan_sector);
 
@@ -509,7 +510,9 @@ TVector3 TJanusDDAS::GetPosition(int detnum, int ring_num, int sector_num){
     return TVector3(std::sqrt(-1),std::sqrt(-1),std::sqrt(-1));
   }
 
-  TVector3 origin = TVector3(0,0,3.);
+  double zoff = 3.;
+
+  TVector3 origin = TVector3(0,0,zoff);
   // Phi of sector 1 of downstream detector
   double phi_offset = 2.*3.1415926535*(0.25);
 
