@@ -36,15 +36,28 @@ public:
   virtual void PrintHits(Option_t* opt = "") const;
 
   size_t Size() const { return janus_hits.size(); } 
+  
+
+  void BuildCorrelatedHits(double EDiff = 1000., double TDiff = 2000);
 
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
+  
 
-  void BuildCorrelatedHits();
   void UnpackChannels(std::vector<TRawEvent>& raw_data);
   void MakeHit(const TJanusDDASHit& chan_ring,
                const TJanusDDASHit& chan_sector);
 
+  void ClearCorrelatedHits()  { janus_hits.clear(); };
+  void BuildRingSectors(); 
+
+
+  std::vector<TJanusDDASHit> d0_rings;    //!
+  std::vector<TJanusDDASHit> d0_sectors;  //!
+  std::vector<TJanusDDASHit> d1_rings;    //!
+  std::vector<TJanusDDASHit> d1_sectors;  //!
+  
+  
   std::vector<TJanusDDASHit> janus_channels;
   std::vector<TJanusDDASHit> janus_hits;
 

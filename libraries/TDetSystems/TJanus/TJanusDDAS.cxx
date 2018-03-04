@@ -6,11 +6,14 @@
 #include <memory>
 
 #include "TMath.h"
+#include "TRandom.h"
 
 #include "DDASDataFormat.h"
 #include "JanusDataFormat.h"
 #include "TRawEvent.h"
 #include "TChannel.h"
+#include "GValue.h"
+
 
 TJanusDDAS::TJanusDDAS() {
   Clear();
@@ -28,6 +31,13 @@ void TJanusDDAS::Copy(TObject& obj) const {
 void TJanusDDAS::Clear(Option_t* opt){
   TDetector::Clear(opt);
 
+  d0_rings.clear();  
+  d0_sectors.clear();
+  d1_rings.clear();  
+  d1_sectors.clear();
+
+
+  janus_channels.clear();
   janus_hits.clear();
 }
 
@@ -35,15 +45,15 @@ int TJanusDDAS::BuildHits(std::vector<TRawEvent>& raw_data){
   UnpackChannels(raw_data);
   BuildCorrelatedHits();
   /*
-  printf("**************************\n");
-  printf("**************************\n");
-  printf("**************************\n");
-  Print("channels");
-  Print();
-  printf("**************************\n");
-  printf("**************************\n");
-  printf("**************************\n");
-  */
+     printf("**************************\n");
+     printf("**************************\n");
+     printf("**************************\n");
+     Print("channels");
+     Print();
+     printf("**************************\n");
+     printf("**************************\n");
+     printf("**************************\n");
+     */
   return janus_hits.size() + janus_channels.size();
 }
 
@@ -59,17 +69,17 @@ void TJanusDDAS::UnpackChannels(std::vector<TRawEvent>& raw_data) {
     //std::cout << "In Janus Unpack Channels" << std::endl;
 
     unsigned int address = ( (5<<24) +
-                             (ddas.GetCrateID()<<16) +
-                             (ddas.GetSlotID()<<8) +
-                             ddas.GetChannelID() );
+        (ddas.GetCrateID()<<16) +
+        (ddas.GetSlotID()<<8) +
+        ddas.GetChannelID() );
     TChannel* chan = TChannel::GetChannel(address);
 
     static int lines_displayed = 0;
     if(!chan){
       if(lines_displayed < 10) {
         std::cout << "Unknown JANUS (crate, slot, channel): ("
-                  << ddas.GetCrateID() << ", " << ddas.GetSlotID()
-                  << ", " << ddas.GetChannelID() << ")" << std::endl;
+          << ddas.GetCrateID() << ", " << ddas.GetSlotID()
+          << ", " << ddas.GetChannelID() << ")" << std::endl;
       }
       lines_displayed++;
       continue;
@@ -111,10 +121,138 @@ void TJanusDDAS::UnpackChannels(std::vector<TRawEvent>& raw_data) {
   SetTimestamp(smallest_timestamp);
 }
 
-void TJanusDDAS::BuildCorrelatedHits() {
+
+
+void TJanusDDAS::BuildRingSectors() { 
+  for(size_t x=0;x<janus_channels.size();x++) {
+    TJanusDDASHit hit = janus_channel[x];
+    if(hit.IsRing()) {
+      if(hit.GetDetnum()==0) {
+        d0_rings.push_back(*hit);
+      } else {    
+        d1_rings.push_back(*hit);
+      }
+    } else {
+      if(hit.GetDetnum()==0) {
+        d0_sectors.push_back(*hit);
+      } else {    
+        d1_sectors.push_back(*hit);
+      }
+    }
+  }
+}
+
+void CleanRingScetors(std::vector<TJanusDDASHit> rings,std::vector<TJanusDDASHit> sectors) {
+  std::vector<bool> r_passed;
+  std::vector<bool> s_passed;
+  r_passed.resize(rings.size());
+  std::fill(r_passed.begin(),r_passed.end(),false);
+  s_passed.resize(sectors.size());
+  std::fill(s_passed.begin(),s_passed.end(),false);
+  
+  for(size_t x=0;x<rings.size();x++) {
+  for(size_t x=0;x<rings.size();x++) {
+    for(size_t y=0;y<sectors.size();y++) {
+      int tdiff = abs(rings.at(x).Timestamp() - sectors.at(y).Timestamp());
+      int cdiff = abs(rings.at(x).GetEnergy() - sectors.at(y).GetEnergy()); // calfile dependent!!!
+      if(tdiff<250 && cdiff<600) {
+        r_passed[x] = true;
+        s_passed[y] = true;
+      }
+    }
+  }
+  std::vector<TJanusDDASHit>::iterator it;
+  int counter=0;
+  for(it=rings.begin();it!=rings.end();) {
+    if(r_passed.at(counter)==false) {
+      it.erase();
+    } else {
+      it++;
+    }
+    counter++;
+  }
+  counter=0;
+  for(it=sectors.begin();it!=sectors.end();) {
+    if(s_passed.at(counter)==false) {
+      it.erase();
+    } else {
+      it++;
+    }
+    counter++;
+  }
+}
+
+
+
+
+void TJanusDDAS::BuildCorrelatedHits(double EDiff, double TDiff) {
   int minimum_charge = 149;
   int maximum_charge = 32738;
- 
+
+  ClearCorrelatedHits();
+
+  static int counter1=0;
+  static int counter2=0;
+
+  
+  std::vector<TJanusDDASHit> rings;
+  std::vector<TJanusDDASHit> sectors;
+  for(size_t x=0;x<janus_channels.size();x++){
+    TJanusDDASHit chan(janus_channels.at(x));
+    if(chan.Charge()<minimum_charge || chan.Charge()>=maximum_charge) continue; //was an and...
+    if(chan.IsRing())
+      rings.push_back(chan);
+    else if(chan.IsSector())
+      sectors.push_back(chan);
+  }
+  
+
+
+
+
+
+
+  if(false){
+
+    if(rings.size()>2 || sectors.size()>2) return;
+
+    janus_channels.clear();
+    if(rings.size()==1) {
+      janus_channels.push_back(rings[0]);
+    }else if(rings.size()==2 && abs(rings.at(0).GetRing()-rings.at(1).GetRing())==1){
+      TJanusDDASHit hit;
+      if(rings.at(0).Charge()>rings.at(1).Charge()){
+        rings.at(0).Copy(hit);
+        hit.SetCharge(hit.Charge() + rings.at(1).Charge());
+      }else {
+        rings.at(1).Copy(hit);
+        hit.SetCharge(hit.Charge() + rings.at(0).Charge());
+      }
+      janus_channels.push_back(hit);
+    }else if(rings.size()!=0){
+      janus_channels.push_back(rings[0]);
+      janus_channels.push_back(rings[1]);
+    }
+
+    if(sectors.size()==1) {
+      janus_channels.push_back(sectors[0]);
+    }else if(sectors.size()==2 && ((abs(sectors.at(0).GetRing()-sectors.at(1).GetRing())==1) || 
+          (abs(sectors.at(0).GetRing()-sectors.at(1).GetRing())==31))){
+      TJanusDDASHit hit;
+      if(sectors.at(0).Charge()>sectors.at(1).Charge()){
+        sectors.at(0).Copy(hit);
+        hit.SetCharge(hit.Charge() + sectors.at(1).Charge());
+      }else {
+        sectors.at(1).Copy(hit);
+        hit.SetCharge(hit.Charge() + sectors.at(0).Charge());
+      }
+      janus_channels.push_back(hit);
+    } else if(sectors.size()!=0){
+      janus_channels.push_back(sectors[0]);
+      janus_channels.push_back(sectors[1]);
+    } 
+
+  }
   //printf("janus size() = %lu\n",janus_channels.size());
   std::vector<bool> used;
   used.resize(janus_channels.size());
@@ -129,48 +267,49 @@ void TJanusDDAS::BuildCorrelatedHits() {
     //printf("here 3\n",x);
     if(!chan_ring.IsRing()) continue;
     //check gross charge window
-    if(chan_ring.Charge()<minimum_charge && chan_ring.Charge()>=maximum_charge) continue;
+    if(chan_ring.Charge()<minimum_charge || chan_ring.Charge()>=maximum_charge) continue; //was an and...
     for(size_t y=0;y<janus_channels.size();y++) {
       if(x==y) continue;
       if(used.at(y)) continue;
       TJanusDDASHit &chan_sector = GetJanusChannel(y);
       if(!chan_sector.IsSector()) continue;
       if(chan_ring.GetDetnum() != chan_sector.GetDetnum()) continue;
-        //check gross charge window
-        if(chan_sector.Charge()<minimum_charge && chan_sector.Charge()>=maximum_charge) continue;
-        float ediff = fabs(chan_ring.GetEnergy() - chan_sector.GetEnergy());
-        int tdiff = abs(chan_ring.Timestamp() - chan_sector.Timestamp());
+      //check gross charge window
+      if(chan_sector.Charge()<minimum_charge || chan_sector.Charge()>=maximum_charge) continue; //was an and...
+      float ediff = fabs(chan_ring.GetEnergy() - chan_sector.GetEnergy());
+      int tdiff = abs(chan_ring.Timestamp() - chan_sector.Timestamp());
 
-        if(ediff < (chan_ring.GetEnergy()*.35)) { //build.....
-          if(tdiff < (2000))                  { //build.....
+      if(ediff < EDiff) { //build.....
+        if(tdiff < TDiff)                  { //build.....
           MakeHit(chan_ring, chan_sector);
 
           //printf("x,y is %lu \t %lu \n",x,y);
           used[x] = true;
           used[y] = true;
           break;
-          }
         }
+      }
     }
+
   }
 
 
 
- // for(const auto& chan_ring : janus_channels) {
- //   if(chan_ring.IsRing() && chan_ring.RawCharge() > 150) {
- //     for(const auto& chan_sector : janus_channels) {
- //       if(chan_sector.IsSector() && chan_sector.RawCharge() > 150) {
- //         if(chan_ring.GetDetnum() == chan_sector.GetDetnum()) {
- //           MakeHit(chan_ring, chan_sector);
- //         }
- //       }
- //     }
- //   }
- // }
+  // for(const auto& chan_ring : janus_channels) {
+  //   if(chan_ring.IsRing() && chan_ring.RawCharge() > 150) {
+  //     for(const auto& chan_sector : janus_channels) {
+  //       if(chan_sector.IsSector() && chan_sector.RawCharge() > 150) {
+  //         if(chan_ring.GetDetnum() == chan_sector.GetDetnum()) {
+  //           MakeHit(chan_ring, chan_sector);
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 }
 
 void TJanusDDAS::MakeHit(const TJanusDDASHit& chan_ring,
-                         const TJanusDDASHit& chan_sector) {
+    const TJanusDDASHit& chan_sector) {
   TJanusDDASHit correlated_hit(chan_ring);
 
   TDetectorHit& back = correlated_hit.GetBackHit();
@@ -197,7 +336,7 @@ TDetectorHit& TJanusDDAS::GetHit(int i){
 
 
 //void TJanusDDAS::Build_VMUSB_Read(TSmartBuffer buf){
-  // const char* data = buf.GetData();
+// const char* data = buf.GetData();
 
 //   const VMUSB_Header* vmusb_header = (VMUSB_Header*)data;
 //   data += sizeof(VMUSB_Header);
@@ -364,8 +503,8 @@ TDetectorHit& TJanusDDAS::GetHit(int i){
 
 TVector3 TJanusDDAS::GetPosition(int detnum, int ring_num, int sector_num){
   if(detnum<0 || detnum>1 ||
-     ring_num<1 || ring_num>24 ||
-     sector_num<1 || sector_num>32){
+      ring_num<1 || ring_num>24 ||
+      sector_num<1 || sector_num>32){
     // batman vector, nan-nan-nan
     return TVector3(std::sqrt(-1),std::sqrt(-1),std::sqrt(-1));
   }
@@ -408,9 +547,9 @@ void TJanusDDAS::InsertHit(const TDetectorHit& hit) {
 void TJanusDDAS::Print(Option_t *opt) const {
   TString sopt(opt);
   if(sopt.Contains("channels")){
-   PrintChannels(opt); 
+    PrintChannels(opt); 
   } else {
-   PrintHits(opt); 
+    PrintHits(opt); 
   }
 }
 
@@ -433,36 +572,16 @@ void TJanusDDAS::PrintChannels(Option_t *opt) const {
     TJanusDDASHit hit = janus_channels.at(i);
     TChannel *c = TChannel::GetChannel(hit.Address());
     if(c) {
-       printf("\t%s\tDet: %i \tChannel: %02i\tChg: %i\tTime: %lu\n",
-               c->GetName(),hit.GetDetnum(),hit.GetFrontChannel(),hit.Charge(),hit.Timestamp());
+      printf("\t%s\tDet: %i \tChannel: %02i\tChg: %i\tTime: %lu\n",
+          c->GetName(),hit.GetDetnum(),hit.GetFrontChannel(),hit.Charge(),hit.Timestamp());
     } else {
-       printf("\tjanus_channel 0x%08x, no channel.\n",hit.Address());
+      printf("\tjanus_channel 0x%08x, no channel.\n",hit.Address());
     }
   }
   printf("---------------------------\n");
   fflush(stdout);
 }
 
-
-
-double TJanusDDAS::SimAngle(const char *beamname,const char *targetname) {
-  //static auto kr = std::make_shared<TNucleus>("78Kr");
-  static auto pb = std::make_shared<TNucleus>("208Pb");
-  static TSRIM srim("kr78_in_pb208");
-  double thickness = (0.75 / 11342.0) * 1e4; // (0.75 mg/cm^2) / (11342 mg/cm^3) * (10^4 um/cm)
-
-  double collision_pos = gRandom->Uniform();
-
-  double collision_energy = srim.GetAdjustedEnergy(3.9*78*1e3, thickness*collision_pos)/1e3;
-  double energy_mid = srim.GetAdjustedEnergy(3.9*78*1e3, thickness*0.5)/1e3;
-
-  TReaction reac(kr, pb, kr, pb, collision_energy);
-  TReaction reac_mid(kr, pb, kr, pb, energy_mid);
-
-  double pb_angle_rad = reac.ConvertThetaLab(90 * (3.1415926/180), 2, 3);
-  double kr_angle_rad_recon = reac_mid.ConvertThetaLab(pb_angle_rad, 3, 2);
-  return kr_angle_rad_recon;
-}
 
 
 

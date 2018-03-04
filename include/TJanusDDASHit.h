@@ -29,9 +29,18 @@ public:
   bool IsSector() const;
 
   TVector3 GetPosition(bool apply_array_offset = true) const;
+  TVector3 GetReconPosition(const char *beamname="72Se",const char *targetname="208Pb",
+                            bool apply_array_offset = true) const;
+  //double SimAngle(const char *beamname="72Se",const char *targetname="208Pb");
+
+
 
 private:
   TDetectorHit back_hit;
+  
+  double Reconstruct(const char *beamname,const char *targetname,const char *srimfile="se72_in_pb208.txt") const;
+
+
 
   ClassDef(TJanusDDASHit,1);
 };

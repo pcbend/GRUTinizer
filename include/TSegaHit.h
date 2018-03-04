@@ -46,7 +46,7 @@ public:
 
   void DrawTrace(int segnum);
 
-  TVector3 GetPosition(bool apply_array_offset = true,
+  TVector3 GetPosition(bool apply_array_offset = false,
                        TVector3 array_offset = TVector3(sqrt(-1.0),sqrt(-1.0),sqrt(-1.0))) const;
 
   double GetDoppler(double beta,
