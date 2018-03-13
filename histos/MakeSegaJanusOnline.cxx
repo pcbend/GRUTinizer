@@ -84,8 +84,10 @@ void MakeRawJanus(TRuntimeObjects& obj) {
 
 
     obj.FillHistogram("janus_summary",200,0,200,hit.GetFrontChannel(),
-        1500,0,15000,hit.Charge());
+        4000,0,40000,hit.Charge());
 
+    if(hit.GetDetnum()==0)
+      obj.FillHistogram("janus_charge_energy",250,0,10,hit.Charge()/hit.GetEnergy());
 
 
     for(size_t y=x+1; y<janus->GetAllChannels().size();y++) {
@@ -138,13 +140,16 @@ void MakeCalJanus(TRuntimeObjects &obj) {
     TJanusDDASHit jhit = janus->GetJanusHit(x);
     obj.FillHistogram("janus_kin",90,0,180,jhit.GetPosition(0).Theta()*TMath::RadToDeg(),
         1800,0,18000,jhit.GetEnergy());
+    obj.FillHistogram("janus_kin_rebin",90,0,180,jhit.GetPosition(0).Theta()*TMath::RadToDeg(),
+                                        256,0,16384,jhit.GetEnergy());
+
 
     obj.FillHistogram(Form("janus_ring_E_det%i",jhit.GetDetnum()),24,0,24,jhit.GetRing()-1,
                                                 1800,0,18000,jhit.GetEnergy());
 
     obj.FillHistogram(Form("janus_fb_dtime_det%i",jhit.GetDetnum()),2000,-10000,10000,jhit.Timestamp()-jhit.GetBackHit().Timestamp());
-    obj.FillHistogram(Form("janus_fb_energy_det%i",jhit.GetDetnum()),512,0,16384,jhit.GetEnergy(),
-        512,0,16384,jhit.GetBackHit().GetEnergy());
+    obj.FillHistogram(Form("janus_fb_energy_det%i",jhit.GetDetnum()),2048,0,65536,jhit.GetEnergy(),
+        2048,0,65536,jhit.GetBackHit().GetEnergy());
     obj.FillHistogram(Form("janus_fb_dtime_front_energy_det%i",jhit.GetDetnum()),200,-1000,1000,jhit.Timestamp()-jhit.GetBackHit().Timestamp(),
         512,0,16384,jhit.GetEnergy());
     obj.FillHistogram(Form("janus_fb_dtime_ring_num_det%i",jhit.GetDetnum()),200,-1000,1000,jhit.Timestamp()-jhit.GetBackHit().Timestamp(),
@@ -172,8 +177,8 @@ void MakeCalJanus(TRuntimeObjects &obj) {
       tmpvec.SetMagThetaPhi(mag,theta,phi);
       tmpvec.SetY(tmpvec.Y()+yoff);
       tmpvec.SetX(tmpvec.X()+xoff);
-      if(jhit.GetRing()<2)
-        obj.FillHistogram(Form("theta_phi%i",jhit.GetDetnum()),300,10,60,tmpvec.Theta()*TMath::RadToDeg(),
+    //  if(jhit.GetRing()<2)
+      obj.FillHistogram(Form("theta_phi%i",jhit.GetDetnum()),300,10,60,tmpvec.Theta()*TMath::RadToDeg(),
             180,-180,180,tmpvec.Phi()*TMath::RadToDeg());
 
 
@@ -224,6 +229,9 @@ void MakeCalJanus(TRuntimeObjects &obj) {
       obj.FillHistogram(Form("janus_secthits_%s",cut->GetName()),32,0,32,jhit.GetSector()-1);
       obj.FillHistogram(Form("map_det%i_%s",jhit.GetDetnum(),cut->GetName()),32,-3.5,3.5,jhit.GetPosition().Phi(),
           70,-3.5,3.5,jhit.GetPosition().Perp());
+      if(!strcmp(cut->GetName(),"upstream")) 
+        obj.FillHistogram("upstream_ring_E",24,0,24,jhit.GetRing()-1,
+                                            256,0,16384,jhit.GetEnergy());
     }
 
 
@@ -239,6 +247,10 @@ void MakeCalJanus(TRuntimeObjects &obj) {
         if(!timing || !timing->IsInside(jhit.Timestamp()-shit.Timestamp(),shit.GetEnergy())) continue;        
 
         double b;
+        b=reaction.AnalysisBetaFromThetaLab(jhit.GetPosition().Theta(),2);
+        if(jhit.GetDetnum()==0)
+          obj.FillHistogram("Upstream_Coinc",1024,0,2048,shit.GetDoppler(b,jhit.GetPosition()),
+                                              512,0,8192,jhit.GetEnergy());
 
         for(int z=0;z<kin_gates.size();z++) {
           GCutG *cut = kin_gates.at(z);
@@ -258,11 +270,17 @@ void MakeCalJanus(TRuntimeObjects &obj) {
             obj.FillHistogram(Form("energy_angle_%s",cut->GetName()),
                 90,0,180,shit.GetPosition().Angle(jhit.GetPosition())*TMath::RadToDeg(),
                 1000,0,3000,shit.GetEnergy());
-           for(int zz=y+1;zz<sega->Size();zz++) {
+            for(int zz=y+1;zz<sega->Size();zz++) {
               TSegaHit shit2 = sega->GetSegaHit(zz);
               obj.FillHistogramSym(Form("dmat_%s",cut->GetName()),
                   1000,0,3000,shit.GetDoppler(b,jhit.GetPosition()),
                   1000,0,3000,shit2.GetDoppler(b,jhit.GetPosition()));
+            }
+            if(!strcmp(cut->GetName(),"upstream")){
+              obj.FillHistogram("si_e_uncorr_sega_upstream",512,0,2048,shit.GetEnergy(),
+                                                            512,0,16384,jhit.GetEnergy());
+              obj.FillHistogram("ring_uncorr_sega_upstream",512,0,2048,shit.GetEnergy(),
+                                                            24,0,24,jhit.GetRing()-1);
             }
           } else {
             b=reaction.AnalysisBetaFromThetaLab(jhit.GetReconPosition().Theta(),2);
@@ -278,6 +296,8 @@ void MakeCalJanus(TRuntimeObjects &obj) {
           obj.FillHistogram(Form("BetaDistribution_%s",cut->GetName()),
               90,0,180,jhit.GetPosition().Theta()*TMath::RadToDeg(),
               100,0,0.1,b);
+          obj.FillHistogram("Ring_theta",90,0,180,jhit.GetPosition().Theta()*TMath::RadToDeg(),24,0,24,jhit.GetRing()-1);
+
           //obj.FillHistogram(Form("doppler_%s",cut->GetName()),1000,0,3000,
           //    shit.GetDoppler(0.08,jhit.GetPosition()));
         }

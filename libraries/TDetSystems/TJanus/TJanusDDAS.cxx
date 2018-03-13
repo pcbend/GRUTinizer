@@ -313,6 +313,8 @@ void TJanusDDAS::MakeHit(const TJanusDDASHit& chan_ring,
     const TJanusDDASHit& chan_sector) {
   TJanusDDASHit correlated_hit(chan_ring);
 
+  
+
   TDetectorHit& back = correlated_hit.GetBackHit();
   back.SetCharge(chan_sector.Charge());
   back.SetTime(chan_sector.Time());
