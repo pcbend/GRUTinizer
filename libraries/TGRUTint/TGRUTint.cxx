@@ -159,7 +159,9 @@ void TGRUTint::ApplyOptions() {
   //will overwrite any with the same address previously read in.
   if(opt->CalInputFiles().size()) {
     for(auto cal_filename : opt->CalInputFiles()) {
-      TChannel::ReadCalFile(cal_filename.c_str());
+      int i = TChannel::ReadCalFile(cal_filename.c_str());
+      printf(MAGENTA " loaded %i channels from %s" RESET_COLOR "\n",i,cal_filename.c_str()); 
+      fflush(stdout);
     }
   }
   if(opt->ValInputFiles().size()) {

@@ -8,6 +8,7 @@
 
 #include <TNamed.h>
 #include <TList.h>
+#include <TMath.h>
 #include <TVector3.h>
 
 class TChannel : public TNamed {
@@ -113,6 +114,7 @@ public:
   void SetChannelX(double x) { fPosition.SetX(x); }
   void SetChannelY(double y) { fPosition.SetY(y); }
   void SetChannelZ(double z) { fPosition.SetZ(z); }
+  void SetChannelTheta(double theta) {fPosition.SetMagThetaPhi(1.0,theta*TMath::DegToRad(),0.0);}
 
 
   TVector3 fPosition;

@@ -6,6 +6,8 @@
 #include <TDetector.h>
 #include <TFSUHit.h>
 
+#include <TCutG.h>
+
 class TFSU: public TDetector {
   public:
     TFSU();  
@@ -18,6 +20,9 @@ class TFSU: public TDetector {
 
     TFSUHit &GetFSUHit(int i) { return fFSUHits.at(i); }
     size_t Size() const       { return fFSUHits.size(); }
+    
+    TFSUHit &GetAddbackHit(int i) { return fAddbackHits.at(i); }
+    size_t AddbackSize() const       { return fAddbackHits.size(); }
  
     virtual void InsertHit(const TDetectorHit &hit) { fFSUHits.emplace_back((TFSUHit&)hit); fSize++; }
     virtual TDetectorHit& GetHit(int i)             { return fFSUHits.at(i);   }
@@ -26,10 +31,16 @@ class TFSU: public TDetector {
     TFSUHit GetE()      const { return fEnergy; }
 
     bool GoodParticle() const { if(fDeltaE.Charge()<1 || fEnergy.Charge()<1) return false; return true; }
+    
+    int CleanHits(TCutG *timing,TCutG *pp_timing=0);
+    int MakeAddbackHits();
+    
+    int WriteToEv2(const char *filename) const;  
 
   private:
     int  BuildHits(std::vector<TRawEvent>& raw_data);
     std::vector<TFSUHit> fFSUHits;
+    std::vector<TFSUHit> fAddbackHits; //!
 
     TFSUHit fDeltaE;
     TFSUHit fEnergy;

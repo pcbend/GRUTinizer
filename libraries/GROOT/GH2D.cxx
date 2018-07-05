@@ -1,5 +1,7 @@
 #include "GH2D.h"
 
+#include <iostream>
+#include <fstream>
 
 
 ClassImp(GH2D)
@@ -133,13 +135,50 @@ GH2D operator-(GH2D &h1,GH2D &h2) {
 
 
 
+void GH2D::WriteSqr(const char *fname) const {
 
+  if(!strlen(fname)) {
+    fname = Form("%s.sqr",GetName());
+  }
+  
+  std::ofstream fout(fname,std::ios::out|std::ios::binary);
 
+  int x = GetNbinsX();
+  int y = GetNbinsY();
+  float gbin;
+  std::cout << "Array dimensions x=" << x << " y=" << y <<  std::endl;
+  //root histograms start with bin 0, which has underflows (not interested)
+  //and 'nbins' has the last bin of data with nbins+1 the overflow 
+  //(so the histogram is an array nbins+2)
+  if( x == y ) {
+    int bufsiz=sizeof(int)*3;
+    int code=0;
 
+    fout.write((char *)&bufsiz,sizeof(int));
+    fout.write((char *)&x,sizeof(int));
+    fout.write((char *)&code,sizeof(int)); //unused
+    fout.write((char *)&code,sizeof(int)); //type, 0 for square
+    fout.write((char *)&bufsiz,sizeof(int));
 
+    bufsiz=sizeof(float)*x*y;
+    fout.write((char *)&bufsiz,sizeof(int));
+    for(int i=1; i<=x; i++){
+      for(int j=1; j<=y; j++){
+        gbin = GetBinContent(j,i);
+        fout.write((char *)&gbin,sizeof(float));
+      }
+    }
+    fout.write((char *)&bufsiz,sizeof(int));
+  } else {
+    std::cout << "Not a square array x=" << x << " y=" << y <<  std::endl;
+  }
+ 
+  std::cout << "Wrote " << GetName() << " to file: " << fname << std::endl;
+ 
+  fout.close();
+  return;
 
-
-
+}
 
 
 

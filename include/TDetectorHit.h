@@ -40,6 +40,8 @@ public:
 
   bool operator< (const TDetectorHit &rhs) const { return GetEnergy() > rhs.GetEnergy(); }
 
+  bool IsEnergy() const { return fFlags & kIsEnergy; }
+
 protected:
   Int_t   fAddress;
   long    fTimestamp;
@@ -47,7 +49,6 @@ protected:
   Float_t fTime;
   
   unsigned char fFlags;
-
 
   enum EHitFlags {
     kIsEnergy = BIT(0),

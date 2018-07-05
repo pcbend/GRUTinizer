@@ -44,6 +44,8 @@ public:
 
   //Int_t Write(const char *name="",Int_t option=0,Int_t bufsize=0) const;  
 
+  void WriteSqr(const char *filename="") const;
+
 protected:
   virtual double RetrieveBinContent(int bin) const { return double (fArray[bin]); }
   virtual void   UpdateBinContent(int bin,double content) { fArray[bin] = float(content); }

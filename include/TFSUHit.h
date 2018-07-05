@@ -23,6 +23,11 @@ class TFSUHit : public TDetectorHit {
     double GetDoppler(const TVector3 *recoil_vec=0) const;
 
     double GetDoppler(double beta) const;
+  
+    int GetNumber() const;
+
+    bool operator<(const TFSUHit &rhs) const { return GetEnergy() < rhs.GetEnergy(); }
+    //bool operator<(const TFSUHit &rhs) const { return Address() < rhs.Address(); }
 
   ClassDef(TFSUHit,1)
 };

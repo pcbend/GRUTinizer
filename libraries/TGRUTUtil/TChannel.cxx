@@ -594,8 +594,10 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
         } else if(type == "Z") {
           double val = 0; ss >> val;
           channel->SetChannelZ(val);
+        } else if(type =="THETA") {
+          double val = 0; ss >> val;
+          channel->SetChannelTheta(val);
         }
-
       }
     }
   }

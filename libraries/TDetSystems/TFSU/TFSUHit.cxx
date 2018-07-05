@@ -23,6 +23,7 @@ void TFSUHit::Print(Option_t *opt) const {
   printf("\tAddress:  0x%08x\n",Address());
   printf("Name:       %s\n",GetName());
   printf("\tCharge:   %i\n",Charge());
+  printf("\tEnergy:   %.02f\n",GetEnergy());
   printf("\tTime:     %i\n",Time());
   GetPosition().Print();
   printf("---------------------------\n");
@@ -47,6 +48,14 @@ double TFSUHit::GetDoppler(const TVector3 *recoil_vector) const {
   return GetEnergy()*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*recoil_vector)));
 } 
 
+
+
+int TFSUHit::GetNumber() const {
+  TChannel *chan = TChannel::GetChannel(Address());
+  if(!chan) return -1;
+  return chan->GetNumber();
+
+}
 
 double TFSUHit::GetDoppler(double beta) const {
   //insert some checks that positions and betas are actually set.....
