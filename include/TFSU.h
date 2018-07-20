@@ -37,6 +37,7 @@ class TFSU: public TDetector {
     
     int WriteToEv2(const char *filename) const;  
 
+    void OrderHits() { std::sort(fFSUHits.rbegin(),fFSUHits.rend()); }
   private:
     int  BuildHits(std::vector<TRawEvent>& raw_data);
     std::vector<TFSUHit> fFSUHits;

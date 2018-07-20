@@ -108,6 +108,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("n no-sort", &fSortRaw)
     .description("Load raw data files without sorting")
     .default_value(true);
+  parser.option("x no-output-tree", &fWriteOutputTree)
+    .description("do not make a runxxxx.root file containing a tree.")
+    .default_value(false);
   parser.option("m sort-multiple", &fSortMultiple)
     .description("If passed multiple raw data files, treat them as one file.")
     .default_value(false);

@@ -24,7 +24,7 @@ void TFSUHit::Print(Option_t *opt) const {
   printf("Name:       %s\n",GetName());
   printf("\tCharge:   %i\n",Charge());
   printf("\tEnergy:   %.02f\n",GetEnergy());
-  printf("\tTime:     %i\n",Time());
+  printf("\tTime:     %i\n",Timestamp());
   GetPosition().Print();
   printf("---------------------------\n");
  }

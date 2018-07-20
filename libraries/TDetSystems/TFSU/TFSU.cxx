@@ -190,7 +190,7 @@ int TFSU::MakeAddbackHits() {
     }
     if(clover) {
       clover->SetAddress(hit.Address());
-      clover->SetTime(hit.Time());
+      clover->SetTimestamp(hit.Timestamp());
       clover->AddEnergy(hit.GetEnergy());
       //clover->Print();
     }

@@ -44,6 +44,7 @@ public:
   bool ShowLogo()           const { return fShowLogo; }
   bool SortRaw()            const { return fSortRaw; }
   bool SortRoot()           const { return fSortRoot; }
+  bool WriteOutputTree()    const { return fWriteOutputTree; }
   bool ExtractWaves()       const { return fExtractWaves;  }
   bool StartGUI()           const { return fStartGui; }
   bool MakeHistos()         const { return fMakeHistos; }
@@ -104,6 +105,7 @@ private:
   bool fShowLogo;
   bool fSortRaw;
   bool fSortRoot;
+  bool fWriteOutputTree;
   bool fExtractWaves;
   bool fIsOnline;
   bool fStartGui;

@@ -388,6 +388,12 @@ void TGRUTint::SetupPipeline() {
   bool write_root_tree = sort_raw || (sort_tree && filter_data && has_explicit_root_output);
   bool write_histograms = opt->MakeHistos() || sort_tree;
 
+  //printf("opt->WriteOutputTree()  =  %i\n",opt->WriteOutputTree());
+  if(write_root_tree && opt->WriteOutputTree()) { //this is right, inverse logic (ugly!)
+    //printf("opt->WriteOutputTree()  =  %i\n",opt->WriteOutputTree());
+    write_root_tree=false;
+  }
+
   std::string output_root_file = "temp_tree.root";
   if(opt->OutputFile().length()) {
     output_root_file = opt->OutputFile();
@@ -467,6 +473,11 @@ void TGRUTint::SetupPipeline() {
 
   if(filter_data) {
     TFilterLoop* filter_loop = TFilterLoop::Get("4_filter_loop");
+
+    for(auto cut_file : cuts_files) {
+      filter_loop->AddCutFile(cut_file);
+    }
+
     if(raw_filtered_output) {
       filter_loop->OpenRawOutputFile(opt->OutputFilteredFile());
     }

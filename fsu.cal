@@ -1,0 +1,228 @@
+
+
+CL1R {
+ Address: 0x000000020
+ EnergyCoeff: 0.050819 0.412789 
+ Theta: 86.
+ Number: 1
+}
+
+CL1G {
+Address: 0x000000021
+ EnergyCoeff: 0.547534 0.357856 
+ Theta: 86.
+ Number: 2
+}
+
+CL1Bu {
+ Address: 0x000000022
+  EnergyCoeff: -0.015725 0.318247
+ Theta: 94.
+ Number: 3
+}
+
+CL1Bk {
+Address: 0x000000023
+  EnergyCoeff: 0.108315 0.313347
+ Theta: 94.
+ Number: 4
+}
+
+F6R {
+Address: 0x000000028
+  EnergyCoeff:  0.338986 0.361118
+ Theta: 134.
+ Number: 9 
+}
+
+F6G {
+Address: 0x000000029
+ EnergyCoeff:  -0.318465 0.356780
+ Theta: 134.
+ Number: 10 
+}
+
+F6Bl {
+Address: 0x00000002a
+ EnergyCoeff:  0.586085 0.364305
+ Theta: 124.
+ Number: 11 
+}
+
+F6Bk {
+Address: 0x00000002b
+  EnergyCoeff:  0.421513 0.360597
+ Theta: 124.
+ Number: 12 
+}
+
+E {
+Address: 0x00000002e
+  EnergyCoeff:  0 0.125 
+ Number: 15 
+}
+
+dE {
+Address: 0x00000002f
+  EnergyCoeff:  0 0.125 
+ Number: 16
+}
+
+
+CL2R {
+Address: 0x000000030
+ EnergyCoeff:  0.424047 0.363452
+ Theta: 86.
+ Number: 17
+}
+
+CL2G {
+Address: 0x000000031
+ EnergyCoeff:  0.238832 0.361625
+ Theta: 86.
+ Number: 18
+}
+
+CL2Bl {
+Address: 0x000000032
+ EnergyCoeff:  1.646274 0.357276
+ Theta: 94.
+ Number: 19
+}
+
+CL2Bk {
+Address: 0x000000033
+ EnergyCoeff:  0.337466 0.363606
+ Theta: 94.
+ Number: 20
+}
+
+
+FSU7 {
+Address: 0x000000036
+ EnergyCoeff: 0.824121 0.412847
+ Theta: 90.
+ Number: 23
+}
+
+
+K11R {
+Address: 0x000000038
+ EnergyCoeff: 0.748269 0.372634
+ Theta: 134.
+ Number: 25
+}
+
+K11G {
+Address: 0x000000039
+ EnergyCoeff: 0.828177 0.352485
+ Theta: 134.
+ Number: 26
+}
+
+K11Bl {
+Address: 0x00000003a
+ EnergyCoeff: 1.274445 0.368751
+ Theta: 124.
+ Number: 27
+}
+
+K11Bk {
+Address: 0x00000003b
+ EnergyCoeff: 0.882807 0.352927
+ Theta: 124.
+ Number: 28
+}
+
+
+CL3R {
+Address: 0x000000040
+  EnergyCoeff: -0.116286 0.359913 
+ Theta: 94.
+ Number: 33
+}
+
+CL3G {
+Address: 0x000000041
+  EnergyCoeff:  0.343056 0.361546
+ Theta: 86.
+ Number: 34
+}
+
+CL3Bl {
+Address: 0x000000042
+  EnergyCoeff:  -0.067831 0.365853
+ Theta: 94.
+ Number: 35
+}
+
+CL3Bk {
+Address: 0x000000043
+  EnergyCoeff:  0.319988 0.3611
+ Theta: 86.
+ Number: 36
+}
+
+
+SB1 {
+Address: 0x000000046
+  EnergyCoeff:  -0.253285 0.327333
+ Theta: 45.
+ Number: 39
+}
+
+SB2 {
+Address: 0x000000047
+  EnergyCoeff:  -0.061069 0.347259
+ Theta: 45.
+ Number: 40
+}
+
+
+
+JJ10R {
+Address: 0x000000048
+  EnergyCoeff: 0.069923 0.357543
+ Theta: 94.
+ Number: 41
+}
+
+JJ10G {
+Address: 0x000000049
+  EnergyCoeff: 0.259773 0.344459
+ Theta: 94.
+ Number: 42
+}
+
+JJ10Bl {
+Address: 0x00000004a
+  EnergyCoeff: 0.449138 0.399896
+ Theta: 86.
+ Number: 43
+}
+
+JJ10Bk {
+Address: 0x00000004b
+  EnergyCoeff: -0.082913 0.380575
+ Theta: 86.
+ Number: 44
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
