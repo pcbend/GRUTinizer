@@ -42,7 +42,7 @@ public:
 
   bool IsEnergy() const { return fFlags & kIsEnergy; }
 
-protected:
+//protected:
   Int_t   fAddress;
   long    fTimestamp;
   Float_t fCharge;

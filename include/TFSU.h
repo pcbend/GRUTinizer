@@ -11,6 +11,7 @@
 class TFSU: public TDetector {
   public:
     TFSU();  
+    TFSU(const TFSUHit& other);
     ~TFSU(); 
 
 
@@ -32,7 +33,8 @@ class TFSU: public TDetector {
 
     bool GoodParticle() const { if(fDeltaE.Charge()<1 || fEnergy.Charge()<1) return false; return true; }
     
-    int CleanHits(TCutG *timing,TCutG *pp_timing=0);
+    //int CleanHits(TCutG *timing,TCutG *pp_timing=0);
+    int CleanHits(double low =25.,double high=9500.,double timediff=50);
     int MakeAddbackHits();
     
     int WriteToEv2(const char *filename) const;  

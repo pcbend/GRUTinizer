@@ -1,54 +1,91 @@
-#ifndef _GH1D_H
-#define _GH1D_H
+#ifndef GH1D_H
+#define GH1D_H
 
-#include <GH1.h>
-#include <TVectorD.h>
+#include "TH1.h"
+#include "TRef.h"
 
-class GH1D : public GH1, public TArrayD {
-  public:
-    GH1D();
-    GH1D(const char *name,const char *title,int nbinsx,double xlow,double xhigh);
-    GH1D(const char *name,const char *title,int nbinsx,const double *xbins);
-    GH1D(const char *name,const char *title,int nbinsx,const float  *xbins);
-    explicit GH1D(const TVectorD &v);
-    GH1D(const GH1D &h1d);
-    GH1D(const TH1  &h1d);
-    GH1D& operator=(const GH1D &h1);
-    virtual ~GH1D() { }
+#include "GH2I.h"
 
-    virtual void AddBinContent(int bin) { ++fArray[bin]; }
-    virtual void AddBinContent(int bin,double w) { fArray[bin]+=(double)w; }
-     
-    virtual void Copy(TObject &hnew) const;
-    virtual void Reset(Option_t *opt="");
-    virtual void SetBinsLength(int n=-1);
+class TF1;
+class TClass;
+class TMethodCall;
 
-    //Int_t Write(const char *name="",Int_t option=0,Int_t bufsize=0) const;  
+class GPeak;
+class GCutG;
+class TRuntimeObjects;
 
+class GH1D : public TH1D {
+public:
+  GH1D() : TH1D(), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0) { }
+  GH1D(const TVectorD& v)
+    : TH1D(v), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0) { }
+  GH1D(const char* name, const char* title, Int_t nbinsx, const Float_t* xbins)
+    : TH1D(name, title, nbinsx, xbins), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0) { }
+  GH1D(const char* name, const char* title, Int_t nbinsx, const Double_t* xbins)
+    : TH1D(name, title, nbinsx, xbins), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0) { }
+  GH1D(const char* name, const char* title, Int_t nbinsx, Double_t xlow, Double_t xup)
+    : TH1D(name, title, nbinsx, xlow, xup), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0) { }
 
-  protected:
-    virtual double RetrieveBinContent(int bin) const { return fArray[bin]; }
-    virtual void   UpdateBinContent(int bin,double content) { fArray[bin]=content; }
+  GH1D(const TF1& function,Int_t nbinsx,Double_t xlow,Double_t xup);
 
+  GH1D(const TH1& source);
+  //GH1D(const TH1 *source);
+  //virtual void SetOption(Option_t* option=" ");
+
+  TObject* GetParent() const { return parent.GetObject(); }
+  void SetParent(TObject* obj) { parent = obj; }
+
+  int GetProjectionAxis() const { return projection_axis; }
+  void SetProjectionAxis(int axis) { projection_axis = axis; }
+
+  virtual Int_t Fill(const TObject* obj);
+  virtual Int_t Fill(const TRuntimeObjects* objs);
+  virtual Int_t Fill(double x) { return TH1D::Fill(x); }
+  virtual Int_t Fill(double x,double w) { return TH1D::Fill(x,w); }
+  virtual Int_t Fill(const char *name,double w) { return TH1D::Fill(name,w); }
+
+  void Clear(Option_t* opt="");
+  void Print(Option_t* opt="") const;
+  void Copy(TObject& obj) const;
+  void Draw(Option_t* opt="");
+  TH1 *DrawCopy(Option_t *opt="") const;
+  TH1 *DrawNormalized(Option_t *opt="",Double_t norm=1) const;
+
+  bool WriteDatFile(const char *outFile);
   
-  ClassDef(GH1D,4)
+  GH1D* Project(int bins=-1);
 
-  public:
-    friend GH1D  operator*(double c1, const GH1D &h1);
-    friend GH1D  operator*(const GH1D &h1,double c1);
-    friend GH1D  operator*(const GH1D &h1,const GH1D &h2);
-    friend GH1D  operator/(const GH1D &h1,const GH1D &h2);
-    friend GH1D  operator+(const GH1D &h1,const GH1D &h2);
-    friend GH1D  operator-(const GH1D &h1,const GH1D &h2);
+  GH1D* GetPrevious(bool DrawEmpty=false) const;
+  GH1D* GetNext(bool DrawEmpty=false) const;
+
+  GH1D* Project(double bin_low, double bin_high) const;
+  GH1D* Project_Background(double bin_low, double bin_high,
+                           double bg_bin_low, double bg_bin_high,
+                           kBackgroundSubtraction mode = kRegionBackground) const;
+
+  void SetFillMethod(const char *classname,const char *methodname,const char* param="");
+  void AddGate(GCutG *gate) { gates.push_back(gate); } 
+
+
+  GPeak* DoPhotoPeakFit(double xlow,double xhigh,Option_t *opt=""); // *MENU* 
+  GPeak* DoPhotoPeakFitNormBG(double xlow,double xhigh,Option_t *opt=""); // *MENU* 
+
+  double GetLastXlow()  const { return xl_last;}
+  double GetLastXhigh() const { return xh_last;}
+
+private:
+  TRef parent;
+  int projection_axis;
+
+  TClass      *fFillClass;  //!
+  TMethodCall *fFillMethod; //!
+
+  double xl_last; //!
+  double xh_last; //!
+  
+  std::vector<GCutG*> gates; //!
+
+  ClassDef(GH1D,1)
 };
-
-GH1D operator*(double c1,const GH1D &h1);
-inline GH1D operator*(const GH1D &h1,double c1) { return operator*(c1,h1); }
-GH1D operator*(const GH1D &h1,const GH1D &h2);
-GH1D operator/(const GH1D &h1,const GH1D &h2);
-GH1D operator+(const GH1D &h1,const GH1D &h2);
-GH1D operator-(const GH1D &h1,const GH1D &h2);
-
-
 
 #endif /* GH1D_H */

@@ -1,200 +1,130 @@
 
 #include "TRuntimeObjects.h"
-
-#include <iostream>
-#include <map>
-#include <cstdio>
-
-#include <TH1.h>
-#include <TH2.h>
-#include <TMath.h>
-#include <TRandom.h>
-#include <TObject.h>
-#include <TLine.h>
+#include "TChannel.h"
 
 #include "TFSU.h"
 #include "GCutG.h"
 
-#include "TChannel.h"
-#include "GValue.h"
-
-double beta =0.02;
-
-TCutG* timing=0;
-TCutG* pp_timing=0;
-
-
-void HandleFSU(TRuntimeObjects &obj,TCutG *cut) {
-  TFSU *fsu = obj.GetDetector<TFSU>();
- 
-  //std::cout << "IN MAKE HISTOS!! " << std::endl; 
-  if(!fsu) return;
-  //fsu->Print("all");
-
-
-  std::string dirname ="";
-  if(cut) dirname=cut->GetName();
-
-  if(!fsu->GoodParticle()) return;
-  obj.FillHistogram(dirname, "pid_all_clean",4000,0,24000,fsu->GetDeltaE().Charge(),
-                                             4000,0,16000,fsu->GetE().Charge());
- 
-  //fsu->Print("addback");
-
- 
-  if(!cut->IsInside(fsu->GetDeltaE().Charge(),fsu->GetE().Charge())) { 
-    //std::cout << "failed " << cut->GetName() << " pid cut!" << std::endl;
-    return;
-  } 
-  //std::cout << "passed " << cut->GetName() << " pid cut!" << std::endl;
-
-  //for(size_t i=0;i<fsu->Size();i++) {
-  //  TFSUHit hit = fsu->GetFSUHit(i);
-  for(size_t i=0;i<fsu->AddbackSize();i++) {
-    TFSUHit hit = fsu->GetAddbackHit(i);
-
-    if(!TChannel::GetChannel(hit.Address())) continue;
-    if(hit.Charge()<0 || hit.Charge()>30000) continue;   // if the gamma hit has good charge
+void HandleFSU(TRuntimeObjects &obj,const char *dirname) {
+    TFSU  *fsu = obj.GetDetector<TFSU>();
     
-    double time = fsu->GetDeltaE().Timestamp()-hit.Timestamp();
+    if(!fsu) {
+      return;
+    } 
+    fsu->CleanHits(10.0,9000.0,40.0);
+    if(!fsu->Size()) {
+      return;
+    }    
 
-    obj.FillHistogram(Form("dop_%s",cut->GetName()),10000,0,5000,hit.GetDoppler(beta));
+    TFSUHit E = fsu->GetE();
+    TFSUHit dE = fsu->GetDeltaE();
 
-    obj.FillHistogram(dirname,"summary_cal",10000,0,5000,hit.GetEnergy(),
-                                               200,0,200,hit.Id());
-    
-    obj.FillHistogram(dirname,"summary_dop",10000,0,5000,hit.GetDoppler(beta),
-                                200,0,200,hit.Id());
-    
-    obj.FillHistogram(dirname,"angle_dop",180,0,180,hit.GetPosition().Theta()*TMath::RadToDeg(),
-                                          10000,0,5000,hit.GetDoppler(beta));
-    obj.FillHistogram(dirname,"angle_cal",180,0,180,hit.GetPosition().Theta()*TMath::RadToDeg(),
-                                          10000,0,5000,hit.GetEnergy());
-    obj.FillHistogram(dirname,"DeltaT",1000,-500,500,time,
-                                2000,0,5000,hit.GetEnergy());
-    
-    obj.FillHistogram(dirname,"DeltaT",1000,-500,500,time,
-                               2000,0,5000,hit.GetEnergy());
 
-    //obj.FillHistogram("Angle",180,0,180,hit.GetPosition().Theta()*TMath::RadToDeg(),
-    //                          5000,0,5000,hit.GetEnergy());
+    obj.FillHistogram(dirname,"Multiplicity", 20,0,20,fsu->Size());
 
-    //for(size_t j=i+1;j<fsu->Size();j++) {
-    //  TFSUHit hit2 = fsu->GetFSUHit(j);
-    for(size_t j=i+1;j<fsu->AddbackSize();j++) {
-      TFSUHit hit2 = fsu->GetAddbackHit(j);
-      if(!TChannel::GetChannel(hit2.Address())) continue;
-      obj.FillHistogramSym(Form("ggmat_%s",cut->GetName()),5000,0,5000,hit.GetEnergy(),
-                                                           5000,0,5000,hit2.GetEnergy());
+
+    for(unsigned int i=0;i<fsu->Size();i++) {
+      TFSUHit hit = fsu->GetFSUHit(i);
+      
+      if(hit.GetEnergy()>9000) continue;
+      if(hit.GetEnergy()<10)   continue;
+
+      obj.FillHistogram(dirname,"energy",8000,0,4000,hit.GetEnergy());
+      obj.FillHistogram(dirname,"summary",8000,0,4000,hit.GetEnergy(),
+                                            100,0,100,hit.GetNumber());
+      obj.FillHistogram(dirname, "GammaDeTime",2000,-1000,1000, dE.Timestamp()-hit.Timestamp(),
+                                               2000,0,4000,hit.GetEnergy());
+
+      for(unsigned int j=i+1;j<fsu->Size();j++){
+      TFSUHit hit2 = fsu->GetFSUHit(j);
+      
+      obj.FillHistogram(dirname,"matrix",4000,0,4000,hit.GetEnergy(),4000,0,4000,hit2.GetEnergy());
+      obj.FillHistogram(dirname,"matrix",4000,0,4000,hit2.GetEnergy(),4000,0,4000,hit.GetEnergy());
+
+      }
+
     }
-  }
-
-  obj.FillHistogram(dirname,"pid",4000,0,16000,fsu->GetDeltaE().Charge(),
-                          4000,0,16000,fsu->GetE().Charge());
-  obj.FillHistogram("pid",4000,0,24000,fsu->GetDeltaE().Charge(),
-                          4000,0,16000,fsu->GetE().Charge());
-
-    
-  double time = fsu->GetDeltaE().Timestamp()-fsu->GetE().Timestamp();
-  obj.FillHistogram("pp_time",1000,-500,500,time,
-                              4000,0,32000,fsu->GetDeltaE().Charge());
- 
-
 }
-
-
-
-
-void HandleFSU(TRuntimeObjects &obj) {
-  TFSU *fsu = obj.GetDetector<TFSU>();
-  if(!fsu) return;
-
-  for(size_t i=0;i<fsu->Size();i++) {
-    TFSUHit hit = fsu->GetFSUHit(i);
-
-    if(!TChannel::GetChannel(hit.Address())) continue;
-    obj.FillHistogram("summary_cal",10000,0,5000,hit.GetEnergy(),
-                                200,0,200,hit.Id());
-    
-    obj.FillHistogram("summary_dop",10000,0,5000,hit.GetDoppler(beta),
-                                200,0,200,hit.Id());
-    
-    obj.FillHistogram("summary_raw",8000,0,16000,hit.Charge(),
-                                200,0,200,hit.Id());
-    
-    //obj.FillHistogram("angle_dop",180,0,180,hit.GetPosition().Theta()*TMath::RadToDeg(),
-    //                              10000,0,5000,hit.GetDoppler());
-    
-    obj.FillHistogram("angle_cal",180,0,180,hit.GetPosition().Theta()*TMath::RadToDeg(),
-                                          10000,0,5000,hit.GetEnergy());
-//    for(size_t j=i+1;j<fsu->Size();j++) {
-//      TFSUHit hit2 = fsu->GetFSUHit(j);
-//      if(!TChannel::GetChannel(hit2.Address())) continue;
-//      obj.FillHistogramSym("ggmat",5000,0,5000,hit.GetEnergy(),
-//                                   5000,0,5000,hit2.GetEnergy());
-//    }
-//    obj.FillHistogram("Angle",180,0,180,hit.GetPosition().Theta()*TMath::RadToDeg(),
-//                              5000,0,5000,hit.GetEnergy());
-  }
-
-  obj.FillHistogram("pid_all_dirty",4000,0,24000,fsu->GetDeltaE().Charge(),
-                                    4000,0,16000,fsu->GetE().Charge());
-
-  
-
-}
-
-
-
-
-
-
-
-
-
 
 // extern "C" is needed to prevent name mangling.
 // The function signature must be exactly as shown here,
 //   or else bad things will happen.
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
-  TFSU  *fsu = obj.GetDetector<TFSU>();
-  TList *list  = &(obj.GetObjects());
-  TList *gates = &(obj.GetGates());
-  int numobj = list->GetSize();
+    TFSU  *fsu = obj.GetDetector<TFSU>();
+    //  TList *list  = &(obj.GetObjects());
+    TList *gates = &(obj.GetGates());
+    //  int numobj = list->GetSize()
+    //  CleanHits(double low,double high,double timediff) {
 
-  if(!fsu || !fsu->Size()) {
-    return;
-  } 
-  if(!timing) {
-    TIter it(gates);
-    while(TCutG *gate =(TCutG*)it.Next()) {
-      if(strncmp(gate->GetName(),"timing",6)==0) {
-        printf("loaded timing\n"); fflush(stdout);
-        timing = gate;
-        //break;
-      }else if(strncmp(gate->GetName(),"pp_timing",9)==0) {
-        printf("loaded pp_timing\n"); fflush(stdout);
-        pp_timing = gate;
-      }
+
+
+    if(!fsu) {
+      return;
+    } 
+    
+    TFSUHit E = fsu->GetE();
+    TFSUHit dE = fsu->GetDeltaE();
+
+    obj.FillHistogram("EdE", 2000, 0, 4000, E.GetEnergy(),
+            2000, 0, 4000, dE.GetEnergy());
+    
+    fsu->CleanHits(10.0,9000.0,40.0);
+    if(!fsu->Size()) {
+      return;
+    }    
+
+
+
+    for(int i=0;i<gates->GetEntries();i++) {
+      GCutG* cut = (GCutG*)gates->At(i);
+        //if(cut->GetTag()=="pid") {
+            if(cut->IsInside(E.GetEnergy(),dE.GetEnergy())) {
+                HandleFSU(obj,cut->GetName());
+            }
+        //}
     }
-  }
-  
-  HandleFSU(obj); 
-  //fsu->WriteToEv2("blah");
- 
-  fsu->CleanHits(timing,pp_timing);
-  if(!fsu->Size()) return;
-  fsu->MakeAddbackHits();
- 
-  TIter it(gates);
-  while(TCutG *gate =(TCutG*)it.Next()) {
-    if(strncmp(((GCutG*)gate)->GetTag(),"pid",3)!=0) continue;
-    HandleFSU(obj,gate);
-    //if(timing) HandleFSU(obj,gate,timing);
-  }
-  
 
-  if(numobj!=list->GetSize())
-    list->Sort();
-}
+
+    for(unsigned int i=0;i<fsu->Size();i++) {  
+        TFSUHit hit = fsu->GetFSUHit(i);
+        obj.FillHistogram("energy",8000,0,4000,hit.GetEnergy());
+        obj.FillHistogram("summary",8000,0,10000,hit.GetEnergy(),
+                                     50,0,50,hit.GetNumber());
+
+
+        obj.FillHistogram("GammaDeTime",2000,-1000,1000, dE.Timestamp()-hit.Timestamp(),
+                2000,0,4000,hit.GetEnergy());
+
+
+
+
+        for(unsigned int j=i+1;j<fsu->Size();j++) {  
+
+            TFSUHit hit2 = fsu->GetFSUHit(j);
+
+
+            if(hit.GetEnergy()>hit2.GetEnergy()) {
+                obj.FillHistogram("detime",2000,-1000,1000,hit.Timestamp()-hit2.Timestamp(), 
+                        2000,0,4000, hit2.GetEnergy());
+            }
+            else{
+                obj.FillHistogram("detime",2000,-1000,1000,hit2.Timestamp()-hit.Timestamp(), 
+                        2000,0,4000, hit.GetEnergy());
+            }
+
+            obj.FillHistogram("dtime",4000,-2000,2000,hit.Timestamp()-hit2.Timestamp());
+            obj.FillHistogram("matrix",4000,0,4000,hit.GetEnergy(),
+                    4000,0,4000,hit2.GetEnergy());
+            obj.FillHistogram("matrix",4000,0,4000,hit2.GetEnergy(),
+                    4000,0,4000,hit.GetEnergy());
+
+
+        }
+        }
+
+    }
+
+    //  if(numobj!=list->GetSize())
+    //    list->Sort();
+

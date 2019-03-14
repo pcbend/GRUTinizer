@@ -5,6 +5,10 @@
 
 TFSU::TFSU() { }
 
+TFSU::TFSU(const TFSUHit& other) {
+  other.Copy(*this);
+}
+
 TFSU::~TFSU() { }
 
 void TFSU::Clear(Option_t *opt) { 
@@ -44,6 +48,22 @@ void TFSU::Copy(TObject& obj) const {
   TNamed::Copy(obj);
 
   TFSU& fsu = (TFSU&)obj;
+  
+  fsu.fDeltaE.fCharge    = GetDeltaE().Charge();
+  fsu.fDeltaE.fAddress   = GetDeltaE().Address();
+  fsu.fDeltaE.fTimestamp = GetDeltaE().Timestamp();
+
+  fsu.fEnergy.fCharge    = GetE().Charge();
+  fsu.fEnergy.fAddress   = GetE().Address();
+  fsu.fEnergy.fTimestamp = GetE().Timestamp();
+
+  //fsu.fDeltaE.Copy(fDeltaE);
+  //fsu.fEnergy.Copy(fEnergy);
+
+
+  //for(size_t x=0;x<Size();x++) {
+  //  fsu.fFSUHits.push_back(TFSUHit(fFSUHits.at(x)));
+  //}
   fsu.fFSUHits = fFSUHits;
   fsu.fAddbackHits = fAddbackHits;
 
@@ -60,15 +80,22 @@ int TFSU::BuildHits(std::vector<TRawEvent>& raw_data) {
     TFSUHit hit;
     hit.SetTimestamp(nscl.GetTimestamp());
     hit.SetAddress((*((Int_t*)(nscl.GetBody()+4)))&0x00000fff); 
-    TChannel *channel = TChannel::GetChannel(hit.Address());
+    //TChannel *channel = TChannel::GetChannel(hit.Address());
     //if(!channel) continue;
     int charge = *((Int_t*)(nscl.GetBody()+16));  
     hit.SetCharge(charge&0x0000ffff);
     //hit.Print();
     //InsertHit(hit);
-    if(channel && !strncmp(channel->GetName(),"E",1)) {
+
+    
+    
+   // if(channel && !strncmp(channel->GetName(),"E",1)) {
+   //   hit.Copy(fEnergy);
+   // } else if(channel && !strncmp(channel->GetName(),"dE",2)) {
+   //   hit.Copy(fDeltaE);
+    if(hit.Address()==0x0000002f) {
       hit.Copy(fEnergy);
-    } else if(channel && !strncmp(channel->GetName(),"dE",2)) {
+    } else if(hit.Address()==0x0000002e) {
       hit.Copy(fDeltaE);
     } else {
      fFSUHits.push_back(hit);
@@ -84,20 +111,21 @@ int TFSU::BuildHits(std::vector<TRawEvent>& raw_data) {
   return fFSUHits.size();
 }
 
-int TFSU::CleanHits(TCutG *timing,TCutG *pp_timing) {
-  if(!timing) return fFSUHits.size();
-  
-  double time = GetDeltaE().Timestamp()-GetE().Timestamp();
-  if(pp_timing && !pp_timing->IsInside(time,GetDeltaE().Charge())) {
-    Clear();
-  }
+//int TFSU::CleanHits(TCutG *timing,TCutG *pp_timing) {
+int TFSU::CleanHits(double low,double high,double timediff) {
 
   std::vector<TFSUHit>::iterator it;
   for(it=fFSUHits.begin();it!=fFSUHits.end(); ) {
-    time = GetDeltaE().Timestamp() - it->Timestamp();
-    if(!timing->IsInside(time,it->GetEnergy())) {
+    bool deleted = false;
+    if(it->GetEnergy()<low||it->GetEnergy()>high) {
       it = fFSUHits.erase(it);
-    } else {
+      deleted=true;
+    }
+    if(!deleted && fabs(GetDeltaE().Timestamp()-it->Timestamp())>timediff)   {
+      it = fFSUHits.erase(it);
+      deleted = true;
+    } 
+    if(!deleted) {
       it++;
     } 
   }
@@ -160,7 +188,8 @@ int TFSU::WriteToEv2(const char *filename) const {
 int TFSU::MakeAddbackHits() {
   if(!fFSUHits.size()) return 0;
   //Print("all");
-  std::sort(fFSUHits.begin(),fFSUHits.end());
+  //std::sort(fFSUHits.begin(),fFSUHits.end());
+  OrderHits();
 
   TFSUHit cl1;  cl1.SetCharge(0.0);
   TFSUHit cl2;  cl2.SetCharge(0.0);
