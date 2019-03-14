@@ -297,3 +297,27 @@ GPeak* GH1D::DoPhotoPeakFitNormBG(double xlow,double xhigh,Option_t *opt) {
   xh_last = xhigh;
   return PhotoPeakFitNormBG((TH1*)this,xlow,xhigh,opt);
 }
+
+
+Int_t GH1D::Write(const char *name,Int_t option,Int_t bufsize)  {
+  //hist.Copy(*this);
+  std::string hname = this->GetName();
+  std::string temp_name = Form("__%s_temp__",this->GetName());
+  this->SetName(temp_name.c_str());
+  TH1D hist(hname.c_str(),this->GetTitle(),this->GetNbinsX(),this->GetXaxis()->GetBinLowEdge(1),this->GetXaxis()->GetBinUpEdge(this->GetNbinsX()));
+  for(int i=0;i<=this->GetNbinsX()+1;i++) {
+      hist.SetBinContent(i,this->GetBinContent(i));
+  }
+  hist.SetEntries(this->GetEntries()); 
+
+  int result = hist.Write();
+  hist.SetDirectory(0);
+  hist.Delete();
+  this->SetName(hname.c_str());
+  return result;
+}
+
+
+
+
+

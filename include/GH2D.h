@@ -71,6 +71,7 @@ public:
   Int_t Fill(const char *namex, const char *namey, Double_t w) { return TH2D::Fill(namex,namey,w); }
 
   Int_t Fill(const TRuntimeObjects*);
+  Int_t Write(const char *name="",Int_t option=0,Int_t bufsize=0);  
 
 private:
   
@@ -80,6 +81,8 @@ private:
   TMethodCall *fYFillMethod; //!
 
   std::vector<GCutG*> gates; //!
+
+
 
   ClassDef(GH2D,1)
 };

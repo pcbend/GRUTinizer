@@ -4,7 +4,6 @@
 #include "TH1.h"
 #include "TRef.h"
 
-#include "GH2Base.h"
 #include "GH2I.h"
 
 class TF1;
@@ -14,8 +13,6 @@ class TMethodCall;
 class GPeak;
 class GCutG;
 class TRuntimeObjects;
-
-
 
 class GH1D : public TH1D {
 public:
@@ -75,6 +72,8 @@ public:
 
   double GetLastXlow()  const { return xl_last;}
   double GetLastXhigh() const { return xh_last;}
+
+  Int_t Write(const char *name="",Int_t option=0,Int_t bufsize=0);  
 
 private:
   TRef parent;
