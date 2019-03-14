@@ -53,13 +53,21 @@ class TKeyDict(dict):
     def __getitem__(self, key):
         output = super(TKeyDict,self).__getitem__(key)
         if isinstance(output, ROOT.TKey):
+            replacement_classes = [(ROOT.TH2D, ROOT.GH2D),
+                                   (ROOT.TH1D, ROOT.GH1D),
+                                   (ROOT.TH1F, ROOT.GH1D),
+                                   #(ROOT.TH2D, ROOT.xH2D),
+                                   #(ROOT.TH3D, ROOT.xH3D),
+                                   ]
+
             output = output.ReadObj()
-            if (isinstance(output, ROOT.TH2) and
-                not isinstance(output, ROOT.GH2)):
-                output = ROOT.GH2D(output)
-            elif (isinstance(output, ROOT.TH1) and
-                not isinstance(output, ROOT.GH1)):
-                output = ROOT.GH1D(output)
+            for in_cls,out_cls in replacement_classes:
+                if (isinstance(output, in_cls) and
+                    not isinstance(output, out_cls)):
+                    replacement = out_cls(output)
+                    output.Delete()
+                    output = replacement
+                    break
             self[key] = output
 
         return output

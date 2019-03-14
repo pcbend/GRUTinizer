@@ -30,8 +30,6 @@ class MainWindow(object):
         self.files = {}
 
         self._setup_GUI()
-        self._setup_keybindings()
-
 
     def LoadGuiFile(self, filename):
         with open(filename) as f:
@@ -192,24 +190,6 @@ class MainWindow(object):
         status = ThreadStatusFrame(self.window)
         status.pack()
 
-    def _setup_keybindings(self):
-        #self.window.bind("<BackSpace>",self.close_all_canvases)
-        #self.window.bind("<BackSpace>",self._keybindings)
-        self.window.bind("<KP_Space>",self._handleKeyPad)
-        self.window.bind("<KP_Decimal>",self._handleKeyPad)
-        self.window.bind("<KP_Enter>",self._handleKeyPad)
-        self.window.bind("<KP_Add>",self._handleKeyPad)
-        self.window.bind("<KP_0>",self._handleKeyPad)
-        self.window.bind("<KP_1>",self._handleKeyPad)
-        self.window.bind("<KP_2>",self._handleKeyPad)
-        self.window.bind("<KP_3>",self._handleKeyPad)
-        self.window.bind("<KP_4>",self._handleKeyPad)
-        self.window.bind("<KP_5>",self._handleKeyPad)
-        self.window.bind("<KP_6>",self._handleKeyPad)
-        self.window.bind("<KP_7>",self._handleKeyPad)
-        self.window.bind("<KP_8>",self._handleKeyPad)
-        self.window.bind("<KP_9>",self._handleKeyPad)
-
 
     def _setup_status_bar(self, parent):
         frame = tk.Frame(parent, height=60)
@@ -305,8 +285,6 @@ class MainWindow(object):
 
         if cls.InheritsFrom(ROOT.TH2.Class()):
             return self.icons['h2_t']
-        elif cls.InheritsFrom(ROOT.GH2.Class()):
-            return self.icons['h2_t']
         elif cls.InheritsFrom(ROOT.TH1.Class()):
             return self.icons['h1_t']
         elif cls.InheritsFrom(ROOT.TFile.Class()):
@@ -370,8 +348,6 @@ class MainWindow(object):
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="1 x 3",onvalue='1x3',
                                   variable=self.predefinedzones,command=self.set_zones)
-        zonesmenu.add_checkbutton(label="1 x 4",onvalue='1x4',
-                                  variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="2 x 1",onvalue='2x1',
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="2 x 2",onvalue='2x2',
@@ -389,8 +365,6 @@ class MainWindow(object):
         zonesmenu.add_checkbutton(label="4 x 4",onvalue='4x4',
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="5 x 2",onvalue='5x2',
-                                  variable=self.predefinedzones,command=self.set_zones)
-        zonesmenu.add_checkbutton(label="6 x 4",onvalue='6x4',
                                   variable=self.predefinedzones,command=self.set_zones)
         zonesmenu.add_checkbutton(label="8 x 3",onvalue='8x3',
                                   variable=self.predefinedzones,command=self.set_zones)
@@ -523,8 +497,8 @@ class MainWindow(object):
             opt.append('colz')
         self._SetOptStat()
         hist.SetLineColor(color)
-        #hist.Draw(' '.join(opt))
-        hist.Draw()
+        hist.Draw(' '.join(opt))
+        #hist.Draw()
 
     def AddDirectory(self, tdir):
         if tdir:
@@ -545,9 +519,9 @@ class MainWindow(object):
         #                                                       ("Cuts File", "*.root")))
         #if not filename:
         #   return
-
+        
 	#filename = os.path.abspath(filename)
-        #tfile = ROOT.TFile(filename);
+        #tfile = ROOT.TFile(filename);                
         self.tcut_tab.AddFile(cutfile)
 
     def LoadDataFile(self, filename = None):
@@ -606,7 +580,7 @@ class MainWindow(object):
     def Snapshot(self):
         ROOT.GSnapshot.Get().Snapshot()
 
-    def close_all_canvases(self,event=0):
+    def close_all_canvases(self):
         canvases = ROOT.gROOT.GetListOfCanvases()
         for canvas in canvases:
             canvas.Close()
@@ -639,47 +613,3 @@ class MainWindow(object):
         #ROOT.PyGUIThread.join(0.1)
 
         self.canvases.append(canvas)
-
-
-    def _handleKeyPad(self,event):
-        canvas_sizes = dict(KP_1=(1,1),
-                            KP_2=(2,1),
-                            KP_3=(3,1),
-                            KP_4=(1,2),
-                            KP_5=(2,2),
-                            KP_6=(3,2),
-                            KP_7=(1,3),
-                            KP_8=(2,3),
-                            KP_9=(3,3))
-        if event.keysym in canvas_sizes:
-            x,y = canvas_sizes[event.keysym]
-            self.open_canvas('',x,y)
-
-        canvas_mod = dict(KP_Add=+1,
-                          KP_Enter=-1)
-        if event.keysym in canvas_mod:
-            shift = canvas_mod[event.keysym]
-            if ROOT.gPad:
-                padnum = ROOT.gPad.GetNumber()
-                canvas = ROOT.gPad.GetCanvas()
-
-                if padnum+shift == 0:
-                    # Ugly way to find the maximum pad
-                    target_num = 1
-                    while True:
-                        if not canvas.GetPad(target_num+1):
-                            break
-                        target_num += 1
-                elif canvas.GetPad(padnum+shift):
-                    target_num = padnum+shift
-                else:
-                    target_num = 1
-
-                canvas.cd(target_num)
-
-                ROOT.gPad.Modified()
-                ROOT.gPad.Update()
-
-
-
-        self.window.lift()
