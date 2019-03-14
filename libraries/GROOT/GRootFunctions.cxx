@@ -9,7 +9,7 @@
 NamespaceImp(GRootFunctions)
 
 
-#define PI TMATH::Pi()
+#define PI TMath::Pi()
 
 Double_t GRootFunctions::PolyBg(Double_t *dim, Double_t *par, Int_t order) {
   Double_t result = 0.0;
@@ -335,6 +335,7 @@ Double_t GRootFunctions::Polarization(Double_t *x,Double_t *par) {
 
 
 Double_t GRootFunctions::ComptonEnergy(Double_t *x,Double_t *par) {
+  //x[0]   = scattering angle, in degrees....
   //par[0] = inital gamma energy; in keV.
   double lower = 1 + (par[0]/511.)*(1-TMath::Cos(TMath::DegToRad()*x[0]));
   return par[0]/lower;
@@ -342,6 +343,7 @@ Double_t GRootFunctions::ComptonEnergy(Double_t *x,Double_t *par) {
 }
 
 Double_t GRootFunctions::ComptonAngle(Double_t *x,Double_t *par) {
+  //x[0]   = scattered gamma energy in keV.
   //par[0] = inital gamma energy; in keV.
   if(x[0]>par[0])
     return 0.00;
@@ -350,7 +352,7 @@ Double_t GRootFunctions::ComptonAngle(Double_t *x,Double_t *par) {
   inside*=511.;
   inside+= -1;
   //printf("inside[%.02f]  = %.023f\n",x[0],inside);
-  return TMath::ACos(inside)*TMath::RadToDeg();
+  return TMath::ACos(-inside)*TMath::RadToDeg();
 
 }
 
@@ -380,6 +382,39 @@ Double_t GRootFunctions::KN_unpol(Double_t *x,Double_t *par) {
   return  0.5*re * (cr)*(cr) * ( (1/cr)  + cr - TMath::Power(TMath::Sin(x[0]*TMath::DegToRad()),2) ); 
   //return   0.5*((4.*TMath::Pi()))* (cr)*(cr) * ( (1/cr)  + cr - TMath::Power(TMath::Sin(x[0]*TMath::DegToRad()),2) ); 
 
+}
+
+Double_t GRootFunctions::KN_unpol_theta(Double_t *x,Double_t *par) {
+
+  //par[0] = energy of the intial gamma;
+  //x[0]   = compton scattering angle;
+  double re = 2.82; //fm
+  double alpha = par[0]/511.;
+  double ctheta = TMath::Cos(x[0]*TMath::DegToRad());
+
+  double one = (1/(1+alpha*(1-ctheta)));
+  double two = (1+ ctheta*ctheta + ((alpha*alpha*(1-ctheta)*(1-ctheta))/(1+alpha*(1-ctheta))));
+
+  double kn = 0.5*re*re*one*one*two;
+  
+  return kn*2*PI*TMath::Sin(x[0]*TMath::DegToRad()); //KN_unpol(x,par); //*2*PI*TMath::Sin(x[0]*TMath::DegToRad());
+}
+
+Double_t GRootFunctions::KN_unpol_theta_norm(Double_t *x,Double_t *par) {
+
+  //par[0] = energy of the intial gamma;
+  //par[1] = normalizatrion factor (scaling factor);
+  //x[0]   = compton scattering angle;
+  double re = 2.82; //fm
+  double alpha = par[0]/511.;
+  double ctheta = TMath::Cos(x[0]*TMath::DegToRad());
+
+  double one = (1/(1+alpha*(1-ctheta)));
+  double two = (1+ ctheta*ctheta + ((alpha*alpha*(1-ctheta)*(1-ctheta))/(1+alpha*(1-ctheta))));
+
+  double kn = 0.5*re*re*one*one*two;
+  
+  return par[1]*kn*2*PI*TMath::Sin(x[0]*TMath::DegToRad()); //KN_unpol(x,par); //*2*PI*TMath::Sin(x[0]*TMath::DegToRad());
 }
 
 Double_t GRootFunctions::KN_unpol_norm(Double_t *x,Double_t *par) {
@@ -438,7 +473,7 @@ Double_t GRootFunctions::W_pol(Double_t *x, Double_t *par) {
   //par[2] a4
   //par[3] Inital gamma energy;
 
-  //x[0] theta, from beam axis;
+ //x[0] theta, from beam axis;
   //x[1] compton scattering angle;  
   //x[2] angle between the reaction plane and the compton scattering plane;  zeta
 
