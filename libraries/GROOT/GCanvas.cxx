@@ -780,7 +780,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
     case kKey_d:
       {
         printf("i am here.\n");
-        new GPopup(gClient->GetDefaultRoot(),gClient->GetDefaultRoot(),500,200);
+        //new GPopup(gClient->GetDefaultRoot(),gClient->GetDefaultRoot(),500,200);
         //new GPopup(0,0);
         //this);
         //TGFileInfo fi;
@@ -892,14 +892,14 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
           for(auto marker : fBackgroundMarkers) {
             background_areas.push_back(marker->localx);
           }
-          if(DirkGausFit(hists.back(),
-                         fMarkers.at(fMarkers.size()-2)->localx,
-                         fMarkers.at(fMarkers.size()-1)->localx,
-                         background_areas,
-                         "L")) {
-               hists.back()->Sumw2(false);
-               edited = true;
-          }
+          //if(DirkGausFit(hists.back(),
+          //               fMarkers.at(fMarkers.size()-2)->localx,
+          //               fMarkers.at(fMarkers.size()-1)->localx,
+          //               background_areas,
+          //               "L")) {
+          //     hists.back()->Sumw2(false);
+          //     edited = true;
+          //}
         }
       }
       break;

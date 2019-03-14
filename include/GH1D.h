@@ -4,6 +4,7 @@
 #include "TH1.h"
 #include "TRef.h"
 
+#include "GH2Base.h"
 #include "GH2I.h"
 
 class TF1;
@@ -13,6 +14,8 @@ class TMethodCall;
 class GPeak;
 class GCutG;
 class TRuntimeObjects;
+
+
 
 class GH1D : public TH1D {
 public:

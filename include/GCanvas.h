@@ -9,6 +9,7 @@
 #include "TH1.h"
 #include "TLine.h"
 
+#include "GH2Base.h"
 #include "GH2I.h"
 
 class GMarker : public TObject{
