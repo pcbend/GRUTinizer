@@ -270,10 +270,20 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
   //fithist->GetListOfFunctions()->Print();
 
 
-  fArea = this->Integral(xlow,xhigh) / fithist->GetBinWidth(1);
-  double bgArea = fBGFit.Integral(xlow,xhigh) / fithist->GetBinWidth(1);;
-  fArea -= bgArea;
+  //  fArea = this->Integral(xlow,xhigh) / fithist->GetBinWidth(1);
+  //  double bgArea = fBGFit.Integral(xlow,xhigh) / fithist->GetBinWidth(1);;
+  //  fArea -= bgArea;
 
+  
+  fArea = this->Integral(xlow,xhigh) / fithist->GetBinWidth(1);
+  double bgArea = fBGFit.Integral(xlow,xhigh) / fithist->GetBinWidth(1);
+  double DBgArea = fBGFit.IntegralError(xlow,xhigh) / fithist->GetBinWidth(1);
+  fArea -= bgArea;
+  fDArea = this->IntegralError(xlow,xhigh) / fithist->GetBinWidth(1);
+  fDArea = TMath::Sqrt(fDArea*fDArea + DBgArea*DBgArea);
+
+  fChi2 = this->GetChisquare();
+  fNdf  = (double)this->GetNDF();
 
   if(xlow>xhigh)
     std::swap(xlow,xhigh);
