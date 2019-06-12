@@ -4,7 +4,12 @@ Unix.*.Root.MacroPath: .:$(GRUTSYS)/util:$(ROOTSYS)/macros
 #default MakeHistos library
 
 #GRUT.HistLib: $(GRUTSYS)/lib/libMakeHistosSourcesSim.so
-GRUT.HistLib: $(GRUTSYS)/lib/libMakeFSU.so
+GRUT.HistLib: $(GRUTSYS)/lib/libDan_histo.so
+#GRUT.HistLib: $(GRUTSYS)/lib/libMake14C36S_gamma.so 
+#GRUT.HistLib: $(GRUTSYS)/lib/librename_cut.so
+
+#GRUT.HistLib: $(GRUTSYS)/lib/libmake_36S_14C_histos.so
+
 
 GRUT.GuiSetup: $(GRUTSYS)/gui_params.hist
 
@@ -20,7 +25,7 @@ Rint.Logon: $(GRUTSYS)/.grut_logon
 Rint.History $(GRUTSYS)/.grut_history
 Rint.HistSize: 1000000
 
-Rint.PromptColor: #CCCC00
+Rint.PromptColor: bold blue
 Rint.BracketColor: bold green
 Rint.BadBracketColor: bold red underlined
 Rint.TabComColor: magenta

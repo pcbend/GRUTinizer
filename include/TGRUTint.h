@@ -48,6 +48,7 @@ public:
 
   Int_t TabCompletionHook(char* buf, int* pLoc, std::ostream& out);
   TFile* OpenRootFile(const std::string& filename, Option_t* opt="");
+  TFile* OpenCutsFile(const std::string& filename, Option_t* opt="");
   TRawFileIn* OpenRawFile(const std::string& filename);
   void ResetAllHistograms();
   void ResortDataFile();

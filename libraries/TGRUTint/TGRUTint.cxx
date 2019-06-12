@@ -213,6 +213,18 @@ void TGRUTint::ApplyOptions() {
   }
 }
 
+TFile *TGRUTint::OpenCutsFile(const std::string& filename, Option_t *opt) { 
+    TFile* tfile = OpenRootFile(filename);
+    //cuts_files.push_back(tfile);
+    //printf("loading cuts, gui is running\n"); fflush(stdout);
+    if(tfile && GUIIsRunning()){
+      TPython::Bind(tfile,"tdir");
+      ProcessLine("TPython::Exec(\"window.LoadCutFile(tdir)\");");
+    }
+    return tfile;
+}
+
+
 TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
   TString sopt(opt);
   sopt.ToLower();
@@ -435,14 +447,16 @@ void TGRUTint::SetupPipeline() {
 
   std::vector<TFile*> cuts_files;
   for(auto filename : opt->CutsInputFiles()) {
-    TFile* tfile = OpenRootFile(filename);
-    cuts_files.push_back(tfile);
-    //printf("loading cuts, gui is running\n"); fflush(stdout);
-    if(tfile && GUIIsRunning()){
-      TPython::Bind(tfile,"tdir");
-      ProcessLine("TPython::Exec(\"window.LoadCutFile(tdir)\");");
-    }
+    cuts_files.push_back(OpenCutsFile(filename));
   }
+ //   TFile* tfile = OpenRootFile(filename);
+ //   cuts_files.push_back(tfile);
+    //printf("loading cuts, gui is running\n"); fflush(stdout);
+ //   if(tfile && GUIIsRunning()){
+ //     TPython::Bind(tfile,"tdir");
+ //     ProcessLine("TPython::Exec(\"window.LoadCutFile(tdir)\");");
+ //   }
+ // }
 
   // No need to set up all the loops if we are just opening the interpreter.
   if(!sort_raw && !sort_tree) {

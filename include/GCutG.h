@@ -4,16 +4,16 @@
 #include <TCutG.h>
 #include <TClass.h>
 #include <TString.h>
-
+#include <TFile.h> 
 
 class GCutG : public TCutG {
   public:
-    GCutG() : TCutG() { }
-    GCutG(const TCutG &cutg) : TCutG(cutg) { 
+    GCutG() : TCutG(),fFile(0) { }
+    GCutG(const TCutG &cutg) : TCutG(cutg),fFile(0)  { 
       if(cutg.InheritsFrom(GCutG::Class())) fTag=((GCutG&)cutg).fTag; }
-    GCutG(const char *name,Int_t n=0) : TCutG(name,n) { }
-    GCutG(const char *name,Int_t n,const Float_t *x,const Float_t *y) : TCutG(name,n,x,y) { }
-    GCutG(const char *name,Int_t n,const Double_t *x,const Double_t *y) : TCutG(name,n,x,y) { } 
+    GCutG(const char *name,Int_t n=0) : TCutG(name,n),fFile(0)  { }
+    GCutG(const char *name,Int_t n,const Float_t *x,const Float_t *y) : TCutG(name,n,x,y),fFile(0)  { }
+    GCutG(const char *name,Int_t n,const Double_t *x,const Double_t *y) : TCutG(name,n,x,y),fFile(0)  { } 
     ~GCutG() { }
     
     
@@ -32,6 +32,9 @@ class GCutG : public TCutG {
     void        SetTag(const char *tag) { fTag = tag;         }
     const char *GetTag()                { return fTag.Data(); }
 
+    void   SetTFile(TFile *file) { fFile = file; }
+    TFile *GetTFile() const      { return fFile; }
+
   private:
 
     TString fTag;
@@ -40,6 +43,8 @@ class GCutG : public TCutG {
     TString fYGateClass;  
     TString fXGateMethod; 
     TString fYGateMethod; 
+
+    TFile *fFile; //!
 
   ClassDef(GCutG,1) 
 };

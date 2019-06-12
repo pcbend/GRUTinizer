@@ -22,6 +22,7 @@ class TFSU: public TDetector {
     TFSUHit &GetFSUHit(int i) { return fFSUHits.at(i); }
     size_t Size() const       { return fFSUHits.size(); }
     
+    void    ClearAddback() { fAddbackHits.clear(); }
     TFSUHit &GetAddbackHit(int i) { return fAddbackHits.at(i); }
     size_t AddbackSize() const       { return fAddbackHits.size(); }
  

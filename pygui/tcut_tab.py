@@ -149,7 +149,15 @@ class TCutTab(object):
         self.AddCut(cutg, det_type)
 
     def DeleteCut(self):
-        cutg = self._check_for_tcut()
+        #cutg = self._check_for_tcut()
+        cuts = self.tree.selection()
+        if not cuts:
+            return
+        cutname = cuts[0]
+        cutg = self.cuts[cutname]
+        cutg.Print()
+        #return 
+
         if(cutg is None):
             return
 

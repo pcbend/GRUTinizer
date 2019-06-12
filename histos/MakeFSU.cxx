@@ -35,6 +35,12 @@ void HandleFSU(TRuntimeObjects &obj,const char *dirname) {
       obj.FillHistogram(dirname, "GammaDeTime",2000,-1000,1000, dE.Timestamp()-hit.Timestamp(),
                                                2000,0,4000,hit.GetEnergy());
 
+      obj.FillHistogram("dE / dt 2D",200,-100,100,(dE.Timestamp() - hit.Timestamp()),
+                                     2000,0,4000, dE.GetEnergy());
+      obj.FillHistogram("E / dt 2D",200,-100,100,(dE.Timestamp() - hit.Timestamp()),
+                                    2000,0,4000, E.GetEnergy());
+
+       
       for(unsigned int j=i+1;j<fsu->Size();j++){
       TFSUHit hit2 = fsu->GetFSUHit(j);
       
@@ -62,7 +68,32 @@ void MakeHistograms(TRuntimeObjects& obj) {
     if(!fsu) {
       return;
     } 
-    
+   
+//-----------------------------------------------------------------------------------------------------------------Dan TEST
+
+//  TFSUHit E = fsu->GetE();
+//  TFSUHit dE = fsu->GetDeltaE();
+
+//  for(unsigned int i=0;i<fsu->Size();i++) {
+//    TFSUHit hit = fsu->GetFSUHit(i);
+
+//    TFSUHit E_it  = fsu->GetE();
+//    TFSUHit dE_it = fsu->GetDeltaE();
+
+//    double EdEdT = E_it.Timestamp() - dE_it.Timestamp();
+
+//    if (EdEdT < 1000){
+//      obj.FillHistogram("E/dE when dT < 10 (units)",2000,0,4000,E_it.GetEnergy(),
+//                                                    2000,0,4000,dE_it.GetEnergy());
+//    }
+
+
+//    obj.FillHistogram("Energy",2000,0,4000, hit.GetEnergy();
+
+//  }
+
+//-----------------------------------------------------------------------------------------------------------------Dan TEST
+
     TFSUHit E = fsu->GetE();
     TFSUHit dE = fsu->GetDeltaE();
 
@@ -72,7 +103,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
     fsu->CleanHits(10.0,9000.0,40.0);
     if(!fsu->Size()) {
       return;
-    }    
+    }  
 
 
 
@@ -103,8 +134,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
             TFSUHit hit2 = fsu->GetFSUHit(j);
 
-
-            if(hit.GetEnergy()>hit2.GetEnergy()) {
+            if(hit.Timestamp()>hit2.Timestamp()){
+ 
+    //  if(numobj!=list->GetSize())
+    //    list->Sort();
                 obj.FillHistogram("detime",2000,-1000,1000,hit.Timestamp()-hit2.Timestamp(), 
                         2000,0,4000, hit2.GetEnergy());
             }
@@ -127,4 +160,4 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     //  if(numobj!=list->GetSize())
     //    list->Sort();
-
+                
