@@ -153,15 +153,15 @@ class TCutTab(object):
         cuts = self.tree.selection()
         if not cuts:
             return
-        cutname = cuts[0]
-        cutg = self.cuts[cutname]
-        cutg.Print()
-        #return 
+        for cutname in cuts: 
+            cutg = self.cuts[cutname]
+            print(cutg)
+            
+            if(cutg is None):
+                return
+            
+        
 
-        if(cutg is None):
-            return
-
-        cutg.Delete()
 
     def CopyCut(self):
         cuts = self.tree.selection()
