@@ -169,6 +169,7 @@ void MakeHistograms(TRuntimeObjects& obj) {    // I get called for every row!!
 
   for(int i=0;i<gates->GetEntries();i++) { //Applies DanParticle for every gate in linked file        
     GCutG* cut = (GCutG*)gates->At(i);
+    char* str_add;
     //if(cut->GetTag()=="pid") {
     if(!once) 
       std::cout << "cut:\t" << cut->GetName() <<"\t" << cut->GetTag() << std::endl;
@@ -189,41 +190,43 @@ void MakeHistograms(TRuntimeObjects& obj) {    // I get called for every row!!
       str_add = "No";
       strcat(str_add, cut->GetName());
       DanParticle(obj,str_add);
-    {
-  }
-  once =true;
+      {
+      }
+      once =true;
 
-  if(zero_cut) {
-    DanParticle(obj, "Zero_Cut");
-  }
-
-
-  //---------------------------------------------------------------------------------------------------
-
-  for(unsigned int i=0;i<fsu->Size();i++) {  // Loops over the instances (GR detections)
-    TFSUHit hit = fsu->GetFSUHit(i); //Gets GR data
-
-    TFSUHit E  = fsu->GetE(); //Gets E and dE data
-    TFSUHit dE = fsu->GetDeltaE();
+      if(zero_cut) {
+	DanParticle(obj, "Zero_Cut");
+      }
 
 
-    obj.FillHistogram("PID",2000,0,4000,E.GetEnergy(), 2000,0,4000,dE.GetEnergy()); //PID
+      //---------------------------------------------------------------------------------------------------
+
+      for(unsigned int i=0;i<fsu->Size();i++) {  // Loops over the instances (GR detections)
+	TFSUHit hit = fsu->GetFSUHit(i); //Gets GR data
+
+	TFSUHit E  = fsu->GetE(); //Gets E and dE data
+	TFSUHit dE = fsu->GetDeltaE();
 
 
-    if(E.GetEnergy() < 0 && dE.GetEnergy() > 150){ 
-      obj.FillHistogram("dEwithoutE", 2000,0,4000, dE.GetEnergy()); //Histo of dE detections without E        
+	obj.FillHistogram("PID",2000,0,4000,E.GetEnergy(), 2000,0,4000,dE.GetEnergy()); //PID
+
+
+	if(E.GetEnergy() < 0 && dE.GetEnergy() > 150){ 
+	  obj.FillHistogram("dEwithoutE", 2000,0,4000, dE.GetEnergy()); //Histo of dE detections without E        
+	}
+
+
+	obj.FillHistogram("Time_dE_E",200,-100,100,(dE.Timestamp() - E.Timestamp()));  //Time difference between detections
+	obj.FillHistogram("Time_dE_GR",200,-100,100,(dE.Timestamp() - hit.Timestamp()));
+
+
+	obj.FillHistogram("Energy_E", 2000,0,4000, E.GetEnergy()); //Energy for E, dE, and GR
+	obj.FillHistogram("Energy_dE", 2000,0,4000, dE.GetEnergy());
+	obj.FillHistogram("Energy_GR", 12000,0,12000, hit.GetEnergy());
+
+
+      }
+  
     }
-
-
-    obj.FillHistogram("Time_dE_E",200,-100,100,(dE.Timestamp() - E.Timestamp()));  //Time difference between detections
-    obj.FillHistogram("Time_dE_GR",200,-100,100,(dE.Timestamp() - hit.Timestamp()));
-
-
-    obj.FillHistogram("Energy_E", 2000,0,4000, E.GetEnergy()); //Energy for E, dE, and GR
-    obj.FillHistogram("Energy_dE", 2000,0,4000, dE.GetEnergy());
-    obj.FillHistogram("Energy_GR", 12000,0,12000, hit.GetEnergy());
-
-
   }
-
-  }
+}

@@ -98,11 +98,11 @@ class TCutTab(object):
     def AddFile(self, tfile):
         for key in tfile.GetListOfKeys():
 	    #print key.GetName()
-            if key.GetClassName()=='TCutG':
+            if key.GetClassName()=='TCutG': # and key.GetCycle()==1:
 		obj = key.ReadObj()
 		#print obj.GetName()
                 self.AddCut(obj)  #key.ReadObj())
-            if key.GetClassName()=='GCutG':
+            if key.GetClassName()=='GCutG': # and key.GetCycle()==1:
 		obj = key.ReadObj()
 		#print obj.GetName()
                 self.AddCut(obj)  #key.ReadObj())
@@ -153,15 +153,22 @@ class TCutTab(object):
         cuts = self.tree.selection()
         if not cuts:
             return
-        cutname = cuts[0]
-        cutg = self.cuts[cutname]
-        cutg.Print()
-        #return 
+            
+        for cut in cuts:
+           for tfile in ROOT.gROOT.GetListOfFiles():
+               if(tfile.FindObjectAny(cut)): 
+                   d = ROOT.gDirectory
+                   f = ROOT.TFile(tfile.GetName(),'update')
+                   f.Delete(cut+";*")
+                   #print(tfile)
+                   f.Close()
+                   selected_item = self.tree.selection()[0] ## get selected item
+                   self.tree.delete(selected_item)
 
-        if(cutg is None):
-            return
 
-        cutg.Delete()
+        #            print(cut)
+
+        return
 
     def CopyCut(self):
         cuts = self.tree.selection()
