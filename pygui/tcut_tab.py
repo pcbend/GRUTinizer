@@ -59,12 +59,10 @@ class TCutTab(object):
 
     def _check_for_tcut(self):
         # Does CUTG exist?
-        #cutg = ROOT.gROOT.GetListOfSpecials().FindObject('CUTG')
-        cutg = ROOT.gROOT.GetListOfSpecials().At(ROOT.gROOT.GetListOfSpecials().GetEntries()-1)
-        if not cutg or not cutg.InheritsFrom('TCutG'):
-            #cutg = ROOT.gROOT.GetListOfSpecials().FindObject('CUTG')
+        cutg = ROOT.gROOT.GetListOfSpecials().FindObject('CUTG')
+        if not cutg:
             return None
-     
+
         # Does it have 3 or more points?
         npoints = cutg.GetN()
         if npoints < 3:
@@ -134,19 +132,10 @@ class TCutTab(object):
 
     def SaveCut(self):
         cutg = self._check_for_tcut()
-        print(cutg)
         if cutg is None:
             return
-        if not ROOT.gPad:
-            return
+
         ROOT.gROOT.GetListOfSpecials().Remove(cutg)
-        ROOT.gPad.GetCanvas().GetContextMenu().Action(cutg,cutg.Class().GetMethodAny("SaveTo"));
-
-        #cutg.GetContextMenu()->Action(cutg,cutg.Class().GetMethodAny("SaveTo"));
-
-
-        return
-
 
         cutg.SetName(self._increment_name())
         for prim in ROOT.gPad.GetListOfPrimitives():
