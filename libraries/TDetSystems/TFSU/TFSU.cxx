@@ -79,7 +79,6 @@ int TFSU::BuildHits(std::vector<TRawEvent>& raw_data) {
     //nscl.Print("all");
     TFSUHit hit;
     hit.SetTimestamp(nscl.GetTimestamp());
-    hit.SetTime(nscl.GetTimestamp());
     hit.SetAddress((*((Int_t*)(nscl.GetBody()+4)))&0x00000fff); 
     //TChannel *channel = TChannel::GetChannel(hit.Address());
     //if(!channel) continue;

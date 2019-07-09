@@ -81,11 +81,9 @@ void TDetectorHit::AddEnergy(double eng) {
 double TDetectorHit::GetTime() const {
   TChannel* chan = TChannel::GetChannel(fAddress);
   if(!chan){
-    //return Time() + gRandom->Uniform();
-    return Timestamp() + gRandom->Uniform();
+    return Time() + gRandom->Uniform();
   }
-  //return chan->CalTime(Time(), fTimestamp);
-  return chan->CalTime((double)Timestamp(), fTimestamp);
+  return chan->CalTime(Time(), fTimestamp);
 }
 
 
