@@ -23,7 +23,7 @@ public:
   static int Size() { return fChannelMap.size(); }
   static int ReadCalFile(const char* filename="",Option_t *opt="replace");
   static int WriteCalFile(std::string filename="",Option_t *opt="");
-
+  
 
   TChannel();
   TChannel(const char*);
@@ -94,9 +94,11 @@ public:
 
   static double Calibrate(int value, const std::vector<double>& coeff);
   static double Calibrate(double value, const std::vector<double>& coeff);
+  static double CalibrateTime(int value, const std::vector<double>& coeff);
+  static double CalibrateTime(double value, const std::vector<double>& coeff);
   static double ParseStartTime(const std::string& type);
   static double Efficiency(double energy, const std::vector<double>& coeff);
-
+  
 
 
   static std::vector<double> empty_vec; //!

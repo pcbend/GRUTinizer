@@ -337,11 +337,33 @@ void TChannel::SetTimeCoeff(std::vector<double> coeff, double timestamp) {
 
 
 double TChannel::CalTime(int time, double timestamp) const {
-  return Calibrate(time, GetTimeCoeff(timestamp));
+  return CalibrateTime(time, GetTimeCoeff(timestamp));
 }
 
 double TChannel::CalTime(double time, double timestamp) const {
-  return Calibrate(time, GetTimeCoeff(timestamp));
+  return CalibrateTime(time, GetTimeCoeff(timestamp));
+}
+
+double TChannel::CalibrateTime(int value, const std::vector<double>& coeff) {
+  if(value==0){
+    return 0;
+  }
+
+  double dvalue = value + gRandom->Uniform();
+  return CalibrateTime(dvalue, coeff);
+}
+
+double TChannel::CalibrateTime(double value, const std::vector<double>& coeff) {
+  if(coeff.size() == 0){
+    return value;
+  }
+
+  double cal_value = value;
+  //Add coefficients to initial value
+  for(int i=coeff.size()-1; i>=0; i--){
+    cal_value += coeff[i];
+  }
+  return cal_value;
 }
 
 void TChannel::ClearEfficiencyCoeff() {
