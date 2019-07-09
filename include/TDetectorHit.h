@@ -27,7 +27,7 @@ public:
 
   void SetAddress(int address)      { fAddress = address; }
   void SetCharge(int charge);
-  void SetTime(int time)            { fTime = time; }
+  void SetTime(float time)          { fTime = time; }
   void SetTimestamp(long timestamp) { fTimestamp = timestamp; }
 
   double GetEnergy() const; //applies TChannel ENERGYCOEFF to Charge
