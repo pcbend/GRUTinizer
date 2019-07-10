@@ -59,6 +59,7 @@ public:
   void SetInfo(const char *temp) { info.assign(temp); }
   void SetNumber(int temp) { number = temp; }
   void SetPedestal(int value) { pedestal = value; }
+  void SetTimeOffset(int value) { time_offset = value; }
 
   void ClearCalibrations();
 
@@ -94,6 +95,8 @@ public:
 
   static double Calibrate(int value, const std::vector<double>& coeff);
   static double Calibrate(double value, const std::vector<double>& coeff);
+  //static double CalibrateTime(int value, const std::vector<double>& coeff);
+  //static double CalibrateTime(double value, const std::vector<double>& coeff);
   static double ParseStartTime(const std::string& type);
   static double Efficiency(double energy, const std::vector<double>& coeff);
 
@@ -136,6 +139,8 @@ public:
   std::vector<CoefficientTimes> time_coeff;
   std::vector<double> efficiency_coeff;
   int pedestal;
+  int time_offset;
+  
   //name and title held by TNamed.
 
   //static std::vector<std::string> fFileNames;

@@ -4,26 +4,25 @@
 #include "TFSU.h"
 #include "GCutG.h"
 
-//boundries for square gates
+/********************************************************************
 
-const double alpha_background_timing_low   = 10.0;
-const double alpha_background_timing_high  = 50.0;
-const double alpha_prompt_timing_low       = -40.0;
-const double alpha_prompt_timing_high      = 0.0; 
+This file is for the sorting of the 36S(14C, np\alpha\gamma)50Ti reaction 
+performed at FSU. This file will generate 1D, 2D, and 3D histograms when
+GRUT.HistLib (located in .grutrc in the base directory) is set to this file.
 
-const double proton_background_timing_low  = 20.0;
-const double proton_background_timing_high = 50.0;
-const double proton_prompt_timing_low      = -25.0;
-const double proton_prompt_timing_high     = 5.0;
+example: GRUT.HistLib: $(GRUTSYS)/lib/libmake_36S_14C_histos.so
 
-//Cutoff energy of the dE for an alpha
-const double dE_alpha_cutoff               = 600.0;
+ ********************************************************************/
 
 //Subscript is assigned once in the set_subscript function
 char subscript;
 
+//partilce_type_enum is used to easily reference the partilce type. For every event, only 1 particle is considered, so this is determined once and carried through every function.
 enum particle_type_enum{PROTON, ALPHA, NO_PARTICLE};
 
+/*GateInfo stores the gates located in the .cuts file fed in as a command line argument in a more easily accessible manner. When GateInfo::initialize_values is called, it will loop through
+all gates and do a string compare to find gates of interest, and then store them in the private GCutG* variables. GateInfo::initialize_values will also determine and assign the particle type.
+All private variables can be accessed by the public get_x functions of GateInfo. */
 class GateInfo
 {
   int  particle_type;
@@ -74,6 +73,9 @@ void GateInfo::initialize_values(TRuntimeObjects &obj)
 int GateInfo::set_particle_type(TRuntimeObjects &obj, double dE_energy, double E_energy)
 {
 
+  //Cutoff energy of the dE for an alpha
+  const double dE_alpha_cutoff = 600.0; 
+
   //Check if there is no particle first, since this is relatively common. This will stop it from looping through unnecessarily
   if(dE_energy == -1)
   {
@@ -83,6 +85,7 @@ int GateInfo::set_particle_type(TRuntimeObjects &obj, double dE_energy, double E
   TList *gates = &(obj.GetGates());
   int num_gates = gates->GetEntries();
 
+  //Iterate through all gates
   for(int i=0; i < num_gates; i++)
   {
     GCutG*       cut      = (GCutG*)gates->At(i);
@@ -101,7 +104,9 @@ int GateInfo::set_particle_type(TRuntimeObjects &obj, double dE_energy, double E
     }
 
   }
-
+  
+  /*Many alpha particles are stopped in the dE entirely, meaning no energy is deposited to the E. If that is the case, the incident alpha will not be plotted on the PID and
+   will not be included in the gate. This if statement checks if the dE reaches some energy threshold, and if it does, it will be assumed that an alpha particle was observed.*/
   if(dE_energy > dE_alpha_cutoff)
   {
     return ALPHA;
@@ -113,6 +118,8 @@ int GateInfo::set_particle_type(TRuntimeObjects &obj, double dE_energy, double E
 
 }
 
+
+//GateInfo::get_x functions are used to read private variables of the GateInfo class
 int GateInfo::get_particle_type()
 {
   return particle_type;
@@ -133,6 +140,7 @@ GCutG* GateInfo::get_gamma_dE_timing()
   return gamma_dE_timing;
 }
 
+//Return the event hit at some index. Hit is returned as an AddbackHit or as a regular hit depending on if global variable is_addback is true or not.
 TFSUHit get_event_hit(TFSU* fsu_event, bool is_addback, unsigned int index)
 {
 
@@ -150,6 +158,7 @@ TFSUHit get_event_hit(TFSU* fsu_event, bool is_addback, unsigned int index)
   return hit;
 }
 
+//Return the event size. Hit is returned as an AddbackSize or as a regular size depending on if global variable is_addback is true or not.
 unsigned int get_event_size(TFSU* fsu_event, bool is_addback)
 {
   
@@ -167,7 +176,7 @@ unsigned int get_event_size(TFSU* fsu_event, bool is_addback)
   return size;
 }
 
-//Generates all general (non-gated) histograms
+//Generates all general (non-gated, no gamma) histograms
 void fill_general_histograms(TRuntimeObjects &obj)
 {
   //Get the event
@@ -188,7 +197,8 @@ void fill_general_histograms(TRuntimeObjects &obj)
   obj.FillHistogram("Energy_dE", 2000,0,4000, dE.GetEnergy());
 }
 
-// Returns a string of the proper histogram directory name, depending on the number of dimensions of the histogram and the particle type.
+/* Returns a string of the proper histogram directory name, depending on the number of dimensions of the histogram and the particle type. This is used to determine
+   the folder in which a histogram will be placed inside of the .hist file generated. */
 char* get_directory_name(int dimensions, GateInfo* gates)
 {
 
@@ -218,6 +228,7 @@ void make_gamma_gamma_timing(TRuntimeObjects &obj, TFSUHit* phit, TFSUHit* phit2
   int gamma_dT;
   double lower_energy;
 
+  //Check which gamma is of the lower energy, then assign the time difference as the time of the higher energy minus the time of the lower energy.
   if(hit.GetEnergy() < hit2.GetEnergy())
   {
     lower_energy = hit.GetEnergy();
@@ -233,6 +244,7 @@ void make_gamma_gamma_timing(TRuntimeObjects &obj, TFSUHit* phit, TFSUHit* phit2
                                                                               6000, 0, 6000, lower_energy);
 }
 
+//Make 1D histograms gated on time prompt or time random.
 void make_1D_prompt_random(TRuntimeObjects &obj, TFSUHit* phit, double dT, GateInfo* gates, char* directory)
 {
 
@@ -240,6 +252,19 @@ void make_1D_prompt_random(TRuntimeObjects &obj, TFSUHit* phit, double dT, GateI
 
   int particle_type = gates->get_particle_type();
 
+  //boundries for square gates
+  const double alpha_background_timing_low   = 10.0;
+  const double alpha_background_timing_high  = 50.0;
+  const double alpha_prompt_timing_low       = -40.0;
+  const double alpha_prompt_timing_high      = 0.0; 
+
+  const double proton_background_timing_low  = 20.0;
+  const double proton_background_timing_high = 50.0;
+  const double proton_prompt_timing_low      = -25.0;
+  const double proton_prompt_timing_high     = 5.0;
+
+  /* Check which type of particle coincided with the event. After, check if gamma-particle timing difference is within the bounds of the low and high of the prompt rectangle gate.
+     If it is, populate the histogram, else, check if the gamma-particle timing difference is within the low and high background rectangle gate.*/
   if(particle_type == PROTON)
   {
     if(dT<=proton_prompt_timing_high && dT>=proton_prompt_timing_low)
@@ -282,13 +307,18 @@ void fill_1D_histograms(TRuntimeObjects &obj, TFSUHit* phit, double dT, TFSUHit*
   obj.FillHistogram(directory, Form("%c_summary", subscript), 12000,0,12000, hit.GetEnergy(), 50,0,50, hit.GetNumber());
 
   make_1D_prompt_random(obj, phit, dT, gates, directory);
-
-  if(hit.GetEnergy() > 20 && hit.GetEnergy() < 9000)
+  
+  /*Bounds of energy_low_cutoff and energy_high_cutoff determined by observation. Below 20keV, a large spike in gamma noise was observed, and above 9000keV, detector artifacts were observed.
+    Because of this, a low and high bounds were put on the spectrum to clean things up.*/
+  int energy_low_cutoff  = 20;
+  int energy_high_cutoff = 9000;
+  if(hit.GetEnergy() > energy_low_cutoff && hit.GetEnergy() < energy_high_cutoff)
   {
 
-    //Jk I know these are 2D but they only use 1 gamma
+    //Jk I know these are 2D but they only use 1 gamma, this should be moved to fill_2D_histograms after testing   
     obj.FillHistogram(directory, "particle_gamma_timing_spectrum", 200,-100,100,(dE.GetTime() - hit.GetTime()), 2000,0,4000, hit.GetEnergy());
     obj.FillHistogram(directory, "particle_gamma_detector_spectrum", 200,-100,100,(dE.GetTime() - hit.GetTime()), 50,0,50, hit.GetNumber());
+
     obj.FillHistogram(directory, "gamma_detector_num_spectrum", 10000, 0, 10000, hit.GetEnergy(), 50, 0, 50, hit.GetNumber());
   }
 }
@@ -307,7 +337,10 @@ void fill_2D_histograms(TRuntimeObjects &obj, TFSUHit* phit, TFSUHit* phit2, dou
   obj.FillHistogramSym(directory, Form("%c%c_mat", subscript, subscript), 4000, 0, 4000, hit.GetEnergy(), 4000, 0, 4000, hit2.GetEnergy());
 }
 
-// General function for iterating over energies of interest when populating the 3D histograms
+/* General function for iterating over energies of interest when populating the 3D histograms. A 3D gamma-gamma-gamma histogram is generated in a similar manner to a 2D gamma-gamma histogram.
+   Because plotting and working with a 3D histogram is difficult, 1 of the dimensions has an energy pre-selected so that we do not have to work with anything larger than a 2D histogram.
+   This function iterates over all energies the user would like to pre-gate on (stored as an array of integers), checks if the 3rd hit (hit3) has an energy within some uncertainty of 
+   that desired value, then will plot the other two hits (hit1 and hit2) if an only if the 3rd hit is within the bounds.*/
 void iterate_over_energies_and_fill_3D(TRuntimeObjects &obj, TFSUHit* phit, TFSUHit* phit2, TFSUHit* phit3, double dT, double dT2, GateInfo* gates, int* energies_to_gate, int energies_to_gate_size, int uncertainty)
 {
 
@@ -317,11 +350,12 @@ void iterate_over_energies_and_fill_3D(TRuntimeObjects &obj, TFSUHit* phit, TFSU
 
   char* directory = get_directory_name(3, gates);
 
-  //Iterate over all proton energies of interest to gate on
+  //Iterate over all energies of interest to gate on
   for(int i=0; i<energies_to_gate_size; i++)
   {
     int gate_energy = energies_to_gate[i];
-
+    
+    //fabs() is used to find the absolute difference in energy, so it can be compared to the uncertainty with one conditional
     if(fabs(hit3.GetEnergy()-gate_energy) <= uncertainty)
     {
       obj.FillHistogramSym(directory, Form("%c%c%c_cube_%d", subscript, subscript, subscript, gate_energy), 4000, 0, 4000, hit.GetEnergy(), 
@@ -413,7 +447,8 @@ void make_histograms(TRuntimeObjects &obj, bool is_addback)
     double dT = dE.GetTime() - hit.GetTime();
     fill_1D_histograms(obj, &hit, dT, &dE, &gates);
     
-    /*
+  //Code is temporarily commented for testing purposes. This should be uncommented if you desire to generate 2D and 3D histograms.
+  /*
     //Check if there are atleast 2 hits for 2D analysis
     if(size >= 2)
     {
@@ -437,7 +472,7 @@ void make_histograms(TRuntimeObjects &obj, bool is_addback)
 	}
       }
     }
-    */
+  */
   }
 }
 

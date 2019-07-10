@@ -56,7 +56,8 @@ std::ostream& operator<<(std::ostream& out, const TChannel& chan) {
       << "   Subposition:\t" << chan.array_subposition << "\n"
       << "   Segment:\t" << chan.segment << "\n"
       //<< "   Collected_Charge:\t" << chan.collected_charge << "\n"
-      << "   Pedestal:\t" << chan.pedestal << "\n";
+      << "   Pedestal:\t" << chan.pedestal << "\n"
+      << "   TimeOffset:\t" << chan.time_offset << "\n"; 
 
   // Print out each energy coefficient
   for(auto& start_coeff : chan.energy_coeff) {
@@ -126,8 +127,9 @@ void TChannel::Copy(TObject &rhs) const {
   ((TChannel&)rhs).energy_coeff = energy_coeff;
   ((TChannel&)rhs).time_coeff = time_coeff;
   ((TChannel&)rhs).efficiency_coeff = efficiency_coeff;
-  ((TChannel&)rhs).pedestal = pedestal;
-  ((TChannel&)rhs).fPosition = fPosition;
+  ((TChannel&)rhs).pedestal    = pedestal;
+  ((TChannel&)rhs).time_offset = time_offset;
+  ((TChannel&)rhs).fPosition   = fPosition;
 }
 
 void TChannel::Clear(Option_t *opt) {
@@ -142,6 +144,7 @@ void TChannel::Clear(Option_t *opt) {
   array_subposition = "";
   collected_charge = "";
   pedestal = 0;
+  time_offset = 0;;
   fPosition.Clear();
 }
 
@@ -337,12 +340,40 @@ void TChannel::SetTimeCoeff(std::vector<double> coeff, double timestamp) {
 
 
 double TChannel::CalTime(int time, double timestamp) const {
-  return Calibrate(time, GetTimeCoeff(timestamp));
+  //return Calibrate(time+time_offset, GetTimeCoeff(timestamp));
+  //printf("time_offset = %i\n",time_offset); fflush(stdout);
+  return timestamp+time_offset; //, GetTimeCoeff(timestamp));
 }
 
 double TChannel::CalTime(double time, double timestamp) const {
-  return Calibrate(time, GetTimeCoeff(timestamp));
+  //return Calibrate(time+time_offset, GetTimeCoeff(timestamp));
+  return timestamp+time_offset; //, GetTimeCoeff(timestamp));
 }
+
+/*
+double TChannel::CalibrateTime(int value, const std::vector<double>& coeff) {
+  if(value==0){
+    return 0;
+  }
+
+  double dvalue = value + gRandom->Uniform();
+  return Calibrate(dvalue, coeff);
+  //return CalibrateTime(dvalue, coeff);
+}
+
+double TChannel::CalibrateTime(double value, const std::vector<double>& coeff) {
+  if(coeff.size() == 0){
+    return value;
+  }
+
+  double cal_value = value;
+  
+  //for(int i=coeff.size()-1; i>=0; i--){
+  //  cal_value += coeff[i];
+  //}
+  return cal_value;
+}
+*/
 
 void TChannel::ClearEfficiencyCoeff() {
   efficiency_coeff.clear();
@@ -358,6 +389,7 @@ double TChannel::Calibrate(int value, const std::vector<double>& coeff) {
 }
 
 double TChannel::Calibrate(double value, const std::vector<double>& coeff) {
+  //printf("%s\n",__PRETTY_FUNCTION__);
   if(coeff.size() == 0){
     return value;
   }
@@ -367,6 +399,7 @@ double TChannel::Calibrate(double value, const std::vector<double>& coeff) {
   for(int i=coeff.size()-1; i>=0; i--){
     cal_value *= value;
     cal_value += coeff[i];
+    //printf("\tcal_value = %.02f\n",cal_value);  fflush(stdout);
   }
   return cal_value;
 }
@@ -562,6 +595,9 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
         } else if(type == "PEDESTAL") {
           int val = 0; ss >> val;
           channel->SetPedestal(val);
+        } else if(type == "TIMEOFFSET") {
+          int val = 0; ss >> val;
+          channel->SetTimeOffset(val);
 
         } else if(type.find("TIMECOEFF")==0) {
           channel->SetTimeCoeff(ParseListOfDoubles(ss),
