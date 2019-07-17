@@ -20,21 +20,42 @@ char subscript;
 //partilce_type_enum is used to easily reference the partilce type. For every event, only 1 particle is considered, so this is determined once and carried through every function.
 enum particle_type_enum{PROTON, ALPHA, NO_PARTICLE};
 
+/*Bounds of energy_low_cutoff and energy_high_cutoff determined by observation. Below 20keV, a large spike in gamma noise was observed, and above 9000keV, detector artifacts were observed.
+  Because of this, a low and high bounds were put on the spectrum to clean things up.*/
+const int energy_low_cutoff  = 20.;
+const int energy_high_cutoff = 9000.;
+
 /*GateInfo stores the gates located in the .cuts file fed in as a command line argument in a more easily accessible manner. When GateInfo::initialize_values is called, it will loop through
 all gates and do a string compare to find gates of interest, and then store them in the private GCutG* variables. GateInfo::initialize_values will also determine and assign the particle type.
 All private variables can be accessed by the public get_x functions of GateInfo. */
 class GateInfo
 {
   int  particle_type;
+
   GCutG *gg_timing_background;
   GCutG *gg_timing_prompt;
+  GCutG *aa_timing_prompt;
+  GCutG *aa_timing_background;
+
+  GCutG *gp_timing_prompt;
+  GCutG *gp_timing_background;
+
   GCutG *gamma_dE_timing;
+
 public:
   void initialize_values(TRuntimeObjects &obj);
   int set_particle_type(TRuntimeObjects &obj, double dE_energy, double E_energy);
+
   int get_particle_type();
+
   GCutG* get_gg_timing_background();
   GCutG* get_gg_timing_prompt();
+  GCutG* get_aa_timing_background();
+  GCutG* get_aa_timing_prompt();
+
+  GCutG* get_gp_timing_background();
+  GCutG* get_gp_timing_prompt();
+
   GCutG* get_gamma_dE_timing(); 
 };
 
@@ -61,6 +82,22 @@ void GateInfo::initialize_values(TRuntimeObjects &obj)
     if(!strcmp(cut_name, "gg_timing_prompt"))
     {
       gg_timing_prompt = cut;
+    }
+    if(!strcmp(cut_name, "aa_timing_background"))
+    {
+      aa_timing_background = cut;
+    }
+    if(!strcmp(cut_name, "aa_timing_prompt"))
+    {
+      aa_timing_prompt = cut;
+    }
+    if(!strcmp(cut_name, "gp_timing_prompt"))
+    {
+      gp_timing_prompt = cut;
+    }
+    if(!strcmp(cut_name, "gp_timing_background"))
+    {
+      gp_timing_background = cut;
     }
     if(!strcmp(cut_name, "gamma_dE_timing_cut_better"))
     {
@@ -133,6 +170,26 @@ GCutG* GateInfo::get_gg_timing_background()
 GCutG* GateInfo::get_gg_timing_prompt()
 {
   return gg_timing_prompt;
+}
+
+GCutG* GateInfo::get_aa_timing_background()
+{
+  return aa_timing_background;
+}
+
+GCutG* GateInfo::get_aa_timing_prompt()
+{
+  return aa_timing_prompt;
+}
+
+GCutG* GateInfo::get_gp_timing_prompt()
+{
+  return gp_timing_prompt;
+}
+
+GCutG* GateInfo::get_gp_timing_background()
+{
+  return gp_timing_background;
 }
 
 GCutG* GateInfo::get_gamma_dE_timing()
@@ -218,6 +275,43 @@ char* get_directory_name(int dimensions, GateInfo* gates)
   }
 }
 
+/*Makes a gamma-gamma timing spectrum, plotting gamma1.time-gamma2.time on the x axis and detector number on the y axis. Gammas will only make it into this histogram
+  if one of the gammas was detected by detector n. */
+void make_gamma_gamma_timing_if_det_n(TRuntimeObjects &obj, TFSUHit* phit, TFSUHit* phit2, char* directory, int det_num)
+{
+  
+  TFSUHit hit  = *phit;
+  TFSUHit hit2 = *phit2;
+  
+  int other_det_num;
+  double gamma_dT;
+  
+  //Check if and which hit came from det n. If one came from det n, the timing will be calculated as hit_n.time - hit_other.time
+  if(hit.GetNumber() == hit2.GetNumber())
+  {
+    return;
+  }
+  else if(hit.GetNumber() == det_num)
+  {
+    gamma_dT = hit.GetTime() - hit2.GetTime();
+    other_det_num = hit2.GetNumber();
+  } 
+  else if(hit2.GetNumber() == det_num)
+  {
+    gamma_dT = hit2.GetTime() - hit.GetTime();
+    other_det_num = hit.GetNumber();
+  }
+  else
+  {
+    return;
+  }
+
+  obj.FillHistogram(directory, Form("det_%d_%c%c_timing_mat", det_num, subscript, subscript), 200, -100, 100, gamma_dT,
+                                                                              50, 0, 50, other_det_num);  
+
+  
+}
+
 //Gamma gamma timing is plotted by taking the time difference of the higher energy vs the lower energy as the x axis, and the lower energy of the two hits as the y axis. 
 void make_gamma_gamma_timing(TRuntimeObjects &obj, TFSUHit* phit, TFSUHit* phit2, double dT, double dT2, GateInfo* gates, char* directory)
 {
@@ -227,21 +321,29 @@ void make_gamma_gamma_timing(TRuntimeObjects &obj, TFSUHit* phit, TFSUHit* phit2
 
   int gamma_dT;
   double lower_energy;
+  int lower_energy_det_num;
 
   //Check which gamma is of the lower energy, then assign the time difference as the time of the higher energy minus the time of the lower energy.
   if(hit.GetEnergy() < hit2.GetEnergy())
   {
     lower_energy = hit.GetEnergy();
+    lower_energy_det_num = hit.GetNumber();
     gamma_dT = hit2.GetTime() - hit.GetTime();
   }
   else
   {
     lower_energy = hit2.GetEnergy();
+    lower_energy_det_num = hit2.GetNumber();
     gamma_dT = hit.GetTime() - hit2.GetTime();
   }
 
   obj.FillHistogram(directory, Form("%c%c_timing_mat", subscript, subscript), 2000, -1000, 1000, gamma_dT,
                                                                               6000, 0, 6000, lower_energy);
+  obj.FillHistogram(directory, Form("%c%c_detector_timing_mat", subscript, subscript), 2000, -1000, 1000, gamma_dT,
+                                                                              50, 0, 50, lower_energy_det_num);
+
+  obj.FillHistogram(directory, Form("%c%c_detector_num_spectrum", subscript, subscript), 400, -200, 200, gamma_dT, 50, 0, 50, lower_energy_det_num);
+  
 }
 
 //Make 1D histograms gated on time prompt or time random.
@@ -308,60 +410,192 @@ void fill_1D_histograms(TRuntimeObjects &obj, TFSUHit* phit, double dT, TFSUHit*
 
   make_1D_prompt_random(obj, phit, dT, gates, directory);
   
-  /*Bounds of energy_low_cutoff and energy_high_cutoff determined by observation. Below 20keV, a large spike in gamma noise was observed, and above 9000keV, detector artifacts were observed.
-    Because of this, a low and high bounds were put on the spectrum to clean things up.*/
-  int energy_low_cutoff  = 20;
-  int energy_high_cutoff = 9000;
-  if(hit.GetEnergy() > energy_low_cutoff && hit.GetEnergy() < energy_high_cutoff)
-  {
-
-    //Jk I know these are 2D but they only use 1 gamma, this should be moved to fill_2D_histograms after testing   
-    obj.FillHistogram(directory, "particle_gamma_timing_spectrum", 200,-100,100,(dE.GetTime() - hit.GetTime()), 2000,0,4000, hit.GetEnergy());
-    obj.FillHistogram(directory, "particle_gamma_detector_spectrum", 200,-100,100,(dE.GetTime() - hit.GetTime()), 50,0,50, hit.GetNumber());
-
-    obj.FillHistogram(directory, "gamma_detector_num_spectrum", 10000, 0, 10000, hit.GetEnergy(), 50, 0, 50, hit.GetNumber());
-  }
 }
 
 
-void fill_2D_histograms(TRuntimeObjects &obj, TFSUHit* phit, TFSUHit* phit2, double dT, double dT2, GateInfo* gates)
+void fill_2D_histograms(TRuntimeObjects &obj, TFSUHit* phit, TFSUHit* phit2, double dT, double dT2, GateInfo* gates, TFSUHit* pdE)
 {
 
   TFSUHit hit  = *phit;
   TFSUHit hit2 = *phit2;
-  
+  TFSUHit dE   = *pdE;
+
   char* directory = get_directory_name(2, gates);
 
   make_gamma_gamma_timing(obj, phit, phit2, dT, dT2, gates, directory);
-
+  //Det 39 is used in make_gamma_gamma_timing_if_det_n due to high counts
+  make_gamma_gamma_timing_if_det_n(obj, phit, phit2, directory, 39);
   obj.FillHistogramSym(directory, Form("%c%c_mat", subscript, subscript), 4000, 0, 4000, hit.GetEnergy(), 4000, 0, 4000, hit2.GetEnergy());
+
+  obj.FillHistogram(directory, Form("particle_%c_timing_spectrum", subscript), 200,-100,100,(dE.GetTime() - hit.GetTime()), 2000,0,4000, hit.GetEnergy());
+  obj.FillHistogram(directory, Form("particle_%c_detector_spectrum", subscript), 200,-100,100,(dE.GetTime() - hit.GetTime()), 50,0,50, hit.GetNumber());
+
+}
+
+//check if any 3 gamma's are time prompt. Between all pairs of 2 of the 3 hits passed in, the time of the higher energy is compared to the time of the lower energy gamma. If the resulting dT
+//is not inside the prompt gate, the function will return false. If all combinations of gammas are within the gate, the function will return true.
+bool is_ggg_time_prompt(TFSUHit* phit, TFSUHit* phit2, TFSUHit* phit3, GateInfo* gates)
+{
+  GCutG *prompt_gate;
+
+  int dT;
+  int lower_energy
+
+  int   hits_size = 3
+  TFSUHit* hits[] = {phit, phit2, phit3};
+
+  if(subscript == 'g')
+  {
+    prompt_gate     = gates->get_gg_timing_prompt();
+  }
+  else if(subscript == 'a')
+  {
+    prompt_gate     = gates->get_aa_timing_prompt();
+  }
+  else
+  {
+    printf("Subscript not set in function fill_3D_gated_on_time_prompt_background!\n");
+    exit(EXIT_FAILURE);
+  }
+
+  for(int i=0; i<hits_size; i++)
+  {
+    for(int j=i; j<hits_size; j++)
+    {
+      if(hits[i]->GetEnergy() > hits[j]->GetEnergy())
+      {
+	dT = hits[i]->GetTime() - hits[j]->GetTime();
+	lower_energy = hits[j]->GetEnergy();
+
+	if(!prompt_gate->IsInside(dT, lower_energy))
+	{
+	  return false;
+	}
+      }
+      else
+      {
+	dT = hits[j]->GetTime() - hits[i]->GetTime();
+	lower_energy = hits[i]->GetEnergy();
+
+	if(!prompt_gate->IsInside(dT, lower_energy))
+	{
+	  return false;
+	}
+      }  
+    }
+  }
+  return true;
+}
+
+bool is_ggg_time_background(TFSUHit* phit, TFSUHit* phit2, TFSUHit* phit3, GateInfo* gates)
+{
+  GCutG *background_gate;
+
+  int dT;
+  int lower_energy
+
+  int   hits_size = 3
+  TFSUHit* hits[] = {phit, phit2, phit3};
+
+  if(subscript == 'g')
+  {
+    background_gate = gates->get_gg_timing_background();
+  }
+  else if(subscript == 'a')
+  {
+    background_gate = gates->get_aa_timing_background();
+  }
+  else
+  {
+    printf("Subscript not set in function fill_3D_gated_on_time_prompt_background!\n");
+    exit(EXIT_FAILURE);
+  }
+
+  for(int i=0; i<hits_size; i++)
+  {
+    for(int j=i; j<hits_size; j++)
+    {
+      if(hits[i]->GetEnergy() > hits[j]->GetEnergy())
+      {
+	dT = hits[i]->GetTime() - hits[j]->GetTime();
+	lower_energy = hits[j]->GetEnergy();
+
+	if(!background_gate->IsInside(dT, lower_energy))
+	{
+	  return false;
+	}
+      }
+      else
+      {
+	dT = hits[j]->GetTime() - hits[i]->GetTime();
+	lower_energy = hits[i]->GetEnergy();
+
+	if(!background_gate->IsInside(dT, lower_energy))
+	{
+	  return false;
+	}
+      }  
+    }
+  }
+  return true;
+}
+
+void fill_3D_gated_on_time_prompt_background(TRuntimeObjects &obj, TFSUHit* pbase_hit, TFSUHit* phit, TFSUHit* phit2, int gate_energy, GateInfo* gates, char* directory)
+{
+
+  if(is_ggg_time_prompt(pbase_hit, phit1, phit2, gates))
+  {
+    obj.FillHistogramSym(directory, Form("%c%c%c_cube_prompt_%d", subscript, subscript, subscript, gate_energy), 4000, 0, 4000, phit->GetEnergy(), 4000, 0, 4000, phit2->GetEnergy());
+  }
+
+  if(background_gate->IsInside(dT, lower_energy))
+  {
+    obj.FillHistogramSym(directory, Form("%c%c%c_cube_background_%d", subscript, subscript, subscript, gate_energy), 4000, 0, 4000, phit->GetEnergy(), 4000, 0, 4000, phit2->GetEnergy());    
+  }
 }
 
 /* General function for iterating over energies of interest when populating the 3D histograms. A 3D gamma-gamma-gamma histogram is generated in a similar manner to a 2D gamma-gamma histogram.
    Because plotting and working with a 3D histogram is difficult, 1 of the dimensions has an energy pre-selected so that we do not have to work with anything larger than a 2D histogram.
    This function iterates over all energies the user would like to pre-gate on (stored as an array of integers), checks if the 3rd hit (hit3) has an energy within some uncertainty of 
    that desired value, then will plot the other two hits (hit1 and hit2) if an only if the 3rd hit is within the bounds.*/
-void iterate_over_energies_and_fill_3D(TRuntimeObjects &obj, TFSUHit* phit, TFSUHit* phit2, TFSUHit* phit3, double dT, double dT2, GateInfo* gates, int* energies_to_gate, int energies_to_gate_size, int uncertainty)
+void iterate_over_energies_and_fill_3D(TRuntimeObjects &obj, TFSUHit* phit, TFSUHit* phit2, TFSUHit* phit3, double dT, double dT2, GateInfo* gates, int* energies_to_gate, int energies_to_gate_size, int uncertainty, char* directory)
 {
 
   TFSUHit hit  = *phit;
   TFSUHit hit2 = *phit2;
   TFSUHit hit3 = *phit3;
 
-  char* directory = get_directory_name(3, gates);
-
   //Iterate over all energies of interest to gate on
   for(int i=0; i<energies_to_gate_size; i++)
   {
     int gate_energy = energies_to_gate[i];
     
+    //Iterate over all 3 energies to fill symmetrically
     //fabs() is used to find the absolute difference in energy, so it can be compared to the uncertainty with one conditional
-    if(fabs(hit3.GetEnergy()-gate_energy) <= uncertainty)
+    if(fabs(hit.GetEnergy()-gate_energy) <= uncertainty)
     {
-      obj.FillHistogramSym(directory, Form("%c%c%c_cube_%d", subscript, subscript, subscript, gate_energy), 4000, 0, 4000, hit.GetEnergy(), 
-			   4000, 0, 4000, hit2.GetEnergy()); 
-      obj.FillHistogramSym(directory, Form("%c%c%c_4096_cube_%d", subscript, subscript, subscript, gate_energy), 4096, 0, 4096, hit.GetEnergy(), 
+      obj.FillHistogramSym(directory, Form("%c%c%c_cube_%d", subscript, subscript, subscript, gate_energy), 4096, 0, 4096, hit2.GetEnergy(), 
+			   4096, 0, 4096, hit3.GetEnergy()); 
+
+      fill_3D_gated_on_time_prompt_background(obj, phit, phit2, phit3, gate_energy, gates, directory);
+    }
+
+    //fabs() is used to find the absolute difference in energy, so it can be compared to the uncertainty with one conditional
+    else if(fabs(hit2.GetEnergy()-gate_energy) <= uncertainty)
+    {
+      obj.FillHistogramSym(directory, Form("%c%c%c_cube_%d", subscript, subscript, subscript, gate_energy), 4096, 0, 4096, hit.GetEnergy(), 
+			   4096, 0, 4096, hit3.GetEnergy()); 
+
+      fill_3D_gated_on_time_prompt_background(obj, phit2, phit, phit3, gate_energy, gates, directory);
+    }
+
+    //fabs() is used to find the absolute difference in energy, so it can be compared to the uncertainty with one conditional
+    else if(fabs(hit3.GetEnergy()-gate_energy) <= uncertainty)
+    {
+      obj.FillHistogramSym(directory, Form("%c%c%c_cube_%d", subscript, subscript, subscript, gate_energy), 4096, 0, 4096, hit.GetEnergy(), 
 			   4096, 0, 4096, hit2.GetEnergy()); 
+
+      fill_3D_gated_on_time_prompt_background(obj, phit3, phit, phit2, gate_energy, gates, directory);
     }
   }
 }
@@ -376,28 +610,30 @@ void fill_3D_histograms(TRuntimeObjects &obj, TFSUHit* phit, TFSUHit* phit2, TFS
     taking a slice out of a 3D cube.
   */
 
-  int particle_type = gates->get_particle_type();
-
-  //energies_to_gate is an array that contains the centroids of interest of a cube coincidence. 
-  int proton_energies_to_gate_size = 4;
-  int proton_energies_to_gate[] = {370, 520, 1001, 1147};
-
-  int alpha_energies_to_gate_size = 3;
-  int alpha_energies_to_gate[] = {1554, 1324, 1064};
-  
   //Uncertainty determined the energy range in which a gamma ray will be considered (e.g. an uncertainty of 2 will consider allow a 1552 to be considered as a 1554)
   int uncertainty = 2;
 
+  //energies_to_gate is an array that contains the centroids of interest of a cube coincidence. 
+  int sc_47_energies_to_gate_size = 2;
+  int sc_47_energies_to_gate[] = {1001, 1147};
+  char sc_47_3D_dir[] = "sc_47_3D"; 
+  iterate_over_energies_and_fill_3D(obj, phit, phit2, phit3, dT, dT2, gates, sc_47_energies_to_gate, sc_47_energies_to_gate_size, uncertainty, sc_47_3D_dir);
 
-  if(particle_type == PROTON)
-  {
-    iterate_over_energies_and_fill_3D(obj, phit, phit2, phit3, dT, dT2, gates, proton_energies_to_gate, proton_energies_to_gate_size, uncertainty);
-  }
+  //int sc_48_energies_to_gate_size = 2;
+  //int sc_48_energies_to_gate[] = {370, 520};
+  //char sc_48_3D_dir[] = "sc_48_3D";
+  //iterate_over_energies_and_fill_3D(obj, phit, phit2, phit3, dT, dT2, gates, sc_48_energies_to_gate, sc_48_energies_to_gate_size, uncertainty, "sc_48_3D_dir");
 
-  if(particle_type == ALPHA)
-  {
-    iterate_over_energies_and_fill_3D(obj, phit, phit2, phit3, dT, dT2, gates, alpha_energies_to_gate, alpha_energies_to_gate_size, uncertainty);
-  }
+  //int ca_44_energies_to_gate_size = 4;  
+  //int ca_44_energies_to_gate[] = {1157, 726, 1883, 1126};
+  //char ca_44_3D_dir[] = "ca_44_3D";
+  //iterate_over_energies_and_fill_3D(obj, phit, phit2, phit3, dT, dT2, gates, ca_44_energies_to_gate, ca_44_energies_to_gate_size, uncertainty, "ca_44_3D_dir");
+
+  //int ca_45_energies_to_gate_size = 3;
+  //int ca_45_energies_to_gate[] = {1554, 1324, 1064};
+  //char ca_45_3D_dir[] = "ca_45_3D";
+  //iterate_over_energies_and_fill_3D(obj, phit, phit2, phit3, dT, dT2, gates, ca_45_energies_to_gate, ca_45_energies_to_gate_size, uncertainty, ca_45_3D_dir);
+
 }
 
 //Set the global variable "subscript" to either a or g. This is used in the titling of histograms.
@@ -412,6 +648,60 @@ void set_subscript(bool is_addback)
   {
     subscript = 'g';
   }
+}
+
+bool hits_within_energy_bounds(TFSUHit* phit)
+{
+  
+  double energy1 = phit->GetEnergy();
+
+  if(energy1 > energy_low_cutoff && energy1 < energy_high_cutoff)
+  {
+    return true;
+  }
+  
+  return false;
+}
+
+bool hits_within_energy_bounds(TFSUHit* phit, TFSUHit* phit2)
+{
+  
+  double energy1 = phit->GetEnergy();
+  double energy2 = phit2->GetEnergy();
+
+  if(energy1 < energy_low_cutoff || energy1 > energy_high_cutoff)
+  {
+    return false;
+  }
+  if(energy2 < energy_low_cutoff || energy2 > energy_high_cutoff)
+  {
+    return false;
+  }
+
+  return true;
+}
+
+bool hits_within_energy_bounds(TFSUHit* phit, TFSUHit* phit2, TFSUHit* phit3)
+{
+  
+  double energy1 = phit->GetEnergy();
+  double energy2 = phit2->GetEnergy();
+  double energy3 = phit3->GetEnergy();
+
+  if(energy1 < energy_low_cutoff || energy1 > energy_high_cutoff)
+  {
+    return false;
+  }
+  if(energy2 < energy_low_cutoff || energy2 > energy_high_cutoff)
+  {
+    return false;
+  }
+  if(energy3 < energy_low_cutoff || energy3 > energy_high_cutoff)
+  {
+    return false;
+  }
+
+  return true;
 }
 
 //Make all histograms, with the condition on if they are addback or not. 
@@ -438,17 +728,21 @@ void make_histograms(TRuntimeObjects &obj, bool is_addback)
   gates.initialize_values(obj);
 
   unsigned int size = get_event_size(fsu_event, is_addback);
-  
-  for(unsigned int i=0; i < size; i++) 
+
+
+  for(unsigned int i=0; i<size; i++) 
   {
 
     //Get the hit, find the timing difference between dE and the gamma, the populate
     TFSUHit hit  = get_event_hit(fsu_event, is_addback, i);
     double dT = dE.GetTime() - hit.GetTime();
-    fill_1D_histograms(obj, &hit, dT, &dE, &gates);
     
-  //Code is temporarily commented for testing purposes. This should be uncommented if you desire to generate 2D and 3D histograms.
-  /*
+    
+    if(hits_within_energy_bounds(&hit))
+    {
+      fill_1D_histograms(obj, &hit, dT, &dE, &gates);
+    }
+
     //Check if there are atleast 2 hits for 2D analysis
     if(size >= 2)
     {
@@ -458,21 +752,27 @@ void make_histograms(TRuntimeObjects &obj, bool is_addback)
 	//Get the hit, find the timing difference between dE and the gamma, the populate
 	TFSUHit hit2 = get_event_hit(fsu_event, is_addback, j);
 	double dT2 = dE.GetTime() - hit2.GetTime();
-	fill_2D_histograms(obj, &hit, &hit2, dT, dT2, &gates);
+
 	
+	if(hits_within_energy_bounds(&hit, &hit2))
+	{
+	  fill_2D_histograms(obj, &hit, &hit2, dT, dT2, &gates, &dE);
+	}
 	if(size >= 3)
 	{
 	  for(unsigned int k=j+1; k<size; k++)
 	  {
-
+	    
 	    TFSUHit hit3 = get_event_hit(fsu_event, is_addback, k);
-	    fill_3D_histograms(obj, &hit, &hit2, &hit3, dT, dT2, &gates);
-	   
+
+	    if(hits_within_energy_bounds(&hit, &hit2, &hit3))
+	    {
+	      fill_3D_histograms(obj, &hit, &hit2, &hit3, dT, dT2, &gates);
+	    }
 	  }
 	}
       }
     }
-  */
   }
 }
 
