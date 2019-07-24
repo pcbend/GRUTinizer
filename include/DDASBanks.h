@@ -35,11 +35,13 @@ struct DDASGEBHeader{  //only at the start of the event...
   unsigned int source_id2; //duplicate of source id1?
   unsigned int barrier2;   //duplicate of barrier1?
   unsigned int body_words;  //inclusize!
+  unsigned int device;      //device info here | revision | freq
   unsigned int status;
   unsigned int time_low;
   unsigned int time_high_cfd;
   unsigned int energy_tracelength;
-
+  unsigned int ext_time_low;
+  unsigned int ext_time_high;
 
   // void print() {
   //   printf("--------------------------------\n");

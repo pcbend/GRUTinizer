@@ -14,7 +14,7 @@
 
 #include "TGretina.h"
 #include "TS800.h"
-#include "TBank29.h"
+#include "TBank88.h"
 #include "TS800.h"
 #include "TFastScint.h"
 #include "GCutG.h"
@@ -632,7 +632,7 @@ extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
   InitMap();
   TGretina *gretina = obj.GetDetector<TGretina>();
-  TBank29  *bank29  = obj.GetDetector<TBank29>();
+  TBank88  *bank29  = obj.GetDetector<TBank88>();
   TS800    *s800    = obj.GetDetector<TS800>();
   TFastScint *labr  = obj.GetDetector<TFastScint>();
   TList    *list    = &(obj.GetObjects());
@@ -673,24 +673,24 @@ void MakeHistograms(TRuntimeObjects& obj) {
   std::string dirname  = "";
 
   if(bank29) {
-    dirname  = "Bank29";
+    dirname  = "Bank88";
     for(unsigned int x=0;x<bank29->Size();x++) {
       TMode3Hit &hit = (TMode3Hit&)bank29->GetHit(x);
-      dirname = "Bank29";
+      dirname = "Bank88";
       histname = Form("bank29_%i",hit.GetChannel());
       obj.FillHistogram(dirname,histname,
           16000,0,64000,hit.Charge());
     }
     if(s800) {
-      histname = "S800_Bank29_time";
+      histname = "S800_Bank88_time";
       obj.FillHistogram(dirname,histname,
           200,-200,200,bank29->Timestamp()-s800->Timestamp());
 
-      histname = "S800_Bank29_runtime";
+      histname = "S800_Bank88_runtime";
       obj.FillHistogram(dirname,histname,
                         3600,0,3600,bank29->Timestamp()*1e-8,
                         1000,-1000,1000,bank29->Timestamp()-s800->Timestamp());
-      histname = Form("S800_Bank29_runtime_Reg%i",s800->GetTrigger().GetRegistr());
+      histname = Form("S800_Bank88_runtime_Reg%i",s800->GetTrigger().GetRegistr());
       obj.FillHistogram(dirname,histname,
                         3600,0,3600,bank29->Timestamp()*1e-8,
                         1000,-1000,1000,bank29->Timestamp()-s800->Timestamp());
@@ -698,18 +698,18 @@ void MakeHistograms(TRuntimeObjects& obj) {
     if(gretina) {
       for(int i=0;i<gretina->Size();i++) {
         TGretinaHit hit = gretina->GetGretinaHit(i);
-        histname = "Gretina_Bank29_time";
+        histname = "Gretina_Bank88_time";
         obj.FillHistogram(dirname,histname,
                           600,-600,600,bank29->Timestamp()-hit.Timestamp(),
                           2000,0,4000,hit.GetCoreEnergy());
-        histname = "Gretina_t0_Bank29_time";
+        histname = "Gretina_t0_Bank88_time";
         obj.FillHistogram(dirname,histname,
                           600,-600,600,bank29->Timestamp()-hit.GetTime(),
                           2000,0,4000,hit.GetCoreEnergy());
       }
     }
     if(labr) {
-      histname = "labr_Bank29_time";
+      histname = "labr_Bank88_time";
       obj.FillHistogram(dirname,histname,
                         600,-600,600,bank29->Timestamp()-labr->Timestamp());
 

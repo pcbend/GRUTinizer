@@ -1,7 +1,8 @@
 
+//TTree *tree = NULL;
+//TMode3 *mode3 = new TMode3;
 
-TTree *tree = NULL;
-TMode3 *mode3 = new TMode3;
+TMode3 *mode3     = obj.GetDetector<TMode3>();
 
 static Int_t evno=0;
 

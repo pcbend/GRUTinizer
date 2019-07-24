@@ -14,7 +14,7 @@
 
 #include "TGretina.h"
 #include "TS800.h"
-#include "TBank29.h"
+#include "TBank88.h"
 #include "TS800.h"
 #include "TFastScint.h"
 #include "GCutG.h"
@@ -35,7 +35,7 @@ int gates_loaded=0;
 
 bool HandleTiming(TRuntimeObjects &obj) {
   TS800 *s800  = obj.GetDetector<TS800>();
-  //TBank29 *bank29  = obj.GetDetector<TBank29>();
+  //TBank88 *bank29  = obj.GetDetector<TBank88>();
   
   if(!s800) //|| s800->GetMTof().E1UpSize() != 1)
     {return false;}
@@ -440,7 +440,7 @@ bool HandleGretina(TRuntimeObjects &obj) {
 bool HandleGretina_Gated(TRuntimeObjects &obj,TCutG *outgoing, TCutG* incoming, TCutG* time_energy = NULL) {
   TGretina *gretina  = obj.GetDetector<TGretina>(); 
   TS800 *s800 = obj.GetDetector<TS800>();
-  TBank29 *bank29 = obj.GetDetector<TBank29>();
+  TBank88 *bank29 = obj.GetDetector<TBank88>();
   
   if(!gretina || !s800 || s800->GetMTof().E1UpSize() != 1)
     {return false;}
@@ -524,7 +524,7 @@ bool HandleGretina_Gated(TRuntimeObjects &obj,TCutG *outgoing, TCutG* incoming, 
      TGretinaHit hit = gretina->GetGretinaHit(i);
      
      TVector3 track = s800->Track();
-     obj.FillHistogram(dirname,"GretinaTime_v_Bank29TimeStamp",1200,-400,800,bank29->Timestamp() - hit.GetTime()
+     obj.FillHistogram(dirname,"GretinaTime_v_Bank88TimeStamp",1200,-400,800,bank29->Timestamp() - hit.GetTime()
                                                               ,2000,0,4000,hit.GetDoppler(0.39,&track));
 
    }
@@ -564,7 +564,7 @@ bool HandleGretina_Gated(TRuntimeObjects &obj,TCutG *outgoing, TCutG* incoming, 
      TGretinaHit hit = gretina->GetGretinaHit(i);
      
      TVector3 track = s800->Track();
-     obj.FillHistogram(dirname,Form("GretinaTime_v_Bank29TimeStamp_%s",outgoing->GetName())
+     obj.FillHistogram(dirname,Form("GretinaTime_v_Bank88TimeStamp_%s",outgoing->GetName())
 		                                                      ,1200,-400,800,bank29->Timestamp() - hit.GetTime()
                                                                       ,2000,0,4000,hit.GetDoppler(0.39,&track));
   }
@@ -594,7 +594,7 @@ bool HandleGretina_Gated(TRuntimeObjects &obj,TCutG *outgoing, TCutG* incoming, 
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
   //TGretina *gretina = obj.GetDetector<TGretina>();
-  //TBank29  *bank29  = obj.GetDetector<TBank29>();
+  //TBank88  *bank29  = obj.GetDetector<TBank88>();
   //TS800    *s800    = obj.GetDetector<TS800>();
 
   TList    *list    = &(obj.GetObjects());
@@ -655,11 +655,11 @@ void MakeHistograms(TRuntimeObjects& obj) {
 //  if(gretina) {
 //    for(unsigned int i=0;i<gretina->Size();i++) {
 //      TGretinaHit hit = gretina->GetGretinaHit(i);
-//      histname = "Gretina_Bank29_time";
+//      histname = "Gretina_Bank88_time";
 //      obj.FillHistogram(dirname,histname,
 //          600,-600,600,bank29->Timestamp()-hit.Timestamp(),
 //          2000,0,4000,hit.GetCoreEnergy());
-//      histname = "Gretina_t0_Bank29_time";
+//      histname = "Gretina_t0_Bank88_time";
 //      obj.FillHistogram(dirname,histname,
 //          600,-600,600,bank29->Timestamp()-hit.GetTime(),
 //          2000,0,4000,hit.GetCoreEnergy());

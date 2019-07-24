@@ -21,15 +21,16 @@ class TS800;
 
 class interaction_point { 
   public:
-  interaction_point():fSeg(-1),fX(sqrt(-1)),fY(sqrt(-1)),fZ(sqrt(-1)),fEng(sqrt(-1)),fFrac(sqrt(-1)) { }
-  interaction_point(int seg,float x,float y,float z,float energy,float fraction=100.0)
-    : fSeg(seg),fX(x),fY(y),fZ(z),fEng(energy),fFrac(fraction) { }
+  interaction_point():fSeg(-1),fX(sqrt(-1)),fY(sqrt(-1)),fZ(sqrt(-1)),fEng(sqrt(-1)),fSegEner(sqrt(-1)),fFrac(sqrt(-1)) { }
+  interaction_point(int seg,float x,float y,float z,float energy,float segenergy, float fraction=100.0)
+    : fSeg(seg),fX(x),fY(y),fZ(z),fEng(energy),fSegEner(segenergy),fFrac(fraction) { }
   virtual ~interaction_point() { }
   int   fSeg;
   float fX;
   float fY;
   float fZ;
-  float fEng;
+  float fEng;  // fraction of total deposited energy
+  float fSegEner; // real energy of the hit segment
   float fFrac;
 
   bool operator<(const interaction_point &other) const {
@@ -88,13 +89,15 @@ public:
   Float_t  GetTOffset()         const { return fTOffset; }
 
   Int_t    GetCrystalId()       const { return fCrystalId;      }
-  Int_t    GetHoleNumber()      const { return fCrystalId/4-1;  }
+  Int_t    GetHoleNumber()      const { return fCrystalId/4;  }
+// GetHoleNumber() had /4-1 in it. For whatever reason...
   Int_t    GetCrystalNumber()   const { return fCrystalId%4;    }
   Float_t  GetCoreEnergy()      const { return fCoreEnergy;     }
   Int_t    GetCoreCharge(int i) const { return fCoreCharge[i];  }
   Float_t  GetCoreEnergy(int i) const;
   virtual Int_t Charge()        const { return GetCoreCharge(3); }
   Int_t GetPad() const { return fPad; }
+  //Float_t GetBaseline()         const { return fBaseline; }
 
   const char *GetName() const;
 
@@ -158,6 +161,7 @@ public:
                                                  if(i==-1) return fSegments.at(0).fSeg;
                                                            return fSegments.at(i).fSeg;  }
   Float_t  GetSegmentEng(const int &i)   const { return fSegments.at(i).fEng;  }
+  Float_t  GetSegmentEner(const int &i)   const { return fSegments.at(i).fSegEner;  } // added this Mark
 
   TVector3 GetIntPosition(unsigned int i)   const;  // position of the ith segment, Global coor.
   TVector3 GetLocalPosition(unsigned int i) const;  // position of the ith segment, Local coor.
@@ -208,6 +212,7 @@ private:
   mutable Float_t fCoreEnergy;
   Float_t         fWalkCorrection;   //also called t0.
   Float_t         fTOffset; //  t0 = toffset + tFit
+  //Float_t         fBaseline;
 
   std::vector<interaction_point> fSegments;
   //std::vector<Int_t> fSegmentNumber; //[fNumberOfInteractions]

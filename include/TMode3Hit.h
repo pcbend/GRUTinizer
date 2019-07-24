@@ -33,6 +33,8 @@ public:
   Int_t    GetSegmentId() const { return GetVME()*10 + GetChannel(); }
   Int_t    GetAbsSegId()  const { return GetCrystal()*40 + GetSegmentId() ; }
   Int_t    GetCrystalId() const { return GetHole()*4 + GetCrystal(); }
+  
+  Int_t WaveSize()        const { return wavesize; }
   const std::vector<Short_t>& GetWave() const { return waveform; }
 
   Long_t   GetLed()       const { return led; }

@@ -5,6 +5,7 @@
 
 #include "TFile.h"
 #include "TThread.h"
+#include "TString.h"
 
 #include "GValue.h"
 #include "TChannel.h"
@@ -121,7 +122,9 @@ void TWriteLoop::AddBranch(TClass* cls){
     det_map[cls] = det_pp;
 
     // Make a new branch.
-    TBranch* new_branch = event_tree->Branch(cls->GetName(), cls->GetName(), det_pp);
+    TString cls_name = cls->GetName();
+    cls_name = cls_name; // + '.';
+    TBranch* new_branch = event_tree->Branch(cls_name.Data(), cls->GetName(), det_pp);
 
     // Fill the new branch up to the point where the tree is filled.
     // Explanation:

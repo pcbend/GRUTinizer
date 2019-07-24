@@ -72,6 +72,8 @@ public:
   unsigned char GetADCBits()    const { return header->adc_bits; }
   unsigned char GetRevision()   const { return header->revision; }
 
+  unsigned int GetAddress()        const { return (0x19000000+(header->status&0x00000fff)); }
+
   int GetChannelID()               const { return (header->status & CHANNELIDMASK)     >> 0;           }
   int GetSlotID()                  const { return (header->status & SLOTIDMASK)        >> 4;           }
   int GetCrateID()                 const { return (header->status & CRATEIDMASK)       >> 8;           }
@@ -85,6 +87,16 @@ public:
   unsigned long GetTimestamp()     const {
     return (((unsigned long)GetTimeHigh())<<32) + GetTimeLow();
   }
+
+  unsigned int GetExternalTimeLow()        const { return header->ext_time_low;                                    }
+  unsigned int GetExternalTimeHigh()       const { return (header->ext_time_high & LOWER16BITMASK);            }
+  unsigned long GetExternalTimestamp()     const {
+    return (((unsigned long)GetExternalTimeHigh())<<32) + GetExternalTimeLow();
+  }
+  
+  
+  
+  
   int GetCFDFailBit()              const { return (header->time_high_cfd & BIT31MASK)     >> 31;       }
   int GetCFDTime()                 const { return (header->time_high_cfd & BIT30TO16MASK) >> 16;       }
 

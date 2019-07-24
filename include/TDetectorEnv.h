@@ -13,7 +13,7 @@ public:
 
   static bool Caesar()     { return Get().source_ids[kDetectorSystems::CAESAR].size(); }
   static bool Gretina()    { return Get().source_ids[kDetectorSystems::GRETINA].size(); }
-  static bool Bank29()     { return Get().source_ids[kDetectorSystems::BANK29].size(); }
+  static bool Bank88()     { return Get().source_ids[kDetectorSystems::BANK88].size(); }
   static bool Mode3()      { return Get().source_ids[kDetectorSystems::MODE3].size(); }
   static bool Janus()      { return Get().source_ids[kDetectorSystems::JANUS].size(); }
   static bool Phoswall()   { return Get().source_ids[kDetectorSystems::PHOSWALL].size(); }
@@ -31,7 +31,7 @@ public:
   static const std::vector<int>& JANUSIDs()      { return Get().source_ids[kDetectorSystems::JANUS]; }
   static const std::vector<int>& GretinaIDs()    { return Get().source_ids[kDetectorSystems::GRETINA]; }
   static const std::vector<int>& Mode3IDs()      { return Get().source_ids[kDetectorSystems::MODE3]; }
-  static const std::vector<int>& Bank29IDs()     { return Get().source_ids[kDetectorSystems::BANK29]; }
+  static const std::vector<int>& Bank88IDs()     { return Get().source_ids[kDetectorSystems::BANK88]; }
   static const std::vector<int>& FastScintIDs()  { return Get().source_ids[kDetectorSystems::FASTSCINT]; }
   static const std::vector<int>& LendaIDs()      { return Get().source_ids[kDetectorSystems::LENDA]; }
 

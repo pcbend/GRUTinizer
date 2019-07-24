@@ -29,6 +29,7 @@ void TGretinaHit::Copy(TObject &rhs) const {
   ((TGretinaHit&)rhs).fCoreCharge[3]  = fCoreCharge[3];
   ((TGretinaHit&)rhs).fNumberOfInteractions = fNumberOfInteractions;
   ((TGretinaHit&)rhs).fSegments       = fSegments;
+  //((TGretinaHit&)rhs).fBaseline       = fBaseline;
 }
 
 Float_t TGretinaHit::GetCoreEnergy(int i) const {
@@ -74,10 +75,15 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
   fWalkCorrection = raw.t0;
   fCrystalId = raw.crystal_id;
   fCoreEnergy = raw.tot_e;
+  //fBaseline = raw.baseline;
 
   //fAddress = (1<<24) + (fCrystalId<<16);
   //fAddress = (1<<24) + ( raw.board_id );
   int board_id = ((fCrystalId/4) << 8) ;  //hole  number : 0x1f00
+ 
+  //std::cout << "Crystal ID is: " << fCrystalId << std::endl ;
+  //std::cout << "Board ID is: " << board_id << std::endl ;
+
 //    board_id =                       ;  //card  number : 0x0030  information not available here.
       board_id += ((fCrystalId%4) << 6) ;  //x-tal number : 0x00c0
       board_id += 9;                       //chan  number : 0x000f  information not available here(assume core).
@@ -100,6 +106,7 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
         pnt.fY   = raw.intpts[i].y;
         pnt.fZ   = raw.intpts[i].z;
         pnt.fEng = raw.intpts[i].e;
+        pnt.fSegEner = raw.intpts[i].seg_ener;
         fSegments.push_back(pnt);
       } catch(...) {
         std::cout << "in try catch block!" << std::endl;
@@ -288,8 +295,7 @@ void TGretinaHit::Add(const TGretinaHit& rhs) {
                                                               rhs.fSegments.at(i).fY,
                                                               rhs.fSegments.at(i).fZ);
         ips.push_back(interaction_point(rhs.fSegments.at(i).fSeg,
-                                        v.X(),v.Y(),v.Z(),
-                                        rhs.fSegments.at(i).fEng,rhs.fSegments.at(i).fFrac));
+                                        v.X(),v.Y(),v.Z(),                                        rhs.fSegments.at(i).fEng,rhs.fSegments.at(i).fSegEner,rhs.fSegments.at(i).fFrac));
       }
     }
     
@@ -302,7 +308,7 @@ void TGretinaHit::Add(const TGretinaHit& rhs) {
                                                           fSegments.at(i).fZ);
         ips.push_back(interaction_point(fSegments.at(i).fSeg,
                                         v.X(),v.Y(),v.Z(),
-                                        fSegments.at(i).fEng,fSegments.at(i).fFrac));
+                                        fSegments.at(i).fEng,fSegments.at(i).fSegEner,fSegments.at(i).fFrac));
       }
     }
    
@@ -320,7 +326,7 @@ void TGretinaHit::Add(const TGretinaHit& rhs) {
                                                           fSegments.at(i).fZ);
         ips.push_back(interaction_point(fSegments.at(i).fSeg,
                                         v.X(),v.Y(),v.Z(),
-                                        fSegments.at(i).fEng,fSegments.at(i).fFrac));
+                                        fSegments.at(i).fEng,fSegments.at(i).fSegEner,fSegments.at(i).fFrac));
       }
     }
     
@@ -332,8 +338,7 @@ void TGretinaHit::Add(const TGretinaHit& rhs) {
                                                               rhs.fSegments.at(i).fY,
                                                               rhs.fSegments.at(i).fZ);
         ips.push_back(interaction_point(rhs.fSegments.at(i).fSeg,
-                                        v.X(),v.Y(),v.Z(),
-                                        rhs.fSegments.at(i).fEng,rhs.fSegments.at(i).fFrac));
+                                        v.X(),v.Y(),v.Z(),                                        rhs.fSegments.at(i).fEng,rhs.fSegments.at(i).fSegEner,rhs.fSegments.at(i).fFrac));
       }
     }
 
@@ -418,6 +423,7 @@ void TGretinaHit::Clear(Option_t *opt) {
 
   fTOffset = sqrt(-1);
   fPad  = 0;
+  //fBaseline = -1;
 
   fNumberOfInteractions = 0;
 

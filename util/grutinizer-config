@@ -54,7 +54,7 @@ detlibs="-lTSega -lTDetector  -lTGretina -lTJanus -lTPhosWall -lTS800 -lTFastSci
 -lTLenda -lTOldSega -lTFSU"
 grutmore="-lTGRUTint -lTLoops -lTHistogramming "
 
-cflags="-std=c++0x -I$incdir -Wl,--no-as-needed"
+cflags="-std=c++11 -I$incdir -Wl,--no-as-needed"
 
 
 

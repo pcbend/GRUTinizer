@@ -703,13 +703,13 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
       }
       if(gHist && gHist->IsSummary()  && gHist->GetHistParent() && gHist->GetHistParent()->InheritsFrom(GH2::Class())) {
         next = ((GH2*)gHist->GetHistParent())->SummaryProjection(gHist,gHist->GetProjectionAxis(),
-                                                                  (int)GH2::kForward,false);
+            (int)GH2::kForward,false);
       } else if(gHist && gHist->GetHistParent()) { 
         next = ((GH2*)gHist->GetHistParent())->GetNext(gHist,(int)GH2::kForward);
       }
       if(next) {
         next->GetXaxis()->SetRangeUser(gHist->GetXaxis()->GetBinLowEdge(gHist->GetXaxis()->GetFirst()),
-                                       gHist->GetXaxis()->GetBinUpEdge(gHist->GetXaxis()->GetLast()));
+            gHist->GetXaxis()->GetBinUpEdge(gHist->GetXaxis()->GetLast()));
         //prev->GetXaxis()->SetRange(axis->GetBinLowEdge(first),
         //                           axis->GetBinUpEdge(last));
         next->Draw("");
@@ -729,13 +729,13 @@ bool GCanvas::Process1DArrowKeyPress(Event_t *event,UInt_t *keysym) {
       }
       if(gHist && gHist->IsSummary()  && gHist->GetHistParent() && gHist->GetHistParent()->InheritsFrom(GH2::Class())) {
         next = ((GH2*)gHist->GetHistParent())->SummaryProjection(gHist,gHist->GetProjectionAxis(),
-                                                                  (int)GH2::kBackward,false);
+            (int)GH2::kBackward,false);
       } else if(gHist && gHist->GetHistParent()) { 
         next = ((GH2*)gHist->GetHistParent())->GetNext(gHist,(int)GH2::kBackward);
       }
       if(next) {
         next->GetXaxis()->SetRangeUser(gHist->GetXaxis()->GetBinLowEdge(gHist->GetXaxis()->GetFirst()),
-                                       gHist->GetXaxis()->GetBinUpEdge(gHist->GetXaxis()->GetLast()));
+            gHist->GetXaxis()->GetBinUpEdge(gHist->GetXaxis()->GetLast()));
         //prev->GetXaxis()->SetRange(axis->GetBinLowEdge(first),
         //                           axis->GetBinUpEdge(last));
         next->Draw("");
@@ -889,7 +889,6 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       if(GausFit(hists.back(),fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx))
         edited = true;
       break;
-
     case kKey_G:
       if(!hists.back() || !fMarkers.size()==4) {
         printf( CYAN "must have a a1 hist with 4 markers drawn" RESET_COLOR "\n");
@@ -1423,7 +1422,8 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
                        TPad *pad = (TPad*)obj;
                        TIter iter2(pad->GetListOfPrimitives());
                        while(TObject *obj2=iter2.Next()) {
-                         if(obj2->InheritsFrom(TH2::Class())) {
+                         if(obj2->InheritsFrom(TH2::Class()) ||
+                             (obj2->InheritsFrom(GH2::Class()))) {
                            TH2* hist = (TH2*)obj2;
                            hist->GetYaxis()->SetRangeUser(y1,y2);
                            pad->Modified();
@@ -1441,81 +1441,81 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
                  break;
 
     case kKey_x: 
-      gHist = NULL;
-      for(auto hist : hists) {
-        if(hist->InheritsFrom(GH2::Class())){
-          gHist = (GH2*)hist;
-          break;
-        }
-      }
+                 gHist = NULL;
+                 for(auto hist : hists) {
+                   if(hist->InheritsFrom(GH2::Class())){
+                     gHist = (GH2*)hist;
+                     break;
+                   }
+                 }
 
-      if(gHist){
-        //gHist->SetSummary(0);
-        GH1 *phist = ((GH2*)gHist)->ProjectionX();//->Draw();
-        if(phist) {
-          new GCanvas();
-          phist->Draw("");
-        }
-        edited=true;
-      }
-      break;
+                 if(gHist){
+                   //gHist->SetSummary(0);
+                   GH1 *phist = ((GH2*)gHist)->ProjectionX();//->Draw();
+                   if(phist) {
+                     new GCanvas();
+                     phist->Draw("");
+                   }
+                   edited=true;
+                 }
+                 break;
 
     case kKey_X: 
-       gHist = NULL;
-       for(auto hist : hists) {
-         if(hist->InheritsFrom(GH2::Class())){
-           gHist = (GH2*)hist;
-           break;
-         }
-       }
-       if(gHist){
-         GH1* phist = ((GH2*)gHist)->SummaryProjection(0,GH1::kXaxis,GH2::kForward,false);
-         if(phist) {
-           new GCanvas();
-           phist->Draw("");
-         }
-         edited = true;
-       }
-      break;
+                 gHist = NULL;
+                 for(auto hist : hists) {
+                   if(hist->InheritsFrom(GH2::Class())){
+                     gHist = (GH2*)hist;
+                     break;
+                   }
+                 }
+                 if(gHist){
+                   GH1* phist = ((GH2*)gHist)->SummaryProjection(0,GH1::kXaxis,GH2::kForward,false);
+                   if(phist) {
+                     new GCanvas();
+                     phist->Draw("");
+                   }
+                   edited = true;
+                 }
+                 break;
 
     case kKey_y: 
-      gHist = NULL;
-      for(auto hist : hists) {
-        if(hist->InheritsFrom(GH2::Class())){
-          gHist = (GH2*)hist;
-          break;
-        }
-      }
+                 gHist = NULL;
+                 for(auto hist : hists) {
+                   if(hist->InheritsFrom(GH2::Class())){
+                     gHist = (GH2*)hist;
+                     break;
+                   }
+                 }
 
-      if(gHist){
-        GH1 *phist = ((GH2*)gHist)->ProjectionY();//->Draw();
-        if(phist) {
-          new GCanvas();
-          phist->Draw("");
-        }
-        edited=true;
-      }
-      break;
+                 if(gHist){
+                   GH1 *phist = ((GH2*)gHist)->ProjectionY();//->Draw();
+                   if(phist) {
+                     new GCanvas();
+                     phist->Draw("");
+                   }
+                   edited=true;
+                 }
+                 break;
 
     case kKey_Y: 
-      gHist = NULL;
-      for(auto hist : hists) {
-        if(hist->InheritsFrom(GH2::Class())){
-          gHist = (GH2*)hist;
-          break;
-        }
-      }
+                 gHist = NULL;
+                 for(auto hist : hists) {
+                   if(hist->InheritsFrom(GH2::Class())){
+                     gHist = (GH2*)hist;
+                     break;
+                   }
+                 }
 
-      if(gHist){
-        //gHist->SetSummary(true);
-        GH1* phist = ((GH2*)gHist)->SummaryProjection(0,GH1::kYaxis,GH2::kForward,false);
-        if(phist) {
-          new GCanvas();
-          phist->Draw("");
-        }
-        edited = true;
-      }
-      break;
+                 if(gHist){
+                   //gHist->SetSummary(true);
+                   GH1* phist = ((GH2*)gHist)->SummaryProjection(0,GH1::kYaxis,GH2::kForward,false);
+                   if(phist) {
+                     new GCanvas();
+                     phist->Draw("");
+                   }
+                   edited = true;
+                 }
+                 break;
     case kKey_z:
                  //printf("in lower case z\n");
                  if(gPad->GetLogz()){
@@ -1554,7 +1554,8 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
                        TPad *pad = (TPad*)obj;
                        TIter iter2(pad->GetListOfPrimitives());
                        while(TObject *obj2=iter2.Next()) {
-                         if(obj2->InheritsFrom(TH2::Class())) {
+                         if(obj2->InheritsFrom(TH2::Class()) ||
+                             obj2->InheritsFrom(GH2::Class())) {
                            //TH2* hist = (TH2*)obj2;
                            if(set && !pad->GetLogz()) {                
                              //printf("\t %i set=true && logz=false;\n",counter++);
@@ -2157,7 +2158,7 @@ TH1 *GCanvas::GetBackGroundHist(GMarker *addlow,GMarker *addhigh) {
 
 void GCanvas::Streamer(TBuffer &R__b)
 {
-   TCanvas::Streamer(R__b);
+  TCanvas::Streamer(R__b);
 }
 
 

@@ -115,15 +115,30 @@ float TIonChamber::GetAve(){
   
   for(unsigned int x=0;x<fData.size();x++) {   
       TChannel *c = TChannel::GetChannel(Address(x));
+    // was  TChannel *c = TChannel::GetChannel(Address(x));
+
+
+/*
+   std::cout << "Address is: " << Address(x) << std::endl ;
+   std::cout << "Address with Channel(x) is: " << Address(GetChannel(x)) << std::endl ;
+   std::cout << "Channel is: " << c << std::endl ;
+   std::cout << "Channel in vector is: " << fChan.at(x) << std::endl ;
+   std::cout << "Data is: " << fData.at(x) << std::endl ;
+*/
+
       if (c){
         temp += c->CalEnergy(fData.at(x));
+        //std::cout << "I am getting to this part" << std::endl;
       }
       else{
         temp += fData.at(x);
+        //std::cout << "temp was set to: " << temp << std::endl;
+       //std::cout << "Instead I am getting here" << std::endl;
       }
   }
   if(temp>0)
     temp = temp/((float)fData.size());
+    //std::cout << "temp is set to: " << temp << std::endl ;
   return temp;
 }
 
@@ -198,32 +213,30 @@ float TIonChamber::GetSum() const {
 //TODO: We need to change this function to correct the sum for each event
 //      based on the track through the CRDCs
 
-float TIonChamber::GetdE(){
-  //std::cout << "GetdE() NOT IMPLEMENTED! Just returning GetSum()" << std::endl;
-  return GetSum();
-}
-
-//Calculate energy loss in Ion Chamber corrected
-//for particle track
-float TIonChamber::GetdECorr(TCrdc *crdc){
-  float sum = GetdE();
+float TIonChamber::GetdE(TCrdc *crdc){
+  float sum = GetAve();
   float x   = crdc->GetDispersiveX();
   float y   = crdc->GetNonDispersiveY();
+
+  return GetdE(x,y);
+}
+
+float TIonChamber::GetdE(double crdc_1_x, double crdc_1_y){
+  float sum = GetAve();
+
+  //std::cout << "IC address is: " << TDetectorHit::Address() << std::endl;
 
   float xtilt  = GValue::Value("IC_DE_XTILT");
   float ytilt  = GValue::Value("IC_DE_YTILT");
   float x0tilt = GValue::Value("IC_DE_X0TILT");
 
-  /*  std::cout << "---------------------" << std::endl;
-  std::cout << " xtilt = " << xtilt << std::endl;
-  std::cout << " ytilt = " << ytilt << std::endl;
-  std::cout << " x0tilt = " << x0tilt << std::endl;
-  std::cout << BLUE << " SUM = " << sum << RESET_COLOR << std::endl;
-  */
-  sum += sum * ytilt * y;
-  //  std::cout << GREEN << " SUM2 = " << sum << RESET_COLOR << std::endl;
-  sum *= TMath::Exp(xtilt*(x0tilt-x));
-  //std::cout << RED << " SUM3 = " << sum << RESET_COLOR << std::endl;
+  if (std::isnan(xtilt) || std::isnan(ytilt) || std::isnan(x0tilt)){
+    std::cout << "Define  IC_DE_XTILT, IC_DE_YTILT, and IC_DE_X0TILT before using TIonChamber::GetdE()!\n";
+  }
+  sum += sum * ytilt * crdc_1_y;
+  if (crdc_1_x < x0tilt){
+    sum *= TMath::Exp(xtilt*(x0tilt-crdc_1_x));
+  }
   return sum;
 }
 
@@ -580,6 +593,8 @@ float TCrdc::GetDispersiveX() const{
   //  return cached_dispersive_x;
   //}
 
+  //std::cout << "CRDCX address is: " << TDetectorHit::Address() << std::endl;
+
   int maxpad = GetMaxPad();
   //std::cout << " Before Max Pad Return " << std::endl;
   if (maxpad ==-1){
@@ -753,6 +768,7 @@ void TMTof::Copy(TObject &obj) const {
   mtof.fRf        = fRf;
   mtof.fHodoscope = fHodoscope;
   mtof.fRef       = fRef;
+
 }
 
 void TMTof::Clear(Option_t *opt) {
@@ -771,6 +787,9 @@ void TMTof::Clear(Option_t *opt) {
   fCorrelatedXFP=sqrt(-1);
   fCorrelatedOBJ=sqrt(-1);
   fCorrelatedE1Up=sqrt(-1);
+  fCorrelatedRfE1=sqrt(-1);
+  fCorrelatedXFPE1=sqrt(-1);
+  fCorrelatedOBJE1=sqrt(-1);
   //fCorrelatedXFP_Ch15=0xffffffff;
   //fCorrelatedOBJ_Ch15=0xffffffff;
   //fCorrelatedE1_Ch15=0xffffffff;
@@ -783,6 +802,86 @@ void TMTof::Clear(Option_t *opt) {
 //  CorrelateXfp();
 //  return true;
 //}
+
+double TMTof::GetCorrelatedObjE1() const{
+  double target = GValue::Value("TARGET_MTOF_OBJE1");
+  if (std::isnan(target)){
+    std::cout << "TARGET_MTOF_OBJE1 not defined! Use fObj.at(0) if you want first.\n";
+    fCorrelatedOBJE1 = sqrt(-1);
+    return fCorrelatedOBJE1 = sqrt(-1);
+  }
+
+  //shift allows "shifting" of TOF to line up different runs. Necessary when,
+  //e.g., the voltage on a scintillator changes during an experiment
+  double shift = GValue::Value("SHIFT_MTOF_OBJE1");
+  
+  if(fObj.size() && fE1Up.size()){
+    fCorrelatedOBJE1 = std::numeric_limits<double>::max(); 
+    for(size_t i=0;i<fObj.size();i++) {     
+      for (size_t j=0; j < fE1Up.size(); j++){
+        double newvalue = fObj.at(i)-fE1Up.at(j);
+        if (!std::isnan(shift)){
+          newvalue += shift;
+        }
+        if(std::abs(target - newvalue) < std::abs(target - fCorrelatedOBJE1)) {
+          fCorrelatedOBJE1 = newvalue;
+        }
+      }
+    }
+  }
+  return fCorrelatedOBJE1;
+}
+
+double TMTof::GetCorrelatedXfpE1() const{
+  double target = GValue::Value("TARGET_MTOF_XFPE1");
+  if (std::isnan(target)){
+    std::cout << "TARGET_MTOF_XFPE1 not defined! Use fXfp.at(0) if you want first.\n";
+    fCorrelatedXFPE1 = sqrt(-1);
+    return fCorrelatedXFPE1;
+  }
+  if(fXfp.size() && fE1Up.size()){
+    fCorrelatedXFPE1 = std::numeric_limits<double>::max(); 
+    for(size_t i=0;i<fXfp.size();i++) {     
+      for (size_t j=0; j < fE1Up.size(); j++){
+        double newvalue = fXfp.at(i)-fE1Up.at(j);
+        if(std::abs(target - newvalue) < std::abs(target - fCorrelatedXFPE1)) {
+          fCorrelatedXFPE1 = newvalue;
+        }
+      }
+    }
+  }
+  return fCorrelatedXFPE1;
+}
+
+
+double TMTof::GetCorrelatedRfE1() const{
+  double target = GValue::Value("TARGET_MTOF_RfE1");
+  if (std::isnan(target)){
+    std::cout << "TARGET_MTOF_RfE1 not defined! Use fRf.at(0) if you want first.\n";
+    fCorrelatedRfE1 = sqrt(-1);
+    return fCorrelatedRfE1 = sqrt(-1);
+  }
+
+  //shift allows "shifting" of TOF to line up different runs. Necessary when,
+  //e.g., the voltage on a scintillator changes during an experiment
+  double shift = GValue::Value("SHIFT_MTOF_RfE1");
+  
+  if(fRf.size() && fE1Up.size()){
+    fCorrelatedRfE1 = std::numeric_limits<double>::max(); 
+    for(size_t i=0;i<fRf.size();i++) {     
+      for (size_t j=0; j < fE1Up.size(); j++){
+        double newvalue = fRf.at(i)-fE1Up.at(j);
+        if (!std::isnan(shift)){
+          newvalue += shift;
+        }
+        if(std::abs(target - newvalue) < std::abs(target - fCorrelatedRfE1)) {
+          fCorrelatedRfE1 = newvalue;
+        }
+      }
+    }
+  }
+  return fCorrelatedRfE1;
+}
 
 
 double TMTof::GetCorrelatedE1Up() const{

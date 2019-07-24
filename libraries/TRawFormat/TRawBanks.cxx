@@ -98,6 +98,7 @@ Int_t TRawEvent::GEBMode3Head::GetSegmentId()  const { return GetVME()*10+GetCha
 Int_t TRawEvent::GEBMode3Head::GetCrystalId()  const { return GetHole()*4+GetCrystal(); }
 
 void TRawEvent::SwapMode3Data(TRawEvent::GEBMode3Data &data) {
+  //std::cout << __PRETTY_FUNCTION__ << std::endl;
   data.led_middle   = SwapShort(data.led_middle)   ;
   data.led_low      = SwapShort(data.led_low)      ;
   data.energy_low   = SwapShort(data.energy_low)   ;

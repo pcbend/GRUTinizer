@@ -64,10 +64,14 @@ public:
 
   //Note c1 is the AFP correction and c2 is the XFP correction
   float GetTofE1_TAC(float c1=0.00,float c2=0.00)  const;
+  float GetTofE1_TAC_XFP(float c1=0.00,float c2=0.00)  const;
   float GetTofE1_TDC(float c1=0.00,float c2=0.00)  const;
   float GetTofE1_MTDC(float c1=0.00,float c2=0.00,int i=0) const;
+ float GetTofE1_MTDC_RF(float c1=0.00,float c2=0.00,int i=0) const;
+ float GetTofE1_MTDC_XFP(float c1=0.00,float c2=0.00,int i=0) const;
 
   float GetCorrTOF_OBJTAC() const;
+  float GetCorrTOF_XFPTAC() const;
   float GetOBJRaw_TAC() const;
   float GetXFRaw_TAC() const;
   
@@ -77,6 +81,8 @@ public:
   //===================================================  
 
   float GetCorrTOF_OBJ_MESY(int i=0) const;
+  float GetCorrTOF_RF_MESY(int i=0) const;
+  float GetCorrTOF_XFP_MESY(int i=0) const;
   
   float GetOBJ_E1Raw_MESY(int i=0) const;
   float GetOBJ_E1Raw_MESY_Ch15(int i=0) const;

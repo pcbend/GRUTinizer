@@ -115,7 +115,7 @@ void TUnpackingLoop::HandleNSCLData(TNSCLEvent& event) {
     case kNSCLEventType::RING_FORMAT:          // 0x000C
     case kNSCLEventType::PHYSICS_EVENT_COUNT:  // 0x001F
     case kNSCLEventType::EVB_FRAGMENT:         // 0x0028
-    case kNSCLEventType::EVB_UNKNOWN_PAYLOAD:  // 0x0029
+    case kNSCLEventType::EVB_UNKNOWN_PAYLOAD:  // 0x0088
     case kNSCLEventType::EVB_GLOM_INFO:        // 0x002A
     case kNSCLEventType::FIRST_USER_ITEM_CODE: // 0x8000
       break;
@@ -192,7 +192,7 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
       fOutputEvent->AddRawData(event, kDetectorSystems::S800);
       break;
     case 8: // Gretina diag. data.
-      HandleGEBMode3(event, kDetectorSystems::BANK29);
+      HandleGEBMode3(event, kDetectorSystems::BANK88);
       break;
     case 9:
       //Simulated S800 data,
@@ -215,11 +215,14 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
     case 21: //lenda
       fOutputEvent->AddRawData(event, kDetectorSystems::LENDA);
       break;
-    case 22: //lenda
+    case 22: //fastscint (?)
       fOutputEvent->AddRawData(event, kDetectorSystems::FASTSCINT);
       break;
-    case 29: // Something.
-      fOutputEvent->AddRawData(event, kDetectorSystems::BANK29);
+    case 25: //uml
+      fOutputEvent->AddRawData(event, kDetectorSystems::UML);
+      break;
+    case 88: // Something.
+      fOutputEvent->AddRawData(event, kDetectorSystems::BANK88);
       break;
     default:
       std::cout << "Dance Party EventType: " << type << std::endl;

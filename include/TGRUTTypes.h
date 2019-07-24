@@ -13,10 +13,12 @@ enum kDetectorSystems {
   MODE3      = 2,
   S800       = 5,
   S800SCALER = 10,
-  BANK29     = 8,
+  BANK88     = 8,
   GRETINA_SIM= 11,
   S800_SIM   = 9,
   LENDA      = 21,
+
+  UML        = 25,
 
   SEGA = 64,
   JANUS = 65,

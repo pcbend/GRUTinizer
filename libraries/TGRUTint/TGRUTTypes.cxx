@@ -5,7 +5,7 @@ std::map<std::string, kDetectorSystems> detector_system_map{
   {"Sega",            kDetectorSystems::SEGA},
   {"Gretina",         kDetectorSystems::GRETINA},
   {"Gretina_Sim",     kDetectorSystems::GRETINA_SIM},
-  {"Bank29",          kDetectorSystems::BANK29},
+  {"Bank88",          kDetectorSystems::BANK88},
   {"Mode3",           kDetectorSystems::MODE3},
   {"Janus",           kDetectorSystems::JANUS},
   {"Caesar",          kDetectorSystems::CAESAR},
@@ -13,7 +13,8 @@ std::map<std::string, kDetectorSystems> detector_system_map{
   {"S800",            kDetectorSystems::S800},
   {"S800_SIM",        kDetectorSystems::S800_SIM},
   {"FastScint",       kDetectorSystems::FASTSCINT},
-  {"FSU",             kDetectorSystems::FSU}
+  {"FSU",             kDetectorSystems::FSU},
+  {"UML",             kDetectorSystems::UML}
 };
 
 

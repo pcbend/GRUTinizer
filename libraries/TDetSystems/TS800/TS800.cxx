@@ -285,6 +285,8 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
 	break;
       case 0x58d0:  // Galotte
 	break;
+    case 0x5805:  // Pin detector for Hiro
+      break;
       case 0x58e0:
 	break;
       case 0x58f0:
@@ -371,6 +373,8 @@ int TS800::BuildHits(UShort_t eventsize,UShort_t *dptr,Long64_t timestamp) {  //
     case 0x58c0:  // VME ADC
       break;
     case 0x58d0:  // Galotte
+      break;
+    case 0x5805:  // Pin detector for Hiro
       break;
     case 0x58e0:
       break;
@@ -791,6 +795,22 @@ float TS800::GetTofE1_TAC(float c1,float c2)  const {
 
 }
 
+float TS800::GetTofE1_TAC_XFP(float c1,float c2)  const {
+  /*if (GetCrdc(0).GetId() == -1) {
+    return sqrt(-1);
+    }*/
+  /*----------------*\
+  | AFP returns nan  |
+  | if both crdc's   |
+  | are not present  |
+  \*----------------*/
+
+  if(GetTof().GetTacXFP()>-1)
+    return GetTof().GetTacXFP() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+  return sqrt(-1);
+
+}
+
 
 float TS800::GetTofE1_TDC(float c1,float c2)  const {
   /*----------------*\
@@ -812,6 +832,40 @@ float TS800::GetTofE1_MTDC(float c1,float c2,int i) const {
   for(unsigned int x=0;x<mtof.fObj.size();x++) {
     for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
       result.push_back( mtof.fObj.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
+    }
+  }
+
+  if(result.size()>(unsigned int)i)
+    return result.at(i);
+  return sqrt(-1.0);
+}
+
+float TS800::GetTofE1_MTDC_XFP(float c1,float c2,int i) const {
+
+  std::vector<float> result;
+  // TODO: This check is always false.  Commented it out, but was there some reason for it?
+  // if(mtof.fObj.size()<0)
+  //   std::cout << " In GetTOF MTDC, Size = " << mtof.fObj.size() << std::endl;
+  for(unsigned int x=0;x<mtof.fXfp.size();x++) {
+    for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
+      result.push_back( mtof.fXfp.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
+    }
+  }
+
+  if(result.size()>(unsigned int)i)
+    return result.at(i);
+  return sqrt(-1.0);
+}
+
+float TS800::GetTofE1_MTDC_RF(float c1,float c2,int i) const {
+
+  std::vector<float> result;
+  // TODO: This check is always false.  Commented it out, but was there some reason for it?
+  // if(mtof.fObj.size()<0)
+  //   std::cout << " In GetTOF MTDC, Size = " << mtof.fObj.size() << std::endl;
+  for(unsigned int x=0;x<mtof.fRf.size();x++) {
+    for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
+      result.push_back( mtof.fRf.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
     }
   }
 
@@ -1278,17 +1332,38 @@ float TS800::GetCorrTOF_OBJ_MESY(int i) const {
   return GetTofE1_MTDC(f_mafp_cor,f_mxfp_cor,i);
 }
 
+//std::vector<float> TS800::GetCorrTOF_OBJ_MESY() const {
+float TS800::GetCorrTOF_XFP_MESY(int i) const {
+  //static double f_afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+  //static double f_xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+  //if(fGlobalReset) {
+    f_mafp_cor = GValue::Value("XFP_MTOF_CORR_AFP");
+    f_mxfp_cor = GValue::Value("XFP_MTOF_CORR_XFP");
+  //}
+  return GetTofE1_MTDC_XFP(f_mafp_cor,f_mxfp_cor,i);
+}
+
+float TS800::GetCorrTOF_RF_MESY(int i) const {
+  //static double f_afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+  //static double f_xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+  //if(fGlobalReset) {
+    f_mafp_cor = GValue::Value("RF_MTOF_CORR_AFP");
+    f_mxfp_cor = GValue::Value("RF_MTOF_CORR_XFP");
+  //}
+  return GetTofE1_MTDC_RF(f_mafp_cor,f_mxfp_cor,i);
+}
+
 //float TS800::GetCorrTOF_XFP(){
 //  double afp_cor = GValue::Value("XFP_TOF_CORR_AFP");
 //  double xfp_cor = GValue::Value("XFP_TOF_CORR_XFP");
 //  return GetTofE1_(afp_cor,xfp_cor);
 //}
 
-//float TS800::GetCorrTOF_XFPTAC(){
-//  double afp_cor = GValue::Value("XFPTAC_TOF_CORR_AFP");
-//double xfp_cor = GValue::Value("XFPTAC_TOF_CORR_XFP");
-//return GetTofE1_TAC(afp_cor,xfp_cor);
-//}
+float TS800::GetCorrTOF_XFPTAC() const{
+  double afp_cor = GValue::Value("XFPTAC_TOF_CORR_AFP");
+  double xfp_cor = GValue::Value("XFPTAC_TOF_CORR_XFP");
+  return GetTofE1_TAC_XFP(afp_cor,xfp_cor);
+}
 //
 //
 

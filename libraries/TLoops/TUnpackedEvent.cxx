@@ -2,7 +2,7 @@
 
 #include "TClass.h"
 
-#include "TBank29.h"
+#include "TBank88.h"
 #include "TCaesar.h"
 #include "TGretina.h"
 #include "TGretSim.h"
@@ -17,6 +17,7 @@
 #include "TFastScint.h"
 #include "TLenda.h"
 #include "TFSU.h"
+#include "TUML.h"
 
 TUnpackedEvent::TUnpackedEvent() { }
 
@@ -56,8 +57,8 @@ void TUnpackedEvent::Build() {
       GetDetector<TS800Scaler>(true)->Build(raw_data);
       break;
 
-    case kDetectorSystems::BANK29:
-      GetDetector<TBank29>(true)->Build(raw_data);
+    case kDetectorSystems::BANK88:
+      GetDetector<TBank88>(true)->Build(raw_data);
       break;
 
     case kDetectorSystems::SEGA:
@@ -86,6 +87,10 @@ void TUnpackedEvent::Build() {
     
     case kDetectorSystems::LENDA:
       GetDetector<TLenda>(true)->Build(raw_data);
+      break;
+    
+    case kDetectorSystems::UML:
+      GetDetector<TUML>(true)->Build(raw_data);
       break;
 
     case kDetectorSystems::FSU:

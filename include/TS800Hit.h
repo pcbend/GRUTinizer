@@ -229,10 +229,11 @@ class TIonChamber : public TDetectorHit {
     int GetChannel(int i) const { if(i>=Size()) return -1; return fChan.at(i); }
     int GetData(int i)    const { if(i>=Size()) return -1; return fData.at(i); }
     int Size() const { return fChan.size(); }
-    float GetdE();
+    float GetdE(TCrdc *);
+    float GetdE(double crdc_1_x, double crdc_1_y);
     float GetSum() const;
     float GetAve();
-    float GetdECorr(TCrdc*);
+  //  float GetdECorr(TCrdc*);
 
     int  Address(int i) const { return TDetectorHit::Address() + GetChannel(i); }
 
@@ -352,13 +353,11 @@ class TIonChamber : public TS800Channel {
     TIonChamber() { }
     TIonChamber(const TIonChamber &ion) { ion.Copy(*this); }
     TIonChamber(short value):TS800Channel(value) { }
-
     virtual void Clear(Option_t *opt="")       { TS800Channel::Clear(opt);    }
     virtual void Print(Option_t *opt="") const { printf("Ion Chamber");TS800Channel::Print(opt);}
     virtual void Copy(TObject &obj)      const { TS800Channel::Copy(obj);  }
   private:
     ClassDef(TIonChamber,1)
-
 };
 */
 
@@ -392,8 +391,12 @@ class TMTof : public TDetectorHit {
     double  GetCorrelatedObj()  const; //{ return fCorrelatedOBJ; }  //!
     double  GetCorrelatedE1Up() const; //{ return fCorrelatedE1Up;  }  //!
 
-    double  GetCorrelatedXfpE1()  const { return GetCorrelatedXfp()-GetCorrelatedE1Up(); }  //!
-    double  GetCorrelatedObjE1()  const { return GetCorrelatedObj()-GetCorrelatedE1Up(); }  //!
+    //double  GetCorrelatedXfpE1()  const { return GetCorrelatedXfp()-GetCorrelatedE1Up(); }  //!
+    //double  GetCorrelatedObjE1()  const { return GetCorrelatedObj()-GetCorrelatedE1Up(); }  //!
+    
+    double  GetCorrelatedXfpE1()  const;   //!
+    double  GetCorrelatedObjE1()  const;   //!
+    double  GetCorrelatedRfE1()  const;   //!
 
 
 
@@ -401,6 +404,9 @@ class TMTof : public TDetectorHit {
     mutable double fCorrelatedXFP;   //!
     mutable double fCorrelatedOBJ;   //!
     mutable double fCorrelatedE1Up;    //!
+    mutable double fCorrelatedRfE1;   //!
+    mutable double fCorrelatedOBJE1; 
+    mutable double fCorrelatedXFPE1; 
     //mutable int fCorrelatedXFP_Ch15;   //!
     //mutable int fCorrelatedOBJ_Ch15;   //!
     //mutable int fCorrelatedE1_Ch15;    //!
