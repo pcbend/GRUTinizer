@@ -32,7 +32,10 @@ public:
   virtual void InsertHit(const TDetectorHit&) = 0;
   virtual TDetectorHit& GetHit(int i)         = 0;
 
-  virtual size_t Size() const { return (size_t)fSize; }
+  //virtual size_t Size() const { return (size_t)fSize; }
+  virtual size_t Size() const = 0; //{ return (size_t)fSize; }
+  //virtual unsigned long Size() const = 0; //{ return (size_t)fSize; }
+  //virtual unsigned int Size() const = 0; //{ return (size_t)fSize; }
 
 
   Long_t Timestamp() const { return fTimestamp; }

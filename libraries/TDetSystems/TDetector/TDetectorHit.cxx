@@ -3,9 +3,9 @@
 #include <iostream>
 #include <cmath>
 
-#include <TClass.h>
-#include <TBuffer.h>
+#include "TClass.h"
 #include "TRandom.h"
+#include "TBuffer.h"
 
 ClassImp(TDetectorHit)
 
@@ -54,19 +54,19 @@ Int_t  TDetectorHit::Charge() const {
   if(fFlags & kIsEnergy) {
     return 0;
   } else {
-    return fCharge;
+    return RawCharge();
   }
 }
 
 double TDetectorHit::GetEnergy() const {
   if(fFlags & kIsEnergy) {
-    return fCharge;
+    return RawCharge();
   } else {
     TChannel* chan = TChannel::GetChannel(fAddress);
     if(!chan){
       return fCharge;
     } else {
-      return chan->CalEnergy(fCharge, fTimestamp);
+      return chan->CalEnergy(RawCharge(), fTimestamp);
     }
   }
 }
@@ -107,13 +107,22 @@ const char* TDetectorHit::GetName() const {
   }
 }
 
+int TDetectorHit::GetNumber() const {
+  TChannel* chan = TChannel::GetChannel(fAddress);
+  if(chan){
+    return chan->GetNumber();
+  } else {
+    return -1;
+  }
+}
+
 
 void TDetectorHit::Streamer(TBuffer &r_b) {
   if(r_b.IsReading()) {
+    //std::cout << "streamer\tin!" << std::endl;
     r_b.ReadClassBuffer(TDetectorHit::Class(),this);
-  } else { 
+  } else {
     //std::cout << "streamer\tout!" << std::endl;
     r_b.WriteClassBuffer(TDetectorHit::Class(),this);
   }
 }
-

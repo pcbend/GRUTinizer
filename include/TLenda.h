@@ -21,6 +21,8 @@ class TLenda : public TDetector {
 
     static TVector3 GetPosition(int i) { return TVector3(0,0,1); }
 
+    size_t Size() const { return lenda_hits.size(); }
+
   private:
     int BuildHits(std::vector<TRawEvent>& raw_data);
     //{ printf("lenda build hits called\n"); fflush(stdout);return 0;}

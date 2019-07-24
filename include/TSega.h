@@ -30,6 +30,8 @@ public:
   std::vector<TSegaHit>::iterator begin() { return sega_hits.begin(); }
   std::vector<TSegaHit>::iterator end() { return sega_hits.end(); }
 
+  size_t Size() const { return sega_hits.size(); }
+
 private:
   virtual int BuildHits(std::vector<TRawEvent>& raw_data);
   static void LoadDetectorPositions();

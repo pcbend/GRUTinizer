@@ -4,7 +4,6 @@
 #include "TChannel.h"
 #include "TObject.h"
 #include "TVector3.h"
-#include "TBuffer.h"
 
 class TDetectorHit : public TObject {
 public:
@@ -12,6 +11,7 @@ public:
   virtual ~TDetectorHit();
 
   virtual const char* GetName() const;
+  virtual int         GetNumber() const;
 
   virtual Int_t Compare(const TObject *obj) const; //needed for root containers
   virtual bool IsSortable() const { return true; }
@@ -21,8 +21,9 @@ public:
   virtual void  Print(Option_t *opt = "" ) const;
 
   Int_t  Address()   const      { return fAddress; }
-  virtual Int_t  Charge() const;
-  virtual Int_t  Time() const           { return fTime; }
+  virtual Int_t Charge() const;
+  virtual float RawCharge() const { return fCharge; }
+  Int_t  Time() const           { return fTime; }
   long   Timestamp() const      { return fTimestamp; }
 
   void SetAddress(int address)      { fAddress = address; }
@@ -31,23 +32,20 @@ public:
   void SetTimestamp(long timestamp) { fTimestamp = timestamp; }
 
   double GetEnergy() const; //applies TChannel ENERGYCOEFF to Charge
+  void SetEnergy(double energy);
   double GetTime() const;   //applies TChannel TIMECOEFF to Time()
 
-  void SetEnergy(double energy);
   void AddEnergy(double eng);
 
   static const TVector3 BeamUnitVec; //!
 
-  bool operator< (const TDetectorHit &rhs) const { return GetEnergy() > rhs.GetEnergy(); }
-
 protected:
   Int_t   fAddress;
-  long    fTimestamp;
   Float_t fCharge;
-  Float_t fTime;
-  
-  unsigned char fFlags;
+  Int_t   fTime;
+  Long_t  fTimestamp;
 
+  unsigned char fFlags;
 
   enum EHitFlags {
     kIsEnergy = BIT(0),
@@ -61,6 +59,8 @@ protected:
   };
 
   ClassDef(TDetectorHit,4)
+  //ClassDef(TDetectorHit,0)
+
 };
 
 #endif

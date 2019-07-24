@@ -145,6 +145,8 @@ public:
   float GetCorrIonSum() const;
 
 
+  size_t Size() const { return 0; } //meaningless here, but needed for inherit purposes.
+
 public:
   int BuildHits(UShort_t size,UShort_t *dptr,Long64_t timestamp); 
 
