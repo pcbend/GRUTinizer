@@ -100,6 +100,15 @@ public:
   int GetCFDFailBit()              const { return (header->time_high_cfd & BIT31MASK)     >> 31;       }
   int GetCFDTime()                 const { return (header->time_high_cfd & BIT30TO16MASK) >> 16;       }
 
+//  int GetTimestampCFD()            const {
+//    if(GetCFDFailBit()) {
+//      return GetTimestamp()*8;  
+//    } else {
+//      GetTimestamp()*2 +((GetCFDTime()&0x40000000)>>30) +
+//    }
+//  }
+ 
+
   int GetEnergy()                  const { return (header->energy_tracelength & LOWER16BITMASK);       }
   int GetTraceLength()             const { return (header->energy_tracelength & UPPER16BITMASK) >> 16; }
 

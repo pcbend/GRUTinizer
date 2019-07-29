@@ -326,11 +326,16 @@ int TGretina::BuildClusters() const {
   std::vector<TClusterPoint>::iterator p_it;  
   std::vector<TCluster>::iterator c_it;  
 
+  // 2.a)    while we do this, lets find the largest energy and set the clusters time.
+  double max_energy;
+  double max_energy_time;
   for(p_it=cluster_points.begin();p_it!=cluster_points.end();p_it++) {
     bool used=false; 
     for(c_it=clusters.begin();c_it!=clusters.end();c_it++) {
       //printf("ANGLE: %.2f \n",c_it->GetPosition().Angle(p_it->GetPosition())*TMath::RadToDeg());
-      if( c_it->GetPosition().Angle(p_it->GetPosition()) < CLUSTER_ANGLE ) {
+      if( c_it->GetPosition().Angle(p_it->GetPosition()) < CLUSTER_ANGLE && 
+          fabs(c_it->GetTime()-p_it->GetTime()) < CLUSTER_BUILD_TIME  ) {
+          //true ) {
         c_it->Add(*p_it);
         used=true;
         break;
@@ -468,7 +473,15 @@ void TGretina::PrintClusters(Option_t *opt) const {
 }
 
 
-void TGretina::CleanHits() { }
+void TGretina::CleanHits() {
+  std::vector<TGretinaHit>::iterator it;
+  for(it=gretina_hits.begin();it!=gretina_hits.end();) {
+    if(it->GetPad()>0) 
+      it = gretina_hits.erase(it); 
+    else 
+      it++;
+  }
+}
 
 
 double TGretina::GetTotalEnergy() const {

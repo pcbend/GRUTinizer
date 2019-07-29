@@ -74,7 +74,7 @@ public:
   Int_t    GetAddress()         const { return fAddress;        }
   Int_t    GetXtalId()          const { return fCrystalId;      }
   Int_t    GetCrystalId()       const { return fCrystalId;      }
-  Int_t    GetHoleNumber()      const { return fCrystalId/4-1;  }
+  Int_t    GetHoleNumber()      const { return fCrystalId/4;  }
   Int_t    GetCrystalNumber()   const { return fCrystalId%4;    }
   Float_t  GetCoreEnergy()      const { return fCoreEnergy;     }
   Int_t    GetCoreCharge(int i) const { return fCoreCharge[i];  }
