@@ -1,20 +1,34 @@
+TOF1_slope{
+  Value: -3.2671
+}
 
+TOF1_offset{
+  Value: 509.5848
+}
+
+TOF2_slope{
+  Value: -3.3555
+}
+
+TOF2_offset{
+  Value: 509.9237
+}
 
 Dispersion {
   value: 50.0
 }
 
+Disp_Length{
+  Value: 0
+}
+
 Length { 
-  value: 46.02
+  value: 46.506
 }
 
 
 TKE_Offset { 
-  value:  0
-}
-
-TOF_Offset {
-  value: 614.3
+  value:  0.0
 }
 
 VC {
@@ -27,11 +41,11 @@ AEM {
 
 
 Brho0 {
-  value: 3.4265
+  value: 3.3100
 }
 
 Strip_Slope {
-  Value: 0.3076
+  Value: 0.30115
 }
 
 Z2_slope {
@@ -39,11 +53,18 @@ Z2_slope {
 }
 
 Z_slope {
-  Value: 3.889
+  Value: 6.43
 }
 
-Z_offset {
+Z_disp{
+  Value: 78.0
+}
+
+Disp_Z{
   Value: 0.0
 }
 
+Z_offset {
+  Value: -7.606
+}
 

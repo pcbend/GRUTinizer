@@ -181,7 +181,6 @@ double TUML::CalTKE() const {
          GValue::Value("TKE_Offset");
 }  
 
-
 double TUML::Beta_to_Gamma(double beta) const {
   if(beta<=0)return 1;
   double beta2 = beta*beta;
@@ -193,13 +192,27 @@ double TUML::Beta_to_Gamma(double beta) const {
 
 
 
-double TUML::SetAoQ() const {
+double TUML::SetAoQ() {
    double AoQ_local = -1; 
  if(GetTof()  > 10.) {
-   double gamma = Beta_to_Gamma(beta);
-   double beta = GetBeta(); 
+//   double dPoPx = GetXPosition()/GValue::Value("Dispersion");
+//   double beta = GValue::Value("Length") * (1 + dPoPx * GValue::Value("Disp_Length") /100.)  / GetTof() / GValue::Value("VC");
+//   double gamma = Beta_to_Gamma(beta);
    if (beta > 0 && beta < 1 )   {
-     AoQ_local = GetBrho() / 3.1071 / beta / gamma;
+//       brho  = GValue::Value("Brho0") * ( 1 + dPoPx / 100.);
+//       if(Z>0) {
+//         double dZ = GValue::Value("Z_disp") - GetZ();
+//
+//         double dPoPz = sqrt(fabs(dZ))* GValue::Value("Disp_Z") / 100. ;
+//         if(dZ<0) dPoPz = -dPoPz;
+//    
+//         double dPoP = dPoPz + dPoPx;
+//
+//        brho = GValue::Value("Brho0") * ( 1 + dPoP/100.);
+//
+//
+//       }
+     AoQ_local = brho / 3.1071 / beta / gamma;
    } else  {
      gamma=1;
      beta=0;
@@ -210,22 +223,24 @@ double TUML::SetAoQ() const {
 
 double TUML::SetZ() const {
   double Z = 0;
-  //if (BetaFinal.isValid())
-    {
-    double beta2 = GetBeta()*GetBeta();
-    if (beta2 > 0)
-        {
+  double dPoPx = GetXPosition()/GValue::Value("Dispersion");
+  if (GetTof() > 0) {
+    double beta = GValue::Value("Length") * (1 + dPoPx * GValue::Value("Disp_Length") /100.)  / GetTof() / GValue::Value("VC");
+    double beta2 = beta*beta;
+      if (beta2 > 0)
+          {
   
-        double dE_v = -1.+log(5930./(1./beta2-1.))/beta2;
-        if (dE_v > 0) {
-		double dE = GetPin1().GetEnergy()+GetPin2().GetEnergy()+GetSssdEnergy();
+          double dE_v = -1.+log(5930./(1./beta2-1.))/beta2;
+             if (dE_v > 0) {
+	  	//double dE = GetPin1().GetEnergy()*GValue::Value("Tke_Slope0") + GetPin2().GetEnergy()*GValue::Value("Tke_Slope1") + GetSssdEnergy()*GValue::Value("Tke_Slope2") + GValue::Value("TKE_Offset");
+                double dE = GetPin1().GetEnergy()+GetPin2().GetEnergy()+GetSssdEnergy();
                 double v = sqrt(dE / dE_v);
-                Z =  v*v*GValue::Value("Z2_slope") + v* GValue::Value("Z_slope")+GValue::Value("Z_offset");
+                Z =  v*v*GValue::Value("Z2_slope") + v* GValue::Value("Z_slope")+GValue::Value("Z_offset"); 
                 //int Zi = (double)Z + 0.5;
                 //dZ = (double)Z  - Zi;
           }
         }
-    }
+  }
   //set Z
   return Z;
 }
@@ -235,21 +250,41 @@ double TUML::SetZ() const {
 void TUML::CalParameters() {
   TKE = CalTKE();
   //double beta; //!
-  beta = GValue::Value("Length") / GetTof() / GValue::Value("VC");
+  double dPoPx = GetXPosition()/GValue::Value("Dispersion");
+  brho  = GValue::Value("Brho0") * ( 1 + dPoPx / 100.);
+  if(GetTof()>0)
+  beta = GValue::Value("Length") * (1 + dPoPx * GValue::Value("Disp_Length") /100.)  / GetTof() / GValue::Value("VC");
+  else beta = 0;
   //double gamma; //!
   gamma = Beta_to_Gamma(beta);
   //double brho; //!
-  dbrho = GetXPosition() / GValue::Value("Dispersion") / 100.;
-  brho  = GValue::Value("Brho0") * ( 1 + dbrho);
-  //double AoQ; //!
-  AoQ   = SetAoQ();
   //double Z; //!
   Z = SetZ();
+  
+  if(Z>0) {
+    double dZ = GValue::Value("Z_disp") - GetZ();
+
+    double dPoPz = sqrt(fabs(dZ))* GValue::Value("Disp_Z") / 100. ;
+    if(dZ<0) dPoPz = -dPoPz;
+    
+    double dPoP = dPoPz + dPoPx;
+
+    brho = GValue::Value("Brho0") * ( 1 + dPoP/100.);
+
+
+  }
+  
+  //double AoQ; //!
+  AoQ   = SetAoQ();
   //double Q; //!
-  Q = TKE / (gamma- 1.) / GValue::Value("AEM") / AoQ;
+  if(AoQ > 0 && TKE > 0 && gamma>0) {
+    Q = TKE / (gamma- 1.) / GValue::Value("AEM") / AoQ;
+  }
 }
 
 
+void TUML::ReCalBrho(){
+}
 
 
 

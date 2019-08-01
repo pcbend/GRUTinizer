@@ -1,7 +1,11 @@
 
 
 Dispersion {
-  value: 40.0
+  value: 50.0
+}
+
+Disp_Length{
+  Value: -1.2
 }
 
 Length { 
@@ -13,10 +17,21 @@ TKE_Offset {
   value:  0
 }
 
+TOF_Slope{
+  value: -6.5342
+}
+
+TOF2_Slope{
+  value: -6.711
+}
+
 TOF_Offset {
   value: 618.8959
 }
 
+TOF2_Offset{
+  value: 619.8289
+}
 VC {
   value: 0.299792458
 }
@@ -42,8 +57,34 @@ Z_slope {
   Value: 6.43
 }
 
-Z_offset {
-  Value: -7.6
+Z_disp{
+  Value: 78
 }
 
+Disp_Z{
+  Value: 60
+}
 
+Z_offset {
+  Value: -7.606
+}
+
+Tke_Slope0{
+  Value: 0.06796
+}
+
+Tke_Slope1{
+  Value: 0.06577
+}
+
+Tke_Slope2{
+  Value: 0.30197
+}
+
+Tke_Slope3{
+  Value: 0.33009
+}
+
+Tke_Slope4{
+  Value: 0.30000
+}

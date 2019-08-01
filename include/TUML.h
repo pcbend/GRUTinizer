@@ -35,14 +35,21 @@ class TUML : public TDetector {
     TUMLHit GetXfp1()    const { return fXfp1; }
     TUMLHit GetXfp2()    const { return fXfp2; }
 
-    //double GetTac1()     const { return fTac1 * 3.2671; }
-    double GetTac1()     const { return fTac1 * 3.2671 * 2; }
-    double GetTac2()     const { return fTac2 * 3.3555 * 2; }
-    double GetTac3()     const { return fTac3 * 3.6493 * 2; }
-    double GetTac4()     const { return fTac4 * 3.3999 * 2; }
-    double GetTac5()     const { return fTac5 * 3.5; }
+   // double GetTac1()     const { return fTac1 * 3.2671; }
+   // double GetTac2()     const { return fTac2 * 3.3555 * 2; }
+   // double GetTac3()     const { return fTac3 * 3.6493 * 2; }
+   // double GetTac4()     const { return fTac4 * 3.3999 * 2; }
+   // double GetTac5()     const { return fTac5 * 3.5; }
+   // coefficients added by e15130.cal, below returns tof value
+    double GetTac1()     const { return fTac1 > 0 ? fTac1*GValue::Value("TOF1_slope") / 1000. +GValue::Value("TOF1_offset") : 0; }
+    double GetTac2()     const { return fTac2 > 0 ? fTac2*GValue::Value("TOF2_slope") / 1000. +GValue::Value("TOF2_offset") : 0; }
+    double GetTac3()     const { return fTac3; }
+    double GetTac4()     const { return fTac4; }
+    double GetTac5()     const { return fTac5; }
 
-    double GetTof()      const { return -GetTac1() / 1000. + GValue::Value("Tof_Offset"); }// this should be ns
+//    double GetTof()      const { return -GetTac1() / 1000. + GValue::Value("Tof_Offset"); }// this should be ns
+    double GetTof()      const { return 1/2.*(GetTac1()+GetTac2()); }// this should be ns
+//    double GetTof()      const { return GetTac1(); }// this should be ns
 
   
     bool Good() const { return true; }
@@ -75,6 +82,8 @@ class TUML : public TDetector {
     double GetQ()     const { return Q;     }
 
     void CalParameters();
+    void ReCalBrho();
+    
 
   //private:
     int BuildHits(std::vector<TRawEvent>& raw_data);
@@ -103,7 +112,7 @@ class TUML : public TDetector {
 
     double CalTKE() const;
     double Beta_to_Gamma(double beta) const;
-    double SetAoQ() const;
+    double SetAoQ();
     double SetZ()   const;
 
     double TKE;   //!

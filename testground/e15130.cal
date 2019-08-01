@@ -3,7 +3,7 @@ PIN1:  {
 Address: 	0x19000020
 Number:  	1
 Info:    	
-EnergyCoeff:  	0.0000	0.0687
+EnergyCoeff:  	0.0000	0.06809
 EfficienyCoeff:
 }
 
@@ -11,7 +11,7 @@ PIN2:  {
 Address: 	0x19000021
 Number:  	2
 Info:    
-EnergyCoeff:  	0.0000	0.0667
+EnergyCoeff:  	0.0000	0.06641
 EfficienyCoeff:
 }
 
@@ -19,7 +19,7 @@ Implant:  {
 Address: 	0x19000022
 Number:  	3
 Info:    	
-EnergyCoeff:  	0.0000	0.3155
+EnergyCoeff:  	0.0000	0.32631
 EfficienyCoeff:
 }
 
@@ -27,7 +27,7 @@ Veto:  {
 Address: 	0x19000023
 Number:  	4
 Info:    	
-EnergyCoeff:  	0.0000	1.0000
+EnergyCoeff:  	0.0000	0.3000
 EfficienyCoeff:
 }
 
@@ -51,7 +51,7 @@ TAC1:  {
 Address: 	0x19000026
 Number:  	6
 Info:    	
-EnergyCoeff:  	0.0000	1.0000
+EnergyCoeff:  	0	1
 EfficienyCoeff:
 }
 
@@ -59,7 +59,7 @@ TAC2:  {
 Address: 	0x19000027
 Number:  	7
 Info:    	
-EnergyCoeff:  	0.0000	1.0000
+EnergyCoeff:  	0  1
 EfficienyCoeff:
 }
 
