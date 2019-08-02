@@ -195,7 +195,8 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
       fInteractions[i].SetAssignE(0.00);
     }
   }
-
+  
+  SortInts();
 }
 
 void TInteractionPoint::Add(TInteractionPoint &other) {
@@ -349,6 +350,7 @@ void TGretinaHit::SortHits(){
 */
 
 void TGretinaHit::SortInts(){
+  std::sort(fInteractions.begin(),fInteractions.end());
   // sets are sorted, so this will sort all properties together.
   //
   // !! When multiple interactions are assigned to a single

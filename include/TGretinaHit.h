@@ -44,6 +44,13 @@ class TInteractionPoint {
 
     int Wedge() const { return ((GetSegNum()-1)%6); }
 
+    bool operator == (const TInteractionPoint &rhs) const {
+      return (GetDecompE() == rhs.GetDecompE());
+    }
+    bool operator < (const TInteractionPoint &rhs) const{
+      return (GetDecompE() > rhs.GetDecompE());
+    }
+
   private:
     int   fSegNum;
     float fEng;          // energy as recorded by preamp.  energy in mode2 format
@@ -144,7 +151,6 @@ public:
     }
   }
   double GetIntPhiDeg(int i) const { return GetIntPhi(i)*TMath::RadToDeg(); }
-
 
 
 private:
