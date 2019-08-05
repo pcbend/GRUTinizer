@@ -27,6 +27,8 @@
 
 #pragma link C++ function MergeStrings;
 
+#pragma link C++ function GammaProjections;
+
 //#pragma link C++ function PeakFit;
 
 #pragma link C++ function Help;

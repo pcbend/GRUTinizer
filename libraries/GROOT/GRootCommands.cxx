@@ -26,6 +26,7 @@
 #include <TROOT.h>
 #include <TStyle.h>
 
+
 #include <GCanvas.h>
 #include <GPeak.h>
 #include <GGaus.h>
@@ -36,6 +37,8 @@
 #include <TGRUTOptions.h>
 //#include <TGRUTInt.h>
 #include <GrutNotifier.h>
+
+
 
 TChain *gChain = new TChain("EventTree");//NULL;
 
@@ -1070,6 +1073,9 @@ void DummyGuiCaller::CallUpdate() {
 
 
 
+
+
+
 /*
 
 TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
@@ -1097,3 +1103,51 @@ TH2 *AddOffset(TH2 *mat,double offset,EAxis axis) {
   return toreturn;
 }
 */
+
+
+std::vector<TH1D*> GammaProjections(TH2 *matrix,std::string gatefile,Option_t *opt) {
+
+  std::vector<std::vector<double> > add_gates;
+  //std::vector<std::pair<double,double> > sub_gates;
+
+  std::ifstream infile;
+  infile.open(gatefile.c_str());
+  //if not infile, do a useful thing
+  std::string line;
+  while(getline(infile,line)) {
+    if(line.length()<1) continue;
+    std::vector<double> limits;
+    std::stringstream ss(line);
+    double temp;
+    while(ss >> temp) {
+     limits.push_back(temp);
+    }
+    std::sort(limits.begin(),limits.end()); // orders low to high....
+    //if(limits.size()~=2) do a bad thing. right now just doing add gates....
+    if(limits.size()) { add_gates.push_back(limits); }
+  }
+  std::vector<TH1D*> projections;
+  for(size_t i=0;i<add_gates.size();i++) {
+    std::vector<double> limits = add_gates.at(i);
+    double low  = limits.front();
+    double high = limits.back();
+    int blow    = matrix->GetYaxis()->FindBin(low);
+    int bhigh   = matrix->GetYaxis()->FindBin(low);
+    double peak = (low+high)/2.;
+    TH1D* proj = matrix->ProjectionX(Form("%s_%i",matrix->GetName(),(int)peak),blow,bhigh);
+    proj->SetTitle(Form("%s_%i",matrix->GetName(),(int)peak));
+    projections.push_back(proj);
+  }
+  TString sopt(opt);
+  sopt.ToLower();
+  if(sopt.Contains("draw")) {
+    TCanvas *canvas = new TCanvas;
+    canvas->Divide(1,projections.size());
+    for(size_t i=0;i<projections.size();i++) {  
+      canvas->cd(i+1);
+      projections.at(i)->Draw();
+    }
+  }
+
+  return projections;
+}

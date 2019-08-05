@@ -1086,9 +1086,26 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
                  }
                  break;
     case kKey_q:{
+                   GH1D* ghist = NULL;
+                   for(auto hist : hists){
+                     if(hist->InheritsFrom(GH1D::Class())){
+                       ghist = (GH1D*)hist;
+                       break;
+                     }
+                   }
+
+                   if(ghist){
+                     double low  = ghist->GetXaxis()->GetBinLowEdge(ghist->GetXaxis()->GetFirst());
+                     double high = ghist->GetXaxis()->GetBinUpEdge(ghist->GetXaxis()->GetLast());
+                     ghist->Rebin();
+                     ghist->GetXaxis()->SetRangeUser(low,high);
+                     edited=true;
+                   }
+                 }
+                  
+                  /*
                   TH1* ghist = hists.at(0);
                   if(GetNMarkers()>1) {
-
                     edited = PhotoPeakFit(ghist,fMarkers.at(fMarkers.size()-2)->localx,fMarkers.back()->localx);
                   }
                   if(edited){
@@ -1102,6 +1119,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
                     }
                   }
                 }
+                */
 
                 break;
 
@@ -1201,6 +1219,26 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       RemoveMarker();
       edited = true;
       break;
+    case kKey_w: {
+              
+                   GH1D* ghist = NULL;
+                   for(auto hist : hists){
+                     if(hist->InheritsFrom(GH1D::Class())){
+                       ghist = (GH1D*)hist;
+                       break;
+                     }
+                   }
+
+                   if(ghist){
+                     double low  = ghist->GetXaxis()->GetBinLowEdge(ghist->GetXaxis()->GetFirst());
+                     double high = ghist->GetXaxis()->GetBinUpEdge(ghist->GetXaxis()->GetLast());
+                     ghist->Unbin();
+                     ghist->GetXaxis()->SetRangeUser(low,high);
+                     edited=true;
+                   }
+                 }
+                break;
+
 
     case kKey_F9:{
                    int color =  hists.at(0)->GetLineColor() + 1;

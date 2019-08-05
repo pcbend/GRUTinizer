@@ -23,13 +23,13 @@
 #include "TRuntimeObjects.h"
 
 GH1D::GH1D(const TH1& source)
-  : parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0)  {
+  : parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0),fOriginal(0)  {
   source.Copy(*this);
 }
 
 
 GH1D::GH1D(const TF1& function,Int_t nbinsx,Double_t xlow,Double_t xup) :
-  TH1D(Form("%s_hist",function.GetName()),Form("%s_hist",function.GetName()),nbinsx, xlow, xup), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0) {
+  TH1D(Form("%s_hist",function.GetName()),Form("%s_hist",function.GetName()),nbinsx, xlow, xup), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0),fOriginal(0) {
 
   //TF1 *f = (TF1*)function.Clone();
   //f->SetRange(xlow,xup);
@@ -40,6 +40,9 @@ GH1D::GH1D(const TF1& function,Int_t nbinsx,Double_t xlow,Double_t xup) :
   }
   //f->Delete();
 }
+
+
+
 
 bool GH1D::WriteDatFile(const char *outFile){
   if(strlen(outFile)<1) return 0;
@@ -97,6 +100,17 @@ void GH1D::Copy(TObject& obj) const {
   TH1D::Copy(obj);
 
   ((GH1D&)obj).parent = parent;
+  ((GH1D&)obj).projection_axis = projection_axis;
+  
+  ((GH1D&)obj).fFillClass  = fFillClass;  
+  ((GH1D&)obj).fFillMethod = fFillMethod; 
+
+  ((GH1D&)obj).xl_last = xl_last; 
+  ((GH1D&)obj).xh_last = xh_last; 
+  ((GH1D&)obj).gates = gates; 
+  ((GH1D&)obj).fOriginal    = fOriginal;     
+  ((GH1D&)obj).fRebinFactor = fRebinFactor;  
+
 }
 
 
@@ -106,6 +120,7 @@ void GH1D::Draw(Option_t* opt) {
     option.ReplaceAll("new","");
     new GCanvas;
   }
+  //SetOriginalData();
   TH1D::Draw(option.Data());
   if(gPad) {
     gPad->Update();
@@ -114,6 +129,7 @@ void GH1D::Draw(Option_t* opt) {
 }
 
 TH1 *GH1D::DrawCopy(Option_t *opt) const {
+  //SetOriginalData();
   TH1 *h = TH1D::DrawCopy(opt);
   if(gPad) {
     gPad->Update();
@@ -123,6 +139,7 @@ TH1 *GH1D::DrawCopy(Option_t *opt) const {
 }
 
 TH1 *GH1D::DrawNormalized(Option_t *opt,Double_t norm) const {
+  //SetOriginalData();
   TH1 *h = TH1D::DrawNormalized(opt,norm);
   if(gPad) {
     gPad->Update();
@@ -318,6 +335,42 @@ Int_t GH1D::Write(const char *name,Int_t option,Int_t bufsize)  {
 }
 
 
+TH1* GH1D::Rebin(int ngroup,const char *newname,const double *xbins) {
+  if((newname && strlen(newname)>0) || xbins) { return TH1D::Rebin(ngroup,newname,xbins); }
+  if(!fOriginal) {
+    if(this->GetDirectory()) {
+      fOriginal = (TH1D*)(this->Clone(Form("%s_%s_original",this->GetDirectory()->GetName(),this->GetName())));
+    } else {
+      fOriginal = (TH1D*)(this->Clone(Form("%s_original",this->GetName())));
+    }
+    //TH1D::Copy(fOriginal);
+    //  fOriginal.SetName(Form("%s_%s_original",this->GetDirectory()->GetName(),this->GetName()));
+    fRebinFactor =1;
+  }
+  fRebinFactor*=ngroup; 
+  //printf("%s rebin_factor:  %i \n",__PRETTY_FUNCTION__,fRebinFactor);
+  return TH1D::Rebin(ngroup,newname,xbins); 
+  //}
+}
 
+void GH1D::Unbin(int ngroup) {
+  if(!fOriginal) return;
+  std::string name  = this->GetName();
+  std::string title = this->GetTitle();
+  //TRef ref = parent;
+  //int pa = projection_axis;
+  fOriginal->Copy(*this);
+  this->SetNameTitle(name.c_str(),title.c_str());
 
+  int to_rebin=fRebinFactor/ngroup;
+  //printf("%s rebin_factor:  %i \n",__PRETTY_FUNCTION__,fRebinFactor);
+  fRebinFactor=1;
+  if(to_rebin>1) {//fRebinFactor<1) fRebinFactor=1;
+    Rebin(to_rebin);
+  }
+  //gPad->Modified(); gPad->Update();
+  //parent =ref;
+  //projection_axis = pa;
+
+}
 

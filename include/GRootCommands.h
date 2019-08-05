@@ -5,6 +5,7 @@
 #include <TChain.h>
 class TTree;
 class TH1;
+class TH1D;
 class TH2;
 class GH2I;
 class GH2D;
@@ -77,4 +78,15 @@ enum EAxis {kXAxis = 1,kYAxis = 2};
 
 //TH2 *AddOffset(TH2 *mat,double offset,EAxis axis=kXAxis);
 
+
+
+//Dan's text file to a-d projection maker.  
+std::vector<TH1D*> GammaProjections(TH2 *matrix,std::string gatefile,Option_t *opt = "draw");
+
+
+
 #endif
+
+
+
+

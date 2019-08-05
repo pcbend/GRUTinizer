@@ -138,6 +138,11 @@ class MainWindow(object):
                            command=self.LoadWindowFile)
         button.pack(side=tk.LEFT)
 
+        button = tk.Button(frame,
+                           text='CB Grab',fg="black",bg="goldenrod",
+                           command=self.CBgrab)
+        button.pack(side=tk.LEFT)
+
         frame.pack(fill=tk.X,expand=False)
 
         frame = tk.Frame(self.window)
@@ -432,8 +437,18 @@ class MainWindow(object):
         menubar.add_cascade(label="Plot",menu=plotmenu)
 
     def _MakeHelpMenu(self,menubar):
+        self.draw2dprojection = tk.StringVar(value='off')
         helpmenu = tk.Menu(menubar,tearoff=0)
+        helpmenu.add_checkbutton(label="Draw 2D",onvalue='off',
+                                 variable=self.draw2dprojection)
+        helpmenu.add_checkbutton(label="Draw 2D x-proj",onvalue='2DX',
+                                 variable=self.draw2dprojection)
+        helpmenu.add_checkbutton(label="Draw 2D y-proj",onvalue='2DY',
+                                 variable=self.draw2dprojection)
         menubar.add_cascade(label="Send Help",menu=helpmenu)
+
+       
+
 
     def RefreshHistograms(self):
         update_tcanvases()
@@ -455,6 +470,14 @@ class MainWindow(object):
 
     def _draw_single(self,hist,color=1,nselected=1):
         canvas_exists = bool(filter(None,self.canvases))
+
+        if(hist.GetDimension()==2):
+			if(self.draw2dprojection.get()=='2DX'):
+				hist=hist.ProjectionX();
+			if(self.draw2dprojection.get()=='2DY'):
+				hist=hist.ProjectionY();
+        
+
 
         if(not canvas_exists or not ROOT.gPad):
             self.open_canvas(columns=self.zone_cols,rows = self.zone_rows)
@@ -579,6 +602,9 @@ class MainWindow(object):
 
     def Snapshot(self):
         ROOT.GSnapshot.Get().Snapshot()
+
+    def CBgrab(self):
+        ROOT.gROOT.ProcessLine(".!gnome-screenshot -ac")
 
     def close_all_canvases(self):
         canvases = ROOT.gROOT.GetListOfCanvases()

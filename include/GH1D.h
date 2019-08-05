@@ -16,21 +16,24 @@ class TRuntimeObjects;
 
 class GH1D : public TH1D {
 public:
-  GH1D() : TH1D(), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0) { }
+  GH1D() : TH1D(), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0),fOriginal(0)             { }
   GH1D(const TVectorD& v)
-    : TH1D(v), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0) { }
+    : TH1D(v), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0),fOriginal(0)                 { }
   GH1D(const char* name, const char* title, Int_t nbinsx, const Float_t* xbins)
-    : TH1D(name, title, nbinsx, xbins), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0) { }
+    : TH1D(name, title, nbinsx, xbins), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0),fOriginal(0) { }
   GH1D(const char* name, const char* title, Int_t nbinsx, const Double_t* xbins)
-    : TH1D(name, title, nbinsx, xbins), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0) { }
+    : TH1D(name, title, nbinsx, xbins), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0),fOriginal(0) { }
   GH1D(const char* name, const char* title, Int_t nbinsx, Double_t xlow, Double_t xup)
-    : TH1D(name, title, nbinsx, xlow, xup), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0) { }
+    : TH1D(name, title, nbinsx, xlow, xup), parent(NULL), projection_axis(-1),fFillClass(0),fFillMethod(0),fOriginal(0) { }
 
   GH1D(const TF1& function,Int_t nbinsx,Double_t xlow,Double_t xup);
 
   GH1D(const TH1& source);
   //GH1D(const TH1 *source);
   //virtual void SetOption(Option_t* option=" ");
+
+  //void Init(); 
+
 
   TObject* GetParent() const { return parent.GetObject(); }
   void SetParent(TObject* obj) { parent = obj; }
@@ -52,6 +55,10 @@ public:
   TH1 *DrawNormalized(Option_t *opt="",Double_t norm=1) const;
 
   bool WriteDatFile(const char *outFile);
+  
+  TH1* Rebin(int ngroup=2,const char *newname="",const double *xbins=0);
+  void Unbin(int ngroup=2); //,const char *newname="",const double *xbins=0);
+
   
   GH1D* Project(int bins=-1);
 
@@ -75,6 +82,10 @@ public:
 
   Int_t Write(const char *name="",Int_t option=0,Int_t bufsize=0);  
 
+  //virtual void UpdateBinContent(int bin, double content) { printf("%s\n",__PRETTY_FUNCTION__),TH1D::UpdateBinContent(bin,content); }
+  //virtual void AddBinContent(int bin)                    { printf("%s\n",__PRETTY_FUNCTION__),TH1D::AddBinContent(bin);  }
+  //virtual void AddBinContent(int bin, double w)          { printf("%s\n",__PRETTY_FUNCTION__),TH1D::AddBinContent(bin,w); }
+
 private:
   TRef parent;
   int projection_axis;
@@ -86,6 +97,11 @@ private:
   double xh_last; //!
   
   std::vector<GCutG*> gates; //!
+
+  ////////
+  TH1D  *fOriginal;     //!
+  int   fRebinFactor;  //!
+  ////////
 
   ClassDef(GH1D,1)
 };
