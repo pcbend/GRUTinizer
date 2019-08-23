@@ -1169,6 +1169,54 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
                   RemoveMarker("all");
                 }
                 break;
+    case kKey_y:
+                if(gPad->GetLogy()) {
+                  gPad->SetLogy(0);
+                }else{
+                  gPad->SetLogy(1);
+                }
+                edited = true;
+                break;
+    case kKey_Y:
+                 //printf("in upper case Z\n");
+                 {
+                   TIter iter(this->GetListOfPrimitives());
+                   bool set = !gPad->GetLogy();
+                   //int counter = 0;
+                   while(TObject *obj = iter.Next()) {
+                     if(obj->InheritsFrom(TPad::Class())) {
+                       TPad *pad = (TPad*)obj;
+                       TIter iter2(pad->GetListOfPrimitives());
+                       while(TObject *obj2=iter2.Next()) {
+                         if(obj2->InheritsFrom(TH1::Class()) ||
+                             obj2->InheritsFrom(GH1::Class())) {
+                           //TH2* hist = (TH2*)obj2;
+                           if(set && !pad->GetLogy()) {                
+                             //printf("\t %i set=true && logz=false;\n",counter++);
+                             TVirtualPad *cpad = gPad;
+                             pad->cd();
+                             gPad->SetLogy(1);
+                             cpad->cd();
+                             edited = true;
+                           } else if(!set && pad->GetLogy()) {
+                             //printf("\t %i set=false && logz=true;\n",counter++);
+                             TVirtualPad *cpad = gPad;
+                             pad->cd();
+                             gPad->SetLogy(0);
+                             cpad->cd();
+                             edited = true;
+                           }
+                         }
+                       }
+                     }
+                   }
+
+                   //for(int i=0;i<hists.size()-1;i++)   // this doesn't work, set range needs values not bins.   pcb.
+                   //   hists.at(i)->GetXaxis()->SetRangeUser(hists.back()->GetXaxis()->GetFirst(),hists.back()->GetXaxis()->GetLast());
+
+                 }
+                 edited = true;
+                 break;
     case kKey_F9:{
                    int color =  hists.at(0)->GetLineColor() + 1;
                    if(color>9)
@@ -1200,6 +1248,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
   bool edited = false;
   //printf("2d hist key pressed.\n");
   std::vector<TH1*> hists = FindHists(2);
+  std::vector<TH1*> hists_oned = FindHists(1);
   if(hists.size()<1)
     return edited;
   switch(*keysym) {
@@ -1495,6 +1544,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
                    }
                    edited=true;
                  }
+
                  break;
 
     case kKey_Y: 

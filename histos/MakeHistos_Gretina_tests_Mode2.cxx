@@ -137,6 +137,11 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
             obj.FillHistogram(Form("q%02i_p%i",quad,p),10000,0,10000,hit.GetCoreEnergy());
 
+if(quad==10){
+            obj.FillHistogram(Form("q%02i_p%i_timestamp",quad,p),7200,0,7200,hit.GetTime()*1e-8,10000,0,10000,hit.GetCoreEnergy());
+
+   obj.FillHistogram(Form("q%02i_p%i_time",quad,p),7200,0,7200,hit.GetTime()*1e-8);}
+
             obj.FillHistogram("sum",10000,0,10000,hit.GetCoreEnergy());
 
             histname="position";
@@ -349,6 +354,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
                 histname = "Bank29_Charge";
                 obj.FillHistogram(histname,2000,-10000,10000,bank29->GetCharge());
+
+
             }
 
             if(s800) {

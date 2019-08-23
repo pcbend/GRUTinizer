@@ -235,6 +235,7 @@ void HandleUML(TRuntimeObjects& obj) {
     obj.FillHistogram(dirname,"DT_Pin1_Xfp2",1000,-500,500,
                       uml->GetPin1().Timestamp() - uml->GetXfp2().Timestamp());
 
+    if(uml->GetImplant().GetEnergy()>200) // 259 from beta spectra
     uml_map.insert(std::make_pair(uml->Timestamp(),*uml));
 
 }
@@ -696,7 +697,8 @@ void SearchIosmer(TRuntimeObjects &obj) {
         for( auto it = gretina_map.begin(); it!=gretina_map.end(); it++) {
             if(it->first>fts+twin) break;
             TGretinaHit tmp_hit = it->second;
-            obj.FillHistogram(dirname,"gamma_time_uml",1000,-twin,twin,it->first-fts,2000,0,4000,tmp_hit.GetCoreEnergy());
+//            obj.FillHistogram(dirname,"gamma_time_uml",1000,-twin,twin,it->first-fts,2000,0,4000,tmp_hit.GetCoreEnergy());
+            obj.FillHistogram(dirname,"gamma_time_uml",1000,-10000,10000,it->first-fts,2000,0,4000,tmp_hit.GetCoreEnergy());
             store_ghit.push_back(it);
 
             // apply pid gates
@@ -929,7 +931,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
                           500,-500,500,bank88->Timestamp()-  uml->Timestamp()  );
     }
 
-    if(uml && gretina && uml->GetPin1().GetEnergy()>1000) {
+//    if(uml && gretina && uml->GetPin1().GetEnergy()>1000) {
+    if(uml && gretina ) {
         obj.FillHistogram("gretina_ddas",3600,0,3600,(gretina->Timestamp())/1e8,
                           500,-500,500,gretina->Timestamp()-  uml->Timestamp());
 
