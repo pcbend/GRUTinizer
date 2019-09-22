@@ -166,13 +166,13 @@ bool GGaus::InitParams(TH1 *fithist){
   //Make initial guesses
   TF1::SetParameter(0,largesty);         //fithist->GetBinContent(bin));
   TF1::SetParameter(1,largestx);         //GetParameter("centroid"));
-  TF1::SetParameter(2,(largestx*.01)/2.35);                    //2,(xhigh-xlow));     //2.0/binWidth); //
+  TF1::SetParameter(2,largestx*.01/2.35);                    //2,(xhigh-xlow));     //2.0/binWidth); //
   //TF1::SetParameter(3,5.);
   //TF1::SetParameter(4,1.);
 
-  TF1::SetParError(0,0.10 * largesty);
-  TF1::SetParError(1,0.25);
-  TF1::SetParError(2,0.10 *((largestx*.01)/2.35));
+//  TF1::SetParError(0,0.10 * largesty);
+//  TF1::SetParError(1,0.25);
+  //TF1::SetParError(2,0.10 *((largestx*.01)/2.35));
   //TF1::SetParError(3,5);
   //TF1::SetParError(4,0.5);
 
@@ -201,6 +201,7 @@ Bool_t GGaus::Fit(TH1 *fithist,Option_t *opt) {
   if(fithist->GetSumw2()->fN!=fithist->GetNbinsX()+2)
     fithist->Sumw2();
 
+//  TFitResultPtr fitres = fithist->Fit(this,Form("%sRSME",options.Data()));
   TFitResultPtr fitres = fithist->Fit(this,Form("%sRSME",options.Data()));
 
   //fitres.Get()->Print();

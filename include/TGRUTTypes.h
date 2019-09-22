@@ -19,6 +19,7 @@ enum kDetectorSystems {
   LENDA      = 21,
 
   UML        = 25,
+  OBJ        = 26, // temporary
 
   SEGA = 64,
   JANUS = 65,

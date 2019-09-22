@@ -358,13 +358,14 @@ int TCalibrator::AddData(TH1 *data,TNucleus *source, double sigma,double thresho
     double peak = it.first;
     double eng  = it.second;
 
-    range = 0.02 * peak;
+    range = 0.01 * peak;
     if(range < 8.)
       range = 8.0;
 
 
-    //GPeak *fit = PhotoPeakFit(data,peak-range,peak+range/2.,"no-print");
+     // GPeak *fit = PhotoPeakFit(data,peak-range,peak+range/2.,"no-print");
       GGaus *fit = GausFit(data,peak-range,peak+range/2.,"no-print");
+     // GGaus *fit = GausFit(data,peak-range,peak+range,"no-print");
 
     peak = fit->GetCentroid();
     fit->Print();
@@ -373,7 +374,7 @@ int TCalibrator::AddData(TH1 *data,TNucleus *source, double sigma,double thresho
     //peak_area[fit->GetCentroid()] = fit->GetSum();
 
     //AddPeak(it.first,it.second,source->GetName(),peak_area.at(it.first),src_eng_int[it.second]);
-    AddPeak(fit->GetCentroid(),eng,source->GetName(),fit->GetSum(),src_eng_int[eng]);
+    AddPeak(fit->GetCentroid(),eng,source->GetName(),fit->GetSum(),src_eng_int[eng],fit->GetParameter(2)*2.355/fit->GetCentroid());
   }
 
   //Print();
@@ -638,13 +639,14 @@ bool TCalibrator::CheckMap(std::map<double,double> inmap) {
 void TCalibrator::UpdateTChannel(TChannel *channel) { }
 
 
-void TCalibrator::AddPeak(double cent,double eng,std::string nuc,double a,double inten) {
+void TCalibrator::AddPeak(double cent,double eng,std::string nuc,double a,double inten,double reso) {
   Peak p;
   p.centroid = cent;
   p.energy   = eng;
   p.nucleus  = nuc;
   p.area     = a;
   p.intensity = inten;
+  p.reso      = reso;
   fPeaks.push_back(p);
   return;
 }

@@ -51,12 +51,13 @@ public:
     double energy;
     double area;
     double intensity;
+    double reso;
     std::string nucleus;
   };
 
-  void AddPeak(double cent,double eng,std::string nuc,double a=0.0,double inten=0.0);
+  void AddPeak(double cent,double eng,std::string nuc,double a=0.0,double inten=0.0,double reso=0);
   Peak GetPeak(UInt_t i) const { return fPeaks.at(i); }
- 
+  int  GetNPeaks() const { return fPeaks.size();}
   TH1 *ApplyCalibration(TH1 *source,int bins=8000,double range=4000,Option_t *opt="") const; 
   
   TGraph *FitGraph() { return &fit_graph; }

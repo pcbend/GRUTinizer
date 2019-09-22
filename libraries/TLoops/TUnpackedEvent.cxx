@@ -18,6 +18,7 @@
 #include "TLenda.h"
 #include "TFSU.h"
 #include "TUML.h"
+#include "TOBJ.h"
 
 TUnpackedEvent::TUnpackedEvent() { }
 
@@ -91,6 +92,10 @@ void TUnpackedEvent::Build() {
     
     case kDetectorSystems::UML:
       GetDetector<TUML>(true)->Build(raw_data);
+      break;
+
+    case kDetectorSystems::OBJ:
+      GetDetector<TOBJ>(true)->Build(raw_data);
       break;
 
     case kDetectorSystems::FSU:

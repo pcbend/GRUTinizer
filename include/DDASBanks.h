@@ -14,11 +14,11 @@ struct DDASHeader{
 } __attribute__((packed));
 
 struct DDAS_QDC_Sum {
-  unsigned int qdc_sum[4];
+  unsigned int qdc_sum[8];
 } __attribute__((packed));
 
 struct DDAS_Energy_Sum {
-  unsigned int energy_sum[8];
+  unsigned int energy_sum[4];
 } __attribute__((packed));
 
 

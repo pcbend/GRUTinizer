@@ -137,11 +137,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
             obj.FillHistogram(Form("q%02i_p%i",quad,p),10000,0,10000,hit.GetCoreEnergy());
 
-if(quad==10){
-            obj.FillHistogram(Form("q%02i_p%i_timestamp",quad,p),7200,0,7200,hit.GetTime()*1e-8,10000,0,10000,hit.GetCoreEnergy());
-
-   obj.FillHistogram(Form("q%02i_p%i_time",quad,p),7200,0,7200,hit.GetTime()*1e-8);}
-
             obj.FillHistogram("sum",10000,0,10000,hit.GetCoreEnergy());
 
             histname="position";
@@ -165,7 +160,6 @@ if(quad==10){
 
 
 
-            dirname = "Summary_Segments";
 //double previous = 0 ;
 
 //hit.TrimSegments(0);
@@ -178,13 +172,39 @@ if(quad==10){
 //histname = Form("GretinaSummary_SegEnerTry_X%02i",hit.GetCrystalId());
 //      obj.FillHistogram(dirname,histname,40,0,40,hit.GetSegmentId(z),
 //      500,0,4000,hit.GetSegmentEner(z));
-                histname = Form("GretinaSummary_SegEnerTry_X%02i",hit.GetCrystalId());
+//                histname = Form("GretinaSummary_SegEnerTry_X%02i",hit.GetCrystalId());
+//                obj.FillHistogram(dirname,histname,40,0,40,hit.GetSegmentId(z),
+//                                  4000,0,4000,hit.GetIntPreampEng(z));
+                dirname = "Summary_Segments";
+                histname = Form("GretinaSummary_SegEnerTry_Q%02i_p%01i",quad,p);
                 obj.FillHistogram(dirname,histname,40,0,40,hit.GetSegmentId(z),
                                   4000,0,4000,hit.GetIntPreampEng(z));
 
-//                if(hit.GetSegmentId(z) == 20 && hit.GetXtalId() == 25 ) {
-//                    obj.FillHistogram("seg_sec_energy",3000,0,3000,hit.GetTime()/1e8,4000,0,4000,hit.GetIntPreampEng(z));
-//                }
+                dirname = "energy_vs_time";
+                if(quad  == 1 && p == 2 && hit.GetSegmentId(z) == 29) {
+                    obj.FillHistogram(dirname,Form("seg_sec_Q%02i_p%01i_ch%02i",quad,p,hit.GetSegmentId(z)),3000,0,3000,hit.GetTime()/1e8,500,0,4000,hit.GetIntPreampEng(z));
+                }
+                if(quad  == 3 && p == 3 && hit.GetSegmentId(z) == 11) {
+                    obj.FillHistogram(dirname,Form("seg_sec_Q%02i_p%01i_ch%02i",quad,p,hit.GetSegmentId(z)),3000,0,3000,hit.GetTime()/1e8,500,0,4000,hit.GetIntPreampEng(z));
+                }
+                if(quad  == 6 && p == 1 && hit.GetSegmentId(z) == 11) {
+                    obj.FillHistogram(dirname,Form("seg_sec_Q%02i_p%01i_ch%02i",quad,p,hit.GetSegmentId(z)),3000,0,3000,hit.GetTime()/1e8,500,0,4000,hit.GetIntPreampEng(z));
+                }
+                if(quad  == 7 && p == 1 && hit.GetSegmentId(z) == 22) {
+                    obj.FillHistogram(dirname,Form("seg_sec_Q%02i_p%01i_ch%02i",quad,p,hit.GetSegmentId(z)),3000,0,3000,hit.GetTime()/1e8,500,0,4000,hit.GetIntPreampEng(z));
+                }
+                if(quad  == 8 && p == 4 && hit.GetSegmentId(z) == 0) {
+                    obj.FillHistogram(dirname,Form("seg_sec_Q%02i_p%01i_ch%02i",quad,p,hit.GetSegmentId(z)),3000,0,3000,hit.GetTime()/1e8,500,0,4000,hit.GetIntPreampEng(z));
+                }
+                if(quad  == 8 && p == 2 && hit.GetSegmentId(z) == 11) {
+                    obj.FillHistogram(dirname,Form("seg_sec_Q%02i_p%01i_ch%02i",quad,p,hit.GetSegmentId(z)),3000,0,3000,hit.GetTime()/1e8,500,0,4000,hit.GetIntPreampEng(z));
+                }
+                if(quad  == 8 && p == 4 && hit.GetSegmentId(z) == 3) {
+                    obj.FillHistogram(dirname,Form("seg_sec_Q%02i_p%01i_ch%02i",quad,p,hit.GetSegmentId(z)),3000,0,3000,hit.GetTime()/1e8,500,0,4000,hit.GetIntPreampEng(z));
+                }
+                if(quad  == 11 && p == 1 && hit.GetSegmentId(z) == 35) {
+                    obj.FillHistogram(dirname,Form("seg_sec_Q%02i_p%01i_ch%02i",quad,p,hit.GetSegmentId(z)),3000,0,3000,hit.GetTime()/1e8,500,0,4000,hit.GetIntPreampEng(z));
+                }
 //                if(hit.GetSegmentId(z) == 21 && hit.GetXtalId() == 25 ) {
 //                    obj.FillHistogram("seg_sec_energy_2",3000,0,3000,hit.GetTime()/1e8,4000,0,4000,hit.GetIntPreampEng(z));
 //                }

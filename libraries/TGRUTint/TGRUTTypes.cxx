@@ -14,7 +14,8 @@ std::map<std::string, kDetectorSystems> detector_system_map{
   {"S800_SIM",        kDetectorSystems::S800_SIM},
   {"FastScint",       kDetectorSystems::FASTSCINT},
   {"FSU",             kDetectorSystems::FSU},
-  {"UML",             kDetectorSystems::UML}
+  {"UML",             kDetectorSystems::UML},
+  {"OBJ",             kDetectorSystems::OBJ}
 };
 
 
