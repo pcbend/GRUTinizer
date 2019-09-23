@@ -34,6 +34,7 @@ int TOBJ::BuildHits(std::vector<TRawEvent>& raw_data) {
       hit.SetTime(ddas.GetCFDTime());
       hit.SetTimestamp(ddas.GetTimestamp());
       hit.SetTrace(ddas.GetTraceLength(),ddas.trace);
+      hit.SetPileup(ddas.GetFinishCode());
       if(ddas.energy_sum!=NULL)  std::cout<<"energy_sum: "<<ddas.energy_sum->energy_sum[0]<<std::endl;;
 //      hit.SetExternalTimestamp(ddas.GetExternalTimestamp());
       //InsertHit(hit);

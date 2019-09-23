@@ -3,10 +3,11 @@
 
 #include <TVector3.h>
 #include <TDetectorHit.h>
+#include <GH1D.h>
 
 class TOBJHit : public TDetectorHit {
   public:
-    TOBJHit() { }
+    TOBJHit() : htrace(nullptr),pileup(false) { }
     ~TOBJHit() { }
 
     virtual void Copy(TObject& obj) const        { TDetectorHit::Copy(obj); }
@@ -29,10 +30,20 @@ class TOBJHit : public TDetectorHit {
 
     void SetExternalTimestamp(long ets) { fExternalTimestamp = ets; }
     long GetExternalTimestamp() const { return fExternalTimestamp; }
+    void DrawTrace(Option_t *option);
+    void TrigFilter(Double_t tpeak,Double_t tgap); // in unit of ticks
+    void EnergyFilter(Double_t tpeak,Double_t tgap,Double_t tau); // in unit of ticks
+    void SetPileup(bool flag){pileup = flag; }
+    bool GetPileip() const { return pileup;}
+    
  
 
   private:
     std::vector<unsigned short> fTrace;
+    std::vector<unsigned short> fETrace;
+    std::vector<unsigned short> fTTrace;
+    GH1D *htrace;
+    Bool_t  pileup;
 
     long fExternalTimestamp;
 
