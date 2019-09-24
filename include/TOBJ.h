@@ -26,7 +26,7 @@ class TOBJ : public TDetector {
 
 
     TOBJHit GetOBJHit(int i) { return obj_hits[i]; } //.at(i);  }
-    TOBJHit GetObj()    const { return fobj; }
+ //   TOBJHit GetObj()    const { return fobj; }
 
     bool Good() const { return true; }
 
@@ -37,7 +37,7 @@ class TOBJ : public TDetector {
 
     
     std::vector<TOBJHit> obj_hits; 
-    TOBJHit fobj;
+//    TOBJHit fobj;
 
     
    ////////////////////

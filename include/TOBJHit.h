@@ -34,15 +34,15 @@ class TOBJHit : public TDetectorHit {
     void TrigFilter(Double_t tpeak,Double_t tgap); // in unit of ticks
     void EnergyFilter(Double_t tpeak,Double_t tgap,Double_t tau); // in unit of ticks
     void SetPileup(bool flag){pileup = flag; }
-    bool GetPileip() const { return pileup;}
+    bool GetPileup() const { return pileup;}
     
  
 
   private:
     std::vector<unsigned short> fTrace;
-    std::vector<unsigned short> fETrace;
-    std::vector<unsigned short> fTTrace;
-    GH1D *htrace;
+    std::vector<Double_t> fETrace;
+    std::vector<Double_t> fTTrace;
+    GH1D *htrace; //!
     Bool_t  pileup;
 
     long fExternalTimestamp;

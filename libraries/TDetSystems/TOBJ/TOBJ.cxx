@@ -58,10 +58,10 @@ int TOBJ::BuildHits(std::vector<TRawEvent>& raw_data) {
         if(ddas_card==2) { // 
           switch(ddas_channel) {
             case 0:     //pin1
-              fobj.SetAddress(ddas.GetAddress());
-              fobj.SetCharge(ddas.GetEnergy());
-              fobj.SetTime(ddas.GetCFDTime());
-              fobj.SetTimestamp(ddas.GetTimestamp());
+//              fobj.SetAddress(ddas.GetAddress());
+//              fobj.SetCharge(ddas.GetEnergy());
+//              fobj.SetTime(ddas.GetCFDTime());
+//              fobj.SetTimestamp(ddas.GetTimestamp());
 //              fPin1.SetExternalTimestamp(ddas.GetExternalTimestamp());
               break;
             case 1:     //pin2
