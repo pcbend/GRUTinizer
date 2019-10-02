@@ -832,7 +832,10 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
             while(TObject *obj2=iter2.Next()) {
               if(obj2->InheritsFrom(TH1::Class())) {
                 TH1* hist = (TH1*)obj2;
-                hist->GetXaxis()->SetRangeUser(x1,x2);
+                if(x1==0&&x2==0)
+                  hist->GetXaxis()->UnZoom();
+                else
+                  hist->GetXaxis()->SetRangeUser(x1,x2);
                 pad->Modified();
                 pad->Update();
               }
@@ -1000,6 +1003,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       }
       edited=true;
       break;
+
     case kKey_o:
       for(unsigned int i=0;i<hists.size();i++) {
         hists.at(i)->GetXaxis()->UnZoom();
@@ -1007,6 +1011,28 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       }
       RemoveMarker("all");
       edited = true;
+      break;
+
+    case kKey_O:
+      {
+      TIter iter(this->GetListOfPrimitives());
+      while(TObject *obj = iter.Next()){
+        if(obj->InheritsFrom(TPad::Class())){
+          TPad *pad = (TPad*)obj;
+          TIter iter2(pad->GetListOfPrimitives());
+          while(TObject *obj2 = iter2.Next()){
+            if(obj2->InheritsFrom(TH1::Class()) || obj2->InheritsFrom(GH1::Class())){
+              TH1 *hist = (TH1*)obj2;
+              hist->GetXaxis()->UnZoom();
+              hist->GetYaxis()->UnZoom();
+            }
+          }
+          pad->Modified();
+          pad->Update();
+        }
+      }
+      edited = true;
+      }
       break;
 
     case kKey_p: 
@@ -1104,9 +1130,12 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
                       TPad *pad = (TPad*)obj;
                       TIter iter2(pad->GetListOfPrimitives());
                       while(TObject *obj2=iter2.Next()) {
-                        if(obj2->InheritsFrom(TH1::Class())) {
+                        if(obj2->InheritsFrom(TH1::Class())||obj2->InheritsFrom(GH1::Class())) {
                           TH1* hist = (TH1*)obj2;
-                          hist->GetYaxis()->SetRangeUser(y1,y2);
+                          if(y1==0&&y2==0)
+                            hist->GetYaxis()->UnZoom();
+                          else 
+                            hist->GetYaxis()->SetRangeUser(y1,y2);
                           pad->Modified();
                           pad->Update();
                         }
@@ -1316,9 +1345,12 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
             TPad *pad = (TPad*)obj;
             TIter iter2(pad->GetListOfPrimitives());
             while(TObject *obj2=iter2.Next()) {
-              if(obj2->InheritsFrom(TH1::Class())) {
+              if(obj2->InheritsFrom(TH1::Class())||obj2->InheritsFrom(GH1::Class())) {
                 TH1* hist = (TH1*)obj2;
-                hist->GetXaxis()->SetRangeUser(x1,x2);
+                if(x1==0 && x2==0) 
+                  hist->GetXaxis()->UnZoom();
+                else
+                  hist->GetXaxis()->SetRangeUser(x1,x2);
                 pad->Modified();
                 pad->Update();
               }
@@ -1474,7 +1506,10 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
                          if(obj2->InheritsFrom(TH2::Class()) ||
                              (obj2->InheritsFrom(GH2::Class()))) {
                            TH2* hist = (TH2*)obj2;
-                           hist->GetYaxis()->SetRangeUser(y1,y2);
+                           if(y1==0 && y2==0)
+                             hist->GetYaxis()->UnZoom();
+                           else 
+                             hist->GetYaxis()->SetRangeUser(y1,y2);
                            pad->Modified();
                            pad->Update();
                          }

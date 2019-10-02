@@ -7,7 +7,7 @@
 
 class TOBJHit : public TDetectorHit {
   public:
-    TOBJHit() : htrace(nullptr),pileup(false) { }
+    TOBJHit() : htrace(nullptr),ttrace(nullptr),etrace(nullptr),pileup(false) { }
     ~TOBJHit() { }
 
     virtual void Copy(TObject& obj) const        { TDetectorHit::Copy(obj); }
@@ -31,10 +31,16 @@ class TOBJHit : public TDetectorHit {
     void SetExternalTimestamp(long ets) { fExternalTimestamp = ets; }
     long GetExternalTimestamp() const { return fExternalTimestamp; }
     void DrawTrace(Option_t *option);
+    void DrawETrace(Option_t *option);
+    void DrawTTrace(Option_t *option);
     void TrigFilter(Double_t tpeak,Double_t tgap); // in unit of ticks
     void EnergyFilter(Double_t tpeak,Double_t tgap,Double_t tau); // in unit of ticks
     void SetPileup(bool flag){pileup = flag; }
     bool GetPileup() const { return pileup;}
+    void ClearETrace() { fETrace.clear();}
+    void ClearTTrace() { fTTrace.clear();}
+    double GetOfflineEnergy() const { return fEnergy;}
+    void CalOfflineEnergy(double thres = 0);
     
  
 
@@ -43,7 +49,11 @@ class TOBJHit : public TDetectorHit {
     std::vector<Double_t> fETrace;
     std::vector<Double_t> fTTrace;
     GH1D *htrace; //!
+    GH1D *ttrace; //!
+    GH1D *etrace; //!
     Bool_t  pileup;
+    Double_t fEnergy;
+    Double_t PeakSample;
 
     long fExternalTimestamp;
 

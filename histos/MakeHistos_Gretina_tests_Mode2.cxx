@@ -137,6 +137,13 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
             obj.FillHistogram(Form("q%02i_p%i",quad,p),10000,0,10000,hit.GetCoreEnergy());
 
+            if(quad==10 && p == 1){
+              obj.FillHistogram("q10p1_cc1",10000,0,100000,hit.GetCoreCharge(0));
+              obj.FillHistogram("q10p1_cc2",10000,0,100000,hit.GetCoreCharge(1));
+              obj.FillHistogram("q10p1_cc3",10000,0,100000,hit.GetCoreCharge(2));
+              obj.FillHistogram("q10p1_cc4",10000,0,100000,hit.GetCoreCharge(3));
+            }
+
             obj.FillHistogram("sum",10000,0,10000,hit.GetCoreEnergy());
 
             histname="position";
