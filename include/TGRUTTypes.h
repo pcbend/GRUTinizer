@@ -18,8 +18,8 @@ enum kDetectorSystems {
   S800_SIM   = 9,
   LENDA      = 21,
 
-  UML        = 25,
-  OBJ        = 26, // temporary
+  UML        = 26,
+  OBJ        = 25, // temporary
 
   SEGA = 64,
   JANUS = 65,

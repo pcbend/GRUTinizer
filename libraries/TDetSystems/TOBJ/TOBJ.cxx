@@ -16,13 +16,14 @@ int TOBJ::BuildHits(std::vector<TRawEvent>& raw_data) {
     TSmartBuffer buf = event.GetPayloadBuffer();
     int total_size = *(int*)buf.GetData();
     const char* buffer_end = buf.GetData() + total_size;
-//    buf.Advance(sizeof(int));
-//    buf.Advance(sizeof(short)); // i am now even more confused.  extra 0x0000 after first ncsl ts
+    // uncomment below two lines if we are getting data from gebpush
+    buf.Advance(sizeof(int));
+    buf.Advance(sizeof(short)); // i am now even more confused.  extra 0x0000 after first ncsl ts
     //buf.Advance(sizeof(int));  // i dont know why this is???  2019-Pt run pcb. 
     //int ptr = sizeof(int);
     while(buf.GetData() < buffer_end) {
       // Constructor advances the buffer to end of each channel
-      TDDASEvent<DDASHeader> ddas(buf);
+      TDDASEvent<DDASGEBHeader> ddas(buf);
       //std::cout << ddas.GetTimestamp() << "     ddas.GetAddress():   " << ddas.GetAddress() << std::endl;
       
       /////////////////
@@ -35,10 +36,10 @@ int TOBJ::BuildHits(std::vector<TRawEvent>& raw_data) {
       hit.SetTimestamp(ddas.GetTimestamp());
       hit.SetTrace(ddas.GetTraceLength(),ddas.trace);
       hit.SetPileup(ddas.GetFinishCode());
-      hit.TrigFilter(0.192,0.192);
-      hit.EnergyFilter(0.192,0.048,0.050);
-      if(ddas.energy_sum!=NULL)  std::cout<<"energy_sum: "<<ddas.energy_sum->energy_sum[0]<<std::endl;;
-//      hit.SetExternalTimestamp(ddas.GetExternalTimestamp());
+//      hit.TrigFilter(0.192,0.192);
+//      hit.EnergyFilter(0.192,0.048,0.050);
+//      if(ddas.energy_sum!=NULL)  std::cout<<"energy_sum: "<<ddas.energy_sum->energy_sum[0]<<std::endl;;
+      hit.SetExternalTimestamp(ddas.GetExternalTimestamp());
       //InsertHit(hit);
       obj_hits.push_back(hit);
       /////////////////

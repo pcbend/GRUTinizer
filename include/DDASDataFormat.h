@@ -36,14 +36,21 @@ public:
     header = (HeaderType*)buf.GetData();
     buf.Advance(sizeof(HeaderType));
 
+    if(HasEnergySum()){
+      energy_sum = (DDAS_Energy_Sum*)buf.GetData();
+      buf.Advance(sizeof(DDAS_Energy_Sum));
+    }
+
     if(HasQDCSum()){
       qdc_sum = (DDAS_QDC_Sum*)buf.GetData();
       buf.Advance(sizeof(DDAS_QDC_Sum));
     }
 
-    if(HasEnergySum()){
-      energy_sum = (DDAS_Energy_Sum*)buf.GetData();
-      buf.Advance(sizeof(DDAS_Energy_Sum));
+    if(HasExternalClk()){
+      ext_time_low = (*((unsigned int*)buf.GetData()));
+      buf.Advance(sizeof(unsigned int));
+      ext_time_high = (*((unsigned int*)buf.GetData()));
+      buf.Advance(sizeof(unsigned int));
     }
 
     if(GetTraceLength()){
@@ -56,16 +63,28 @@ public:
   DDAS_Energy_Sum* energy_sum;
   unsigned short* trace;
 
-  bool HasQDCSum() const {
-    return (GetChannelHeaderLength() == 8 ||
-            GetChannelHeaderLength() == 16);
-  }
-
-
   bool HasEnergySum() const {
-    return (GetChannelHeaderLength() == 12 ||
-            GetChannelHeaderLength() == 16);
+    return (GetChannelHeaderLength() == 8 ||
+            GetChannelHeaderLength() == 10||
+            GetChannelHeaderLength() == 16||
+            GetChannelHeaderLength() == 18);
   }
+
+
+  bool HasQDCSum() const {
+    return (GetChannelHeaderLength() == 12 ||
+            GetChannelHeaderLength() == 14 ||
+            GetChannelHeaderLength() == 16 ||
+            GetChannelHeaderLength() == 18);
+  }
+
+  bool HasExternalClk() const {
+    return (GetChannelHeaderLength() == 6  ||
+            GetChannelHeaderLength() == 10 ||
+            GetChannelHeaderLength() == 14 ||
+            GetChannelHeaderLength() == 18);
+  }
+
 
   unsigned int GetSize()        const { return header->size; }
   unsigned short GetFrequency() const { return header->frequency; }
@@ -88,8 +107,8 @@ public:
     return (((unsigned long)GetTimeHigh())<<32) + GetTimeLow();
   }
 
-  unsigned int GetExternalTimeLow()        const { return header->ext_time_low;                                    }
-  unsigned int GetExternalTimeHigh()       const { return (header->ext_time_high & LOWER16BITMASK);            }
+  unsigned int GetExternalTimeLow()        const { return ext_time_low;                                    }
+  unsigned int GetExternalTimeHigh()       const { return (ext_time_high & LOWER16BITMASK);            }
   unsigned long GetExternalTimestamp()     const {
     return (((unsigned long)GetExternalTimeHigh())<<32) + GetExternalTimeLow();
   }
@@ -121,6 +140,9 @@ private:
   HeaderType* header;
 
   TSmartBuffer buf;
+
+  unsigned int ext_time_low;
+  unsigned int ext_time_high;
 
   ClassDef(TDDASEvent, 0);
 };

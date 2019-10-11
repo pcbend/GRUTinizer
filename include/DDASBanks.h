@@ -40,8 +40,8 @@ struct DDASGEBHeader{  //only at the start of the event...
   unsigned int time_low;
   unsigned int time_high_cfd;
   unsigned int energy_tracelength;
-  unsigned int ext_time_low;
-  unsigned int ext_time_high;
+//  unsigned int ext_time_low;
+//  unsigned int ext_time_high;
 
   // void print() {
   //   printf("--------------------------------\n");

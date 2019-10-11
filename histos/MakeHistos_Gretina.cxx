@@ -14,6 +14,7 @@
 #include "TGretina.h"
 #include "TBank88.h"
 #include "TS800.h"
+#include "TOBJ.h"
 #include "TFastScint.h"
 
 #include "TChannel.h"
@@ -454,6 +455,7 @@ bool HandleGretinaGated(TRuntimeObjects &obj, GCutG *outgoing) {
   TGretina *gretina = obj.GetDetector<TGretina>();
   TS800    *s800    = obj.GetDetector<TS800>();
   TBank88  *bank29  = obj.GetDetector<TBank88>();
+  TOBJ *obj_sci = obj.GetDetector<TOBJ>();
 
   if(!gretina || !s800) 
     return false;
@@ -688,6 +690,26 @@ void MakeHistograms(TRuntimeObjects& obj) {
   TGretina *gretina = obj.GetDetector<TGretina>();
   TBank88  *bank29  = obj.GetDetector<TBank88>();
   TS800    *s800    = obj.GetDetector<TS800>();
+  TOBJ     *obj_sci = obj.GetDetector<TOBJ>();
+
+  if(obj_sci){
+    obj.FillHistogram("obj_singles",1000,0,40000,obj_sci->GetOBJHit(0).GetEnergy());
+  }
+  if(obj_sci&&s800){
+    obj.FillHistogram("ts_obj_s800",1000,-2000,2000,s800->GetTimestamp()-obj_sci->GetOBJHit(0).GetExternalTimestamp()*8);
+  }
+  if(s800&&gretina){
+    obj.FillHistogram("ts_gre_s800",1000,-2000,2000,s800->GetTimestamp()-gretina->GetGretinaHit(0).Timestamp());
+  }
+  if(obj_sci&&gretina){
+    obj.FillHistogram("ts_gre_objs",1000,-2000,2000,obj_sci->GetOBJHit(0).GetExternalTimestamp()*8-gretina->GetGretinaHit(0).Timestamp());
+    for(size_t i = 0; i<gretina->Size();i++){
+      Double_t ge = gretina->GetGretinaHit(i).GetEnergy();
+      obj.FillHistogram("mat_gre_objs",1000,0,100000,obj_sci->GetOBJHit(0).GetEnergy(),1000,0,4000,ge);
+    }
+  }
+
+  return;
 
   TList *gates = &(obj.GetGates());
   TList    *list    = &(obj.GetObjects());

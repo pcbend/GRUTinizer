@@ -832,10 +832,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
             while(TObject *obj2=iter2.Next()) {
               if(obj2->InheritsFrom(TH1::Class())) {
                 TH1* hist = (TH1*)obj2;
-                if(x1==0&&x2==0)
-                  hist->GetXaxis()->UnZoom();
-                else
-                  hist->GetXaxis()->SetRangeUser(x1,x2);
+                hist->GetXaxis()->SetRangeUser(x1,x2);
                 pad->Modified();
                 pad->Update();
               }
@@ -1132,10 +1129,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
                       while(TObject *obj2=iter2.Next()) {
                         if(obj2->InheritsFrom(TH1::Class())||obj2->InheritsFrom(GH1::Class())) {
                           TH1* hist = (TH1*)obj2;
-                          if(y1==0&&y2==0)
-                            hist->GetYaxis()->UnZoom();
-                          else 
-                            hist->GetYaxis()->SetRangeUser(y1,y2);
+                          hist->GetYaxis()->SetRangeUser(y1,y2);
                           pad->Modified();
                           pad->Update();
                         }
@@ -1347,10 +1341,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
             while(TObject *obj2=iter2.Next()) {
               if(obj2->InheritsFrom(TH1::Class())||obj2->InheritsFrom(GH1::Class())) {
                 TH1* hist = (TH1*)obj2;
-                if(x1==0 && x2==0) 
-                  hist->GetXaxis()->UnZoom();
-                else
-                  hist->GetXaxis()->SetRangeUser(x1,x2);
+                hist->GetXaxis()->SetRangeUser(x1,x2);
                 pad->Modified();
                 pad->Update();
               }
@@ -1506,10 +1497,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
                          if(obj2->InheritsFrom(TH2::Class()) ||
                              (obj2->InheritsFrom(GH2::Class()))) {
                            TH2* hist = (TH2*)obj2;
-                           if(y1==0 && y2==0)
-                             hist->GetYaxis()->UnZoom();
-                           else 
-                             hist->GetYaxis()->SetRangeUser(y1,y2);
+                           hist->GetYaxis()->SetRangeUser(y1,y2);
                            pad->Modified();
                            pad->Update();
                          }
