@@ -139,6 +139,7 @@ public:
   unsigned short GetMRef(int i)        const {if(i<GetMRefSize())       return mtof.fRef.at(i);        return sqrt(-1);  }        
            int   GetMRefSize()         const { return mtof.fRef.size();  }
 
+  unsigned short GetPinE()   const { return pine;}
   
   int GetReg() const { return trigger.GetRegistr(); } 
 
@@ -159,6 +160,7 @@ private:
   bool HandleIonCPacket(unsigned short*,int);     //!
   bool HandleCRDCPacket(unsigned short*,int);     //!
   bool HandleMTDCPacket(unsigned short*,int);     //!
+  bool HandleOBJPinPacket(unsigned short*,int);   //!
 
   TScintillator scint[3];
   TTrigger     trigger;
@@ -167,6 +169,7 @@ private:
   TIonChamber  ion;
   TCrdc        crdc1;
   TCrdc        crdc2;
+  UShort_t     pine;
   //THodoscope   hodo[32];
   //TMultiHitTof multi_tof;
   

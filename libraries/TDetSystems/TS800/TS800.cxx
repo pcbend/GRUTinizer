@@ -278,6 +278,7 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
       case 0x5890:  // Obj Scint
 	break;
       case 0x58a0:  // Obj Pin Packet
+        HandleOBJPinPacket(dptr+1,sizeleft); 
 	break;
       case 0x58b0:  // S800 Hodoscope
 	break;
@@ -359,14 +360,14 @@ int TS800::BuildHits(UShort_t eventsize,UShort_t *dptr,Long64_t timestamp) {  //
     case 0x5860:  // TA Pin Packet
       break;
     case 0x5870:  // II Track Packet
+      
       break;
     case 0x5880:  // II PPAC
       break;
     case 0x5890:  // Obj Scint
       break;
     case 0x58a0:  // Obj Pin Packet
-      //end of s800 tag!
-      x += size +1;
+      HandleOBJPinPacket(dptr+1,sizeleft);
       break;
     case 0x58b0:  // S800 Hodoscope
       break;
@@ -558,6 +559,16 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
   std::cout << " CRDC Anod : " << current_crdc->GetAnode() << std::endl;
   std::dec;*/
   return true;
+}
+
+bool TS800::HandleOBJPinPacket(unsigned short* data, int size){
+   if(size == 0) {
+     pine = 0; 
+   }else{
+     pine = *data;
+     pine = (pine&0x0fff);
+   }
+   return true;
 }
 
 bool TS800::HandleScintPacket(unsigned short* data, int size){
@@ -824,7 +835,7 @@ float TS800::GetTofE1_TDC(float c1,float c2)  const {
 }
 
 float TS800::GetTofE1_MTDC(float c1,float c2,int i) const {
-
+/*
   std::vector<float> result;
   // TODO: This check is always false.  Commented it out, but was there some reason for it?
   // if(mtof.fObj.size()<0)
@@ -838,6 +849,14 @@ float TS800::GetTofE1_MTDC(float c1,float c2,int i) const {
   if(result.size()>(unsigned int)i)
     return result.at(i);
   return sqrt(-1.0);
+  */
+  int x = mtof.fObj.size();
+  int y = mtof.fE1Up.size();
+  if(i<0||i>=x*y) return sqrt(-1);
+
+  int index_x = i/y;
+  int index_y = i%y;
+  return mtof.fObj.at(index_x)-mtof.fE1Up.at(index_y)+c1*GetAFP()+c2*GetCrdc(0).GetDispersiveX();
 }
 
 float TS800::GetTofE1_MTDC_XFP(float c1,float c2,int i) const {
@@ -883,6 +902,7 @@ float TS800::GetOBJ_E1Raw() const {
 }
 
 float TS800::GetOBJ_E1Raw_MESY(int i) const {
+  /*
   std::vector<float> result;
   for(unsigned int x=0;x<mtof.fObj.size();x++) {
     for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
@@ -893,9 +913,21 @@ float TS800::GetOBJ_E1Raw_MESY(int i) const {
   if(result.size()>(unsigned int)i)
     return result.at(i);
   return sqrt(-1.0);
+  */
+
+  int x = mtof.fObj.size();
+  int y = mtof.fE1Up.size();
+
+  if(i<0 || i>=x*y ) return sqrt(-1);
+
+  int index_x = i/y;
+  int index_y = i%y;
+
+  return mtof.fObj.at(index_x)-mtof.fE1Up.at(index_y);
 }
 
 float TS800::GetOBJ_E1Raw_MESY_Ch15(int i) const {
+  /*
   std::vector<float> result;
   for(unsigned int x=0;x<mtof.fObj.size();x++) {
     for(unsigned int y=0;y<mtof.fRef.size();y++) {
@@ -906,6 +938,16 @@ float TS800::GetOBJ_E1Raw_MESY_Ch15(int i) const {
   if(result.size()>(unsigned int)i)
     return result.at(i);
   return sqrt(-1.0);
+  */
+  int x = mtof.fObj.size();
+  int y = mtof.fRef.size();
+
+  if(i<0 || i>=x*y) return sqrt(-1);
+
+  int index_x = i/y;
+  int index_y = i%y;
+
+  return mtof.fObj.at(index_x)-mtof.fRef.at(index_y);
 }
 
 float TS800::GetRawOBJ_MESY(unsigned int i) const {

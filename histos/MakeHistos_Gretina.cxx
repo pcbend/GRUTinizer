@@ -439,6 +439,51 @@ obj.FillHistogram(dirname,histname,4000,-2000,2000,s800->GetCorrTOF_OBJ());
   return true;
 }
 
+void CheckDAQCorrelation(TRuntimeObjects& obj){
+
+  TGretina *gretina = obj.GetDetector<TGretina>();
+  TBank88  *bank88  = obj.GetDetector<TBank88>();
+  TS800    *s800    = obj.GetDetector<TS800>();
+  TOBJ     *obj_sci = obj.GetDetector<TOBJ>();
+
+  std::string dirname = "DAQ_Correlation";
+
+  if(bank88&&s800){
+    obj.FillHistogram(dirname,"tdiff_bank88_s800",3600,0,3600,s800->GetTimestamp()/1e8,1000,-2000,2000,s800->GetTimestamp()-bank88->GetTimestamp());
+  }
+  if(bank88&&gretina){
+    obj.FillHistogram("tdiff_bank88_gretina",3600,0,3600,bank88->GetTimestamp(),1000,-2000,2000,gretina->GetGretinaHit(0).Timestamp()-bank88->GetTimestamp());
+  }
+  if(obj_sci&&s800){
+    obj.FillHistogram("tdiff_ddas_s800",3600,0,3600,s800->GetTimestamp()/1e8,1000,-2000,2000,s800->GetTimestamp()-obj_sci->GetOBJHit(0).GetExternalTimestamp()*8);
+  }
+  if(s800&&gretina){
+    obj.FillHistogram("tdiff_s800_gretina",3600,0,3600,s800->GetTimestamp()/1e8,1000,-2000,2000,s800->GetTimestamp()-gretina->GetGretinaHit(0).Timestamp());
+  }
+  if(obj_sci&&gretina){
+    obj.FillHistogram("tdiff_gretina_ddas",obj_sci->GetOBJHit(0).GetExternalTimestamp()*8/1e8,1000,-2000,2000,obj_sci->GetOBJHit(0).GetExternalTimestamp()*8-gretina->GetGretinaHit(0).Timestamp());
+  }
+  if(s800 && s800->GetTrigger().GetRegistr() <100 && s800->GetTrigger().GetRegistr()>0){
+     TString dirname = Form("DAQ_Correlation_trigger_%d",s800->GetTrigger().GetRegistr());
+     if(bank88&&s800){
+       obj.FillHistogram(dirname,"tdiff_bank88_s800",3600,0,3600,s800->GetTimestamp()/1e8,1000,-2000,2000,s800->GetTimestamp()-bank88->GetTimestamp());
+     }
+     if(bank88&&gretina){
+       obj.FillHistogram("tdiff_bank88_gretina",3600,0,3600,bank88->GetTimestamp(),1000,-2000,2000,gretina->GetGretinaHit(0).Timestamp()-bank88->GetTimestamp());
+     }
+     if(obj_sci&&s800){
+       obj.FillHistogram("tdiff_ddas_s800",3600,0,3600,s800->GetTimestamp()/1e8,1000,-2000,2000,s800->GetTimestamp()-obj_sci->GetOBJHit(0).GetExternalTimestamp()*8);
+     }
+     if(s800&&gretina){
+       obj.FillHistogram("tdiff_s800_gretina",3600,0,3600,s800->GetTimestamp()/1e8,1000,-2000,2000,s800->GetTimestamp()-gretina->GetGretinaHit(0).Timestamp());
+     }
+     if(obj_sci&&gretina){
+       obj.FillHistogram("tdiff_gretina_ddas",obj_sci->GetOBJHit(0).GetExternalTimestamp()*8/1e8,1000,-2000,2000,obj_sci->GetOBJHit(0).GetExternalTimestamp()*8-gretina->GetGretinaHit(0).Timestamp());
+     }
+
+  }
+}
+
 
 
 /*
@@ -454,7 +499,7 @@ bool HandleGretinaGated(TRuntimeObjects &obj, GCutG *outgoing) {
 
   TGretina *gretina = obj.GetDetector<TGretina>();
   TS800    *s800    = obj.GetDetector<TS800>();
-  TBank88  *bank29  = obj.GetDetector<TBank88>();
+  TBank88  *bank88  = obj.GetDetector<TBank88>();
   TOBJ *obj_sci = obj.GetDetector<TOBJ>();
 
   if(!gretina || !s800) 
@@ -542,40 +587,40 @@ if(hole!=0){
 */
 
 /*
- if(bank29) {
+ if(bank88) {
  histname = Form("Gretina_Bank88_TD");
-      obj.FillHistogram(histname,600,-600,600,bank29->Timestamp()-hit.GetTime(),
+      obj.FillHistogram(histname,600,-600,600,bank88->Timestamp()-hit.GetTime(),
                                  5000,0,10000,hit.GetCoreEnergy());
 
 if(reg&2){
 histname = Form("Gretina_Bank88_TD_Reg2");
-      obj.FillHistogram(histname,600,-600,600,bank29->Timestamp()-hit.GetTime(),
+      obj.FillHistogram(histname,600,-600,600,bank88->Timestamp()-hit.GetTime(),
                                  5000,0,10000,hit.GetCoreEnergy());
    
 histname = Form("Gretina_Bank88_TD_Reg2_Cry%02i",hit.GetCrystalId());
-      obj.FillHistogram(histname,600,-600,600,bank29->Timestamp()-hit.GetTime(),
+      obj.FillHistogram(histname,600,-600,600,bank88->Timestamp()-hit.GetTime(),
                                  5000,0,10000,hit.GetCoreEnergy());
 
  }
 
 if(reg&1){
 histname = Form("Gretina_Bank88_TD_Reg1_Cry%02i",hit.GetCrystalId());
-      obj.FillHistogram(histname,600,-600,600,bank29->Timestamp()-hit.GetTime(),
+      obj.FillHistogram(histname,600,-600,600,bank88->Timestamp()-hit.GetTime(),
                                  5000,0,10000,hit.GetCoreEnergy());
     }
 
 }
 
-if(bank29 && s800){
+if(bank88 && s800){
 
 if(reg&2){
 histname = Form("S800_Bank88_TD-Energy_Reg2");
-      obj.FillHistogram(histname,600,-600,600,bank29->Timestamp()-s800->Timestamp(),
+      obj.FillHistogram(histname,600,-600,600,bank88->Timestamp()-s800->Timestamp(),
                                  5000,0,10000,hit.GetCoreEnergy());}
 
 if(reg&1){
 histname = Form("S800_Bank88_TD-Energy_Reg1");
-      obj.FillHistogram(histname,600,-600,600,bank29->Timestamp()-s800->Timestamp(),
+      obj.FillHistogram(histname,600,-600,600,bank88->Timestamp()-s800->Timestamp(),
                                  5000,0,10000,hit.GetCoreEnergy());
 }}
 */
@@ -668,6 +713,86 @@ if(s800 && gretina){
 }
 
 
+void MonitorOBJScintillator_DDAS(TRuntimeObjects &obj){
+  TOBJ     *obj_sci = obj.GetDetector<TOBJ>();
+  if(obj_sci){
+    std::string dirname = "OBJSci";
+    for(size_t x = 0; x<obj_sci->Size();x++)
+      obj.FillHistogram(dirname,"Energy_of_OBJSci",1000,0,40000,obj_sci->GetOBJHit(x).GetEnergy());
+  }
+}
+
+void MonitorCrdcs(TRuntimeObjects& obj){
+  TS800 *s800 = obj.GetDetector<TS800>();
+  if(!s800) return;
+  
+  std::string dirname = "CRDC_Det";
+  auto crdc1 = s800->GetCrdc(0);
+  auto crdc2 = s800->GetCrdc(1);
+  Double_t crdc1_x = crdc1.GetDispersiveX();
+  Double_t crdc1_y = crdc1.GetNonDispersiveY();
+  Double_t crdc2_x = crdc2.GetDispersiveX();
+  Double_t crdc2_y = crdc2.GetNonDispersiveY();
+
+  obj.FillHistogram(dirname,"Crdc1_xy",800,-400,400,crdc1_x,800,-400,400,crdc1_y);
+  obj.FillHistogram(dirname,"Crdc2_xy",800,-400,400,crdc2_x,800,-400,400,crdc2_y);
+
+  obj.FillHistogram(dirname,"Crdc1_time_ts",3600,0,3600,s800->Timestamp()/1e8,500,-2000,2000,crdc1.GetTime());
+  obj.FillHistogram(dirname,"Crdc2_time_ts",3600,0,3600,s800->Timestamp()/1e8,500,-2000,2000,crdc2.GetTime());
+}
+
+
+void MonitorICs(TRuntimeObjects &obj){
+  TS800 *s800 = obj.GetDetector<TS800>();
+  if(!s800) return;
+
+  std::string dirname = "ION_Chamber";
+  auto ic = s800->GetIonChamber();
+  for(int x = 0; x<ic.Size(); x++){
+    obj.FillHistogram(dirname,"Energy_Channel",32,0,32,ic.GetChannel(x),1000,0,4000,ic.GetData(x));
+  }
+  
+  auto crdc1 = s800->GetCrdc(0);
+  obj.FillHistogram(dirname,"ICEnergy_crdc1x",800,-400,400,crdc1.GetDispersiveX(),1000,0,4000,ic.GetSum());
+  obj.FillHistogram(dirname,"ICAVEnergy_crdc1x",800,-400,400,crdc1.GetDispersiveX(),1000,0,4000,ic.GetAve());
+  obj.FillHistogram(dirname,"ICEnergy_crdc1y",800,-400,400,crdc1.GetNonDispersiveY(),1000,0,4000,ic.GetSum());
+  obj.FillHistogram(dirname,"ICAVEnergy_crdc1y",800,-400,400,crdc1.GetNonDispersiveY(),1000,0,4000,ic.GetAve());
+}
+
+void MonitorTOF(TRuntimeObjects &obj){
+  TS800 *s800 = obj.GetDetector<TS800>();
+  if(!s800) return;
+
+  std::string dirname = "TOF_Packet";
+  auto tof = s800->GetTof();
+  obj.FillHistogram(dirname,"OBJ_TAC",4000,-2000,2000,tof.GetTacOBJ());
+  obj.FillHistogram(dirname,"XFP_TAC",4000,-2000,2000,tof.GetTacXFP());
+  obj.FillHistogram(dirname,"OBJ-XFP",4000,-2000,2000,tof.GetTacOBJ()-tof.GetTacXFP());
+  obj.FillHistogram(dirname,"OBJ_vs_XFP",1000,-2000,2000,tof.GetTacOBJ(),1000,-2000,2000,tof.GetTacXFP());
+
+  auto mtof = s800->GetMTof();
+  for(int x = 0; x < mtof.XfpSize(); x++)
+  for(int y = 0; y < mtof.E1UpSize();y++){
+    obj.FillHistogram(dirname,"XFP-E1_Mesy",1000,-10000,10000,s800->GetRawXF_MESY(x)-s800->GetRawE1_MESY(y));
+    obj.FillHistogram(dirname,"XFP-E1_Mesy_vs_AFP",1000,-10000,10000,s800->GetRawXF_MESY(x)-s800->GetRawE1_MESY(y),100,-0.1,0.1,s800->GetAFP());
+    obj.FillHistogram(dirname,"XFP-E1_Mesy_vs_XFP",1000,-10000,10000,s800->GetRawXF_MESY(x)-s800->GetRawE1_MESY(y),100,-0.1,0.1,s800->GetBFP());
+  }
+
+  for(int x = 0; x < mtof.ObjSize(); x++)
+  for(int y = 0; y < mtof.E1UpSize();y++){
+    obj.FillHistogram(dirname,"OBJ-E1_Mesy",1000,-10000,10000,s800->GetRawOBJ_MESY(x)-s800->GetRawE1_MESY(y));
+    obj.FillHistogram(dirname,"OBJ-E1_Mesy_vs_AFP",1000,-10000,10000,s800->GetRawOBJ_MESY(x)-s800->GetRawE1_MESY(y),100,-0.1,0.1,s800->GetAFP());
+    obj.FillHistogram(dirname,"OBJ-E1_Mesy_vs_XFP",1000,-10000,10000,s800->GetRawOBJ_MESY(x)-s800->GetRawE1_MESY(y),100,-0.1,0.1,s800->GetBFP());
+  }
+
+  for(int x = 0; x < mtof.ObjSize(); x++)
+  for(int y = 0; y < mtof.XfpSize();y++){
+    obj.FillHistogram(dirname,"XFP-OBJ_Mesy",1000,-10000,10000,s800->GetRawOBJ_MESY(x)-s800->GetRawXF_MESY(y));
+    obj.FillHistogram(dirname,"XFP-OBJ_Mesy_vs_AFP",1000,-10000,10000,s800->GetRawOBJ_MESY(x)-s800->GetRawXF_MESY(y),100,-0.1,0.1,s800->GetAFP());
+    obj.FillHistogram(dirname,"XFP-OBJ_Mesy_vs_BFP",1000,-10000,10000,s800->GetRawOBJ_MESY(x)-s800->GetRawXF_MESY(y),100,-0.1,0.1,s800->GetBFP());
+  }
+
+}
 
 ////////////////////////////
 /*
@@ -688,26 +813,17 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   InitMap();
   TGretina *gretina = obj.GetDetector<TGretina>();
-  TBank88  *bank29  = obj.GetDetector<TBank88>();
+  TBank88  *bank88  = obj.GetDetector<TBank88>();
   TS800    *s800    = obj.GetDetector<TS800>();
   TOBJ     *obj_sci = obj.GetDetector<TOBJ>();
 
-  if(obj_sci){
-    obj.FillHistogram("obj_singles",1000,0,40000,obj_sci->GetOBJHit(0).GetEnergy());
-  }
-  if(obj_sci&&s800){
-    obj.FillHistogram("ts_obj_s800",1000,-2000,2000,s800->GetTimestamp()-obj_sci->GetOBJHit(0).GetExternalTimestamp()*8);
-  }
-  if(s800&&gretina){
-    obj.FillHistogram("ts_gre_s800",1000,-2000,2000,s800->GetTimestamp()-gretina->GetGretinaHit(0).Timestamp());
-  }
-  if(obj_sci&&gretina){
-    obj.FillHistogram("ts_gre_objs",1000,-2000,2000,obj_sci->GetOBJHit(0).GetExternalTimestamp()*8-gretina->GetGretinaHit(0).Timestamp());
-    for(size_t i = 0; i<gretina->Size();i++){
-      Double_t ge = gretina->GetGretinaHit(i).GetEnergy();
-      obj.FillHistogram("mat_gre_objs",1000,0,100000,obj_sci->GetOBJHit(0).GetEnergy(),1000,0,4000,ge);
-    }
-  }
+
+  CheckDAQCorrelation(obj);
+  MonitorOBJScintillator_DDAS(obj);
+  MonitorCrdcs(obj);
+  MonitorICs(obj);
+  MonitorTOF(obj);
+  
 
   return;
 
@@ -747,33 +863,33 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
  unsigned int reg = s800->GetReg();
 
-//if(bank29) {
-//    for(unsigned int x=0;x<bank29->Size();x++) {
-  //    TMode3Hit &hit = (TMode3Hit&)bank29->GetHit(x);
-    //  std::string histname = Form("bank29_%i",hit.GetChannel());
+//if(bank88) {
+//    for(unsigned int x=0;x<bank88->Size();x++) {
+  //    TMode3Hit &hit = (TMode3Hit&)bank88->GetHit(x);
+    //  std::string histname = Form("bank88_%i",hit.GetChannel());
       //obj.FillHistogram(histname,16000,0,64000,hit.Charge());
    // }
-    if(s800&&bank29) {
+    if(s800&&bank88) {
      // std::string histname = "S800_Bank88_timestamp_difference";
-      obj.FillHistogram("S800_Bank88_timestamp_difference",800,-400,400,bank29->Timestamp()-s800->Timestamp());}
+      obj.FillHistogram("S800_Bank88_timestamp_difference",800,-400,400,bank88->Timestamp()-s800->Timestamp());}
 
-if(!s800 && bank29){
+if(!s800 && bank88){
       obj.FillHistogram("S800_Bank88_timestamp_difference",400,-400,400,110);}
 
-if(!bank29 && s800){
+if(!bank88 && s800){
       obj.FillHistogram("S800_Bank88_timestamp_difference",400,-400,400,100);}
 
-if(!bank29 && !s800){
+if(!bank88 && !s800){
       obj.FillHistogram("S800_Bank88_timestamp_difference",400,-400,400,120);}
 
 
-if(s800 && bank29){
+if(s800 && bank88){
 
-      histname = "S800_Bank88_timestamp_difference_vs_bank29time";
-      obj.FillHistogram(histname,7200,0,7200,bank29->Timestamp()*1e-8,400,-400,400,bank29->Timestamp()-s800->Timestamp());
+      histname = "S800_Bank88_timestamp_difference_vs_bank88time";
+      obj.FillHistogram(histname,7200,0,7200,bank88->Timestamp()*1e-8,400,-400,400,bank88->Timestamp()-s800->Timestamp());
 
       histname = "S800_Bank88_timestamp_difference_vs_s800time";
-      obj.FillHistogram(histname,7200,0,7200,s800->Timestamp()*1e-8,400,-400,400,bank29->Timestamp()-s800->Timestamp());
+      obj.FillHistogram(histname,7200,0,7200,s800->Timestamp()*1e-8,400,-400,400,bank88->Timestamp()-s800->Timestamp());
     }
 //  }
 
@@ -883,24 +999,24 @@ if(hole!=0){
 if(hole!=0){
  dirname = Form("Det%i",hole);
     
- if(bank29) {
+ if(bank88) {
 
 if(reg&2){
  histname = Form("Gretina_Bank88_TD_Reg2_Cry%02i_Det%02i",hit.GetCrystalId(),hole);
-      obj.FillHistogram(histname,600,-600,600,bank29->Timestamp()-hit.GetTime(),
+      obj.FillHistogram(histname,600,-600,600,bank88->Timestamp()-hit.GetTime(),
                                  2000,0,4000,hit.GetCoreEnergy());
 
  histname = Form("Gretina_Bank88_TDvsBank88TS_Reg2_Cry%02i_Det%02i",hit.GetCrystalId(),hole);
-      obj.FillHistogram(histname,7200,0,7200,bank29->Timestamp()*1e-8,700,-400,1000,bank29->Timestamp()-hit.GetTime());
+      obj.FillHistogram(histname,7200,0,7200,bank88->Timestamp()*1e-8,700,-400,1000,bank88->Timestamp()-hit.GetTime());
     }
 
 if(reg&1){
  histname = Form("Gretina_Bank88_TD_Reg1_Cry%02i_Det%02i",hit.GetCrystalId(),hole);
-      obj.FillHistogram(histname,600,-600,600,bank29->Timestamp()-hit.GetTime(),
+      obj.FillHistogram(histname,600,-600,600,bank88->Timestamp()-hit.GetTime(),
                                  2000,0,4000,hit.GetCoreEnergy());
 
  histname = Form("Gretina_Bank88_TDvsBank88TS_Reg1_Cry%02i_Det%02i",hit.GetCrystalId(),hole);
-      obj.FillHistogram(histname,7200,0,7200,bank29->Timestamp()*1e-8,700,-400,1000,bank29->Timestamp()-hit.GetTime());
+      obj.FillHistogram(histname,7200,0,7200,bank88->Timestamp()*1e-8,700,-400,1000,bank88->Timestamp()-hit.GetTime());
     }}
 
     if(s800) {
@@ -919,28 +1035,28 @@ if(reg&1){
 
    }}
 
- if(bank29) {
+ if(bank88) {
  histname = Form("Gretina_Bank88_TD");
-      obj.FillHistogram(histname,600,-600,600,bank29->Timestamp()-hit.GetTime(),
+      obj.FillHistogram(histname,600,-600,600,bank88->Timestamp()-hit.GetTime(),
                                  5000,0,10000,hit.GetCoreEnergy());
 
 if(reg&2){
 histname = Form("Gretina_Bank88_TD_Reg2");
-      obj.FillHistogram(histname,600,-600,600,bank29->Timestamp()-hit.GetTime(),
+      obj.FillHistogram(histname,600,-600,600,bank88->Timestamp()-hit.GetTime(),
                                  5000,0,10000,hit.GetCoreEnergy());
     }
 
 if(reg&1){
 histname = Form("Gretina_Bank88_TD_Reg1");
-      obj.FillHistogram(histname,600,-600,600,bank29->Timestamp()-hit.GetTime(),
+      obj.FillHistogram(histname,600,-600,600,bank88->Timestamp()-hit.GetTime(),
                                  5000,0,10000,hit.GetCoreEnergy());
     }
 
 }
 
-  if(s800 && bank29){
+  if(s800 && bank88){
       std::string histname = "GretinaEnergy_Bank88-S800_timestamp_difference";
-      obj.FillHistogram(histname,400,-400,400,bank29->Timestamp()-s800->Timestamp(),    2000,0,4000,hit.GetCoreEnergy());}
+      obj.FillHistogram(histname,400,-400,400,bank88->Timestamp()-s800->Timestamp(),    2000,0,4000,hit.GetCoreEnergy());}
 
   }
  }
@@ -996,3 +1112,5 @@ int outgoing_passed=-1;
   if(numobj!=list->GetSize())
     list->Sort();
 }
+
+
