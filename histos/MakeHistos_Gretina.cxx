@@ -22,9 +22,11 @@
 #include "GCutG.h"
 #include "TChain.h"
 
-std::vector<GCutG*> incoming_cuts = {0};
-std::vector<GCutG*> outgoing_cuts = {0};
-std::vector<GCutG*> time_energy_cuts = {0};
+std::vector<GCutG*> incoming_cuts ;
+std::vector<GCutG*> outgoing_cuts ;
+std::vector<GCutG*> tofcuts ;
+std::vector<GCutG*> pidcuts;
+std::vector<GCutG*> tmppidcuts;
 int gates_loaded=0;
 
 //quads as of June 2019.
@@ -263,10 +265,10 @@ bool OutgoingBeam(TRuntimeObjects& obj,GCutG *incoming) {
 
   histname = "CRDC1_Y_vs_Time";
   obj.FillHistogram(dirname,histname,800,-400,400,s800->GetCrdc(0).GetNonDispersiveY(),
-                                     3600,0,3600,s800->Timestamp()*1e-8);
+                                     3600,0,7200,s800->Timestamp()*1e-8);
 
   histname = "CRDC1_Time_vs_Timestamp";
-  obj.FillHistogram(dirname,histname,1000,-2000,2000,s800->GetCrdc(0).GetTime(),3600,0,3600,s800->Timestamp()*1e-8);
+  obj.FillHistogram(dirname,histname,1000,-2000,2000,s800->GetCrdc(0).GetTime(),3600,0,7200,s800->Timestamp()*1e-8);
 
 
   //histname = "CRDC1_Pad";
@@ -322,7 +324,7 @@ for(int j=0;j<E1UpSize;j++){
   obj.FillHistogram(dirname,histname,1200,-60000,60000,s800->GetCorrTOF_OBJ_MESY());
 
   histname = "OBJ_MESY_vs_Timestamp";
-  obj.FillHistogram(dirname,histname,4000,-20000,20000,s800->GetMTof().GetCorrelatedObjE1(),3600,0,3600,s800->Timestamp()*1e-8);
+  obj.FillHistogram(dirname,histname,4000,-20000,20000,s800->GetMTof().GetCorrelatedObjE1(),3600,0,7200,s800->Timestamp()*1e-8);
 
   histname = "XFP_function";
   obj.FillHistogram(dirname,histname,8000,-40000,40000,s800->GetMTof().GetCorrelatedXfpE1());
@@ -449,38 +451,37 @@ void CheckDAQCorrelation(TRuntimeObjects& obj){
   std::string dirname = "DAQ_Correlation";
 
   if(bank88&&s800){
-    obj.FillHistogram(dirname,"tdiff_bank88_s800",3600,0,3600,s800->GetTimestamp()/1e8,1000,-2000,2000,s800->GetTimestamp()-bank88->GetTimestamp());
+    obj.FillHistogram(dirname,"tdiff_bank88_s800",3600,0,7200,s800->GetTimestamp()/1e8,1000,-2000,2000,s800->GetTimestamp()-bank88->GetTimestamp());
   }
   if(bank88&&gretina){
-    obj.FillHistogram("tdiff_bank88_gretina",3600,0,3600,bank88->GetTimestamp(),1000,-2000,2000,gretina->GetGretinaHit(0).Timestamp()-bank88->GetTimestamp());
+    obj.FillHistogram(dirname,"tdiff_bank88_gretina",3600,0,7200,bank88->GetTimestamp(),1000,-2000,2000,gretina->GetGretinaHit(0).Timestamp()-bank88->GetTimestamp());
   }
   if(obj_sci&&s800){
-    obj.FillHistogram("tdiff_ddas_s800",3600,0,3600,s800->GetTimestamp()/1e8,1000,-2000,2000,s800->GetTimestamp()-obj_sci->GetOBJHit(0).GetExternalTimestamp()*8);
+    obj.FillHistogram(dirname,"tdiff_ddas_s800",3600,0,7200,s800->GetTimestamp()/1e8,1000,-2000,2000,s800->GetTimestamp()-obj_sci->GetOBJHit(0).GetExternalTimestamp()*8);
   }
   if(s800&&gretina){
-    obj.FillHistogram("tdiff_s800_gretina",3600,0,3600,s800->GetTimestamp()/1e8,1000,-2000,2000,s800->GetTimestamp()-gretina->GetGretinaHit(0).Timestamp());
+    obj.FillHistogram(dirname,"tdiff_s800_gretina",3600,0,7200,s800->GetTimestamp()/1e8,1000,-2000,2000,s800->GetTimestamp()-gretina->GetGretinaHit(0).Timestamp());
   }
   if(obj_sci&&gretina){
-    obj.FillHistogram("tdiff_gretina_ddas",obj_sci->GetOBJHit(0).GetExternalTimestamp()*8/1e8,1000,-2000,2000,obj_sci->GetOBJHit(0).GetExternalTimestamp()*8-gretina->GetGretinaHit(0).Timestamp());
+    obj.FillHistogram(dirname,"tdiff_gretina_ddas",3600,0,7200,obj_sci->GetOBJHit(0).GetExternalTimestamp()*8/1e8,1000,-2000,2000,obj_sci->GetOBJHit(0).GetExternalTimestamp()*8-gretina->GetGretinaHit(0).Timestamp());
   }
   if(s800 && s800->GetTrigger().GetRegistr() <100 && s800->GetTrigger().GetRegistr()>0){
      TString dirname = Form("DAQ_Correlation_trigger_%d",s800->GetTrigger().GetRegistr());
      if(bank88&&s800){
-       obj.FillHistogram(dirname,"tdiff_bank88_s800",3600,0,3600,s800->GetTimestamp()/1e8,1000,-2000,2000,s800->GetTimestamp()-bank88->GetTimestamp());
+       obj.FillHistogram(dirname,"tdiff_bank88_s800",3600,0,7200,s800->GetTimestamp()/1e8,1000,-2000,2000,s800->GetTimestamp()-bank88->GetTimestamp());
      }
      if(bank88&&gretina){
-       obj.FillHistogram("tdiff_bank88_gretina",3600,0,3600,bank88->GetTimestamp(),1000,-2000,2000,gretina->GetGretinaHit(0).Timestamp()-bank88->GetTimestamp());
+       obj.FillHistogram(dirname,"tdiff_bank88_gretina",3600,0,7200,bank88->GetTimestamp(),1000,-2000,2000,gretina->GetGretinaHit(0).Timestamp()-bank88->GetTimestamp());
      }
      if(obj_sci&&s800){
-       obj.FillHistogram("tdiff_ddas_s800",3600,0,3600,s800->GetTimestamp()/1e8,1000,-2000,2000,s800->GetTimestamp()-obj_sci->GetOBJHit(0).GetExternalTimestamp()*8);
+       obj.FillHistogram(dirname,"tdiff_ddas_s800",3600,0,7200,s800->GetTimestamp()/1e8,1000,-2000,2000,s800->GetTimestamp()-obj_sci->GetOBJHit(0).GetExternalTimestamp()*8);
      }
      if(s800&&gretina){
-       obj.FillHistogram("tdiff_s800_gretina",3600,0,3600,s800->GetTimestamp()/1e8,1000,-2000,2000,s800->GetTimestamp()-gretina->GetGretinaHit(0).Timestamp());
+       obj.FillHistogram(dirname,"tdiff_s800_gretina",3600,0,7200,s800->GetTimestamp()/1e8,1000,-2000,2000,s800->GetTimestamp()-gretina->GetGretinaHit(0).Timestamp());
      }
      if(obj_sci&&gretina){
-       obj.FillHistogram("tdiff_gretina_ddas",obj_sci->GetOBJHit(0).GetExternalTimestamp()*8/1e8,1000,-2000,2000,obj_sci->GetOBJHit(0).GetExternalTimestamp()*8-gretina->GetGretinaHit(0).Timestamp());
+       obj.FillHistogram(dirname,"tdiff_gretina_ddas",3600,0,7200,obj_sci->GetOBJHit(0).GetExternalTimestamp()*8/1e8,1000,-2000,2000,obj_sci->GetOBJHit(0).GetExternalTimestamp()*8-gretina->GetGretinaHit(0).Timestamp());
      }
-
   }
 }
 
@@ -717,8 +718,16 @@ void MonitorOBJScintillator_DDAS(TRuntimeObjects &obj){
   TOBJ     *obj_sci = obj.GetDetector<TOBJ>();
   if(obj_sci){
     std::string dirname = "OBJSci";
-    for(size_t x = 0; x<obj_sci->Size();x++)
-      obj.FillHistogram(dirname,"Energy_of_OBJSci",1000,0,40000,obj_sci->GetOBJHit(x).GetEnergy());
+    for(size_t x = 0; x<obj_sci->Size();x++){
+      auto objhit = obj_sci->GetOBJHit(x);
+      obj.FillHistogram(dirname,"Energy_of_OBJSci",1000,0,40000,objhit.GetEnergy());
+      if(objhit.GetPileup()){
+        obj.FillHistogram(dirname,"Energy_of_OBJSci_Pileup",1000,0,40000,objhit.GetEnergy());
+      }else{
+        obj.FillHistogram(dirname,"Energy_of_OBJSci_noPileup",1000,0,40000,objhit.GetEnergy());
+      }
+
+    }
   }
 }
 
@@ -759,6 +768,42 @@ void MonitorICs(TRuntimeObjects &obj){
   obj.FillHistogram(dirname,"ICAVEnergy_crdc1y",800,-400,400,crdc1.GetNonDispersiveY(),1000,0,4000,ic.GetAve());
 }
 
+void OutgoingPID(TRuntimeObjects &obj){
+  TS800 *s800 = obj.GetDetector<TS800>();
+  if(!s800) return;
+  
+  std::string dirname = "OUT_PID";
+  auto ic = s800->GetIonChamber();
+  auto crdc1 = s800->GetCrdc(0);
+  obj.FillHistogram(dirname,"TOF-dE",2000,-4000,4000,s800->GetCorrTOF_OBJ_MESY(0),4000,0,4000,ic.GetdE(crdc1.GetDispersiveX(),crdc1.GetNonDispersiveY()));
+  obj.FillHistogram(dirname,"dE-Crdc1x",800,-400,400,crdc1.GetDispersiveX(),4000,0,4000,ic.GetdE(crdc1.GetDispersiveX(),crdc1.GetNonDispersiveY()));
+
+  auto obj_sci = obj.GetDetector<TOBJ>();
+  if(!obj_sci) return;
+  if(tmppidcuts.at(0)->IsInside(s800->GetRawOBJ_MESY(0)-s800->GetRawXF_MESY(0),obj_sci->GetOBJHit(0).GetEnergy())){
+  obj.FillHistogram(dirname,"TOF-dE-gated-by-sci",2000,-4000,4000,s800->GetCorrTOF_OBJ_MESY(0),4000,0,4000,ic.GetdE(crdc1.GetDispersiveX(),crdc1.GetNonDispersiveY()));
+  }
+}
+
+void IncomingPID(TRuntimeObjects &obj){
+  TS800 *s800 = obj.GetDetector<TS800>();
+  TOBJ *obj_sci = obj.GetDetector<TOBJ>();
+  if(!s800 || !obj_sci) return;
+  
+  std::string dirname = "INC_PID";
+  for(size_t x = 0; x<obj_sci->Size();x++)
+  obj.FillHistogram(dirname,"TOF-dE-Sci",4000,-4000,4000,s800->GetCorrTOF_OBJ_MESY(0),10000,0,40000,obj_sci->GetOBJHit(x).GetEnergy());
+  obj.FillHistogram(dirname,"TOF-dE-PIN",4000,-4000,4000,s800->GetCorrTOF_OBJ_MESY(0),1000,0,4000,s800->GetPinE());
+
+  obj.FillHistogram(dirname,"TOF-dE-Sci-raw",4000,-10000,10000,s800->GetRawOBJ_MESY(0)-s800->GetRawXF_MESY(0),1000,0,40000,obj_sci->GetOBJHit(0).GetEnergy());
+  obj.FillHistogram(dirname,"TOF-dE-PIN-raw",4000,-10000,10000,s800->GetRawOBJ_MESY(0)-s800->GetRawXF_MESY(0),1000,0,4000,s800->GetPinE());
+
+  if(tmppidcuts.at(0)->IsInside(s800->GetRawOBJ_MESY(0)-s800->GetRawXF_MESY(0),obj_sci->GetOBJHit(0).GetEnergy())){
+    obj.FillHistogram(dirname,"TOF-dE-PIN-raw-gated",4000,-10000,10000,s800->GetRawOBJ_MESY(0)-s800->GetRawXF_MESY(0),1000,0,4000,s800->GetPinE());
+  }
+
+}
+
 void MonitorTOF(TRuntimeObjects &obj){
   TS800 *s800 = obj.GetDetector<TS800>();
   if(!s800) return;
@@ -774,24 +819,101 @@ void MonitorTOF(TRuntimeObjects &obj){
   for(int x = 0; x < mtof.XfpSize(); x++)
   for(int y = 0; y < mtof.E1UpSize();y++){
     obj.FillHistogram(dirname,"XFP-E1_Mesy",1000,-10000,10000,s800->GetRawXF_MESY(x)-s800->GetRawE1_MESY(y));
-    obj.FillHistogram(dirname,"XFP-E1_Mesy_vs_AFP",1000,-10000,10000,s800->GetRawXF_MESY(x)-s800->GetRawE1_MESY(y),100,-0.1,0.1,s800->GetAFP());
-    obj.FillHistogram(dirname,"XFP-E1_Mesy_vs_XFP",1000,-10000,10000,s800->GetRawXF_MESY(x)-s800->GetRawE1_MESY(y),100,-0.1,0.1,s800->GetBFP());
+    obj.FillHistogram(dirname,"XFP-E1_Mesy_vs_AFP",3000,-4000,8000,s800->GetCorrTOF_XFP_MESY(x*y+y),1000,-0.1,0.1,s800->GetAFP());
+    obj.FillHistogram(dirname,"XFP-E1_Mesy_vs_XFP",3000,-4000,8000,s800->GetCorrTOF_XFP_MESY(x*y+y),1000,-400,400,s800->GetXFP());
   }
 
   for(int x = 0; x < mtof.ObjSize(); x++)
   for(int y = 0; y < mtof.E1UpSize();y++){
     obj.FillHistogram(dirname,"OBJ-E1_Mesy",1000,-10000,10000,s800->GetRawOBJ_MESY(x)-s800->GetRawE1_MESY(y));
-    obj.FillHistogram(dirname,"OBJ-E1_Mesy_vs_AFP",1000,-10000,10000,s800->GetRawOBJ_MESY(x)-s800->GetRawE1_MESY(y),100,-0.1,0.1,s800->GetAFP());
-    obj.FillHistogram(dirname,"OBJ-E1_Mesy_vs_XFP",1000,-10000,10000,s800->GetRawOBJ_MESY(x)-s800->GetRawE1_MESY(y),100,-0.1,0.1,s800->GetBFP());
+    obj.FillHistogram(dirname,"OBJ-E1_Mesy_vs_AFP",2000,-4000,4000,s800->GetCorrTOF_OBJ_MESY(x*y+y),1000,-0.1,0.1,s800->GetAFP());
+    obj.FillHistogram(dirname,"OBJ-E1_Mesy_vs_XFP",2000,-4000,4000,s800->GetCorrTOF_OBJ_MESY(x*y+y),1000,-400,400,s800->GetXFP());
   }
 
   for(int x = 0; x < mtof.ObjSize(); x++)
   for(int y = 0; y < mtof.XfpSize();y++){
     obj.FillHistogram(dirname,"XFP-OBJ_Mesy",1000,-10000,10000,s800->GetRawOBJ_MESY(x)-s800->GetRawXF_MESY(y));
-    obj.FillHistogram(dirname,"XFP-OBJ_Mesy_vs_AFP",1000,-10000,10000,s800->GetRawOBJ_MESY(x)-s800->GetRawXF_MESY(y),100,-0.1,0.1,s800->GetAFP());
-    obj.FillHistogram(dirname,"XFP-OBJ_Mesy_vs_BFP",1000,-10000,10000,s800->GetRawOBJ_MESY(x)-s800->GetRawXF_MESY(y),100,-0.1,0.1,s800->GetBFP());
+    obj.FillHistogram(dirname,"XFP-OBJ_Mesy_vs_AFP",2000,-10000,10000,s800->GetRawOBJ_MESY(x)-s800->GetRawXF_MESY(y),100,-0.1,0.1,s800->GetAFP());
+    obj.FillHistogram(dirname,"XFP-OBJ_Mesy_vs_BFP",2000,-10000,10000,s800->GetRawOBJ_MESY(x)-s800->GetRawXF_MESY(y),100,-0.1,0.1,s800->GetBFP());
+    obj.FillHistogram(dirname,"XFP-OBJ_Mesy_vs_XFP",2000,-10000,10000,s800->GetRawOBJ_MESY(x)-s800->GetRawXF_MESY(y),1000,-400,400,s800->GetXFP());
+  }
+  obj.FillHistogram(dirname,"XFP_vs_OBJ_MESY",2000,27000,31000,mtof.GetCorrelatedObj(),2000,28000,36000,mtof.GetCorrelatedXfp());
+  
+}
+
+void CountOBJ(TRuntimeObjects &obj){
+  if(pidcuts.size()==0) return;
+  TS800 *s800 = obj.GetDetector<TS800>();
+  TOBJ *obj_sci = obj.GetDetector<TOBJ>();
+  if(!s800) return;
+  if(!obj_sci) return;
+  auto mtof = s800->GetMTof();
+  if(tofcuts.size()==1 && !(tofcuts.at(0)->IsInside(mtof.GetCorrelatedObj(),mtof.GetCorrelatedXfp()))) return;
+
+  std::string dirname="Count_OBJ";
+  std::string dirname2="Check_Mdis";
+  auto ic = s800->GetIonChamber();
+  auto crdc1 = s800->GetCrdc(0);
+  double tof = s800->GetCorrTOF_OBJ_MESY(0);
+  double dE = ic.GetdE(crdc1.GetDispersiveX(),crdc1.GetNonDispersiveY());
+  obj.FillHistogram(dirname,"tof-dE",3000,-4000,8000,tof,4000,0,4000,dE);
+  for(size_t x = 0; x<pidcuts.size();x++){
+    std::string histname;
+    if(pidcuts.at(x)->IsInside(tof,dE)){
+      histname = Form("tof-dE_%s",pidcuts.at(x)->GetName());
+      obj.FillHistogram(dirname,histname,3000,-4000,8000,tof,4000,0,4000,dE);
+      histname = Form("CRDC1_x_%s",pidcuts.at(x)->GetName());
+      obj.FillHistogram(dirname2,histname,800,-400,400,crdc1.GetDispersiveX());
+      dirname2 = "INC_PID";
+      histname = Form("TOF_dE_Sci_Raw_%s",pidcuts.at(x)->GetName());
+      obj.FillHistogram(dirname,histname,4000,-10000,10000,s800->GetRawOBJ_MESY(0)-s800->GetRawXF_MESY(0),1000,0,40000,obj_sci->GetOBJHit(0).GetEnergy());
+      histname = Form("TOF_dE_Pin_Raw_%s",pidcuts.at(x)->GetName());
+      obj.FillHistogram(dirname,histname,4000,-10000,10000,s800->GetRawOBJ_MESY(0)-s800->GetRawXF_MESY(0),1000,0,4000,s800->GetPinE());
+    }
+
+  }
+  if(!obj_sci) return;
+  for(size_t y = 0; y < pidcuts.size(); y++){
+    
+    std::string histname;
+    if(pidcuts.at(y)->IsInside(tof,dE)){
+    histname = Form("Energy_if_OBJSci_%s",pidcuts.at(y)->GetName());
+    for(size_t x = 0; x<obj_sci->Size();x++)
+      obj.FillHistogram(dirname,histname,1000,0,40000,obj_sci->GetOBJHit(x).GetEnergy());
+    }
   }
 
+}
+
+void MonitorPin(TRuntimeObjects &obj){
+
+  TS800 *s800 = obj.GetDetector<TS800>();
+  if(!s800) return;
+
+  std::string dirname = "PIN";
+  obj.FillHistogram(dirname,"Pin_energy",4000,0,4000,s800->GetPinE());
+}
+
+void LoadGates(TRuntimeObjects &obj){
+  TList *gates = &(obj.GetGates());
+  if(!gates||gates->GetSize()==0) return;
+  
+  if(gates_loaded!=gates->GetSize()){
+    TIter iter(gates);
+    while(TObject *obj = iter.Next()){
+      GCutG *gate = (GCutG*)obj;
+      std::string tag = gate->GetTag();
+      std::cout<<"tag : "<<tag<<std::endl;
+      if(!tag.compare("pid")){
+        pidcuts.push_back(gate);
+      }else if(!tag.compare("tof")){
+        tofcuts.push_back(gate);
+      }else if(!tag.compare("temppid")){
+        tmppidcuts.push_back(gate);
+      }
+      gates_loaded++;
+    }
+  }
 }
 
 ////////////////////////////
@@ -818,11 +940,18 @@ void MakeHistograms(TRuntimeObjects& obj) {
   TOBJ     *obj_sci = obj.GetDetector<TOBJ>();
 
 
+  LoadGates(obj);
   CheckDAQCorrelation(obj);
+
   MonitorOBJScintillator_DDAS(obj);
   MonitorCrdcs(obj);
   MonitorICs(obj);
   MonitorTOF(obj);
+  MonitorPin(obj);
+
+  OutgoingPID(obj);
+  IncomingPID(obj);
+  CountOBJ(obj);
   
 
   return;
@@ -839,7 +968,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       GCutG *gate = (GCutG*)obj;
       std::string tag = gate->GetTag();
       if(!tag.compare("time_energy")) {
-        time_energy_cuts.push_back(gate);
+//        time_energy_cuts.push_back(gate);
       } 
         else if(!tag.compare("outgoing")) {
         outgoing_cuts.push_back(gate);

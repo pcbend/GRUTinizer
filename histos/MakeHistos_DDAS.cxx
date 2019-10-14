@@ -89,7 +89,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
       static int total_events = 0;
       for(size_t i = 0; i< objs->Size(); i++){
         TOBJHit ohit = objs->GetOBJHit(i);
-        obj.FillHistogram("ddas_dir","ddas_energy",1000,0,10000,ohit.GetEnergy());
+        obj.FillHistogram("ddas_dir","ddas_energy",1000,0,50000,ohit.GetEnergy());
 //        long long tdiff = objs->Timestamp()-first_ts;
         long long tdiff = ohit.Timestamp()-first_ts;
         obj.FillHistogram("ddas_dir","ddas_tdiff",1000000,-1000,6000000,tdiff);
@@ -100,11 +100,13 @@ void MakeHistograms(TRuntimeObjects& obj) {
         if(ohit.GetTrace()->size()>0){
           std::vector<unsigned short> *tr = ohit.GetTrace();
           for(size_t j = 0; j<ohit.GetTrace()->size();j++){
-            obj.FillHistogram("ddas_dir","trace",1000,0,1000,j,1000,-10000 ,10000,tr->at(j));
+            obj.FillHistogram("ddas_dir","trace",1000,0,1000,j,1000,-10000 ,40000,tr->at(j));
           }
         }
       }
     }
+
+    return;
 
     if(s800) {
         obj.FillHistogram("E1Up_Singles",2000,0,2000,s800->GetScint().GetEUp()) ;
