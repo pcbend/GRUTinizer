@@ -835,6 +835,10 @@ float TS800::GetTofE1_TDC(float c1,float c2)  const {
 }
 
 float TS800::GetTofE1_MTDC(float c1,float c2,int i) const {
+
+  if(!std::isnan(GValue::Value("TARGET_MTOF_OBJE1"))){
+    return mtof.GetCorrelatedObjE1() + c1*GetAFP()+c2*GetCrdc(0).GetDispersiveX();
+  }
 /*
   std::vector<float> result;
   // TODO: This check is always false.  Commented it out, but was there some reason for it?
@@ -861,36 +865,51 @@ float TS800::GetTofE1_MTDC(float c1,float c2,int i) const {
 
 float TS800::GetTofE1_MTDC_XFP(float c1,float c2,int i) const {
 
+  if(!std::isnan(GValue::Value("TARGET_MTOF_XFPE1"))){
+    return mtof.GetCorrelatedXfpE1() + c1*GetAFP() + c2*GetCrdc(0).GetDispersiveX();
+  }
   std::vector<float> result;
   // TODO: This check is always false.  Commented it out, but was there some reason for it?
   // if(mtof.fObj.size()<0)
   //   std::cout << " In GetTOF MTDC, Size = " << mtof.fObj.size() << std::endl;
-  for(unsigned int x=0;x<mtof.fXfp.size();x++) {
-    for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
-      result.push_back( mtof.fXfp.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
-    }
-  }
+  //for(unsigned int x=0;x<mtof.fXfp.size();x++) {
+  //  for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
+  //    result.push_back( mtof.fXfp.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
+  //  }
+  //}
+  int x = mtof.fXfp.size();
+  int y = mtof.fE1Up.size();
+  if(i<0||i>=x*y) return sqrt(-1);
 
-  if(result.size()>(unsigned int)i)
-    return result.at(i);
-  return sqrt(-1.0);
+  int index_x = i/y;
+  int index_y = i%y;
+
+  return mtof.fXfp.at(index_x)-mtof.fE1Up.at(index_y)+c1*GetAFP()+c2*GetCrdc(0).GetDispersiveX();
 }
 
 float TS800::GetTofE1_MTDC_RF(float c1,float c2,int i) const {
+  
+  if(!std::isnan(GValue::Value("TARGET_MTOF_RfE1"))){
 
-  std::vector<float> result;
+    return mtof.GetCorrelatedRfE1() + c1 *GetAFP()+c2*GetCrdc(0).GetDispersiveX();
+
+  }
+  //std::vector<float> result;
   // TODO: This check is always false.  Commented it out, but was there some reason for it?
   // if(mtof.fObj.size()<0)
   //   std::cout << " In GetTOF MTDC, Size = " << mtof.fObj.size() << std::endl;
-  for(unsigned int x=0;x<mtof.fRf.size();x++) {
-    for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
-      result.push_back( mtof.fRf.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
-    }
-  }
+  //for(unsigned int x=0;x<mtof.fRf.size();x++) {
+  //  for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
+  //    result.push_back( mtof.fRf.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
+  //  }
+  //}
 
-  if(result.size()>(unsigned int)i)
-    return result.at(i);
-  return sqrt(-1.0);
+  int x = mtof.fE1Up.size();
+  int y = mtof.fRf.size();
+  if(i<0 || i>=x*y) return sqrt(-1.0);
+  int index_x = i/y;
+  int index_y = i%y;
+  return mtof.fRf.at(index_x) - mtof.fE1Up.at(index_y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
 }
 
 float TS800::GetOBJRaw_TAC() const {
@@ -1384,6 +1403,7 @@ float TS800::GetCorrTOF_XFP_MESY(int i) const {
   //}
   return GetTofE1_MTDC_XFP(f_mafp_cor,f_mxfp_cor,i);
 }
+
 
 float TS800::GetCorrTOF_RF_MESY(int i) const {
   //static double f_afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");

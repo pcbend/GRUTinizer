@@ -80,9 +80,9 @@ public:
   float GetXF_E1Raw() const;
   //===================================================  
 
-  float GetCorrTOF_OBJ_MESY(int i=0) const;
+  float GetCorrTOF_OBJ_MESY(int i=0) const; // return correlated and corrected TOF
   float GetCorrTOF_RF_MESY(int i=0) const;
-  float GetCorrTOF_XFP_MESY(int i=0) const;
+  float GetCorrTOF_XFP_MESY(int i=0) const;// return correlated and corrected TOF
   
   float GetOBJ_E1Raw_MESY(int i=0) const;
   float GetOBJ_E1Raw_MESY_Ch15(int i=0) const;
