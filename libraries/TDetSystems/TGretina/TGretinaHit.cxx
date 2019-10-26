@@ -151,13 +151,18 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
   SetTimestamp(raw.timestamp);
   fT0 = raw.t0;
   fCrystalId = raw.crystal_id;
-  fCoreEnergy = raw.tot_e;
 
   int board_id = ((fCrystalId/4) << 8) ;  //hole  number : 0x1f00
   //    board_id =                       ;  //card  number : 0x0030  information not available here.
   board_id += ((fCrystalId%4) << 6) ;  //x-tal number : 0x00c0
   board_id += 9;                       //chan  number : 0x000f  information not available here(assume core).
   fAddress = (1<<24) + board_id;
+
+  TChannel *ch = TChannel::GetChannel(fAddress);
+  if(!ch)
+    fCoreEnergy = raw.tot_e;
+  else
+    fCoreEnergy = ch->CalEnergy(raw.tot_e);
 
 
   for(int i=0; i<4; i++){

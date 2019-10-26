@@ -17,13 +17,14 @@ int TOBJ::BuildHits(std::vector<TRawEvent>& raw_data) {
     int total_size = *(int*)buf.GetData();
     const char* buffer_end = buf.GetData() + total_size;
     // uncomment below two lines if we are getting data from gebpush
-    buf.Advance(sizeof(int));
-    buf.Advance(sizeof(short)); // i am now even more confused.  extra 0x0000 after first ncsl ts
+    //buf.Advance(sizeof(int));
+    //buf.Advance(sizeof(short)); // i am now even more confused.  extra 0x0000 after first ncsl ts
     //buf.Advance(sizeof(int));  // i dont know why this is???  2019-Pt run pcb. 
     //int ptr = sizeof(int);
     while(buf.GetData() < buffer_end) {
       // Constructor advances the buffer to end of each channel
-      TDDASEvent<DDASGEBHeader> ddas(buf);
+      //TDDASEvent<DDASGEBHeader> ddas(buf);
+      TDDASEvent<DDASHeader> ddas(buf);
       //std::cout << ddas.GetTimestamp() << "     ddas.GetAddress():   " << ddas.GetAddress() << std::endl;
       
       /////////////////
