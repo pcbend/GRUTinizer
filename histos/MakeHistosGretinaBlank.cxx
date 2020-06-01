@@ -109,6 +109,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   if(numobj!=list->GetSize())
     list->Sort();
-  }
+  
 }
 
