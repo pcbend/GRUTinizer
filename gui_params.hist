@@ -1,9 +1,0 @@
-{'histograms': [],
- 'tcuts': [],
- 'variables': {'AFP_COEF': 1200,
-               'BETA': 0.404,
-               'CRDCX_COEF': 0.15,
-               'E1_TDC_high': 8000,
-               'E1_TDC_low': -8000,
-               'MAFP_COEF': 1000,
-               'MCRDCX_COEF': 0.1}}
