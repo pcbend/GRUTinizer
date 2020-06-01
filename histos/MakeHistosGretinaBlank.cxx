@@ -91,8 +91,19 @@ void MakeHistograms(TRuntimeObjects& obj) {
     return;
 
 
-  for(unsigned int i=0; i<gretina->Size(); i++) {
-    TGretinaHit hit = gretina->GetGretinaHit(i);
+  for(unsigned int x=0; x<gretina->Size(); x++) {
+    TGretinaHit xhit = gretina->GetGretinaHit(i);
+
+    //  1D hitogram 
+    //  obj.FillHistogram(dirname,histname,bins,xlow,xhigh,xvalue);
+    for(unsigned int y=0; y<gretina->Size(); y++) {
+      TGretinaHit yhit = gretina->GetGretinaHit(y);
+     
+      //  2D hitogram 
+      //  obj.FillHistogram(dirname,histname,xbins,xlow,xhigh,xvalue,
+      //                                     ybins,ylow,yhigh,yvalue);
+  
+    }
 
   }
 
