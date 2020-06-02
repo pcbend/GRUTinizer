@@ -50,11 +50,11 @@ double GH1::FitEval(double *dim,double *par) {
 
   int binNum = GetXaxis()->FindBin(x); //gHist->GetBin() does not respect rebinning.
 
-  int nBins = GetNbinsX();
+  int nBins     = GetNbinsX();
   int kevPerBin = GetXaxis()->GetXmax()/nBins;
-  int curBinX = GetBinCenter(binNum);
-  int nextBinX = GetBinCenter(binNum+1);
-  int prevBinX = GetBinCenter(binNum-1);
+  int curBinX   = GetBinCenter(binNum);
+  int nextBinX  = GetBinCenter(binNum+1);
+  int prevBinX  = GetBinCenter(binNum-1);
 
   if (x > prevBinX && x <= curBinX){
     double leftDiff = x - prevBinX;

@@ -1,11 +1,11 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import ast
 import os
 import pprint
-import Tkinter as tk
-import tkFileDialog
-import ttk
+import tkinter.filedialog
+import tkinter as tk
+from tkinter import ttk
 
 import sys
 
@@ -47,7 +47,7 @@ class MainWindow(object):
 
     def _save_gui_file(self, filename = None):
         if filename is None:
-            filename = tkFileDialog.asksaveasfilename(filetypes=(("GUI File", "*.hist"),))
+            filename = tkinter.filedialog.asksaveasfilename(filetypes=(("GUI File", "*.hist"),))
 
         if not filename:
             return
@@ -68,7 +68,7 @@ class MainWindow(object):
 
     def _dump_root_file(self, filename = None, include_histograms = True):
         if filename is None:
-            filename = tkFileDialog.asksaveasfilename(filetypes=(("ROOT File", "*.root"),))
+            filename = tkinter.filedialog.asksaveasfilename(filetypes=(("ROOT File", "*.root"),))
 
         if not filename:
             return
@@ -420,7 +420,7 @@ class MainWindow(object):
             zones = map(int,zones_str.split("x"))
             self.zone_cols,self.zone_rows = zones
         except (IndexError,ValueError):
-            print 'Cannot set zones to "{}"'.format(zones_str)
+            print('Cannot set zones to "{}"'.format(zones_str))
 
     def _MakeOptStatMenu(self, menubar):
         self.optstat_name      = tk.BooleanVar(value=True)
@@ -562,7 +562,7 @@ class MainWindow(object):
 
     def LoadDataFile(self, filename = None):
         if filename is None:
-            filename = tkFileDialog.askopenfilename(filetypes=(("NSCL Evt", "*.evt"),
+            filename = tkinter.filedialog.askopenfilename(filetypes=(("NSCL Evt", "*.evt"),
                                                                ("GEB File", "*.dat"),
                                                                ("GZip File", "*.gz")))
 
@@ -574,7 +574,7 @@ class MainWindow(object):
     def LoadRootFile(self,filename=None):
         #print "In py LoadRooFile " + filename
         if filename is None:
-            filename = tkFileDialog.askopenfilename(filetypes=(("ROOT File", "*.root"),))
+            filename = tkinter.filedialog.askopenfilename(filetypes=(("ROOT File", "*.root"),))
 
         if not filename:
             return
@@ -587,11 +587,11 @@ class MainWindow(object):
             self.tcut_tab.AddFile(tfile)
             self.variable_tab.AddFile(tfile)
         else:
-            print 'MainWindow.LoadRootFile: Could not open {}'.format(filename)
+            print('MainWindow.LoadRootFile: Could not open {}'.format(filename))
 
     def LoadWindowFile(self,filename=None):
         if filename is None:
-            filename = tkFileDialog.askopenfilename(filetypes=(("Window File","*.win"),))
+            filename = tkinter.filedialog.askopenfilename(filetypes=(("Window File","*.win"),))
 
         if not filename:
             return
@@ -631,7 +631,8 @@ class MainWindow(object):
 
         if width*height == 0:
             array = self.get_canvas_size()
-            array = map(int,array)
+            #array = map(int,array)
+            array = list(map(int,array))
             canvas = ROOT.GCanvas(title,title,0,0,array[0],array[1],True)
         else:
             canvas = ROOT.GCanvas(title,title,topx,topy,width,height,True)
