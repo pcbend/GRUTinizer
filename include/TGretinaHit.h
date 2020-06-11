@@ -136,6 +136,8 @@ public:
   Float_t  GetIntAssignEng(int i)     const { return GetInteractionPoint(i).GetAssignE(); }
   TVector3 GetIntPosition(int i)      const { return GetInteractionPoint(i).GetPosition(GetCrystalId()); }
   TVector3 GetLocalIntPosition(int i) const { return GetInteractionPoint(i).GetLocalPosition(); }
+  TVector3 GetCrystalPosition()       const;// { return TGretina::GetCrystalPosition(fCrystalId); }
+
   
   void   SetCoreEnergy(float temp) const { fCoreEnergy = temp; }
 

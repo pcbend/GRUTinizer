@@ -300,6 +300,8 @@ int TGretinaHit::CleanInteractions() {
   return fInteractions.size();
 }
 
+TVector3 TGretinaHit::GetCrystalPosition()  const { return TGretina::GetCrystalPosition(fCrystalId); }
+
 
 //TVector3 TGretinaHit::GetCrystalPosition(int i) const {
 //  std::cerr << __PRETTY_FUNCTION__ << " NOT IMPLEMENTED YET" << std::endl;
