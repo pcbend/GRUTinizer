@@ -13,8 +13,8 @@
 
 bool file_exists(const char *filename){
   //std::ifstream(filename);
-  struct stat buffer;
-  return (stat(filename,&buffer)==0);
+  struct stat64 buffer;
+  return (stat64(filename,&buffer)==0);
 }
 
 bool all_files_exist(const std::vector<std::string>& filenames) {
