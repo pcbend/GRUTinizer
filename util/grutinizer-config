@@ -130,7 +130,7 @@ while test $# -gt 0; do
         continue
       fi
       rootout="yes"
-      out="$out `root-config --cflags --glibs` -lPhysics -lSpectrum -lPyROOT -lMinuit -lMathMore"
+      out="$out `root-config --cflags --glibs` -lPhysics -lSpectrum -lROOTTPython -lMinuit -lMathMore"
       ;;
     --libdir)
         if test "x$libdirout" = "xyes" ; then

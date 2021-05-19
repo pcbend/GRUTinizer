@@ -279,7 +279,8 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   TFitResultPtr fitres = fithist->Fit(this,Form("%sLRSME",options.Data()));
 
   //fitres.Get()->Print();
-  //  printf("chi^2/NDF = %.02f\n",this->GetChisquare()/(double)this->GetNDF());
+  printf("chi^2/NDF = %.02f\n",this->GetChisquare()/(double)this->GetNDF());
+
   
   
   if(!fitres.Get()->IsValid()) {

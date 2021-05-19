@@ -24,8 +24,8 @@ bool TS800::fGlobalReset =false;
 
 
 
-//static double f_mafp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
-//static double f_mxfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+static double f_mafp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+static double f_mxfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
 
 
 

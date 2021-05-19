@@ -11,13 +11,12 @@
 extern "C"
 bool FilterCondition(TRuntimeObjects& obj) {
 
+
   TGretina *gretina = obj.GetDetector<TGretina>();
   //TS800 *s800       = obj.GetDetector<TS800>();
 
   if(!gretina)
     return false;
-  }
-
 
   //if((s800->GetTrigger().GetRegistr()&0x0002)>>1)
   // return true;

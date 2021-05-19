@@ -57,7 +57,7 @@ CFLAGS    += $(shell root-config --cflags)
 CFLAGS    += -MMD -MP $(INCLUDES)
 CFLAGS    += -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
 LINKFLAGS += -Llib $(addprefix -l,$(LIBRARY_NAMES)) -Wl,-rpath,\$$ORIGIN/../lib
-LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lPyROOT -lMinuit -lMathMore
+LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lROOTTPython -lMinuit -lMathMore
 LINKFLAGS := $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX)
 
 ROOT_LIBFLAGS := $(shell root-config --cflags)

@@ -34,6 +34,8 @@
 #include "TF2.h"
 #include "TProfile.h"
 
+#include "TObjString.h"
+
 #include "TRandom.h"
 #include "THLimitsFinder.h"
 #include "TMath.h"
