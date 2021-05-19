@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 
 import itertools
-import Tkinter as tk
-import ttk
+import tkinter as tk
+from tkinter import ttk
 
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
@@ -30,7 +30,8 @@ class HistTab(object):
         # Map from treeview name to ROOT object
         self.hist_lookup = TKeyDict()
         self.treeview.bind("<Double-1>", self.OnHistClick)
-
+        self.treeview.bind("<space>", self.OnHistButton)
+        
         scrollbar = ttk.Scrollbar(parent)
         scrollbar.pack(side=tk.LEFT,fill=tk.Y)
         self.treeview.configure(yscrollcommand=scrollbar.set)
@@ -48,7 +49,7 @@ class HistTab(object):
 
         color = 1;
         for name,obj in sorted(histograms.items()):
-            if isinstance(obj, ROOT.GH2Base):
+            if isinstance(obj, ROOT.GH2):
                 self._refresh(name, obj)
 
             self.main._draw_single(obj,color,len(histograms))
@@ -59,18 +60,23 @@ class HistTab(object):
 
         update_tcanvases()
 
+    def OnHistButton(self,event):
+        self.OnHistClick(event)
+        self.main.window.lift()
+
+
     def _dump_to_tfile(self):
         for key in self.hist_lookup:
             self.hist_lookup[key].Write()
 
     def _load_compiled_histograms(self, filename):
-        print 'load compiled histograms called.'
+        print('load compiled histograms called.')
         #pipeline = ROOT.GetPipeline(0)
         #if outfile:
         #    pipeline.SetHistogramLibrary(filename)
 
     def _compiled_histogram_filename(self):
-        print ' _compiled_histogram_filename  called.\n'
+        print(' _compiled_histogram_filename  called.\n')
         #pipeline = ROOT.GetPipeline(0)
         #if pipeline:
         #    return pipeline.GetLibraryName()
@@ -126,9 +132,9 @@ class HistTab(object):
             iterable = obj.GetListOfKeys()
             if not iterable:
                 iterable = obj.GetList()
-        elif isinstance(obj, ROOT.GH2Base):
-            iterable = itertools.chain(obj.GetProjections(),
-                                       obj.GetSummaryProjections())
+        elif isinstance(obj, ROOT.GH2):
+            iterable = itertools.chain(obj.GetProjections())
+                                       #,obj.GetSummaryProjections())
         else:
             iterable = None
 

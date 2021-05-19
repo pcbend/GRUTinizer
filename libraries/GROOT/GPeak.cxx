@@ -4,6 +4,7 @@
 #include <TVirtualFitter.h>
 #include <TFitResult.h>
 #include <TFitResultPtr.h>
+#include <TH1.h>
 
 
 #include "Globals.h"
@@ -39,8 +40,7 @@ GPeak::GPeak(Double_t cent,Double_t xlow,Double_t xhigh,Option_t *opt)
   
   SetParent(0);
   //TF1::SetDirectory(0);
-  fBGFit.SetParent(0);
-  fBGFit.SetBit(TObject::kCanDelete,false);
+  DetachBackground();
   //fBGFit.SetDirectory(0);
 
 }
@@ -74,8 +74,8 @@ GPeak::GPeak(Double_t cent,Double_t xlow,Double_t xhigh,TF1 *bg,Option_t *opt)
   fBGFit.SetLineColor(kBlack);
   
   SetParent(0);
+  DetachBackground();
   //SetDirectory(0);
-  fBGFit.SetParent(0);
   //fBGFit.SetDirectory(0);
 }
 
@@ -92,7 +92,7 @@ GPeak::GPeak()
   
   SetParent(0);
   //SetDirectory(0);
-  fBGFit.SetParent(0);
+  DetachBackground();
   //fBGFit.SetDirectory(0);
 }
 
@@ -101,7 +101,7 @@ GPeak::GPeak(const GPeak &peak)
   
   SetParent(0);
   //SetDirectory(0);
-  fBGFit.SetParent(0);
+  DetachBackground();
   //fBGFit.SetDirectory(0);
   peak.Copy(*this);
 }
@@ -157,6 +157,7 @@ void GPeak::Copy(TObject &obj) const {
   ((GPeak&)obj).fNdf      = fNdf;
 
   fBGFit.Copy((((GPeak&)obj).fBGFit));
+  ((GPeak&)obj).DetachBackground();
 }
 
 bool GPeak::InitParams(TH1 *fithist){
@@ -385,6 +386,8 @@ Bool_t GPeak::Fit(TH1 *fithist,Option_t *opt) {
   fithist->GetListOfFunctions()->Add(fBGFit.Clone()); //use to be a clone.
 
   SetParent(0); //fithist);
+  DetachBackground();
+
 
   //delete tmppeak;
   return true;
@@ -463,6 +466,8 @@ Bool_t GPeak::FitExclude(TH1 *fithist,double xlow,double xhigh,Option_t *opt) {
   //Copy(*fithist->GetListOfFunctions()->FindObject(GetName()));
   //fithist->GetListOfFunctions()->Remove(fBGFit.GetName()); 
   fithist->GetListOfFunctions()->Add(fBGFit.Clone()); //use to be a clone.
+  DetachBackground();
+
   
   return true;
 
@@ -533,4 +538,9 @@ void GPeak::DrawResiduals(TH1 *hist) const{
   residuals->Draw("*AC");
   delete[] res;
   delete[] bin;
+}
+
+void GPeak::DetachBackground() {
+  fBGFit.SetParent(0);
+  fBGFit.SetBit(TObject::kCanDelete,false);
 }

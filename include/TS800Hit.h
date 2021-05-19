@@ -176,6 +176,10 @@ class TCrdc : public TDetectorHit {
     unsigned short anode;
     unsigned short time;
 
+    mutable bool has_cached_dispersive_x; //!
+    mutable double cached_dispersive_x; //!
+
+
     static TF1 *fgaus;
 
 
@@ -225,12 +229,23 @@ class TIonChamber : public TDetectorHit {
     int GetChannel(int i) const { if(i>=Size()) return -1; return fChan.at(i); }
     int GetData(int i)    const { if(i>=Size()) return -1; return fData.at(i); }
     int Size() const { return fChan.size(); }
-    float GetdE();
-    float GetSum();
+    float GetdE(TCrdc *);
+    float GetdE(double crdc_1_x, double crdc_1_y);
+    float GetSum() const;
     float GetAve();
-    float GetdECorr(TCrdc*);
+  //  float GetdECorr(TCrdc*);
 
     int  Address(int i) const { return TDetectorHit::Address() + GetChannel(i); }
+
+
+    float GetCalData(int i) const {
+      TChannel *c = TChannel::GetChannel(Address(GetChannel(i)));
+      if(c){
+        return c->CalEnergy(GetData(i));
+      }else{
+       return (float)GetData(i);
+      }
+    }
 
     virtual void Copy(TObject&) const;
     virtual void Print(Option_t *opt="") const;
@@ -338,13 +353,11 @@ class TIonChamber : public TS800Channel {
     TIonChamber() { }
     TIonChamber(const TIonChamber &ion) { ion.Copy(*this); }
     TIonChamber(short value):TS800Channel(value) { }
-
     virtual void Clear(Option_t *opt="")       { TS800Channel::Clear(opt);    }
     virtual void Print(Option_t *opt="") const { printf("Ion Chamber");TS800Channel::Print(opt);}
     virtual void Copy(TObject &obj)      const { TS800Channel::Copy(obj);  }
   private:
     ClassDef(TIonChamber,1)
-
 };
 */
 
@@ -369,17 +382,36 @@ class TMTof : public TDetectorHit {
     int RefSize()        const { return fRef.size(); }
 
 
+    //bool Correlate()     const;
+    //bool CorrelateE1Up() const;
+    //bool CorrelateObj()  const;
+    //bool CorrelateXfp()  const;
+    
+    double  GetCorrelatedXfp()  const; //{ return fCorrelatedXFP; }  //!
+    double  GetCorrelatedObj()  const; //{ return fCorrelatedOBJ; }  //!
+    double  GetCorrelatedE1Up() const; //{ return fCorrelatedE1Up;  }  //!
+
+    //double  GetCorrelatedXfpE1()  const { return GetCorrelatedXfp()-GetCorrelatedE1Up(); }  //!
+    //double  GetCorrelatedObjE1()  const { return GetCorrelatedObj()-GetCorrelatedE1Up(); }  //!
+    
+    double  GetCorrelatedXfpE1()  const;   //!
+    double  GetCorrelatedObjE1()  const;   //!
+    double  GetCorrelatedRfE1()  const;   //!
 
 
-  //private:
-    mutable int fCorrelatedXFP;   //!
-    mutable int fCorrelatedOBJ;   //!
-    mutable int fCorrelatedE1;    //!
-    mutable int fCorrelatedXFP_Ch15;   //!
-    mutable int fCorrelatedOBJ_Ch15;   //!
-    mutable int fCorrelatedE1_Ch15;    //!
 
+  private:
+    mutable double fCorrelatedXFP;   //!
+    mutable double fCorrelatedOBJ;   //!
+    mutable double fCorrelatedE1Up;    //!
+    mutable double fCorrelatedRfE1;   //!
+    mutable double fCorrelatedOBJE1; 
+    mutable double fCorrelatedXFPE1; 
+    //mutable int fCorrelatedXFP_Ch15;   //!
+    //mutable int fCorrelatedOBJ_Ch15;   //!
+    //mutable int fCorrelatedE1_Ch15;    //!
 
+  public:
     std::vector<unsigned short> fE1Up;         // Channel 0
     std::vector<unsigned short> fE1Down;       // Channel 1
     std::vector<unsigned short> fXfp;          // Channel 2

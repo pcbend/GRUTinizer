@@ -3,7 +3,6 @@
 .SECONDEXPANSION:
 
 
-PLATFORM:=$(PLATFORM)
 # EDIT THIS SECTION
 
 INCLUDES   = include
@@ -16,12 +15,15 @@ SRC_SUFFIX = cxx
 
 USING_ROOT_6 = $(shell expr $(shell root-config --version | cut -f1 -d.) \>= 6)
 
+PLATFORM:=$(shell uname)
+$(info PLATFORM: $(PLATFORM))
+
 ifeq ($(PLATFORM),Darwin)
 export __APPLE__:= 1
 CFLAGS     += -DOS_DARWIN -DHAVE_ZLIB
 CFLAGS     += -I/opt/X11/include -Qunused-arguments
 CPP        = clang++
-SHAREDSWITCH = -install_name # ENDING SPACE
+SHAREDSWITCH = -undefined dynamic_lookup -dynamiclib -install_name # ENDING SPACE
 else
 export __LINUX__:= 1
 CPP        = g++
@@ -46,16 +48,17 @@ BLD_STRING= "Building\ "
 COPY_STRING="Copying\ \ "
 FIN_STRING="Finished Building"
 
-LIBRARY_DIRS   := $(shell find libraries -type d -links 2 2> /dev/null)
+LIBRARY_DIRS   := $(shell find libraries -type d -exec sh -c "if ! find {} ! -path {} -type d | grep -qe '.*'; then echo {}; fi" \; 2> /dev/null)
 LIBRARY_NAMES  := $(notdir $(LIBRARY_DIRS))
 LIBRARY_OUTPUT := $(patsubst %,lib/lib%.so,$(LIBRARY_NAMES))
 
 INCLUDES  := $(addprefix -I$(PWD)/,$(INCLUDES))
 CFLAGS    += $(shell root-config --cflags)
 CFLAGS    += -MMD -MP $(INCLUDES)
+CFLAGS    += -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
 LINKFLAGS += -Llib $(addprefix -l,$(LIBRARY_NAMES)) -Wl,-rpath,\$$ORIGIN/../lib
-LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lPyROOT -lMinuit
-LINKFLAGS := $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX) $(CFLAGS)
+LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lPyROOT -lMinuit -lMathMore
+LINKFLAGS := $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX)
 
 ROOT_LIBFLAGS := $(shell root-config --cflags)
 
@@ -68,7 +71,7 @@ HISTOGRAM_SO    := $(patsubst histos/%.$(SRC_SUFFIX),lib/lib%.so,$(wildcard hist
 FILTER_SO    := $(patsubst filters/%.$(SRC_SUFFIX),lib/lib%.so,$(wildcard filters/*.$(SRC_SUFFIX)))
 
 ifdef VERBOSE
-run_and_test = @echo $(1) && $(1);
+run_and_test = @echo "$(1)" && $(1);
 else
 run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  \
                 $(1) 2> $(2).log || touch $(2).error; \
@@ -86,8 +89,9 @@ run_and_test =@printf "%b%b%b" " $(3)$(4)$(5)" $(notdir $(2)) "$(NO_COLOR)\r";  
                 rm -f $(2).log $(2).error
 endif
 
-all: include/GVersion.h $(EXECUTABLES) $(LIBRARY_OUTPUT) pcm_files bin/grutinizer-config bin/gadd_fast.py\
-     $(HISTOGRAM_SO) $(FILTER_SO) extras
+all: include/GVersion.h $(EXECUTABLES) $(LIBRARY_OUTPUT) pcm_files \
+           bin/grutinizer-config \
+           $(HISTOGRAM_SO) $(FILTER_SO) extras lib/libAllGrutinizer.so
 	@printf "$(OK_COLOR)Compilation successful, $(WARN_COLOR)woohoo!$(NO_COLOR)\n"
 
 pcm_files:
@@ -97,6 +101,10 @@ docs:
 
 bin/%: util/% | bin
 	@ln -sf ../$< $@
+
+.build/util/gadd.o: $(ROOTSYS)/main/src/hadd.cxx
+	@mkdir -p $(dir $@)
+	$(call run_and_test,sed s/hadd/gadd/g < $< | $(CPP) -x c++ -fPIC -c -o $@ $(CFLAGS) -,$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
 bin/grutinizer: $(MAIN_O_FILES) | $(LIBRARY_OUTPUT) pcm_files bin
 	$(call run_and_test,$(CPP) $^ -o $@ $(LINKFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
@@ -110,6 +118,9 @@ bin lib:
 include/GVersion.h: .git/HEAD .git/index util/gen_version.sh
 	$(call run_and_test,util/gen_version.sh,$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
+lib/libAllGrutinizer.so: $(LIBRARY_OUTPUT)
+	$(call run_and_test,echo | $(CPP) -x c++ - -fPIC -o $@ $(SHAREDSWITCH)$(notdir $@) $(LINKFLAGS),$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
+
 lib/lib%.so: .build/histos/%.o | lib
 	$(call run_and_test,$(CPP) -fPIC $^ $(SHAREDSWITCH)lib$*.so $(ROOT_LIBFLAGS) -o $@,$@,$(BLD_COLOR),$(BLD_STRING),$(OBJ_COLOR) )
 
@@ -121,7 +132,7 @@ lib/lib%.so: .build/filters/%.o | lib
 # If a LinkDef.h file is present in the library directory,
 #    a dictionary file will also be generated and added to the library.
 libdir          = $(shell find libraries -name $(1) -type d)
-lib_src_files   = $(shell find $(call libdir,$(1)) -name "*.$(SRC_SUFFIX)")
+lib_src_files   = $(if $(call libdir,$(1)), $(shell find $(call libdir,$(1)) -name "*.$(SRC_SUFFIX)"), nonexisting-file.cxx)
 lib_o_files     = $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(call lib_src_files,$(1)))
 lib_linkdef     = $(wildcard $(call libdir,$(1))/LinkDef.h)
 lib_dictionary  = $(patsubst %/LinkDef.h,.build/%/LibDictionary.o,$(call lib_linkdef,$(1)))
@@ -137,7 +148,7 @@ lib/lib%.so: $$(call lib_o_files,%) $$(call lib_dictionary,%) | lib
 	@mkdir -p $(dir $@)
 	$(call run_and_test,$(CPP) -fPIC -c $< -o $@ $(CFLAGS),$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 
-dict_header_files = $(addprefix $(PWD)/include/,$(subst //,,$(shell head $(1) -n 1 2> /dev/null)))
+dict_header_files = $(addprefix $(PWD)/include/,$(subst //,,$(shell head -n 1 $(1) 2> /dev/null)))
 find_linkdef = $(shell find $(1) -name "*LinkDef.h")
 
 # In order for all function names to be unique, rootcint requires unique output names.

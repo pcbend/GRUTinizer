@@ -6,10 +6,14 @@
 #include "TRootCanvas.h"
 //#include "TPeak.h"
 
-#include "TH1.h"
 #include "TLine.h"
+//#include "TBuffer.h"
 
-#include "GH2I.h"
+class TF1;
+class TH1;
+class GH1;
+class GH2;
+
 
 class GMarker : public TObject{
 public:
@@ -57,6 +61,7 @@ class GPopup : public TGTransientFrame  {
 class GCanvas : public TCanvas {
 public:
   GCanvas(Bool_t build = kTRUE);
+  GCanvas(int cols, int rows,Bool_t build=kTRUE);
   GCanvas(const char* name, const char* title = "", Int_t form = 1);
   GCanvas(const char* name, const char* title, Int_t ww, Int_t wh);
   GCanvas(const char* name, Int_t ww, Int_t wh, Int_t winid);
@@ -87,11 +92,13 @@ private:
 
   bool fGuiEnabled;
 
+  GH1 *gHist;
+
   //bool fStatsDisplayed;
   bool fMarkerMode;
   std::vector<GMarker*> fMarkers;
   std::vector<GMarker*> fBackgroundMarkers;
-  kBackgroundSubtraction fBackgroundMode;
+  //kBackgroundSubtraction fBackgroundMode;
   void AddMarker(int,int,int dim=1);
   void RemoveMarker(Option_t *opt="");
   void OrderMarkers();
@@ -138,15 +145,16 @@ private:
   //bool PeakFitQ(GMarker *m1=0,GMarker *m2=0);
 
   //static int fBGSubtraction_type;
+  //
+  //void Streamer(TBuffer*);
 private:
   Window_t fCanvasWindowID;
   TRootCanvas *fRootCanvas;
 
   bool control_key;
-
   bool toggle_control() { control_key = !control_key; return control_key; }
 
-  ClassDef(GCanvas,2);
+  ClassDef(GCanvas,10);
 };
 
 #endif

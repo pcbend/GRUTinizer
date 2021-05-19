@@ -59,6 +59,11 @@ bool TDataLoop::Iteration() {
     bytes_read = source->Read(evt);
   }
 
+  // static int evtnum = 0;
+  // std::cout << "Evtnum: " << evtnum++ << std::endl;
+  // std::cout << "Bytes read: " << bytes_read << std::endl;
+  // evt.Print();
+
   if(bytes_read < 0 && fSelfStopping){
     // Error, and no point in trying again.
     printf("finished sorting all input.\n");

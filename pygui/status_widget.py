@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 
 from collections import namedtuple
-import Tkinter as tk
-import ttk
+import tkinter as tk
+from tkinter import ttk
 
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True

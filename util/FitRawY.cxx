@@ -8,6 +8,7 @@
 #include "TH1.h"
 #include "TList.h"
 #include "TH2.h"
+#include "GH2.h"
 #include "TF1.h"
 #include "TGraphErrors.h"
 #include "TMath.h"
@@ -42,8 +43,12 @@ TList *FitRawY(TH1 *hist,bool draw=false,bool is_core=false,double threshold=.18
   }
   list = new TList;
   list->Add(hist);
+  //std::cout << "(1) I am crashing here, dude!" << std::endl ;
   TH1 *newhist = (TH1*)hist->Clone(Form("%s_bgsub",hist->GetName()));
+  //std::cout << "(1++) I am crashing here, dude!" << std::endl ;
   if(sub) {
+
+    //std::cout << "(2) I am crashing here, dude!" << std::endl ;
     TH1 *bg = hist->ShowBackground(100,"");
     bg->SetNameTitle(Form("%s_bg",hist->GetName()),Form("%s_bg",hist->GetName()));
     list->Add(bg);
@@ -53,9 +58,12 @@ TList *FitRawY(TH1 *hist,bool draw=false,bool is_core=false,double threshold=.18
   list->Add(newhist);
 
   if(is_core){
+   // std::cout << "(3) I am crashing here, dude!" << std::endl ;
     hist->GetXaxis()->SetRangeUser(500,hist->GetXaxis()->GetXmax());
     newhist->GetXaxis()->SetRangeUser(500,newhist->GetXaxis()->GetXmax());
+
   } else {
+  //  std::cout << "(4) I am crashing here, dude!" << std::endl ;
     hist->GetXaxis()->SetRangeUser(2000,hist->GetXaxis()->GetXmax());
     newhist->GetXaxis()->SetRangeUser(2000,newhist->GetXaxis()->GetXmax());
   }
@@ -196,7 +204,9 @@ TH2 *MakeFWHMSummary(TH2 *hist,int hole,int cryl){
 }
 */
 
-TList *MakeSummary(TH2 *hist,int qnum){
+// changed this to GH2. Was TH2 (06/04/19 - Mark).
+
+TList *MakeSummary(GH2 *hist,int qnum){
   if(!hist)
     return 0;
   TList *list = new TList;
@@ -222,7 +232,10 @@ TList *MakeSummary(TH2 *hist,int qnum){
 
     std::string HistName = Form("%s_%i",hist->GetName(),i);
     printf("%s\n",HistName.c_str());
-    TH1D *raw = hist->ProjectionY(HistName.c_str(),i,i);
+
+// We had to add (TH1D*) to make this work. 06/04/19 (Mark)
+
+    TH1D *raw = (TH1D*)hist->ProjectionY(HistName.c_str(),i,i);
 
     fit_attempts = 0;
     TList *fit_list;
@@ -341,7 +354,10 @@ int my_function(const char *filename) {
     //  break;
     TKey *key = (TKey*)(file->GetListOfKeys()->At(x));
     if(TClass::GetClass(key->GetClassName())->InheritsFrom("TH2")) {
-       TH2 *h = (TH2*)key->ReadObj();
+
+// changed this to GH2. Was TH2 (06/04/19 - Mark).
+
+       GH2 *h = (GH2*)key->ReadObj();
        string name = h->GetName();
        //int hole = atoi(name.substr(4,2).c_str());
        //int cryl = atoi(name.substr(7,1).c_str());

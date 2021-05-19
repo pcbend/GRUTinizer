@@ -37,6 +37,8 @@ public:
   static double GetBeta(double betamax, double kr_angle_rad, bool energy_loss=false, double collision_pos=0.5);
   static double SimAngle();
 
+  size_t Size() const { return janus_hits.size(); }
+
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 

@@ -49,6 +49,7 @@ public:
   bool MakeHistos()         const { return fMakeHistos; }
   bool SortMultiple()       const { return fSortMultiple; }
 
+  bool UseFSU()             const { return fFSU; }
 
   bool IsOnline()           const { return fIsOnline; }
 
@@ -64,6 +65,8 @@ public:
   std::string GenerateOutputFilename(const std::vector<std::string>& filename);
 
   bool LongFileDescription() const { return fLongFileDescription; }
+
+  bool SuppressErrors() const { return fSuppressErrors; }
 
 
   void SetStartGUI(bool flag=true) { fStartGui=flag; }
@@ -106,6 +109,9 @@ private:
   bool fStartGui;
   bool fMakeHistos;
   bool fSortMultiple;
+  bool fSuppressErrors;
+
+  bool fFSU;
 
   bool fTimeSortInput;
   int fTimeSortDepth;

@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include <TClass.h>
+#include <TBuffer.h>
 
 ClassImp(TDetector)
 
@@ -76,5 +77,13 @@ int TDetector::BuildHits(std::vector<TRawEvent*> &raw_data) {
   return BuildHits(event);
 }
 
+
+void TDetector::Streamer(TBuffer &r_b) {
+  if(r_b.IsReading()) {
+    r_b.ReadClassBuffer(TDetector::Class(),this);
+  } else { 
+    r_b.WriteClassBuffer(TDetector::Class(),this);
+  }
+}
 
 

@@ -12,28 +12,26 @@ extern "C"
 bool FilterCondition(TRuntimeObjects& obj) {
 
   TGretina *gretina = obj.GetDetector<TGretina>();
-  TS800 *s800       = obj.GetDetector<TS800>();
+  //TS800 *s800       = obj.GetDetector<TS800>();
 
   if(!gretina)
     return false;
+  }
+
+
+  //if((s800->GetTrigger().GetRegistr()&0x0002)>>1)
+  // return true;
+  //if(s800->GetTrigger().GetRegistr()==3) {
+    //printf("i am returning true\n"); fflush(stdout);
+  //  return true;
+  //}
   
-  if(!s800){
-    //    printf("i am returning false ***\n"); fflush(stdout);
+  //return false;
+  gretina->CleanHits();
+  if(!gretina->Size())
     return false;
-  }
 
-
-
-  //  std::cout << s800->Size() << std::endl;
-  
-
-  //  if(s800->GetTrigger().GetRegistr()==3) {
-  if( s800->GetTrigger().GetRegistr()&0x0002 ){
-    //    printf("i am returning true\n"); fflush(stdout);
-    return true;
-  }
-  //  printf("i am returning false ***\n"); fflush(stdout);
-  return false;
+  return true;
 
 
 }

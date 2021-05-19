@@ -92,15 +92,16 @@ void TCompiledHistograms::Write() {
       while((dir_obj=dir_next())){
 	dir_obj->Write();
       }
+    } else {
+      obj->Write();
     }
-    else obj->Write();
   }
 
 
 
   //  objects.Write();
-  TPreserveGDirectory preserve;
-  gDirectory->mkdir("variables")->cd();
+  //TPreserveGDirectory preserve;
+  //gDirectory->mkdir("variables")->cd();
   //variables.Write();
 }
 

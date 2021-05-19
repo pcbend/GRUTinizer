@@ -35,6 +35,7 @@ std::ostream& operator<<(std::ostream& os, const TRawEvent::GEBBankType1 &bank) 
    os << "bl poststep = "<< std::setw(8) << bank.poststep << std::endl;
    os << std::setprecision(ss);
    os << "pad (error) = "<< std::setw(8) << bank.pad << std::endl;
+   //for(int x=0;x<16;x++)
    for(int x=0;x<bank.num;x++)
       os << "\t" << bank.intpts[x];
    os << "************************" << std::endl;
@@ -97,6 +98,7 @@ Int_t TRawEvent::GEBMode3Head::GetSegmentId()  const { return GetVME()*10+GetCha
 Int_t TRawEvent::GEBMode3Head::GetCrystalId()  const { return GetHole()*4+GetCrystal(); }
 
 void TRawEvent::SwapMode3Data(TRawEvent::GEBMode3Data &data) {
+  //std::cout << __PRETTY_FUNCTION__ << std::endl;
   data.led_middle   = SwapShort(data.led_middle)   ;
   data.led_low      = SwapShort(data.led_low)      ;
   data.energy_low   = SwapShort(data.energy_low)   ;

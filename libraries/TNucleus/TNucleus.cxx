@@ -11,6 +11,7 @@
 #include <TGraph.h>
 
 #include "ProgramPath.h"
+#include "TGRUTUtilities.h"
 
 //#define debug
 
@@ -442,7 +443,7 @@ void TNucleus::Print(Option_t *opt) const{
   int counter =0;
   while(TTransition *tran = (TTransition*)next()) {
     printf("\t%i\t",counter++);
-    tran->Print(); 
+    tran->Print();
   }
 }
 
@@ -468,7 +469,7 @@ bool TNucleus::LoadTransitionFile(){
   filename = std::string(getenv("GRUTSYS")) + "/libraries/SourceData/";
   std::string symbol = this->GetSymbol();
   std::transform(symbol.begin(), symbol.end(), symbol.begin(), ::tolower);
-  filename.append(symbol.c_str());          
+  filename.append(symbol.c_str());
   filename.append(std::to_string(this->GetA()));
   filename.append(".sou");
 
@@ -479,11 +480,15 @@ bool TNucleus::LoadTransitionFile(){
     return false;
   }
   //printf("found %s\n",filename.c_str());
-  
+
   std::string line;
- 
+
   while(getline(transfile,line)) {
+    trim(line);
+
     //printf("%i\t%s\n",counter++,line.c_str());
+    if(!line.length())
+        continue;
     if(!line.compare(0,2,"//"))
         continue;
     if(!line.compare(0,1,"#"))
@@ -508,7 +513,7 @@ bool TNucleus::LoadTransitionFile(){
     }
     AddTransition(tran);
   }
-   
+
   return true;
 
 }

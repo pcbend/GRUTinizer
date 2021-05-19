@@ -48,7 +48,10 @@ void TGRUTOptions::Clear(Option_t* opt) {
   fMakeHistos = false;
   fSortMultiple = false;
 
+  fFSU = false;
+
   fShouldExit = false;
+  fSuppressErrors = false;
 }
 
 void TGRUTOptions::Print(Option_t* opt) const { }
@@ -115,7 +118,7 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("t time-sort", &fTimeSortInput)
     .description("Reorder raw events by time");
   parser.option("time-sort-depth",&fTimeSortDepth)
-    .description("Number of events to hold when time sorting")
+    .description("Number of events to hold when time sorting; default value 100000")
     .default_value(100000);
   parser.option("build-window", &fBuildWindow)
     .description("Build window, timestamp units")
@@ -138,6 +141,11 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .description("Show this help message");
   parser.option("v version", &fShowedVersion)
     .description("Show version information");
+  parser.option("suppress-errors", &fSuppressErrors)
+    .description("Suppress errors");
+  parser.option("fsu",&fFSU)
+    .description("use FSU style DDAS format")
+    .default_value(false);
 
 
   // Look for any arguments ending with .info, pass to parser.

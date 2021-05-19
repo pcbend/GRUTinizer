@@ -1,6 +1,6 @@
 # author: stefaan.himpe@gmail.com
 # license: MIT
-from Tkinter import Text, END
+from tkinter import Text, END
 import re
 
 class AnsiColorText(Text):

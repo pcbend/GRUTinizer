@@ -20,6 +20,11 @@ class GPopup : public TGTransientFrame {
 
     virtual void Print(Option_t *opt="") const;
 
+    virtual void SetFrames() = 0;
+
+  protected:
+    void Init(); 
+
   ClassDef(GPopup,0) 
 };
 

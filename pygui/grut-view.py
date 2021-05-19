@@ -3,7 +3,7 @@ import os
 import sys
 import warnings
 import threading
-import Tkinter as tk
+import tkinter as tk
 import time
 
 import ROOT
@@ -29,7 +29,7 @@ def update():
     except tk.TclError:
         pass
     except Exception as e:
-        print e
+        print(e)
 
 def on_close():
     global window

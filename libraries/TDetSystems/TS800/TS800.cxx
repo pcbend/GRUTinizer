@@ -224,7 +224,8 @@ void TS800::Clear(Option_t* opt){
 
 int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
   if(raw_data.size() != 1){
-    std::cout << "Data buffers: " << raw_data.size() << std::endl;
+    std::cout << "Trying to combine multiple (" <<  raw_data.size() <<"s800 buffers: " << std::endl;
+    return 0;
   }
   for(auto& event : raw_data) { // should only be one..
     SetTimestamp(event.GetTimestamp());
@@ -278,6 +279,7 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
       case 0x5890:  // Obj Scint
 	break;
       case 0x58a0:  // Obj Pin Packet
+        HandleOBJPinPacket(dptr+1,sizeleft); 
 	break;
       case 0x58b0:  // S800 Hodoscope
 	break;
@@ -285,6 +287,8 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
 	break;
       case 0x58d0:  // Galotte
 	break;
+    case 0x5805:  // Pin detector for Hiro
+      break;
       case 0x58e0:
 	break;
       case 0x58f0:
@@ -300,6 +304,103 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
   }
   return 1;
 }
+
+int TS800::BuildHits(UShort_t eventsize,UShort_t *dptr,Long64_t timestamp) {  //std::vector<TRawEvent>& raw_data){
+  SetTimestamp(timestamp);
+  //int ptr = 0;
+  //const TRawEvent::GEBS800Header *head = ((const TRawEvent::GEBS800Header*)event.GetPayload());
+  //ptr += sizeof(TRawEvent::GEBS800Header);
+
+  //Here, we are now pointing at the size of the next S800 thing.  Inclusive in shorts.
+  //std::string toprint = "all";
+  
+  unsigned short *data = dptr+2; //unsigned short*)(event.GetPayload()+ptr);
+  size_t x = 0;
+  //printf(" new s800 event\n"); fflush(stdout);
+  while(x<eventsize) { //(head->total_size-sizeof(TRawEvent::GEBS800Header)+16)) {  //total size is inclusive.
+    int size             = *(data+x);
+    unsigned short *dptr = (data+x+1);
+    //toprint.append(Form("0x%04x",*dptr));
+    x+=size;
+    if(x>eventsize) {
+      //std::cout << "x is oor." << std::endl;
+      return -1;
+    }
+    if(size==0) {
+      std::cout << "size is zero." << std::endl;\
+      return -1;
+    //  geb->Print(toprint.c_str());
+    //  printf("head size = %i\n",sizeof(head));
+    //  exit(0);
+    }
+    int sizeleft = size-2;
+    //ptr +=  (*((unsigned short*)(geb->GetPayload()+ptr))*2);
+    //printf(" x [0x%04x] at %i\n",*dptr,x); fflush(stdout);
+    switch(*dptr) {
+    case 0x5801:  //S800 TriggerPacket.
+      HandleTrigPacket(dptr+1,sizeleft);
+      break;
+    case 0x5802:  // S800 TOF.
+      //event.Print("all0x5802");
+      HandleTOFPacket(dptr+1,sizeleft);
+      break;
+    case 0x5810:  // S800 Scint
+      //event.Print("all0x5810");
+      HandleScintPacket(dptr+1,sizeleft);
+      break;
+    case 0x5820:  // S800 Ion Chamber
+      //event.Print("all0x5820");
+      HandleIonCPacket(dptr+1,sizeleft);
+      break;
+    case 0x5840:  // CRDC Packet
+      //event.Print("all0x58400x5845");
+      HandleCRDCPacket(dptr+1,sizeleft);
+      break;
+    case 0x5850:  // II CRDC Packet
+      break;
+    case 0x5860:  // TA Pin Packet
+      break;
+    case 0x5870:  // II Track Packet
+      
+      break;
+    case 0x5880:  // II PPAC
+      break;
+    case 0x5890:  // Obj Scint
+      break;
+    case 0x58a0:  // Obj Pin Packet
+      HandleOBJPinPacket(dptr+1,sizeleft);
+      break;
+    case 0x58b0:  // S800 Hodoscope
+      break;
+    case 0x58c0:  // VME ADC
+      break;
+    case 0x58d0:  // Galotte
+      break;
+    case 0x5805:  // Pin detector for Hiro
+      break;
+    case 0x58e0:
+      break;
+    case 0x58f0:
+      HandleMTDCPacket(dptr+1,sizeleft);
+      break;
+    
+    default:
+      //fprintf(stderr,"unknown data S800 type: 0x%04x  @ x = %i \n",*dptr,x);
+      return 0;
+    };
+  }
+  //SetEventCounter(head->GetEventNumber());
+  //geb->Print(toprint.c_str());
+  
+  return 1;
+}
+
+
+
+
+
+
+
 
 bool TS800::HandleTrigPacket(unsigned short *data,int size) {
   if(size<1){
@@ -459,6 +560,16 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
   std::cout << " CRDC Anod : " << current_crdc->GetAnode() << std::endl;
   std::dec;*/
   return true;
+}
+
+bool TS800::HandleOBJPinPacket(unsigned short* data, int size){
+   if(size == 0) {
+     pine = 0; 
+   }else{
+     pine = *data;
+     pine = (pine&0x0fff);
+   }
+   return true;
 }
 
 bool TS800::HandleScintPacket(unsigned short* data, int size){
@@ -696,6 +807,22 @@ float TS800::GetTofE1_TAC(float c1,float c2)  const {
 
 }
 
+float TS800::GetTofE1_TAC_XFP(float c1,float c2)  const {
+  /*if (GetCrdc(0).GetId() == -1) {
+    return sqrt(-1);
+    }*/
+  /*----------------*\
+  | AFP returns nan  |
+  | if both crdc's   |
+  | are not present  |
+  \*----------------*/
+
+  if(GetTof().GetTacXFP()>-1)
+    return GetTof().GetTacXFP() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+  return sqrt(-1);
+
+}
+
 
 float TS800::GetTofE1_TDC(float c1,float c2)  const {
   /*----------------*\
@@ -710,6 +837,10 @@ float TS800::GetTofE1_TDC(float c1,float c2)  const {
 
 float TS800::GetTofE1_MTDC(float c1,float c2,int i) const {
 
+  if(!std::isnan(GValue::Value("TARGET_MTOF_OBJE1"))){
+    return mtof.GetCorrelatedObjE1() + c1*GetAFP()+c2*GetCrdc(0).GetDispersiveX();
+  }
+/*
   std::vector<float> result;
   // TODO: This check is always false.  Commented it out, but was there some reason for it?
   // if(mtof.fObj.size()<0)
@@ -717,30 +848,69 @@ float TS800::GetTofE1_MTDC(float c1,float c2,int i) const {
   for(unsigned int x=0;x<mtof.fObj.size();x++) {
     for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
       result.push_back( mtof.fObj.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
-
-      // std::cout << "-----------------" << std::endl;
-      // std::cout << " c1 = "  << c1
-      // 		<< ", c2 = "  << c2
-      // 		<< std::endl;
-      // std::cout << " mtof.fObj.at(" << x
-      // 	      << ") = " << mtof.fObj.at(x)
-      // 	      << std::endl;
-      // std::cout << " mtof.fE1Up.at(" << x
-      // 	      << ") = " << mtof.fE1Up.at(y)
-      // 	      << std::endl;
-      // std::cout << " GetAFP() = "
-      // 	      << ") = " << GetAFP()
-      // 	      << std::endl;
-      // std::cout << " GetCrdc(0).GetDispersiveX() = "
-      // 		<< GetCrdc(0).GetDispersiveX()
-      // 		<< std::endl;
-   
     }
   }
+
+  if(result.size()>(unsigned int)i)
+    return result.at(i);
+  return sqrt(-1.0);
+  */
+  int x = mtof.fObj.size();
+  int y = mtof.fE1Up.size();
+  if(i<0||i>=x*y) return sqrt(-1);
+
+  int index_x = i/y;
+  int index_y = i%y;
+  return mtof.fObj.at(index_x)-mtof.fE1Up.at(index_y)+c1*GetAFP()+c2*GetCrdc(0).GetDispersiveX();
+}
+
+float TS800::GetTofE1_MTDC_XFP(float c1,float c2,int i) const {
+
+  if(!std::isnan(GValue::Value("TARGET_MTOF_XFPE1"))){
+    return mtof.GetCorrelatedXfpE1() + c1*GetAFP() + c2*GetCrdc(0).GetDispersiveX();
+  }
+  std::vector<float> result;
+  // TODO: This check is always false.  Commented it out, but was there some reason for it?
+  // if(mtof.fObj.size()<0)
+  //   std::cout << " In GetTOF MTDC, Size = " << mtof.fObj.size() << std::endl;
+  //for(unsigned int x=0;x<mtof.fXfp.size();x++) {
+  //  for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
+  //    result.push_back( mtof.fXfp.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
+  //  }
+  //}
+  int x = mtof.fXfp.size();
+  int y = mtof.fE1Up.size();
+  if(i<0||i>=x*y) return sqrt(-1);
+
+  int index_x = i/y;
+  int index_y = i%y;
+
+  return mtof.fXfp.at(index_x)-mtof.fE1Up.at(index_y)+c1*GetAFP()+c2*GetCrdc(0).GetDispersiveX();
+}
+
+float TS800::GetTofE1_MTDC_RF(float c1,float c2,int i) const {
   
-   if(result.size()>(unsigned int)i)
-     return result.at(i);
-   return sqrt(-1.0);
+  if(!std::isnan(GValue::Value("TARGET_MTOF_RfE1"))){
+
+    return mtof.GetCorrelatedRfE1() + c1 *GetAFP()+c2*GetCrdc(0).GetDispersiveX();
+
+  }
+  //std::vector<float> result;
+  // TODO: This check is always false.  Commented it out, but was there some reason for it?
+  // if(mtof.fObj.size()<0)
+  //   std::cout << " In GetTOF MTDC, Size = " << mtof.fObj.size() << std::endl;
+  //for(unsigned int x=0;x<mtof.fRf.size();x++) {
+  //  for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
+  //    result.push_back( mtof.fRf.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
+  //  }
+  //}
+
+  int x = mtof.fE1Up.size();
+  int y = mtof.fRf.size();
+  if(i<0 || i>=x*y) return sqrt(-1.0);
+  int index_x = i/y;
+  int index_y = i%y;
+  return mtof.fRf.at(index_x) - mtof.fE1Up.at(index_y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
 }
 
 float TS800::GetOBJRaw_TAC() const {
@@ -752,6 +922,7 @@ float TS800::GetOBJ_E1Raw() const {
 }
 
 float TS800::GetOBJ_E1Raw_MESY(int i) const {
+  /*
   std::vector<float> result;
   for(unsigned int x=0;x<mtof.fObj.size();x++) {
     for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
@@ -762,9 +933,21 @@ float TS800::GetOBJ_E1Raw_MESY(int i) const {
   if(result.size()>(unsigned int)i)
     return result.at(i);
   return sqrt(-1.0);
+  */
+
+  int x = mtof.fObj.size();
+  int y = mtof.fE1Up.size();
+
+  if(i<0 || i>=x*y ) return sqrt(-1);
+
+  int index_x = i/y;
+  int index_y = i%y;
+
+  return mtof.fObj.at(index_x)-mtof.fE1Up.at(index_y);
 }
 
 float TS800::GetOBJ_E1Raw_MESY_Ch15(int i) const {
+  /*
   std::vector<float> result;
   for(unsigned int x=0;x<mtof.fObj.size();x++) {
     for(unsigned int y=0;y<mtof.fRef.size();y++) {
@@ -775,6 +958,16 @@ float TS800::GetOBJ_E1Raw_MESY_Ch15(int i) const {
   if(result.size()>(unsigned int)i)
     return result.at(i);
   return sqrt(-1.0);
+  */
+  int x = mtof.fObj.size();
+  int y = mtof.fRef.size();
+
+  if(i<0 || i>=x*y) return sqrt(-1);
+
+  int index_x = i/y;
+  int index_y = i%y;
+
+  return mtof.fObj.at(index_x)-mtof.fRef.at(index_y);
 }
 
 float TS800::GetRawOBJ_MESY(unsigned int i) const {
@@ -832,37 +1025,25 @@ float TS800::GetXF_E1Raw_MESY_Ch15(int i) const {
   return sqrt(-1.0);
 }
 
-float TS800::MCorrelatedOBJ() const{
-  if(mtof.fCorrelatedOBJ>-1) return mtof.fObj.at(mtof.fCorrelatedOBJ);
-  else return 0;
-}
 
-float TS800::MCorrelatedXFP() const{
-  if(mtof.fCorrelatedXFP>-1) return mtof.fXfp.at(mtof.fCorrelatedXFP);
-  else return 0;
-}
 
-float TS800::MCorrelatedE1() const{
-  if(mtof.fCorrelatedE1>-1) return mtof.fE1Up.at(mtof.fCorrelatedE1);
-  else return 0;
-}
-
+/*
 float TS800::MCorrelatedOBJ_E1(bool corrected) const{
   if(!(mtof.fE1Up.size()==1)) {
     mtof.fCorrelatedOBJ = -1;
-    mtof.fCorrelatedE1  = -1;
+    mtof.fCorrelatedE1Up  = -1;
   }
-  else if(mtof.fCorrelatedOBJ>-1 && mtof.fCorrelatedE1>-1){
+  else if(mtof.fCorrelatedOBJ>-1 && mtof.fCorrelatedE1Up>-1){
     double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
     double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
     if(corrected==false){
       afp_cor = 0;
       xfp_cor = 0;
     }
-    return (mtof.fObj.at(mtof.fCorrelatedOBJ)-mtof.fE1Up.at(mtof.fCorrelatedE1) + 
+    return (mtof.fObj.at(mtof.fCorrelatedOBJ)-mtof.fE1Up.at(mtof.fCorrelatedE1Up) + 
 	    afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
   }
-  else if(mtof.fCorrelatedE1>-1){
+  else if(mtof.fCorrelatedE1Up>-1){
     double OBJLow  = GValue::Value("MOBJ_CORR_LOW");
     double OBJHigh = GValue::Value("MOBJ_CORR_HIGH");
     
@@ -881,7 +1062,7 @@ float TS800::MCorrelatedOBJ_E1(bool corrected) const{
     std::vector<float> val2;
     float val;
       for(unsigned int y=0;y<mtof.fObj.size();y++) {
-      val = (mtof.fObj.at(y) - mtof.fE1Up.at(mtof.fCorrelatedE1) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX()) ;
+      val = (mtof.fObj.at(y) - mtof.fE1Up.at(mtof.fCorrelatedE1Up) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX()) ;
       if(val<OBJHigh && val>OBJLow){
 	val2.push_back(val);      
 	mtof.fCorrelatedOBJ=y;
@@ -916,7 +1097,7 @@ float TS800::MCorrelatedOBJ_E1(bool corrected) const{
 	if(val<OBJHigh && val>OBJLow){
 	  val2.push_back(val);      
 	  mtof.fCorrelatedOBJ=y;
-	  mtof.fCorrelatedE1=x;
+	  mtof.fCorrelatedE1Up=x;
 	}
       }
     }
@@ -924,18 +1105,20 @@ float TS800::MCorrelatedOBJ_E1(bool corrected) const{
     if(val2.size()==1)
       return val2.at(0);
     mtof.fCorrelatedOBJ =-1;
-    mtof.fCorrelatedE1  =-1;
+    mtof.fCorrelatedE1Up  =-1;
   }
 
   return 0;
 }
+*/
 
+/*
 float TS800::MCorrelatedXFP_E1(bool corrected) const{
   if(!(mtof.fE1Up.size()==1)) {
     mtof.fCorrelatedXFP = -1;
-    mtof.fCorrelatedE1  = -1;
+    mtof.fCorrelatedE1Up  = -1;
   }
-  else if(mtof.fCorrelatedXFP>-1 && mtof.fCorrelatedE1>-1)  {    
+  else if(mtof.fCorrelatedXFP>-1 && mtof.fCorrelatedE1Up>-1)  {    
     double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
     double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
     if(corrected==false){
@@ -943,9 +1126,9 @@ float TS800::MCorrelatedXFP_E1(bool corrected) const{
       xfp_cor = 0;
     }
     
-    return (mtof.fXfp.at(mtof.fCorrelatedXFP)-mtof.fE1Up.at(mtof.fCorrelatedE1) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+    return (mtof.fXfp.at(mtof.fCorrelatedXFP)-mtof.fE1Up.at(mtof.fCorrelatedE1Up) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
   }
-  else if(mtof.fCorrelatedE1>-1){
+  else if(mtof.fCorrelatedE1Up>-1){
     double XFLow = GValue::Value("MXF_CORR_LOW");
     double XFHigh = GValue::Value("MXF_CORR_HIGH");
     double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
@@ -963,7 +1146,7 @@ float TS800::MCorrelatedXFP_E1(bool corrected) const{
     std::vector<float> val2;
     float val;
     for(unsigned int y=0;y<mtof.fXfp.size();y++) {
-      val = (mtof.fXfp.at(y) - mtof.fE1Up.at(mtof.fCorrelatedE1) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+      val = (mtof.fXfp.at(y) - mtof.fE1Up.at(mtof.fCorrelatedE1Up) + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
       if(val<XFHigh && val>XFLow){
 	val2.push_back(val);      
 	mtof.fCorrelatedXFP=y;
@@ -996,19 +1179,20 @@ float TS800::MCorrelatedXFP_E1(bool corrected) const{
 	if(val<XFHigh && val>XFLow){
 	  val2.push_back(val);      
 	  mtof.fCorrelatedXFP=y;
-	  mtof.fCorrelatedE1=x;
+	  mtof.fCorrelatedE1Up=x;
 	}
       }
     }
     if(val2.size()==1)
       return val2.at(0);
     mtof.fCorrelatedXFP =-1;
-    mtof.fCorrelatedE1  =-1;
+    mtof.fCorrelatedE1Up  =-1;
   }
   return 0;
 }
+*/
 
-
+/*
 float TS800::MCorrelatedOBJ_Ch15() const{
   if(mtof.fCorrelatedOBJ_Ch15>-1) return mtof.fObj.at(mtof.fCorrelatedOBJ_Ch15);
   else return 0;
@@ -1184,7 +1368,7 @@ float TS800::MCorrelatedXFP_E1_Ch15(bool corrected) const{
   }
   return 0;
 }
-
+*/
 
 float TS800::GetCorrTOF_OBJTAC() const {
   double afp_cor = GValue::Value("OBJTAC_TOF_CORR_AFP");
@@ -1203,11 +1387,33 @@ float TS800::GetCorrTOF_OBJ() const {
 float TS800::GetCorrTOF_OBJ_MESY(int i) const {
   //static double f_afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
   //static double f_xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
-  //  if(fGlobalReset) {
-  static double    f_mafp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
-  static double    f_mxfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
-  //  }
+  //if(fGlobalReset) {
+    f_mafp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+    f_mxfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+  //}
   return GetTofE1_MTDC(f_mafp_cor,f_mxfp_cor,i);
+}
+
+//std::vector<float> TS800::GetCorrTOF_OBJ_MESY() const {
+float TS800::GetCorrTOF_XFP_MESY(int i) const {
+  //static double f_afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+  //static double f_xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+  //if(fGlobalReset) {
+    f_mafp_cor = GValue::Value("XFP_MTOF_CORR_AFP");
+    f_mxfp_cor = GValue::Value("XFP_MTOF_CORR_XFP");
+  //}
+  return GetTofE1_MTDC_XFP(f_mafp_cor,f_mxfp_cor,i);
+}
+
+
+float TS800::GetCorrTOF_RF_MESY(int i) const {
+  //static double f_afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+  //static double f_xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+  //if(fGlobalReset) {
+    f_mafp_cor = GValue::Value("RF_MTOF_CORR_AFP");
+    f_mxfp_cor = GValue::Value("RF_MTOF_CORR_XFP");
+  //}
+  return GetTofE1_MTDC_RF(f_mafp_cor,f_mxfp_cor,i);
 }
 
 //float TS800::GetCorrTOF_XFP(){
@@ -1216,11 +1422,11 @@ float TS800::GetCorrTOF_OBJ_MESY(int i) const {
 //  return GetTofE1_(afp_cor,xfp_cor);
 //}
 
-//float TS800::GetCorrTOF_XFPTAC(){
-//  double afp_cor = GValue::Value("XFPTAC_TOF_CORR_AFP");
-//double xfp_cor = GValue::Value("XFPTAC_TOF_CORR_XFP");
-//return GetTofE1_TAC(afp_cor,xfp_cor);
-//}
+float TS800::GetCorrTOF_XFPTAC() const{
+  double afp_cor = GValue::Value("XFPTAC_TOF_CORR_AFP");
+  double xfp_cor = GValue::Value("XFPTAC_TOF_CORR_XFP");
+  return GetTofE1_TAC_XFP(afp_cor,xfp_cor);
+}
 //
 //
 
@@ -1425,3 +1631,78 @@ void TS800::DrawPID_Mesy_Tune(Long_t nentries,int i,TChain *chain){
 
 
 }
+
+
+double TS800::GetMTofObjE1() const {
+  // I return the correlated gvalue corrected time-of-flight obj to e1.
+  double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+  double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+  if(std::isnan(afp_cor) || std::isnan(xfp_cor)) {
+    printf(ALERTTEXT "Attmepting to do mtof obj correction without values!" RESET_COLOR "\n");
+    fflush(stdout);
+    return sqrt(-1);
+  }
+  return(GetMTof().GetCorrelatedObjE1()
+         + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+
+}
+
+double TS800::GetMTofXfpE1() const {
+  // I return the correlated gvalue corrected time-of-flight xfp to e1.
+  double afp_cor = GValue::Value("XFP_MTOF_CORR_AFP");
+  double xfp_cor = GValue::Value("XFP_MTOF_CORR_XFP");
+  if(std::isnan(afp_cor) || std::isnan(xfp_cor)) {
+    printf(ALERTTEXT "Attmepting to do mtof xfp correction without values!" RESET_COLOR "\n");
+    fflush(stdout);
+    return sqrt(-1);
+  }
+  return(GetMTof().GetCorrelatedXfpE1()
+         + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+
+
+}
+
+
+/*
+float TS800::GetMTOF_ObjE1(unsigned int i,bool find_best) const { 
+  if(!find_best) 
+    return GetCorrTOF_OBJ_MESY(i); 
+  double target = GValue::Value("MTOF_ObjE1");
+  if(std::isnan(target)) {
+    target = GValue::Value("TARGET_MTOF_ObjE1");
+    if(std::isnan(target)) {
+      return GetCorrTOF_OBJ_MESY(i); 
+    }
+  }
+  double value = GetMTOF_ObjE1(0,0);
+  for(int i=1;i<mtof.fObj.size();i++) {    
+    double newvalue = GetMTOF_ObjE1(i,0);
+    if(std::abs(target - newvalue) < std::abs(target - value)) {
+      value = newvalue;
+    }
+  }
+  return value;
+}
+
+
+float TS800::GetMTOF_XfpE1(unsigned int i,bool find_best) const { 
+  if(!find_best) 
+    return GetRawXF_MESY(i); 
+  double target = GValue::Value("MTOF_XfpE1");
+  if(std::isnan(target)) {
+    target = GValue::Value("TARGET_MTOF_XfpE1");
+    //std::cout << target << std::endl;
+    if(std::isnan(target)) {
+      return GetRawXF_MESY(i);
+    }
+  }
+  double value = GetMTOF_XfpE1(0,0);
+  for(int i=1;i<mtof.fXfp.size();i++) {    
+    double newvalue = GetMTOF_XfpE1(i,0);
+    if(std::abs(target - newvalue) < std::abs(target - value)) {
+      value = newvalue;
+    }
+  }
+  return value;
+}
+*/

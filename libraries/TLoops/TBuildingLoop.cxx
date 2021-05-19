@@ -70,6 +70,16 @@ bool TBuildingLoop::CheckBuildWindow(TRawEvent *event) {
   if(timestamp == -1){
     return false;
   }
+ 
+  //////////////////////////
+  ////// DDAS offset hack //
+ // if(event->GetEventType()==0x19) {
+ //   timestamp += 50000.; 
+ // }
+  //////////////////////////
+
+
+  //std::cout << "Build window: " << build_window << std::endl;
 
   if(timestamp > event_start + build_window ||
      timestamp < event_start - build_window) {

@@ -20,6 +20,8 @@ TMode3Hit::~TMode3Hit() { }
 void TMode3Hit::BuildFrom(TSmartBuffer& buf){
   Clear();
 
+  //buf.Print("all");
+
   bool read_waveform = TGRUTOptions::Get()->ExtractWaves();
 
   auto header = (TRawEvent::GEBMode3Head*)buf.GetData();
@@ -32,11 +34,21 @@ void TMode3Hit::BuildFrom(TSmartBuffer& buf){
   buf.Advance(sizeof(TRawEvent::GEBMode3Data));
 
   led = data->GetLed();
-  //charge = data->GetEnergy(*header);
-  SetCharge(data->GetEnergy(*header));
+  int charge = data->GetEnergy(*header);
+  //SetCharge(data->GetEnergy(*header));
+  if(charge<0) { charge*=-1; }  // we should prob remove this... pcb 
+  SetCharge(charge);
+
+
+  //std::cout << "Board ID:" << board_id << " and still sorting!" << std::endl ;
+
+  //std::cout << "LED:" << led << std::endl ;
 
   dt1  = data->GetDeltaT1();
   dt2  = data->GetDeltaT2();
+
+  //std::cout << "DT1:" << dt1 << std::endl ;
+  //std::cout << "DT2:" << dt2 << std::endl ;
 
   charge0  = data->GetEnergy0(*header);
   charge1  = data->GetEnergy1(*header);
@@ -45,8 +57,15 @@ void TMode3Hit::BuildFrom(TSmartBuffer& buf){
   cfd = data->GetCfd();
 
   size_t wave_bytes = header->GetLength()*4 - sizeof(*header) + 4 - sizeof(*data);
+  //std::cout << "wave_bytes:  " << wave_bytes << std::endl;
+  //std::cout << "timestamp:   " << led << std::endl;  
+  //std::cout << "timestamp:   " << std::hex << led << std::dec << std::endl; 
+  SetTimestamp(led);
+
   if(read_waveform){
     size_t wavesize = wave_bytes/sizeof(short);
+
+    //std::cout << "wave size:  " << wavesize << std::endl;
     waveform.resize(wavesize);
 
     memcpy((char*)&waveform[0], buf.GetData(), wave_bytes);
@@ -57,7 +76,11 @@ void TMode3Hit::BuildFrom(TSmartBuffer& buf){
       waveform[i]   = tmp;
     }
   }
+  //std::cout << "Charge:  " << Charge() << std::endl;
+  //std::cout << "Charge0:  " << GetCharge0() << std::endl;
+  //Print("all");
   buf.Advance(wave_bytes);
+  //exit(0);
 }
 
 
@@ -69,7 +92,6 @@ void TMode3Hit::Copy(TObject& obj) const {
 
   TMode3Hit& mode3 = (TMode3Hit&)obj;
 
-
   mode3.board_id = board_id;
   mode3.led      = led;
   mode3.cfd      = cfd;
@@ -77,7 +99,20 @@ void TMode3Hit::Copy(TObject& obj) const {
 }
 
 
-void TMode3Hit::Print(Option_t *opt) const { }
+void TMode3Hit::Print(Option_t *opt) const {
+  TString sopt(opt);
+  if(sopt.Contains("long")) {
+    printf("TMode3Hit @ %lu \n",Timestamp());
+    printf("\tHole:     %i\n",GetHole());
+    printf("\tXtal:     %i\n",GetCrystal());
+    printf("\tSegment:  %i\n",GetSegmentId());
+    printf("\tCharge:   %i\n",Charge());
+    printf("\tPickoff:  %i\n",GetCharge0());
+    printf("\tWaveSize: %i\t%i\n",wavesize,(int)waveform.size());
+  } else {
+    printf("hole[%03i] xtal[%i] seg[%03i]:   %i\n",GetHole(),GetCrystal(),GetSegmentId(),GetCharge0());
+  }
+}
 
 void TMode3Hit::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
@@ -93,7 +128,7 @@ void TMode3Hit::Clear(Option_t *opt) {
   waveform.clear();
 }
 
-double TMode3Hit::AverageWave(int samples) {
+double TMode3Hit::AverageWave(int samples) const {
   if(waveform.size() == 0) {
     return 0.0;
   }
@@ -102,16 +137,16 @@ double TMode3Hit::AverageWave(int samples) {
     samples = waveform.size();
   }
   double sum = 0.0;
-  double wsum = 0.0;
   for(int i=0;i<samples;i++) {
-    wsum += (double)i*(std::abs((double)waveform[i]));
+    //wsum += (double)i*(std::abs((double)waveform[i]));
     sum += waveform[i];
   }
-  return wsum/sum;
+  //return wsum/sum;
+  return sum / ((double)samples);
 }
 
 
-void TMode3Hit::Draw(Option_t *opt)  {
+void TMode3Hit::Draw(Option_t *opt) const {
   if(!waveform.size())
     return;
   TString option = opt;
@@ -120,10 +155,12 @@ void TMode3Hit::Draw(Option_t *opt)  {
   } else {
     gPad->Clear();
   }
-  GH1D wave("wave","wave",(int)waveform.size(),0,(double)waveform.size());
+  //double avg = AverageWave(10);
+  
+  GH1D wave("wave",Form("0x%08x",Address()),(int)waveform.size(),0,(double)waveform.size());
   for(unsigned int x=0;x<waveform.size();x++) 
     wave.Fill(x,waveform.at(x));
-  wave.DrawCopy();
+  wave.DrawCopy(opt);
 
 }
 

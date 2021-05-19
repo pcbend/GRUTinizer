@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 
-import Tkinter as tk
-import ttk
+import tkinter as tk
+from tkinter import ttk
 
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
@@ -86,7 +86,7 @@ class VariableTab(object):
         try:
             value = float(self.var_value.get())
         except ValueError:
-            print 'Could not convert "{}" to float'.format(self.var_value.get())
+            print('Could not convert "{}" to float'.format(self.var_value.get()))
             return
 
         self.SetReplaceVariable(name, value)

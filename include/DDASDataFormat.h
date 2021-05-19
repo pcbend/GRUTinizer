@@ -25,24 +25,73 @@
 #define BIT29TO16MASK      0x3FFF0000  // Bits 29 through 16
 #define BIT28TO16MASK      0x1FFF0000  // Bits 28 through 16
 
-
-class TDDASEvent : public TObject {
-public:
 #include "DDASBanks.h"
 
-  TDDASEvent(const TSmartBuffer& buf);
+template<typename HeaderType>
+class TDDASEvent : public TObject {
+public:
+  TDDASEvent(TSmartBuffer& buf)
+    : qdc_sum(NULL), energy_sum(NULL), trace(NULL),
+      header(NULL), buf(buf) {
+    header = (HeaderType*)buf.GetData();
+    buf.Advance(sizeof(HeaderType));
+
+    if(HasEnergySum()){
+      energy_sum = (DDAS_Energy_Sum*)buf.GetData();
+      buf.Advance(sizeof(DDAS_Energy_Sum));
+    }
+
+    if(HasQDCSum()){
+      qdc_sum = (DDAS_QDC_Sum*)buf.GetData();
+      buf.Advance(sizeof(DDAS_QDC_Sum));
+    }
+
+    if(HasExternalClk()){
+      ext_time_low = (*((unsigned int*)buf.GetData()));
+      buf.Advance(sizeof(unsigned int));
+      ext_time_high = (*((unsigned int*)buf.GetData()));
+      buf.Advance(sizeof(unsigned int));
+    }
+
+    if(GetTraceLength()){
+      trace = (unsigned short*)buf.GetData();
+      buf.Advance(GetTraceLength()*sizeof(unsigned short));
+    }
+  }
 
   DDAS_QDC_Sum* qdc_sum;
   DDAS_Energy_Sum* energy_sum;
   unsigned short* trace;
 
-  bool HasQDCSum() const;
-  bool HasEnergySum() const;
+  bool HasEnergySum() const {
+    return (GetChannelHeaderLength() == 8 ||
+            GetChannelHeaderLength() == 10||
+            GetChannelHeaderLength() == 16||
+            GetChannelHeaderLength() == 18);
+  }
+
+
+  bool HasQDCSum() const {
+    return (GetChannelHeaderLength() == 12 ||
+            GetChannelHeaderLength() == 14 ||
+            GetChannelHeaderLength() == 16 ||
+            GetChannelHeaderLength() == 18);
+  }
+
+  bool HasExternalClk() const {
+    return (GetChannelHeaderLength() == 6  ||
+            GetChannelHeaderLength() == 10 ||
+            GetChannelHeaderLength() == 14 ||
+            GetChannelHeaderLength() == 18);
+  }
+
 
   unsigned int GetSize()        const { return header->size; }
   unsigned short GetFrequency() const { return header->frequency; }
   unsigned char GetADCBits()    const { return header->adc_bits; }
   unsigned char GetRevision()   const { return header->revision; }
+
+  unsigned int GetAddress()        const { return (0x19000000+(header->status&0x00000fff)); }
 
   int GetChannelID()               const { return (header->status & CHANNELIDMASK)     >> 0;           }
   int GetSlotID()                  const { return (header->status & SLOTIDMASK)        >> 4;           }
@@ -57,20 +106,49 @@ public:
   unsigned long GetTimestamp()     const {
     return (((unsigned long)GetTimeHigh())<<32) + GetTimeLow();
   }
+
+  unsigned int GetExternalTimeLow()        const { return ext_time_low;                                    }
+  unsigned int GetExternalTimeHigh()       const { return (ext_time_high & LOWER16BITMASK);            }
+  unsigned long GetExternalTimestamp()     const {
+    return (((unsigned long)GetExternalTimeHigh())<<32) + GetExternalTimeLow();
+  }
+  
+  
+  
+  
   int GetCFDFailBit()              const { return (header->time_high_cfd & BIT31MASK)     >> 31;       }
   int GetCFDTime()                 const { return (header->time_high_cfd & BIT30TO16MASK) >> 16;       }
+
+//  int GetTimestampCFD()            const {
+//    if(GetCFDFailBit()) {
+//      return GetTimestamp()*8;  
+//    } else {
+//      GetTimestamp()*2 +((GetCFDTime()&0x40000000)>>30) +
+//    }
+//  }
+ 
 
   int GetEnergy()                  const { return (header->energy_tracelength & LOWER16BITMASK);       }
   int GetTraceLength()             const { return (header->energy_tracelength & UPPER16BITMASK) >> 16; }
 
+  friend std::ostream& operator<<(std::ostream& out, const TDDASEvent& event) {
+    out << "DDAS Channel: \n";
+    return out;
+  }
+
 private:
-  DDASHeader* header;
+  HeaderType* header;
 
   TSmartBuffer buf;
+
+  unsigned int ext_time_low;
+  unsigned int ext_time_high;
 
   ClassDef(TDDASEvent, 0);
 };
 
-std::ostream& operator<<(std::ostream& out, const TDDASEvent& event);
+
+
+
 
 #endif /* _DDASDATAFORMAT_H_ */

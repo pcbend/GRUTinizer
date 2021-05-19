@@ -2,7 +2,7 @@
 
 #include "TClass.h"
 
-#include "TBank29.h"
+#include "TBank88.h"
 #include "TCaesar.h"
 #include "TGretina.h"
 #include "TGretSim.h"
@@ -15,6 +15,10 @@
 #include "TS800Scaler.h"
 #include "TSega.h"
 #include "TFastScint.h"
+#include "TLenda.h"
+#include "TFSU.h"
+#include "TUML.h"
+#include "TOBJ.h"
 
 TUnpackedEvent::TUnpackedEvent() { }
 
@@ -54,8 +58,8 @@ void TUnpackedEvent::Build() {
       GetDetector<TS800Scaler>(true)->Build(raw_data);
       break;
 
-    case kDetectorSystems::BANK29:
-      GetDetector<TBank29>(true)->Build(raw_data);
+    case kDetectorSystems::BANK88:
+      GetDetector<TBank88>(true)->Build(raw_data);
       break;
 
     case kDetectorSystems::SEGA:
@@ -81,6 +85,21 @@ void TUnpackedEvent::Build() {
     case kDetectorSystems::NSCLSCALERS:
       GetDetector<TNSCLScalers>(true)->Build(raw_data);
       break;
+    
+    case kDetectorSystems::LENDA:
+      GetDetector<TLenda>(true)->Build(raw_data);
+      break;
+    
+    case kDetectorSystems::UML:
+      GetDetector<TUML>(true)->Build(raw_data);
+      break;
+
+    case kDetectorSystems::OBJ:
+      GetDetector<TOBJ>(true)->Build(raw_data);
+      break;
+
+    case kDetectorSystems::FSU:
+      GetDetector<TFSU>(true)->Build(raw_data);
 
     default:
       break;
@@ -101,3 +120,19 @@ void TUnpackedEvent::SetRunStart(unsigned int unix_time){
     det->SetRunStart(unix_time);
   }
 }
+
+
+TDetector* TUnpackedEvent::GetDetector(std::string detname) const {
+  for(auto det : detectors) {
+    if(detname.compare(det->IsA()->GetName())==0) {
+      TDetector* output = det;
+      if(output){
+        return output;
+      }
+    }
+  }
+  return NULL;
+}
+
+
+

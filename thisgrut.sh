@@ -1,12 +1,3 @@
-# Source this script to set up the grutSort build that this script is part of.
-#
-# Conveniently an alias like this can be defined in .bashrc:
-#   alias thisgrut=". bin/thisgrut.sh"
-#
-# This script if for the bash like shells, see thisgrut.csh for csh like shells.
-#
-# Author: Fons Rademakers, 18/8/2006
-# Adapted by Ryan Dunlop, 8/9/2015
 
 drop_from_path()
 {

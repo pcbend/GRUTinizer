@@ -4,37 +4,45 @@
 #include "TDetectorHit.h"
 
 class TFastScintHit : public TDetectorHit {
-public:
-  TFastScintHit();
-  TFastScintHit(const TDetectorHit&);
+  public:
+    TFastScintHit();
+    TFastScintHit(const TDetectorHit&);
 
-  virtual void Print(Option_t* opt = "") const;
-  virtual void Clear(Option_t* opt = "");
-  virtual void Copy(TObject& obj) const;
+    virtual void Print(Option_t* opt = "") const;
+    virtual void Clear(Option_t* opt = "");
+    virtual void Copy(TObject& obj) const;
 
-  //void SetCharge(int chg)    { fCharge  = chg;  }
-  void SetChannel(int chan)  { fChannel = chan; }
-  //void SetTime(int time)     { fTime = time;    }
-  //void SetTimestamp(long ts) { fTimestamp = ts; }
-  //void SetEnergy();
+    int  GetChannel()    const { return Address() & 0x1f;   }
 
-  //virtual int Charge() const { return fCharge;    }
-  int  GetChannel()    const { return fChannel;   }
-  //int  GetTime()       const { return fTime;      }
-  //long GetTimestamp()  const { return fTimestamp; }
-  //float GetEnergy()    const { return fEnergy;    }
-  //
-  TVector3 &GetPosition() const;
+    TVector3 &GetPosition() const;
+
+    void SetTime(unsigned short time) { fTimes.push_back(time); }
+    virtual int  Time() const { 
+      if(fTimes.size()) {
+	return fTimes[0]; 
+      } else {
+	return -1;
+      }
+    }
+
+    const std::vector<unsigned short>& GetAllTimes() const { return fTimes; }
+    size_t GetNumTimes() const { return fTimes.size(); }
+    int GetMTime(size_t j) const { 
+      //if(GetNumTimes()<j) {
+	return fTimes[j]; 
+      //} else {
+	//return -1;
+      //}
+    }
 
 
-private:
-  //long  fTimestamp;
-  int   fChannel;
-  //int   fTime;
-  //int   fCharge;
-  //float fEnergy;
+    bool operator<(const TFastScintHit &rhs) const { return Charge()>rhs.Charge(); } //  fAddress<rhs.fAddress; }
 
-  ClassDef(TFastScintHit,22)
+  private:
+
+    std::vector<unsigned short> fTimes;
+
+  ClassDef(TFastScintHit,24)
 };
 
 #endif /* _TFASTSCINTDETECTORHIT_H_ */

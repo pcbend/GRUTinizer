@@ -30,7 +30,8 @@ int TOrderedRawFile::GetEvent(TRawEvent& event) {
   }
 
   if(oldest_timestamp != -1 && newest_timestamp != -1 &&
-     curr_timestamp < newest_timestamp){
+     curr_timestamp < newest_timestamp &&
+     !TGRUTOptions::Get()->SuppressErrors()){
     std::cerr << "Sorting failed, insufficient depth "
               << "(" << curr_timestamp << " < " << newest_timestamp << std::endl;
   }

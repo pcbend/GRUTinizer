@@ -8,6 +8,7 @@
 
 #include <TNamed.h>
 #include <TList.h>
+#include <TVector3.h>
 
 class TChannel : public TNamed {
 public:
@@ -47,6 +48,7 @@ public:
   const char*  GetCollectedCharge() const  { return collected_charge.c_str(); }
   double       GetPedestal() const         { return pedestal; }
 
+  TVector3     GetChannelPosition() const  { return fPosition; }
 
   void SetAddress(unsigned int temp) { address = temp; }
   void SetName(const char *temp)     {
@@ -87,7 +89,6 @@ public:
 public:
   static int  ParseInputData(std::string &input,Option_t *opt="");
   static int  WriteToBuffer(Option_t *opt="");
-  static void trim(std::string *, const std::string &trimChars=" \f\n\r\t\v");
   static std::vector<double> ParseListOfDoubles(std::istream& ss);
 
   static double Calibrate(int value, const std::vector<double>& coeff);
@@ -108,6 +109,13 @@ public:
   std::string array_subposition;
   std::string collected_charge;
   int segment;
+
+  void SetChannelX(double x) { fPosition.SetX(x); }
+  void SetChannelY(double y) { fPosition.SetY(y); }
+  void SetChannelZ(double z) { fPosition.SetZ(z); }
+
+
+  TVector3 fPosition;
 
   // For backwards compatibility, unpack the name
   //  into the system/array_position/arraysubposition/collectedcharge/segment.
@@ -133,7 +141,9 @@ public:
   static std::map<unsigned int,TChannel*> fChannelMap;
   static TChannel *fDefaultChannel;
 
-  ClassDef(TChannel,2);
+  
+
+  ClassDef(TChannel,3);
 };
 
 #endif

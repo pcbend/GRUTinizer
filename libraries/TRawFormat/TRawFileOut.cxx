@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <cstdlib>
+#include <cassert>
 
 #include "TGEBEvent.h"
 #include "TNSCLEvent.h"
@@ -73,7 +75,22 @@ void TRawFileOut::swap(TRawFileOut& other) {
 }
 
 void TRawFileOut::Write(TRawEvent& event) {
-  WriteBytes((char*)event.GetRawHeader(), sizeof(TRawEvent::RawHeader));
+  // static bool kill_next = false;
+
+  // if(kill_next) {
+  //   event.Print("all");
+  // }
+
+  if(IsGEBData(event)) {
+    TRawEvent::RawHeader header;
+    header.datum1 = event.GetEventType();
+    header.datum2 = event.GetPayloadBuffer().GetSize();
+    WriteBytes((char*)&header, sizeof(TRawEvent::RawHeader));
+  } else {
+    WriteBytes((char*)event.GetRawHeader(), sizeof(TRawEvent::RawHeader));
+  }
+
+
 
   TSmartBuffer buf;
   if(IsGEBData(event)) {
@@ -86,6 +103,15 @@ void TRawFileOut::Write(TRawEvent& event) {
     buf = event.GetBuffer();
   }
   WriteBytes(buf.GetData(), buf.GetSize());
+
+  // if(kill_next) {
+  //   exit(5);
+  // }
+  // if(event.GetEventType()==8) {
+  //   std::cout << "I haz a card29" << std::endl;
+  //   event.Print("all");
+  //   kill_next = true;
+  // }
 }
 
 void TRawFileOut::Write(TUnpackedEvent& event) {
@@ -163,9 +189,14 @@ void TRawFileOut::WriteBuiltNSCLEvent(TUnpackedEvent& event) {
 }
 
 void TRawFileOut::WriteBytes(const char* data, size_t size) {
+  size_t bytes_written = 0;
   if(raw_file_out) {
-    fwrite(data, sizeof(char), size, raw_file_out);
+    bytes_written = fwrite(data, sizeof(char), size, raw_file_out);
   } else if(gzip_file_out) {
-    gzwrite(*gzip_file_out, data, size);
+    bytes_written = gzwrite(*gzip_file_out, data, size);
   }
+  if(bytes_written != size) {
+    std::cout << "Incorrect amount written: " << bytes_written << " instead of " << size << std::endl;
+  }
+  assert(bytes_written == size);
 }

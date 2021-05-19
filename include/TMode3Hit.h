@@ -21,8 +21,8 @@ public:
 
   //virtual void          InsertHit(const TDetectorHit& hit) { return;       }
   //virtual TDetectorHit& GetHit(const int &i=0)             { return hit; }
-  //virtual int           Size()                             { return 1;     }
-  double AverageWave(int samples=-1);
+  virtual size_t  Size()  const { return waveform.size();     }
+  double AverageWave(int samples=-1) const;
 
   void     BuildFrom(TSmartBuffer& buf);
 
@@ -33,6 +33,8 @@ public:
   Int_t    GetSegmentId() const { return GetVME()*10 + GetChannel(); }
   Int_t    GetAbsSegId()  const { return GetCrystal()*40 + GetSegmentId() ; }
   Int_t    GetCrystalId() const { return GetHole()*4 + GetCrystal(); }
+  
+  Int_t WaveSize()        const { return wavesize; }
   const std::vector<Short_t>& GetWave() const { return waveform; }
 
   Long_t   GetLed()       const { return led; }
@@ -54,8 +56,9 @@ public:
   double GetEnergy1() const;
   double GetEnergy2() const;
 
-  void Draw(Option_t *opt="");
+  void Draw(Option_t *opt="") const;
 
+  bool operator<(const TMode3Hit &rhs) const { return GetSegmentId() < rhs.GetSegmentId(); }
 
 private:
   //virtual int BuildHits();

@@ -59,12 +59,19 @@ public:
   //Added 1/4/2016 for getting trigbit - BAE
   TTrigger      &GetTrigger()      const { return (TTrigger&)trigger;}
 
+  
+  float GetIonSum() const { return ion.GetSum(); }
+
   //Note c1 is the AFP correction and c2 is the XFP correction
   float GetTofE1_TAC(float c1=0.00,float c2=0.00)  const;
+  float GetTofE1_TAC_XFP(float c1=0.00,float c2=0.00)  const;
   float GetTofE1_TDC(float c1=0.00,float c2=0.00)  const;
   float GetTofE1_MTDC(float c1=0.00,float c2=0.00,int i=0) const;
+ float GetTofE1_MTDC_RF(float c1=0.00,float c2=0.00,int i=0) const;
+ float GetTofE1_MTDC_XFP(float c1=0.00,float c2=0.00,int i=0) const;
 
   float GetCorrTOF_OBJTAC() const;
+  float GetCorrTOF_XFPTAC() const;
   float GetOBJRaw_TAC() const;
   float GetXFRaw_TAC() const;
   
@@ -73,7 +80,9 @@ public:
   float GetXF_E1Raw() const;
   //===================================================  
 
-  float GetCorrTOF_OBJ_MESY(int i=0) const;
+  float GetCorrTOF_OBJ_MESY(int i=0) const; // return correlated and corrected TOF
+  float GetCorrTOF_RF_MESY(int i=0) const;
+  float GetCorrTOF_XFP_MESY(int i=0) const;// return correlated and corrected TOF
   
   float GetOBJ_E1Raw_MESY(int i=0) const;
   float GetOBJ_E1Raw_MESY_Ch15(int i=0) const;
@@ -86,22 +95,61 @@ public:
   float GetRawE1_MESY(unsigned int i=0) const;
   float GetRawE1_MESY_Ch15(unsigned int i=0) const;
   
-  
   float GetRawXF_MESY(unsigned int i=0) const;
 
-  float MCorrelatedOBJ() const;
-  float MCorrelatedXFP() const;
-  float MCorrelatedE1() const;
-  float MCorrelatedOBJ_E1(bool corrected=true) const;
-  float MCorrelatedXFP_E1(bool corrected=true) const;
+  //float GetMTOF_ObjE1(unsigned int i=0,bool find_best=true) const; // { return GetCorrTOF_OBJ_MESY(i); }
+  //float GetMTOF_XfpE1(unsigned int i=0,bool find_best=true) const; // { return GetXF_E1Raw_MESY(i);    }
+  //float GetMTOF_RfE1(unsigned int i=0)  const { return GetME1Up(i) - GetMRf(i);  }
+  //float GetMTOF_ObjRf(unsigned int i=0) const { return GetMRf(i)   - GetMObj(i); }
 
-  float MCorrelatedOBJ_Ch15() const;
-  float MCorrelatedXFP_Ch15() const;
-  float MCorrelatedE1_Ch15() const;
-  float MCorrelatedOBJ_E1_Ch15(bool corrected=true) const;
-  float MCorrelatedXFP_E1_Ch15(bool corrected=true) const;
+  double MCorrelatedOBJ() const { return GetMTof().GetCorrelatedObj(); }
+  double MCorrelatedXFP() const { return GetMTof().GetCorrelatedXfp(); }
+  double MCorrelatedE1() const  { return GetMTof().GetCorrelatedE1Up();  }
+  
+  double GetMTofObjE1() const ; // I return the correlated gvalue corrected time-of-flight obj to e1.
+  double GetMTofXfpE1() const ; // I return the correlated gvalue corrected time-of-flight xfp to e1.
 
   
+  
+  //float MCorrelatedOBJ_E1(bool corrected=true) const;
+  //float MCorrelatedXFP_E1(bool corrected=true) const;
+
+  //float MCorrelatedOBJ_Ch15() const;
+  //float MCorrelatedXFP_Ch15() const;
+  //float MCorrelatedE1_Ch15() const;
+  //float MCorrelatedOBJ_E1_Ch15(bool corrected=true) const;
+  //float MCorrelatedXFP_E1_Ch15(bool corrected=true) const;
+
+
+  unsigned short GetME1Up(int i)       const {if(i<GetME1Size())   return mtof.fE1Up.at(i);  return sqrt(-1); }     
+  unsigned short GetME1Down(int i)     const {if(i<GetME1Size())   return mtof.fE1Down.at(i);return sqrt(-1); }    
+           int   GetME1Size()          const { return mtof.fE1Up.size();  }
+  unsigned short GetMXfp(int i)        const {if(i<GetMXfpSize())    return mtof.fXfp.at(i);   return sqrt(-1); }
+           int   GetMXfpSize()         const { return mtof.fXfp.size();  }
+  unsigned short GetMObj(int i)        const {if(i<GetMObjSize())    return mtof.fObj.at(i);   return sqrt(-1); }
+           int   GetMObjSize()         const { return mtof.fObj.size();  }
+  unsigned short GetMRf(int i)         const {if(i<GetMRfSize())     return mtof.fRf.at(i);    return sqrt(-1);  }
+           int   GetMRfSize()          const { return mtof.fRf.size();  }
+  unsigned short GetMCrdc1Anode(int i) const {if(i<GetMCrdc1AnodeSize()) return mtof.fCrdc1Anode.at(i);return sqrt(-1); }
+           int   GetMCrdc1AnodeSize()  const { return mtof.fCrdc1Anode.size();  }
+  unsigned short GetMCrdc2Anode(int i) const {if(i<GetMCrdc2AnodeSize()) return mtof.fCrdc2Anode.at(i);return sqrt(-1); }
+           int   GetMCrdc2AnodeSize()  const { return mtof.fCrdc2Anode.size();  }
+  unsigned short GetMHodoscope(int i)  const {if(i<GetMHodoscopeSize()) return mtof.fHodoscope.at(i);  return sqrt(-1);  }
+           int   GetMHodoscopeSize()   const { return mtof.fHodoscope.size();  }
+  unsigned short GetMRef(int i)        const {if(i<GetMRefSize())       return mtof.fRef.at(i);        return sqrt(-1);  }        
+           int   GetMRefSize()         const { return mtof.fRef.size();  }
+
+  unsigned short GetPinE()   const { return pine;}
+  
+  int GetReg() const { return trigger.GetRegistr(); } 
+
+  float GetCorrIonSum() const;
+
+
+  size_t Size() const { return 0; } //meaningless here, but needed for inherit purposes.
+
+public:
+  int BuildHits(UShort_t size,UShort_t *dptr,Long64_t timestamp); 
 
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
@@ -112,6 +160,7 @@ private:
   bool HandleIonCPacket(unsigned short*,int);     //!
   bool HandleCRDCPacket(unsigned short*,int);     //!
   bool HandleMTDCPacket(unsigned short*,int);     //!
+  bool HandleOBJPinPacket(unsigned short*,int);   //!
 
   TScintillator scint[3];
   TTrigger     trigger;
@@ -120,6 +169,7 @@ private:
   TIonChamber  ion;
   TCrdc        crdc1;
   TCrdc        crdc2;
+  UShort_t     pine;
   //THodoscope   hodo[32];
   //TMultiHitTof multi_tof;
   

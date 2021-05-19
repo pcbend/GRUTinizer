@@ -19,6 +19,8 @@ public:
   virtual void InsertHit(const TDetectorHit&);
   virtual TDetectorHit& GetHit(int i);
 
+  void SortHitsByTimestamp();
+
   virtual void SetRunStart(unsigned int unix_time);
 
   static TVector3 GetSegmentPosition(int detnum, int segnum);
@@ -27,6 +29,8 @@ public:
   // Allows for looping over all hits with for(auto& hit : sega) { }
   std::vector<TSegaHit>::iterator begin() { return sega_hits.begin(); }
   std::vector<TSegaHit>::iterator end() { return sega_hits.end(); }
+
+  size_t Size() const { return sega_hits.size(); }
 
 private:
   virtual int BuildHits(std::vector<TRawEvent>& raw_data);

@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "TNSCLEvent.h"
+#include "TGRUTOptions.h"
 
 TNSCLScalers::TNSCLScalers() {
   Clear();
@@ -55,6 +56,7 @@ void TNSCLScalers::Clear(Option_t *opt) {
 }
 
 int TNSCLScalers::BuildHits(std::vector<TRawEvent>& raw_data) {
+  if(TGRUTOptions::Get()->UseFSU()) return 0;
   for(auto& event : raw_data){
     SetTimestamp(event.GetTimestamp());
     source_id = ((TNSCLEvent&)event).GetSourceID();

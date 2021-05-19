@@ -8,9 +8,11 @@
 #include <sstream>
 #include <utility>
 
+#include "TBuffer.h"
 #include "TRandom.h"
 
 #include "GRootFunctions.h"
+#include "TGRUTUtilities.h"
 
 std::map<unsigned int,TChannel*> TChannel::fChannelMap;
 TChannel *TChannel::fDefaultChannel = new TChannel("TChannel",0xffffffff);
@@ -89,6 +91,12 @@ std::ostream& operator<<(std::ostream& out, const TChannel& chan) {
   }
   out << "\n";
 
+  //if(chan.GetChannelPosition().Mag()>0) {
+    out << "   X:\t" << chan.GetChannelPosition().X() << "\n";
+    out << "   Y:\t" << chan.GetChannelPosition().Y() << "\n";
+    out << "   Z:\t" << chan.GetChannelPosition().Z() << "\n";
+  //}
+
   // Close out the rest
   out << "}\n-----------------------------------\n";
 
@@ -119,6 +127,7 @@ void TChannel::Copy(TObject &rhs) const {
   ((TChannel&)rhs).time_coeff = time_coeff;
   ((TChannel&)rhs).efficiency_coeff = efficiency_coeff;
   ((TChannel&)rhs).pedestal = pedestal;
+  ((TChannel&)rhs).fPosition = fPosition;
 }
 
 void TChannel::Clear(Option_t *opt) {
@@ -133,6 +142,7 @@ void TChannel::Clear(Option_t *opt) {
   array_subposition = "";
   collected_charge = "";
   pedestal = 0;
+  fPosition.Clear();
 }
 
 //void TChannel::Compare(const TObject &rhs) const { }
@@ -242,22 +252,6 @@ int TChannel::DeleteAllChannels()  {
   }
   fChannelMap.clear();
   return count;
-}
-
-
-
-void TChannel::trim(std::string * line, const std::string & trimChars) {
-   //Removes the the string "trimCars" from the start or end of 'line'
-  if(line->length() == 0)
-    return;
-
-  std::size_t found = line->find_first_not_of(trimChars);
-  if(found != std::string::npos)
-    *line = line->substr(found, line->length());
-
-  found = line->find_last_not_of(trimChars);
-  if(found != std::string::npos)
-    *line = line->substr(0, found + 1);
 }
 
 void TChannel::ClearCalibrations() {
@@ -484,7 +478,7 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
 
   while(std::getline(infile,line)) {
     linenumber++;
-    trim(&line);
+    trim(line);
     size_t comment = line.find("//");
     if(comment != std::string::npos) {
        line = line.substr(0,comment);
@@ -523,7 +517,7 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
     if(openbrace != std::string::npos) {
        brace_open = true;
        name = line.substr(0,openbrace).c_str();
-       trim(&name);
+       trim(name);
        channel = new TChannel(name.c_str());
     }
     //=============================================//
@@ -531,14 +525,14 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
       if(colon != std::string::npos) {
         // Type is everything up to the colon
         std::string type = line.substr(0,colon);
-        trim(&type);
+        trim(type);
         for(unsigned int i=0; i<type.length(); i++){
           type[i] = toupper(type[i]);
         }
 
         // The payload is everything after the colon
         line = line.substr(colon+1,line.length());
-        trim(&line);
+        trim(line);
         std::istringstream ss(line);
 
         if(type == "NAME") {
@@ -591,7 +585,17 @@ int TChannel::ParseInputData(std::string &input,Option_t *opt) {
 
         } else if(type == "SEGMENT") {
           ss >> channel->segment;
+        } else if(type == "X") {
+          double val = 0; ss >> val;
+          channel->SetChannelX(val);
+        } else if(type == "Y") {
+          double val = 0; ss >> val;
+          channel->SetChannelY(val);
+        } else if(type == "Z") {
+          double val = 0; ss >> val;
+          channel->SetChannelZ(val);
         }
+
       }
     }
   }

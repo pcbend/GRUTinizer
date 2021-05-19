@@ -11,6 +11,7 @@ public:
   virtual ~TDetectorHit();
 
   virtual const char* GetName() const;
+  virtual int         GetNumber() const;
 
   virtual Int_t Compare(const TObject *obj) const; //needed for root containers
   virtual bool IsSortable() const { return true; }
@@ -20,7 +21,8 @@ public:
   virtual void  Print(Option_t *opt = "" ) const;
 
   Int_t  Address()   const      { return fAddress; }
-  virtual Int_t  Charge() const;
+  virtual Int_t Charge() const;
+  virtual float RawCharge() const { return fCharge; }
   Int_t  Time() const           { return fTime; }
   long   Timestamp() const      { return fTimestamp; }
 
@@ -38,10 +40,10 @@ public:
   static const TVector3 BeamUnitVec; //!
 
 protected:
-  Int_t fAddress;
+  Int_t   fAddress;
   Float_t fCharge;
-  Int_t fTime;
-  long fTimestamp;
+  Int_t   fTime;
+  Long_t  fTimestamp;
 
   unsigned char fFlags;
 
@@ -57,6 +59,8 @@ protected:
   };
 
   ClassDef(TDetectorHit,4)
+  //ClassDef(TDetectorHit,0)
+
 };
 
 #endif

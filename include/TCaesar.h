@@ -49,7 +49,7 @@ public:
   void SetULM(int ulm) { fUlm = ulm; }
 
 
-  unsigned int Size() const { return caesar_hits.size(); }
+  size_t Size() const { return caesar_hits.size(); }
   int AddbackSize() { BuildAddback(); return addback_hits.size(); }
 
   //Corrects TCaesar time (gain matched) by subtracting out the

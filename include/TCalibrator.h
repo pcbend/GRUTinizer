@@ -24,18 +24,21 @@ public:
   virtual void Draw(Option_t *option="");
         UInt_t Size() const { return fPeaks.size(); }
 
+  bool Check() const;
+
   int GetFitOrder() const { return fit_order; }
   void SetFitOrder(int order) { fit_order = order; }
 
   TGraph& MakeCalibrationGraph(bool zerozero=false); //  double min_figure_of_merit = 0.001);
   TGraphErrors &MakeEffGraph(double secondsi=3600.,double bq=100000.,Option_t *opt="draw"); 
+  bool          SaveEffGraph(std::string datafile="",std::string fitfile=""); 
   std::vector<double> Calibrate(double min_figure_of_merit = 0.001);
 
   int AddData(TH1* source_data, std::string source,
-               double sigma=2.0,double threshold=0.05,double error=0.001);
+               double sigma=2.0,double threshold=0.05,bool rm_bg=false,double error=0.001);
  
   int AddData(TH1* source_data, TNucleus* source,
-               double sigma=2.0,double threshold=0.05,double error=0.001);
+               double sigma=2.0,double threshold=0.05,bool rm_bg=false,double error=0.001);
 
   void UpdateTChannel(TChannel* channel);
 
@@ -48,17 +51,22 @@ public:
     double energy;
     double area;
     double intensity;
+    double reso;
     std::string nucleus;
   };
 
-  void AddPeak(double cent,double eng,std::string nuc,double a=0.0,double inten=0.0);
+  void AddPeak(double cent,double eng,std::string nuc,double a=0.0,double inten=0.0,double reso=0);
   Peak GetPeak(UInt_t i) const { return fPeaks.at(i); }
- 
+  int  GetNPeaks() const { return fPeaks.size();}
+  TH1 *ApplyCalibration(TH1 *source,int bins=8000,double range=4000,Option_t *opt="") const; 
+  
   TGraph *FitGraph() { return &fit_graph; }
   TGraph *EffGraph() { return &eff_graph; }
   TF1 *LinFit() { return linfit; }
   TF1 *EffFit() { return efffit; }
-  
+
+  double GetChi2(Option_t *opt="") const;
+
   std::string PrintEfficency(const char *filenamei="");
 
 #ifndef __CINT__
