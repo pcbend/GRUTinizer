@@ -58,6 +58,16 @@ void InitMap() {
 
 #define INTEGRATION 128.0
 
+Double_t ProjectileTheta(Double_t theta, Double_t beta){
+  // std::cout << theta << ", " << beta
+  // 	    << ", "
+  // 	    << (TMath::Cos(theta) - beta)/(1 - beta*TMath::Cos(theta))
+  // 	    << ", "
+  // 	    << TMath::ACos( (TMath::Cos(theta) - beta)/(1 - beta*TMath::Cos(theta)) )
+  // 	    << std::endl;
+  return TMath::ACos( (TMath::Cos(theta) - beta)/(1 - beta*TMath::Cos(theta)) );
+}
+
 // extern "C" is needed to prevent name mangling.
 // The function signature must be exactly as shown here,
 //   or else bad things will happen.
@@ -73,11 +83,34 @@ void MakeHistograms(TRuntimeObjects& obj) {
   TList *list = &(obj.GetObjects());
   int numobj = list->GetSize();
 
+  double beta = GValue::Value("BETA");
+  if(std::isnan(beta))
+    beta=0.00;
+  double xoffset = GValue::Value("GRETINA_X_OFFSET");
+  if(std::isnan(xoffset))
+    xoffset=0.00;
+  double yoffset = GValue::Value("GRETINA_Y_OFFSET");
+  if(std::isnan(yoffset))
+    yoffset=0.00;
+  double zoffset = GValue::Value("GRETINA_Z_OFFSET");
+  if(std::isnan(zoffset))
+    zoffset=0.00;
+  TVector3 targetOffset(xoffset,yoffset,zoffset);
+  
   Int_t    energyNChannels = 8192;
   Double_t energyLlim = 0.;
   Double_t energyUlim = 8192.;
-  
+  Double_t cosTheta  = -1;
+  Double_t mCosTheta = -1;
+  Double_t x1 = -1;
+  Double_t y1 = -1;
+  Double_t z1 = -1;
+  Double_t x2 = -1;
+  Double_t y2 = -1;
+  Double_t z2 = -1;
+
   if(gretSim){
+
     for(int x=0; x<gretSim->Size(); x++){
       TGretSimHit hit = gretSim->GetGretinaSimHit(x);
       obj.FillHistogram("sim","emitted_energy",
@@ -86,6 +119,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
       obj.FillHistogram("sim","emitted_theta",
 			180, 0., 180.,
 			hit.GetTheta()*TMath::RadToDeg());
+      obj.FillHistogram("sim","emitted_proj_theta",
+			180, 0., 180.,
+			ProjectileTheta(hit.GetTheta(),
+					beta)*TMath::RadToDeg());
       obj.FillHistogram("sim","emitted_phi",
 			360, 0., 360.,
 			hit.GetPhi()*TMath::RadToDeg());
@@ -100,7 +137,24 @@ void MakeHistograms(TRuntimeObjects& obj) {
      			hit.GetZ(),
      			300, 0.2, 0.5,
      			hit.GetBeta());
+      if(x==0){
+	Double_t th = ProjectileTheta(hit.GetTheta(), beta);
+	x1 = TMath::Sin(th)*TMath::Cos(hit.GetPhi());
+	y1 = TMath::Sin(th)*TMath::Sin(hit.GetPhi());
+	z1 = TMath::Cos(th);
+      }
+      if(x==1){
+	Double_t th = ProjectileTheta(hit.GetTheta(), beta);
+	x2 = TMath::Sin(th)*TMath::Cos(hit.GetPhi());
+	y2 = TMath::Sin(th)*TMath::Sin(hit.GetPhi());
+	z2 = TMath::Cos(th);
+      }
     }
+    cosTheta
+      = (x1*x2+y1*y2+z1*z2)/(x1*x1+y1*y1+z1*z1)/(x2*x2+y2*y2+z2*z2);
+    obj.FillHistogram("sim","emitted_delta",
+		      100, -1, 1.,
+		      cosTheta);
   }
   
   if(!s800Sim)
@@ -164,20 +218,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
   if(!gretina)
     return;
 
-  double beta = GValue::Value("BETA");
-  if(std::isnan(beta))
-    beta=0.00;
-  double xoffset = GValue::Value("GRETINA_X_OFFSET");
-  if(std::isnan(xoffset))
-    xoffset=0.00;
-  double yoffset = GValue::Value("GRETINA_Y_OFFSET");
-  if(std::isnan(yoffset))
-    yoffset=0.00;
-  double zoffset = GValue::Value("GRETINA_Z_OFFSET");
-  if(std::isnan(zoffset))
-    zoffset=0.00;
-  TVector3 targetOffset(xoffset,yoffset,zoffset);
-
   // (optionally define extra beta values in gvalues file)
   const Int_t    nBetas = 1;
   Double_t betas[nBetas] = {beta};
@@ -222,7 +262,7 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     for(int i=0; i<nBetas; i++){
 
-      // Symmetrized gamma-gamma
+      // Symmetrized gamma-gamma and angular correlation
       Double_t e1 = hit.GetDoppler_2(betas[i])*gRandom->Gaus(1,1./1000.);
       for(int y=x+1; y<gretina->Size(); y++){
 
@@ -237,6 +277,30 @@ void MakeHistograms(TRuntimeObjects& obj) {
 			  Form("gamma_gamma_dop_%.0f_gaus", betas[i]*10000),
 			  energyNChannels/8, energyLlim, energyUlim, e2,
 			  energyNChannels/8, energyLlim, energyUlim, e1);
+
+	if( (e1 > 1110. && e1 < 1145. && e2 > 1305. && e2 < 1350.)
+	    || (e2 > 1110. && e2 < 1145. && e1 > 1305. && e1 < 1350.) ){
+	  //TVector3 r1 = hit.GetFirstIntPosition_2();
+	  //TVector3 r2 = hit2.GetFirstIntPosition_2();
+	  //	  mCosTheta = r1.Dot(r2)/r1.Mag()/r2.Mag();
+	  Double_t th = ProjectileTheta(hit.GetTheta(), beta);
+	  x1 = sin(th)*cos(hit.GetPhi());
+	  y1 = sin(th)*sin(hit.GetPhi());
+	  z1 = cos(th);
+	  th = ProjectileTheta(hit2.GetTheta(), beta);
+	  x2 = sin(th)*cos(hit2.GetPhi());
+	  y2 = sin(th)*sin(hit2.GetPhi());
+	  z2 = cos(th);
+	  mCosTheta
+	    = (x1*x2+y1*y2+z1*z2)/(x1*x1+y1*y1+z1*z1)/(x2*x2+y2*y2+z2*z2);
+	  obj.FillHistogram("position","delta",
+			    100, -1, 1., mCosTheta);
+	  obj.FillHistogram("position","cosTheta_mCosTheta",
+			    100, -1, 1.,
+			    cosTheta,
+			    100, -1, 1.,
+			    mCosTheta);
+	}
       }
     
       obj.FillHistogram("energy",
@@ -262,11 +326,29 @@ void MakeHistograms(TRuntimeObjects& obj) {
       }
     }
     
+    obj.FillHistogram("position", "theta",
+		      180, 0., 180.,
+		      hit.GetTheta()*TMath::RadToDeg());
+
+    obj.FillHistogram("position", "theta_proj",
+		      180, 0., 180.,
+		      ProjectileTheta(hit.GetTheta(), beta)*TMath::RadToDeg());
+
+    obj.FillHistogram("position", "phi",
+		      360, 0., 360.,
+		      hit.GetPhi()*TMath::RadToDeg());
+
     obj.FillHistogram("position", "theta_vs_phi",
 		      360, 0., 360.,
 		      hit.GetPhi()*TMath::RadToDeg(),
 		      180, 0., 180.,
 		      hit.GetTheta()*TMath::RadToDeg());
+
+    obj.FillHistogram("position", "theta_vs_phi_proj",
+		      360, 0., 360.,
+		      hit.GetPhi()*TMath::RadToDeg(),
+		      180, 0., 180.,
+		      ProjectileTheta(hit.GetTheta(), beta)*TMath::RadToDeg());
 
     if(hit.GetHoleNumber() < 10){
       obj.FillHistogram("position", "theta_vs_phi_fw",

@@ -73,7 +73,29 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
   TList *list = &(obj.GetObjects());
   int numobj = list->GetSize();
-    
+
+  // These are written for every event, not just those in which
+  // gamma rays are detected, so catch them first.
+  if(gretSim){
+    if(gretSim->Size() > 0){
+      obj.FillHistogram("sim","beta",
+			300, 0.2, 0.5,
+			gretSim->GetGretinaSimHit(0).GetBeta());
+      obj.FillHistogram("sim","z",
+			1000,-50,50.,
+			gretSim->GetGretinaSimHit(0).GetZ());
+      obj.FillHistogram("sim","beta_z",
+			1000,-50.,50.,
+			gretSim->GetGretinaSimHit(0).GetZ(),
+			300, 0.2, 0.5,
+			gretSim->GetGretinaSimHit(0).GetBeta());
+      obj.FillHistogram("sim","theta",
+			180,0,180.,
+			gretSim->GetGretinaSimHit(0).GetTheta()*TMath::RadToDeg());
+    }
+  }
+
+  
   if(!s800Sim)
     return;
 
@@ -130,22 +152,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
      obj.FillHistogram("s800","scatter",
 		       4096, 0, 300,
 		       scatter);
-     if(gretSim){
-       if(gretSim->Size() > 0){
-	 obj.FillHistogram("sim","beta",
-			   300, 0.2, 0.5,
-			   gretSim->GetGretinaSimHit(0).GetBeta());
-	 obj.FillHistogram("sim","z",
-			   1000,-50,50.,
-			   gretSim->GetGretinaSimHit(0).GetZ());
-	 obj.FillHistogram("sim","beta_z",
-			   1000,-50.,50.,
-			   gretSim->GetGretinaSimHit(0).GetZ(),
-			   300, 0.2, 0.5,
-			   gretSim->GetGretinaSimHit(0).GetBeta());
-       }
-     }
-
   }
   
   if(!gretina)
@@ -235,6 +241,13 @@ void MakeHistograms(TRuntimeObjects& obj) {
 			energyNChannels, energyLlim, energyUlim,
 			hit.GetDoppler_2(betas[i]));
 
+      obj.FillHistogram("position",
+			Form("dop_theta_%.0f",betas[i]*10000),
+			energyNChannels, energyLlim, energyUlim,
+			hit.GetDoppler_2(betas[i]),
+			180, 0., 180.,
+			hit.GetTheta()*TMath::RadToDeg());
+
       obj.FillHistogram("energy",
 			Form("dop_%.0f_gaus", betas[i]*10000),
 			energyNChannels, energyLlim, energyUlim,
@@ -253,19 +266,23 @@ void MakeHistograms(TRuntimeObjects& obj) {
       }
     }
     
-    obj.FillHistogram("position", "theta_vs_phi",
-		      360, 0., 360.,
-		      hit.GetPhi()*TMath::RadToDeg(),
+    obj.FillHistogram("position", "theta",
 		      180, 0., 180.,
 		      hit.GetTheta()*TMath::RadToDeg());
-
+    
     if(hit.GetHoleNumber() < 10){
+      obj.FillHistogram("position", "theta_fw",
+			180, 0., 180.,
+			hit.GetTheta()*TMath::RadToDeg());
       obj.FillHistogram("position", "theta_vs_phi_fw",
 			360, 0., 360.,
 			hit.GetPhi()*TMath::RadToDeg(),
 			180, 0., 180.,
 			hit.GetTheta()*TMath::RadToDeg());
     } else {
+      obj.FillHistogram("position", "theta_bw",
+			180, 0., 180.,
+			hit.GetTheta()*TMath::RadToDeg());
       obj.FillHistogram("position", "theta_vs_phi_bw",
 			360, 0., 360.,
 			hit.GetPhi()*TMath::RadToDeg(),

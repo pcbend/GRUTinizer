@@ -23,39 +23,6 @@
 #include "TChannel.h"
 #include "GValue.h"
 
-#define Q1 15
-#define Q2 7
-#define Q3 8
-#define Q4 16
-#define Q5 9
-#define Q6 14
-#define Q7 17
-#define Q8 6
-#define Q9 19
-
-std::map<int,int> HoleQMap;
-std::map<int,std::string> LayerMap;
-
-void InitMap() {
-  HoleQMap[Q1] = 1;
-  HoleQMap[Q2] = 2;
-  HoleQMap[Q3] = 3;
-  HoleQMap[Q4] = 4;
-  HoleQMap[Q5] = 5;
-  HoleQMap[Q6] = 6;
-  HoleQMap[Q7] = 7;
-  HoleQMap[Q8] = 8;
-  HoleQMap[Q9] = 9;
-
-  LayerMap[0] = "alpha";
-  LayerMap[1] = "beta";
-  LayerMap[2] = "gamma";
-  LayerMap[3] = "delta";
-  LayerMap[4] = "epsilon";
-  LayerMap[5] = "phi";
-
-}
-
 #define INTEGRATION 128.0
 
 // extern "C" is needed to prevent name mangling.
@@ -63,7 +30,7 @@ void InitMap() {
 //   or else bad things will happen.
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
-  InitMap();
+
   TGretina *gretina = obj.GetDetector<TGretina>();
   TBank29  *bank29  = obj.GetDetector<TBank29>();
   TS800    *s800    = obj.GetDetector<TS800>();
@@ -78,89 +45,24 @@ void MakeHistograms(TRuntimeObjects& obj) {
   Double_t energyUlim = 8192.;
   
   if(gretSim){
-    for(int x=0; x<gretSim->Size(); x++){
-      TGretSimHit hit = gretSim->GetGretinaSimHit(x);
+    if(gretSim->Size() > 0){
+      obj.FillHistogram("sim","beta",
+			1000, 0, 1.0,
+			gretSim->GetGretinaSimHit(0).GetBeta());
       obj.FillHistogram("sim","emitted_energy",
 			energyNChannels, energyLlim, energyUlim,
-			hit.GetEn());
-      obj.FillHistogram("sim","emitted_theta",
-			180, 0., 180.,
-			hit.GetTheta()*TMath::RadToDeg());
-      obj.FillHistogram("sim","emitted_phi",
-			360, 0., 360.,
-			hit.GetPhi()*TMath::RadToDeg());
-      obj.FillHistogram("sim","emitted_z",
-			1000,-50., 50.,
-			hit.GetZ());
-      obj.FillHistogram("sim","beta",
-     			500, 0, 0.5,
-     			hit.GetBeta());
+			gretSim->GetGretinaSimHit(0).GetEn());
+      obj.FillHistogram("sim","z",
+			1000,-5,5.,
+			gretSim->GetGretinaSimHit(0).GetZ());
       obj.FillHistogram("sim","beta_z",
-     			1000,-5,5.,
-     			hit.GetZ(),
-     			300, 0.2, 0.5,
-     			hit.GetBeta());
+			1000,-5,5.,
+			gretSim->GetGretinaSimHit(0).GetZ(),
+			300, 0.3, 0.6,
+			gretSim->GetGretinaSimHit(0).GetBeta());
     }
   }
-  
-  if(!s800Sim)
-    return;
 
-  if(s800Sim->Size() > 0){
-     // std::cout << "In MakeHistos:" << std::endl;
-    
-     // std::cout << "               time stamp = "
-     //  	      << s800Sim->Timestamp() << std::endl;
-
-     // std::cout << "                     size = "
-     // 	       << s800Sim->Size()
-     // 	       << std::endl;
-     
-     // std::cout << std::flush;
-
-     Double_t dta = s800Sim->GetS800SimHit(0).GetDTA();
-
-     // std::cout << "                      ATA = "
-     //  	      << s800Sim->GetS800SimHit(0).GetATA() << std::endl;
-
-     // std::cout << "                      BTA = "
-     //    	      << s800Sim->GetS800SimHit(0).GetBTA() << std::endl;
-
-     // std::cout << "                      DTA = "
-     //  	      << dta << std::endl;
-    
-
-     obj.FillHistogram("s800","dta",
-		       200, -0.10, 0.10,
-		       dta);
-
-     // Rough dta acceptance cut
-     if(dta < -0.06 || dta > 0.06)
-       return;
-  
-     obj.FillHistogram("s800","dta_cut",
-		       200, -0.10, 0.10,
-		       dta);
-
-     obj.FillHistogram("s800","ata",
-		       200, -100, 100,
-		       s800Sim->GetS800SimHit(0).GetATA());
-
-     obj.FillHistogram("s800","bta",
-		       200, -100, 100,
-		       s800Sim->GetS800SimHit(0).GetBTA());
-     
-     Double_t xsin, ysin, scatter;
-
-     xsin =  sin(s800Sim->GetS800SimHit(0).GetATA()/1000.);
-     ysin = -sin(s800Sim->GetS800SimHit(0).GetBTA()/1000.);
-     scatter = asin(sqrt(xsin*xsin + ysin*ysin))*1000.;
-     
-     obj.FillHistogram("s800","scatter",
-		       4096, 0, 300,
-		       scatter);
-  }
-  
   if(!gretina)
     return;
 
