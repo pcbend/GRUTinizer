@@ -1,0 +1,920 @@
+#include "TRuntimeObjects.h"
+
+#include <cstdio>
+#include <iostream>
+#include <map>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+#include <limits>
+
+#include "TFile.h"
+#include "TH1.h"
+#include "TH2.h"
+#include "TMath.h"
+#include "TObject.h"
+#include "TRandom.h"
+
+#include "GValue.h"
+#include "TJanusDDAS.h"
+#include "TNSCLScalers.h"
+#include "TSega.h"
+#include "GCutG.h"
+
+#include "TVector3.h"
+#include "TReaction.h"
+#include "TSRIM.h"
+#include "TRandom.h"
+#include "TNucleus.h"
+
+//const bool BEFORE = true;
+//const char* BEAM = "87Rb";
+//const char* TARG = "208Pb";
+//const char* SFILE = "rb87_in_pb208";
+
+const bool BEFORE = false;
+const char* BEAM = "106Cd";
+const char* TARG = "208Pb";
+const char* SFILE = "cd106_in_pb208";
+
+static auto beam = std::make_shared<TNucleus>(BEAM);
+static auto targ = std::make_shared<TNucleus>(TARG);
+static TSRIM srim(SFILE);
+const double En_mid = srim.GetAdjustedEnergy(GValue::Value("beamenergy")*1e3, 0.33063)/1e3;
+
+TReaction reac_mid(beam, targ, beam, targ, En_mid);
+
+double get_beta(double angle_rad, int part, double beam_energy = 0, bool energy_loss = true) {
+  // Factors of 1e3 are because TNucleus and TReaction use MeV, while TSRIM uses keV.
+
+  double thick = GValue::Value("targetthick");
+  double thickness = (thick / 11342.0) * 1e4; // (1 mg/cm^2) / (11342 mg/cm^3) * (10^4 um/cm)
+
+  double pre_energy_MeV;
+  if(beam_energy)
+    {pre_energy_MeV = beam_energy;}
+  else
+    {pre_energy_MeV = GValue::Value("beamenergy");}
+
+  if(energy_loss) {
+    pre_energy_MeV = srim.GetAdjustedEnergy(pre_energy_MeV*1e3, thickness/2.0)/1e3;
+  }
+
+  TReaction reac(beam, targ, beam, targ, pre_energy_MeV);
+  
+  double post_energy_MeV = reac.GetTLab(angle_rad,part);
+
+  if(energy_loss) {
+    double distance_travelled = (thickness/2)/std::abs(std::cos(angle_rad));
+    post_energy_MeV = srim.GetAdjustedEnergy(post_energy_MeV*1e3, distance_travelled)/1e3;
+  }
+
+  return beam->GetBetaFromEnergy(post_energy_MeV);
+}
+
+class BinCenters {
+    public:
+        BinCenters(int bins, double low, double high)
+            : bins(bins), low(low), high(high) { }
+
+        class iterator {
+            public:
+                iterator(BinCenters& axis, int binnum)
+                    : axis(axis), binnum(binnum) { }
+
+                double operator*() const;
+
+                bool operator==(const iterator& other) const {
+                    return
+                        (&axis == &other.axis) &&
+                        (binnum == other.binnum);
+                }
+
+                bool operator!=(const iterator& other) const {
+                    return !(*this == other);
+                }
+
+                iterator& operator++() {
+                    binnum++;
+                    return *this;
+                }
+
+            private:
+                BinCenters& axis;
+                int binnum;
+        };
+        friend class BinCenters::iterator;
+
+        iterator begin() {
+            return iterator(*this, 0);
+        }
+
+        iterator end() {
+            return iterator(*this, bins);
+        }
+
+    private:
+        int bins;
+        double low;
+        double high;
+};
+
+double BinCenters::iterator::operator*() const {
+    return axis.low + (binnum+0.5) * (axis.high-axis.low)/axis.bins;
+}
+
+void MakeSega(TRuntimeObjects& obj, TSega& sega) {
+
+    std::string dirname = "SeGA";
+
+    obj.FillHistogram(dirname,"multiplicity",100,0,100,sega.Size());
+
+    double cc_ts = -1;
+    for(unsigned int i=0; i<sega.Size(); i++){
+        TSegaHit& hit = sega.GetSegaHit(i);
+	
+        int hit_detnum = hit.GetDetnum();
+	int map_segnum = hit.GetMapSegnum();
+	int map_pairnum = hit.GetMapPairnum();
+	int map_slicenum = hit.GetMapSlicenum();
+        double energy = hit.GetEnergy();
+
+	double theta = hit.GetPosition().Theta()*TMath::RadToDeg();
+	double phi = hit.GetPosition().Phi();
+	if(phi<0)
+	  {phi += TMath::TwoPi();}
+	phi *= TMath::RadToDeg();
+
+        obj.FillHistogram(dirname,"detnum",16,1,17,hit_detnum);
+
+        obj.FillHistogram(dirname,"sega_charge_summary",16,1,17,hit_detnum,32768,0,32768,hit.Charge());
+
+        obj.FillHistogram(dirname,"sega_energy_summary",19,0,19,hit_detnum,8000,0,4000, energy);
+
+        obj.FillHistogram(dirname,"energy",8000,0,4000, energy);
+
+        cc_ts = hit.Timestamp();
+
+	double num_segs = hit.GetNumSegments();
+	double seg_sum_charge = 0;
+	double seg_sum_energy = 0;
+    
+	for(int j=0;j<num_segs;j++) {
+
+	   TSegaSegmentHit seg = hit.GetSegment(j);
+	   double seg_ts = seg.Timestamp();
+	   seg_sum_charge += seg.Charge();
+	   seg_sum_energy += seg.GetEnergy();
+
+	   obj.FillHistogram("SeGA_Segments",Form("sega_det%02d_segsummary",seg.GetDetnum()),
+	                     32,1,33,seg.GetSegnum(),
+                             2048,0,32768,seg.Charge());
+
+	   obj.FillHistogram("SeGA_Segments",Form("sega_det%02d_segsummary_energy",seg.GetDetnum()),
+	                     32,1,33,seg.GetSegnum(),
+	                     2500,0,5000,seg.GetEnergy());
+
+	   obj.FillHistogram("SeGA_Segments","allseg_summary_charge",
+			     512,1,513,32*(hit_detnum-1) + seg.GetSegnum(),
+                             2048,0,32768,seg.Charge());
+
+	   obj.FillHistogram("SeGA_Segments","allseg_summary_energy",
+			     512,1,513,32*(hit_detnum-1) + seg.GetSegnum(),
+                             2500,0,5000,seg.GetEnergy());
+
+	   obj.FillHistogram(dirname,"Core_Segment_tdiff",2000,-20000,20000,cc_ts-seg_ts);
+	   
+	   obj.FillHistogram("SeGA_Detectors",Form("Core_Segment_tdiff_det%02d",seg.GetDetnum()),
+			     2000,-20000,20000,cc_ts-seg_ts);
+
+	   obj.FillHistogram("SeGA_Detectors",Form("cc_seg_tdiff_v_CoreEn_det%02d",seg.GetDetnum())
+			     ,2000,-20000,20000,cc_ts-seg_ts,2000,0,4000,energy);
+
+	   obj.FillHistogram(dirname,"cc_seg_tdiff_v_CoreEn",2000,-20000,20000,cc_ts-seg_ts,
+			     2000,0,4000,energy);
+
+	   obj.FillHistogram(dirname,"cc_seg_tdiff_v_segCharge",2000,-20000,20000,cc_ts-seg_ts,
+			     4000,0,30000,seg.Charge());
+
+	   obj.FillHistogram(dirname,"cc_seg_tdiff_v_segEn",2000,-20000,20000,cc_ts-seg_ts,
+			     2000,0,4000,seg.GetEnergy());
+
+	}//loop over sega segments
+
+	obj.FillHistogram("SeGA_Detectors",Form("SegSum_v_Core_charge_det%02d",hit_detnum),
+			  2048,0,32768,hit.Charge(),2048,0,32768,seg_sum_charge);
+
+	obj.FillHistogram("SeGA_Detectors",Form("SegSum_v_Core_energy_det%02d",hit_detnum),
+			  2500,0,20000,energy,2500,0,20000,seg_sum_energy);
+
+	if(energy < std::numeric_limits<double>::epsilon()) {
+
+	  obj.FillHistogram("SeGA_Detectors",Form("CoreEn_NoCore_det%02d",hit_detnum),2000,-2000,2000,energy);
+	  
+	  obj.FillHistogram("SeGA_Detectors",Form("SegSum_energy_NoCore_det%02d",hit_detnum),
+			    8000,0,8000,seg_sum_energy);
+	}
+
+	if(hit.Charge() < std::numeric_limits<double>::epsilon()) {
+
+	  obj.FillHistogram("SeGA_Detectors",Form("CoreCharge_NoCore_det%02d",hit_detnum),2000,-2000,2000,hit.Charge());
+	  
+	  obj.FillHistogram("SeGA_Detectors",Form("SegSum_charge_NoCore_det%02d",hit_detnum),
+			    8192,0,32768,seg_sum_charge);
+	}
+	
+	if(num_segs == 0) {
+	  obj.FillHistogram(dirname,"Energy_NoSegs",6000,0,6000,energy);
+	  obj.FillHistogram("SeGA_Detectors",Form("Energy_NoSegs_det%02d",hit.GetDetnum()),6000,0,6000,energy);
+	}
+	else if(num_segs > 0) {
+          obj.FillHistogram(dirname,"Energy_YesSegs",6000,0,6000,energy);
+	  obj.FillHistogram("SeGA_Detectors",Form("Energy_YesSegs_det%02d",hit.GetDetnum()),6000,0,6000,energy);
+	}
+
+	obj.FillHistogram(dirname,"Theta_v_SegMap",512,1,513,map_segnum,720,0,180,theta);
+	obj.FillHistogram(dirname,"Phi_v_SegMap",512,1,513,map_segnum,720,0,360,phi);
+
+	obj.FillHistogram(dirname,"Theta_v_PairMap",256,1,257,map_pairnum,720,0,180,theta);
+	obj.FillHistogram(dirname,"Phi_v_PairMap",256,1,257,map_pairnum,720,0,360,phi);
+
+	obj.FillHistogram(dirname,"Theta_v_SliceMap",128,1,129,map_slicenum,720,0,180,theta);
+	obj.FillHistogram(dirname,"Phi_v_SliceMap",128,1,129,map_slicenum,720,0,360,phi);
+
+    }//loop over sega hits
+}
+
+void MakeJanus(TRuntimeObjects& obj, TJanusDDAS& janus) {
+
+    std::string dirname = "Janus";
+
+    if(janus.GetDetectorChannels(0).size()){
+      obj.FillHistogram(dirname, "Num_Channels_det0",100, 0, 100, janus.GetDetectorChannels(0).size());
+    }
+    if(janus.GetDetectorChannels(1).size()){
+      obj.FillHistogram(dirname, "Num_Channels_det1",100, 0, 100, janus.GetDetectorChannels(1).size());
+    }
+
+    if(janus.GetDetectorChannels(0).size() && janus.GetDetectorChannels(1).size()){ 
+      obj.FillHistogram(dirname,"Num_Channels_BothDets_det0",100, 0, 100, janus.GetDetectorChannels(0).size());
+      obj.FillHistogram(dirname,"Num_Channels_BothDets_det1",100, 0, 100, janus.GetDetectorChannels(1).size());
+      
+    }
+
+    if(janus.GetDetectorHits(0).size()){
+      obj.FillHistogram(dirname, "Num_Hits_det0",1000, 0, 1000, janus.GetDetectorHits(0).size());
+    }
+    if(janus.GetDetectorHits(1).size()){
+      obj.FillHistogram(dirname, "Num_Hits_det1",1000, 0, 1000, janus.GetDetectorHits(1).size());
+    }
+
+    if(janus.GetDetectorHits(0).size() && janus.GetDetectorHits(1).size()){
+      obj.FillHistogram(dirname,"Num_Hits_BothDets_det0",1000, 0, 1000, janus.GetDetectorHits(0).size());
+      obj.FillHistogram(dirname,"Num_Hits_BothDets_det1",1000, 0, 1000, janus.GetDetectorHits(1).size());
+    }
+  
+    for(size_t i=0;i<janus.GetAllChannels().size();i++){
+       auto &chan = janus.GetJanusChannel(i);
+
+       obj.FillHistogram(dirname, "Charge_Summary_Chan",
+                         128, 0, 128, chan.GetFrontChannel(),
+                         3500, 0, 35000, chan.Charge());
+
+       obj.FillHistogram(dirname, "Energy_Summary_Chan",
+                         128, 0, 128, chan.GetFrontChannel(),
+                         3500, 0, 35000, chan.GetEnergy());
+
+       obj.FillHistogram(dirname,"Detnum_Chan",2,0,2, chan.GetDetnum());
+
+       for(size_t j=0;j<janus.GetAllChannels().size();j++) {
+	 if(i==j)
+	   {continue;}
+
+	 auto &chan1 = janus.GetJanusChannel(j);
+	 obj.FillHistogram(dirname,Form("Tdiff_chan_sym_det%d",chan.GetDetnum()),
+			   2750,-11000,11000,chan.Timestamp()-chan1.Timestamp());
+
+	 if(j>i) {
+	   obj.FillHistogram(dirname,Form("Tdiff_chan_det%d",chan.GetDetnum()),
+			     2750,-11000,11000,chan.Timestamp()-chan1.Timestamp());
+
+	   obj.FillHistogram(dirname,Form("Tdiff_v_Mult_chan_det%d",chan.GetDetnum()),
+			     100,0,100,janus.GetAllChannels().size(),
+			     2750,-11000,11000,chan.Timestamp()-chan1.Timestamp());
+	 }
+       }
+    }
+
+   for(auto& hit : janus.GetAllHits()) { 
+
+      obj.FillHistogram(dirname,Form("RingNum_det%d",hit.GetDetnum()),26,0,26,hit.GetRing()); 
+      obj.FillHistogram(dirname,Form("SectorNum_det%d",hit.GetDetnum()),34,0,34,hit.GetSector());
+
+      obj.FillHistogram(dirname,Form("HitPattern_det%i",hit.GetDetnum()),
+                        40,0,40,hit.GetSector(),
+                        40,0,40,hit.GetRing());
+
+      obj.FillHistogram(dirname, "Charge_Summary_Hit",
+                        128, 0, 128, hit.GetFrontChannel(),
+                        3500, 0, 35000, hit.Charge());
+      obj.FillHistogram(dirname, "Charge_Summary_Hit",
+                        128, 0, 128, hit.GetBackChannel(),
+                        3500, 0, 35000, hit.GetBackHit().Charge());
+
+      obj.FillHistogram(dirname, "Energy_Summary_Hit",
+                        128, 0, 128, hit.GetFrontChannel(),
+                        3500, 0, 35000, hit.GetEnergy());
+      obj.FillHistogram(dirname, "Energy_Summary_Hit",
+                        128, 0, 128, hit.GetBackChannel(),
+                        3500, 0, 35000, hit.GetBackHit().GetEnergy());
+
+      obj.FillHistogram(dirname,Form("SectorEnergy_v_Ring_det%d",hit.GetDetnum()),
+                      26,0,26,hit.GetRing(),
+                      3000,0,33000,hit.GetEnergy());
+
+      obj.FillHistogram(dirname,Form("RingEnergy_v_Ring_det%d",hit.GetDetnum()),
+                        26,0,26,hit.GetRing(),
+		        3000,0,33000,hit.GetBackHit().GetEnergy());
+
+      auto tdiff = hit.Timestamp() - hit.GetBackHit().Timestamp();
+      auto ediff = std::abs(hit.GetEnergy() - hit.GetBackHit().GetEnergy());
+      
+      obj.FillHistogram(dirname, "Tdiff_Hit",2750, -11000, 11000, tdiff);
+      obj.FillHistogram(dirname, Form("Tdiff_Hit_det%d",hit.GetDetnum()),2500, -10000, 10000, tdiff);
+
+      obj.FillHistogram(dirname, "Ediff_Hit",35000, 0, 35000, ediff);
+      obj.FillHistogram(dirname, Form("Ediff_Hit_det%d",hit.GetDetnum()),35000, 0, 35000, ediff);
+
+      obj.FillHistogram(dirname,"Ediff_v_Tdiff_Hit",
+			2000, -10000, 10000, tdiff,
+			2500, 0, 35000, ediff);
+      obj.FillHistogram(dirname,Form("Ediff_v_Tdiff_Hit_det%d",hit.GetDetnum()),
+			2000, -10000, 10000, tdiff,
+			2500, 0, 35000, ediff);
+     
+      obj.FillHistogram(dirname, "RingEnergy_v_Tdiff",
+                        2000, -10000, 10000, tdiff,
+                        2500,0,35000, hit.GetEnergy());
+      obj.FillHistogram(dirname, Form("RingEnergy_v_Tdiff_det%d",hit.GetDetnum()),
+                        2000, -10000, 10000, tdiff,
+                        2500,0,35000, hit.GetEnergy());
+
+      obj.FillHistogram(dirname, "RingEnergy_v_Ediff",
+                        2500, 0, 35000, ediff,
+                        2500, 0, 35000, hit.GetBackHit().GetEnergy());
+      obj.FillHistogram(dirname, Form("RingEnergy_v_Ediff_det%d",hit.GetDetnum()),
+                        2500, 0, 35000, ediff,
+                        2500, 0, 35000, hit.GetBackHit().GetEnergy());
+
+      obj.FillHistogram(dirname, "SectorEnergy_v_Tdiff",
+                        2000, -10000, 10000, tdiff,
+                        2500,0,35000, hit.GetEnergy());
+      obj.FillHistogram(dirname, Form("SectorEnergy_v_Tdiff_det%d",hit.GetDetnum()),
+                        2000, -10000, 10000, tdiff,
+                        2500,0,35000, hit.GetEnergy());
+
+      obj.FillHistogram(dirname, "SectorEnergy_v_Ediff",
+                        2500, 0, 35000, ediff,
+                        2500, 0, 35000, hit.GetEnergy());
+      obj.FillHistogram(dirname, Form("SectorEnergy_v_Ediff_det%d",hit.GetDetnum()),
+                        2500, 0, 35000, ediff,
+                        2500, 0, 35000, hit.GetEnergy());
+
+      obj.FillHistogram(dirname, "RingEnergy_v_SectorEnergy",
+                        2000,0,35000,hit.GetEnergy(),
+                        2000,0,35000,hit.GetBackHit().GetEnergy());
+      obj.FillHistogram(dirname,Form("RingEnergy_v_SectorEnergy_det%i",hit.GetDetnum()),
+                        2000,0,35000,hit.GetEnergy(),
+                        2000,0,35000,hit.GetBackHit().GetEnergy());
+
+      obj.FillHistogram(dirname,"RingEnergy_v_Theta",
+                        100,0,200,hit.GetPosition(BEFORE).Theta()*(180./TMath::Pi()),
+                        4000,0,35000,hit.GetBackHit().GetEnergy());
+
+      obj.FillHistogram(dirname,"SectorEnergy_v_Theta",
+                        100,0,200,hit.GetPosition(BEFORE).Theta()*(180./TMath::Pi()),
+                        4000,0,35000,hit.GetEnergy());
+      
+      TVector3 tmpvec = hit.GetPosition(BEFORE);
+      double perp, theta, phi, mag;
+      //double xoff = -0.13;
+      //double yoff = 0.17;
+      double xoff = 0.0;
+      double yoff = 0.0;
+
+      perp = hit.GetPosition(BEFORE).Perp() + gRandom->Rndm()*.1 - .045;
+      theta = TMath::ATan(perp/3);
+      phi = hit.GetPosition(BEFORE).Phi() + (gRandom->Rndm()*1. - .5) * (TMath::Pi() / 16.);
+      mag = 3./TMath::Cos(theta);
+      tmpvec.SetMagThetaPhi(mag,theta,phi);
+      tmpvec.SetY(tmpvec.Y()+yoff);
+      tmpvec.SetX(tmpvec.X()+xoff);
+
+      obj.FillHistogram(dirname,Form("Phi_v_Theta_det%i",hit.GetDetnum()),
+                        90,0,180,hit.GetPosition(BEFORE).Theta()*TMath::RadToDeg(),
+                        180,-180,180,hit.GetPosition(BEFORE).Phi()*TMath::RadToDeg());
+
+      obj.FillHistogram(dirname,Form("Y_v_X_det%i",hit.GetDetnum()),
+                        160,-4,4,hit.GetPosition(BEFORE).X(),
+                        160,-4,4,hit.GetPosition(BEFORE).Y());
+
+      obj.FillHistogram(dirname,Form("HeatMap_det%i",hit.GetDetnum()),
+                        160,-4,4,tmpvec.X(),
+                        160,-4,4,tmpvec.Y());
+      
+    }
+}
+
+void MakeSeGAJanus(TRuntimeObjects& obj, TSega& sega, TJanusDDAS& janus) {
+
+    std::string dirname = "SeGAJanus";
+
+    obj.FillHistogram(dirname,"sega_mult",20,0,20,sega.Size());
+
+    obj.FillHistogram(dirname,"janus_mult",150,-10,140,janus.GetAllHits().size());
+
+    for(auto& j_chan : janus.GetAllChannels()) {
+	for(unsigned int i=0; i<sega.Size(); i++) {
+            TSegaHit& s_hit = sega.GetSegaHit(i);
+
+	    auto tdiff = (s_hit.Timestamp() - j_chan.Timestamp());
+	    obj.FillHistogram(dirname,"p_gam_Tdiff_chan",20000,-10000,10000,tdiff);
+	}
+      }
+
+    for(auto& j_hit : janus.GetAllHits()) {
+
+        obj.FillHistogram(dirname,Form("RingNum_det%i",j_hit.GetDetnum()),26,0,26,j_hit.GetRing()); 
+        obj.FillHistogram(dirname,Form("SectorNum_det%i",j_hit.GetDetnum()),34,0,34,j_hit.GetSector());
+
+        for(unsigned int i=0; i<sega.Size(); i++) {
+            TSegaHit& s_hit = sega.GetSegaHit(i);
+	    
+            auto j_pos = j_hit.GetPosition(BEFORE);
+            double s_energy = s_hit.GetEnergy();
+            auto tdiff = (s_hit.Timestamp() - j_hit.Timestamp());
+
+	    obj.FillHistogram(dirname,"p_gam_Tdiff_Hit",20000,-10000,10000,tdiff);
+
+            obj.FillHistogram(dirname,"GammaEnergy",4000,0,4000,s_energy);
+
+	    obj.FillHistogram(dirname,"GammaEnergy_summary",
+                              20,0,20,s_hit.GetDetnum(),
+                              4000,0,4000,s_energy);
+
+	    double s_energy_dc = s_hit.GetDoppler(get_beta(j_pos.Theta(),2),j_pos,
+						  TVector3(0,0,GValue::Value("Sega_Z_offset"))); 
+
+            obj.FillHistogram(dirname,"GammaEnergyDC",4000,0,4000,s_energy_dc);
+
+	    obj.FillHistogram(dirname,"GammaEnergyDC_summary",
+                              20,0,20,s_hit.GetDetnum(),
+                              4000,0,4000,s_energy_dc);
+
+            obj.FillHistogram(dirname,"GammaEnergy_v_tdiff",
+                              1000,-2000,2000,tdiff,
+                              2500,0,5000,s_energy);
+
+	    double num_segs = s_hit.GetNumSegments();
+	    double seg_sum_charge = 0;
+	    double seg_sum_energy = 0;
+    
+	    for(int j=0;j<num_segs;j++) {
+	      TSegaSegmentHit seg = s_hit.GetSegment(j);
+	      seg_sum_charge += seg.Charge();
+	      seg_sum_energy += seg.GetEnergy();
+	    } //end loop over sega segments
+
+	    obj.FillHistogram("SeGAJanus_sDets",Form("SegSum_v_Core_charge_det%02d",s_hit.GetDetnum()),
+			      2048,0,32768,s_hit.Charge(),2048,0,32768,seg_sum_charge);
+
+	    obj.FillHistogram("SeGAJanus_sDets",Form("SegSum_v_Core_energy_det%02d",s_hit.GetDetnum()),
+			      2500,0,5000,s_energy,2500,0,5000,seg_sum_energy);
+	    
+        } //end loop over sega hits 
+    } //end loop over janus hits
+} //end MakeSeGAJanus 
+
+void MakeScatteredSeGAJanus(TRuntimeObjects& obj, TSega& sega, TJanusDDAS& janus, GCutG* time_gate, GCutG* scatter_gate) {
+    if(!scatter_gate) 
+      {return;}
+
+    std::string dirname = "SeGAJanus_Scattered";
+    dirname += scatter_gate->GetName();
+    if(time_gate) {
+	    dirname += "_";
+            dirname += time_gate->GetName();
+     }
+
+    for(auto& j_hit : janus.GetAllHits()) {
+       if(!scatter_gate->IsInside(j_hit.GetPosition(BEFORE).Theta()*(180./TMath::Pi()),j_hit.GetEnergy())) 
+         {continue;}
+
+       obj.FillHistogram(dirname,"Janus_HitMult",1000, 0, 1000, janus.GetAllHits().size(),1.0/janus.GetAllHits().size());
+       
+       obj.FillHistogram(dirname,Form("Ring_det%i",j_hit.GetDetnum()),
+                         26,0,26,j_hit.GetRing()); 
+       obj.FillHistogram(dirname,Form("Sector_det%i",j_hit.GetDetnum()),
+                         34,0,34,j_hit.GetSector());
+        
+       obj.FillHistogram(dirname,"RingEnergy_v_Theta",
+                        100,0,200,j_hit.GetPosition(BEFORE).Theta()*(180./TMath::Pi()),
+                        4000,0,35000,j_hit.GetBackHit().GetEnergy());
+
+       obj.FillHistogram(dirname,"SectorEnergy_v_Theta",
+                        100,0,200,j_hit.GetPosition(BEFORE).Theta()*(180./TMath::Pi()),
+                        4000,0,35000,j_hit.GetEnergy());
+
+       //TReaction reac(beam,targ,beam,targ,En_mid);
+      double theta_cm = reac_mid.ConvertThetaLabToCm(j_hit.GetPosition(BEFORE).Theta(),2);
+      
+      double dRuth = 1.0/TMath::Power(TMath::Sin(theta_cm/2.0),4);
+      double solid_angle = j_hit.GetCmSolidAngle(reac_mid,2,BEFORE); //sr
+
+      obj.FillHistogram(dirname,"Theta",360,0,180,j_hit.GetPosition(BEFORE).Theta()*TMath::RadToDeg());
+      
+      obj.FillHistogram(dirname,Form("Ring_Norm1_det%d",j_hit.GetDetnum()),26,0,26,j_hit.GetRing(),1.0/(dRuth*solid_angle));
+      obj.FillHistogram(dirname,"Theta_Norm1",360,0,180,
+			j_hit.GetPosition(BEFORE).Theta()*TMath::RadToDeg(),1.0/(dRuth*solid_angle));
+      
+       for(unsigned int i=0; i<sega.Size(); i++) {
+          TSegaHit& s_hit = sega.GetSegaHit(i);
+
+          double s_energy = s_hit.GetEnergy();
+          auto tdiff = (s_hit.Timestamp() - j_hit.Timestamp());
+
+	  if(time_gate) {
+            if(!time_gate->IsInside(tdiff,s_energy)) 
+              {continue;}
+	  }
+
+	  obj.FillHistogram(dirname,"sega_mult",20,0,20,sega.Size(),1.0/(sega.Size()*janus.Size()));
+	  
+	  auto j_pos = j_hit.GetPosition(BEFORE);
+          auto s_pos = s_hit.GetPosition(false);
+          auto angle = s_pos.Angle(j_pos);
+	  double beta = get_beta(j_pos.Theta(),2);
+          double s_energy_dc_z = s_hit.GetDoppler(beta,j_pos,TVector3(0,0,GValue::Value("Sega_Z_offset")));
+
+          obj.FillHistogram(dirname,"GammaEnergy",4000,0,4000,s_energy);
+
+	  obj.FillHistogram(dirname,"GammaEnergy_summary",
+                            20,0,20,s_hit.GetDetnum(),
+                            4000,0,4000, s_energy);
+
+          obj.FillHistogram(dirname,"GammaEnergyDCz",12000,0,4000, s_energy_dc_z);
+
+	  obj.FillHistogram(dirname,"GammaEnergyDCz_summary",20,0,20,s_hit.GetDetnum(),8000,0,4000, s_energy_dc_z);
+	  
+	  obj.FillHistogram(Form("Scattered%s_jRings",scatter_gate->GetName()),Form("GammaEnergyDCz_R%02d",j_hit.GetRing())
+			    ,8000,0,4000,s_energy_dc_z);
+
+          obj.FillHistogram(dirname,"GammaEnergy_v_Angle",4000,0,4000,s_energy,90,0,180,(180./3.1415926)*angle);
+
+          obj.FillHistogram(dirname,"GammaEnergyDCz_v_Angle",8000,0,4000,s_energy_dc_z,180,0,180,(180/TMath::Pi())*angle);
+
+          obj.FillHistogram(dirname,"GammaEnergy_v_tdiff",2000,-2000,2000,tdiff,4000,0,4000,s_energy);
+
+	  obj.FillHistogram(dirname,"GammaEnergyDCz_v_tdiff",2000,-2000,2000,tdiff,4000,0,4000,s_energy_dc_z);
+
+	  obj.FillHistogram(dirname,"Beta_v_JanusTheta",360,0,180,j_hit.GetPosition(BEFORE).Theta()*TMath::RadToDeg()
+			                               ,100,0,0.10,beta);
+	  
+          double j_phi = j_pos.Phi();
+	  double thing = 33*TMath::Pi()/16.0;
+	  if(j_phi < 0)
+	    {j_phi += TMath::TwoPi();}
+
+	  obj.FillHistogram(dirname,"Janus_Phi",32,0,thing,j_phi);
+	  
+	  obj.FillHistogram(dirname,"Beta_v_JanusPhi",32,0,thing,j_phi,100,0,0.10,beta);
+
+	  obj.FillHistogram(dirname,"GammaEnergy_v_JanusPhi",4000,0,4000,s_energy,32,0,thing,j_phi);
+
+	  obj.FillHistogram(dirname,"GammaEnergyDCz_v_JanusPhi",8000,0,4000,s_energy_dc_z,32,0,thing,j_phi);
+
+	  TVector3 incBeam = TVector3(0.0,0.0,1.0);
+          TVector3 reacPlane = j_pos.Cross(incBeam);
+          TVector3 detPlane = s_pos.Cross(incBeam);
+
+	  double reac_phi = reacPlane.Phi();
+          if(reac_phi < 0)
+	    {reac_phi += TMath::TwoPi();}
+
+          double det_phi = detPlane.Phi();
+          if(det_phi < 0)
+	    {det_phi += TMath::TwoPi();}
+
+          double planeAng = reac_phi - det_phi;
+          if(planeAng < 0)
+	    {planeAng += TMath::TwoPi();}
+
+	  double thing1 = 65*TMath::Pi()/32;
+
+	  obj.FillHistogram(dirname,"Detection_Phi",32,0,thing,det_phi);
+
+	  obj.FillHistogram(dirname,"Reaction_Phi",32,0,thing,reac_phi);
+
+	  obj.FillHistogram(dirname,"Plane_Angle",32,0,thing1,planeAng);
+
+	  obj.FillHistogram(dirname,"GammaEnergy_v_PlaneAng",4000,0,4000,s_energy,32,0,thing1,planeAng);
+
+	  obj.FillHistogram(dirname,"GammaEnergyDCz_v_PlaneAng",8000,0,4000,s_energy_dc_z,32,0,thing1,planeAng);
+
+	  obj.FillHistogram(dirname,"GammaEnergyDCz_allseg_summary",
+			    512,1,513,32*(s_hit.GetDetnum() - 1) + s_hit.GetMainSegnum(),
+                            35,600,670,s_energy_dc_z);
+
+	  obj.FillHistogram(dirname,"GammaEnergyDCz_SegMap_summary",
+			    512,1,513,s_hit.GetMapSegnum(),
+                            35,600,670,s_energy_dc_z);
+
+	  obj.FillHistogram(dirname,"GammaEnergyDCz_PairMap_summary",
+			    512,1,513,s_hit.GetMapPairnum(),
+                            35,600,670,s_energy_dc_z);
+
+	  obj.FillHistogram(dirname,"GammaEnergyDCz_SliceMap_summary",
+			    512,1,513,s_hit.GetMapSlicenum(),
+                            35,600,670,s_energy_dc_z);
+
+	  obj.FillHistogram(Form("Scattered%s_sDets",scatter_gate->GetName()),Form("GammaEnergyDCz_det%02d",
+			    s_hit.GetDetnum()),4000,0,4000,s_energy_dc_z);
+
+	  obj.FillHistogram(Form("Scattered%s_sDets",scatter_gate->GetName()),Form("GammaEnergy_v_PlaneAng_det%02d",
+			    s_hit.GetDetnum()),4000,0,4000,s_energy,40,0,6.3,planeAng);
+
+	  obj.FillHistogram(Form("Scattered%s_sDets",scatter_gate->GetName()),Form("GammaEnergyDCz_v_PlaneAng_det%02d",
+			    s_hit.GetDetnum()),8000,0,4000,s_energy_dc_z,40,0,6.3,planeAng);
+
+	  obj.FillHistogram(Form("Scattered%s_sDets",scatter_gate->GetName()),Form("GammaEnergy_v_Angle_det%02d",
+			    s_hit.GetDetnum()),4000,0,4000, s_energy,90,0,180,(180/3.1415926)*angle);
+
+	  obj.FillHistogram(Form("Scattered%s_sDets",scatter_gate->GetName()),Form("GammaEnergyDCz_v_Angle_det%02d",
+			    s_hit.GetDetnum()),4000,0,4000, s_energy_dc_z,90,0,180,(180/3.1415926)*angle);
+
+	  obj.FillHistogram(Form("Scattered%s_sDet%02d_Segments",scatter_gate->GetName(),s_hit.GetDetnum()),
+	  		    "GammaEnergyDCz_seg_summary",32,1,33,s_hit.GetMainSegnum(),35,600,670,s_energy_dc_z);
+
+	  //obj.FillHistogram(Form("Scattered%s_sDet%02d_Segments",scatter_gate->GetName(),s_hit.GetDetnum()),
+	  //		    "GammaEnergyDCz_segmap_summary",32,1,33,s_hit.GetMapSegnum(),35,600,670,s_energy_dc_z);
+
+	  obj.FillHistogram(Form("Scattered%s_sDet%02d_Segments",scatter_gate->GetName(),s_hit.GetDetnum()),
+			    Form("GammaEnergy_v_PlaneAng_seg%02d",s_hit.GetMainSegnum()),
+			    100,550,750,s_energy,32,0,6.3,planeAng);
+
+	  obj.FillHistogram(Form("Scattered%s_sDet%02d_Segments",scatter_gate->GetName(),s_hit.GetDetnum()),
+			    Form("GammaEnergyDCz_v_PlaneAng_seg%02d",s_hit.GetMainSegnum()),
+			    70,600,670,s_energy_dc_z,32,0,6.3,planeAng);
+
+	  obj.FillHistogram(Form("Scattered%s_sDet%02d_Segments",scatter_gate->GetName(),s_hit.GetDetnum()),
+			    Form("GammaEnergy_v_Angle_seg%02d",s_hit.GetMainSegnum()),
+                            100,550,750,s_energy,
+                            90,0,180,(180/3.1415926)*angle);
+
+	  obj.FillHistogram(Form("Scattered%s_sDet%02d_Segments",scatter_gate->GetName(),s_hit.GetDetnum()),
+			    Form("GammaEnergyDCz_v_Angle_seg%02d",s_hit.GetMainSegnum()),
+                            70,600,670, s_energy_dc_z,
+                            90,0,180,(180/3.1415926)*angle);
+
+          for(double zshift : BinCenters(50, 2.8, 3.3)) {
+	      obj.FillHistogram(dirname,"GammaEnergyDC_Zscan",50,2.8,3.3,zshift,
+			        8000,0,4000,s_hit.GetDoppler(get_beta(j_pos.Theta(),2),
+        						     j_pos,TVector3(0,0,zshift)));
+	  }
+	  
+	  for(double beam_En : BinCenters(100, 412, 502)) {
+	    obj.FillHistogram(dirname,"GammaEnergyDCz_Escan",100,412,502,beam_En,
+			      4000,0,4000,s_hit.GetDoppler(get_beta(j_pos.Theta(),2,beam_En),
+							   j_pos,TVector3(0,0,GValue::Value("Sega_Z_offset"))));
+	  }
+	  
+
+        }
+    }
+
+}
+
+void MakeReconstructedSeGAJanus(TRuntimeObjects& obj, TSega& sega, TJanusDDAS& janus, GCutG* time_gate, GCutG* recon_gate) {
+
+    if(!recon_gate) 
+      {return;}
+
+    std::string dirname = "SeGAJanus_Recoiling";
+    dirname += recon_gate->GetName();
+    if(time_gate){
+      dirname += "_";
+      dirname += time_gate->GetName();
+    }
+
+    obj.FillHistogram(dirname,"Janus_HitMult",1000, 0, 1000, janus.GetAllHits().size());
+
+    obj.FillHistogram(dirname,"Sega_Mult",20,0,20,sega.Size());
+
+    for(auto& j_hit : janus.GetAllHits()) {
+       if(!recon_gate->IsInside(j_hit.GetPosition().Theta()*(180./TMath::Pi()),j_hit.GetEnergy())) 
+         {continue;}
+
+       obj.FillHistogram(dirname,Form("RingNum_det%i",j_hit.GetDetnum()),
+                         26,0,26,j_hit.GetRing()); 
+       obj.FillHistogram(dirname,Form("SectorNum_det%i",j_hit.GetDetnum()),
+                         34,0,34,j_hit.GetSector());
+        
+       for(unsigned int i=0; i<sega.Size(); i++) {
+
+          TSegaHit& s_hit = sega.GetSegaHit(i);
+          double s_energy = s_hit.GetEnergy();
+          auto tdiff = (s_hit.Timestamp() - j_hit.Timestamp());
+
+          if(time_gate) {
+            if(!time_gate->IsInside(tdiff,s_energy)) 
+              {continue;}
+          }
+
+          auto j_pos = j_hit.GetPosition(BEFORE);
+          //auto recon_pos = j_hit.GetReconPosition(BEAM,TARG,SFILE,BEFORE);
+	  auto recon_pos = j_hit.GetReconPosition(reac_mid,3,2,false,BEFORE);
+          auto s_pos = s_hit.GetPosition();
+          double recon_angle = s_pos.Angle(recon_pos);
+	  double beta = get_beta(recon_pos.Theta(),2);
+          double s_energy_recon_dop = s_hit.GetDoppler(beta,recon_pos,TVector3(0,0,GValue::Value("Sega_Z_offset")));
+          
+          obj.FillHistogram(dirname, "GammaEnergy",4000, 0, 4000, s_energy);
+
+	  obj.FillHistogram(dirname,"GammaEnergy_summary",
+                            20,0,20,s_hit.GetDetnum(),
+                            4000,0,4000, s_energy);
+
+          obj.FillHistogram(dirname,"GammaEnergy_v_ReconAngle",
+                            4000, 0, 4000, s_energy,
+                            180, 0, 180, (180/TMath::Pi())*recon_angle);
+
+          obj.FillHistogram(dirname,"GammaEnergyReconDC",4000, 0, 4000, s_energy_recon_dop);
+
+	  obj.FillHistogram(dirname,"GammaEnergyReconDC_summary",
+                            20,0,20,s_hit.GetDetnum(),
+                            4000,0,4000, s_energy_recon_dop);
+
+	  obj.FillHistogram(dirname,"GammaEnergyReconDC_SegMap_summary",
+			    512,1,513,s_hit.GetMapSegnum(),
+                            35,600,670,s_energy_recon_dop);
+
+	  obj.FillHistogram(dirname,"GammaEnergyReconDC_PairMap_summary",
+			    512,1,513,s_hit.GetMapPairnum(),
+                            35,600,670,s_energy_recon_dop);
+
+	  obj.FillHistogram(dirname,"GammaEnergyReconDC_SlceMap_summary",
+			    512,1,513,s_hit.GetMapSlicenum(),
+                            35,600,670,s_energy_recon_dop);
+
+          obj.FillHistogram(dirname,"GammaEnergyReconDC_v_ReconAngle",
+                            4000, 0, 4000, s_energy_recon_dop,
+                            180, 0, 180, (180/TMath::Pi())*recon_angle);
+
+	  obj.FillHistogram(dirname,"ReconTheta",180,0,180,recon_pos.Theta()*(180./TMath::Pi()));
+
+	  obj.FillHistogram(dirname,"Beta_v_ReconTheta",100,0,200,recon_pos.Theta()*(180./TMath::Pi()),100,0,0.15,beta);
+
+	  double recon_phi = recon_pos.Phi();
+	  double thing = 33*TMath::Pi()/16.0;
+	  if(recon_phi < 0)
+	    {recon_phi += TMath::TwoPi();}
+
+	  obj.FillHistogram(dirname,"Recon_Phi",32,0,thing,recon_phi);
+	  
+	  obj.FillHistogram(dirname,"Beta_v_ReconPhi",32,0,thing,recon_phi,100,0,0.15,beta);
+
+	  obj.FillHistogram(dirname,"GammaEnergy_v_ReconPhi",4000,0,4000,s_energy,32,0,thing,recon_phi);
+
+	  obj.FillHistogram(dirname,"GammaEnergyReconDC_v_ReconPhi",4000,0,4000,s_energy_recon_dop,
+			                                        32,0,thing,recon_phi);
+
+	  TVector3 incBeam = TVector3(0.0,0.0,1.0);
+          TVector3 reacPlane = recon_pos.Cross(incBeam);
+          TVector3 detPlane = s_pos.Cross(incBeam);
+
+	  double reac_phi = reacPlane.Phi();
+          if(reac_phi < 0)
+	    {reac_phi += TMath::TwoPi();}
+
+          double det_phi = detPlane.Phi();
+          if(det_phi < 0)
+	    {det_phi += TMath::TwoPi();}
+
+          double planeAng = reac_phi - det_phi;
+          if(planeAng < 0)
+	    {planeAng += TMath::TwoPi();}
+
+	  double thing1 = 65*TMath::Pi()/32;
+
+	  obj.FillHistogram(dirname,"Detection_Phi",32,0,thing,det_phi);
+
+	  obj.FillHistogram(dirname,"Reaction_Phi",32,0,thing,reac_phi);
+
+	  obj.FillHistogram(dirname,"Plane_Angle",32,0,thing1,planeAng);
+
+	  obj.FillHistogram(dirname,"GammaEnergy_v_PlaneAng",4000,0,4000,s_energy,32,0,thing1,planeAng);
+
+	  obj.FillHistogram(dirname,"GammaEnergyReconDC_v_PlaneAng",4000,0,4000,s_energy_recon_dop,
+			                                       64,0,thing1,planeAng);
+
+	  obj.FillHistogram("RecoilingPb_sDets",Form("GammaEnergy_v_PlaneAng_det%02d",s_hit.GetDetnum())
+			    ,4000,0,4000,s_energy,64,0,6.3,planeAng);
+
+	  obj.FillHistogram("RecoilingPb_sDets",Form("GammaEnergyDCz_v_PlaneAng_det%02d",s_hit.GetDetnum())
+			    ,8000,0,4000,s_energy_recon_dop,64,0,6.3,planeAng);
+
+	  obj.FillHistogram("RecoilingPb_sDets",Form("GammaEnergy_v_ReconAngle_det%02d",s_hit.GetDetnum())
+                            ,4000,0,4000, s_energy,
+                            90,0,180,(180/3.1415926)*recon_angle);
+
+	  obj.FillHistogram("RecoilingPb_sDets",Form("GammaEnergyDCz_v_ReconAngle_det%02d",s_hit.GetDetnum())
+                            ,4000,0,4000, s_energy_recon_dop,
+                            90,0,180,(180/3.1415926)*recon_angle);
+	  
+
+	  for(double beam_En : BinCenters(100, 412, 502)) {
+
+	    obj.FillHistogram(dirname,"GammaEnergyReconDC_Escan",100,412,502,beam_En,
+			      4000,0,4000,s_hit.GetDoppler(get_beta(recon_pos.Theta(),2,beam_En),
+							   recon_pos,TVector3(0,0,GValue::Value("Sega_Z_offset"))));
+
+	  }
+
+        }
+    }
+}
+
+int gates_loaded=0;
+std::vector<GCutG*> scatter_gates;
+std::vector<GCutG*> recon_gates;
+GCutG *time_gate=0;
+
+// extern "C" is needed to prevent name mangling.
+// The function signature must be exactly as shown here,
+//   or else bad things will happen.
+extern "C"
+void MakeHistograms(TRuntimeObjects& obj) {
+
+  //init_map();
+  //read_map();
+  
+  TSega* sega = obj.GetDetector<TSega>();
+  TJanusDDAS* janus = obj.GetDetector<TJanusDDAS>();
+
+  TList *gates = &(obj.GetGates());
+  if(gates_loaded!=gates->GetSize()) {
+    TIter iter(gates);
+    while(TObject *obj = iter.Next()) {
+      GCutG *gate = (GCutG*)obj;
+      std::string tag = gate->GetTag();
+      if(!tag.compare("Scatter")) {
+        scatter_gates.push_back(gate);
+        std::cout << "Scattered Beam Gate: << " << gate->GetName() << std::endl;
+      }else if(!tag.compare("Reconstruct")) {
+        recon_gates.push_back(gate); 
+        std::cout << "Target Recoil Gate: << " << gate->GetName() << std::endl;
+      }else if(!tag.compare("time")) {
+        time_gate = gate; 
+        std::cout << "Time Gate: << " << gate->GetName() << std::endl;
+      }
+      gates_loaded++;
+    }
+  } 
+
+ 
+  if(sega) {
+    MakeSega(obj,*sega);
+  }
+
+  if(janus) {
+    MakeJanus(obj,*janus);
+  }
+  
+  if(sega && janus) {
+    MakeSeGAJanus(obj,*sega,*janus);
+
+    /*
+    if(time_gate) {
+      for(auto &scatter_gate : scatter_gates){
+         MakeScatteredSeGAJanus(obj, *sega, *janus, time_gate, scatter_gate);
+       } 
+      for(auto &recon_gate : recon_gates){
+        MakeReconstructedSeGAJanus(obj, *sega, *janus, time_gate, recon_gate);
+      }  
+    }
+    */
+
+    /*
+    if(!time_gate) {
+      for(auto &scatter_gate : scatter_gates){
+	MakeScatteredSeGAJanus(obj, *sega, *janus, 0, scatter_gate);
+      } 
+      for(auto &recon_gate : recon_gates){
+	MakeReconstructedSeGAJanus(obj, *sega, *janus, 0, recon_gate);
+      }  
+    }
+    */
+    
+  }
+}

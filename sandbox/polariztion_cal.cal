@@ -1,0 +1,5185 @@
+GRG01AA00:  {
+Address: 	0x01040000
+Number:  	4
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG01AB00:  {
+Address: 	0x01040001
+Number:  	4
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG01AC00:  {
+Address: 	0x01040002
+Number:  	4
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG01AD00:  {
+Address: 	0x01040003
+Number:  	4
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG01BA00:  {
+Address: 	0x01050000
+Number:  	4
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG01BB00:  {
+Address: 	0x01050001
+Number:  	4
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG01BC00:  {
+Address: 	0x01050002
+Number:  	4
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG01BD00:  {
+Address: 	0x01050003
+Number:  	4
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG01CA00:  {
+Address: 	0x01060000
+Number:  	4
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG01CB00:  {
+Address: 	0x01060001
+Number:  	4
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG01CC00:  {
+Address: 	0x01060002
+Number:  	4
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG01CD00:  {
+Address: 	0x01060003
+Number:  	4
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG01DA00:  {
+Address: 	0x01070000
+Number:  	4
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG01DB00:  {
+Address: 	0x01070001
+Number:  	4
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG01DC00:  {
+Address: 	0x01070002
+Number:  	4
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG01DD00:  {
+Address: 	0x01070003
+Number:  	4
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG02AA00:  {
+Address: 	0x01080000
+Number:  	8
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG02AB00:  {
+Address: 	0x01080001
+Number:  	8
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG02AC00:  {
+Address: 	0x01080002
+Number:  	8
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG02AD00:  {
+Address: 	0x01080003
+Number:  	8
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG02BA00:  {
+Address: 	0x01090000
+Number:  	8
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG02BB00:  {
+Address: 	0x01090001
+Number:  	8
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG02BC00:  {
+Address: 	0x01090002
+Number:  	8
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG02BD00:  {
+Address: 	0x01090003
+Number:  	8
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG02CA00:  {
+Address: 	0x010a0000
+Number:  	8
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG02CB00:  {
+Address: 	0x010a0001
+Number:  	8
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG02CC00:  {
+Address: 	0x010a0002
+Number:  	8
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG02CD00:  {
+Address: 	0x010a0003
+Number:  	8
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG02DA00:  {
+Address: 	0x010b0000
+Number:  	8
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG02DB00:  {
+Address: 	0x010b0001
+Number:  	8
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG02DC00:  {
+Address: 	0x010b0002
+Number:  	8
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG02DD00:  {
+Address: 	0x010b0003
+Number:  	8
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG03AA00:  {
+Address: 	0x010c0000
+Number:  	12
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG03AB00:  {
+Address: 	0x010c0001
+Number:  	12
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG03AC00:  {
+Address: 	0x010c0002
+Number:  	12
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG03AD00:  {
+Address: 	0x010c0003
+Number:  	12
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG03BA00:  {
+Address: 	0x010d0000
+Number:  	12
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG03BB00:  {
+Address: 	0x010d0001
+Number:  	12
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG03BC00:  {
+Address: 	0x010d0002
+Number:  	12
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG03BD00:  {
+Address: 	0x010d0003
+Number:  	12
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG03CA00:  {
+Address: 	0x010e0000
+Number:  	12
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG03CB00:  {
+Address: 	0x010e0001
+Number:  	12
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG03CC00:  {
+Address: 	0x010e0002
+Number:  	12
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG03CD00:  {
+Address: 	0x010e0003
+Number:  	12
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG03DA00:  {
+Address: 	0x010f0000
+Number:  	12
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG03DB00:  {
+Address: 	0x010f0001
+Number:  	12
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG03DC00:  {
+Address: 	0x010f0002
+Number:  	12
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG03DD00:  {
+Address: 	0x010f0003
+Number:  	12
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG04AA00:  {
+Address: 	0x01100000
+Number:  	16
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG04AB00:  {
+Address: 	0x01100001
+Number:  	16
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG04AC00:  {
+Address: 	0x01100002
+Number:  	16
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG04AD00:  {
+Address: 	0x01100003
+Number:  	16
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG04BA00:  {
+Address: 	0x01110000
+Number:  	16
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG04BB00:  {
+Address: 	0x01110001
+Number:  	16
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG04BC00:  {
+Address: 	0x01110002
+Number:  	16
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG04BD00:  {
+Address: 	0x01110003
+Number:  	16
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG04CA00:  {
+Address: 	0x01120000
+Number:  	16
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG04CB00:  {
+Address: 	0x01120001
+Number:  	16
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG04CC00:  {
+Address: 	0x01120002
+Number:  	16
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG04CD00:  {
+Address: 	0x01120003
+Number:  	16
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG04DA00:  {
+Address: 	0x01130000
+Number:  	16
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG04DB00:  {
+Address: 	0x01130001
+Number:  	16
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG04DC00:  {
+Address: 	0x01130002
+Number:  	16
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG04DD00:  {
+Address: 	0x01130003
+Number:  	16
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG05AA00:  {
+Address: 	0x01140000
+Number:  	20
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG05AB00:  {
+Address: 	0x01140001
+Number:  	20
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG05AC00:  {
+Address: 	0x01140002
+Number:  	20
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG05AD00:  {
+Address: 	0x01140003
+Number:  	20
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG05BA00:  {
+Address: 	0x01150000
+Number:  	20
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG05BB00:  {
+Address: 	0x01150001
+Number:  	20
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG05BC00:  {
+Address: 	0x01150002
+Number:  	20
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG05BD00:  {
+Address: 	0x01150003
+Number:  	20
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG05CA00:  {
+Address: 	0x01160000
+Number:  	20
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG05CB00:  {
+Address: 	0x01160001
+Number:  	20
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG05CC00:  {
+Address: 	0x01160002
+Number:  	20
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG05CD00:  {
+Address: 	0x01160003
+Number:  	20
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG05DA00:  {
+Address: 	0x01170000
+Number:  	20
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG05DB00:  {
+Address: 	0x01170001
+Number:  	20
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG05DC00:  {
+Address: 	0x01170002
+Number:  	20
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG05DD00:  {
+Address: 	0x01170003
+Number:  	20
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG06AA00:  {
+Address: 	0x01180000
+Number:  	24
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG06AB00:  {
+Address: 	0x01180001
+Number:  	24
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG06AC00:  {
+Address: 	0x01180002
+Number:  	24
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG06AD00:  {
+Address: 	0x01180003
+Number:  	24
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG06BA00:  {
+Address: 	0x01190000
+Number:  	24
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG06BB00:  {
+Address: 	0x01190001
+Number:  	24
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG06BC00:  {
+Address: 	0x01190002
+Number:  	24
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG06BD00:  {
+Address: 	0x01190003
+Number:  	24
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG06CA00:  {
+Address: 	0x011a0000
+Number:  	24
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG06CB00:  {
+Address: 	0x011a0001
+Number:  	24
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG06CC00:  {
+Address: 	0x011a0002
+Number:  	24
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG06CD00:  {
+Address: 	0x011a0003
+Number:  	24
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG06DA00:  {
+Address: 	0x011b0000
+Number:  	24
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG06DB00:  {
+Address: 	0x011b0001
+Number:  	24
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG06DC00:  {
+Address: 	0x011b0002
+Number:  	24
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG06DD00:  {
+Address: 	0x011b0003
+Number:  	24
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG07AA00:  {
+Address: 	0x011c0000
+Number:  	28
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG07AB00:  {
+Address: 	0x011c0001
+Number:  	28
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG07AC00:  {
+Address: 	0x011c0002
+Number:  	28
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG07AD00:  {
+Address: 	0x011c0003
+Number:  	28
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG07BA00:  {
+Address: 	0x011d0000
+Number:  	28
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG07BB00:  {
+Address: 	0x011d0001
+Number:  	28
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG07BC00:  {
+Address: 	0x011d0002
+Number:  	28
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG07BD00:  {
+Address: 	0x011d0003
+Number:  	28
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG07CA00:  {
+Address: 	0x011e0000
+Number:  	28
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG07CB00:  {
+Address: 	0x011e0001
+Number:  	28
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG07CC00:  {
+Address: 	0x011e0002
+Number:  	28
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG07CD00:  {
+Address: 	0x011e0003
+Number:  	28
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG07DA00:  {
+Address: 	0x011f0000
+Number:  	28
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG07DB00:  {
+Address: 	0x011f0001
+Number:  	28
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG07DC00:  {
+Address: 	0x011f0002
+Number:  	28
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG07DD00:  {
+Address: 	0x011f0003
+Number:  	28
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG08AA00:  {
+Address: 	0x01200000
+Number:  	32
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG08AB00:  {
+Address: 	0x01200001
+Number:  	32
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG08AC00:  {
+Address: 	0x01200002
+Number:  	32
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG08AD00:  {
+Address: 	0x01200003
+Number:  	32
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG08BA00:  {
+Address: 	0x01210000
+Number:  	32
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG08BB00:  {
+Address: 	0x01210001
+Number:  	32
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG08BC00:  {
+Address: 	0x01210002
+Number:  	32
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG08BD00:  {
+Address: 	0x01210003
+Number:  	32
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG08CA00:  {
+Address: 	0x01220000
+Number:  	32
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG08CB00:  {
+Address: 	0x01220001
+Number:  	32
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG08CC00:  {
+Address: 	0x01220002
+Number:  	32
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG08CD00:  {
+Address: 	0x01220003
+Number:  	32
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG08DA00:  {
+Address: 	0x01230000
+Number:  	32
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG08DB00:  {
+Address: 	0x01230001
+Number:  	32
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG08DC00:  {
+Address: 	0x01230002
+Number:  	32
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG08DD00:  {
+Address: 	0x01230003
+Number:  	32
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG09AA00:  {
+Address: 	0x01240000
+Number:  	36
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG09AB00:  {
+Address: 	0x01240001
+Number:  	36
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG09AC00:  {
+Address: 	0x01240002
+Number:  	36
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG09AD00:  {
+Address: 	0x01240003
+Number:  	36
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG09BA00:  {
+Address: 	0x01250000
+Number:  	36
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG09BB00:  {
+Address: 	0x01250001
+Number:  	36
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG09BC00:  {
+Address: 	0x01250002
+Number:  	36
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG09BD00:  {
+Address: 	0x01250003
+Number:  	36
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG09CA00:  {
+Address: 	0x01260000
+Number:  	36
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG09CB00:  {
+Address: 	0x01260001
+Number:  	36
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG09CC00:  {
+Address: 	0x01260002
+Number:  	36
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG09CD00:  {
+Address: 	0x01260003
+Number:  	36
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG09DA00:  {
+Address: 	0x01270000
+Number:  	36
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG09DB00:  {
+Address: 	0x01270001
+Number:  	36
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG09DC00:  {
+Address: 	0x01270002
+Number:  	36
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG09DD00:  {
+Address: 	0x01270003
+Number:  	36
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG10AA00:  {
+Address: 	0x01280000
+Number:  	40
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG10AB00:  {
+Address: 	0x01280001
+Number:  	40
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG10AC00:  {
+Address: 	0x01280002
+Number:  	40
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG10AD00:  {
+Address: 	0x01280003
+Number:  	40
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG10BA00:  {
+Address: 	0x01290000
+Number:  	40
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG10BB00:  {
+Address: 	0x01290001
+Number:  	40
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG10BC00:  {
+Address: 	0x01290002
+Number:  	40
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG10BD00:  {
+Address: 	0x01290003
+Number:  	40
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG10CA00:  {
+Address: 	0x012a0000
+Number:  	40
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG10CB00:  {
+Address: 	0x012a0001
+Number:  	40
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG10CC00:  {
+Address: 	0x012a0002
+Number:  	40
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG10CD00:  {
+Address: 	0x012a0003
+Number:  	40
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG10DA00:  {
+Address: 	0x012b0000
+Number:  	40
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG10DB00:  {
+Address: 	0x012b0001
+Number:  	40
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG10DC00:  {
+Address: 	0x012b0002
+Number:  	40
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG10DD00:  {
+Address: 	0x012b0003
+Number:  	40
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG11AA00:  {
+Address: 	0x012c0000
+Number:  	44
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG11AB00:  {
+Address: 	0x012c0001
+Number:  	44
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG11AC00:  {
+Address: 	0x012c0002
+Number:  	44
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG11AD00:  {
+Address: 	0x012c0003
+Number:  	44
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG11BA00:  {
+Address: 	0x012d0000
+Number:  	44
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG11BB00:  {
+Address: 	0x012d0001
+Number:  	44
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG11BC00:  {
+Address: 	0x012d0002
+Number:  	44
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG11BD00:  {
+Address: 	0x012d0003
+Number:  	44
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG11CA00:  {
+Address: 	0x012e0000
+Number:  	44
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG11CB00:  {
+Address: 	0x012e0001
+Number:  	44
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG11CC00:  {
+Address: 	0x012e0002
+Number:  	44
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG11CD00:  {
+Address: 	0x012e0003
+Number:  	44
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG11DA00:  {
+Address: 	0x012f0000
+Number:  	44
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG11DB00:  {
+Address: 	0x012f0001
+Number:  	44
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG11DC00:  {
+Address: 	0x012f0002
+Number:  	44
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG11DD00:  {
+Address: 	0x012f0003
+Number:  	44
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG12AA00:  {
+Address: 	0x01300000
+Number:  	48
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG12AB00:  {
+Address: 	0x01300001
+Number:  	48
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG12AC00:  {
+Address: 	0x01300002
+Number:  	48
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG12AD00:  {
+Address: 	0x01300003
+Number:  	48
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG12BA00:  {
+Address: 	0x01310000
+Number:  	48
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG12BB00:  {
+Address: 	0x01310001
+Number:  	48
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG12BC00:  {
+Address: 	0x01310002
+Number:  	48
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG12BD00:  {
+Address: 	0x01310003
+Number:  	48
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG12CA00:  {
+Address: 	0x01320000
+Number:  	48
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG12CB00:  {
+Address: 	0x01320001
+Number:  	48
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG12CC00:  {
+Address: 	0x01320002
+Number:  	48
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG12CD00:  {
+Address: 	0x01320003
+Number:  	48
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG12DA00:  {
+Address: 	0x01330000
+Number:  	48
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG12DB00:  {
+Address: 	0x01330001
+Number:  	48
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG12DC00:  {
+Address: 	0x01330002
+Number:  	48
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG12DD00:  {
+Address: 	0x01330003
+Number:  	48
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG13AA00:  {
+Address: 	0x01340000
+Number:  	52
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG13AB00:  {
+Address: 	0x01340001
+Number:  	52
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG13AC00:  {
+Address: 	0x01340002
+Number:  	52
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG13AD00:  {
+Address: 	0x01340003
+Number:  	52
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG13BA00:  {
+Address: 	0x01350000
+Number:  	52
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG13BB00:  {
+Address: 	0x01350001
+Number:  	52
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG13BC00:  {
+Address: 	0x01350002
+Number:  	52
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG13BD00:  {
+Address: 	0x01350003
+Number:  	52
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG13CA00:  {
+Address: 	0x01360000
+Number:  	52
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG13CB00:  {
+Address: 	0x01360001
+Number:  	52
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG13CC00:  {
+Address: 	0x01360002
+Number:  	52
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG13CD00:  {
+Address: 	0x01360003
+Number:  	52
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG13DA00:  {
+Address: 	0x01370000
+Number:  	52
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG13DB00:  {
+Address: 	0x01370001
+Number:  	52
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG13DC00:  {
+Address: 	0x01370002
+Number:  	52
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG13DD00:  {
+Address: 	0x01370003
+Number:  	52
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG14AA00:  {
+Address: 	0x01380000
+Number:  	56
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG14AB00:  {
+Address: 	0x01380001
+Number:  	56
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG14AC00:  {
+Address: 	0x01380002
+Number:  	56
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG14AD00:  {
+Address: 	0x01380003
+Number:  	56
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG14BA00:  {
+Address: 	0x01390000
+Number:  	56
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG14BB00:  {
+Address: 	0x01390001
+Number:  	56
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG14BC00:  {
+Address: 	0x01390002
+Number:  	56
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG14BD00:  {
+Address: 	0x01390003
+Number:  	56
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG14CA00:  {
+Address: 	0x013a0000
+Number:  	56
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG14CB00:  {
+Address: 	0x013a0001
+Number:  	56
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG14CC00:  {
+Address: 	0x013a0002
+Number:  	56
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG14CD00:  {
+Address: 	0x013a0003
+Number:  	56
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG14DA00:  {
+Address: 	0x013b0000
+Number:  	56
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG14DB00:  {
+Address: 	0x013b0001
+Number:  	56
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG14DC00:  {
+Address: 	0x013b0002
+Number:  	56
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG14DD00:  {
+Address: 	0x013b0003
+Number:  	56
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG15AA00:  {
+Address: 	0x013c0000
+Number:  	60
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG15AB00:  {
+Address: 	0x013c0001
+Number:  	60
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG15AC00:  {
+Address: 	0x013c0002
+Number:  	60
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG15AD00:  {
+Address: 	0x013c0003
+Number:  	60
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG15BA00:  {
+Address: 	0x013d0000
+Number:  	60
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG15BB00:  {
+Address: 	0x013d0001
+Number:  	60
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG15BC00:  {
+Address: 	0x013d0002
+Number:  	60
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG15BD00:  {
+Address: 	0x013d0003
+Number:  	60
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG15CA00:  {
+Address: 	0x013e0000
+Number:  	60
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG15CB00:  {
+Address: 	0x013e0001
+Number:  	60
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG15CC00:  {
+Address: 	0x013e0002
+Number:  	60
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG15CD00:  {
+Address: 	0x013e0003
+Number:  	60
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG15DA00:  {
+Address: 	0x013f0000
+Number:  	60
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG15DB00:  {
+Address: 	0x013f0001
+Number:  	60
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG15DC00:  {
+Address: 	0x013f0002
+Number:  	60
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG15DD00:  {
+Address: 	0x013f0003
+Number:  	60
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG16AA00:  {
+Address: 	0x01400000
+Number:  	64
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG16AB00:  {
+Address: 	0x01400001
+Number:  	64
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG16AC00:  {
+Address: 	0x01400002
+Number:  	64
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG16AD00:  {
+Address: 	0x01400003
+Number:  	64
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG16BA00:  {
+Address: 	0x01410000
+Number:  	64
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG16BB00:  {
+Address: 	0x01410001
+Number:  	64
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG16BC00:  {
+Address: 	0x01410002
+Number:  	64
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG16BD00:  {
+Address: 	0x01410003
+Number:  	64
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG16CA00:  {
+Address: 	0x01420000
+Number:  	64
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG16CB00:  {
+Address: 	0x01420001
+Number:  	64
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG16CC00:  {
+Address: 	0x01420002
+Number:  	64
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG16CD00:  {
+Address: 	0x01420003
+Number:  	64
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG16DA00:  {
+Address: 	0x01430000
+Number:  	64
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG16DB00:  {
+Address: 	0x01430001
+Number:  	64
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG16DC00:  {
+Address: 	0x01430002
+Number:  	64
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG16DD00:  {
+Address: 	0x01430003
+Number:  	64
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG17AA00:  {
+Address: 	0x01440000
+Number:  	68
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG17AB00:  {
+Address: 	0x01440001
+Number:  	68
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG17AC00:  {
+Address: 	0x01440002
+Number:  	68
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG17AD00:  {
+Address: 	0x01440003
+Number:  	68
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG17BA00:  {
+Address: 	0x01450000
+Number:  	68
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG17BB00:  {
+Address: 	0x01450001
+Number:  	68
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG17BC00:  {
+Address: 	0x01450002
+Number:  	68
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG17BD00:  {
+Address: 	0x01450003
+Number:  	68
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG17CA00:  {
+Address: 	0x01460000
+Number:  	68
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG17CB00:  {
+Address: 	0x01460001
+Number:  	68
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG17CC00:  {
+Address: 	0x01460002
+Number:  	68
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG17CD00:  {
+Address: 	0x01460003
+Number:  	68
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG17DA00:  {
+Address: 	0x01470000
+Number:  	68
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG17DB00:  {
+Address: 	0x01470001
+Number:  	68
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG17DC00:  {
+Address: 	0x01470002
+Number:  	68
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG17DD00:  {
+Address: 	0x01470003
+Number:  	68
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG18AA00:  {
+Address: 	0x01480000
+Number:  	72
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG18AB00:  {
+Address: 	0x01480001
+Number:  	72
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG18AC00:  {
+Address: 	0x01480002
+Number:  	72
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG18AD00:  {
+Address: 	0x01480003
+Number:  	72
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG18BA00:  {
+Address: 	0x01490000
+Number:  	72
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG18BB00:  {
+Address: 	0x01490001
+Number:  	72
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG18BC00:  {
+Address: 	0x01490002
+Number:  	72
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG18BD00:  {
+Address: 	0x01490003
+Number:  	72
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG18CA00:  {
+Address: 	0x014a0000
+Number:  	72
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG18CB00:  {
+Address: 	0x014a0001
+Number:  	72
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG18CC00:  {
+Address: 	0x014a0002
+Number:  	72
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG18CD00:  {
+Address: 	0x014a0003
+Number:  	72
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG18DA00:  {
+Address: 	0x014b0000
+Number:  	72
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG18DB00:  {
+Address: 	0x014b0001
+Number:  	72
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG18DC00:  {
+Address: 	0x014b0002
+Number:  	72
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG18DD00:  {
+Address: 	0x014b0003
+Number:  	72
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG19AA00:  {
+Address: 	0x014c0000
+Number:  	76
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG19AB00:  {
+Address: 	0x014c0001
+Number:  	76
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG19AC00:  {
+Address: 	0x014c0002
+Number:  	76
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG19AD00:  {
+Address: 	0x014c0003
+Number:  	76
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG19BA00:  {
+Address: 	0x014d0000
+Number:  	76
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG19BB00:  {
+Address: 	0x014d0001
+Number:  	76
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG19BC00:  {
+Address: 	0x014d0002
+Number:  	76
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG19BD00:  {
+Address: 	0x014d0003
+Number:  	76
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG19CA00:  {
+Address: 	0x014e0000
+Number:  	76
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG19CB00:  {
+Address: 	0x014e0001
+Number:  	76
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG19CC00:  {
+Address: 	0x014e0002
+Number:  	76
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG19CD00:  {
+Address: 	0x014e0003
+Number:  	76
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG19DA00:  {
+Address: 	0x014f0000
+Number:  	76
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG19DB00:  {
+Address: 	0x014f0001
+Number:  	76
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG19DC00:  {
+Address: 	0x014f0002
+Number:  	76
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG19DD00:  {
+Address: 	0x014f0003
+Number:  	76
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG20AA00:  {
+Address: 	0x01500000
+Number:  	80
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG20AB00:  {
+Address: 	0x01500001
+Number:  	80
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG20AC00:  {
+Address: 	0x01500002
+Number:  	80
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG20AD00:  {
+Address: 	0x01500003
+Number:  	80
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG20BA00:  {
+Address: 	0x01510000
+Number:  	80
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG20BB00:  {
+Address: 	0x01510001
+Number:  	80
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG20BC00:  {
+Address: 	0x01510002
+Number:  	80
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG20BD00:  {
+Address: 	0x01510003
+Number:  	80
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG20CA00:  {
+Address: 	0x01520000
+Number:  	80
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG20CB00:  {
+Address: 	0x01520001
+Number:  	80
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG20CC00:  {
+Address: 	0x01520002
+Number:  	80
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG20CD00:  {
+Address: 	0x01520003
+Number:  	80
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG20DA00:  {
+Address: 	0x01530000
+Number:  	80
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG20DB00:  {
+Address: 	0x01530001
+Number:  	80
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG20DC00:  {
+Address: 	0x01530002
+Number:  	80
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG20DD00:  {
+Address: 	0x01530003
+Number:  	80
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG21AA00:  {
+Address: 	0x01540000
+Number:  	84
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG21AB00:  {
+Address: 	0x01540001
+Number:  	84
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG21AC00:  {
+Address: 	0x01540002
+Number:  	84
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG21AD00:  {
+Address: 	0x01540003
+Number:  	84
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG21BA00:  {
+Address: 	0x01550000
+Number:  	84
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG21BB00:  {
+Address: 	0x01550001
+Number:  	84
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG21BC00:  {
+Address: 	0x01550002
+Number:  	84
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG21BD00:  {
+Address: 	0x01550003
+Number:  	84
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG21CA00:  {
+Address: 	0x01560000
+Number:  	84
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG21CB00:  {
+Address: 	0x01560001
+Number:  	84
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG21CC00:  {
+Address: 	0x01560002
+Number:  	84
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG21CD00:  {
+Address: 	0x01560003
+Number:  	84
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG21DA00:  {
+Address: 	0x01570000
+Number:  	84
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG21DB00:  {
+Address: 	0x01570001
+Number:  	84
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG21DC00:  {
+Address: 	0x01570002
+Number:  	84
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG21DD00:  {
+Address: 	0x01570003
+Number:  	84
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG22AA00:  {
+Address: 	0x01580000
+Number:  	88
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG22AB00:  {
+Address: 	0x01580001
+Number:  	88
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG22AC00:  {
+Address: 	0x01580002
+Number:  	88
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG22AD00:  {
+Address: 	0x01580003
+Number:  	88
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG22BA00:  {
+Address: 	0x01590000
+Number:  	88
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG22BB00:  {
+Address: 	0x01590001
+Number:  	88
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG22BC00:  {
+Address: 	0x01590002
+Number:  	88
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG22BD00:  {
+Address: 	0x01590003
+Number:  	88
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG22CA00:  {
+Address: 	0x015a0000
+Number:  	88
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG22CB00:  {
+Address: 	0x015a0001
+Number:  	88
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG22CC00:  {
+Address: 	0x015a0002
+Number:  	88
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG22CD00:  {
+Address: 	0x015a0003
+Number:  	88
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG22DA00:  {
+Address: 	0x015b0000
+Number:  	88
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG22DB00:  {
+Address: 	0x015b0001
+Number:  	88
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG22DC00:  {
+Address: 	0x015b0002
+Number:  	88
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG22DD00:  {
+Address: 	0x015b0003
+Number:  	88
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG23AA00:  {
+Address: 	0x015c0000
+Number:  	92
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG23AB00:  {
+Address: 	0x015c0001
+Number:  	92
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG23AC00:  {
+Address: 	0x015c0002
+Number:  	92
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG23AD00:  {
+Address: 	0x015c0003
+Number:  	92
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG23BA00:  {
+Address: 	0x015d0000
+Number:  	92
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG23BB00:  {
+Address: 	0x015d0001
+Number:  	92
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG23BC00:  {
+Address: 	0x015d0002
+Number:  	92
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG23BD00:  {
+Address: 	0x015d0003
+Number:  	92
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG23CA00:  {
+Address: 	0x015e0000
+Number:  	92
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG23CB00:  {
+Address: 	0x015e0001
+Number:  	92
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG23CC00:  {
+Address: 	0x015e0002
+Number:  	92
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG23CD00:  {
+Address: 	0x015e0003
+Number:  	92
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG23DA00:  {
+Address: 	0x015f0000
+Number:  	92
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG23DB00:  {
+Address: 	0x015f0001
+Number:  	92
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG23DC00:  {
+Address: 	0x015f0002
+Number:  	92
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG23DD00:  {
+Address: 	0x015f0003
+Number:  	92
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG24AA00:  {
+Address: 	0x01600000
+Number:  	96
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG24AB00:  {
+Address: 	0x01600001
+Number:  	96
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG24AC00:  {
+Address: 	0x01600002
+Number:  	96
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG24AD00:  {
+Address: 	0x01600003
+Number:  	96
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG24BA00:  {
+Address: 	0x01610000
+Number:  	96
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG24BB00:  {
+Address: 	0x01610001
+Number:  	96
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG24BC00:  {
+Address: 	0x01610002
+Number:  	96
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG24BD00:  {
+Address: 	0x01610003
+Number:  	96
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG24CA00:  {
+Address: 	0x01620000
+Number:  	96
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG24CB00:  {
+Address: 	0x01620001
+Number:  	96
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG24CC00:  {
+Address: 	0x01620002
+Number:  	96
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG24CD00:  {
+Address: 	0x01620003
+Number:  	96
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG24DA00:  {
+Address: 	0x01630000
+Number:  	96
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG24DB00:  {
+Address: 	0x01630001
+Number:  	96
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG24DC00:  {
+Address: 	0x01630002
+Number:  	96
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG24DD00:  {
+Address: 	0x01630003
+Number:  	96
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG25AA00:  {
+Address: 	0x01640000
+Number:  	100
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG25AB00:  {
+Address: 	0x01640001
+Number:  	100
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG25AC00:  {
+Address: 	0x01640002
+Number:  	100
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG25AD00:  {
+Address: 	0x01640003
+Number:  	100
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG25BA00:  {
+Address: 	0x01650000
+Number:  	100
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG25BB00:  {
+Address: 	0x01650001
+Number:  	100
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG25BC00:  {
+Address: 	0x01650002
+Number:  	100
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG25BD00:  {
+Address: 	0x01650003
+Number:  	100
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG25CA00:  {
+Address: 	0x01660000
+Number:  	100
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG25CB00:  {
+Address: 	0x01660001
+Number:  	100
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG25CC00:  {
+Address: 	0x01660002
+Number:  	100
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG25CD00:  {
+Address: 	0x01660003
+Number:  	100
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG25DA00:  {
+Address: 	0x01670000
+Number:  	100
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG25DB00:  {
+Address: 	0x01670001
+Number:  	100
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG25DC00:  {
+Address: 	0x01670002
+Number:  	100
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG25DD00:  {
+Address: 	0x01670003
+Number:  	100
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG26AA00:  {
+Address: 	0x01680000
+Number:  	104
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG26AB00:  {
+Address: 	0x01680001
+Number:  	104
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG26AC00:  {
+Address: 	0x01680002
+Number:  	104
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG26AD00:  {
+Address: 	0x01680003
+Number:  	104
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG26BA00:  {
+Address: 	0x01690000
+Number:  	104
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG26BB00:  {
+Address: 	0x01690001
+Number:  	104
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG26BC00:  {
+Address: 	0x01690002
+Number:  	104
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG26BD00:  {
+Address: 	0x01690003
+Number:  	104
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG26CA00:  {
+Address: 	0x016a0000
+Number:  	104
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG26CB00:  {
+Address: 	0x016a0001
+Number:  	104
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG26CC00:  {
+Address: 	0x016a0002
+Number:  	104
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG26CD00:  {
+Address: 	0x016a0003
+Number:  	104
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG26DA00:  {
+Address: 	0x016b0000
+Number:  	104
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG26DB00:  {
+Address: 	0x016b0001
+Number:  	104
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG26DC00:  {
+Address: 	0x016b0002
+Number:  	104
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG26DD00:  {
+Address: 	0x016b0003
+Number:  	104
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG27AA00:  {
+Address: 	0x016c0000
+Number:  	108
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG27AB00:  {
+Address: 	0x016c0001
+Number:  	108
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG27AC00:  {
+Address: 	0x016c0002
+Number:  	108
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG27AD00:  {
+Address: 	0x016c0003
+Number:  	108
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG27BA00:  {
+Address: 	0x016d0000
+Number:  	108
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG27BB00:  {
+Address: 	0x016d0001
+Number:  	108
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG27BC00:  {
+Address: 	0x016d0002
+Number:  	108
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG27BD00:  {
+Address: 	0x016d0003
+Number:  	108
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG27CA00:  {
+Address: 	0x016e0000
+Number:  	108
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG27CB00:  {
+Address: 	0x016e0001
+Number:  	108
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG27CC00:  {
+Address: 	0x016e0002
+Number:  	108
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG27CD00:  {
+Address: 	0x016e0003
+Number:  	108
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG27DA00:  {
+Address: 	0x016f0000
+Number:  	108
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG27DB00:  {
+Address: 	0x016f0001
+Number:  	108
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG27DC00:  {
+Address: 	0x016f0002
+Number:  	108
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG27DD00:  {
+Address: 	0x016f0003
+Number:  	108
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG28AA00:  {
+Address: 	0x01700000
+Number:  	112
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG28AB00:  {
+Address: 	0x01700001
+Number:  	112
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG28AC00:  {
+Address: 	0x01700002
+Number:  	112
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG28AD00:  {
+Address: 	0x01700003
+Number:  	112
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG28BA00:  {
+Address: 	0x01710000
+Number:  	112
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG28BB00:  {
+Address: 	0x01710001
+Number:  	112
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG28BC00:  {
+Address: 	0x01710002
+Number:  	112
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG28BD00:  {
+Address: 	0x01710003
+Number:  	112
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG28CA00:  {
+Address: 	0x01720000
+Number:  	112
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG28CB00:  {
+Address: 	0x01720001
+Number:  	112
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG28CC00:  {
+Address: 	0x01720002
+Number:  	112
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG28CD00:  {
+Address: 	0x01720003
+Number:  	112
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG28DA00:  {
+Address: 	0x01730000
+Number:  	112
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG28DB00:  {
+Address: 	0x01730001
+Number:  	112
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG28DC00:  {
+Address: 	0x01730002
+Number:  	112
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG28DD00:  {
+Address: 	0x01730003
+Number:  	112
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG29AA00:  {
+Address: 	0x01740000
+Number:  	116
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG29AB00:  {
+Address: 	0x01740001
+Number:  	116
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG29AC00:  {
+Address: 	0x01740002
+Number:  	116
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG29AD00:  {
+Address: 	0x01740003
+Number:  	116
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG29BA00:  {
+Address: 	0x01750000
+Number:  	116
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG29BB00:  {
+Address: 	0x01750001
+Number:  	116
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG29BC00:  {
+Address: 	0x01750002
+Number:  	116
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG29BD00:  {
+Address: 	0x01750003
+Number:  	116
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG29CA00:  {
+Address: 	0x01760000
+Number:  	116
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG29CB00:  {
+Address: 	0x01760001
+Number:  	116
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG29CC00:  {
+Address: 	0x01760002
+Number:  	116
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG29CD00:  {
+Address: 	0x01760003
+Number:  	116
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG29DA00:  {
+Address: 	0x01770000
+Number:  	116
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG29DB00:  {
+Address: 	0x01770001
+Number:  	116
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG29DC00:  {
+Address: 	0x01770002
+Number:  	116
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG29DD00:  {
+Address: 	0x01770003
+Number:  	116
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG30AA00:  {
+Address: 	0x01780000
+Number:  	120
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG30AB00:  {
+Address: 	0x01780001
+Number:  	120
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG30AC00:  {
+Address: 	0x01780002
+Number:  	120
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG30AD00:  {
+Address: 	0x01780003
+Number:  	120
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG30BA00:  {
+Address: 	0x01790000
+Number:  	120
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG30BB00:  {
+Address: 	0x01790001
+Number:  	120
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG30BC00:  {
+Address: 	0x01790002
+Number:  	120
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG30BD00:  {
+Address: 	0x01790003
+Number:  	120
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG30CA00:  {
+Address: 	0x017a0000
+Number:  	120
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG30CB00:  {
+Address: 	0x017a0001
+Number:  	120
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG30CC00:  {
+Address: 	0x017a0002
+Number:  	120
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG30CD00:  {
+Address: 	0x017a0003
+Number:  	120
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG30DA00:  {
+Address: 	0x017b0000
+Number:  	120
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG30DB00:  {
+Address: 	0x017b0001
+Number:  	120
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG30DC00:  {
+Address: 	0x017b0002
+Number:  	120
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG30DD00:  {
+Address: 	0x017b0003
+Number:  	120
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG31AA00:  {
+Address: 	0x017c0000
+Number:  	124
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG31AB00:  {
+Address: 	0x017c0001
+Number:  	124
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG31AC00:  {
+Address: 	0x017c0002
+Number:  	124
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG31AD00:  {
+Address: 	0x017c0003
+Number:  	124
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG31BA00:  {
+Address: 	0x017d0000
+Number:  	124
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG31BB00:  {
+Address: 	0x017d0001
+Number:  	124
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG31BC00:  {
+Address: 	0x017d0002
+Number:  	124
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG31BD00:  {
+Address: 	0x017d0003
+Number:  	124
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG31CA00:  {
+Address: 	0x017e0000
+Number:  	124
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG31CB00:  {
+Address: 	0x017e0001
+Number:  	124
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG31CC00:  {
+Address: 	0x017e0002
+Number:  	124
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG31CD00:  {
+Address: 	0x017e0003
+Number:  	124
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG31DA00:  {
+Address: 	0x017f0000
+Number:  	124
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG31DB00:  {
+Address: 	0x017f0001
+Number:  	124
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG31DC00:  {
+Address: 	0x017f0002
+Number:  	124
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG31DD00:  {
+Address: 	0x017f0003
+Number:  	124
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG32AA00:  {
+Address: 	0x01800000
+Number:  	128
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG32AB00:  {
+Address: 	0x01800001
+Number:  	128
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG32AC00:  {
+Address: 	0x01800002
+Number:  	128
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG32AD00:  {
+Address: 	0x01800003
+Number:  	128
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG32BA00:  {
+Address: 	0x01810000
+Number:  	128
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG32BB00:  {
+Address: 	0x01810001
+Number:  	128
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG32BC00:  {
+Address: 	0x01810002
+Number:  	128
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG32BD00:  {
+Address: 	0x01810003
+Number:  	128
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG32CA00:  {
+Address: 	0x01820000
+Number:  	128
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG32CB00:  {
+Address: 	0x01820001
+Number:  	128
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG32CC00:  {
+Address: 	0x01820002
+Number:  	128
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG32CD00:  {
+Address: 	0x01820003
+Number:  	128
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG32DA00:  {
+Address: 	0x01830000
+Number:  	128
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG32DB00:  {
+Address: 	0x01830001
+Number:  	128
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG32DC00:  {
+Address: 	0x01830002
+Number:  	128
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG32DD00:  {
+Address: 	0x01830003
+Number:  	128
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG33AA00:  {
+Address: 	0x01840000
+Number:  	132
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG33AB00:  {
+Address: 	0x01840001
+Number:  	132
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG33AC00:  {
+Address: 	0x01840002
+Number:  	132
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG33AD00:  {
+Address: 	0x01840003
+Number:  	132
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG33BA00:  {
+Address: 	0x01850000
+Number:  	132
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG33BB00:  {
+Address: 	0x01850001
+Number:  	132
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG33BC00:  {
+Address: 	0x01850002
+Number:  	132
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG33BD00:  {
+Address: 	0x01850003
+Number:  	132
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG33CA00:  {
+Address: 	0x01860000
+Number:  	132
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG33CB00:  {
+Address: 	0x01860001
+Number:  	132
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG33CC00:  {
+Address: 	0x01860002
+Number:  	132
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG33CD00:  {
+Address: 	0x01860003
+Number:  	132
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG33DA00:  {
+Address: 	0x01870000
+Number:  	132
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG33DB00:  {
+Address: 	0x01870001
+Number:  	132
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG33DC00:  {
+Address: 	0x01870002
+Number:  	132
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG33DD00:  {
+Address: 	0x01870003
+Number:  	132
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG34AA00:  {
+Address: 	0x01880000
+Number:  	136
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG34AB00:  {
+Address: 	0x01880001
+Number:  	136
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG34AC00:  {
+Address: 	0x01880002
+Number:  	136
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG34AD00:  {
+Address: 	0x01880003
+Number:  	136
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG34BA00:  {
+Address: 	0x01890000
+Number:  	136
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG34BB00:  {
+Address: 	0x01890001
+Number:  	136
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG34BC00:  {
+Address: 	0x01890002
+Number:  	136
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG34BD00:  {
+Address: 	0x01890003
+Number:  	136
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG34CA00:  {
+Address: 	0x018a0000
+Number:  	136
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG34CB00:  {
+Address: 	0x018a0001
+Number:  	136
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG34CC00:  {
+Address: 	0x018a0002
+Number:  	136
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG34CD00:  {
+Address: 	0x018a0003
+Number:  	136
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG34DA00:  {
+Address: 	0x018b0000
+Number:  	136
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG34DB00:  {
+Address: 	0x018b0001
+Number:  	136
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG34DC00:  {
+Address: 	0x018b0002
+Number:  	136
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG34DD00:  {
+Address: 	0x018b0003
+Number:  	136
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG35AA00:  {
+Address: 	0x018c0000
+Number:  	140
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG35AB00:  {
+Address: 	0x018c0001
+Number:  	140
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG35AC00:  {
+Address: 	0x018c0002
+Number:  	140
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG35AD00:  {
+Address: 	0x018c0003
+Number:  	140
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG35BA00:  {
+Address: 	0x018d0000
+Number:  	140
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG35BB00:  {
+Address: 	0x018d0001
+Number:  	140
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG35BC00:  {
+Address: 	0x018d0002
+Number:  	140
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG35BD00:  {
+Address: 	0x018d0003
+Number:  	140
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG35CA00:  {
+Address: 	0x018e0000
+Number:  	140
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG35CB00:  {
+Address: 	0x018e0001
+Number:  	140
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG35CC00:  {
+Address: 	0x018e0002
+Number:  	140
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG35CD00:  {
+Address: 	0x018e0003
+Number:  	140
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG35DA00:  {
+Address: 	0x018f0000
+Number:  	140
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG35DB00:  {
+Address: 	0x018f0001
+Number:  	140
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG35DC00:  {
+Address: 	0x018f0002
+Number:  	140
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG35DD00:  {
+Address: 	0x018f0003
+Number:  	140
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG36AA00:  {
+Address: 	0x01900000
+Number:  	144
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG36AB00:  {
+Address: 	0x01900001
+Number:  	144
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG36AC00:  {
+Address: 	0x01900002
+Number:  	144
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG36AD00:  {
+Address: 	0x01900003
+Number:  	144
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG36BA00:  {
+Address: 	0x01910000
+Number:  	144
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG36BB00:  {
+Address: 	0x01910001
+Number:  	144
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG36BC00:  {
+Address: 	0x01910002
+Number:  	144
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG36BD00:  {
+Address: 	0x01910003
+Number:  	144
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG36CA00:  {
+Address: 	0x01920000
+Number:  	144
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG36CB00:  {
+Address: 	0x01920001
+Number:  	144
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG36CC00:  {
+Address: 	0x01920002
+Number:  	144
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG36CD00:  {
+Address: 	0x01920003
+Number:  	144
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG36DA00:  {
+Address: 	0x01930000
+Number:  	144
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG36DB00:  {
+Address: 	0x01930001
+Number:  	144
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG36DC00:  {
+Address: 	0x01930002
+Number:  	144
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+GRG36DD00:  {
+Address: 	0x01930003
+Number:  	144
+Info:    	
+EnergyCoeff:  	0.0000	1.0000
+EfficienyCoeff:
+}
+-----------------------------------
+
+
