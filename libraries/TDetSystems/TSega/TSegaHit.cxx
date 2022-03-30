@@ -17,7 +17,6 @@ TSegaHit::TSegaHit() {
 
 void TSegaHit::Copy(TObject& obj) const{
   TDetectorHit::Copy(obj);
-
   TSegaHit& sega = (TSegaHit&)obj;
   sega.fTrace = fTrace;
 }
@@ -31,7 +30,6 @@ void TSegaHit::Draw(Option_t* opt) {
   }
 
   TVirtualPad* base_pad = gPad;
-
   bool draw_all = option.Contains("all", TString::ECaseCompare::kIgnoreCase);
   if(draw_all){
     base_pad->Divide(1, 2, 0.005, 0.005);
@@ -40,7 +38,6 @@ void TSegaHit::Draw(Option_t* opt) {
   }
 
   DrawTrace(0);
-
   if(draw_all){
     for(int i=1; i<33; i++) {
       base_pad->cd(2)->cd(i);
@@ -78,10 +75,7 @@ void TSegaHit::Clear(Option_t *opt) {
 }
 
 void TSegaHit::Print(Option_t *opt) const {
-  std::cout << "TSegaHit:\n"
-            << "\tChannel: " << GetChannel() << "\n"
-            << "\tCharge: " << Charge() << "\n"
-            << std::flush;
+  std::cout << "TSegaHit:\n" << "\tChannel: " << GetChannel() << "\n" << "\tCharge: " << Charge() << "\n" << std::flush;
 }
 
 void TSegaHit::SetTrace(unsigned int trace_length, const unsigned short* trace) {
@@ -110,8 +104,7 @@ int TSegaHit::GetDetnum() const {
   } else if(fSegments.size()) {
     output = fSegments[0].GetDetnum();
   } else {
-    // std::cout << "Unknown address: " << std::hex << fAddress << std::dec
-    //           << std::endl;
+    // std::cout << "Unknown address: " << std::hex << fAddress << std::dec << std::endl;
     output = -1;
   }
 
@@ -119,7 +112,6 @@ int TSegaHit::GetDetnum() const {
     // std::cout << "Chan with det=-1: " << chan->GetName() << std::endl;
     // std::cout << "address: " << fAddress << std::endl;
   }
-
   return output;
 }
 
@@ -180,12 +172,8 @@ int TSegaHit::GetMapSlicenum() const {return TSega::MappedSlicenum(GetDetnum(),G
 TVector3 TSegaHit::GetPosition(bool apply_array_offset, TVector3 array_offset) const {
   TVector3 array_pos = TSega::GetSegmentPosition(GetDetnum(), GetMainSegnum());
   if(apply_array_offset){
-    if(std::isnan(array_offset.X()) &&
-       std::isnan(array_offset.Y()) &&
-       std::isnan(array_offset.Z())) {
-      array_offset = TVector3(GValue::Value("Sega_X_offset"),
-                              GValue::Value("Sega_Y_offset"),
-                              GValue::Value("Sega_Z_offset"));
+    if(std::isnan(array_offset.X()) && std::isnan(array_offset.Y()) && std::isnan(array_offset.Z())) {
+      array_offset = TVector3(GValue::Value("Sega_X_offset"), GValue::Value("Sega_Y_offset"), GValue::Value("Sega_Z_offset"));
     }
     array_pos += array_offset;
   }
@@ -204,7 +192,6 @@ double TSegaHit::GetDoppler(double beta,const TVector3& particle_vec, const TVec
   if(GetNumSegments()<1) {
     return std::sqrt(-1);
   }
-
   double gamma = 1/(sqrt(1-pow(beta,2)));
   TVector3 pos = GetPosition(true, sega_offset);
   double cos_angle = TMath::Cos(pos.Angle(particle_vec));
@@ -216,14 +203,12 @@ double TSegaHit::GetTraceHeight() const {
   if(fTrace.size() < 20){
     return std::sqrt(-1);
   }
-
   double low = 0;
   double high = 0;
   for(unsigned int i=0; i<10; i++){
     low += fTrace[i];
     high += fTrace[fTrace.size()-i-1];
   }
-
   return (high-low)/10;
 }
 
@@ -231,7 +216,6 @@ double TSegaHit::GetTraceHeightDoppler(double beta,const TVector3& vec) const {
   if(GetNumSegments()<1) {
     return std::sqrt(-1);
   }
-
   double gamma = 1/(sqrt(1-pow(beta,2)));
   TVector3 pos = GetPosition();
   double cos_angle = TMath::Cos(pos.Angle(vec));

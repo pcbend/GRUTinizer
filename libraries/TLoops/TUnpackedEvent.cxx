@@ -16,6 +16,7 @@
 #include "TSega.h"
 #include "TFastScint.h"
 #include "TLenda.h"
+#include "TDiamondDet.h"
 
 TUnpackedEvent::TUnpackedEvent() { }
 
@@ -28,12 +29,13 @@ TUnpackedEvent::~TUnpackedEvent() {
 void TUnpackedEvent::Build() {
   //printf("i am called\n"); fflush(stdout);
   int counter =0;
+
   for(auto& item : raw_data_map) {
     //printf("counter = %i\n",counter++);
     kDetectorSystems detector = item.first;
     std::vector<TRawEvent>& raw_data = item.second;
- 
-    //printf("det %s\n",GetDetector(detector, true)->Class()->GetName());
+
+//    printf("det %s\n",GetDetector(detector, true)->Class()->GetName());
     GetDetector(detector, true)->Build(raw_data);
 
   }

@@ -25,6 +25,8 @@ enum kDetectorSystems {
   JANUS_DDAS = 66,
   FASTSCINT =4,
 
+  DIAMONDDET = 70,
+
   CAESAR = 80,
 
   PHOSWALL = 17,

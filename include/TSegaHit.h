@@ -43,6 +43,19 @@ public:
 
   void SetTrace(unsigned int trace_length, const unsigned short* trace);
 
+  void SetEnergySumBool(bool sum = false) {fEsum = sum; }
+  bool HasEnergySum() const {return fEsum; }
+
+  void SetEnergySum1(int energy_sum) { fEnSum1 = energy_sum; }
+  void SetEnergySum2(int energy_sum) { fEnSum2 = energy_sum; }
+  void SetEnergySum3(int energy_sum) { fEnSum3 = energy_sum; }
+  void SetEnergySum4(int energy_sum) { fEnSum4 = energy_sum; }
+
+  int GetEnergySum1() const {return fEnSum1;}
+  int GetEnergySum2() const {return fEnSum2;}
+  int GetEnergySum3() const {return fEnSum3;}
+  int GetEnergySum4() const {return fEnSum4;}
+
   TSegaSegmentHit& MakeSegmentByAddress(unsigned int address);
 
   int GetSlot() const;
@@ -65,6 +78,11 @@ public:
 private:
   std::vector<unsigned short> fTrace;
   std::vector<TSegaSegmentHit> fSegments;
+  int fEnSum1;
+  int fEnSum2;
+  int fEnSum3;
+  int fEnSum4;
+  bool fEsum;
 
   ClassDef(TSegaHit,4);
 };

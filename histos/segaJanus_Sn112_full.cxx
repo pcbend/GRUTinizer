@@ -13,292 +13,197 @@ double reac_en;
 
 /////////Kinematics/////////
 double Theta_CM_FP(double ThetaLAB, double Ep, bool sol2=false) {
-  
   double tau = (beam_mass/targ_mass)/std::sqrt(1 - (Ex/Ep)*(1 + beam_mass/targ_mass));
-  
   if(std::sin(ThetaLAB) > 1.0/tau) {
     ThetaLAB = std::asin(1.0/tau);
-
     if(ThetaLAB < 0) {
       ThetaLAB += TMath::Pi();
     }
-
     return std::asin(tau*std::sin(ThetaLAB)) + ThetaLAB;
   }
-
   if(!sol2) {
     return std::asin(tau*std::sin(ThetaLAB)) + ThetaLAB;
   }
-  
   return std::asin(tau*std::sin(-ThetaLAB)) + ThetaLAB + TMath::Pi();
-
 }
 
 double Theta_CM_FR(double ThetaLAB, double Ep, bool sol2=false) {
-  
   double tau = 1.0/std::sqrt(1 - (Ex/Ep)*(1 + beam_mass/targ_mass));
-  
   if(std::sin(ThetaLAB) > 1.0/tau) {
     ThetaLAB = std::asin(1.0/tau);
-
     if(ThetaLAB < 0) {
       ThetaLAB += TMath::Pi();
     }
-
     return std::asin(tau*std::sin(ThetaLAB)) + ThetaLAB;
   }
-
   if(!sol2) {
     return TMath::Pi() - (std::asin(tau*std::sin(ThetaLAB)) + ThetaLAB);
   }
-  
   return -std::asin(tau*std::sin(-ThetaLAB)) - ThetaLAB;
-
 }
 
 double Theta_LAB(double thetaCM, double Ep) {
-
   double tau = (beam_mass/targ_mass)/std::sqrt(1 - (Ex/Ep)*(1 + beam_mass/targ_mass));
   double tanTheta = std::sin(thetaCM)/(std::cos(thetaCM) + tau);
-
   if(tanTheta > 0) {
     return std::atan(tanTheta);
   }
-  
   return std::atan(tanTheta) + TMath::Pi();
-  
 }
 
 double Theta_LAB_Max(double Ep) {
-
   double tau = (beam_mass/targ_mass)/std::sqrt(1 - (Ex/Ep)*(1 + beam_mass/targ_mass));
-
   if(tau < 1.0) {
     return TMath::Pi();
   }
-  
   return std::asin(1.0/tau);
-  
 }
 
 double Recoil_Theta_LAB(double thetaCM, double Ep) {
-
   double tau = 1.0/std::sqrt(1 - (Ex/Ep)*(1 + beam_mass/targ_mass));
   double tanTheta = std::sin(TMath::Pi() - thetaCM)/(std::cos(TMath::Pi() - thetaCM) + tau);
-  
   return std::atan(tanTheta);
-  
 }
 
 double Recoil_Theta_LAB_Max(double Ep) {
-
   double tau = 1.0/std::sqrt(1 - (Ex/Ep)*(1 + beam_mass/targ_mass));
-  
   return std::asin(1.0/tau);
-    
 }
 
 double KE_LAB(double thetaCM, double Ep) {
-
   double tau = (beam_mass/targ_mass)/std::sqrt(1 - (Ex/Ep)*(1 + beam_mass/targ_mass));
-
   double term1 = std::pow(targ_mass/(beam_mass + targ_mass),2);
   double term2 = 1 + tau*tau + 2*tau*std::cos(thetaCM);
   double term3 = Ep - Ex*(1 + beam_mass/targ_mass);
-  
   return term1*term2*term3;
 }
 
 double Recoil_KE_LAB(double thetaCM, double Ep) {
-
   double tau = 1.0/std::sqrt(1 - (Ex/Ep)*(1 + beam_mass/targ_mass));
-
   double term1 = beam_mass*targ_mass/std::pow(beam_mass + targ_mass,2);
   double term2 = 1 + tau*tau + 2*tau*std::cos(TMath::Pi() - thetaCM);
   double term3 = Ep - Ex*(1 + beam_mass/targ_mass);
-  
   return term1*term2*term3;
 }
 
 /*
 double RuthCM(double thetaCM, double Ep) {
-
   double factor = 1.29596*TMath::Power(beam_Z*targ_Z,2.0);
-
   double Ecm = Ep/(1.0 + (beam_mass/targ_mass));
   double Esym2 = TMath::Power(Ecm,1.5)*TMath::Sqrt(Ecm-Ex);
-  
   return factor/(Esym2*TMath::Power(TMath::Sin(thetaCM/2.0),4));
 }
 
 double RuthLAB(double thetaLAB, double Ep, bool sol2=false) {
-
   double thetaCM = Theta_CM_FP(thetaLAB,Ep,sol2);
- 
   double num = TMath::Power(TMath::Sin(thetaCM)/TMath::Sin(thetaLAB),2.0);
   double denom = TMath::Abs(TMath::Cos(thetaCM-thetaLAB));
   double jacobian = num/denom;
-
   return RuthCM(thetaCM,Ep)*jacobian;
-  
 }
 
 double Beta_LAB(double thetaCM, double Ep) {
-
   double energy = KE_LAB(thetaCM,Ep);
   double gam = energy/beam_mass + 1.0;
-
   return TMath::Sqrt(1.0 - 1.0/(gam*gam));
-  
 }
 
 double Recoil_Beta_LAB(double thetaCM, double Ep) {
-
   double energy = Recoil_KE_LAB(thetaCM,Ep);
   double gam = energy/targ_mass + 1.0;
-
   return TMath::Sqrt(1.0 - 1.0/(gam*gam));
-  
 }
 */
 
 double Beta(double energy, double mass) {
-
   double gam = energy/mass + 1.0;
-  
   return TMath::Sqrt(1.0 - 1.0/(gam*gam));
-  
 }
 ////////////////////////////
 
 std::string Prefix(int level) {
-
   switch(level) {
-
   case 0:
     return "Total_";
-
   case 1:
     return "Primary_";
-
   case 2:
     return "Secondary_";
-
   case 3:
     return "Tertiary_";
-
   }
-
   return "_";
-  
 }
 
 void BasicJanusSpectra(TRuntimeObjects& obj, TJanusDDASHit& hit, std::string dirname, std::string h_suf) {
-
   const TVector3 pos = hit.GetPosition(false);
-  
   obj.FillHistogram(dirname,Form("%sSectorCharge_Hit_det%d",h_suf.c_str(),hit.GetDetnum()),3000,0,30000,hit.Charge());
   obj.FillHistogram(dirname,Form("%sRingCharge_Hit_det%d",h_suf.c_str(),hit.GetDetnum()),3000,0,30000,hit.GetBackHit().Charge());
-  
-  obj.FillHistogram(dirname,Form("%sCharge_Summary_Hit",h_suf.c_str()),
-                    128,0,128,hit.GetFrontChannel(),
-                    3000,0,30000,hit.Charge());
-  obj.FillHistogram(dirname,Form("%sCharge_Summary_Hit",h_suf.c_str()),
-                    128,0,128,hit.GetBackChannel(),
-                    3000,0,30000,hit.GetBackHit().Charge());
+  obj.FillHistogram(dirname,Form("%sCharge_Summary_Hit",h_suf.c_str()), 128,0,128,hit.GetFrontChannel(), 3000,0,30000,hit.Charge());
+  obj.FillHistogram(dirname,Form("%sCharge_Summary_Hit",h_suf.c_str()), 128,0,128,hit.GetBackChannel(),  3000,0,30000,hit.GetBackHit().Charge());
 
   obj.FillHistogram(dirname,Form("%sRing_det%d",h_suf.c_str(),hit.GetDetnum()),26,0,26,hit.GetRing());
   obj.FillHistogram(dirname,Form("%sSector_det%d",h_suf.c_str(),hit.GetDetnum()),34,0,34,hit.GetSector());
 
-  obj.FillHistogram(dirname,Form("%sSectorCharge_v_Sector_det%d",h_suf.c_str(),hit.GetDetnum()),
-  		    34,0,34,hit.GetSector(),3000,0,30000,hit.Charge());
+  obj.FillHistogram(dirname,Form("%sSectorCharge_v_Sector_det%d",h_suf.c_str(),hit.GetDetnum()), 34, 0, 34,hit.GetSector(),3000,0,30000,hit.Charge());
 
-  obj.FillHistogram(dirname,Form("%sSectorCharge_v_Ring_det%d",h_suf.c_str(),hit.GetDetnum()),
-		    26,0,26,hit.GetRing(),3000,0,30000,hit.Charge());
+  obj.FillHistogram(dirname,Form("%sSectorCharge_v_Ring_det%d",h_suf.c_str(),hit.GetDetnum()), 26,0,26,hit.GetRing(),3000,0,30000,hit.Charge());
 
   if(hit.GetRing()<=6) {
-    obj.FillHistogram(dirname,Form("%sSectorCharge_v_Ring_det%d_Expt1",h_suf.c_str(),hit.GetDetnum()),
-		      8,0,8,hit.GetRing(),3000,0,30000,hit.Charge());
+    obj.FillHistogram(dirname,Form("%sSectorCharge_v_Ring_det%d_Expt1",h_suf.c_str(),hit.GetDetnum()), 8,0,8,hit.GetRing(),3000,0,30000,hit.Charge());
   }
   else if((hit.GetRing()<=12) && (hit.GetRing()>6)) {
-    obj.FillHistogram(dirname,Form("%sSectorCharge_v_Ring_det%d_Expt2",h_suf.c_str(),hit.GetDetnum()),
-		      8,6,14,hit.GetRing(),3000,0,30000,hit.Charge());
+    obj.FillHistogram(dirname,Form("%sSectorCharge_v_Ring_det%d_Expt2",h_suf.c_str(),hit.GetDetnum()), 8,6,14,hit.GetRing(),3000,0,30000,hit.Charge());
   }
   else if((hit.GetRing()<=18) && (hit.GetRing()>12)) {
-    obj.FillHistogram(dirname,Form("%sSectorCharge_v_Ring_det%d_Expt3",h_suf.c_str(),hit.GetDetnum()),
-		      8,12,20,hit.GetRing(),3000,0,30000,hit.Charge());
+    obj.FillHistogram(dirname,Form("%sSectorCharge_v_Ring_det%d_Expt3",h_suf.c_str(),hit.GetDetnum()), 8,12,20,hit.GetRing(),3000,0,30000,hit.Charge());
   }
   else if(hit.GetRing()>18) {
-    obj.FillHistogram(dirname,Form("%sSectorCharge_v_Ring_det%d_Expt4",h_suf.c_str(),hit.GetDetnum()),
-		      8,18,26,hit.GetRing(),3000,0,30000,hit.Charge());
+    obj.FillHistogram(dirname,Form("%sSectorCharge_v_Ring_det%d_Expt4",h_suf.c_str(),hit.GetDetnum()), 8,18,26,hit.GetRing(),3000,0,30000,hit.Charge());
   }
 
-  obj.FillHistogram(dirname,Form("%sRingCharge_v_Sector_det%d",h_suf.c_str(),hit.GetDetnum()),
-		    34,0,34,hit.GetSector(),3000,0,30000,hit.GetBackHit().Charge());
-  
-  obj.FillHistogram(dirname,Form("%sRingCharge_v_Ring_det%d",h_suf.c_str(),hit.GetDetnum()),
-		    26,0,26,hit.GetRing(),3000,0,30000,hit.GetBackHit().Charge());
+  obj.FillHistogram(dirname,Form("%sRingCharge_v_Sector_det%d",h_suf.c_str(),hit.GetDetnum()), 34,0,34,hit.GetSector(),3000,0,30000,hit.GetBackHit().Charge());
 
-  obj.FillHistogram(dirname,Form("%sRing_v_Sector_det%d",h_suf.c_str(),hit.GetDetnum()),
-		    26,0,26,hit.GetRing(),34,0,34,hit.GetSector());
+  obj.FillHistogram(dirname,Form("%sRingCharge_v_Ring_det%d",h_suf.c_str(),hit.GetDetnum()), 26,0,26,hit.GetRing(),3000,0,30000,hit.GetBackHit().Charge());
+
+  obj.FillHistogram(dirname,Form("%sRing_v_Sector_det%d",h_suf.c_str(),hit.GetDetnum()), 26,0,26,hit.GetRing(),34,0,34,hit.GetSector());
 
   double shift = 0.5*TMath::TwoPi()/32.0;
-  obj.FillHistogram(dirname,Form("%sPerp_v_Phi_det%d",h_suf.c_str(),hit.GetDetnum()),
-		    32,-TMath::Pi()+shift,TMath::Pi()+shift,pos.Phi(),24,1.1,3.5,pos.Perp());
+  obj.FillHistogram(dirname,Form("%sPerp_v_Phi_det%d",h_suf.c_str(),hit.GetDetnum()), 32,-TMath::Pi()+shift,TMath::Pi()+shift,pos.Phi(),24,1.1,3.5,pos.Perp());
 
-  obj.FillHistogram(dirname,Form("%sY_v_X_det%d",h_suf.c_str(),hit.GetDetnum()),
-		    200,-4,4,pos.X(),
-		    200,-4,4,pos.Y());
+  obj.FillHistogram(dirname,Form("%sY_v_X_det%d",h_suf.c_str(),hit.GetDetnum()), 200,-4,4,pos.X(), 200,-4,4,pos.Y());
 
-  obj.FillHistogram(dirname,Form("%sSectorCharge_v_RingCharge_Hit_det%d",h_suf.c_str(),hit.GetDetnum()),
-		    2000,0,30000,hit.GetBackHit().Charge(),
-		    2000,0,30000,hit.Charge());
+  obj.FillHistogram(dirname,Form("%sSectorCharge_v_RingCharge_Hit_det%d",h_suf.c_str(),hit.GetDetnum()), 2000,0,30000,hit.GetBackHit().Charge(), 2000,0,30000,hit.Charge());
 
   auto tdiff = hit.GetBackHit().Timestamp() - hit.Timestamp();
-   
-  obj.FillHistogram(dirname,Form("%sFrontBack_Tdiff_Hit_det%d",h_suf.c_str(),hit.GetDetnum()),
-		    2750,-11000,11000,tdiff);
+
+  obj.FillHistogram(dirname,Form("%sFrontBack_Tdiff_Hit_det%d",h_suf.c_str(),hit.GetDetnum()), 2750,-11000,11000,tdiff);
 
   auto cdiff = hit.GetBackHit().Charge() - hit.Charge();
-  
+
   obj.FillHistogram(dirname,Form("%sCdiff_Hit_det%d",h_suf.c_str(),hit.GetDetnum()),2000,0,20000,cdiff);
 
-  obj.FillHistogram(dirname,Form("%sCdiff_v_Tdiff_Hit_det%d",h_suf.c_str(),hit.GetDetnum()),
-		    2500,-10000,10000,tdiff,
-		    1000,0,30000,cdiff);
+  obj.FillHistogram(dirname,Form("%sCdiff_v_Tdiff_Hit_det%d",h_suf.c_str(),hit.GetDetnum()), 2500,-10000,10000,tdiff, 1000,0,30000,cdiff);
 
-  obj.FillHistogram(dirname,Form("%sRingCharge_v_Tdiff_Hit_det%d",h_suf.c_str(),hit.GetDetnum()),
-		    2500,-10000,10000, tdiff,
-		    1000,0,30000,hit.GetBackHit().Charge());
+  obj.FillHistogram(dirname,Form("%sRingCharge_v_Tdiff_Hit_det%d",h_suf.c_str(),hit.GetDetnum()), 2500,-10000,10000, tdiff, 1000,0,30000,hit.GetBackHit().Charge());
 
-  obj.FillHistogram(dirname,Form("%sRingCharge_v_Cdiff_Hit_det%d",h_suf.c_str(),hit.GetDetnum()),
-		    5000,0,20000,cdiff,
-		    1000,0,30000,hit.GetBackHit().Charge());
+  obj.FillHistogram(dirname,Form("%sRingCharge_v_Cdiff_Hit_det%d",h_suf.c_str(),hit.GetDetnum()), 5000,0,20000,cdiff, 1000,0,30000,hit.GetBackHit().Charge());
 
-  obj.FillHistogram(dirname,Form("%sSectorCharge_v_Tdiff_Hit_det%d",h_suf.c_str(),hit.GetDetnum()),
-		    2500,-10000,10000,tdiff,
-		    1000,0,30000,hit.Charge());
+  obj.FillHistogram(dirname,Form("%sSectorCharge_v_Tdiff_Hit_det%d",h_suf.c_str(),hit.GetDetnum()), 2500,-10000,10000,tdiff, 1000,0,30000,hit.Charge());
 
-  obj.FillHistogram(dirname,Form("%sSectorCharge_v_Cdiff_Hit_det%d",h_suf.c_str(),hit.GetDetnum()),
-		    5000,0,20000,cdiff,
-		    1000,0,30000,hit.Charge());
-
+  obj.FillHistogram(dirname,Form("%sSectorCharge_v_Cdiff_Hit_det%d",h_suf.c_str(),hit.GetDetnum()), 5000,0,20000,cdiff, 1000,0,30000,hit.Charge());
   return;
- 
 }
 
 void LeveledJanusSpectra(TRuntimeObjects& obj, TJanusDDAS& janus, int lvl) {
 
   std::string dirname = Prefix(lvl) + "Janus_Ungated";
-  
+
   for(size_t i=0; i<janus.GetUnusedChannels(lvl).size(); i++) {
-    
+
     auto &chan = janus.GetUnusedChannels(lvl).at(i);
-    
-    obj.FillHistogram(dirname,"Charge_Summary_UnusedChans",
-		      128,0,128,chan.GetFrontChannel(),
+    obj.FillHistogram(dirname,"Charge_Summary_UnusedChans", 128,0,128,chan.GetFrontChannel(),
 		      3500,0,35000,chan.Charge());
-    
     for(size_t j=i+1;j<janus.GetUnusedChannels(lvl).size();j++) {
       
       auto &chan1 = janus.GetUnusedChannels(lvl).at(j);
@@ -944,11 +849,8 @@ void MakeGatedSeGAJanus(TRuntimeObjects& obj, TSega& sega, TJanusDDAS& janus, GC
 
       obj.FillHistogram(dirname,"ReconPhi_Correlation",4000,0,4000,s_energy,32,0,thing,planeAng_rec);
       obj.FillHistogram(dirname,"ReconPhi_Correction",4000,0,4000,recon_en,32,0,thing,planeAng_rec);
-      
     }//end sega hit loop
-    
   }//end janus hit loop
-
   return;
 }
 
@@ -961,7 +863,7 @@ std::vector<GCutG*> janus_gates;
 //   or else bad things will happen.
 extern "C"
 void MakeHistograms(TRuntimeObjects& obj) {
-  
+
   TSega* sega = obj.GetDetector<TSega>();
   TJanusDDAS* janus = obj.GetDetector<TJanusDDAS>();
   beam_mass = GValue::Value("BEAM_MASS");
@@ -981,43 +883,33 @@ void MakeHistograms(TRuntimeObjects& obj) {
         time_gate = gate;
 	gates_loaded++;
         std::cout << "Time Gate: " << name << std::endl;
-      }
-      else if(!tag.compare("D0") || !tag.compare("D1")) {
+      } else if(!tag.compare("D0") || !tag.compare("D1")) {
         janus_gates.push_back(gate);
 	gates_loaded++;
         std::cout << "Janus Gate: " << tag << " " << name << std::endl;
-      }
-      else {
+      } else {
 	std::cout << "Unknown Gate: Name = " << name << ", Tag = " << tag << std::endl;
       }
     }
-  } 
-
-  
-/*
-  if(sega) {
+  }
+/*  if(sega) {
     MakeSega(obj,*sega);
   }
 */
-  
-  
+
   if(janus) {
     MakeJanus(obj,*janus);
-
     for(auto &gate : janus_gates) {
       MakeGatedJanus(obj,*janus,gate);
     }
   }
 
   if(sega && janus) {
-
     MakeSeGAJanus(obj,*sega,*janus);
-
     for(auto &gate : janus_gates) {
       MakeGatedSeGAJanus(obj,*sega,*janus,gate,time_gate);
     }
   }
-
   return;
 }
 

@@ -1,12 +1,12 @@
 #ifndef GRUT_GVERSION
 #define GRUT_GVERSION
 
-#define GRUT_RELEASE "1.02.00"
-#define GRUT_RELEASE_TIME "2016-07-18 11:07:15 -0400"
-#define GRUT_RELEASE_NAME "Chipper Chartreuse Chipmunk"
+#define GRUT_RELEASE ""
+#define GRUT_RELEASE_TIME ""
+#define GRUT_RELEASE_NAME ""
 
-#define GRUT_GIT_COMMIT "v1.02.00-237-g1780159"
-#define GRUT_GIT_BRANCH "janus2018"
-#define GRUT_GIT_COMMIT_TIME "2022-02-09 15:35:36 -0500"
+#define GRUT_GIT_COMMIT ""
+#define GRUT_GIT_BRANCH "main"
+#define GRUT_GIT_COMMIT_TIME ""
 
 #endif /* GRUT_GVERSION */

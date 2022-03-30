@@ -14,7 +14,7 @@
 #include "TS800Scaler.h"
 #include "TS800Sim.h"
 #include "TSega.h"
-
+#include "TDiamondDet.h"
 // Map from string to detector enum.
 // This is used to parse the DetectorEnvironment.env file.
 // This is ONLY used when parsing NSCL data files, not
@@ -34,6 +34,8 @@ std::map<std::string, kDetectorSystems> detector_system_map{
   {"Janus",       kDetectorSystems::JANUS},
   {"JanusDDAS",   kDetectorSystems::JANUS_DDAS},
   {"FastScint",   kDetectorSystems::FASTSCINT},
+
+  {"Diamond",     kDetectorSystems::DIAMONDDET},
 
   {"Caesar",      kDetectorSystems::CAESAR},
   {"Phoswall",    kDetectorSystems::PHOSWALL},
@@ -58,6 +60,8 @@ std::map<kDetectorSystems, TDetectorFactoryBase*> detector_factory_map {
   {kDetectorSystems::JANUS,       new TDetectorFactory<TJanus>() },
   {kDetectorSystems::JANUS_DDAS,  new TDetectorFactory<TJanusDDAS>() },
   {kDetectorSystems::FASTSCINT,   new TDetectorFactory<TFastScint>() },
+
+  {kDetectorSystems::DIAMONDDET,   new TDetectorFactory<TDiamondDet>() },
 
   {kDetectorSystems::CAESAR,      new TDetectorFactory<TCaesar>() },
   {kDetectorSystems::PHOSWALL,    new TDetectorFactory<TPhosWall>() },

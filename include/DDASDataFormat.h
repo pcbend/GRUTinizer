@@ -90,6 +90,8 @@ public:
 
   int GetEnergy()                  const { return (header->energy_tracelength & LOWER16BITMASK);       }
   int GetTraceLength()             const { return (header->energy_tracelength & UPPER16BITMASK) >> 16; }
+  int GetEnergySum(int i)	   const { if(HasQDCSum()) return qdc_sum->qdc_sum[i];
+                                           else return -2;					       }
 
   friend std::ostream& operator<<(std::ostream& out, const TDDASEvent& event) {
     out << "DDAS Channel: \n";

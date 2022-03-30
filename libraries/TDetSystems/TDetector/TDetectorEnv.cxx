@@ -92,7 +92,6 @@ Int_t TDetectorEnv::ParseInputData(const char *inputdata) {
 
     if(colon  == std::string::npos)
       continue;
-
     std::string type = line.substr(0, colon);
     line = line.substr(colon + 1, line.length());
     trim(&line);
@@ -141,7 +140,6 @@ kDetectorSystems TDetectorEnv::DetermineSystem(int source_id) const {
   if(output == kDetectorSystems::UNKNOWN_SYSTEM){
     std::cerr << RED << "Unknown sourceid found: " << source_id << RESET_COLOR << std::endl;
   }
-
   return output;
 }
 

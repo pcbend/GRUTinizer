@@ -22,6 +22,7 @@ public:
   static bool Sega()       { return Get().source_ids[kDetectorSystems::SEGA].size(); }
   static bool FastScint()  { return Get().source_ids[kDetectorSystems::FASTSCINT].size(); }
   static bool Lenda()      { return Get().source_ids[kDetectorSystems::LENDA].size(); }
+  static bool DiamondDet() { return Get().source_ids[kDetectorSystems::DIAMONDDET].size(); }
 
   static const std::vector<int>& CaesarIDs()     { return Get().source_ids[kDetectorSystems::CAESAR]; }
   static const std::vector<int>& SegaIDs()       { return Get().source_ids[kDetectorSystems::SEGA]; }
@@ -34,6 +35,7 @@ public:
   static const std::vector<int>& Bank29IDs()     { return Get().source_ids[kDetectorSystems::BANK29]; }
   static const std::vector<int>& FastScintIDs()  { return Get().source_ids[kDetectorSystems::FASTSCINT]; }
   static const std::vector<int>& LendaIDs()      { return Get().source_ids[kDetectorSystems::LENDA]; }
+  static const std::vector<int>& DiamondDetIDs() { return Get().source_ids[kDetectorSystems::DIAMONDDET]; }
 
   kDetectorSystems DetermineSystem(int source_id) const;
   kDetectorSystems DetermineSystem(TRawEvent& event) const;
