@@ -55,7 +55,7 @@ int TDiamondDet::BuildHits(std::vector<TRawEvent>& raw_data) {
     // Get a hit, make it if it does not exist
     TDiamondDetHit hit;
     hit.SetAddress(address);
-    hit.SetTimestamp(ddas.GetTimestamp()*10); // this is now in ns pcb!!
+    hit.SetTimestamp(ddas.GetTimestamp()); // this is now in ns pcb!!
     if(hit.Timestamp()<smallest_timestamp) { smallest_timestamp = hit.Timestamp(); }
     hit.SetCharge(ddas.GetEnergy());
 

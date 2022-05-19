@@ -86,11 +86,13 @@ int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
     if(segnum==0){
       hit->SetAddress(address);
       //hit->SetTimestamp(nscl.GetTimestamp());
-      hit->SetTimestamp(ddas.GetTimestamp()*10); // this is now in ns pcb!!
+      hit->SetTimestamp(ddas.GetTimestamp()); // Timestamp in ns
+      hit->SetTimeFull(ddas.GetTime()); // Timestamp + CFD
+      hit->SetCFDTime(ddas.GetCFDTime()); // CFD ONLY
       if(hit->Timestamp()<smallest_timestamp) { smallest_timestamp = hit->Timestamp(); }
       hit->SetCharge(ddas.GetEnergy());
       hit->SetTrace(ddas.GetTraceLength(), ddas.trace);
-      hit->SetEnergySumBool(ddas.HasQDCSum());
+      hit->SetEnergySumBool(ddas.HasEnergySum());
       hit->SetEnergySum1(ddas.GetEnergySum(0));
       hit->SetEnergySum2(ddas.GetEnergySum(1));
       hit->SetEnergySum3(ddas.GetEnergySum(2));
@@ -98,7 +100,9 @@ int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
     } else {
       TSegaSegmentHit& seg = hit->MakeSegmentByAddress(address);
       seg.SetCharge(ddas.GetEnergy());
-      seg.SetTimestamp(ddas.GetTimestamp()*10);  // this is now in ns pcb!!
+      seg.SetTimestamp(ddas.GetTimestamp());  // Timestamp in ns
+      seg.SetTimeFull(ddas.GetTime()); // Timestamp + CFD
+      seg.SetCFDTime(ddas.GetCFDTime()); // CFD ONLY
       seg.SetTrace(ddas.GetTraceLength(), ddas.trace);
     }
   }
