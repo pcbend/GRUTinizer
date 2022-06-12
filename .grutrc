@@ -21,7 +21,7 @@ Rint.Logon: $(GRUTSYS)/.grut_logon
 Rint.History $(GRUTSYS)/.grut_history
 Rint.HistSize: 1000000
 
-Rint.PromptColor: #CCCC00
+Rint.PromptColor: %CCCC00
 Rint.BracketColor: bold green
 Rint.BadBracketColor: bold red underlined
 Rint.TabComColor: magenta
