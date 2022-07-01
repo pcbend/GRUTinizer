@@ -216,6 +216,23 @@ void BasicJanusSpectra(TRuntimeObjects& obj, TJanusDDASHit& hit, std::string dir
   obj.FillHistogram(dirname,Form("%sSectorCharge_v_Ring_det%d",h_suf.c_str(),hit.GetDetnum()),
 		    26,0,26,hit.GetRing(),3000,0,30000,hit.Charge());
 
+  if(hit.GetRing()<=6) {
+    obj.FillHistogram(dirname,Form("%sSectorCharge_v_Ring_det%d_Expt1",h_suf.c_str(),hit.GetDetnum()),
+		      8,0,8,hit.GetRing(),3000,0,30000,hit.Charge());
+  }
+  else if((hit.GetRing()<=12) && (hit.GetRing()>6)) {
+    obj.FillHistogram(dirname,Form("%sSectorCharge_v_Ring_det%d_Expt2",h_suf.c_str(),hit.GetDetnum()),
+		      8,6,14,hit.GetRing(),3000,0,30000,hit.Charge());
+  }
+  else if((hit.GetRing()<=18) && (hit.GetRing()>12)) {
+    obj.FillHistogram(dirname,Form("%sSectorCharge_v_Ring_det%d_Expt3",h_suf.c_str(),hit.GetDetnum()),
+		      8,12,20,hit.GetRing(),3000,0,30000,hit.Charge());
+  }
+  else if(hit.GetRing()>18) {
+    obj.FillHistogram(dirname,Form("%sSectorCharge_v_Ring_det%d_Expt4",h_suf.c_str(),hit.GetDetnum()),
+		      8,18,26,hit.GetRing(),3000,0,30000,hit.Charge());
+  }
+
   obj.FillHistogram(dirname,Form("%sRingCharge_v_Sector_det%d",h_suf.c_str(),hit.GetDetnum()),
 		    34,0,34,hit.GetSector(),3000,0,30000,hit.GetBackHit().Charge());
   
@@ -336,6 +353,11 @@ void LeveledJanusSpectra(TRuntimeObjects& obj, TJanusDDAS& janus, int lvl) {
     BasicJanusSpectra(obj,hit,dirname,"Addback_"); 
   }
   
+  obj.FillHistogram(dirname,"TwoHit_HitMult_det1",50,0,50,janus.GetSpecificHits(1,lvl,2).size());   
+  obj.FillHistogram(dirname,"TwoHit_HitMult_det0",50,0,50,janus.GetSpecificHits(0,lvl,2).size());
+  for(auto& hit : janus.GetDoubleHits(lvl)) {
+    BasicJanusSpectra(obj,hit,dirname,"TwoHit_"); 
+  }
   return;
 
 }
@@ -672,8 +694,8 @@ void MakeGatedSeGAJanus(TRuntimeObjects& obj, TSega& sega, TJanusDDAS& janus, GC
 			GCutG* time_gate) {
 
   static TSRIM srimB("120Sn_in_196Pt");
-  static TSRIM srimT("196Pt_in_196Pt");
   static TSRIM srimC("85Rb_in_196Pt");
+  static TSRIM srimT("196Pt_in_196Pt");
   
   if(!janus_gate){
     return;
@@ -790,6 +812,9 @@ void MakeGatedSeGAJanus(TRuntimeObjects& obj, TSega& sega, TJanusDDAS& janus, GC
       obj.FillHistogram(dirname,"Doppler_Energy_Summary",18,0,18,s_hit.GetDetnum(),4000,0,4000,dop_en);
       obj.FillHistogram(dirname,Form("Doppler_Energy_jDet%d",detNum),4000,0,4000,dop_en);
 
+      int ringNum = j_hit.GetRing();
+      obj.FillHistogram(dirname,Form("Dopper_Energy_Ring%d",ringNum),4000,0,4000,dop_en);
+
       obj.FillHistogram(dirname,Form("Doppler_Energy_v_tdiff_jdet%d",detNum),
 			1000,-1000,3000,tdiff,
 			2500,0,5000,dop_en);
@@ -877,6 +902,8 @@ void MakeGatedSeGAJanus(TRuntimeObjects& obj, TSega& sega, TJanusDDAS& janus, GC
       obj.FillHistogram(dirname,"Recon_Energy_Summary",18,0,18,s_hit.GetDetnum(),4000,0,4000,recon_en);
       obj.FillHistogram(dirname,Form("Recon_Energy_jDet%d",detNum),4000,0,4000,recon_en);
 
+      obj.FillHistogram(dirname,Form("Recon_Energy_Ring%d",ringNum),4000,0,4000,recon_en);
+
       obj.FillHistogram(dirname,Form("ParticleCharge_v_ReconEnergy_jdet%d",detNum),
 			2000,0,5000,recon_en,
 			1000,0,30000,j_hit.Charge());
@@ -953,16 +980,16 @@ void MakeHistograms(TRuntimeObjects& obj) {
   
   
   if(janus) {
-    //MakeJanus(obj,*janus);
+    MakeJanus(obj,*janus);
 
     for(auto &gate : janus_gates) {
-      //MakeGatedJanus(obj,*janus,gate);
+      MakeGatedJanus(obj,*janus,gate);
     }
   }
 
   if(sega && janus) {
 
-    //MakeSeGAJanus(obj,*sega,*janus);
+    MakeSeGAJanus(obj,*sega,*janus);
 
     for(auto &gate : janus_gates) {
       MakeGatedSeGAJanus(obj,*sega,*janus,gate,time_gate);

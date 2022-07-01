@@ -2,7 +2,7 @@
 #define _DDASDATAFORMAT_H_
 
 #include <ostream>
-
+#include <iostream>
 #include "TObject.h"
 
 #include "TSmartBuffer.h"
@@ -27,23 +27,24 @@
 
 #include "DDASBanks.h"
 
+using namespace std;
 template<typename HeaderType>
 class TDDASEvent : public TObject {
 public:
   TDDASEvent(TSmartBuffer& buf)
-    : qdc_sum(NULL), energy_sum(NULL), trace(NULL),
+    : energy_sum(NULL), qdc_sum(NULL), trace(NULL),
       header(NULL), buf(buf) {
     header = (HeaderType*)buf.GetData();
     buf.Advance(sizeof(HeaderType));
 
-    if(HasQDCSum()){
-      qdc_sum = (DDAS_QDC_Sum*)buf.GetData();
-      buf.Advance(sizeof(DDAS_QDC_Sum));
-    }
-
     if(HasEnergySum()){
       energy_sum = (DDAS_Energy_Sum*)buf.GetData();
       buf.Advance(sizeof(DDAS_Energy_Sum));
+    }
+
+    if(HasQDCSum()){
+      qdc_sum = (DDAS_QDC_Sum*)buf.GetData();
+      buf.Advance(sizeof(DDAS_QDC_Sum));
     }
 
     if(GetTraceLength()){
@@ -52,18 +53,17 @@ public:
     }
   }
 
-  DDAS_QDC_Sum* qdc_sum;
   DDAS_Energy_Sum* energy_sum;
+  DDAS_QDC_Sum* qdc_sum;
   unsigned short* trace;
-
-  bool HasQDCSum() const {
-    return (GetChannelHeaderLength() == 8 ||
-            GetChannelHeaderLength() == 16);
-  }
-
 
   bool HasEnergySum() const {
     return (GetChannelHeaderLength() == 12 ||
+            GetChannelHeaderLength() == 16);
+  }
+
+  bool HasQDCSum() const {
+    return (GetChannelHeaderLength() == 8 ||
             GetChannelHeaderLength() == 16);
   }
 
@@ -82,15 +82,62 @@ public:
 
   unsigned int GetTimeLow()        const { return header->time_low;                                    }
   unsigned int GetTimeHigh()       const { return (header->time_high_cfd & LOWER16BITMASK);            }
-  unsigned long GetTimestamp()     const {
-    return (((unsigned long)GetTimeHigh())<<32) + GetTimeLow();
+
+  unsigned long GetTimestamp()       const {
+    if(header->frequency == 100) {
+      return ((((unsigned long)GetTimeHigh())<<32) + GetTimeLow()) * 10;
+    } else if(header->frequency == 250) {
+      return ((((unsigned long)GetTimeHigh())<<32) + GetTimeLow()) * 8;
+    } else if(header->frequency == 500) {
+      return ((((unsigned long)GetTimeHigh())<<32) + GetTimeLow()) * 10;
+    } else {
+      return ((((unsigned long)GetTimeHigh())<<32) + GetTimeLow()) * 10;
+    }
   }
-  int GetCFDFailBit()              const { return (header->time_high_cfd & BIT31MASK)     >> 31;       }
-  int GetCFDTime()                 const { return (header->time_high_cfd & BIT30TO16MASK) >> 16;       }
+
+  int GetCFDTrig()     const {
+    if(header->frequency == 100) {
+      return 0;
+    } else if(header->frequency == 250) {
+      return (header->time_high_cfd & BIT30MASK) >> 30;
+    } else if(header->frequency == 500) {
+      return (header->time_high_cfd & BIT31TO29MASK) >> 29;
+    } else {
+      return 0;
+    }
+  }
+
+  int GetCFDFailBit()     const {
+    if(header->frequency == 100) {
+      return (header->time_high_cfd & BIT31MASK) >> 31;
+    } else if(header->frequency == 250) {
+      return (header->time_high_cfd & BIT31MASK) >> 31;
+    } else if(header->frequency == 500) {
+      return (GetCFDTrig() == 7) ? 1 : 0;
+    } else {
+      return (header->time_high_cfd & BIT31MASK) >> 31;
+    }
+  }
+
+  double GetCFDTime()     const {
+    if(header->frequency == 100) {
+      return (((header->time_high_cfd & BIT30TO16MASK) >> 16) / 32768 ) * 10.0;
+    } else if(header->frequency == 250) {
+      return (((header->time_high_cfd & BIT29TO16MASK) >> 16) / 16384 - GetCFDTrig() ) * 4.0;
+    } else if(header->frequency == 500) {
+      return (((header->time_high_cfd & BIT28TO16MASK) >> 16) / 8192 + GetCFDTrig() -1 ) * 2.0;
+    } else {
+      return (((header->time_high_cfd & BIT30TO16MASK) >> 16) / 32768 ) * 10.0;
+    }
+  }
+
+  double GetTime()          const { return (static_cast<double>(GetTimestamp()) + GetCFDTime());       }
 
   int GetEnergy()                  const { return (header->energy_tracelength & LOWER16BITMASK);       }
   int GetTraceLength()             const { return (header->energy_tracelength & UPPER16BITMASK) >> 16; }
-  int GetEnergySum(int i)	   const { if(HasQDCSum()) return qdc_sum->qdc_sum[i];
+  int GetEnergySum(int i)	   const { if(HasEnergySum()) return energy_sum->energy_sum[i];
+                                           else return -2;					       }
+  int GetQDCSum(int i)	           const { if(HasQDCSum()) return qdc_sum->qdc_sum[i];
                                            else return -2;					       }
 
   friend std::ostream& operator<<(std::ostream& out, const TDDASEvent& event) {

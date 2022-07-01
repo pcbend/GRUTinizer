@@ -112,7 +112,6 @@ void TJanusDDAS::UnpackChannels(std::vector<TRawEvent>& raw_data) {
   unsigned long smallest_timestamp = 0x7fffffffffffffff;
   for(auto& event : raw_data){
     //SetTimestamp(event.GetTimestamp());
-
     TSmartBuffer buf = event.GetPayloadBuffer();
     TDDASEvent<DDASHeader> ddas(buf);
 
@@ -142,7 +141,7 @@ void TJanusDDAS::UnpackChannels(std::vector<TRawEvent>& raw_data) {
     TJanusDDASHit janus_chan;
     janus_chan.SetCharge(ddas.GetEnergy());
     janus_chan.SetTime(ddas.GetCFDTime());
-    janus_chan.SetTimestamp(ddas.GetTimestamp()*8); // this are more 
+    janus_chan.SetTimestamp(ddas.GetTimestamp());
     if(janus_chan.Timestamp()<smallest_timestamp) { smallest_timestamp = janus_chan.Timestamp(); }
     janus_chan.SetAddress(address);
 

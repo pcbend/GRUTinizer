@@ -42,15 +42,9 @@ TDetectorHit& TSega::GetHit(int i){
 }
 
 int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
-  //for(auto& event : raw_data){
-  //TNSCLEvent& nscl = (TNSCLEvent&)event;
-  //SetTimestamp(nscl.GetTimestamp()); uncommented Mark
 
   unsigned long smallest_timestamp = 0x7fffffffffffffff;
   for(auto& event : raw_data){
-    //SetTimestamp(event.GetTimestamp());  //fix me pcb
-    //TSmartBuffer buf = nscl.GetPayloadBuffer();
-    //TDDASEvent<DDASHeader> ddas(buf);
     TSmartBuffer buf = event.GetPayloadBuffer();
     TDDASEvent<DDASHeader> ddas(buf);
     unsigned int address = ( (1<<24) + (ddas.GetCrateID()<<16) + (ddas.GetSlotID()<<8) + ddas.GetChannelID() );
@@ -61,44 +55,64 @@ int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
         std::cout << "Unknown SeGA (crate, slot, channel): (" << ddas.GetCrateID() << ", " << ddas.GetSlotID() << ", " << ddas.GetChannelID() << ")" << std::endl;
       }
       lines_displayed++;
-      // sega_hits.emplace_back();
-      // TSegaHit* hit = &sega_hits.back();
-      // hit->SetAddress(address);
-      // hit->SetTimestamp(nscl.GetTimestamp());
       continue;
     }
     int detnum = chan->GetArrayPosition();
     int segnum = chan->GetSegment();
     // Get a hit, make it if it does not exist
     TSegaHit* hit = NULL;
-    for(auto& ihit : sega_hits){
+/*    for(auto& ihit : sega_hits){   //replave this with the below SG
       if(ihit.GetDetnum() == detnum){
         hit = &ihit;
 	break;
       }
+    }*/
+
+    for(auto& ihit : sega_hits){
+      if(ihit.GetDetnum() == detnum) {
+	if(segnum == 0) {
+	  if(!ihit.HasCore()){ //If there is no core event assign to the ihit
+            hit = &ihit;
+            break;
+          } else {
+	    break; //If there is another core event in the build window make a new hit
+          }
+        } else {
+	  int tdiff = static_cast<int>(ihit.Timestamp()-ddas.GetTimestamp());
+	  if(tdiff < 2000 && tdiff > -2000) { //Segments should be within 2us of a core
+            hit = &ihit;
+      	    break;
+	  } //else std::cout << "BadSegmentMatch " << detnum << "\t" << tdiff << std::endl;
+        }
+      }
     }
+
     if(hit == NULL){
       sega_hits.emplace_back();
       hit = &sega_hits.back();
       fSize++;
     }
-//std::cout << "Length:QDC:Sum = " << ddas.GetChannelHeaderLength() << " " << ddas.HasQDCSum() << " " << ddas.HasEnergySum() << std::endl;
+
     if(segnum==0){
       hit->SetAddress(address);
-      //hit->SetTimestamp(nscl.GetTimestamp());
-      hit->SetTimestamp(ddas.GetTimestamp()*10); // this is now in ns pcb!!
+      hit->SetTimestamp(ddas.GetTimestamp()); // Timestamp in ns
+      hit->SetTimeFull(ddas.GetTime()); // Timestamp + CFD
+      hit->SetCFDTime(ddas.GetCFDTime()); // CFD ONLY
       if(hit->Timestamp()<smallest_timestamp) { smallest_timestamp = hit->Timestamp(); }
       hit->SetCharge(ddas.GetEnergy());
       hit->SetTrace(ddas.GetTraceLength(), ddas.trace);
-      hit->SetEnergySumBool(ddas.HasQDCSum());
+      hit->SetEnergySumBool(ddas.HasEnergySum());
       hit->SetEnergySum1(ddas.GetEnergySum(0));
       hit->SetEnergySum2(ddas.GetEnergySum(1));
       hit->SetEnergySum3(ddas.GetEnergySum(2));
       hit->SetEnergySum4(ddas.GetEnergySum(3));
     } else {
       TSegaSegmentHit& seg = hit->MakeSegmentByAddress(address);
+      if(!hit->HasCore()) hit->SetTimestamp(ddas.GetTimestamp()); //ADD this line SG
       seg.SetCharge(ddas.GetEnergy());
-      seg.SetTimestamp(ddas.GetTimestamp()*10);  // this is now in ns pcb!!
+      seg.SetTimestamp(ddas.GetTimestamp());  // Timestamp in ns
+      seg.SetTimeFull(ddas.GetTime()); // Timestamp + CFD
+      seg.SetCFDTime(ddas.GetCFDTime()); // CFD ONLY
       seg.SetTrace(ddas.GetTraceLength(), ddas.trace);
     }
   }

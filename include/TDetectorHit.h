@@ -22,12 +22,16 @@ public:
   Int_t  Address()   const      { return fAddress; }
   virtual Int_t  Charge() const;
   virtual Int_t  Time() const           { return fTime; }
+  virtual double  CFDTime() const           { return fCFD; }
+  virtual double  TimeFull() const           { return fTimefull; }
   long   Timestamp() const      { return fTimestamp; }
 
   void SetAddress(int address)      { fAddress = address; }
   void SetCharge(int charge);
   void SetTime(int time)            { fTime = time; }
   void SetTimestamp(long timestamp) { fTimestamp = timestamp; }
+  void SetCFDTime(double cfd)            { fCFD = cfd; }
+  void SetTimeFull(long time)            { fTimefull = time; }
 
   double GetEnergy() const; //applies TChannel ENERGYCOEFF to Charge
   double GetTime() const;   //applies TChannel TIMECOEFF to Time()
@@ -53,8 +57,9 @@ protected:
   Int_t   fAddress;
   long    fTimestamp;
   Float_t fCharge;
-  Float_t fTime;
-  
+  int fTime;
+  double fTimefull;
+  double fCFD;
   unsigned char fFlags;
 
 

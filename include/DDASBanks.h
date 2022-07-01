@@ -13,14 +13,13 @@ struct DDASHeader{
   unsigned int energy_tracelength;
 } __attribute__((packed));
 
-struct DDAS_QDC_Sum {
-  unsigned int qdc_sum[4];
-} __attribute__((packed));
-
 struct DDAS_Energy_Sum {
-  unsigned int energy_sum[8];
+  unsigned int energy_sum[4];
 } __attribute__((packed));
 
+struct DDAS_QDC_Sum {
+  unsigned int qdc_sum[8];
+} __attribute__((packed));
 
 struct DDASGEBHeader{  //only at the start of the event...
   //unsigned int size; // Size of DDAS packet, inclusive, number of 16-bit words
