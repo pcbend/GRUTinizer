@@ -61,13 +61,6 @@ int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
     int segnum = chan->GetSegment();
     // Get a hit, make it if it does not exist
     TSegaHit* hit = NULL;
-/*    for(auto& ihit : sega_hits){   //replave this with the below SG
-      if(ihit.GetDetnum() == detnum){
-        hit = &ihit;
-	break;
-      }
-    }*/
-
     for(auto& ihit : sega_hits){
       if(ihit.GetDetnum() == detnum) {
 	if(segnum == 0) {
