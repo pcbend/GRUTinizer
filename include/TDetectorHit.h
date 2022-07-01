@@ -31,7 +31,11 @@ public:
   void SetTime(int time)            { fTime = time; }
   void SetTimestamp(long timestamp) { fTimestamp = timestamp; }
   void SetCFDTime(double cfd)            { fCFD = cfd; }
+<<<<<<< HEAD
   void SetTimeFull(long time)            { fTimefull = time; }
+=======
+  void SetTimeFull(double time)            { fTimefull = time; }
+>>>>>>> e78cf9b86722698a9758c1240c4d7fbef59981d9
 
   double GetEnergy() const; //applies TChannel ENERGYCOEFF to Charge
   double GetTime() const;   //applies TChannel TIMECOEFF to Time()
