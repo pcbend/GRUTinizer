@@ -95,10 +95,6 @@ int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
 
     if(segnum==0){
       hit->SetAddress(address);
-<<<<<<< HEAD
-=======
-      //hit->SetTimestamp(nscl.GetTimestamp());
->>>>>>> e78cf9b86722698a9758c1240c4d7fbef59981d9
       hit->SetTimestamp(ddas.GetTimestamp()); // Timestamp in ns
       hit->SetTimeFull(ddas.GetTime()); // Timestamp + CFD
       hit->SetCFDTime(ddas.GetCFDTime()); // CFD ONLY
