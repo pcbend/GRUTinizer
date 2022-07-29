@@ -46,7 +46,7 @@ bool TInverseMap::ReadMapFile(const char *filename) {
   std::string line;
   getline(infile,info);
   sscanf(info.c_str(),"S800 inverse map - Brho=%g - M=%d - Q=%d", &fBrho, &fMass, &fCharge);
-  
+
   int par =0;
   while(getline(infile,line)) {
     if(line.find("----------")!=std::string::npos)
@@ -59,8 +59,8 @@ bool TInverseMap::ReadMapFile(const char *filename) {
     InvMapRow invrow;
     std::stringstream ss(line);
     ss >> index;
-    if((index-1) != fMap[par-1].size()) { 
-      //problems. 
+    if((index-1) != fMap[par-1].size()) {
+      //problems.
     }
     {
       std::string temp;
@@ -75,7 +75,7 @@ bool TInverseMap::ReadMapFile(const char *filename) {
     ss >> invrow.exp[3];
     ss >> invrow.exp[4];
     ss >> invrow.exp[5];
-    
+
     fMap[par-1].push_back(invrow);
 
     //printf("%i\t%s\n",index,line.c_str());
@@ -105,32 +105,32 @@ void TInverseMap::Print(Option_t *opt) const {
   }
 }
 
-//Parameter def.               |    
-// 0 == ATA                    |    
-// 1 == YTA                    |    
-// 2 == BTA                    |    
-// 3 == DTA                    |    
+//Parameter def.               |
+// 0 == ATA                    |
+// 1 == YTA                    |
+// 2 == BTA                    |
+// 3 == DTA                    |
 
 //Input def.
-// 0 == Crdc 0 -x in meters.   |    
-// 1 == - Afp in radians.      |    
-// 2 == Crdc 0 +y in meters.   |    
-// 3 == + Bfp in radians.      |   
-// 4 == 0;                     |    
-// 5 == 0;                     |    
+// 0 == Crdc 0 -x in meters.   |
+// 1 == - Afp in radians.      |
+// 2 == Crdc 0 +y in meters.   |
+// 3 == + Bfp in radians.      |
+// 4 == 0;                     |
+// 5 == 0;                     |
 
 // S800 angles
 // S800 system (looking dwnstream)
 // positive ata: dispersive (aka: from x-axis) angle pointing down
 // positive bta: none-dispersive (aka: from y-axis)  angle pointing right
 // yta: y position in [m], along none-dispersive angle, positive right
-// 
+//
 // GRETINA:
 // z: beamaxis
 // x: down (=S800 neg. dispersive direction)
 // Y: left
 // Opening for gate valve points to the floor (x positive)
-// 
+//
 // We transform S800 angle into GRETINA.
 
 float TInverseMap::Ata(int order, double xfp, double afp, double yfp, double bfp) const {
@@ -177,7 +177,7 @@ float TInverseMap::Dta(int order, double xfp, double afp, double yfp, double bfp
   return MapCalc(order, 3, input);
 }
 
-float TInverseMap::Ata(int order, const TS800 *s800) { 
+float TInverseMap::Ata(int order, const TS800 *s800) {
   float input[6];
   input[0]  = - s800->GetXFP() / 1000.0;
   input[1]  = - s800->GetAFP();
@@ -189,7 +189,7 @@ float TInverseMap::Ata(int order, const TS800 *s800) {
   return MapCalc(order,par,input);
 }
 
-float TInverseMap::Bta(int order, const TS800 *s800) { 
+float TInverseMap::Bta(int order, const TS800 *s800) {
   float input[6];
   input[0]  = - s800->GetXFP() / 1000.0;
   input[1]  = - s800->GetAFP();
@@ -201,7 +201,7 @@ float TInverseMap::Bta(int order, const TS800 *s800) {
   return MapCalc(order,par,input);
 }
 
-float TInverseMap::Yta(int order, const TS800 *s800) { 
+float TInverseMap::Yta(int order, const TS800 *s800) {
   float input[6];
   input[0]  = - s800->GetXFP() / 1000.0;
   input[1]  = - s800->GetAFP();
@@ -214,7 +214,7 @@ float TInverseMap::Yta(int order, const TS800 *s800) {
   return MapCalc(order,par,input)*1000;
 }
 
-float TInverseMap::Dta(int order, const TS800 *s800) { 
+float TInverseMap::Dta(int order, const TS800 *s800) {
   float input[6];
   input[0]  = - s800->GetXFP() / 1000.0;
   input[1]  = - s800->GetAFP();
@@ -226,7 +226,7 @@ float TInverseMap::Dta(int order, const TS800 *s800) {
   return MapCalc(order,par,input);
 }
 
-float TInverseMap::MapCalc(int order,int par,float *input) const { 
+float TInverseMap::MapCalc(int order,int par,float *input) const {
   float cumul         = 0.0;
   float multiplicator = 0.0;
   std::vector<InvMapRow> vec = fMap.at(par);

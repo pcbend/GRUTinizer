@@ -104,7 +104,9 @@ public:
   double GetX() const { return GetPosition().X(); }
   double GetY() const { return GetPosition().Y(); }
   double GetZ() const { return GetPosition().Z(); }
-  
+
+  int GetABDepth() const { return fAB; }
+
   double GetPhi() const {
     double phi = GetPosition().Phi();
     if(phi<0) {
@@ -164,14 +166,14 @@ public:
   TVector3 GetPosition()                    const { return GetIntPosition(0); }
   TVector3 GetLastPosition()                const;
 
-  TVector3 GetCrystalPosition()           const; 
-                                                
-  void Add(const TGretinaHit& other);
-  void SetCoreEnergy(float temp) const { fCoreEnergy = temp; }
+  TVector3 GetCrystalPosition()           const;
 
+  void Add(const TGretinaHit& other);
+  void NNAdd(const TGretinaHit& other);
+  void SetCoreEnergy(float temp) const { fCoreEnergy = temp; }
+  void SetABDepth(int ab) const { fAB = ab; }
   void TrimSegments(int type); // 0: drop multiple ident int pnts.  1: make into wedge "data"
   bool IsClean() const { return !fPad; }
-
 //bool IsAddback() const { return this->TestBit(31); }
 
 private:
@@ -203,11 +205,13 @@ private:
   Int_t           fCoreCharge[4];
   Int_t   fPad;
   Int_t   fNumberOfInteractions;
-  
   mutable Float_t fCoreEnergy;
+  mutable Int_t fAB;
   Float_t         fWalkCorrection;   //also called t0.
   Float_t         fTOffset; //  t0 = toffset + tFit
 
+  std::vector<TGretinaHit> fSingles;
+  bool fSetFirstSingles = false;
   std::vector<interaction_point> fSegments;
   ClassDef(TGretinaHit,5)
 };

@@ -74,9 +74,10 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
   fWalkCorrection = raw.t0;
   fCrystalId = raw.crystal_id;
   fCoreEnergy = raw.tot_e;
+  fAB = 0;
 
   //fAddress = (1<<24) + (fCrystalId<<16);
-  //fAddress = (1<<24) + ( raw.board_id );
+  //fWAddress = (1<<24) + ( raw.board_id );
   int board_id = ((fCrystalId/4) << 8) ;  //hole  number : 0x1f00
   //    board_id =                       ;  //card  number : 0x0030  information not available here.
   board_id += ((fCrystalId%4) << 6) ;  //x-tal number : 0x00c0
@@ -90,7 +91,6 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
 
   fNumberOfInteractions = raw.num;
   fPad = raw.pad;
-
   //std::cout<< "pad\t" << fPad << "\tints\t" << fNumberOfInteractions << std::endl; 
   for(int i=0; i<fNumberOfInteractions; i++) {
     try {
@@ -99,7 +99,8 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
       pnt.fX   = raw.intpts[i].x;
       pnt.fY   = raw.intpts[i].y;
       pnt.fZ   = raw.intpts[i].z;
-      pnt.fEng = raw.intpts[i].e;
+      pnt.fFrac   = raw.intpts[i].e;
+      pnt.fEng = raw.intpts[i].seg_ener;
       fSegments.push_back(pnt);
     } catch(...) {
       std::cout << "in try catch block!" << std::endl;
@@ -331,6 +332,27 @@ void TGretinaHit::Add(const TGretinaHit& rhs) {
     fNumberOfInteractions++;
   }
 }
+
+void TGretinaHit::NNAdd(const TGretinaHit& rhs) {
+  //copy original hit into singles
+  if (!fSetFirstSingles){
+    TGretinaHit myCopy(*this);
+    fSingles.push_back(myCopy);
+    fSetFirstSingles = true;
+  }
+  fCoreEnergy += rhs.fCoreEnergy;
+  fSingles.push_back(rhs);
+
+  // Fill all interaction points
+  for(unsigned int i=0; i<rhs.fSegments.size(); i++){
+    if(fNumberOfInteractions >= MAXHPGESEGMENTS){
+      break;
+    }
+    fSegments.push_back(rhs.fSegments[i]);
+    fNumberOfInteractions++;
+  }
+}
+
 /*
    TGretinaHit& TGretinaHit::operator+=(const TGretinaHit& rhs) {
    AddToSelf(rhs);

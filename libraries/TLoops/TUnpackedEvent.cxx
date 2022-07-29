@@ -28,10 +28,8 @@ TUnpackedEvent::~TUnpackedEvent() {
 
 void TUnpackedEvent::Build() {
   //printf("i am called\n"); fflush(stdout);
-  int counter =0;
 
   for(auto& item : raw_data_map) {
-    //printf("counter = %i\n",counter++);
     kDetectorSystems detector = item.first;
     std::vector<TRawEvent>& raw_data = item.second;
 

@@ -156,44 +156,7 @@ float TIonChamber::GetSum() const {
   return temp;
 }
 
-//FROM GRROOT
-//bool Calibration::BuildIonChamber(GIonChamber* in, TRACK* track, IC* out){
-//  out->Clear();
-//  out->SetCal(ICCal(in));
-//  double sum = ICSum(out->GetCal());
-//  double IC_corg = 1;
-//  double IC_coro = 0;
-//  if(fIC_cor[0]!=NULL)
-//    IC_corg = fIC_cor[0]->GetBinContent(fevent/10000+1);
-//  if(fIC_cor[1]!=NULL)
-//    IC_coro = fIC_cor[1]->GetBinContent(fevent/10000+1);
-//  sum *= IC_corg;
-//  sum += IC_coro;
-//  out->SetSum(sum);
-//  out->SetDE(ICDE(sum,track));
-//  if(!isnan(sum) && sum>fSett->ICThresh()){
-//    fichctr++;
-//    return true;
-//  }
-//  return false;
-//}
-//Float_t Calibration::ICDE(Float_t sum, TRACK* track){
-//  Float_t x = track->GetXFP();
-//  Float_t y = track->GetYFP();
-//  if(!isnan(sum) && !isnan(track->GetAFP())){
-//    if(!isnan(y))
-//      sum += sum*fSett->dE_ytilt()*y;
-//    if(!isnan(x) && x < fSett->dE_x0tilt())
-//      sum *= exp(fSett->dE_xtilt()* (fSett->dE_x0tilt() -x) );
-//    fs800valid = 0;
-//    return sum * fde_slope + fde_offset;
-//  } else {
-//    return sqrt(-1.0);
-//  }
-//}
-
 float TIonChamber::GetdE(TCrdc *crdc){
-  float sum = GetAve();
   float x   = crdc->GetDispersiveX();
   float y   = crdc->GetNonDispersiveY();
 

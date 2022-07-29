@@ -31,6 +31,8 @@ TGretina::~TGretina() {
 Float_t TGretina::crmat[32][4][4][4];
 Float_t TGretina::m_segpos[2][36][3];
 bool    TGretina::fCRMATSet = false;
+bool    TGretina::fNEIGHBOURSet = false;
+bool	TGretina::gretNeighbour[124][124];
 
 bool DefaultAddback(const TGretinaHit& one,const TGretinaHit &two) {
   TVector3 res = one.GetLastPosition()-two.GetPosition();
@@ -40,43 +42,89 @@ bool DefaultAddback(const TGretinaHit& one,const TGretinaHit &two) {
 
 std::function<bool(const TGretinaHit&,const TGretinaHit&)> TGretina::fAddbackCondition = DefaultAddback;
 
-void TGretina::BuildAddback(int EngRange) const {
-  if( addback_hits.size() > 0 ||
-      gretina_hits.size() == 0) {
+void TGretina::BuildAddback(int EngRange, bool SortByEng) const {
+  if( addback_hits.size() > 0 || gretina_hits.size() == 0) {
     return;
   }
 
-  addback_hits = gretina_hits;
+  std::vector<TGretinaHit> temp_hits = gretina_hits;
 
   if(EngRange>=0 && EngRange<4){
-    for(auto& hit : addback_hits) {
-      hit.SetCoreEnergy(hit.GetCoreEnergy(EngRange));
+    for(auto& hit : temp_hits) {
+      hit.SetCoreEnergy(hit.GetCoreEnergy());//EngRange));
+      hit.SetABDepth(0);
     }
   }
 
-  
-  std::sort(addback_hits.begin(), addback_hits.end(),
-	    [](const TGretinaHit& a, const TGretinaHit& b) {
-	      return a.GetCoreEnergy() > b.GetCoreEnergy();
-	    });
+  //sort so that the first hit has the greatest energy
+  //this way we can loop through i,j with i < j and know that
+  //any hit with higher energy cannot be an addback to one with lower energy
+  if (SortByEng){
+    std::sort(temp_hits.begin(), temp_hits.end(),
+        [](const TGretinaHit& a, const TGretinaHit& b) {
+          return a.GetCoreEnergy() > b.GetCoreEnergy();
+        });
+  }
 
-  for(unsigned int i=0; i<addback_hits.size(); i++) {
-    TGretinaHit& current_hit = addback_hits[i];
-    std::vector<unsigned int> to_erase;
-    for(unsigned int j=i+1; j<addback_hits.size(); j++) {
-      TGretinaHit& other_hit = addback_hits[j];
-      if(fAddbackCondition(current_hit, other_hit)) {
-	current_hit.Add(other_hit);
-	to_erase.push_back(j);
+  //loop through every hit
+  for(unsigned int i=0; i < temp_hits.size(); i++) {
+    TGretinaHit &current_hit = temp_hits[i];
+    int nNeighbourHits = 0;
+    int n1_index, n2_index = -1;
+
+    //only pick unqiue pairs of hits
+    for(unsigned int j=i+1; j < temp_hits.size(); j++) {
+      if (IsNeighbour(current_hit,temp_hits[j])){
+        nNeighbourHits++;
+        n1_index = j;
+
+        //check every hit k to see if it is a neighbour with j
+        for (unsigned int k=0; k < temp_hits.size(); k++){
+          if (k==i || k==j) continue;
+          if (IsNeighbour(temp_hits[j],temp_hits[k])){
+            nNeighbourHits++;
+            //if hit k is a neighbour with hit i then this is an n2 hit
+            if (IsNeighbour(current_hit,temp_hits[k])){
+              n2_index = k;
+            }
+          }
+        }
       }
     }
 
-    for(auto it = to_erase.rbegin(); it<to_erase.rend(); it++) {
-      unsigned int erasing = *it;
-      addback_hits.erase(addback_hits.begin() + erasing);
+    //n0
+    if (nNeighbourHits == 0){
+      addback_hits.push_back(current_hit);
+      addback_hits.back().SetABDepth(0);
+//      std::cout << current_hit.GetCoreEnergy() << "\t" << addback_hits.back().GetCoreEnergy() << std::endl;
+    }
+    //n1
+    else if (nNeighbourHits == 1) {
+      current_hit.NNAdd(temp_hits[n1_index]);
+      addback_hits.push_back(current_hit);
+      addback_hits.back().SetABDepth(1);
+      temp_hits.erase(temp_hits.begin() + n1_index);
+    }
+    //n2
+    else if (nNeighbourHits == 2 && n2_index != -1) {
+      current_hit.NNAdd(temp_hits[n1_index]);
+      current_hit.NNAdd(temp_hits[n2_index]);
+      addback_hits.push_back(current_hit);
+      addback_hits.back().SetABDepth(2);
+      if (n2_index < n1_index) std::swap(n1_index,n2_index);
+      temp_hits.erase(temp_hits.begin() + n2_index);
+      temp_hits.erase(temp_hits.begin() + n1_index);
+    }
+    //ng
+    else {
+      addback_hits.push_back(current_hit);
+      addback_hits.back().SetABDepth(3);
     }
   }
+  // std::cout<<"BUILDNNADDBACK EXIT"<<std::endl;
+  return;
 }
+
 
 void TGretina::SetCRMAT() {
   if(fCRMATSet){
@@ -173,7 +221,6 @@ void TGretina::SetSegmentCRMAT() {
     //m_segpos[(type)%2][seg][2] = z;
     seg++;
   }
-  
   infile.close();
   //fclose(infile);
 }
@@ -198,6 +245,35 @@ TVector3 TGretina::GetSegmentPosition(int cry_id,int segment) {
   //v.RotateY(TMath::Pi());
   //return CrystalToGlobal(cry_id,x,y,z);
   return CrystalToGlobal(cry_id,v.X(),v.Y(),v.Z());
+}
+
+void TGretina::SetGretNeighbours() {
+  if(fNEIGHBOURSet){
+    return;
+  }
+
+  std::string temp = getenv("GRUTSYS");
+  temp.append("/libraries/TDetSystems/TGretina/gretina-pairs.dat");
+  std::ifstream infile;
+  infile.open(temp.c_str());
+  if(!infile.is_open()) {
+    std::cout<<"error with file"<<std::endl;
+    return;
+  }
+
+  int i = 0;
+  bool tmpB;
+  while(infile.good()) {
+    for(int j = 0; j < 124; j++) {
+      infile >> tmpB;
+      gretNeighbour[i][j] = tmpB;
+    }
+    i++;
+  }
+
+  infile.close();
+  fNEIGHBOURSet = true;
+  return;
 }
 
 TVector3 TGretina::GetCrystalPosition(int cry_id) {
@@ -334,109 +410,3 @@ void TGretina::Clear(Option_t *opt) {
   gretina_hits.clear();
   addback_hits.clear();
 }
-
-/*
-void TGretina::DrawDopplerGamma(Double_t Beta,Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain){
-  TString OptString = opt;
-  if(!chain)
-    chain = gChain;
-  if(!chain || !chain->GetBranch("TGretina"))
-    return;
-  if(!gPad || !gPad->IsEditable()){
-    gROOT->MakeDefCanvas();
-  }else{
-    gPad->GetCanvas()->Clear();
-  }
-  std::string name  = Form("%s_Gammas",Class()->GetName());
-  std::string title = Form("%s Gamma 1-D",Class()->GetName());
-  GH1D *h = (GH1D*)gROOT->FindObject(name.c_str());
-  if(!h)
-    h = new GH1D(name.c_str(),title.c_str(),4000,0,8000);
-
-
-  chain->Project(name.c_str(),Form("gretina_hits.GetDoppler(%f)",Beta),gate,opt,nentries);
-  h->GetXaxis()->SetTitle("Energy [keV]");
-  h->GetYaxis()->SetTitle("Counts / 2 keV");
-  h->Draw(opt);
-
-}
-
-void TGretina::DrawDopplerBeta(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain){
-  TString OptString = opt;
-  if(!chain)
-    chain = gChain;
-  if(!chain || !chain->GetBranch("TGretina"))
-    return;
-  if(!gPad || !gPad->IsEditable()){
-    gROOT->MakeDefCanvas();
-  }else{
-    gPad->GetCanvas()->Clear();
-  }
-  std::string name  = Form("%s_DopplerBeta",Class()->GetName());
-  std::string title = Form("Gretina Doppler Beta");
-  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
-  if(!h)
-    h = new GH2I(name.c_str(),title.c_str(),2000,0,4000,101,0.2,0.5);
-  double beta = 0.2;
-  for(int i = 0; i < 100; i++){
-    chain->Project(name.c_str(),Form("gretina_hits.GetDoppler(%f):%f",beta,beta),gate,opt,nentries);
-  }
-  h->GetXaxis()->SetTitle("Energy [keV]");
-  h->GetYaxis()->SetTitle("BETA");
-  h->Draw(opt);
-  std::cout << " I DONT WORK YET!!!" << std::endl;
-
-}
-
-void TGretina::DrawEnVsTheta(Double_t Beta,Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain){
-  TString OptString = opt;
-  if(!chain)
-    chain = gChain;
-  if(!chain || !chain->GetBranch("TGretina"))
-    return;
-  if(!gPad || !gPad->IsEditable()){
-    gROOT->MakeDefCanvas();
-  }else{
-    gPad->GetCanvas()->Clear();
-  }
-  std::string name  = Form("%s_En_vs_Theta",Class()->GetName());
-  std::string title = Form("Gretina Energy vs Theta");
-  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
-  if(!h)
-    h = new GH2I(name.c_str(),title.c_str(),4000,0,4000,314,0,3.14);
-
-  chain->Project(name.c_str(),Form("gretina_hits.GetTheta():gretina_hits.GetDoppler(%f)",Beta),gate,opt,nentries);
-  h->GetXaxis()->SetTitle("Theta [radians]");
-  h->GetYaxis()->SetTitle("Energy [keV]");
-  h->Draw(opt);
-
-}
-
-void TGretina::DrawCoreSummary(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain){
-  TString OptString = opt;
-  if(!chain)
-    chain = gChain;
-  if(!chain || !chain->GetBranch("TGretina"))
-    return;
-  if(!gPad || !gPad->IsEditable()){
-    gROOT->MakeDefCanvas();
-  }else{
-    gPad->GetCanvas()->Clear();
-  }
-  std::string name  = Form("%s_Core_Summary",Class()->GetName());
-  std::string title = Form("Gretina Core Summary");
-  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
-  if(!h)
-    h = new GH2I(name.c_str(),title.c_str(),60,20,80,4000,0,4000);
-
-  chain->Project(name.c_str(),"gretina_hits.GetCoreEnergy():gretina_hits.GetCrystalId()",gate,opt,nentries);
-  h->GetXaxis()->SetTitle("Crystal ID");
-  h->GetYaxis()->SetTitle("Energy [arb]");
-  h->Draw(opt);
-
-}
-*/
-
-
-
-

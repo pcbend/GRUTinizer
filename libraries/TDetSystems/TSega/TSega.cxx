@@ -43,7 +43,7 @@ TDetectorHit& TSega::GetHit(int i){
 
 int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
 
-  unsigned long smallest_timestamp = 0x7fffffffffffffff;
+  long int smallest_timestamp = 0x7fffffffffffffff;
   for(auto& event : raw_data){
     TSmartBuffer buf = event.GetPayloadBuffer();
     TDDASEvent<DDASHeader> ddas(buf);

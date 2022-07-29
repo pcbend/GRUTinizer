@@ -238,13 +238,12 @@ TGraph* TKinematics::Evslab_graph(double thmin, double thmax, double size, int p
 
   int steps = ((int)(thmax+1) - (int)thmin) / 1.0;   // when is size ever needed to be a double?? pcb.
                                                            // i am under the impression that size should always be 1.0;
-  size = size/steps;                                                       
+  size = size/steps;
   //for(int i=0;i<((thmax-thmin)/size);i++){
   std::cout << "steps = " << steps << std::endl;
   for(int i=0;i<steps;i++){
     Final((thmin+i*size)*deg2rad,2);//part);   //2);
-    double lab = (thmin+i*size);
-    double tmpangle = GetThetalab(part);//*(1/deg2rad);
+    double tmpangle = GetThetalab(part);// *(1/deg2rad);
     double tmpeng   = GetTlab(part) * 1000;
     //printf("step[%i] \t lab = %.02f \t tmpangle = %.02f \t tmpeng = %.02f\n",i, tmpangle,tmpeng);
     if(tmpangle<1 || tmpangle > (GetMaxAngle(fVcm[part])*rad2deg) -1) {
@@ -256,7 +255,7 @@ TGraph* TKinematics::Evslab_graph(double thmin, double thmax, double size, int p
       continue;
     }
     angle.push_back(GetThetalab(part)* (1/deg2rad));
-    energy.push_back(GetTlab(part) * 1000); 
+    energy.push_back(GetTlab(part) * 1000);
     //std::cout << GetThetalab(part)* (1/deg2rad) << "\t" << GetTlab(part) * 1000 << std::endl;
   }
 

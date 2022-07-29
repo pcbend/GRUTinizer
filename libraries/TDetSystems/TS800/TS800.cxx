@@ -61,11 +61,26 @@ Float_t TS800::GetAta(int i) const {
     ata += GValue::Value("ATA_SHIFT");
   }
   return ata;
+}
 
+Float_t TS800::GetAta(float xfp, float afp, float yfp, float bfp, int i) const {
+  float ata = TInverseMap::Get()->Ata(i, xfp, afp, yfp, bfp);
+  if(!std::isnan(GValue::Value("ATA_SHIFT"))) {
+    ata += GValue::Value("ATA_SHIFT");
+  }
+  return ata;
 }
 
 Float_t TS800::GetBta(int i) const {
   float bta = TInverseMap::Get()->Bta(i,this);
+  if(!std::isnan(GValue::Value("BTA_SHIFT"))) {
+    bta += GValue::Value("BTA_SHIFT");
+  }
+  return bta;
+}
+
+Float_t TS800::GetBta(float xfp, float afp, float yfp, float bfp, int i) const {
+  float bta = TInverseMap::Get()->Bta(i, xfp, afp, yfp, bfp);
   if(!std::isnan(GValue::Value("BTA_SHIFT"))) {
     bta += GValue::Value("BTA_SHIFT");
   }
@@ -80,8 +95,24 @@ Float_t TS800::GetYta(int i) const {
   return yta;
 }
 
+Float_t TS800::GetYta(float xfp, float afp, float yfp, float bfp, int i) const {
+  float yta = TInverseMap::Get()->Yta(i, xfp, afp, yfp, bfp);
+  if(!std::isnan(GValue::Value("YTA_SHIFT"))) {
+    yta += GValue::Value("YTA_SHIFT");
+  }
+  return yta;
+}
+
 Float_t TS800::GetDta(int i) const {
   float dta = TInverseMap::Get()->Dta(i,this);
+  if(!std::isnan(GValue::Value("DTA_SHIFT"))) {
+    dta += GValue::Value("DTA_SHIFT");
+  }
+  return dta;
+}
+
+Float_t TS800::GetDta(float xfp, float afp, float yfp, float bfp, int i) const {
+  float dta = TInverseMap::Get()->Dta(i, xfp, afp, yfp, bfp);
   if(!std::isnan(GValue::Value("DTA_SHIFT"))) {
     dta += GValue::Value("DTA_SHIFT");
   }
@@ -91,6 +122,13 @@ Float_t TS800::GetDta(int i) const {
 float TS800::AdjustedBeta(float beta) const {
   double gamma = 1.0/(sqrt(1.-beta*beta));
   double dp_p = gamma/(1.+gamma) * GetDta();
+  beta *=(1.+dp_p/(gamma*gamma));
+  return beta;
+}
+
+float TS800::AdjustedBeta(float beta, float dta) const {
+  double gamma = 1.0/(sqrt(1.-beta*beta));
+  double dp_p = gamma/(1.+gamma) * dta;;
   beta *=(1.+dp_p/(gamma*gamma));
   return beta;
 }
@@ -124,35 +162,15 @@ TVector3 TS800::Track(double sata,double sbta) const {
 
   TVector3 track(ata,-bta,sqrt(1-ata*ata-bta*bta));
   //TVector3 track(ata,-bta,1.0);
-  
   return track;//.Unit();
 }
 
+TVector3 TS800::Track(float Ata, float Bta, double sata,double sbta) const {
+  double ata = TMath::Sin(Ata + sata);
+  double bta = TMath::Sin(Bta + sbta);
 
-TVector3 TS800::ExitTargetVect(int order){
-  TVector3 track;
-  double sin_ata = 0;
-  double sin_bta = 0;
-  sin_ata = GetAta(order); //* TMath::DegToRad() ;
-  sin_bta = GetBta(order); // * TMath::DegToRad() ;
-  
-  sin_ata = TMath::Sin(sin_ata);
-  sin_bta = TMath::Sin(sin_bta);
-
-  double phi   = 0;
-  double theta = 0;
-  
-   if(sin_ata>0 && sin_bta>0)      phi = 2.0*TMath::Pi()-TMath::ATan(sin_bta/sin_ata);
-   else if(sin_ata<0 && sin_bta>0) phi = TMath::Pi()+TMath::ATan(sin_bta/TMath::Abs(sin_ata));
-   else if(sin_ata<0 && sin_bta<0) phi = TMath::Pi()-TMath::ATan(TMath::Abs(sin_bta)/TMath::Abs(sin_ata));
-   else if(sin_ata>0 && sin_bta<0) phi = TMath::ATan(TMath::Abs(sin_bta)/sin_ata);
-   else                      phi = 0;
-
-   theta = TMath::ASin(TMath::Sqrt(sin_ata*sin_ata+sin_bta*sin_bta));
-   //   track.SetMagThetaPhi(1,theta,phi);
-   track.SetXYZ(TMath::Sin(theta)*TMath::Cos(phi),TMath::Sin(theta)*TMath::Sin(phi),TMath::Cos(phi));
-   //track.SetXYZ(sin_ata,-sin_bta,1);
-   return track; 
+  TVector3 track(ata,-bta,sqrt(1-ata*ata-bta*bta));
+  return track;
 }
 
 TVector3 TS800::CRDCTrack(){
@@ -183,9 +201,6 @@ float TS800::GetYFP(int i) const {
 }
 
 float TS800::GetAFP() const{
-   /*  if (GetCrdc(0).GetId() == -1 || GetCrdc(1).GetId() == -1){
-     return sqrt(-1);
-  }*/
   if(GetCrdc(0).Size()==0||GetCrdc(1).Size()==0){
     return sqrt(-1);
   }
@@ -194,14 +209,21 @@ float TS800::GetAFP() const{
 
 }
 
+float TS800::GetAFP(float xfp0, float xfp1) const{
+  float AFP = TMath::ATan((xfp1-xfp0)/1073.0);
+  return AFP;
+}
+
 float TS800::GetBFP() const{
-  /*if (GetCrdc(0).GetId() == -1 || GetCrdc(1).GetId() == -1) {
-    return sqrt(-1);
-    }*/
-  if(GetCrdc(0).Size()==0||GetCrdc(1).Size()==0){
+   if(GetCrdc(0).Size()==0||GetCrdc(1).Size()==0){
     return sqrt(-1);
   }
   float BFP = TMath::ATan((GetYFP(1)-GetYFP(0))/1073.0);
+  return BFP;
+}
+
+float TS800::GetBFP(float yfp0, float yfp1) const{
+  float BFP = TMath::ATan((yfp1-yfp0)/1073.0);
   return BFP;
 }
 
@@ -209,7 +231,7 @@ void TS800::Clear(Option_t* opt){
   TDetector::Clear(opt);
   crdc1.Clear();
   crdc2.Clear();
-  
+
   scint[0].Clear();
   scint[1].Clear();
   scint[2].Clear();
