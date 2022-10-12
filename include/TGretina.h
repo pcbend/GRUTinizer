@@ -8,7 +8,6 @@
 #include <TObject.h>
 #include <TMath.h>
 
-//#include <TClonesArray.h>
 
 #include "TDetector.h"
 #include "TGretinaHit.h"
@@ -43,7 +42,7 @@ public:
 
   static bool IsNeighbour(int ID1, int ID2) {SetGretNeighbours(); return gretNeighbour[ID1][ID2];}
   static bool IsNeighbour(const TGretinaHit &a, const TGretinaHit &b) { return IsNeighbour(a.GetCrystalId(),b.GetCrystalId());}
-#ifndef __CINT__ 
+#ifndef __CINT__
   static void SetAddbackCondition(std::function<bool(const TGretinaHit&,const TGretinaHit&)> condition) {
     fAddbackCondition = condition;
   }
@@ -55,20 +54,19 @@ public:
 
   void  SortHits();
 
-  void  CleanHits(int i=-1) { 
+  void  CleanHits(int i=-1) {
     for(auto x=gretina_hits.begin();x!=gretina_hits.end();) { //x++) {
       if(x->GetPad()==0) {
         x->TrimSegments(1);
-        if(i>=0) 
-          x->SetCoreEnergy(x->GetCoreEnergy(i));
+        if(i>=0) x->SetCoreEnergy(x->GetCoreEnergy(i));
         x++;
       } else {
         x = gretina_hits.erase(x);
       }
     }
   }
- 
-  double SumHits(bool clean=true) { 
+
+  double SumHits(bool clean=true) {
     double sum =0.0;
     for(auto x=gretina_hits.begin();x!=gretina_hits.end();x++) {
       if(clean && x->GetPad()==0) {
@@ -102,7 +100,6 @@ private:
   static void SetCRMAT();
   static void SetSegmentCRMAT();
   static bool fCRMATSet;
-
 
   ClassDef(TGretina,3);
 };

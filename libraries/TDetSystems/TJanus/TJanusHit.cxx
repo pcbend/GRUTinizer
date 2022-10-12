@@ -26,6 +26,10 @@ void TJanusHit::Copy(TObject& obj) const {
   hit.fTimeOverflowBit  = fTimeOverflowBit;
   hit.fTimeUnderflowBit = fTimeUnderflowBit;
 
+  hit.fRing = fRing;
+  hit.fSector = fSector;
+  hit.fDetector = fDetector;
+
   back_hit.Copy(hit.back_hit);
 }
 
@@ -51,40 +55,12 @@ int TJanusHit::GetBackChannel() const {
   return (slotnum-5)*32 + channum;
 }
 
-int TJanusHit::GetDetnum() const {
-  TChannel* chan = TChannel::GetChannel(fAddress);
-  if(chan){
-    return chan->GetArrayPosition();
-  } else {
-    return -1;
-  }
-}
-
-int TJanusHit::GetRing() const {
-  TChannel* chan = TChannel::GetChannel(fAddress);
-  if(chan){
-    return chan->GetSegment();
-  } else {
-    return 0;
-  }
-}
-
-int TJanusHit::GetSector() const {
-  TChannel* chan = TChannel::GetChannel(back_hit.Address());
-  if(chan){
-    return chan->GetSegment();
-  } else {
-    return 0;
-  }
-}
 
 void TJanusHit::Print(Option_t *opt) const {
-  printf("JanusHit[%03i,%03i]  Ring: %02i  Sector: %02i  Charge: %i   Energy: %.02f\n",
-          GetFrontChannel(),GetBackChannel(),GetRing(),GetSector(),Charge(),GetEnergy());
-
+  std::cout << "Some Function" << std::endl;
+//  printf("JanusHit[%03i,%03i]  Ring: %02i  Sector: %02i  Charge: %i   Energy: %.02f\n",
+//          GetFrontChannel(),GetBackChannel(),GetRing(),GetSector(),Charge(),GetEnergy());
 }
-
-
 
 TVector3 TJanusHit::GetPosition(bool apply_array_offset) const {
   TVector3 output = TJanus::GetPosition(GetDetnum(), GetRing(), GetSector());

@@ -15,15 +15,29 @@ public:
   virtual void Print(Option_t* opt = "") const;
   virtual void InsertHit(const TDetectorHit&);
 
-  virtual TJanusHit&    GetJanusHit(int i);
+//  virtual TJanusHit&    GetJanusHit(int i);
   virtual TDetectorHit& GetHit(int i);
 
   std::vector<TJanusHit>& GetAllChannels() { return janus_channels; }
   std::vector<TJanusHit>& GetAllHits() { return janus_hits; }
 
-  static TVector3 GetPosition(int detnum, int ring_num, int sector_num);
+  int GetRingSize() { return ring_hits.size(); }
+  int GetSectorSize() { return sector_hits.size(); }
 
-  virtual void SetRunStart(unsigned int unix_time);
+  TJanusHit* GetJanusHit(const int &i);
+  TJanusHit* GetRingHit(const int &i);
+  TJanusHit* GetSectorHit(const int &i);
+
+  static TVector3 GetPosition(int detnum, int ring_num, int sector_num);
+  static TVector3 GetPosition(int ring, int sector, double zoffset, bool sectorsdownstream, bool smear = false);
+
+  Int_t GetJanusSize();
+  void BuildJanusHit();
+
+  void SetMultiHit(bool set = false) { multhit = set; } //Multihits in S3
+  void SetFrontBackTime(int time) { TDiff = time; }	//Time diff between ring/sector hits
+  void SetFrontBackEnergy(double en) { EWin = en; }	//Energy ratio of ring/sector hits
+
 
   char StackTriggered() const { return stack_triggered; }
   int NumPackets() const { return num_packets; }
@@ -34,9 +48,6 @@ public:
   iterator begin() { return janus_hits.begin(); }
   iterator end() { return janus_hits.end(); }
 
-  static double GetBeta(double betamax, double kr_angle_rad, bool energy_loss=false, double collision_pos=0.5);
-  static double SimAngle();
-
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);
 
@@ -45,10 +56,28 @@ private:
   std::vector<TJanusHit> janus_channels;
   std::vector<TJanusHit> janus_hits;
 
+  std::vector<TJanusHit> ring_hits;   	//Vector to store ring hits
+  std::vector<TJanusHit> sector_hits; 	//Vector to store sector hits
+
   char stack_triggered;
   int num_packets;
   int total_bytes;
 
+  //For geometry
+  static int NRing;
+  static int NSector;
+
+  static double PhiOffset;
+  static double OuterDiameter;
+  static double InnerDiameter;
+  static double TargetDistance;
+
+  //For matching ring/sectors
+  static double TDiff;
+  static double EWin;
+  static double FrontBackOffset;
+  //For enabling multihit events in S3
+  static bool multhit;
   ClassDef(TJanus,3);
 };
 

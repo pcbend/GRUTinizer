@@ -17,7 +17,7 @@ class TSmartBuffer;
 class TS800;
 
 
-class interaction_point { 
+class interaction_point {
   public:
   interaction_point():fSeg(-1),fX(sqrt(-1)),fY(sqrt(-1)),fZ(sqrt(-1)),fEng(sqrt(-1)),fFrac(sqrt(-1)) { }
   interaction_point(int seg,float x,float y,float z,float energy,float fraction=100.0)
@@ -33,22 +33,21 @@ class interaction_point {
   bool operator<(const interaction_point &other) const {
     if(fEng!=other.fEng) {
       return fEng>other.fEng;
-    } 
+    }
     if(fSeg==other.fSeg) {
       return fFrac>other.fFrac;
     }
     return fSeg<other.fSeg;
   }
 
-  void Print(Option_t *opt="") const { 
+  void Print(Option_t *opt="") const {
     printf("Seg[%02i]\tWedge[%i]\tEng: % 4.2f / % 4.2f  \t(X,Y,Z) % 3.2f % 3.2f % 3.2f\n",
             fSeg,(fSeg%6),fEng,fFrac,fX,fY,fZ);
-  
   };
   ClassDef(interaction_point,1)
 };
 
-#ifndef __CINT__ 
+#ifndef __CINT__
 
 struct intpnt_compare {
   bool operator()(const interaction_point &p1,const interaction_point &p2) {
@@ -62,11 +61,7 @@ struct intpnt_compare_wedge {
   }
 };
 
-
-
 #endif
-
-
 
 class TGretinaHit : public TDetectorHit {
 
@@ -80,7 +75,7 @@ public:
   void BuildFrom(TSmartBuffer& raw);
 
 
-  Double_t GetTime()            const { return (double)Timestamp() + (double)fWalkCorrection; } 
+  Double_t GetTime()            const { return (double)Timestamp() + (double)fWalkCorrection; }
   Float_t  GetT0()              const { return fWalkCorrection; }
   Float_t  GetTFit()            const { return fWalkCorrection - fTOffset; }
   Float_t  GetTOffset()         const { return fTOffset; }
@@ -88,7 +83,8 @@ public:
   Int_t    GetCrystalId()       const { return fCrystalId;      }
   Int_t    GetHoleNumber()      const { return fCrystalId/4-1;  }
   Int_t    GetCrystalNumber()   const { return fCrystalId%4;    }
-  Float_t  GetCoreEnergy()      const { return fCoreEnergy;     }
+  Float_t  GetCoreEnergy()      const;
+//  Float_t  GetCoreEnergy()      const { return fCoreEnergy;     }
   Int_t    GetCoreCharge(int i) const { return fCoreCharge[i];  }
   Float_t  GetCoreEnergy(int i) const;
   virtual Int_t Charge()        const { return GetCoreCharge(3); }
@@ -98,9 +94,9 @@ public:
 
   void  Print(Option_t *opt="") const;
   void  Clear(Option_t *opt="");
-  
+
   Int_t Size()  const { return fSegments.size();  }
-  
+
   double GetX() const { return GetPosition().X(); }
   double GetY() const { return GetPosition().Y(); }
   double GetZ() const { return GetPosition().Z(); }
@@ -119,7 +115,7 @@ public:
   double GetPhiDeg()   const { return GetPhi()*TMath::RadToDeg(); }
   double GetThetaDeg() const { return GetTheta()*TMath::RadToDeg(); }
 
-  Int_t Compare(const TObject *obj) const { 
+  Int_t Compare(const TObject *obj) const {
     TGretinaHit *other = (TGretinaHit*)obj;
     if(this->GetCoreEnergy()>other->GetCoreEnergy())
       return -1;
@@ -127,9 +123,9 @@ public:
       return 1;  //sort largest to smallest.
     return 0;
   }
-  
+
   bool HasInteractions() { return !fSegments.empty(); }
-  
+ 
   bool operator<(const TGretinaHit &rhs) const { return fCoreEnergy > rhs.fCoreEnergy; }
 
   double GetDoppler(double beta,const TVector3 *vec=0,int EngRange=-1) const {
@@ -140,18 +136,13 @@ public:
     }
     double tmp = 0.0;
     double gamma = 1/(sqrt(1-pow(beta,2)));
-    if(EngRange>0) 
-      tmp = GetCoreEnergy(EngRange)*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*vec)));
-    else
-      tmp = fCoreEnergy*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*vec)));
+    if(EngRange>0) tmp = GetCoreEnergy(EngRange)*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*vec)));
+    else tmp = fCoreEnergy*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*vec)));
     return tmp;
-  } 
-  
+  }
+
   double GetDopplerYta(double beta , double yta, const TVector3 *vec=0, int EngRange =-1) const;
   double GetDopplerYta(double beta , double yta, double target_x_shift, double target_y_shift, double target_z_shift, const TVector3 *vec=0, int EngRange =-1) const;
-  double GetDoppler(const TS800 *s800,bool doDTAcorr=false,int EngRange=-1);
-  double GetDoppler_dB(double beta,const TVector3 *vec=0, double Dta=0);
-
 
 
   Int_t    NumberOfInteractions()        const { return fNumberOfInteractions; }
@@ -177,7 +168,6 @@ public:
 //bool IsAddback() const { return this->TestBit(31); }
 
 private:
-  void SortHits();
 /* All possible decomp information and
  * where is is stored:
  * -------------------
@@ -203,10 +193,10 @@ private:
 
   Int_t           fCrystalId;
   Int_t           fCoreCharge[4];
-  Int_t   fPad;
-  Int_t   fNumberOfInteractions;
+  Int_t   	  fPad;
+  Int_t   	  fNumberOfInteractions;
   mutable Float_t fCoreEnergy;
-  mutable Int_t fAB;
+  mutable Int_t   fAB;
   Float_t         fWalkCorrection;   //also called t0.
   Float_t         fTOffset; //  t0 = toffset + tFit
 

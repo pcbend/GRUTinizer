@@ -6,15 +6,6 @@
 
 
 #include "TGretina.h"
-//#include "GRootCommands.h"
-//#include <TPad.h>
-//#include <TROOT.h>
-
-//#include "GH1D.h"
-//#include "GH2I.h"
-//#include "TGRUTOptions.h"
-//#include "GCanvas.h"
-
 #include "TGEBEvent.h"
 
 TGretina::TGretina(){
@@ -43,6 +34,8 @@ bool DefaultAddback(const TGretinaHit& one,const TGretinaHit &two) {
 std::function<bool(const TGretinaHit&,const TGretinaHit&)> TGretina::fAddbackCondition = DefaultAddback;
 
 void TGretina::BuildAddback(int EngRange, bool SortByEng) const {
+  //See D. Weisshaar et al., Nucl. Instrum. Methods Phys. Res., Sect. A 847, 18, (2017). Sec 3.3 for details
+  //of addback procedure
   if( addback_hits.size() > 0 || gretina_hits.size() == 0) {
     return;
   }
@@ -52,6 +45,7 @@ void TGretina::BuildAddback(int EngRange, bool SortByEng) const {
   if(EngRange>=0 && EngRange<4){
     for(auto& hit : temp_hits) {
       hit.SetCoreEnergy(hit.GetCoreEnergy());//EngRange));
+//      hit.SetCoreEnergy(hit.GetCoreEnergy(EngRange));
       hit.SetABDepth(0);
     }
   }
@@ -96,7 +90,6 @@ void TGretina::BuildAddback(int EngRange, bool SortByEng) const {
     if (nNeighbourHits == 0){
       addback_hits.push_back(current_hit);
       addback_hits.back().SetABDepth(0);
-//      std::cout << current_hit.GetCoreEnergy() << "\t" << addback_hits.back().GetCoreEnergy() << std::endl;
     }
     //n1
     else if (nNeighbourHits == 1) {
@@ -121,7 +114,6 @@ void TGretina::BuildAddback(int EngRange, bool SortByEng) const {
       addback_hits.back().SetABDepth(3);
     }
   }
-  // std::cout<<"BUILDNNADDBACK EXIT"<<std::endl;
   return;
 }
 
@@ -183,13 +175,12 @@ void TGretina::SetSegmentCRMAT() {
   int NUMSEG = 36;
   std::string temp = getenv("GRUTSYS");
   temp.append("/libraries/TDetSystems/TGretina/crmat_segpos.dat");
-  //infile = fopen(temp.c_str(),"r");
   std::ifstream infile;
   infile.open(temp.c_str());
   if(!infile.is_open()) {
     return;
   }
-  // notice: In file type-A is first, then 
+  // notice: In file type-A is first, then
   //         type-B but as type-B are even
   //         det_ids in the data stream we
   //         define type=0 for type-B not
@@ -216,13 +207,9 @@ void TGretina::SetSegmentCRMAT() {
     m_segpos[(type+1)%2][seg][0] = x;
     m_segpos[(type+1)%2][seg][1] = y;
     m_segpos[(type+1)%2][seg][2] = z;
-    //m_segpos[(type)%2][seg][0] = x;
-    //m_segpos[(type)%2][seg][1] = y;
-    //m_segpos[(type)%2][seg][2] = z;
     seg++;
   }
   infile.close();
-  //fclose(infile);
 }
 
 
@@ -278,8 +265,7 @@ void TGretina::SetGretNeighbours() {
 
 TVector3 TGretina::GetCrystalPosition(int cry_id) {
   SetCRMAT();
-  //return CrystalToGlobal(cry_id,0.0,0.0,0.0); 
-  
+
   TVector3 v;
   v.SetXYZ(0.0,0.0,0.0);
   for(int i=30;i<36;i++) {
@@ -287,45 +273,33 @@ TVector3 TGretina::GetCrystalPosition(int cry_id) {
     v.SetXYZ(v.X()+a.X(),v.Y()+a.Y(),v.Z()+a.Z());
   }
   v.SetXYZ(v.X()/6.0,v.Y()/6.0,v.Z()/6.0);
-  return v;      
-  
+  return v;
 }
 
 void TGretina::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 
   TGretina& gretina = (TGretina&)obj;
-  gretina.gretina_hits = gretina_hits; // gretina_hits->Copy(*gretina.gretina_hits);
-  //addback_hits->Copy(*gretina.addback_hits);
+  gretina.gretina_hits = gretina_hits;
 }
 
 void TGretina::InsertHit(const TDetectorHit& hit){
-  //TGretinaHit* new_hit = (TGretinaHit*)gretina_hits->ConstructedAt(Size());
-  //hit.Copy(*new_hit);
   gretina_hits.emplace_back((TGretinaHit&)hit);
   fSize++;
 }
 
 int TGretina::BuildHits(std::vector<TRawEvent>& raw_data){
-  //printf("%s\n",__PRETTY_FUNCTION__);
   if(raw_data.size()<1)
     return Size();
   long smallest_time = 0x3fffffffffffffff;
   for(auto& event : raw_data){
-    if(event.GetTimestamp()<smallest_time)
-      smallest_time=event.GetTimestamp();
-    // TGEBEvent* geb = (TGEBEvent*)&event;
-    // const TRawEvent::GEBBankType1* raw = (const TRawEvent::GEBBankType1*)geb->GetPayloadBuffer().GetData();
+    if(event.GetTimestamp()<smallest_time) smallest_time = event.GetTimestamp();
     TGretinaHit hit;
     TSmartBuffer buf = event.GetPayloadBuffer();
     hit.BuildFrom(buf);
     InsertHit(hit);
   }
   SetTimestamp(smallest_time);
-  //gretina_hits->At(0)->Print();
-  //BuildAddbackHits();
-
-  //gretina_hits->At(0)->Print();
   return Size();
 }
 
@@ -355,41 +329,6 @@ TVector3 TGretina::CrystalToGlobal(int cryId,Float_t x,Float_t y,Float_t z) {
 
   return TVector3(xl, yl, zl);
 }
-
-/*
-void TGretina::BuildAddbackHits(){
-  if(Size()==0)
-    return;
-
-  addback_hits->Clear();
-  TGretinaHit *newhit = (TGretinaHit*)addback_hits->ConstructedAt(0);
-  GetHit(0).Copy(*newhit);
-
-  if(Size()==1)
-    return;
-
-  std::vector<double> max_energies;
-  max_energies.push_back(newhit->GetCoreEnergy());
-
-  for(int x=1;x<Size();x++) {
-
-    bool used = false;
-    for(int y=0;y<addback_hits->GetEntries();y++) {
-      if(GetAddbackHit(y).CheckAddback(GetGretinaHit(x))) {
-        used = true;
-        GetAddbackHit(y).Add(GetGretinaHit(x), max_energies[y]);
-        break;
-      }
-    }
-
-    if(!used) {
-      TGretinaHit *tmphit = (TGretinaHit*)addback_hits->ConstructedAt(addback_hits->GetEntries());
-      GetGretinaHit(x).Copy(*tmphit);
-      max_energies.push_back(newhit->GetCoreEnergy());
-    }
-  }
-}
-*/
 
 void TGretina::Print(Option_t *opt) const {
   printf(BLUE "GRETINA: size = %i" RESET_COLOR "\n",(int)Size());

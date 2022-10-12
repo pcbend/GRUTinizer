@@ -146,96 +146,16 @@ void TJanusDDAS::UnpackChannels(std::vector<TRawEvent>& raw_data) {
     janus_chan.SetAddress(address);
 
     janus_channels.push_back(janus_chan);
-    // static int shown = 0;
-    // if(shown < 10) {
-    //   std::cout << "-------------------\n";
-    //   std::cout << "Charge = " << ddas.GetEnergy() << "\n";
-
-    //   for(int i=0; i<ddas.GetTraceLength(); i++) {
-    //     std::cout << ddas.trace[i] << "\t";
-    //     if(i%8 == 0) {
-    //       std::cout << "\n";
-    //     }
-    //   }
-
-    //   std::cout << "\n";
-
-    //   std::cout << std::flush;
-    //   shown++;
-    // }
   }
 
   SetTimestamp(smallest_timestamp);
 }
 
 
-/*
-void TJanusDDAS::BuildRingSectors() { 
-  for(size_t x=0;x<janus_channels.size();x++) {
-    TJanusDDASHit hit = janus_channel[x];
-    if(hit.IsRing()) {
-      if(hit.GetDetnum()==0) {
-        d0_rings.push_back(*hit);
-      } else {    
-        d1_rings.push_back(*hit);
-      }
-    } else {
-      if(hit.GetDetnum()==0) {
-        d0_sectors.push_back(*hit);
-      } else {    
-        d1_sectors.push_back(*hit);
-      }
-    }
-  }
-}
-*/
-/*
-void CleanRingScetors(std::vector<TJanusDDASHit> rings,std::vector<TJanusDDASHit> sectors) {
-  std::vector<bool> r_passed;
-  std::vector<bool> s_passed;
-  r_passed.resize(rings.size());
-  std::fill(r_passed.begin(),r_passed.end(),false);
-  s_passed.resize(sectors.size());
-  std::fill(s_passed.begin(),s_passed.end(),false);
-  
-  for(size_t x=0;x<rings.size();x++) {
-  for(size_t x=0;x<rings.size();x++) {
-    for(size_t y=0;y<sectors.size();y++) {
-      int tdiff = abs(rings.at(x).Timestamp() - sectors.at(y).Timestamp());
-      int cdiff = abs(rings.at(x).GetEnergy() - sectors.at(y).GetEnergy()); // calfile dependent!!!
-      if(tdiff<250 && cdiff<600) {
-        r_passed[x] = true;
-        s_passed[y] = true;
-      }
-    }
-  }
-  std::vector<TJanusDDASHit>::iterator it;
-  int counter=0;
-  for(it=rings.begin();it!=rings.end();) {
-    if(r_passed.at(counter)==false) {
-      it.erase();
-    } else {
-      it++;
-    }
-    counter++;
-  }
-  counter=0;
-  for(it=sectors.begin();it!=sectors.end();) {
-    if(s_passed.at(counter)==false) {
-      it.erase();
-    } else {
-      it++;
-    }
-    counter++;
-  }
-}
-*/
-
-
 void TJanusDDAS::BuildCorrelatedHits() {
   ClearCorrelatedHits();
-  
-  //software thresholds; they're a little arbitrary 
+
+  //software thresholds; they're a little arbitrary
   //int minimum_charge = 1000;
   //int maximum_charge = 30000;
 
@@ -249,23 +169,21 @@ void TJanusDDAS::BuildCorrelatedHits() {
 
   double EWin = GValue::Value("EWIN");
   double TDiff = GValue::Value("TDIFF");
-  
+
   for(size_t x=0;x<janus_channels.size();x++){
     TJanusDDASHit chan(janus_channels.at(x));
-    
     if(chan.Charge() < minimum_charge || chan.Charge() > maximum_charge) {
       bad_charge_channels.push_back(chan);
       continue;
     }
 
     channels.push_back(chan);
-    
     if(chan.IsRing()){
       rings.push_back(chan);
     }
     else if(chan.IsSector()){
       sectors.push_back(chan);
-    }    
+    }
   }
 
   //if(janus_channels.size() != bad_charge_channels.size() + channels.size())
@@ -280,7 +198,7 @@ void TJanusDDAS::BuildCorrelatedHits() {
 
   std::vector<bool> used_rings;
   std::vector<bool> used_sectors;
-  
+
   //Ensure we only use each ring and sector once
   used_rings.resize(rings.size());
   std::fill(used_rings.begin(),used_rings.end(),false);
@@ -921,172 +839,6 @@ std::vector<TJanusDDASHit> TJanusDDAS::GetSpecificHits(const int detNum, const i
   return DesiredHits;
 
 }
-
-//void TJanusDDAS::Build_VMUSB_Read(TSmartBuffer buf){
-// const char* data = buf.GetData();
-
-//   const VMUSB_Header* vmusb_header = (VMUSB_Header*)data;
-//   data += sizeof(VMUSB_Header);
-
-
-//   std::map<unsigned int,TJanusDDASHit> front_hits;
-//   std::map<unsigned int,TJanusDDASHit> back_hits;
-//   for(int i=0; i<num_packets; i++){
-//     const CAEN_DataPacket* packet = (CAEN_DataPacket*)data;
-//     data += sizeof(CAEN_DataPacket);
-
-//     if(!packet->IsValid()){
-//       continue;
-//     }
-
-//     // ADCs are in slots 5-8, TDCs in slots 9-12
-//     bool is_tdc = packet->card_num() >= 9;
-//     unsigned int adc_cardnum = packet->card_num();
-//     if(is_tdc){
-//       adc_cardnum -= 4;
-//     }
-//     unsigned int address =
-//       (2<<24) + //system id
-//       (4<<16) + //crate id
-//       (adc_cardnum<<8) +
-//       packet->channel_num();
-
-//     TChannel* chan = TChannel::GetChannel(address);
-//     // Bad stuff, tell somebody to fix it
-//     static int lines_displayed = 0;
-//     if(!chan){
-//       if(lines_displayed < 1000) {
-//         std::cout << "Unknown analog (slot, channel): ("
-//                   << adc_cardnum << ", " << packet->channel_num()
-//                   << "), address = 0x"
-//                   << std::hex << address << std::dec
-//                   << std::endl;
-//       } else if(lines_displayed==1000){
-//         std::cout << "I'm going to stop telling you that the channel was unknown,"
-//                   << " you should probably stop the program." << std::endl;
-//       }
-//       lines_displayed++;
-//       continue;
-//     }
-
-//     TJanusDDASHit* hit = NULL;
-//     if(*chan->GetArraySubposition() == 'F'){
-//       hit = &front_hits[address];
-//     } else {
-//       hit = &back_hits[address];
-//     }
-
-//     hit->SetAddress(address);
-//     //hit->SetTimestamp(timestamp);
-
-//     if(is_tdc){
-//       hit->SetTime(packet->adcvalue());
-//     } else {
-//       hit->SetCharge(packet->adcvalue());
-//     }
-//   }
-
-//   for(auto& elem : front_hits){
-//     TJanusDDASHit& hit = elem.second;
-//     janus_channels.emplace_back(hit);
-//   }
-//   for(auto& elem : back_hits){
-//     TJanusDDASHit& hit = elem.second;
-//     janus_channels.emplace_back(hit);
-
-//     // if(hit.Time() > 50 && hit.Time() < 4000) {
-//     //   std::cout << "address: 0x" << std::hex << hit.Address() << std::dec
-//     //             << "\tvalue: " << hit.Time()
-//     //             << "\tvalue: " << janus_channels.back().Time()
-//     //             << std::endl;
-//     // }
-//   }
-
-//   // Find all fronts with a reasonable TDC value
-//   int best_front = -1;
-//   double max_charge = -1e9;
-//   for(auto& elem : front_hits){
-//     TJanusDDASHit& hit = elem.second;
-//     // if(hit.Time() > 50 && hit.Time() < 3900 &&
-//     //    hit.Charge() > max_charge){
-//     if(hit.Charge() > max_charge &&
-//        hit.GetDetnum() >= 0 &&
-//        hit.GetDetnum() < 2){
-//       best_front = elem.first;
-//       max_charge = hit.Charge();
-//     }
-//   }
-
-//   // Find all backs with a reasonable TDC value
-//   int best_back = -1;
-//   max_charge = -1e9;
-//   for(auto& elem : back_hits){
-//     TJanusDDASHit& hit = elem.second;
-//     // if(hit.Time() > 50 && hit.Time() < 3900 &&
-//     //    hit.Charge() > max_charge) {
-//     if(hit.Charge() > max_charge &&
-//        hit.GetDetnum() >= 0 &&
-//        hit.GetDetnum() < 2){
-//       best_back = elem.first;
-//       max_charge = hit.Charge();
-//     }
-//   }
-
-
-//   if(best_front != -1 && best_back != -1){
-//     //Copy most parameters from the front
-//     TJanusDDASHit& front = front_hits[best_front];
-//     janus_hits.emplace_back(front);
-//     fSize++;
-//     TJanusDDASHit& hit = janus_hits.back();
-
-//     //Copy more parameters from the back
-//     TJanusDDASHit& back  = back_hits[best_back];
-//     hit.GetBackHit().SetAddress(back.Address());
-//     hit.GetBackHit().SetCharge(back.Charge());
-//     hit.GetBackHit().SetTime(back.Time());
-//     hit.GetBackHit().SetTimestamp(back.Timestamp());
-
-//     // std::cout << "Front chan: " << hit.GetFrontChannel() << ", ADC=" << front.Charge() << ", TDC=" << front.Time()
-//     //           << "\tBack chan: " << hit.GetBackChannel() << ", ADC=" << back.Charge() << ", TDC=" << back.Time()
-//     //           << std::endl;
-
-//     // std::cout << "Back hit is channel: " << hit.GetBackChannel()
-//     //           << " with TDC = " << hit.GetBackHit().Time()
-//     //           << ", ADC = " << hit.GetBackHit().Charge()
-//     //           << std::endl;
-
-//   } //else {
-// //   static bool message_displayed = false;
-// //   //    if(!message_displayed){
-// //     std::cout << "Abnormal JANUS Event: " << good_fronts.size()
-// //               << ", " << good_backs.size() << std::endl;
-// //     for(auto good_front : good_fronts){
-// //       std::cout << "\tRing: " << std::hex << front_hits[good_front].Address() << std::dec<< "\tCharge: " << front_hits[good_front].Charge() << "\tTime: " << front_hits[good_front].Time() << std::dec << std::endl;
-// //     }
-// //     for(auto good_back : good_backs){
-// //       std::cout << "\tSector: " << std::hex << back_hits[good_back].Address() << std::dec << "\tCharge: " << back_hits[good_back].Charge() << "\tTime: " << back_hits[good_back].Time() << std::dec << std::endl;
-// //     }
-// //     message_displayed = true;
-// //     //    }
-// // }
-
-
-//   data += sizeof(VME_Timestamp);
-
-//   //assert(data == buf.GetData() + buf.GetSize());
-//   if(data != buf.GetData() + buf.GetSize()){
-//     std::cerr << "End of janus read not equal to size of buffer given:\n"
-//               << "\tBuffer Start: " << (void*)buf.GetData() << "\tBuffer Size: " << buf.GetSize()
-//               << "\n\tBuffer End: " << (void*)(buf.GetData() + buf.GetSize())
-//               << "\n\tNum ADC chan: " << num_packets
-//               << "\n\tPtr at end of read: " << (void*)(data)
-//               << "\n\tDiff: " << (buf.GetData() + buf.GetSize()) - data
-//               << std::endl;
-
-//     buf.Print("all");
-//   }
-//}
 
 double TJanusDDAS::GetBeta(double theta, TReaction& reac, int part, TSRIM& srim, bool sol2,
 			   bool dE) {
