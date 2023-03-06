@@ -83,10 +83,15 @@ public:
   Int_t    GetCrystalId()       const { return fCrystalId;      }
   Int_t    GetHoleNumber()      const { return fCrystalId/4-1;  }
   Int_t    GetCrystalNumber()   const { return fCrystalId%4;    }
+  Int_t    GetDetnum()       const;
+  Int_t    GetArrayNumber()     const { return 4*(GetDetnum() - 1) + GetCrystalNumber(); }
   Float_t  GetCoreEnergy()      const;
 //  Float_t  GetCoreEnergy()      const { return fCoreEnergy;     }
   Int_t    GetCoreCharge(int i) const { return fCoreCharge[i];  }
   Float_t  GetCoreEnergy(int i) const;
+  Float_t  GetBaseline()	const { return fBaseline;	}
+  Float_t  GetPoststep()	const { return fPoststep;	}
+  Float_t  GetPrestep()		const { return fPrestep;	}
   virtual Int_t Charge()        const { return GetCoreCharge(3); }
   Int_t GetPad() const { return fPad; }
 
@@ -199,6 +204,9 @@ private:
   mutable Int_t   fAB;
   Float_t         fWalkCorrection;   //also called t0.
   Float_t         fTOffset; //  t0 = toffset + tFit
+  Float_t	  fBaseline;
+  Float_t	  fPoststep;
+  Float_t	  fPrestep;
 
   std::vector<TGretinaHit> fSingles;
   bool fSetFirstSingles = false;

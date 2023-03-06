@@ -3,7 +3,6 @@
 *.exe
 *grutinizer
 *.evt
-*.dat
 *.cvt
 *.gz
 *.bz2

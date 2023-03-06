@@ -30,8 +30,10 @@ void TGretinaHit::Copy(TObject &rhs) const {
   ((TGretinaHit&)rhs).fNumberOfInteractions = fNumberOfInteractions;
   ((TGretinaHit&)rhs).fSegments       = fSegments;
   ((TGretinaHit&)rhs).fAB	      = fAB;
+  ((TGretinaHit&)rhs).fBaseline	      = fBaseline;
+  ((TGretinaHit&)rhs).fPrestep	      = fPrestep;
+  ((TGretinaHit&)rhs).fPoststep	      = fPoststep;
 }
-
 Float_t TGretinaHit::GetCoreEnergy() const {
   TChannel *channel = TChannel::GetChannel(Address());
   //printf("GetAddress() + i = 0x%08x\n",GetAddress()+i);
@@ -84,6 +86,9 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
   for(int i=0; i<4; i++){
     fCoreCharge[i] = raw.core_e[i];
   }
+  fBaseline = raw.baseline;
+  fPrestep = raw.prestep;
+  fPoststep = raw.poststep;
 
   fNumberOfInteractions = raw.num;
   fPad = raw.pad;
@@ -316,3 +321,25 @@ void TGretinaHit::TrimSegments(int type) {
     fNumberOfInteractions = fSegments.size();
   }
 }
+
+int TGretinaHit::GetDetnum() const {
+  TChannel* chan = TChannel::GetChannel(fAddress);
+  int output = -1;
+  if(chan && fAddress!=-1){
+    output = chan->GetArrayPosition();
+  }
+/*else if(fSegments.size()) {
+    output = fSegments[0].GetDetnum();
+  }
+*/ else {
+    // std::cout << "Unknown address: " << std::hex << fAddress << std::dec << std::endl;
+    output = -1;
+  }
+
+  if(output == -1 && chan){
+    // std::cout << "Chan with det=-1: " << chan->GetName() << std::endl;
+    // std::cout << "address: " << fAddress << std::endl;
+  }
+  return output;
+}
+
