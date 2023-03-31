@@ -202,7 +202,6 @@ TVector3 TJanus::GetPosition(int detnum, int ring_num, int sector_num){
   if(detnum<0 || detnum>1 ||
      ring_num<1 || ring_num>24 ||
      sector_num<1 || sector_num>32){
-    // batman vector, nan-nan-nan
     return TVector3(std::sqrt(-1),std::sqrt(-1),std::sqrt(-1));
   }
 

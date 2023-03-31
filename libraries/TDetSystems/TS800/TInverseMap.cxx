@@ -163,7 +163,7 @@ float TInverseMap::Yta(int order, double xfp, double afp, double yfp, double bfp
   input[3]  =   bfp;
   input[4]  =   0.0;
   input[5]  =   0.0;
-  return MapCalc(order, 1, input);
+  return MapCalc(order, 1, input)*1000;
 }
 
 float TInverseMap::Dta(int order, double xfp, double afp, double yfp, double bfp) const {
@@ -241,12 +241,3 @@ float TInverseMap::MapCalc(int order,int par,float *input) const {
   }
   return cumul;
 }
-
-
-
-
-
-
-
-
-

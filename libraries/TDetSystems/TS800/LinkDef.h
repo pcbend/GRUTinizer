@@ -32,5 +32,6 @@
 #pragma link C++ class TS800Hit+;
 #pragma link C++ class TS800+;
 #pragma link C++ class TS800Scaler+;
+#pragma link C++ class TS800Track+;
 
 #endif

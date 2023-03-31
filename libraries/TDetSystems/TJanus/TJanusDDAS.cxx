@@ -40,12 +40,10 @@ void TJanusDDAS::Copy(TObject& obj) const {
   janus.tertiary_hits = tertiary_hits;
   janus.tertiary_singles = tertiary_singles;
   janus.tertiary_doubles = tertiary_doubles;
-  
 }
 
 void TJanusDDAS::Clear(Option_t* opt){
   TDetector::Clear(opt);
-  
   //janus_channels.clear();
   //janus_hits.clear();
   ClearChannels();
@@ -56,7 +54,7 @@ void TJanusDDAS::ClearChannels() {
 
   janus_channels.clear();
   bad_charge_channels.clear();
-  
+
   channels.clear();
   rings.clear();
   sectors.clear();
@@ -79,7 +77,7 @@ void TJanusDDAS::ClearCorrelatedHits()  {
   primary_hits.clear();
   primary_single_hits.clear();
   primary_double_hits.clear();
-  
+
   secondary_hits.clear();
   secondary_singles.clear();
   secondary_doubles.clear();
@@ -109,7 +107,7 @@ int TJanusDDAS::BuildHits(std::vector<TRawEvent>& raw_data){
 
 void TJanusDDAS::UnpackChannels(std::vector<TRawEvent>& raw_data) {
 
-  unsigned long smallest_timestamp = 0x7fffffffffffffff;
+  long smallest_timestamp = 0x7fffffffffffffff;
   for(auto& event : raw_data){
     //SetTimestamp(event.GetTimestamp());
     TSmartBuffer buf = event.GetPayloadBuffer();
@@ -1170,7 +1168,7 @@ void TJanusDDAS::Print(Option_t *opt) const {
 
 void TJanusDDAS::PrintHits(Option_t *opt) const {
   printf("TJanusDDAS @ %lu\n",Timestamp());
-  printf(" Size: %i\n",primary_hits.size());
+  printf(" Size: %zu\n",primary_hits.size());
   for(unsigned int i=0;i<Size();i++) {
     printf("\t"); primary_hits.at(i).Print(); printf("\n");
   }
@@ -1181,7 +1179,7 @@ void TJanusDDAS::PrintHits(Option_t *opt) const {
 void TJanusDDAS::PrintChannels(Option_t *opt) const {
   printf("JANUS Channels!\n");
   printf("TJanusDDAS @ %lu\n",Timestamp());
-  printf(" Size: %i\n",janus_channels.size());
+  printf(" Size: %zu\n",janus_channels.size());
   for(unsigned int i=0;i<janus_channels.size();i++) {
     TJanusDDASHit hit = janus_channels.at(i);
     TChannel *c = TChannel::GetChannel(hit.Address());
@@ -1195,9 +1193,3 @@ void TJanusDDAS::PrintChannels(Option_t *opt) const {
   printf("---------------------------\n");
   fflush(stdout);
 }
-
-
-
-
-
-

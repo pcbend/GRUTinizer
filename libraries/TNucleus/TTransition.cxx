@@ -67,25 +67,4 @@ int TTransition::Compare(const TObject* obj) const {
   else
     return 1;
   return -9;
-}                                  
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}

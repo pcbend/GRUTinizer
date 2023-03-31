@@ -25,8 +25,7 @@ void TGretSimHit::Copy(TObject &rhs) const {
 }
 
 const char *TGretSimHit::GetName() const {
-  std::string name = "name";
-  return name.c_str();
+  return "name";
 }
 
 void TGretSimHit::Print(Option_t *opt) const {
@@ -51,6 +50,4 @@ void TGretSimHit::Clear(Option_t *opt) {
   fIsFull=sqrt(-1);
   fTotalHits=sqrt(-1);
   fHitNum=sqrt(-1);
- 
 }
-

@@ -26,8 +26,6 @@ ClassImp(TNucleus)
   //
   /////////////////////////////////////////////////////////////////
 
-  //const char *TNucleus::massfile = "/home/tiguser/packages/GRSISort/libraries/TGRSIAnalysis/SourceData/mass.dat";
-
 static double amu = 931.494043;
 //static double MeV2Kg = 1.77777778e-30;
 
@@ -300,102 +298,6 @@ double TNucleus::GetRadius() const{
   return 1.12*pow(this->GetA(),1./3.) - 0.94*pow(this->GetA(),-1./3.);
 }
 
-/*
-<<<<<<< HEAD
-   bool TNucleus::SetSourceData() {
-
-   std::string name = GetSymbol();
-   if(name.length()==0)
-   return false;
-
-   if(name[0]<='Z' && name[0]>='A')
-   name[0] = name[0]-'A'+'a';
-   name = name + Form("%i",GetA()) + ".sou";
-   std::string path = getenv("GRSISYS");
-   path +=  "/libraries/TGRSIAnalysis/SourceData/";
-   path +=  name;
-
-   printf("path = %s\n",path.c_str());
-   std::ifstream sourcefile;
-   sourcefile.open(path.c_str());
-   if(!sourcefile.is_open()) {
-   printf("unable to set source data for %s.\n",GetName());
-   return false;
-   }
-
-   TransitionList.Clear();
-
-   std::string line;
-   int linenumber = 0;
-   while(getline(sourcefile,line)) {
-   linenumber++;
-   int comment = line.find("//");
-   if (comment != std::string::npos)
-   line = line.substr(0, comment);
-   if(line.length()==0)
-   continue;
-//TGRSITransition *tran = new TGRSITransition;
-//std::stringstream ss(line);
-//ss >> tran->fenergy;
-//ss >> tran->fenergy_uncertainty;
-//ss >> tran->fintensity;
-//ss >> tran->fintensity_uncertainty;
-//TransitionList.Add(tran);
-//  printf("eng: %.02f\tinten: %.02f\n",((TGRSITransition*)TransitionList.Last())->fenergy,((TGRSITransition*)TransitionList.Last())->fintensity);
-}
-
-printf("Found %d Transitions for %s\n",TransitionList.GetSize(),GetName());
-return true;
-=======
-  bool TNucleus::SetSourceData() {
-
-  std::string name = GetSymbol();
-  if(name.length()==0)
-  return false;
-
-  if(name[0]<='Z' && name[0]>='A')
-  name[0] = name[0]-'A'+'a';
-  name = name + Form("%i",GetA()) + ".sou";
-  std::string path = getenv("GRSISYS");
-  path +=  "/libraries/TGRSIAnalysis/SourceData/";
-  path +=  name;
-
-  printf("path = %s\n",path.c_str());
-  std::ifstream sourcefile;
-  sourcefile.open(path.c_str());
-  if(!sourcefile.is_open()) {
-  printf("unable to set source data for %s.\n",GetName());
-  return false;
-  }
->>>>>>> 5aa7f5e5225d24f8b01a7ffcc333c50eff387814
-
-  TransitionList.Clear();
-
-  std::string line;
-  int linenumber = 0;
-  while(getline(sourcefile,line)) {
-  linenumber++;
-  int comment = line.find("//");
-  if (comment != std::string::npos)
-  line = line.substr(0, comment);
-  if(line.length()==0)
-  continue;
-  //TGRSITransition *tran = new TGRSITransition;
-  //std::stringstream ss(line);
-  //ss >> tran->fenergy;
-  //ss >> tran->fenergy_uncertainty;
-  //ss >> tran->fintensity;
-  //ss >> tran->fintensity_uncertainty;
-  //TransitionList.Add(tran);
-  //  printf("eng: %.02f\tinten: %.02f\n",((TGRSITransition*)TransitionList.Last())->fenergy,((TGRSITransition*)TransitionList.Last())->fintensity);
-  }
-
-  printf("Found %d Transitions for %s\n",TransitionList.GetSize(),GetName());
-  return true;
-
-  }
-*/
-
 
 void TNucleus::AddTransition(Double_t energy, Double_t intensity, Double_t energy_uncertainty, Double_t intensity_uncertainty){
   TTransition *tran = new TTransition();
@@ -411,22 +313,6 @@ void TNucleus::AddTransition(Double_t energy, Double_t intensity, Double_t energ
 void TNucleus::AddTransition(TTransition* tran){
   TransitionList.Add(tran);
 }
-/*
-   Bool_t TNucleus::RemoveTransition(Int_t idx){
-   TGRSITransition *tran;
-   tran = (TGRSITransition*)TransitionList.RemoveAt(idx);
-   if(tran){
-   printf("Removed transition: ");
-   printf("%d\t eng: %.02f\tinten: %.02f\n",idx,tran->fenergy,tran->fintensity);
-   delete tran;
-   return true;
-   }
-   else{
-   printf("Out of range\n");
-   return false;
-   }
-   }
-*/
 
 TTransition* TNucleus::GetTransition(Int_t idx){
   TTransition *tran = (TTransition*)TransitionList.At(idx);

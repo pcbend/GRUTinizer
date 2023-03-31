@@ -54,8 +54,6 @@ public:
   double GetEnergy1() const;
   double GetEnergy2() const;
 
-  void Draw(Option_t *opt="") const;
-
   bool operator<(const TMode3Hit &rhs) const { return GetSegmentId() < rhs.GetSegmentId(); }
 
 private:

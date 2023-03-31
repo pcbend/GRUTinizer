@@ -27,8 +27,6 @@ bool TS800::fGlobalReset =false;
 static double f_mafp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
 static double f_mxfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
 
-
-
 TS800::TS800() {
   Clear();
 }
@@ -119,11 +117,27 @@ Float_t TS800::GetDta(float xfp, float afp, float yfp, float bfp, int i) const {
   return dta;
 }
 
-float TS800::AdjustedBeta(float beta) const {
-  double gamma = 1.0/(sqrt(1.-beta*beta));
-  double dp_p = gamma/(1.+gamma) * GetDta();
-  beta *=(1.+dp_p/(gamma*gamma));
-  return beta;
+
+Float_t TS800::GetScatteringAngle(float ata, float bta) const {
+  return asin(sqrt( pow(sin(ata),2) + pow(sin(bta),2) )) * 1000; //in mrad
+}
+
+Float_t TS800::GetAzita(float ata, float bta) const {
+  float xsin = TMath::Sin(ata);
+  float ysin = TMath::Sin(bta);
+  float azita = 0.0;
+  if(xsin>0 && ysin>0){
+    azita = TMath::ATan(ysin/xsin);
+  } else if(xsin<0 && ysin>0){
+    azita = TMath::Pi()-TMath::ATan(ysin/TMath::Abs(xsin));
+  } else if(xsin<0 && ysin<0){
+    azita = TMath::Pi()+TMath::ATan(TMath::Abs(ysin)/TMath::Abs(xsin));
+  } else if(xsin>0 && ysin<0){
+    azita = 2.0*TMath::Pi()-TMath::ATan(TMath::Abs(ysin)/xsin);
+  } else {
+    azita = 0;
+  }
+  return azita;
 }
 
 float TS800::AdjustedBeta(float beta, float dta) const {
@@ -134,35 +148,15 @@ float TS800::AdjustedBeta(float beta, float dta) const {
 }
 
 
-Float_t TS800::Azita(int order){
-  float xsin = TMath::Sin(GetAta(order));
-  float ysin = TMath::Sin(GetBta(order));
-  float azita = 0.0;
-  if(xsin>0 && ysin>0){
-    azita = TMath::ATan(ysin/xsin);
-  } else if(xsin<0 && ysin>0){
-    azita = TMath::Pi()-TMath::ATan(ysin/TMath::Abs(xsin));
-  } else if(xsin<0 && ysin<0){
-    azita = TMath::Pi()+TMath::ATan(TMath::Abs(ysin)/TMath::Abs(xsin));
-  } else if(xsin>0 && ysin<0){
-    azita = 2.0*TMath::Pi()-TMath::ATan(TMath::Abs(ysin)/xsin);
-  } else{
-    azita = 0;
-  }
-  return azita;
-}
-
 TVector3 TS800::Track(double sata,double sbta) const {
-  //TVector3 track(0,0,1);  // set to input beam trajectory 
+  //TVector3 track(0,0,1);  // set to input beam trajectory
   //track.RotateY(GetAta(3));
   //track.Rotate( GetBta(3),-track.Cross(TVector3(0,1,0)) );
-  //  TVector3 track(TMath::Sin(GetAta()),-TMath::Sin(GetBta()),1);
   double ata = TMath::Sin(GetAta()+sata);
   double bta = TMath::Sin(GetBta()+sbta);
 
   TVector3 track(ata,-bta,sqrt(1-ata*ata-bta*bta));
-  //TVector3 track(ata,-bta,1.0);
-  return track;//.Unit();
+  return track;
 }
 
 TVector3 TS800::Track(float Ata, float Bta, double sata,double sbta) const {
@@ -187,44 +181,29 @@ float TS800::GetXFP(int i) const {
 }
 
 float TS800::GetYFP(int i) const {
-  float ypos = GetCrdc(i).GetNonDispersiveY();
-
-  // // Bit 2 in registr is coincidence event.
-  // // These have a timing offset, which corresponds to a spatial offset.
-  // if(trigger.GetRegistr() & 2) {
-  //   double slope = GValue::Value( (i==0) ? "CRDC1_Y_SLOPE" : "CRDC2_Y_SLOPE" );
-  //   double coinc_timediff = 10;
-  //   ypos -= slope*coinc_timediff;
-  // }
-
-  return ypos;
+  return GetCrdc(i).GetNonDispersiveY();
 }
 
 float TS800::GetAFP() const{
   if(GetCrdc(0).Size()==0||GetCrdc(1).Size()==0){
     return sqrt(-1);
   }
-  float AFP = TMath::ATan((GetXFP(1)-GetXFP(0))/1073.0);
-  return AFP;
-
+  return TMath::ATan((GetXFP(1)-GetXFP(0))/1073.0);
 }
 
 float TS800::GetAFP(float xfp0, float xfp1) const{
-  float AFP = TMath::ATan((xfp1-xfp0)/1073.0);
-  return AFP;
+  return TMath::ATan((xfp1-xfp0)/1073.0);
 }
 
 float TS800::GetBFP() const{
    if(GetCrdc(0).Size()==0||GetCrdc(1).Size()==0){
     return sqrt(-1);
   }
-  float BFP = TMath::ATan((GetYFP(1)-GetYFP(0))/1073.0);
-  return BFP;
+  return TMath::ATan((GetYFP(1)-GetYFP(0))/1073.0);
 }
 
 float TS800::GetBFP(float yfp0, float yfp1) const{
-  float BFP = TMath::ATan((yfp1-yfp0)/1073.0);
-  return BFP;
+  return TMath::ATan((yfp1-yfp0)/1073.0);
 }
 
 void TS800::Clear(Option_t* opt){
@@ -716,7 +695,6 @@ bool TS800::HandleIonCPacket(unsigned short* data, int size){
 bool TS800::HandleHodoPacket(unsigned short *data,int size) {
   if(!size)
     return false;
-  
   //note: size is size left after subtracting out length of packet size and packet tag
 
   //ID is the Hodoscope Sub-pcket "Energy" tag
@@ -724,6 +702,7 @@ bool TS800::HandleHodoPacket(unsigned short *data,int size) {
   //are dealing with channels (16,31)
   int x = 0;
   int id = *(data+x); x += 1;
+//  if(x < size && id!=2)std::cout << id << "\t" << x << "\t" << size << std::endl;
   while (x < size){
     if (id == 2){
 //    hit_reg1 = *(data+x);
@@ -1024,7 +1003,6 @@ float TS800::GetCorrTOF_XFP() const {
   double xfp_cor = GValue::Value("XFP_TOF_CORR_XFP");
   return GetTofXFP_E1_TDC(afp_cor,xfp_cor);
 }
-//std::vector<float> TS800::GetCorrTOF_OBJ_MESY() const {
 float TS800::GetCorrTOF_OBJ_MESY(int i) const {
   //static double f_afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
   //static double f_xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
@@ -1034,207 +1012,6 @@ float TS800::GetCorrTOF_OBJ_MESY(int i) const {
   //}
   return GetTofE1_MTDC(f_mafp_cor,f_mxfp_cor,i);
 }
-
-void TS800::DrawPID(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) {
-  TString OptString = opt;
-  if(!chain)
-    chain = gChain;
-  if(!chain || !chain->GetBranch("TS800"))
-    return;
-  if(!gPad || !gPad->IsEditable()) {
-    gROOT->MakeDefCanvas();
-  } else {
-    if(!OptString.Contains("Tune"))
-      gPad->GetCanvas()->Clear();
-  }
-
-  std::string name = Form("%s_PID",Class()->GetName()); //_%s",opt);
-  std::string title = Form("%s PID AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJTAC_TOF_CORR_AFP"),GValue::Value("OBJTAC_TOF_CORR_XFP")); //_%s",opt);
-  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
-  if(!h)
-    h = new GH2I(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJTAC()",4096,0,4096,4000,0,4000);
-  chain->Project(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJTAC()","","colz",nentries);
-  h->GetXaxis()->SetTitle("Corrected TOF (objtac)");
-  h->GetYaxis()->SetTitle("Ion Chamber Energy loss (arb. units)");
-  h->Draw("colz");
-}
-
-
-void TS800::DrawAFP(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) {
-  TString OptString = opt;
-  if(!chain)
-    chain = gChain;
-  if(!chain || !chain->GetBranch("TS800"))
-    return;
-  if(!gPad || !gPad->IsEditable()) {
-    gROOT->MakeDefCanvas();
-  } else {
-    if(!OptString.Contains("Tune"))
-      gPad->GetCanvas()->Clear();
-  }
-
-  std::string name = Form("%s_AFP",Class()->GetName()); //_%s",opt);
-  std::string title = Form("%s AFP AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJTAC_TOF_CORR_AFP"),GValue::Value("OBJTAC_TOF_CORR_XFP")); //_%s",opt);
-  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
-  if(!h)
-    h = new GH2I(name.c_str(),title.c_str(),2048,0,2048,4000,-0.1,0.1);
-  chain->Project(name.c_str(),"GetAFP():GetCorrTOF_OBJTAC()","","colz",nentries);
-  h->GetXaxis()->SetTitle("Corrected TOF (objtac)");
-  h->GetYaxis()->SetTitle("Corrected AFP (objtac)");
-  h->Draw("colz");
-}
-
-
-void TS800::DrawDispX(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) {
-
-  TString OptString = opt;
-
-  if(!chain)
-    chain = gChain;
-  if(!chain || !chain->GetBranch("TS800"))
-    return;
-  if(!gPad || !gPad->IsEditable()) {
-    gROOT->MakeDefCanvas();
-  } else {
-    if(!OptString.Contains("Tune"))
-       gPad->GetCanvas()->Clear();
-  }
-
-  std::string name = Form("%s_DispX",Class()->GetName()); //_%s",opt);
-  std::string title = Form("%s DispX AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJTAC_TOF_CORR_AFP"),GValue::Value("OBJTAC_TOF_CORR_XFP")); //_%s",opt);
-  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
-  if(!h)
-    h = new GH2I(name.c_str(),title.c_str(),4096,-2047,2048,4000,-300,300);
-  h->SetTitle(title.c_str());
-  chain->Project(name.c_str(),"GetCrdc(0)->GetDispersiveX():GetCorrTOF_OBJTAC()","","colz",nentries);
-  h->GetXaxis()->SetTitle("Corrected TOF (objtac)");
-  h->GetYaxis()->SetTitle("Dispersive X (objtac)");
-  h->Draw("colz");
-}
-
-void TS800::DrawPID_Tune(Long_t nentries,TChain *chain){
-  if(!chain) chain=gChain;
-  if(!chain || !chain->GetBranch("TS800")) return;
-  if(!gPad || !gPad->IsEditable()){
-    gROOT->MakeDefCanvas()->Divide(3,1);
-  }
-  else{
-    gPad->GetCanvas()->Clear();
-    gPad->GetCanvas()->Divide(3,1);
-  }
-
-  gPad->GetCanvas()->cd(1);
-  DrawDispX("","Tune",nentries);
-
-  gPad->GetCanvas()->cd(2);
-  DrawAFP("","Tune",nentries);
-
-  gPad->GetCanvas()->cd(3);
-  DrawPID("","Tune",nentries);
-
-
-}
-
-void TS800::DrawPID_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TChain *chain) {
-  TString OptString = opt;
-  if(!chain)
-    chain = gChain;
-  if(!chain || !chain->GetBranch("TS800"))
-    return;
-  if(!gPad || !gPad->IsEditable()) {
-    gROOT->MakeDefCanvas();
-  } else {
-    if(!OptString.Contains("Tune"))
-      gPad->GetCanvas()->Clear();
-  }
-
-  std::string name = Form("%s_PID",Class()->GetName()); //_%s",opt);
-  std::string title = Form("%s PID AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJ_MTOF_CORR_AFP"),GValue::Value("OBJ_MTOF_CORR_XFP")); //_%s",opt);
-  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
-  if(!h)
-    h = new GH2I(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJ_MESY()",4096,-4096,4096,4000,-4000,4000);
-  chain->Project(name.c_str(),Form("GetIonChamber()->GetSum():GetCorrTOF_OBJ_MESY(%i)",i),"","colz",nentries);
-  h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");
-  h->GetYaxis()->SetTitle("Ion Chamber Energy loss (arb. units)");
-  h->Draw("colz");
-}
-
-
-void TS800::DrawAFP_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TChain *chain) {
-  TString OptString = opt;
-  if(!chain)
-    chain = gChain;
-  if(!chain || !chain->GetBranch("TS800"))
-    return;
-  if(!gPad || !gPad->IsEditable()) {
-    gROOT->MakeDefCanvas();
-  } else {
-    if(!OptString.Contains("Tune"))
-      gPad->GetCanvas()->Clear();
-  }
-
-  std::string name = Form("%s_AFP",Class()->GetName()); //_%s",opt);
-  std::string title = Form("%s AFP AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJ_MTOF_CORR_AFP"),GValue::Value("OBJ_MTOF_CORR_XFP")); //_%s",opt);
-  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
-  if(!h)
-    h = new GH2I(name.c_str(),title.c_str(),2048,-4096,2048,4000,-0.1,0.1);
-  chain->Project(name.c_str(),Form("GetAFP():GetCorrTOF_OBJ_MESY(%i)",i),"","colz",nentries);
-  h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");
-  h->GetYaxis()->SetTitle("Corrected AFP (Mesy)");
-  h->Draw("colz");
-}
-
-
-void TS800::DrawDispX_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TChain *chain) {
-
-  TString OptString = opt;
-
-  if(!chain)
-    chain = gChain;
-  if(!chain || !chain->GetBranch("TS800"))
-    return;
-  if(!gPad || !gPad->IsEditable()) {
-    gROOT->MakeDefCanvas();
-  } else {
-    if(!OptString.Contains("Tune"))
-       gPad->GetCanvas()->Clear();
-  }
-
-  std::string name = Form("%s_DispX",Class()->GetName()); //_%s",opt);
-  std::string title = Form("%s DispX AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJ_MTOF_CORR_AFP"),GValue::Value("OBJ_MTOF_CORR_XFP")); //_%s",opt);
-  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
-  if(!h)
-    h = new GH2I(name.c_str(),title.c_str(),4096,-4096,4096,4000,-300,300);
-  h->SetTitle(title.c_str());
-  chain->Project(name.c_str(),Form("GetCrdc(0)->GetDispersiveX():GetCorrTOF_OBJ_MESY(%i)",i),"","colz",nentries);
-  h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");
-  h->GetYaxis()->SetTitle("Dispersive X (Mesy)");
-  h->Draw("colz");
-}
-
-void TS800::DrawPID_Mesy_Tune(Long_t nentries,int i,TChain *chain){
-  if(!chain) chain=gChain;
-  if(!chain || !chain->GetBranch("TS800")) return;
-  if(!gPad || !gPad->IsEditable()){
-    gROOT->MakeDefCanvas()->Divide(3,1);
-  }
-  else{
-    gPad->GetCanvas()->Clear();
-    gPad->GetCanvas()->Divide(3,1);
-  }
-
-  gPad->GetCanvas()->cd(1);
-  DrawDispX_Mesy("","Tune",nentries,i);
-
-  gPad->GetCanvas()->cd(2);
-  DrawAFP_Mesy("","Tune",nentries,i);
-
-  gPad->GetCanvas()->cd(3);
-  DrawPID_Mesy("","Tune",nentries,i);
-
-
-}
-
 
 double TS800::GetMTofObjE1() const {
   // I return the correlated gvalue corrected time-of-flight obj to e1.
@@ -1273,48 +1050,42 @@ double TS800::GetMTofXfpE1(double afp_cor, double xfp_cor) const {
          + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
 }
 
-
-
-/*
-float TS800::GetMTOF_ObjE1(unsigned int i,bool find_best) const { 
-  if(!find_best) 
-    return GetCorrTOF_OBJ_MESY(i); 
-  double target = GValue::Value("MTOF_ObjE1");
-  if(std::isnan(target)) {
-    target = GValue::Value("TARGET_MTOF_ObjE1");
-    if(std::isnan(target)) {
-      return GetCorrTOF_OBJ_MESY(i); 
-    }
-  }
-  double value = GetMTOF_ObjE1(0,0);
-  for(int i=1;i<mtof.fObj.size();i++) {    
-    double newvalue = GetMTOF_ObjE1(i,0);
-    if(std::abs(target - newvalue) < std::abs(target - value)) {
-      value = newvalue;
-    }
-  }
-  return value;
+TS800Track::TS800Track() {
+  Clear();
 }
 
-
-float TS800::GetMTOF_XfpE1(unsigned int i,bool find_best) const { 
-  if(!find_best) 
-    return GetRawXF_MESY(i); 
-  double target = GValue::Value("MTOF_XfpE1");
-  if(std::isnan(target)) {
-    target = GValue::Value("TARGET_MTOF_XfpE1");
-    //std::cout << target << std::endl;
-    if(std::isnan(target)) {
-      return GetRawXF_MESY(i);
-    }
-  }
-  double value = GetMTOF_XfpE1(0,0);
-  for(int i=1;i<mtof.fXfp.size();i++) {    
-    double newvalue = GetMTOF_XfpE1(i,0);
-    if(std::abs(target - newvalue) < std::abs(target - value)) {
-      value = newvalue;
-    }
-  }
-  return value;
+TS800Track::~TS800Track(){
 }
-*/
+
+void TS800Track::Clear() {
+  xfp[0] = -1;
+  xfp[1] = -1;
+  yfp[0] = -1;
+  yfp[1] = -1;
+  afp = -1;
+  bfp = -1;
+  ata = -1;
+  yta = -1;
+  bta = -1;
+  dta = -1;
+  azita = -1;
+}
+
+void TS800Track::CalculateTracking(const TS800 *s800, int i) {
+
+  xfp[0] = s800->GetCrdc(0).GetDispersiveX();
+  xfp[1] = s800->GetCrdc(1).GetDispersiveX();
+  yfp[0] = s800->GetCrdc(0).GetNonDispersiveY();
+  yfp[1] = s800->GetCrdc(1).GetNonDispersiveY();
+
+  afp = s800->GetAFP(xfp[0], xfp[1]);
+  bfp = s800->GetBFP(yfp[0], yfp[1]);
+
+  ata = s800->GetAta(xfp[0], afp, yfp[0], bfp, i);
+  bta = s800->GetBta(xfp[0], afp, yfp[0], bfp, i);
+  yta = s800->GetYta(xfp[0], afp, yfp[0], bfp, i);
+  dta = s800->GetDta(xfp[0], afp, yfp[0], bfp, i);
+
+  scatter = s800->GetScatteringAngle(ata, bta);
+  track = s800->Track(ata, bta);
+}

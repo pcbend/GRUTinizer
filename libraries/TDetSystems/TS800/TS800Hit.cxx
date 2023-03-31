@@ -111,45 +111,26 @@ void TIonChamber::Set(int ch, int data){
 
 float TIonChamber::GetAve(){
   float temp =0.0;
-  //if(fdE==-1.0) {
-  
-  for(unsigned int x=0;x<fData.size();x++) {   
+  for(unsigned int x=0;x<fData.size();x++) {
       TChannel *c = TChannel::GetChannel(Address(x));
       if (c){
         temp += c->CalEnergy(fData.at(x));
-      }
-      else{
+      } else{
         temp += fData.at(x);
       }
   }
-  if(temp>0)
-    temp = temp/((float)fData.size());
+  if(temp > 0) temp = temp/((float)fData.size());
   return temp;
 }
 
 
 float TIonChamber::GetSum() const {
   float temp =0.0;
-  //if(fdE==-1.0) {
-  /*
-  for(unsigned int x=0;x<fData.size();x++) {   
-      TChannel *c = TChannel::GetChannel(Address(x));
-      if (c){
-        temp += c->CalEnergy(fData.at(x));
-      }
-      else{
-        temp += fData.at(x);
-      }
-  }
-  if(temp>0)
-  temp = temp/((float)fData.size());*/
-
   for(int x=0;x<Size();x++){
     TChannel *c = TChannel::GetChannel(Address(x));
     if(c){
-      //printf("I AM HERE!!!\n"); fflush(stdout);
       temp+=c->CalEnergy(GetData(x));
-    }else{
+    } else{
       temp+=GetData(x);
     }
   }
@@ -207,196 +188,50 @@ TCrdc::TCrdc() {
 TCrdc::~TCrdc() {
 }
 
-TF1 *TCrdc::fgaus = new TF1("fgaus","gaus");
-
-
 int TCrdc::GetMaxPad() const {
-//  double temp = 0;
-//  int    place =0;
-  if(!data.size())
-    return -1.0;
+  if(!data.size()) return -1.0;
 
-  //std::cout << " Data has size? = " << data.size() << std::endl;
- std::map<int,double> sum; 
-
-//  temp = data.at(0);
+  int maxp = 0;
+  float maxd = 0;
   for(unsigned int i = 0; i < data.size(); i++){
-    /*
-    std::cout << " ------ " << std::endl;
-    std::cout << " Data    : " << data.at(i) << " at " << i << std::endl;
-    std::cout << " Sample  : " << sample.at(i) << " at " << i << std::endl;
-    std::cout << " Channel : " << channel.at(i) << " at " << i << std::endl;
-    */
-    
-
-    /*if(data.at(i)>0){
-      WeightedSumNum += float(data.at(i))*float(channel.at(i));
-      WeightedSumDen += float(channel.at(i));
-
-    }*/
-
     if(!IsGoodSample(i)) {
       continue;
     }
-
     TChannel *c = TChannel::GetChannel(Address(i));
     double cal_data;
     if(c){
       cal_data = c->CalEnergy(data.at(i));
-    }
-    else{
+    } else{
       cal_data = (double)data.at(i);
     }
-    sum[channel.at(i)] += cal_data;
-  }
-
-  std::map<int,double>::iterator  it;
-  int max = -1;
-  double maxd =-1;
-  for(it = sum.begin();it!=sum.end();it++) {
-    if(it->second > maxd){
-      max = it->first;
-      maxd = it->second;
+    if(cal_data > maxd) {
+      maxp = channel.at(i);
+      maxd = cal_data;
     }
   }
-  //return (float)(channel.at(place))+gRandom->Uniform();
-  return max;
+  return maxp;
 }
 
 int TCrdc::GetMaxPadSum() const{
-  if(!data.size())
-    return -1.0;
-
- std::map<int,double> sum; 
-
+  if(!data.size()) return -1.0;
+  float maxd = 0;
   for(unsigned int i = 0; i < data.size(); i++){
-    bool good = false;
-    if (i == 0 && data.size()>1) {
-      if(channel.at(i) == channel.at(i+1))
-        good = true;
-    }
-    else if(i == data.size()-1 && data.size()>2) {
-      if(channel.at(i) == channel.at(i-1))
-        good = true;
-    } else if(data.size()>2) {
-      if((channel.at(i) == channel.at(i-1)) ||
-         (channel.at(i) == channel.at(i+1)))
-        good = true;
-    }
-
-    if(!good){
+    if(!IsGoodSample(i)) {
       continue;
     }
-
     TChannel *c = TChannel::GetChannel(Address(i));
     double cal_data;
     if(c){
-        cal_data = c->CalEnergy(data.at(i));
-    }
-    else{
+      cal_data = c->CalEnergy(data.at(i));
+    } else{
       cal_data = (double)data.at(i);
     }
-
-    sum[channel.at(i)] += cal_data;
-  }
-
-  std::map<int,double>::iterator  it;
-  double maxd =-1.0;
-  for(it = sum.begin();it!=sum.end();it++) {
-    if(it->second > maxd){
-      maxd = it->second;
+    if(cal_data > maxd) {
+      maxd = cal_data;
     }
   }
-  //return (float)(channel.at(place))+gRandom->Uniform();
-  return maxd; 
+  return maxd;
 }
-
-void TCrdc::DrawChannels(Option_t *opt,bool calibrate) const {
-  if(!gPad)
-    new GCanvas();
-  else {
-    //gPad->Clear();
-    //GCanvas* c = (GCanvas*)gPad->GetCanvas();
-    //c->Clear();
-  }
-
-  std::vector<TH1I> hits;
-  //int currentchannel = -1;
-  //TH2I *currenthist = 0;
-  TH2I hist(Form("crdc_%i",fId),Form("crdc_%i",fId),224,0,224,128,0,128);
-  for(int x=0;x<this->Size();x++) {
-    //if(channel.at(x)!=currentchannel) {
-
-      //TH1I hist(Form("channel_%02i",channel.at(x)),Form("channel_%02i",channel.at(x)),512,0,512);
-      //hits.push_back(hist);
-      //currentchannel = channel.at(x);
-      //currenthist = &(hits.back());
-      double cal_data;
-      //printf("channel.size() = %i \t ",channel.size());
-      //printf("address = %08x \t ",Address(x));
-      //printf("channel = %i \t ",channel.at(x));
-      //printf("x = %i  ",x);
-      TChannel *c = TChannel::GetChannel(Address(x));
-      if(c && calibrate) {
-        cal_data = c->CalEnergy(data.at(x));
-//        printf("cal_data[%03i]  = %f\n",channel.at(x),cal_data);
-      } else {
-        if(!c)
-          printf("failed to find TChannel for 0x%08x\n",Address(x));
-        cal_data = data.at(x);
-        //printf("cal_data[%03i]  = %f\n",channel.at(x),cal_data);
-      }
-      hist.Fill(channel.at(x),sample.at(x),cal_data);
-    //}
-    //hist.Fill(sample.at(x),data.at(x));
-  }
-  //c->Divide(1,hits.size());
-  //for(int x=0;x<hits.size();x++) {
-  //  c->cd(x+1);
-  //  hits.at(x).DrawCopy();
-  //}
-  //printf("GetMaxPad()     = %i\n",GetMaxPad());
-  //printf("GetDipersiveX() = %.02f\n",GetDispersiveX());
-  hist.DrawCopy("colz");
-  return;
-}
-
-void TCrdc::DrawHit(Option_t *opt) const {
-  GCanvas *c = 0;
-  if(!gPad)
-    c = new GCanvas();
-  else {
-    //gPad->Clear();
-    c = (GCanvas*)gPad->GetCanvas();
-    c->Clear();
-  }
-  TH1I *mat = new TH1I("hit_pattern","hit_pattern",256,0,256);
-  int currentchannel = -1;
-  int currentx = -1;
-  //int currenty = -1;
-  int datasum =0;
-  for(int x=0;x<Size();x++) {
-    if(channel.at(x)!=currentchannel) {
-       if(currentchannel!=-1)
-         mat->Fill(currentx,datasum);
-       datasum = 0;
-       currentchannel = channel.at(x);
-       currentx = channel.at(x);
-       //currenty = channel.at(x)%16;
-    }
-    datasum+=data.at(x);
-
-  }
-  if(currentchannel!=-1)
-    mat->Fill(currentx,datasum);
-
-  std::string options = "";
-  options.append(opt);
-  mat->Draw(options.c_str());
-
-  return;
-}
-
 
 int TCrdc::GetWidth() {
   if(Size()<2)
@@ -413,10 +248,6 @@ void TCrdc::Copy(TObject &obj) const {
   c.data     = data;
   c.anode    = anode;
   c.time     = time;
-//c.fCRDCXslope = fCRDCXslope;
-//c.fCRDCYslope = fCRDCYslope;
-//c.fCRDCXoff = fCRDCXoff;
-//c.fCRDCYoff = fCRDCYoff;
 }
 
 void TCrdc::Clear(Option_t *opt) {
@@ -431,96 +262,12 @@ void TCrdc::Clear(Option_t *opt) {
   cached_dispersive_x = std::sqrt(-1);
 }
 
-/*
-float TCrdc::GetDispersiveX() const{
-  if (GetMaxPad() ==-1){
-    return sqrt(-1);
-  }
-
-  float x_slope = sqrt(-1);
-  float x_offset = sqrt(-1);
-  if(fId==0) {
-    x_slope = GValue::Value("CRDC1_X_SLOPE");
-    x_offset = GValue::Value("CRDC1_X_OFFSET");
-  } else if(fId==1) {
-    x_slope = GValue::Value("CRDC2_X_SLOPE");
-    x_offset = GValue::Value("CRDC2_X_OFFSET");
-  }
-
-  std::map<int,int> datamap;
-  int mpad = GetMaxPad();
-  for(int i=0;i<Size();i++) {
-    if((channel.at(i) <( mpad-10)) || (channel.at(i)>(mpad+10)))
-      continue;
-    datamap[channel.at(i)] += GetData(i);
-  }
-
-
-  int i=0;
-  std::map<int,int>::iterator it;
-  TGraph g(datamap.size());
-  for(it=datamap.begin();it!=datamap.end();it++) {
-    g.SetPoint(i++,it->first,it->second);
-  }
-  TVirtualFitter::SetMaxIterations(10);
-  g.Fit(fgaus,"qgoff"); //  "gaus","q","goff");
-  TVirtualFitter::SetMaxIterations(5000);
-  //new GCanvas;
-  //g->Draw("AC");
-  //new GCanvas;
-  //printf("fgaus->GetParameter(1) = %.02f\n",fgaus->GetParameter(1));
-  //return (GetMaxPad()*x_slope+x_offset);
-  double pad = fgaus->GetParameter(1);
-  //fgaus->Reset();
-  return (pad*x_slope+x_offset);
-}
-*/
-
-//float TCrdc::GetDispersiveX() const{
-//  if (GetMaxPad() ==-1){
-//    return sqrt(-1);
-//  }
-
-//  float x_slope = sqrt(-1);
-//  float x_offset = sqrt(-1);
-//  if(fId==0) {
-//    x_slope = GValue::Value("CRDC1_X_SLOPE");
-//    x_offset = GValue::Value("CRDC1_X_OFFSET");
-//  } else if(fId==1) {
-//    x_slope = GValue::Value("CRDC2_X_SLOPE");
-//    x_offset = GValue::Value("CRDC2_X_OFFSET");
-//  }
-//  if(std::isnan(x_slope))
-//    x_slope = 1.0;
-//  if(std::isnan(x_offset))
-//    x_offset = 0.0;
-//  
-
-
-//  std::map<int,int> datamap;
-//  int mpad = GetMaxPad();
-//  double datasum = 0;
-//  for(int i=0;i<Size();i++) {
-//    if((channel.at(i) <( mpad-10)) || (channel.at(i)>(mpad+10)))
-//      continue;
-//    datamap[channel.at(i)] += GetData(i);
-//    datasum += GetData(i);
-//  }
-//  std::map<int,int>::iterator it;
-//  double wchansum = 0.0;
-//  for(it=datamap.begin();it!=datamap.end();it++) {
-//    wchansum += it->first*(it->second/datasum);
-//  }
-//  return (wchansum*x_slope+x_offset);
-//}
 
 bool TCrdc::IsGoodSample(int i) const {
   if (i == 0 && data.size()>1) {
     return channel.at(i) == channel.at(i+1);
-    
   } else if(i == (int)data.size()-1 && data.size()>2) {
     return channel.at(i) == channel.at(i-1);
-    
   } else if(data.size()>2) {
     return (channel.at(i) == channel.at(i-1) ||
 	    (channel.at(i) == channel.at(i+1)));
@@ -529,24 +276,17 @@ bool TCrdc::IsGoodSample(int i) const {
 }
 
 float TCrdc::GetDispersiveX() const{
-  //if(has_cached_dispersive_x) {
-  //  return cached_dispersive_x;
-  //}
-
   int maxpad = GetMaxPad();
-  //std::cout << " Before Max Pad Return " << std::endl;
   if (maxpad ==-1){
     has_cached_dispersive_x = true;
     return sqrt(-1);
   }
-  //std::cout << " After Max Pad Return " << std::endl;
-
   float x_slope = sqrt(-1);
   float x_offset = sqrt(-1);
-  if(fId==0) {
+  if(fId == 0) {
     x_slope = GValue::Value("CRDC1_X_SLOPE");
     x_offset = GValue::Value("CRDC1_X_OFFSET");
-  } else if(fId==1) {
+  } else {
     x_slope = GValue::Value("CRDC2_X_SLOPE");
     x_offset = GValue::Value("CRDC2_X_OFFSET");
   }
@@ -554,8 +294,7 @@ float TCrdc::GetDispersiveX() const{
     x_slope = 1.0;
   if(std::isnan(x_offset))
     x_offset = 0.0;
-  
-  std::map<int,double> datamap;
+
   const int GRAVITY_WIDTH = 14;//determines how many pads one uses in averaging
   const int NUM_PADS = 224;
   int lowpad = maxpad - GRAVITY_WIDTH/2;
@@ -567,25 +306,21 @@ float TCrdc::GetDispersiveX() const{
     highpad = NUM_PADS-1;
   }
 
-
   double datasum = 0;
   double weighted_sum = 0;
   for(int i=0;i<Size();i++) {
-
     if((channel.at(i) < lowpad)||(channel.at(i)>highpad) ||
        !IsGoodSample(i)) {
       continue;
     }
-    
+
     TChannel *c = TChannel::GetChannel(Address(i));
     double cal_data;
     if (c){
       cal_data = c->CalEnergy(GetData(i));
-    }
-    else{
+    } else{
       cal_data = (double)GetData(i);
     }
-    
     datasum += cal_data;
     weighted_sum += channel.at(i)*cal_data;
   }
@@ -615,18 +350,10 @@ float TCrdc::GetNonDispersiveY() {
     y_offset = GValue::Value("CRDC2_Y_OFFSET");
   }
 
-  if(std::isnan(y_slope))
-    y_slope = 1.0;
-  if(std::isnan(y_offset))
-    y_offset = 0.0;
+  if(std::isnan(y_slope)) y_slope = 1.0;
+  if(std::isnan(y_offset)) y_offset = 0.0;
 
-  // std::cout << " ------------------ "  << std::endl;
-  // std::cout << " 2 Slope = " << y_slope << std::endl;
-  // std::cout << " 2 Offst = " << y_offset << std::endl;
-    
-  //  return ((GetTimeRand()*y_slope+y_offset));
   float tmp = ((float)time)*y_slope+y_offset;
-  //printf("fId[%i]:  %.05f * %.03f + %.05f = %.05f\n",fId,y_slope,(float)time,y_offset,tmp);
   return tmp;
 }
 
@@ -682,8 +409,8 @@ void TCrdcPad::Copy(TObject &obj) const {
 
 THodoscope::THodoscope() { Clear(); }
 THodoscope::~THodoscope() { Clear(); }
-THodoscope::THodoscope(const THodoscope &hodoscope) { 
-  hodoscope.Copy(*this); 
+THodoscope::THodoscope(const THodoscope &hodoscope) {
+  hodoscope.Copy(*this);
 }
 
 void THodoscope::Copy(TObject &obj) const {
@@ -733,7 +460,7 @@ void THodoHit::Copy(TObject &obj) const {
   hit.fChannel = fChannel;
 }
 
-void THodoHit::Print(Option_t *opt) const{
+void THodoHit::Print(Option_t *opt) const {
   printf("Channel: %d Charge: %d\n", GetChannel(), GetCharge());
 }
 void THodoHit::Clear(Option_t *opt){
@@ -759,7 +486,6 @@ void TMTof::Copy(TObject &obj) const {
   mtof.fE1Down    = fE1Down;
   mtof.fXfp       = fXfp;
   mtof.fObj       = fObj;
-  //mtof.fGalotte   = fGalotte;
   mtof.fCrdc1Anode = fCrdc1Anode;
   mtof.fCrdc2Anode = fCrdc2Anode;
   mtof.fRf        = fRf;
@@ -773,7 +499,6 @@ void TMTof::Clear(Option_t *opt) {
   fE1Down.clear();
   fXfp.clear();
   fObj.clear();
-  //fGalotte.clear();
   fCrdc1Anode.clear();
   fCrdc2Anode.clear();
   fRf.clear();
@@ -784,14 +509,7 @@ void TMTof::Clear(Option_t *opt) {
   fCorrelatedOBJE1=sqrt(-1);
 }
 
-//bool TMTof::Correlate() const {
-//  CorrelateE1Up();
-//  CorrelateObj();
-//  CorrelateXfp();
-//  return true;
-//}
-
-double TMTof::GetCorrelatedObjE1() const{
+double TMTof::GetCorrelatedObjE1(int channel) const {
   double target = GValue::Value("TARGET_MTOF_OBJE1");
   if (std::isnan(target)){
     std::cout << "TARGET_MTOF_OBJE1 not defined! Use fObj.at(0) if you want first.\n";
@@ -802,12 +520,13 @@ double TMTof::GetCorrelatedObjE1() const{
   //shift allows "shifting" of TOF to line up different runs. Necessary when,
   //e.g., the voltage on a scintillator changes during an experiment
   double shift = GValue::Value("SHIFT_MTOF_OBJE1");
-  
-  if(fObj.size() && fE1Up.size()){
-    fCorrelatedOBJE1 = std::numeric_limits<double>::max(); 
-    for(size_t i=0;i<fObj.size();i++) {     
-      for (size_t j=0; j < fE1Up.size(); j++){
-        double newvalue = fObj.at(i)-fE1Up.at(j);
+
+  std::vector<unsigned short> refvec = GetMTofVector(channel);
+  if(fObj.size() && refvec.size()){
+    fCorrelatedOBJE1 = std::numeric_limits<double>::max();
+    for(size_t i=0;i<fObj.size();i++) {
+      for (size_t j=0; j < refvec.size(); j++){
+        double newvalue = fObj.at(i) - refvec.at(j);
         if (!std::isnan(shift)){
           newvalue += shift;
         }
@@ -820,18 +539,20 @@ double TMTof::GetCorrelatedObjE1() const{
   return fCorrelatedOBJE1;
 }
 
-double TMTof::GetCorrelatedXfpE1() const{
+double TMTof::GetCorrelatedXfpE1(int channel) const{
   double target = GValue::Value("TARGET_MTOF_XFPE1");
   if (std::isnan(target)){
     std::cout << "TARGET_MTOF_XFPE1 not defined! Use fXfp.at(0) if you want first.\n";
     fCorrelatedXFPE1 = sqrt(-1);
     return fCorrelatedXFPE1;
   }
-  if(fXfp.size() && fE1Up.size()){
-    fCorrelatedXFPE1 = std::numeric_limits<double>::max(); 
-    for(size_t i=0;i<fXfp.size();i++) {     
-      for (size_t j=0; j < fE1Up.size(); j++){
-        double newvalue = fXfp.at(i)-fE1Up.at(j);
+
+  std::vector<unsigned short> refvec = GetMTofVector(channel);
+  if(fXfp.size() && refvec.size()){
+    fCorrelatedXFPE1 = std::numeric_limits<double>::max();
+    for(size_t i=0;i<fXfp.size();i++) {
+      for (size_t j=0; j < refvec.size(); j++){
+        double newvalue = fXfp.at(i)-refvec.at(j);
         if(std::abs(target - newvalue) < std::abs(target - fCorrelatedXFPE1)) {
           fCorrelatedXFPE1 = newvalue;
         }
@@ -841,4 +562,41 @@ double TMTof::GetCorrelatedXfpE1() const{
   return fCorrelatedXFPE1;
 }
 
+//Used to selected reference channel for MToF, defaults to E1 up
+std::vector<unsigned short> TMTof::GetMTofVector(int channel) const {
+  switch(channel) {
+    case 0  : //E1 up
+      return  fE1Up;
+      break;
+    case 1  : //E1 down
+      return  fE1Down;
+      break;
+    case 2  : //Xfp
+      return  fE1Down;
+      break;
+    case 3  : //Obj
+      return  fObj;
+      break;
+    case 5  : //Rf
+      return  fRf;
+      break;
+    case 6  : //CRDC1 anode
+      return  fCrdc1Anode;
+      break;
+    case 7  : //CRDC2 anode
+      return  fCrdc2Anode;
+      break;
+    case 12 : //Hodoscope
+      return  fHodoscope;
+      break;
+    case 15 : //Refrence
+      return  fRef;
+      break;
+    default : //E1 Up
+      return  fE1Up;
+      break;
+  }
+
+  return fE1Up;
+}
 void TMTof::Print(Option_t *opt) const {    }

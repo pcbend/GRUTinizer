@@ -54,8 +54,7 @@ Float_t TGretinaHit::GetCoreEnergy(int i) const {
 const char *TGretinaHit::GetName() const {
   TChannel *channel = TChannel::GetChannel(Address());
   if(channel) return channel->GetName();
-  std::string name = "";
-  return name.c_str();
+  return "";
 }
 
 

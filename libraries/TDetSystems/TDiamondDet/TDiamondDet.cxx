@@ -38,7 +38,7 @@ TDetectorHit& TDiamondDet::GetHit(int i){
 
 int TDiamondDet::BuildHits(std::vector<TRawEvent>& raw_data) {
 
-  unsigned long smallest_timestamp = 0x7fffffffffffffff;
+  long smallest_timestamp = 0x7fffffffffffffff;
   for(auto& event : raw_data){
     TSmartBuffer buf = event.GetPayloadBuffer();
     TDDASEvent<DDASHeader> ddas(buf);

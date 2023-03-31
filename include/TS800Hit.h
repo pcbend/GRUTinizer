@@ -10,18 +10,8 @@
 #include "TRandom.h"
 #include "GValue.h"
 
-class TF1;
 
 #define MAXCRDC 513
-//#define CRDC_XSlope 2.54
-//#define CRDC_XOffset -281.94
-//#define CRDC_YSlope 2.54
-//#define CRDC_YOffset -281.94
-//#define CRDC_XSlope 1
-//#define CRDC_YSlope 1
-//#define CRDC_XOffset 0
-//#define CRDC_YOffset 0
-
 
 class TS800Channel : public TDetectorHit {
   public:
@@ -139,7 +129,6 @@ class TCrdc : public TDetectorHit {
 
 
     int  Address(int i) const { return TDetectorHit::Address() + channel.at(i); }
-
     void AddPoint(int chan,int samp,int dat) { channel.push_back(chan);
                                                sample.push_back(samp);
                                                data.push_back(dat);    }
@@ -149,8 +138,8 @@ class TCrdc : public TDetectorHit {
 
     int GetWidth();
 
-    float GetDispersiveX() const;     
-    float GetNonDispersiveY();  
+    float GetDispersiveX() const;
+    float GetNonDispersiveY();
     int GetMaxPad() const;
     int GetMaxPadSum() const;
 
@@ -158,16 +147,13 @@ class TCrdc : public TDetectorHit {
     virtual void Print(Option_t *opt="") const;
     virtual void Clear(Option_t *opt="");
 
-    virtual void DrawChannels(Option_t *opt="",bool calibrate=true) const;
-    virtual void DrawHit(Option_t *opt="") const;
-
     int Sum() const { int result = 0; for(unsigned int x=0;x<data.size();x++) result +=data[x]; return result; }
 
   private:
     virtual int Charge() const { return 0; }
 
     bool IsGoodSample(int i) const;
-    
+
     short fId;
     std::vector<int> channel;
     std::vector<int> sample;
@@ -175,13 +161,8 @@ class TCrdc : public TDetectorHit {
 
     unsigned short anode;
     unsigned short time;
-
     mutable bool has_cached_dispersive_x; //!
     mutable double cached_dispersive_x; //!
-
-
-    static TF1 *fgaus;
-
 
   ClassDef(TCrdc,1)
 };
@@ -291,29 +272,6 @@ class TTOFHit :  public TS800Channel {
   ClassDef(TTOFHit,1);
 };
 
-/*
-class THodoHit : public TS800Channel {
-  public:
-    THodoHit() { Clear(); }
-    THodoHit(short chan,short value) { SetChannel(chan); Set(value); }
-    ~THodoHit() { };
-
-    virtual void Clear(Option_t *opt="")       { TS800Channel::Clear(opt); fChannel=-1; }
-    virtual void Print(Option_t *opt="") const { printf("HODO"); }
-    virtual void Copy(TObject &obj)      const { TS800Channel::Copy(obj); ((THodoHit&)obj).fChannel = fChannel; }
-
-    void SetChannel(short chan) { fChannel = chan;  }
-    short GetId()      const { return GetChannel(); }
-    short GetChannel() const { return fChannel;     }
-
-  private:
-    short fChannel;
-
-
-  ClassDef(THodoHit,1)
-};
-*/
-
 
 class TFPScint :  public TS800Channel {
   public:
@@ -347,21 +305,6 @@ class TFPScint :  public TS800Channel {
   ClassDef(TFPScint,1);
 };
 
-/*
-class TIonChamber : public TS800Channel {
-  public:
-    TIonChamber() { }
-    TIonChamber(const TIonChamber &ion) { ion.Copy(*this); }
-    TIonChamber(short value):TS800Channel(value) { }
-
-    virtual void Clear(Option_t *opt="")       { TS800Channel::Clear(opt);    }
-    virtual void Print(Option_t *opt="") const { printf("Ion Chamber");TS800Channel::Print(opt);}
-    virtual void Copy(TObject &obj)      const { TS800Channel::Copy(obj);  }
-  private:
-    ClassDef(TIonChamber,1)
-
-};
-*/
 class THodoHit : public TDetectorHit{
   public:
     THodoHit() { Clear(); }
@@ -372,14 +315,14 @@ class THodoHit : public TDetectorHit{
     virtual void Clear(Option_t *opt="");
 
 
-    void SetChannel(int channel) { fChannel = channel;} 
-    
+    void SetChannel(int channel) { fChannel = channel;}
+
     int GetCharge() const { return Charge(); }
     int GetChannel() const { return fChannel; }
   private:
     int fChannel;
 
-    ClassDef(THodoHit, 1); 
+    ClassDef(THodoHit, 1);
 };
 
 class THodoscope : public TDetectorHit {
@@ -395,17 +338,17 @@ class THodoscope : public TDetectorHit {
 
     int  Address(int i) const { return TDetectorHit::Address() + GetChannel(i); }
 
-    int GetChannel(int i) const { return GetHodoHit(i).GetChannel();} 
+    int GetChannel(int i) const { return GetHodoHit(i).GetChannel();}
     TDetectorHit& GetHit(int i);
     THodoHit& GetHodoHit(int i);
     const THodoHit& GetHodoHit(int i) const;
     std::vector<THodoHit> GetHodoHits() const { return hodo_hits; } ;
-    
-    size_t Size() const { return hodo_hits.size(); } 
+
+    size_t Size() const { return hodo_hits.size(); }
 
     std::vector<THodoHit> hodo_hits;
 
-    ClassDef(THodoscope, 1); 
+    ClassDef(THodoscope, 1);
 
 };
 
@@ -434,9 +377,10 @@ class TMTof : public TDetectorHit {
     //TARGET_MTOF_# GValues. Values are set in TMTof as fCorrelatedXfp,
     //fCorrelatedXfp, etc.  Note that if the GValues are not set, the first
     //value in each time-of-flight is taken.
-    double  GetCorrelatedXfpE1()  const;   //!
-    double  GetCorrelatedObjE1()  const;   //!
+    double  GetCorrelatedXfpE1(int i = 15)  const;   //!
+    double  GetCorrelatedObjE1(int i = 15)  const;   //!
 
+    std::vector<unsigned short> GetMTofVector(int i = 15) const;
 
 
   private:
@@ -453,12 +397,7 @@ class TMTof : public TDetectorHit {
     std::vector<unsigned short> fCrdc2Anode;   // Channel 7
     std::vector<unsigned short> fHodoscope;    // Channel 12
     std::vector<unsigned short> fRef;          // Channel 15, same as E1Up (different cable.)
-
-    //std::vector<int> fGalotte;
-    //
     virtual Int_t Charge() const  {return 0;}
-    //
-    //
   ClassDef(TMTof,1)
 };
 
@@ -471,8 +410,6 @@ class TCrdcPad : public TDetectorHit {
     ~TCrdcPad();
 
     virtual Int_t Charge() const;
-
-
     void SetChannel(short chan)         { fChannel = chan; }
     void SetPoint(short sample,short value) {
       if(fNumSamples >= MAXCRDC){
@@ -495,9 +432,6 @@ class TCrdcPad : public TDetectorHit {
     short fNumSamples;
     short fSample[MAXCRDC];
     short fValue[MAXCRDC];
-    //std::map <int,int> fTrace;
-
-
 
   ClassDef(TCrdcPad,1)
 };
@@ -517,14 +451,5 @@ class TS800Hit : public TDetectorHit {
 
   ClassDef(TS800Hit,1);
 };
-
-
-
-
-
-
-
-
-
 
 #endif

@@ -920,7 +920,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       break;
 
     case kKey_G:
-      if(!hists.back() || !fMarkers.size()==4) {
+      if(!hists.back() || fMarkers.size()!=4) {
         printf( CYAN "must have a a1 hist with 4 markers drawn" RESET_COLOR "\n");
       } else  {
         std::vector<double> xvalues;
@@ -1007,6 +1007,7 @@ bool GCanvas::Process1DKeyboardPress(Event_t *event,UInt_t *keysym) {
       break;
     case kKey_M:
       SetMarkerMode(false);
+      break;
     case kKey_n:
       RemoveMarker("all");
       for(unsigned int i=0;i<hists.size();i++) {
@@ -1457,7 +1458,7 @@ bool GCanvas::Process2DKeyboardPress(Event_t *event,UInt_t *keysym) {
             toremove.push_back(mylist->At(i)->GetName());
           }
         }
-        for(int i=0;i<toremove.size();i++) {
+        for(unsigned int i=0;i<toremove.size();i++) {
           mylist->Remove(mylist->FindObject(toremove.at(i).c_str()));
         }
       }

@@ -172,7 +172,7 @@ void TGRUTint::ApplyOptions() {
 
   if(opt->StartGUI()){
     StartGUI();
-    for(int x=0;x<opt->WinInputFiles().size();x++) {
+    for(unsigned int x=0;x<opt->WinInputFiles().size();x++) {
       TPresetCanvas *c = new TPresetCanvas();
       c->ReadWinFile(opt->WinInputFiles().at(x).c_str());
       c->Draw();

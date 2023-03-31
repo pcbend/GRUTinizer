@@ -43,7 +43,7 @@ float TJanusDDASHit::RawCharge() const {
 int TJanusDDASHit::GetFrontChannel() const {
   int address = Address();
 
-  int crate_id = (address & 0x00ff0000) >> 16;
+//  int crate_id = (address & 0x00ff0000) >> 16;
   int slot_id  = (address & 0x0000ff00) >> 8;
   int chan_id  = (address & 0x000000ff) >> 0;
 
@@ -53,7 +53,7 @@ int TJanusDDASHit::GetFrontChannel() const {
 int TJanusDDASHit::GetBackChannel() const {
   int address = back_hit.Address();
 
-  int crate_id = (address & 0x00ff0000) >> 16;
+//  int crate_id = (address & 0x00ff0000) >> 16;
   int slot_id  = (address & 0x0000ff00) >> 8;
   int chan_id  = (address & 0x000000ff) >> 0;
 

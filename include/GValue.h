@@ -26,7 +26,6 @@ public:
   void SetValue(double value) { fValue = value; }
   void SetInfo(const char *temp) { info.assign(temp); }
 
-
   static int ReadValFile(const char *filename="",Option_t *opt="replace");
   static int WriteValFile(std::string filename="",Option_t *opt="");
 
@@ -37,6 +36,8 @@ public:
 			      GValue::EPriority priority = kUser);
   static GValue* Get(std::string name="") { return FindValue(name); }
   static double Value(std::string);
+  static std::string Info(std::string);
+
   static TList* AllValues() {
     TList* output = new TList;
     output->SetOwner(false);

@@ -17,7 +17,6 @@ public:
 
   virtual void Copy(TObject& obj) const;
   virtual void Print(Option_t *opt = "all") const;
-  virtual void Draw(Option_t *opt = "") const;
   virtual void Clear(Option_t *opt = "");
   virtual size_t Size() const { return mode3_hits.size(); }
 

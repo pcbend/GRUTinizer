@@ -15,7 +15,6 @@ public:
   virtual void Copy(TObject&) const;
   virtual void Clear(Option_t *opt = "");
   virtual void Print(Option_t *opt = "") const;
-  virtual void Draw(Option_t* opt = "");
 
   virtual Int_t Charge() const;
 
@@ -61,8 +60,6 @@ public:
   int GetSlot() const;
   int GetCrate() const;
   int GetChannel() const;
-
-  void DrawTrace(int segnum);
 
   TVector3 GetPosition(bool apply_array_offset = false,
                        TVector3 array_offset = TVector3(sqrt(-1.0),sqrt(-1.0),sqrt(-1.0))) const;

@@ -1,10 +1,5 @@
 #include "TMode3.h"
-
 #include "TGEBEvent.h"
-
-
-#include "GH1D.h"
-#include "GCanvas.h"
 
 TMode3::TMode3(){
   //mode3_hits = new TClonesArray("TMode3Hit");
@@ -48,13 +43,13 @@ int TMode3::BuildHits(std::vector<TRawEvent>& raw_data){
   return Size();
 }
 
-void TMode3::Print(Option_t *opt) const { 
+void TMode3::Print(Option_t *opt) const {
   TString sopt(opt);
   sopt.ToLower();
- 
-  printf("TMode3;  %i total hits:\n",Size());
+
+  printf("TMode3;  %zu total hits:\n",Size());
   printf(" @ %lu \n",Timestamp());
-  
+
   if(sopt.Contains("all")) {
   for(size_t i=0;i<Size();i++) {
     printf("\t");
@@ -68,39 +63,3 @@ void TMode3::Clear(Option_t *opt) {
   //TDetector::Clear(opt);
   mode3_hits.clear(); //->Clear(opt);//("TMode3Hit");
 }
-
-void TMode3::Draw(Option_t *opt) const {
-  if(!Size())
-    return;
-  TString option = opt;
-  if(!gPad || option.Contains("new",TString::kIgnoreCase)) {
-    new GCanvas;
-  } else {
-    gPad->Clear();
-  }
-  int total_bins =0;
-  std::vector<double> segdata;
-  std::vector<double> coredata;
-  for(size_t i=0;i<Size();i++) {
-    TMode3Hit hit = GetMode3Hit(i);
-    if(hit.GetChannel()==9) {
-      for(size_t j=0;j<hit.Size();j++) {
-        coredata.push_back(hit.GetWave().at(j));
-      }
-    } else {
-      double avg = hit.AverageWave(10);
-      for(size_t j=0;j<hit.Size();j++) {
-        segdata.push_back(hit.GetWave().at(j)-avg);
-      }
-
-    } 
-  }
-  GH1D seg("seghist","seghist",segdata.size(),0,segdata.size());
-  for(unsigned int i=0;i<segdata.size();i++) {
-    seg.Fill(i,segdata.at(i));
-  }
-  seg.DrawCopy(opt);
-
-}
-
-

@@ -11,13 +11,13 @@
 
 #include "TUnpackedEvent.h"
 
-class GH1;
-class GH2;
+class TH1;
+class TH2;
 class TFile;
 class TProfile;
 
-class GH1D;
-class GH2D;
+class TH1D;
+class TH2D;
 class TDetector;
 
 /// Object passed to the online histograms.
@@ -58,28 +58,28 @@ public:
   TList* GetGatesPtr()      { return gates;     }
 
 
-  GH1* FillHistogram(const char* name,
+  TH1* FillHistogram(const char* name,
                      int bins, double low, double high, double value,
                      double weight=1);
-  GH2* FillHistogram(const char* name,
+  TH2* FillHistogram(const char* name,
                      int Xbins, double Xlow, double Xhigh, double Xvalue,
                      int Ybins, double Ylow, double Yhigh, double Yvalue,
                      double weight=1);
   
-  GH1* FillHistogram(const char* name,
+  TH1* FillHistogram(const char* name,
                      int bins, double low, double high, const char *value, double weight);
-  GH2* FillHistogram(const char* name,
+  TH2* FillHistogram(const char* name,
                      int Xbins, double Xlow, double Xhigh, const char *Xvalue,
                      int Ybins, double Ylow, double Yhigh, double Yvalue,
                      double weight);
 
 
 
-  GH1D* InitHistogram(const char* name,const char *title,int bins, double low, double high);
-  GH2D* InitHistogram(const char* name,const char *title,int Xbins, double Xlow, double Xhigh,
+  TH1D* InitHistogram(const char* name,const char *title,int bins, double low, double high);
+  TH2D* InitHistogram(const char* name,const char *title,int Xbins, double Xlow, double Xhigh,
                                                         int Ybins, double Ylow, double Yhigh);
-  GH1D* InitHistogram(const char* dir,const char* name,const char *title,int bins, double low, double high);
-  GH2D* InitHistogram(const char* dir,const char* name,const char *title,int Xbins, double Xlow, double Xhigh,
+  TH1D* InitHistogram(const char* dir,const char* name,const char *title,int bins, double low, double high);
+  TH2D* InitHistogram(const char* dir,const char* name,const char *title,int Xbins, double Xlow, double Xhigh,
                                                                         int Ybins, double Ylow, double Yhigh);
   int   FillHistogram(const char* name);
   int   FillHistogram(const char* dir,const char* name);
@@ -91,19 +91,19 @@ public:
   TProfile* FillProfileHist(const char* name,
 			    int Xbins, double Xlow, double Xhigh, double Xvalue,
 			    double Yvalue);
-  GH2* FillHistogramSym(const char* name,
+  TH2* FillHistogramSym(const char* name,
 			int Xbins, double Xlow, double Xhigh, double Xvalue,
 			int Ybins, double Ylow, double Yhigh, double Yvalue);
 
 
-  GH1* FillHistogram(const std::string& name,
+  TH1* FillHistogram(const std::string& name,
                      int bins, double low, double high, double value,
                      double weight=1){
     return FillHistogram(name.c_str(),
                          bins, low, high, value,
                          weight);
   }
-  GH2* FillHistogram(const std::string& name,
+  TH2* FillHistogram(const std::string& name,
                      int Xbins, double Xlow, double Xhigh, double Xvalue,
                      int Ybins, double Ylow, double Yhigh, double Yvalue,
                      double weight=1) {
@@ -119,7 +119,7 @@ public:
 			   Xbins, Xlow, Xhigh, Xvalue,
 			   Yvalue);
   }
-  GH2* FillHistogramSym(const std::string& name,
+  TH2* FillHistogramSym(const std::string& name,
                         int Xbins, double Xlow, double Xhigh, double Xvalue,
                         int Ybins, double Ylow, double Yhigh, double Yvalue) {
     return FillHistogramSym(name.c_str(),

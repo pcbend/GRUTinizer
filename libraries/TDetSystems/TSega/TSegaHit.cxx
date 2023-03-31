@@ -9,7 +9,6 @@
 #include "GValue.h"
 #include "TSega.h"
 
-#include <GH1D.h>
 
 TSegaHit::TSegaHit() {
   Clear();
@@ -19,54 +18,6 @@ void TSegaHit::Copy(TObject& obj) const{
   TDetectorHit::Copy(obj);
   TSegaHit& sega = (TSegaHit&)obj;
   sega.fTrace = fTrace;
-}
-
-void TSegaHit::Draw(Option_t* opt) {
-  TString option = opt;
-  if(!gPad || option.Contains("new", TString::ECaseCompare::kIgnoreCase)) {
-    new GCanvas;
-  } else {
-    gPad->Clear();
-  }
-
-  TVirtualPad* base_pad = gPad;
-  bool draw_all = option.Contains("all", TString::ECaseCompare::kIgnoreCase);
-  if(draw_all){
-    base_pad->Divide(1, 2, 0.005, 0.005);
-    base_pad->cd(2)->Divide(4,8,0,0);
-    base_pad->cd(1);
-  }
-
-  DrawTrace(0);
-  if(draw_all){
-    for(int i=1; i<33; i++) {
-      base_pad->cd(2)->cd(i);
-      DrawTrace(i);
-    }
-  }
-  base_pad->cd();
-}
-
-void TSegaHit::DrawTrace(int segnum) {
-  std::vector<unsigned short>* trace = GetTrace(segnum);
-  if(!trace){
-    std::cout << "No segment trace found for segment " << segnum << std::endl;
-    return;
-  }
-
-  GH1D hist("sega_wave", "", trace->size(), 0, 10*trace->size());
-  hist.SetStats(false);
-
-  if(segnum==0){
-    hist.SetTitle(Form("SeGA Detector %d at %ld ns", GetDetnum(), Timestamp()));
-    hist.GetXaxis()->SetTitle("Time (ns)");
-    hist.GetYaxis()->SetTitle("ADC units");
-  }
-
-  for(size_t i=0; i<trace->size(); i++) {
-    hist.SetBinContent(i+1,(*trace)[i]);
-  }
-  hist.DrawCopy();
 }
 
 void TSegaHit::Clear(Option_t *opt) {

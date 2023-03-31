@@ -9,15 +9,13 @@
 #include "GValue.h"
 #include "TDiamond.h"
 
-#include <GH1D.h>
-
 TDiamondDetHit::TDiamondDetHit() {
   Clear();
 }
 
 void TDiamondDetHit::Copy(TObject& obj) const{
   TDetectorHit::Copy(obj);
-  TDiamondDetHit& diamond = (TDiamondDetHit&)obj;
+//  TDiamondDetHit& diamond = (TDiamondDetHit&)obj;
 }
 
 void TDiamondDetHit::Draw(Option_t* opt) {

@@ -1,4 +1,4 @@
-//TChannel.h TGRUTUtilities.h TPresetCanvas.h TCalibrator.h TVariable.h
+//TChannel.h TGRUTUtilities.h TPresetCanvas.h TCalibrator.h TVariable.h TGates.h
 #ifdef __CINT__
 
 #pragma link off all globals;
@@ -16,6 +16,8 @@
 #pragma link C++ class TPresetCanvas-;
 
 #pragma link C++ class TGRUTUtilities+;
+
+#pragma link C++ class TGates+;
 
 #pragma link C++ function get_run_number;
 #pragma link C++ function FindColor;

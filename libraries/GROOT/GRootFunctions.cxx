@@ -467,7 +467,6 @@ Double_t GRootFunctions::W_pol_norm(Double_t *x, Double_t *par) {
 
   double w  = AlignedAD_Norm(&x[0],par);
   double kn = KN_unpol(&x[1],&par[3]);
-  double kn_norm = KN_unpol(&x[1],&par[4]);
   double an = AnalyzingPower(&x[1],&par[3]); 
   double p  = Polarization(&x[0],par); 
   
@@ -640,8 +639,6 @@ Double_t GRootFunctions::W_pol6(Double_t *x,Double_t *par) {
 
   //x[0] theta, from beam axis;
   //x[1] angle between the reaction plane and the compton scattering plane;
-
-  double y[3] = { x[0],par[4],x[1] };
 
   //double //w  = AlignedAD_Norm(&y[0],par);
   //double   w  = 1.0;

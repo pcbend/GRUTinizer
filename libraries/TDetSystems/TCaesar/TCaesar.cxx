@@ -197,7 +197,7 @@ TDetectorHit& TCaesar::GetHit(int i){
 
 void TCaesar::Print(Option_t *opt) const {
   printf("Caesar event @ %lu\n",Timestamp());
-  printf("Number of Hits: %i\n",Size());
+  printf("Number of Hits: %zu\n",Size());
   for(unsigned int i=0;i<Size();i++) {
     printf("\t");
     GetCaesarHit(i).Print();

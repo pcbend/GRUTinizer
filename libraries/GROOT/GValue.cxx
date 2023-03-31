@@ -50,6 +50,13 @@ double GValue::Value(std::string name) {
   return fValueVector.at(name)->GetValue();
 }
 
+std::string GValue::Info(std::string name) {
+  std::transform(name.begin(),name.end(),name.begin(),::toupper);
+  if(!fValueVector.count(name))
+    return "";
+  return fValueVector.at(name)->GetInfo();
+}
+
 void GValue::SetReplaceValue(std::string name, double value,
 			     EPriority priority) {
   std::transform(name.begin(),name.end(),name.begin(),::toupper);

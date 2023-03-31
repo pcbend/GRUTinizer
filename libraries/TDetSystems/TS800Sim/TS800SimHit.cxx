@@ -24,8 +24,7 @@ void TS800SimHit::Copy(TObject &rhs) const {
 }
 
 const char *TS800SimHit::GetName() const {
-  std::string name = "name";
-  return name.c_str();
+  return "name";
 }
 
 void TS800SimHit::Print(Option_t *opt) const {

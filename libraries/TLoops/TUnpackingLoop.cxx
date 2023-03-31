@@ -48,7 +48,7 @@ bool TUnpackingLoop::Iteration(){
       return true;
     }
   }
-  int counter=0;
+  //int counter=0;
   //printf("here 1\n"); fflush(stdout);
   fOutputEvent = new TUnpackedEvent;
   for(unsigned int i=0;i<event.size();i++) {
@@ -140,7 +140,7 @@ void TUnpackingLoop::HandleBuiltNSCLData(TNSCLEvent& event){
   TNSCLBuiltRingItem built(event);
 
   //printf("i am being called!!!\n"); fflush(stdout);
-  int counter=0;
+  //int counter=0;
   for(unsigned int i=0; i<built.NumFragments(); i++){
     //printf("\tcounter = %i\n",counter++); fflush(stdout);
     TNSCLFragment& fragment = built.GetFragment(i);
