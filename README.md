@@ -1,10 +1,6 @@
 # GRUTinizer
 Install GRUTinizer
 - Needs a root installation to work, at present 6.18 is the latest root version that works.
-- Go here and pull the current version of the code
-
-https://github.com/sg5190/GRUTinizer
-
 - Add these lines to your bashrc
 export GRUTSYS=/path/to/GRUTinizer
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GRUTSYS/lib
