@@ -211,10 +211,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
   GCutG* gate = 0;
   while ((gate = (GCutG*)next())) {
     TString cutname = gate->GetName();
-    if(cutname.Contains("in") && !incoming_cut)
+    if(!incoming_cut && cutname.Contains("in"))
       incoming_cut = gate;
 
-    if(cutname.Contains("out") && !outgoing_cut)
+    if(!outgoing_cut && cutname.Contains("out"))
       outgoing_cut = gate;
   }
 
