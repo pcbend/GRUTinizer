@@ -290,31 +290,34 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
 		       120, 0, 120,
 		       hit.GetCrystalId());
        
-     histname = Form("doppler_%s",outgoing->GetName());
+     histname = Form("doppler_%s_%s",incoming->GetName(), outgoing->GetName());
      obj.FillHistogram(dirname, histname,
 		       energyNChannels, energyLlim, energyUlim,
 		       hit.GetDoppler(beta, 0));
 
-     histname = Form("doppler_s800_%s",outgoing->GetName());
+     histname = Form("doppler_s800_%s_%s",incoming->GetName(),
+		     outgoing->GetName());
      TVector3 track = s800->Track();
      obj.FillHistogram(dirname, histname,
 		       energyNChannels, energyLlim, energyUlim,
 		       hit.GetDoppler(beta, &track));
 
-     histname = Form("doppler_theta_%s",outgoing->GetName());
+     histname = Form("doppler_theta_%s_%s",incoming->GetName(),
+		     outgoing->GetName());
      obj.FillHistogram(dirname, histname,
 		       100, 0, TMath::Pi(),
 		       hit.GetTheta(),
 		       energyNChannels, energyLlim, energyUlim,
 		       hit.GetDoppler(beta, 0));
 
-     histname = Form("theta_phi_%s",outgoing->GetName());
+     histname = Form("theta_phi_%s_%s",incoming->GetName(),
+		     outgoing->GetName());
      obj.FillHistogram(dirname, histname,
 		       500, 0, TMath::Pi(),
 		       hit.GetPhi(),
 		       500, 0, TMath::Pi(),
 		       hit.GetTheta());
-     histname = Form("theta_%s",outgoing->GetName());
+     histname = Form("theta_%s_%s",incoming->GetName(), outgoing->GetName());
      obj.FillHistogram(dirname, histname,
 		       500, 0, TMath::Pi(),
 		       hit.GetTheta());
@@ -324,32 +327,38 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
 		       hit.GetPhi());
        
      if( hit.GetCrystalPosition().Theta() < TMath::Pi()/2. ){
-       histname = Form("theta_phi_fw_%s",outgoing->GetName());
+       histname = Form("theta_phi_fw_%s_%s",incoming->GetName(),
+		       outgoing->GetName());
        obj.FillHistogram(dirname, histname,
 			 500, 0, TMath::Pi(),
 			 hit.GetPhi(),
 			 500, 0, TMath::Pi(),
 			 hit.GetTheta());
-       histname = Form("theta_fw_%s",outgoing->GetName());
+       histname = Form("theta_fw_%s_%s",incoming->GetName(),
+		       outgoing->GetName());
        obj.FillHistogram(dirname, histname,
 			 500, 0, TMath::Pi(),
 			 hit.GetTheta());
-       histname = Form("phi_fw_%s",outgoing->GetName());
+       histname = Form("phi_fw_%s_%s",incoming->GetName(),
+		       outgoing->GetName());
        obj.FillHistogram(dirname, histname,
 			 500, 0, TMath::Pi(),
 			 hit.GetPhi());
      } else {
-       histname = Form("theta_phi_bw_%s",outgoing->GetName());
+       histname = Form("theta_phi_bw_%s_%s",incoming->GetName(),
+		       outgoing->GetName());
        obj.FillHistogram(dirname, histname,
 			 500, 0, TMath::Pi(),
 			 hit.GetPhi(),
 			 500, 0, TMath::Pi(),
 			 hit.GetTheta());
-       histname = Form("theta_bw_%s",outgoing->GetName());
+       histname = Form("theta_bw_%s_%s",incoming->GetName(),
+		       outgoing->GetName());
        obj.FillHistogram(dirname, histname,
 			 500, 0, TMath::Pi(),
 			 hit.GetTheta());
-       histname = Form("phi_bw_%s",outgoing->GetName());
+       histname = Form("phi_bw_%s_%s",incoming->GetName(),
+		       outgoing->GetName());
        obj.FillHistogram(dirname, histname,
 			 500, 0, TMath::Pi(),
 			 hit.GetPhi());
@@ -361,28 +370,33 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
 
      if( !gt_time->IsInside(s800->GetTimestamp()-hit.GetTime(),
 			    hit.GetCoreEnergy()) ){
-       histname = Form("background_%s",outgoing->GetName());
+       histname = Form("background_%s_%s",incoming->GetName(),
+		       outgoing->GetName());
        obj.FillHistogram(dirname, histname,
 			 energyNChannels*4, energyLlim, energyUlim,
 			 hit.GetCoreEnergy());
-       histname = Form("background_dop_%s",outgoing->GetName());
+       histname = Form("background_dop_%s_%s",incoming->GetName(),
+		       outgoing->GetName());
        obj.FillHistogram(dirname, histname,
 			 energyNChannels*4, energyLlim, energyUlim,
 			 hit.GetDoppler(beta, 0));
        return false;
      }
   
-     histname = Form("doppler_%s_t",outgoing->GetName());
+     histname = Form("doppler_%s_%s_t",incoming->GetName(),
+		     outgoing->GetName());
      obj.FillHistogram(dirname, histname,
 		       energyNChannels, energyLlim, energyUlim,
 		       hit.GetDoppler(beta, 0));
 
-     histname = Form("doppler_s800_%s_t",outgoing->GetName());
+     histname = Form("doppler_s800_%s_%s_t",incoming->GetName(),
+		     outgoing->GetName());
      obj.FillHistogram(dirname, histname,
 		       energyNChannels, energyLlim, energyUlim,
 		       hit.GetDoppler(beta, &track));
 
-     histname = Form("doppler_theta_%s_t",outgoing->GetName());
+     histname = Form("doppler_theta_%s_%s_t",incoming->GetName(),
+		     outgoing->GetName());
      obj.FillHistogram(dirname, histname,
 		       100, 0, TMath::Pi(),
 		       hit.GetTheta(),
