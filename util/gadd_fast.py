@@ -106,7 +106,8 @@ def main():
 
     # return 0
 
-    with Merger(max_workers=10, files_per_merge=5, gadd_args=unknown) as merger:
+#    with Merger(max_workers=10, files_per_merge=5, gadd_args=unknown) as merger:
+    with Merger(max_workers=10, files_per_merge=2, gadd_args=unknown) as merger:
         merger.merge(args.input_files, args.output_file)
 
     return 0
