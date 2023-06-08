@@ -140,9 +140,22 @@ bool DTA(TRuntimeObjects &obj, GCutG *incoming, GCutG *outgoing){
     return false;
 
   std::string dirname = "S800";
-  std::string histname = Form("dta_%s_%s",
+
+  std::string histname = Form("crdc1_x_%s_%s",
 			      incoming->GetName(),
 			      outgoing->GetName());
+  obj.FillHistogram(dirname,histname,800,-400,400,
+		    s800->GetCrdc(0).GetDispersiveX());
+
+  histname = Form("crdc2_x_%s_%s",
+		  incoming->GetName(),
+		  outgoing->GetName());
+  obj.FillHistogram(dirname,histname,800,-400,400,
+		    s800->GetCrdc(1).GetDispersiveX());
+
+  histname = Form("dta_%s_%s",
+		  incoming->GetName(),
+		  outgoing->GetName());
   obj.FillHistogram(dirname, histname,
 		    200, -0.1, 0.1,
 		    s800->GetDta());
@@ -515,16 +528,6 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	}
       }
     }
-
-    histname = "CRDC1_X";
-    dirname  = "CRDC";
-    obj.FillHistogram(dirname,histname,800,-400,400,
-		      s800->GetCrdc(0).GetDispersiveX());
-
-    histname = "CRDC2_X";
-    obj.FillHistogram(dirname,histname,800,-400,400,
-		      s800->GetCrdc(1).GetDispersiveX());
-
   }
 
   if(numobj!=list->GetSize())
