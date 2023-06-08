@@ -153,21 +153,21 @@ bool DTA(TRuntimeObjects &obj, GCutG *incoming, GCutG *outgoing){
 		  incoming->GetName(),
 		  outgoing->GetName());
   obj.FillHistogram(dirname, histname,
-		    120, -6.0, 6.0,
+		    1200, -6.0, 6.0,
 		    ata);
   histname = Form("bta_%s_%s",
 		  incoming->GetName(),
 		  outgoing->GetName());
   obj.FillHistogram(dirname, histname,
-		    120, -6.0, 6.0,
+		    1200, -6.0, 6.0,
 		    bta);
   histname = Form("ata_bta_%s_%s",
 		  incoming->GetName(),
 		  outgoing->GetName());
   obj.FillHistogram(dirname, histname,
-		    120, -6.0, 6.0,
+		    1200, -6.0, 6.0,
 		    bta,
-		    120, -6.0, 6.0,
+		    1200, -6.0, 6.0,
 		    ata);
   histname = Form("yta_%s_%s",
 		  incoming->GetName(),
@@ -180,7 +180,7 @@ bool DTA(TRuntimeObjects &obj, GCutG *incoming, GCutG *outgoing){
 		  outgoing->GetName());
   Double_t scatter = sqrt(ata*ata + bta*bta);
   obj.FillHistogram(dirname, histname,
-		    60, 0, 6,
+		    600, 0, 6,
 		    scatter);
 
   return true;
