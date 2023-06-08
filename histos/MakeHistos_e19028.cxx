@@ -85,9 +85,9 @@ bool OutgoingS800(TRuntimeObjects &obj, TS800 *s800, GCutG *outgoing) {
 
    //LR (e19028 Run0022, 74Kr setting, emtpy cell)
    obj.FillHistogram(dirname, histname,
-		     600, -1800, -1200,
+		     1400, -2400, -1000,
 		     s800->GetOBJ_E1Raw_MESY(),
-		     800, 3000, 3800,
+		     1400, 2600, 4000,
 		     s800->GetXF_E1Raw_MESY());
 
    return true;
