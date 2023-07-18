@@ -32,9 +32,11 @@ template<typename HeaderType>
 class TDDASEvent : public TObject {
 public:
   TDDASEvent(TSmartBuffer& buf)
-    : energy_sum(NULL), qdc_sum(NULL), trace(NULL),
+    : energy_sum(NULL), qdc_sum(NULL), extclock(NULL), trace(NULL),
       header(NULL), buf(buf) {
     header = (HeaderType*)buf.GetData();
+//    std::cout << sizeof(HeaderType) << "\t" << std::hex << header->size << "\t" << header->frequency << "\t" << header->status << "\t" << GetChannelHeaderLength() << std::dec << std::endl;
+//header->print();
     buf.Advance(sizeof(HeaderType));
 
     if(HasEnergySum()){
@@ -51,22 +53,37 @@ public:
       trace = (unsigned short*)buf.GetData();
       buf.Advance(GetTraceLength()*sizeof(unsigned short));
     }
+    if(HasExternalClock()){
+      extclock = (DDAS_Ext_Clock*)buf.GetData();
+      buf.Advance(sizeof(DDAS_Ext_Clock));
+    }
   }
 
   DDAS_Energy_Sum* energy_sum;
   DDAS_QDC_Sum* qdc_sum;
+  DDAS_Ext_Clock* extclock;
   unsigned short* trace;
 
   bool HasEnergySum() const {
     return (GetChannelHeaderLength() == 12 ||
-            GetChannelHeaderLength() == 16);
+            GetChannelHeaderLength() == 14 ||
+            GetChannelHeaderLength() == 16 ||
+            GetChannelHeaderLength() == 18);
   }
 
   bool HasQDCSum() const {
     return (GetChannelHeaderLength() == 8 ||
-            GetChannelHeaderLength() == 16);
+            GetChannelHeaderLength() == 10 ||
+            GetChannelHeaderLength() == 16 ||
+            GetChannelHeaderLength() == 18);
   }
 
+  bool HasExternalClock() const {
+   return (GetChannelHeaderLength() == 6  ||
+           GetChannelHeaderLength() == 10 ||
+           GetChannelHeaderLength() == 14 ||
+           GetChannelHeaderLength() == 18);
+  }
   unsigned int GetSize()        const { return header->size; }
   unsigned short GetFrequency() const { return header->frequency; }
   unsigned char GetADCBits()    const { return header->adc_bits; }
@@ -134,7 +151,8 @@ public:
   double GetTime()          const { return (static_cast<double>(GetTimestamp()) + GetCFDTime());       }
 
   int GetEnergy()                  const { return (header->energy_tracelength & LOWER16BITMASK);       }
-  int GetTraceLength()             const { return (header->energy_tracelength & UPPER16BITMASK) >> 16; }
+  int GetTraceLength()             const { return (header->energy_tracelength & BIT30TO16MASK) >> 16; }
+  int GetTraceOverflow()           const { return (header->energy_tracelength & BIT31MASK) >> 31; }
   int GetEnergySum(int i)	   const { if(HasEnergySum()) return energy_sum->energy_sum[i];
                                            else return -2;					       }
   int GetQDCSum(int i)	           const { if(HasQDCSum()) return qdc_sum->qdc_sum[i];
@@ -147,14 +165,7 @@ public:
 
 private:
   HeaderType* header;
-
   TSmartBuffer buf;
-
   ClassDef(TDDASEvent, 0);
 };
-
-
-
-
-
 #endif /* _DDASDATAFORMAT_H_ */

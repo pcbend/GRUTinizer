@@ -125,6 +125,8 @@ public:
   double GetMTofXfpE1() const ;
   double GetMTofXfpE1(double afp_cor, double xfp_cor) const ;
 
+  double GetMTofCorr(double correlatedtof, double afp, double xfp, double afp_cor, double xfp_cor) const ;
+
   unsigned short GetME1Up(int i)       const {if(i<GetME1Size())   return mtof.fE1Up.at(i);  return sqrt(-1); }
   unsigned short GetME1Down(int i)     const {if(i<GetME1Size())   return mtof.fE1Down.at(i);return sqrt(-1); }
            int   GetME1Size()          const { return mtof.fE1Up.size();  }

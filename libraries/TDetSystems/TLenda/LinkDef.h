@@ -1,4 +1,4 @@
-// TLenda.h TLendaHit.h
+// TLenda.h TLendaHit.h TLendaFilter.h
 
 #ifdef __CINT__
 
@@ -7,6 +7,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+#pragma link C++ class TLendaFilter+;
 #pragma link C++ class TLendaHit+;
 #pragma link C++ class std::vector<TLendaHit>+;
 #pragma link C++ class TLenda+;

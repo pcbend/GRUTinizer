@@ -562,6 +562,27 @@ double TMTof::GetCorrelatedXfpE1(int channel) const{
   return fCorrelatedXFPE1;
 }
 
+
+double TMTof::GetCorrelatedTof(int ch1, int ch2, double target, double shift) const{
+  double fCorr = -1;
+  std::vector<unsigned short> refvec1 = GetMTofVector(ch1);
+  std::vector<unsigned short> refvec2 = GetMTofVector(ch2);
+
+  if(refvec1.size() && refvec1.size()){
+    fCorr = std::numeric_limits<double>::max();
+    for(size_t i = 0; i < refvec1.size(); i++) {
+      for (size_t j = 0; j < refvec2.size(); j++){
+        double newvalue = refvec1.at(i) - refvec2.at(j);
+	newvalue += shift;
+        if(std::abs(target - newvalue) < std::abs(target - fCorr)) {
+          fCorr = newvalue;
+        }
+      }
+    }
+  }
+  return fCorr;
+}
+
 //Used to selected reference channel for MToF, defaults to E1 up
 std::vector<unsigned short> TMTof::GetMTofVector(int channel) const {
   switch(channel) {
@@ -572,7 +593,7 @@ std::vector<unsigned short> TMTof::GetMTofVector(int channel) const {
       return  fE1Down;
       break;
     case 2  : //Xfp
-      return  fE1Down;
+      return  fXfp;
       break;
     case 3  : //Obj
       return  fObj;
@@ -599,4 +620,57 @@ std::vector<unsigned short> TMTof::GetMTofVector(int channel) const {
 
   return fE1Up;
 }
+
+double TMTof::GetCorrelatedObjE1() const {
+  double target = GValue::Value("TARGET_MTOF_OBJE1");
+  if (std::isnan(target)){
+    std::cout << "TARGET_MTOF_OBJE1 not defined! Use fObj.at(0) if you want first.\n";
+    fCorrelatedOBJE1 = sqrt(-1);
+    return fCorrelatedOBJE1 = sqrt(-1);
+  }
+
+  //shift allows "shifting" of TOF to line up different runs. Necessary when,
+  //e.g., the voltage on a scintillator changes during an experiment
+  double shift = GValue::Value("SHIFT_MTOF_OBJE1");
+
+  if(fObj.size() && fE1Up.size()){
+    fCorrelatedOBJE1 = std::numeric_limits<double>::max();
+    for(size_t i=0;i<fObj.size();i++) {
+      for (size_t j=0; j < fE1Up.size(); j++){
+        double newvalue = fObj.at(i) - fE1Up.at(j);
+        if (!std::isnan(shift)){
+          newvalue += shift;
+        }
+        if(std::abs(target - newvalue) < std::abs(target - fCorrelatedOBJE1)) {
+          fCorrelatedOBJE1 = newvalue;
+        }
+      }
+    }
+  }
+  return fCorrelatedOBJE1;
+}
+
+double TMTof::GetCorrelatedXfpE1() const{
+  double target = GValue::Value("TARGET_MTOF_XFPE1");
+  if (std::isnan(target)){
+    std::cout << "TARGET_MTOF_XFPE1 not defined! Use fXfp.at(0) if you want first.\n";
+    fCorrelatedXFPE1 = sqrt(-1);
+    return fCorrelatedXFPE1;
+  }
+
+  if(fXfp.size() && fE1Up.size()){
+    fCorrelatedXFPE1 = std::numeric_limits<double>::max();
+    for(size_t i=0;i<fXfp.size();i++) {
+      for (size_t j=0; j < fE1Up.size(); j++){
+        double newvalue = fXfp.at(i)-fE1Up.at(j);
+        if(std::abs(target - newvalue) < std::abs(target - fCorrelatedXFPE1)) {
+          fCorrelatedXFPE1 = newvalue;
+        }
+      }
+    }
+  }
+  return fCorrelatedXFPE1;
+}
+
+
 void TMTof::Print(Option_t *opt) const {    }

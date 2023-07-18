@@ -53,7 +53,6 @@ void TS800::Copy(TObject& obj) const {
 
 
 Float_t TS800::GetAta(int i) const {
-  //float Shift_ata = 0;
   float ata = TInverseMap::Get()->Ata(i,this);
   if(!std::isnan(GValue::Value("ATA_SHIFT"))) {
     ata += GValue::Value("ATA_SHIFT");
@@ -1017,9 +1016,13 @@ double TS800::GetMTofObjE1() const {
   // I return the correlated gvalue corrected time-of-flight obj to e1.
   double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
   double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
+  static int line_displayed = 0;
   if(std::isnan(afp_cor) || std::isnan(xfp_cor)) {
-    printf(ALERTTEXT "Attmepting to do mtof obj correction without values!" RESET_COLOR "\n");
-    fflush(stdout);
+    if(line_displayed < 10) {
+      printf(ALERTTEXT "Attmepting to do mtof obj correction without values!" RESET_COLOR "\n");
+      fflush(stdout);
+      line_displayed++;
+    }
     return sqrt(-1);
   }
   return GetMTofObjE1(afp_cor, xfp_cor);
@@ -1036,9 +1039,13 @@ double TS800::GetMTofXfpE1() const {
   // I return the correlated gvalue corrected time-of-flight xfp to e1.
   double afp_cor = GValue::Value("XFP_MTOF_CORR_AFP");
   double xfp_cor = GValue::Value("XFP_MTOF_CORR_XFP");
+  static int line_displayed = 0;
   if(std::isnan(afp_cor) || std::isnan(xfp_cor)) {
-    printf(ALERTTEXT "Attmepting to do mtof xfp correction without values!" RESET_COLOR "\n");
-    fflush(stdout);
+    if(line_displayed < 10) {
+      printf(ALERTTEXT "Attmepting to do mtof xfp correction without values!" RESET_COLOR "\n");
+      fflush(stdout);
+      line_displayed++;
+    }
     return sqrt(-1);
   }
   return GetMTofXfpE1(afp_cor, xfp_cor);
@@ -1048,6 +1055,10 @@ double TS800::GetMTofXfpE1(double afp_cor, double xfp_cor) const {
   // I return the correlated gvalue corrected time-of-flight xfp to e1.
   return(GetMTof().GetCorrelatedXfpE1()
          + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
+}
+
+double TS800::GetMTofCorr(double correlatedtof, double afp, double xp, double afp_cor, double xfp_cor) const {
+  return (correlatedtof + afp_cor*afp + xfp_cor*xp);
 }
 
 TS800Track::TS800Track() {
@@ -1087,5 +1098,6 @@ void TS800Track::CalculateTracking(const TS800 *s800, int i) {
   dta = s800->GetDta(xfp[0], afp, yfp[0], bfp, i);
 
   scatter = s800->GetScatteringAngle(ata, bta);
+  azita = s800->GetAzita(ata, bta);
   track = s800->Track(ata, bta);
 }

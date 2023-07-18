@@ -75,7 +75,6 @@ bool TInverseMap::ReadMapFile(const char *filename) {
     ss >> invrow.exp[3];
     ss >> invrow.exp[4];
     ss >> invrow.exp[5];
-
     fMap[par-1].push_back(invrow);
 
     //printf("%i\t%s\n",index,line.c_str());
@@ -241,3 +240,4 @@ float TInverseMap::MapCalc(int order,int par,float *input) const {
   }
   return cumul;
 }
+
