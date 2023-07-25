@@ -315,6 +315,11 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
 		       energyNChannels*4, energyLlim, energyUlim,
 		       hit.GetCoreEnergy());
 
+     histname = "hole";
+     obj.FillHistogram(dirname, histname,
+		       30, 0, 30,
+		       hit.GetHoleNumber());
+
      histname = "overview";
      obj.FillHistogram(dirname, histname,
 		       energyNChannels*4, energyLlim, energyUlim,
@@ -342,10 +347,26 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
 		       energyNChannels, energyLlim, energyUlim,
 		       hit.GetDoppler(beta, 0));
 
+     histname = Form("hole_theta_%s_%s",incoming->GetName(),
+		     outgoing->GetName());
+     obj.FillHistogram(dirname, histname,
+		       30, 0, 30,
+		       hit.GetHoleNumber(),
+		       500, 0, TMath::Pi(),
+		       hit.GetTheta());
+
+     histname = Form("hole_phi_%s_%s",incoming->GetName(),
+		     outgoing->GetName());
+     obj.FillHistogram(dirname, histname,
+		       30, 0, 30,
+		       hit.GetHoleNumber(),
+		       500, 0, 2*TMath::Pi(),
+		       hit.GetPhi());
+     
      histname = Form("theta_phi_%s_%s",incoming->GetName(),
 		     outgoing->GetName());
      obj.FillHistogram(dirname, histname,
-		       500, 0, TMath::Pi(),
+		       500, 0, 2*TMath::Pi(),
 		       hit.GetPhi(),
 		       500, 0, TMath::Pi(),
 		       hit.GetTheta());
@@ -355,14 +376,14 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
 		       hit.GetTheta());
      histname = Form("phi_%s",outgoing->GetName());
      obj.FillHistogram(dirname, histname,
-		       500, 0, TMath::Pi(),
+		       500, 0, 2*TMath::Pi(),
 		       hit.GetPhi());
        
      if( hit.GetCrystalPosition().Theta() < TMath::Pi()/2. ){
        histname = Form("theta_phi_fw_%s_%s",incoming->GetName(),
 		       outgoing->GetName());
        obj.FillHistogram(dirname, histname,
-			 500, 0, TMath::Pi(),
+			 500, 0, 2*TMath::Pi(),
 			 hit.GetPhi(),
 			 500, 0, TMath::Pi(),
 			 hit.GetTheta());
@@ -374,13 +395,13 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
        histname = Form("phi_fw_%s_%s",incoming->GetName(),
 		       outgoing->GetName());
        obj.FillHistogram(dirname, histname,
-			 500, 0, TMath::Pi(),
+			 500, 0, 2*TMath::Pi(),
 			 hit.GetPhi());
      } else {
        histname = Form("theta_phi_bw_%s_%s",incoming->GetName(),
 		       outgoing->GetName());
        obj.FillHistogram(dirname, histname,
-			 500, 0, TMath::Pi(),
+			 500, 0, 2*TMath::Pi(),
 			 hit.GetPhi(),
 			 500, 0, TMath::Pi(),
 			 hit.GetTheta());
@@ -392,7 +413,7 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
        histname = Form("phi_bw_%s_%s",incoming->GetName(),
 		       outgoing->GetName());
        obj.FillHistogram(dirname, histname,
-			 500, 0, TMath::Pi(),
+			 500, 0, 2*TMath::Pi(),
 			 hit.GetPhi());
      }
 
