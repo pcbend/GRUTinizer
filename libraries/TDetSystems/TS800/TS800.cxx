@@ -518,6 +518,7 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
       int connector_number = (word2&(0x0c00)) >> 10;
       int databits         = (word2&(0x03ff));
       int real_channel = (connector_number << 6) + channel_number;
+      if(real_channel == 224) continue;
 
       /*std::cout << " sample Number    : " << std::dec << sample_number << std::endl;
         std::cout << " channel Number   : " << std::dec << channel_number << std::endl;

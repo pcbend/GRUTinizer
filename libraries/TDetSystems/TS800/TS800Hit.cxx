@@ -281,6 +281,7 @@ int TCrdc::GetMaxPad() const {
 
 //  temp = data.at(0);
   for(unsigned int i = 0; i < data.size(); i++){
+    if(channel.at(i) == 224) continue; // e21001 extra channel causing problems
     /*
     std::cout << " ------ " << std::endl;
     std::cout << " Data    : " << data.at(i) << " at " << i << std::endl;
