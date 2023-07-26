@@ -83,7 +83,6 @@ bool OutgoingS800(TRuntimeObjects &obj, TS800 *s800, GCutG *outgoing) {
      histname = "incoming";
    }
 
-   //LR (e19028 Run0022, 74Kr setting, emtpy cell)
    obj.FillHistogram(dirname, histname,
 		     1500, -5000, -2000,
 		     s800->GetOBJ_E1Raw_MESY(),
@@ -106,6 +105,15 @@ bool IncomingS800(TRuntimeObjects &obj,TS800 *s800,GCutG *incoming) {
 			     s800->GetXF_E1Raw_MESY()) )
        return false;
      histname = Form("outgoing_%s", incoming->GetName());
+
+     obj.FillHistogram(dirname, Form("CorrTOF_OBJ_MESY_%s", incoming->GetName()),
+		       1000, -4600, -3600,
+		       s800->GetCorrTOF_OBJ_MESY());
+
+     obj.FillHistogram(dirname, Form("IonChamber_Charge_%s", incoming->GetName()),
+		       1200, 6000, 20000,
+		       s800->GetIonChamber().Charge());
+
    } else {
      histname = "outgoing";
    }
@@ -115,7 +123,17 @@ bool IncomingS800(TRuntimeObjects &obj,TS800 *s800,GCutG *incoming) {
 		     s800->GetCorrTOF_OBJ_MESY(),
 		     1200, 6000, 20000,
 		     s800->GetIonChamber().Charge());
-  return true;
+
+   histname = "CorrTOF_OBJ_MESY";
+   obj.FillHistogram(dirname, histname,
+		     1000, -4600, -3600,
+		     s800->GetCorrTOF_OBJ_MESY());
+   histname = "IonChamber_Charge";
+   obj.FillHistogram(dirname, histname,
+		     1200, 6000, 20000,
+		     s800->GetIonChamber().Charge());
+
+   return true;
 
 }
 
@@ -339,6 +357,14 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
 		       energyNChannels, energyLlim, energyUlim,
 		       hit.GetDoppler(beta, &track));
 
+     histname = Form("doppler_s800_theta_%s_%s",incoming->GetName(),
+		     outgoing->GetName());
+     obj.FillHistogram(dirname, histname,
+		       100, 0, TMath::Pi(),
+		       hit.GetTheta(),
+		       energyNChannels, energyLlim, energyUlim,
+		       hit.GetDoppler(beta, &track));
+
      histname = Form("doppler_theta_%s_%s",incoming->GetName(),
 		     outgoing->GetName());
      obj.FillHistogram(dirname, histname,
@@ -346,7 +372,7 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
 		       hit.GetTheta(),
 		       energyNChannels, energyLlim, energyUlim,
 		       hit.GetDoppler(beta, 0));
-
+          
      histname = Form("hole_theta_%s_%s",incoming->GetName(),
 		     outgoing->GetName());
      obj.FillHistogram(dirname, histname,
@@ -455,6 +481,44 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
 		       hit.GetTheta(),
 		       energyNChannels, energyLlim, energyUlim,
 		       hit.GetDoppler(beta, 0));
+     
+     Double_t ata = s800->GetAta()*TMath::RadToDeg();
+     Double_t bta = s800->GetBta()*TMath::RadToDeg();
+     Double_t scatter = sqrt(ata*ata + bta*bta);
+
+     histname = Form("doppler_scatter_%s_%s_t",
+		     incoming->GetName(),
+		     outgoing->GetName());
+     obj.FillHistogram(dirname, histname,
+		       60, 0, 6,
+		       scatter,
+		       energyNChannels, energyLlim, energyUlim,
+		       hit.GetDoppler(beta, 0));
+
+     histname = Form("doppler_s800_scatter_%s_%s_t",
+		     incoming->GetName(),
+		     outgoing->GetName());
+     obj.FillHistogram(dirname, histname,
+		       60, 0, 6,
+		       scatter,
+		       energyNChannels, energyLlim, energyUlim,
+		       hit.GetDoppler(beta, &track));
+
+     if(scatter < 2.0) {
+       histname = Form("doppler_s800_0-2deg_%s_%s_t",
+		       incoming->GetName(),
+		       outgoing->GetName());
+       obj.FillHistogram(dirname, histname,
+			 energyNChannels, energyLlim, energyUlim,
+			 hit.GetDoppler(beta, &track));
+     } else {
+       histname = Form("doppler_s800_2-6deg_%s_%s_t",
+		       incoming->GetName(),
+		       outgoing->GetName());
+       obj.FillHistogram(dirname, histname,
+			 energyNChannels, energyLlim, energyUlim,
+			 hit.GetDoppler(beta, &track));
+     } 
 
    }
 
