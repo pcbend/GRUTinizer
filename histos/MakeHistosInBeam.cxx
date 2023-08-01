@@ -142,20 +142,20 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
      obj.FillHistogram("s800","ata",
 		       200, -100, 100,
-		       s800Sim->GetS800SimHit(0).GetATA());
+		       s800Sim->GetS800SimHit(0).GetATA()*1000.);
 
      obj.FillHistogram("s800","bta",
 		       200, -100, 100,
-		       s800Sim->GetS800SimHit(0).GetBTA());
+		       s800Sim->GetS800SimHit(0).GetBTA()*1000.);
      
-     Double_t xsin, ysin, scatter;
+     Double_t ata, bta, scatter;
 
-     xsin =  sin(s800Sim->GetS800SimHit(0).GetATA()/1000.);
-     ysin = -sin(s800Sim->GetS800SimHit(0).GetBTA()/1000.);
-     scatter = asin(sqrt(xsin*xsin + ysin*ysin))*1000.;
+     ata = s800Sim->GetS800SimHit(0).GetATA()*1000.;
+     bta = s800Sim->GetS800SimHit(0).GetBTA()*1000.;
+     scatter = sqrt(ata*ata + bta*bta);
      
      obj.FillHistogram("s800","scatter",
-		       4096, 0, 300,
+		       200, 0, 200,
 		       scatter);
   }
   

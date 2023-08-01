@@ -197,27 +197,27 @@ bool DTA(TRuntimeObjects &obj, GCutG *incoming, GCutG *outgoing){
 		    200, -0.1, 0.1,
 		    s800->GetDta());
 
-  Double_t ata = s800->GetAta()*TMath::RadToDeg();
-  Double_t bta = s800->GetBta()*TMath::RadToDeg();
+  Double_t ata = s800->GetAta()*1000.;
+  Double_t bta = s800->GetBta()*1000.;
   histname = Form("ata_%s_%s",
 		  incoming->GetName(),
 		  outgoing->GetName());
   obj.FillHistogram(dirname, histname,
-		    1200, -6.0, 6.0,
+		    200, -100, 100,
 		    ata);
   histname = Form("bta_%s_%s",
 		  incoming->GetName(),
 		  outgoing->GetName());
   obj.FillHistogram(dirname, histname,
-		    1200, -6.0, 6.0,
+		    200, -100, 100,
 		    bta);
   histname = Form("ata_bta_%s_%s",
 		  incoming->GetName(),
 		  outgoing->GetName());
   obj.FillHistogram(dirname, histname,
-		    1200, -6.0, 6.0,
+		    200, -100, 100,
 		    bta,
-		    1200, -6.0, 6.0,
+		    200, -100, 100,
 		    ata);
   histname = Form("yta_%s_%s",
 		  incoming->GetName(),
@@ -230,7 +230,7 @@ bool DTA(TRuntimeObjects &obj, GCutG *incoming, GCutG *outgoing){
 		  outgoing->GetName());
   Double_t scatter = sqrt(ata*ata + bta*bta);
   obj.FillHistogram(dirname, histname,
-		    600, 0, 6,
+		    100, 0, 100,
 		    scatter);
 
   return true;
@@ -238,10 +238,11 @@ bool DTA(TRuntimeObjects &obj, GCutG *incoming, GCutG *outgoing){
 
 bool TriggerRegister(TRuntimeObjects &obj, GCutG *incoming, GCutG *outgoing){
 
-  TGretina *gretina = obj.GetDetector<TGretina>();
+  //  TGretina *gretina = obj.GetDetector<TGretina>();
   TS800       *s800 = obj.GetDetector<TS800>();
 
-  if(!gretina || !s800)
+  //  if(!gretina || !s800)
+  if(!s800)
     return false;
   
   std::string dirname = "S800";
@@ -269,12 +270,16 @@ bool TriggerRegister(TRuntimeObjects &obj, GCutG *incoming, GCutG *outgoing){
 			  s800->GetIonChamber().Charge()) )
     return false;
 
-  histname = "trigger_bit_PID";
+  histname = Form("trigger_bit_%s_%s",
+		  incoming_cut->GetName(),
+		  outgoing_cut->GetName());
   for(int j=0;j<16;j++) {
     if(((bits>>j)&0x0001))
       obj.FillHistogram(dirname, histname, 20, 0, 20, j);
   }
-  histname = "trigger_raw_PID";
+  histname = Form("trigger_raw_%s_%s",
+		  incoming_cut->GetName(),
+		  outgoing_cut->GetName());
   obj.FillHistogram(dirname, histname,
 		    20, 0, 20,
 		    s800->GetTrigger().GetRegistr());
@@ -302,9 +307,10 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
      return false;
 
    if(!outgoing->IsInside(s800->GetCorrTOF_OBJ_MESY(),
-   			  s800->GetIonChamber().GetSum()) )
+			  s800->GetIonChamber().Charge()) )   
      return false;
-   //			  s800->GetIonChamber().Charge()) )   
+   //  			  s800->GetIonChamber().GetSum()) )
+
    
    std::string dirname = "gretina";
 
@@ -482,15 +488,15 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
 		       energyNChannels, energyLlim, energyUlim,
 		       hit.GetDoppler(beta, 0));
      
-     Double_t ata = s800->GetAta()*TMath::RadToDeg();
-     Double_t bta = s800->GetBta()*TMath::RadToDeg();
+     Double_t ata = s800->GetAta()*1000.;
+     Double_t bta = s800->GetBta()*1000.;
      Double_t scatter = sqrt(ata*ata + bta*bta);
 
      histname = Form("doppler_scatter_%s_%s_t",
 		     incoming->GetName(),
 		     outgoing->GetName());
      obj.FillHistogram(dirname, histname,
-		       60, 0, 6,
+		       100, 0, 100,
 		       scatter,
 		       energyNChannels, energyLlim, energyUlim,
 		       hit.GetDoppler(beta, 0));
@@ -499,20 +505,20 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
 		     incoming->GetName(),
 		     outgoing->GetName());
      obj.FillHistogram(dirname, histname,
-		       60, 0, 6,
+		       100, 0, 100,
 		       scatter,
 		       energyNChannels, energyLlim, energyUlim,
 		       hit.GetDoppler(beta, &track));
 
-     if(scatter < 2.0) {
-       histname = Form("doppler_s800_0-2deg_%s_%s_t",
+     if(scatter < 35.0) {
+       histname = Form("doppler_s800_0-35mrad_%s_%s_t",
 		       incoming->GetName(),
 		       outgoing->GetName());
        obj.FillHistogram(dirname, histname,
 			 energyNChannels, energyLlim, energyUlim,
 			 hit.GetDoppler(beta, &track));
      } else {
-       histname = Form("doppler_s800_2-6deg_%s_%s_t",
+       histname = Form("doppler_s800_35-100mrad_%s_%s_t",
 		       incoming->GetName(),
 		       outgoing->GetName());
        obj.FillHistogram(dirname, histname,
@@ -569,7 +575,8 @@ void MakeHistograms(TRuntimeObjects& obj) {
     OutgoingS800(obj, s800, outgoing_cut);
 
     DTA(obj, incoming_cut, outgoing_cut);
-
+    TriggerRegister(obj, incoming_cut, outgoing_cut);
+    
     if(gretina) {
       
       HandleGretina(obj, incoming_cut, outgoing_cut, gt_time);
@@ -608,9 +615,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
 	       incoming_cut->IsInside(s800->GetOBJ_E1Raw_MESY(),
 				      s800->GetXF_E1Raw_MESY()) &&
 	       outgoing_cut->IsInside(s800->GetCorrTOF_OBJ_MESY(),
-				      s800->GetIonChamber().GetSum()) ){
-	      //		      s800->GetIonChamber().Charge()) ){
-
+				      s800->GetIonChamber().Charge()) ){
+	      //		      s800->GetIonChamber().GetSum()) ){
+	      
 	      // histname = Form("dtime_all_reg%i_%s_%s",j,
 	      // 		      incoming_cut->GetName(),
 	      // 		      outgoing_cut->GetName());
