@@ -518,7 +518,7 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
       int connector_number = (word2&(0x0c00)) >> 10;
       int databits         = (word2&(0x03ff));
       int real_channel = (connector_number << 6) + channel_number;
-
+      if(real_channel > 223) continue;
       /*std::cout << " sample Number    : " << std::dec << sample_number << std::endl;
         std::cout << " channel Number   : " << std::dec << channel_number << std::endl;
         std::cout << " connector Number : " << std::dec << connector_number << std::endl;
@@ -1058,6 +1058,15 @@ double TS800::GetMTofXfpE1(double afp_cor, double xfp_cor) const {
 }
 
 double TS800::GetMTofCorr(double correlatedtof, double afp, double xp, double afp_cor, double xfp_cor) const {
+  static int line_displayed;
+  if(std::isnan(afp_cor) || std::isnan(xfp_cor)) {
+    if(line_displayed < 10) {
+      printf(ALERTTEXT "Attmepting to do mtof corrections without values!" RESET_COLOR "\n");
+      fflush(stdout);
+      line_displayed++;
+    }
+    return sqrt(-1);
+  }
   return (correlatedtof + afp_cor*afp + xfp_cor*xp);
 }
 

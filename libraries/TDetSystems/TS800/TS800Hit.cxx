@@ -190,7 +190,6 @@ TCrdc::~TCrdc() {
 
 int TCrdc::GetMaxPad() const {
   if(!data.size()) return -1.0;
-
   int maxp = 0;
   float maxd = 0;
   for(unsigned int i = 0; i < data.size(); i++){
@@ -567,19 +566,21 @@ double TMTof::GetCorrelatedTof(int ch1, int ch2, double target, double shift) co
   double fCorr = -1;
   std::vector<unsigned short> refvec1 = GetMTofVector(ch1);
   std::vector<unsigned short> refvec2 = GetMTofVector(ch2);
-
   if(refvec1.size() && refvec1.size()){
+    if(std::isnan(target)) return (refvec1.at(0) - refvec2.at(0));
     fCorr = std::numeric_limits<double>::max();
     for(size_t i = 0; i < refvec1.size(); i++) {
       for (size_t j = 0; j < refvec2.size(); j++){
         double newvalue = refvec1.at(i) - refvec2.at(j);
-	newvalue += shift;
+	if(!std::isnan(shift)) {
+	  newvalue += shift;
+        }
         if(std::abs(target - newvalue) < std::abs(target - fCorr)) {
           fCorr = newvalue;
         }
       }
     }
-  }
+  } else return sqrt(-1);
   return fCorr;
 }
 
@@ -619,6 +620,47 @@ std::vector<unsigned short> TMTof::GetMTofVector(int channel) const {
   }
 
   return fE1Up;
+}
+
+
+double TMTof::GetCorrelatedTof(std::string ch1, std::string ch2, double target, double shift) const{
+  double fCorr = -1;
+  std::vector<unsigned short> refvec1 = GetMTofVectorFromString(ch1);
+  std::vector<unsigned short> refvec2 = GetMTofVectorFromString(ch2);
+
+  if(refvec1.size() && refvec1.size()){
+    if(std::isnan(target)) return (refvec1.at(0) - refvec2.at(0));
+    fCorr = std::numeric_limits<double>::max();
+    for(size_t i = 0; i < refvec1.size(); i++) {
+      for (size_t j = 0; j < refvec2.size(); j++){
+        double newvalue = refvec1.at(i) - refvec2.at(j);
+	if(!std::isnan(shift)) {
+	  newvalue += shift;
+        }
+        if(std::abs(target - newvalue) < std::abs(target - fCorr)) {
+          fCorr = newvalue;
+        }
+      }
+    }
+  } else return sqrt(-1);
+  return fCorr;
+}
+//Used to selected reference channel for MToF, defaults to E1 up
+std::vector<unsigned short> TMTof::GetMTofVectorFromString(std::string vecname) const {
+  if(vecname == "E1Up")        return fE1Up;
+  else if(vecname == "E1Down") return  fE1Down;
+  else if(vecname == "Xfp")    return  fXfp;
+  else if(vecname == "Obj")    return  fObj;
+  else if(vecname == "Rf")    return  fRf;
+  else if(vecname == "Crdc1")  return  fCrdc1Anode;
+  else if(vecname == "Crdc2")  return  fCrdc2Anode;
+  else if(vecname == "Hodo")   return  fHodoscope;
+  else if(vecname == "Ref")    return  fRef;
+  else {
+    std::cout << "Vector Name Not Recognised using fE1Up" << std::endl;
+    std::cout << "Recognised Names: E1Up E1Down Xfp Obj Rf Crdc1 Crdc2 Hodo Ref" << std::endl;
+    return  fE1Up;
+  }
 }
 
 double TMTof::GetCorrelatedObjE1() const {

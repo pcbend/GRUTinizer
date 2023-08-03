@@ -385,6 +385,8 @@ class TMTof : public TDetectorHit {
 
     std::vector<unsigned short> GetMTofVector(int i = 15) const;
     double GetCorrelatedTof(int ch1, int ch2, double target, double shift) const;
+    std::vector<unsigned short> GetMTofVectorFromString(std::string) const;
+    double GetCorrelatedTof(std::string ch1, std::string ch2, double target, double shift) const;
 
 
   private:

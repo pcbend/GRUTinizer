@@ -2,14 +2,15 @@
 
 ClassImp(TGates)
 
-TGates::TGates() { }
+TGates::TGates() {
+}
 
 TGates::~TGates() { }
 
 bool TGates::LoadPIDFile(const char * infile) {
   std::ifstream ifile(infile);
   if(!ifile.is_open()) {
-    std::cout << "PID File not found" << std::endl;
+    std::cout << "PID File " << infile << " not found" << std::endl;
     return false;
   }
   ifile >> fNPid;
@@ -23,7 +24,6 @@ bool TGates::LoadPIDFile(const char * infile) {
       tmpG->SetPoint(j, fX, fY);
     }
     tmpG->SetName(Form("%s",tmpN->GetSymbol()));
-//    GateList.push_back(tmpG);
     GateList.push_back(std::make_pair(tmpN, tmpG));
   }
   return true;
@@ -55,8 +55,15 @@ void TGates::MakePIDFile(const char * filename) {
     if(con != "y") break;
   }
 
+
   std::ofstream outfile;
-  outfile.open(Form("%s.pid",filename));
+
+  std::string fn = filename;
+  if(fn.substr(fn.find_last_of(".") + 1) == "pid") {
+    outfile.open(Form("%s",filename));
+  } else {
+    outfile.open(Form("%s.pid",filename));
+  }
 
   outfile << NPID << std::endl;
   for(unsigned int i = 0; i < data.size();i++) {
@@ -64,6 +71,12 @@ void TGates::MakePIDFile(const char * filename) {
   }
   outfile.close();
   return;
+}
+
+std::string TGates::GetSymbol(int ID) {
+  if(ID > (int)GateList.size() - 1) return "NA";
+  else return GateList.at(ID).first->GetSymbol();
+
 }
 
 int TGates::GateID(float x, float y) {

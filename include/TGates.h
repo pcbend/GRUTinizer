@@ -27,7 +27,10 @@ class TGates : public TObject{
   bool LoadPIDFile(const char *);				//Loads PID Files
   void MakePIDFile(const char *);				//Creates a text file containing particle gates
   std::vector<std::pair<TNucleus*,TCutG*> > GetListOfGates() { return GateList; }
+
+  std::string GetSymbol(int);
   int GateID(float, float);
+  int Size() { return (int)GateList.size(); }
  private:
   int fNPid;
   int fNP;

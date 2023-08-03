@@ -25,6 +25,9 @@ Rint.BracketColor: bold green
 Rint.BadBracketColor: bold red underlined
 Rint.TabComColor: magenta
 
+Rint.Load: $(GRUTSYS)/sandbox/PIDHelper.C
+#Rint.Load: $(GRUTSYS)/sandbox/makePID.C
+
 #default root variables form the grsi enviorment
 Canvas.MoveOpaque: false
 Canvas.ResizeOpaque: false
