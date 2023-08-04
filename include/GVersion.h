@@ -1,12 +1,12 @@
 #ifndef GRUT_GVERSION
 #define GRUT_GVERSION
 
-#define GRUT_RELEASE ""
-#define GRUT_RELEASE_TIME ""
-#define GRUT_RELEASE_NAME ""
+#define GRUT_RELEASE "1.0"
+#define GRUT_RELEASE_TIME "2023-08-03 14:25:23 -0400"
+#define GRUT_RELEASE_NAME "v1.0"
 
-#define GRUT_GIT_COMMIT ""
+#define GRUT_GIT_COMMIT "v1.0"
 #define GRUT_GIT_BRANCH "main"
-#define GRUT_GIT_COMMIT_TIME ""
+#define GRUT_GIT_COMMIT_TIME "2023-08-03 14:25:23 -0400"
 
 #endif /* GRUT_GVERSION */
