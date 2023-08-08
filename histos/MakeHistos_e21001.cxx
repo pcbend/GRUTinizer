@@ -223,7 +223,7 @@ bool DTA(TRuntimeObjects &obj, GCutG *incoming, GCutG *outgoing){
 		  incoming->GetName(),
 		  outgoing->GetName());
   obj.FillHistogram(dirname, histname,
-		    200, -20, 20,
+		    400, -20, 20,
 		    s800->GetYta());
   histname = Form("scatter_%s_%s",
 		  incoming->GetName(),
@@ -321,16 +321,16 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
    double beta = GValue::Value("BETA");
    if(std::isnan(beta))
      beta=0.00;
-   double xoffset = GValue::Value("GRETINA_X_OFFSET");
-   if(std::isnan(xoffset))
-     xoffset=0.00;
-   double yoffset = GValue::Value("GRETINA_Y_OFFSET");
-   if(std::isnan(yoffset))
-     yoffset=0.00;
-   double zoffset = GValue::Value("GRETINA_Z_OFFSET");
-   if(std::isnan(zoffset))
-     zoffset=0.00;
-   TVector3 targetOffset(xoffset, yoffset, zoffset);
+   // double xoffset = GValue::Value("GRETINA_X_OFFSET");
+   // if(std::isnan(xoffset))
+   //   xoffset=0.00;
+   // double yoffset = GValue::Value("GRETINA_Y_OFFSET");
+   // if(std::isnan(yoffset))
+   //   yoffset=0.00;
+   // double zoffset = GValue::Value("GRETINA_Z_OFFSET");
+   // if(std::isnan(zoffset))
+   //   zoffset=0.00;
+   // TVector3 targetOffset(xoffset, yoffset, zoffset);
 
    for(int x=0;x<gretina->Size();x++) {
      TGretinaHit hit = gretina->GetGretinaHit(x);
@@ -351,6 +351,10 @@ bool HandleGretina(TRuntimeObjects &obj,GCutG *incoming,
 		       120, 0, 120,
 		       hit.GetCrystalId());
        
+     // e21001: this crystal was shut down due to noise issues.
+     if(hit.GetCrystalId()==78)
+       continue;
+     
      histname = Form("doppler_%s_%s",incoming->GetName(), outgoing->GetName());
      obj.FillHistogram(dirname, histname,
 		       energyNChannels, energyLlim, energyUlim,

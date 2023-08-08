@@ -193,6 +193,10 @@ void MakeHistograms(TRuntimeObjects& obj) {
 
     TGretinaHit hit = gretina->GetGretinaHit(x);
 
+    // e21001: this crystal was shut down due to noise issues.
+     if(hit.GetCrystalId()==78)
+       continue;
+    
     // Addback preprocessing
     if(hit.GetCoreEnergy() > energyLlim &&
        hit.GetCoreEnergy() < energyUlim){
@@ -230,6 +234,11 @@ void MakeHistograms(TRuntimeObjects& obj) {
       for(unsigned int y=x+1; y<gretina->Size(); y++){
 
 	TGretinaHit hit2 = gretina->GetGretinaHit(y);
+	
+	// e21001: this crystal was shut down due to noise issues.
+	if(hit2.GetCrystalId()==78)
+	  continue;
+
 	Double_t e2 = hit2.GetDoppler(betas[i])*gRandom->Gaus(1,1./1000.);
       
 	obj.FillHistogram("energy",
