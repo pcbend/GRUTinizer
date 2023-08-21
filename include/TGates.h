@@ -28,6 +28,10 @@ class TGates : public TObject{
   void MakePIDFile(const char *);				//Creates a text file containing particle gates
   std::vector<std::pair<TNucleus*,TCutG*> > GetListOfGates() { return GateList; }
 
+  bool LoadGateFile(const char *);				//Loads 2d Gate from File
+  void MakeGateFile(const char *);				//Creates a text file containing a 2d gate
+  bool InGate(float, float);					//Checks if inside gate
+
   std::string GetSymbol(int);
   int GateID(float, float);
   int Size() { return (int)GateList.size(); }
@@ -39,6 +43,7 @@ class TGates : public TObject{
   float fX;
   float fY;
 
+  TCutG*  gate2D;
   std::vector<std::pair<TNucleus*,TCutG*> > GateList;
 
 ClassDef(TGates,1);				// Creates a nucleus with corresponding nuclear information

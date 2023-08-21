@@ -87,3 +87,61 @@ int TGates::GateID(float x, float y) {
   }
   return -1;
 }
+
+bool TGates::LoadGateFile(const char * infile) {
+  std::ifstream ifile(infile);
+  if(!ifile.is_open()) {
+    std::cout << "Gate File " << infile << " not found" << std::endl;
+    return false;
+  }
+
+  gate2D = new TCutG();
+  ifile >> fNP;
+  for(int j = 0; j < fNP; j++) {
+    ifile >> fX >> fY;
+    gate2D->SetPoint(j, fX, fY);
+  }
+  gate2D->SetName("gate2d");
+
+  return true;
+}
+
+void TGates::MakeGateFile(const char * filename) {
+  std::vector<std::string> data;
+  while(1) {
+    TCutG *cut1 = (TCutG*)gPad->WaitPrimitive("CUTG","CutG");
+    cut1->SetName("cut1");
+    cut1->Print();
+    int n = cut1->GetN();
+    double *x = cut1->GetX();
+    double *y = cut1->GetY();
+    data.push_back(Form("%i",n));
+    for (int i = 0; i < n; i++) {
+      data.push_back(Form("%f %f",*x++,*y++));
+    }
+    delete cut1;
+    std::string con;
+    std::cout << "Redraw (y/n)" << std::endl;
+    std::cin >> con;
+    if(con != "y") break;
+    else data.clear();
+  }
+  std::ofstream outfile;
+
+  std::string fn = filename;
+  if(fn.substr(fn.find_last_of(".") + 1) == "gate") {
+    outfile.open(Form("%s",filename));
+  } else {
+    outfile.open(Form("%s.gate",filename));
+  }
+  for(unsigned int i = 0; i < data.size();i++) {
+    outfile << data.at(i) << std::endl;
+  }
+  outfile.close();
+  return;
+}
+
+bool TGates::InGate(float X, float Y) {
+  if(gate2D->IsInside(X, Y)) return true;
+  else return false;
+}

@@ -622,7 +622,8 @@ std::vector<unsigned short> TMTof::GetMTofVector(int channel) const {
   return fE1Up;
 }
 
-
+//General purpose function to calculate time of flight between any two channels
+//Replaces GetCorrelatedbjE1(), GetCorrelatedXFPE1()
 double TMTof::GetCorrelatedTof(std::string ch1, std::string ch2, double target, double shift) const{
   double fCorr = -1;
   std::vector<unsigned short> refvec1 = GetMTofVectorFromString(ch1);
