@@ -133,7 +133,9 @@ public:
  
   bool operator<(const TGretinaHit &rhs) const { return fCoreEnergy > rhs.fCoreEnergy; }
 
-  double GetDoppler(double beta,const TVector3 *vec=0,int EngRange=-1) const {
+  double GetDoppler(double beta,const TVector3 *vec=0,int EngRange=-1) const;
+
+/*  double GetDoppler(double beta,const TVector3 *vec=0,int EngRange=-1) const {
     if(Size()<1)
       return 0.0;
     if(vec==0) {
@@ -144,7 +146,7 @@ public:
     if(EngRange>0) tmp = GetCoreEnergy(EngRange)*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*vec)));
     else tmp = fCoreEnergy*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*vec)));
     return tmp;
-  }
+  }*/
 
   double GetDopplerYta(double beta , double yta, const TVector3 *vec=0, int EngRange =-1) const;
   double GetDopplerYta(double beta , double yta, double target_x_shift, double target_y_shift, double target_z_shift, const TVector3 *vec=0, int EngRange =-1) const;

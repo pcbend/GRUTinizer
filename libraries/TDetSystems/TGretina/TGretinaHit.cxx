@@ -143,6 +143,31 @@ TVector3 TGretinaHit::GetLocalPosition(unsigned int i) const {
 }
 
 
+double TGretinaHit::GetDoppler(double beta,const TVector3 *vec, int EngRange) const {
+  if(Size()<1)
+    return 0.0;
+  if(vec==0) {
+    vec = &BeamUnitVec;
+  }
+  double tmp = 0.0;
+  double gamma = 1/(sqrt(1-pow(beta,2)));
+
+  TVector3 gret_pos = GetPosition();
+  double xoffset = GValue::Value("TARGET_X_OFFSET");
+  if(std::isnan(xoffset)) xoffset=0.00;
+  double yoffset = GValue::Value("TARGET_Y_OFFSET");
+  if(std::isnan(yoffset)) yoffset=0.00;
+  double zoffset = GValue::Value("TARGET_Z_OFFSET");
+  if(std::isnan(zoffset)) zoffset=0.00;
+
+  gret_pos.SetX(gret_pos.X() - xoffset);
+  gret_pos.SetY(gret_pos.Y() - yoffset);
+  gret_pos.SetZ(gret_pos.Z() - zoffset);
+
+  if(EngRange>0) tmp = GetCoreEnergy(EngRange)*gamma *(1 - beta*TMath::Cos(gret_pos.Angle(*vec)));
+  else tmp = fCoreEnergy*gamma *(1 - beta*TMath::Cos(gret_pos.Angle(*vec)));
+  return tmp;
+}
 double TGretinaHit::GetDopplerYta(double beta, double yta, const TVector3 *vec, int EngRange) const {
   if(Size()<1)
     return 0.0;
