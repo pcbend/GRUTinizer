@@ -1,12 +1,5 @@
 #include "Globals.h"
-
 #include "TS800Hit.h"
-#include "TRandom.h"
-#include "GCanvas.h"
-#include "TH2.h"
-#include "TGraph.h"
-#include "TF1.h"
-#include "TVirtualFitter.h"
 
 TTrigger::TTrigger() {
   Clear();
@@ -112,17 +105,16 @@ void TIonChamber::Set(int ch, int data){
 float TIonChamber::GetAve(){
   float temp =0.0;
   for(unsigned int x=0;x<fData.size();x++) {
-      TChannel *c = TChannel::GetChannel(Address(x));
-      if (c){
-        temp += c->CalEnergy(fData.at(x));
-      } else{
-        temp += fData.at(x);
-      }
+    TChannel *c = TChannel::GetChannel(Address(x));
+    if (c){
+      temp += c->CalEnergy(fData.at(x));
+    } else{
+      temp += fData.at(x);
+    }
   }
   if(temp > 0) temp = temp/((float)fData.size());
   return temp;
 }
-
 
 float TIonChamber::GetSum() const {
   float temp =0.0;
@@ -179,8 +171,6 @@ void TIonChamber::Clear(Option_t *opt) {
 void TIonChamber::Print(Option_t *opt) const { }
 
 /******* End of TIonChamber.  Beginning of TWhatever **********/
-
-
 TCrdc::TCrdc() {
   Clear();
 }
@@ -189,6 +179,7 @@ TCrdc::~TCrdc() {
 }
 
 int TCrdc::GetMaxPad() const {
+
   if(!data.size()) return -1.0;
   int maxp = 0;
   float maxd = 0;
@@ -208,6 +199,12 @@ int TCrdc::GetMaxPad() const {
       maxd = cal_data;
     }
   }
+
+  //WIP
+  //Attempting to speed up function
+//  if(!data.size()) return -1.0;
+//  int dis = std::distance(data.begin(), std::max_element(data.begin(), data.end()));
+//  int maxp = channel.at(dis);
   return maxp;
 }
 
@@ -276,6 +273,7 @@ bool TCrdc::IsGoodSample(int i) const {
 
 float TCrdc::GetDispersiveX() const{
   int maxpad = GetMaxPad();
+
   if (maxpad ==-1){
     has_cached_dispersive_x = true;
     return sqrt(-1);
@@ -330,15 +328,15 @@ float TCrdc::GetDispersiveX() const{
 
   has_cached_dispersive_x = true;
   cached_dispersive_x = output;
-
   return output;
 }
 
 
 float TCrdc::GetNonDispersiveY() {
-  if (GetMaxPad() ==-1){
+  if (GetMaxPad() == -1){
     return sqrt(-1);
   }
+
   float y_slope = sqrt(-1);
   float y_offset = sqrt(-1);
   if(fId==0) {
@@ -352,9 +350,91 @@ float TCrdc::GetNonDispersiveY() {
   if(std::isnan(y_slope)) y_slope = 1.0;
   if(std::isnan(y_offset)) y_offset = 0.0;
 
+  float tmp = ((float)time) * y_slope + y_offset;
+  return tmp;
+}
+
+
+float TCrdc::GetDispersiveX(int maxpad) const{
+  if (maxpad ==-1){
+    has_cached_dispersive_x = true;
+    return sqrt(-1);
+  }
+  float x_slope = sqrt(-1);
+  float x_offset = sqrt(-1);
+  if(fId == 0) {
+    x_slope = GValue::Value("CRDC1_X_SLOPE");
+    x_offset = GValue::Value("CRDC1_X_OFFSET");
+  } else {
+    x_slope = GValue::Value("CRDC2_X_SLOPE");
+    x_offset = GValue::Value("CRDC2_X_OFFSET");
+  }
+  if(std::isnan(x_slope))
+    x_slope = 1.0;
+  if(std::isnan(x_offset))
+    x_offset = 0.0;
+
+  const int GRAVITY_WIDTH = 14;//determines how many pads one uses in averaging
+  const int NUM_PADS = 224;
+  int lowpad = maxpad - GRAVITY_WIDTH/2;
+  int highpad = lowpad + GRAVITY_WIDTH;
+  if (lowpad < 0){
+    lowpad = 0;
+  }
+  if (highpad >= NUM_PADS){
+    highpad = NUM_PADS-1;
+  }
+
+  double datasum = 0;
+  double weighted_sum = 0;
+  for(int i=0;i<Size();i++) {
+    if((channel.at(i) < lowpad)||(channel.at(i)>highpad) ||
+       !IsGoodSample(i)) {
+      continue;
+    }
+
+    TChannel *c = TChannel::GetChannel(Address(i));
+    double cal_data;
+    if (c){
+      cal_data = c->CalEnergy(GetData(i));
+    } else{
+      cal_data = (double)GetData(i);
+    }
+    datasum += cal_data;
+    weighted_sum += channel.at(i)*cal_data;
+  }
+
+  // + 0.5 so that we take the middle of the pad, not the left edge.
+  double mean_chan = weighted_sum/datasum + 0.5;
+  double output = (mean_chan*x_slope+x_offset);
+
+  has_cached_dispersive_x = true;
+  cached_dispersive_x = output;
+  return output;
+}
+
+
+float TCrdc::GetNonDispersiveY(int maxpad) {
+  if (maxpad ==-1){
+    return sqrt(-1);
+  }
+
+  float y_slope = sqrt(-1);
+  float y_offset = sqrt(-1);
+  if(fId==0) {
+    y_slope = GValue::Value("CRDC1_Y_SLOPE");
+    y_offset = GValue::Value("CRDC1_Y_OFFSET");
+  } else if(fId==1) {
+    y_slope = GValue::Value("CRDC2_Y_SLOPE");
+    y_offset = GValue::Value("CRDC2_Y_OFFSET");
+  }
+
+  if(std::isnan(y_slope)) y_slope = 1.0;
+  if(std::isnan(y_offset)) y_offset = 0.0;
   float tmp = ((float)time)*y_slope+y_offset;
   return tmp;
 }
+
 
 void TCrdc::Print(Option_t *opt) const { }
 
@@ -562,6 +642,8 @@ double TMTof::GetCorrelatedXfpE1(int channel) const{
 }
 
 
+//General purpose function to calculate time of flight between any two channels
+//Replaces GetCorrelatedbjE1(), GetCorrelatedXFPE1()
 double TMTof::GetCorrelatedTof(int ch1, int ch2, double target, double shift) const{
   double fCorr = -1;
   std::vector<unsigned short> refvec1 = GetMTofVector(ch1);

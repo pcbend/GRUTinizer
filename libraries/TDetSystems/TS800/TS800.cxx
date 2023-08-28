@@ -1,6 +1,5 @@
 #include "TS800.h"
 
-
 #include <atomic>
 #include <cassert>
 #include <iostream>
@@ -10,19 +9,10 @@
 
 #include "TGEBEvent.h"
 #include "TGRUTOptions.h"
-#include "GH2I.h"
-#include "GRootCommands.h"
-#include "GCanvas.h"
-
-#include "TChain.h"
-#include "TPad.h"
-#include "TROOT.h"
-
 #include "TInverseMap.h"
 
+
 bool TS800::fGlobalReset =false;
-
-
 
 static double f_mafp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
 static double f_mxfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
@@ -148,11 +138,9 @@ float TS800::AdjustedBeta(float beta, float dta) const {
 
 
 TVector3 TS800::Track(double sata,double sbta) const {
-  //TVector3 track(0,0,1);  // set to input beam trajectory
-  //track.RotateY(GetAta(3));
-  //track.Rotate( GetBta(3),-track.Cross(TVector3(0,1,0)) );
   double ata = TMath::Sin(GetAta()+sata);
   double bta = TMath::Sin(GetBta()+sbta);
+
   TVector3 track(ata,-bta,sqrt(1-ata*ata-bta*bta));
   return track;
 }
@@ -169,8 +157,6 @@ TVector3 TS800::CRDCTrack(){
   TVector3 track;
   track.SetTheta(TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1073.0)); // rad
   track.SetPhi(TMath::ATan((GetCrdc(0).GetNonDispersiveY()-GetCrdc(1).GetNonDispersiveY())/1073.0)); // rad
-  //track.SetPt(1) // need to do this.
-
   return track;
 }
 
@@ -219,7 +205,6 @@ void TS800::Clear(Option_t* opt){
   ion.Clear();
 
   hodo.Clear();
-
 }
 
 int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
@@ -266,7 +251,7 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
 	break;
       case 0x5840:  // CRDC Packet
 	//event.Print("all0x58400x5845");
-  HandleCRDCPacket(dptr+1,sizeleft);
+  	HandleCRDCPacket(dptr+1,sizeleft);
 	break;
       case 0x5850:  // II CRDC Packet
 	break;
@@ -281,7 +266,7 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
       case 0x58a0:  // Obj Pin Packet
 	break;
       case 0x58b0:  // S800 Hodoscope
-  HandleHodoPacket(dptr+1, sizeleft);
+  	HandleHodoPacket(dptr+1, sizeleft);
 	break;
       case 0x58c0:  // VME ADC
 	break;
@@ -313,7 +298,7 @@ int TS800::BuildHits(UShort_t eventsize,UShort_t *dptr,Long64_t timestamp) {  //
 
   //Here, we are now pointing at the size of the next S800 thing.  Inclusive in shorts.
   //std::string toprint = "all";
-  
+
   unsigned short *data = dptr+2; //unsigned short*)(event.GetPayload()+ptr);
   size_t x = 0;
   //printf(" new s800 event\n"); fflush(stdout);
@@ -382,7 +367,6 @@ int TS800::BuildHits(UShort_t eventsize,UShort_t *dptr,Long64_t timestamp) {  //
     case 0x58f0:
       HandleMTDCPacket(dptr+1,sizeleft);
       break;
-    
     default:
       //fprintf(stderr,"unknown data S800 type: 0x%04x  @ x = %i \n",*dptr,x);
       return 0;
@@ -390,19 +374,11 @@ int TS800::BuildHits(UShort_t eventsize,UShort_t *dptr,Long64_t timestamp) {  //
   }
   //SetEventCounter(head->GetEventNumber());
   //geb->Print(toprint.c_str());
-  
   return 1;
 }
 
-
-
-
-
-
-
-
 bool TS800::HandleTrigPacket(unsigned short *data,int size) {
-  if(size<1){
+  if(size < 1){
     static int i=0;
     i++;
     std::cout << "Encountered " << i << " events with empty trig packet" << std::endl;
@@ -458,7 +434,6 @@ bool TS800::HandleTOFPacket(unsigned short *data ,int size){
       break;
     }
   }
-
   return true;
 }
 
@@ -724,45 +699,10 @@ bool TS800::HandleHodoPacket(unsigned short *data,int size) {
   }//x < size
   return true;
 }
-/*
-bool TS800::HandleHODOPacket(unsigned short *data,int size) {
-  if(!size)
-    return false;
-  //printf("HODO id: 0x%04x\n",(*((unsigned short*)data)));
-  int id = (*((unsigned short*)data));
-  for(int x=2;x<size;x+=2) {
-    THodoHit *hit =0;
-    unsigned short temp = (*((unsigned short*)data));
-    //printf("\tHODO : 0x%04x\n",(*((unsigned short*)data)));
-    switch(id) {
-      case 0:
-        hit = (THodoHit*)hodo->ConstructedAt(hodo->GetEntries());
-        hit->SetChannel((temp*0xf000)>>12);
-        hit->Set(temp);
-        break;
-      case 1:
-        hit = (THodoHit*)hodo->ConstructedAt(hodo->GetEntries());
-        hit->SetChannel(((temp*0xf000)>>12)+16);
-        hit->Set(temp);
-        break;
-      case 2:
-        hodo_hit_pattern1 = temp;
-        hodo_hit_pattern2 = (*((unsigned short*)(data+2)));
-        hodo_hit_time     = (*((unsigned short*)(data+4)));
-        return true;
-    }
-  }
 
-  return true;
-}
-*/
 bool TS800::HandleMTDCPacket(unsigned short *data,int size) {
   int x = 0;
   while(x<size){
-    //printf("0x%04x  ",*(data+x));
-    //x++;
-    //if((x%8)==0)
-    //  printf("\n");
 
     unsigned short word1 = *(data+x);
     unsigned short word2 = *(data+x+1);
@@ -801,8 +741,6 @@ bool TS800::HandleMTDCPacket(unsigned short *data,int size) {
     };
 
   }
-  //printf("\n\n");
-
   return true;
 }
 
@@ -1070,7 +1008,7 @@ double TS800::GetMTofCorr(double correlatedtof, double afp, double xp, double af
   return (correlatedtof + afp_cor*afp + xfp_cor*xp);
 }
 
-//New function to calculate all S800 angle, taken from SpecTcl
+//New function to calculate all S800 angles, taken from SpecTcl
 TS800Track::TS800Track() {
   Clear();
 }
@@ -1092,12 +1030,17 @@ void TS800Track::Clear() {
   azita = -1;
 }
 
+//Calulates everything from the CRDC postions and inverse maps
+//with minimum number of function calls
 void TS800Track::CalculateTracking(const TS800 *s800, int i) {
 
-  xfp[0] = s800->GetCrdc(0).GetDispersiveX();
-  xfp[1] = s800->GetCrdc(1).GetDispersiveX();
-  yfp[0] = s800->GetCrdc(0).GetNonDispersiveY();
-  yfp[1] = s800->GetCrdc(1).GetNonDispersiveY();
+  int maxp0 = s800->GetCrdc(0).GetMaxPad();
+  int maxp1 = s800->GetCrdc(1).GetMaxPad();
+
+  xfp[0] = s800->GetCrdc(0).GetDispersiveX(maxp0);
+  xfp[1] = s800->GetCrdc(1).GetDispersiveX(maxp1);
+  yfp[0] = s800->GetCrdc(0).GetNonDispersiveY(maxp0);
+  yfp[1] = s800->GetCrdc(1).GetNonDispersiveY(maxp1);
 
   afp = s800->GetAFP(xfp[0], xfp[1]);
   bfp = s800->GetBFP(yfp[0], yfp[1]);

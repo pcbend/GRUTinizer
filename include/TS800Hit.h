@@ -140,6 +140,9 @@ class TCrdc : public TDetectorHit {
 
     float GetDispersiveX() const;
     float GetNonDispersiveY();
+    float GetDispersiveX(int) const;
+    float GetNonDispersiveY(int);
+
     int GetMaxPad() const;
     int GetMaxPadSum() const;
 

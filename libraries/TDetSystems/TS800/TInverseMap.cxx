@@ -6,7 +6,6 @@
 #include <unistd.h>
 #include <sstream>
 
-
 #include <TS800.h>
 #include <TGRUTOptions.h>
 
@@ -232,7 +231,7 @@ float TInverseMap::MapCalc(int order,int par,float *input) const {
   for(unsigned int x=0; x<vec.size();x++) {
     if(order<vec.at(x).order) break;
     multiplicator = 1.0;
-    for(int y=0;y<6;y++) {
+    for(int y=0;y<4;y++) {
       if(vec.at(x).exp[y]!=0)
         multiplicator *= pow(input[y],vec.at(x).exp[y]);
     }
@@ -240,4 +239,3 @@ float TInverseMap::MapCalc(int order,int par,float *input) const {
   }
   return cumul;
 }
-

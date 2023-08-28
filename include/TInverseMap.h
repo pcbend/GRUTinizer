@@ -26,16 +26,13 @@ class TInverseMap : public TNamed {
     float Dta(int,const TS800*);
 
     float MapCalc(int,int,float*) const;
-
     int Size() { return fMap.size(); }
-
-    
 
   private:
     TInverseMap(const char* filename);
     static TInverseMap *fInverseMap;
 
-    bool ReadMapFile(const char *filename);  
+    bool ReadMapFile(const char *filename);
 
     struct InvMapRow{
       double coefficient;
