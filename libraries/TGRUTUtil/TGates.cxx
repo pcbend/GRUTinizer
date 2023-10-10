@@ -88,6 +88,29 @@ int TGates::GateID(float x, float y) {
   return -1;
 }
 
+int TGates::GetA(int ID) {
+  if(ID > (int)GateList.size() - 1) return -1;
+  else return GateList.at(ID).first->GetA();
+
+}
+
+int TGates::GetZ(int ID) {
+  if(ID > (int)GateList.size() - 1) return -1;
+  else return GateList.at(ID).first->GetZ();
+
+}
+
+int TGates::GetN(int ID) {
+  if(ID > (int)GateList.size() - 1) return -1;
+  else return GateList.at(ID).first->GetN();
+
+}
+
+double TGates::GetMass(int ID) {
+  if(ID > (int)GateList.size() - 1) return -1;
+  else return GateList.at(ID).first->GetMass();
+}
+
 bool TGates::LoadGateFile(const char * infile) {
   std::ifstream ifile(infile);
   if(!ifile.is_open()) {

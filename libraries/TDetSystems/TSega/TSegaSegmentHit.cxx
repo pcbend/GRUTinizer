@@ -4,6 +4,9 @@
 #include <algorithm>
 #include <iostream>
 
+/*******************************************************************************/
+/* Copies hit ******************************************************************/
+/*******************************************************************************/
 void TSegaSegmentHit::Copy(TObject& obj) const{
   TDetectorHit::Copy(obj);
 
@@ -11,17 +14,26 @@ void TSegaSegmentHit::Copy(TObject& obj) const{
   sega.fTrace = fTrace;
 }
 
+/*******************************************************************************/
+/* Clear hit *******************************************************************/
+/*******************************************************************************/
 void TSegaSegmentHit::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
   fTrace.clear();
 }
 
+/*******************************************************************************/
+/* Basic Print function ********************************************************/
+/*******************************************************************************/
 void TSegaSegmentHit::Print(Option_t *opt) const {
   std::cout << "TSegaSegmentHit:\n"
             << "\tCharge: " << Charge() << "\n"
             << std::flush;
 }
 
+/*******************************************************************************/
+/* Sets trace information if present in data ***********************************/
+/*******************************************************************************/
 void TSegaSegmentHit::SetTrace(unsigned int trace_length, const unsigned short* trace) {
   if(!trace){
     fTrace.clear();
@@ -36,6 +48,9 @@ void TSegaSegmentHit::SetTrace(unsigned int trace_length, const unsigned short* 
   }
 }
 
+/*******************************************************************************/
+/* Returns detector number based on channels.cal file definition ***************/
+/*******************************************************************************/
 int TSegaSegmentHit::GetDetnum() const {
   TChannel* chan = TChannel::GetChannel(fAddress);
   if(chan){
@@ -47,6 +62,9 @@ int TSegaSegmentHit::GetDetnum() const {
   }
 }
 
+/*******************************************************************************/
+/* Returns segment number based on channels.cal file definition ****************/
+/*******************************************************************************/
 int TSegaSegmentHit::GetSegnum() const {
   TChannel* chan = TChannel::GetChannel(fAddress);
   if(chan){
@@ -56,11 +74,16 @@ int TSegaSegmentHit::GetSegnum() const {
   }
 }
 
-//Mapped Numbers
+/*******************************************************************************/
+/* Mapped numbers - I do not know the purpose of these functions ***************/
+/*******************************************************************************/
 int TSegaSegmentHit::GetMapnum() const {return TSega::MappedSegnum(GetDetnum(),GetSegnum());}
 int TSegaSegmentHit::GetPairnum() const {return TSega::MappedPairnum(GetDetnum(),GetSegnum());}
 int TSegaSegmentHit::GetSlicenum() const {return TSega::MappedSlicenum(GetDetnum(),GetSegnum());}
 
+/*******************************************************************************/
+/* Returns DDAS crate/slot channel number **************************************/
+/*******************************************************************************/
 int TSegaSegmentHit::GetCrate() const {
   return (fAddress&0x00ff0000)>>16;
 }
@@ -73,6 +96,9 @@ int TSegaSegmentHit::GetChannel() const {
   return (fAddress&0x000000ff)>>0;
 }
 
+/*******************************************************************************/
+/* Uncalibrated SeGA segment energies ******************************************/
+/*******************************************************************************/
 Int_t TSegaSegmentHit::Charge() const {
   if(fCharge > 30000) {
     return fCharge - 32768;

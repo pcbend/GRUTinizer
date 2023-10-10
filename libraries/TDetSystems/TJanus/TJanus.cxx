@@ -425,25 +425,16 @@ void TJanus::InsertHit(const TDetectorHit& hit) {
   fSize++;
 }
 
-TJanusHit* TJanus::GetRingHit(const int&i) {
-  if(i < GetRingSize()) {
-    return &ring_hits.at(i);
-  }
-  return nullptr;
+TJanusHit& TJanus::GetRingHit(int i) {
+  return ring_hits.at(i);
 }
 
-TJanusHit* TJanus::GetSectorHit(const int&i) {
-  if(i < GetSectorSize()) {
-    return &sector_hits.at(i);
-  }
-  return nullptr;
+TJanusHit& TJanus::GetSectorHit(int i) {
+  return sector_hits.at(i);
 }
 
-TJanusHit* TJanus::GetJanusHit(const int&i) {
-  if(i < (int)janus_hits.size()) {
-    return &janus_hits.at(i);
-  }
-  return nullptr;
+TJanusHit& TJanus::GetJanusHit(int i) {
+  return janus_hits.at(i);
 }
 
 void TJanus::Print(Option_t *opt) const {

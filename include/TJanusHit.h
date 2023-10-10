@@ -37,6 +37,7 @@ public:
   int GetRing() const { return fRing; }
   int GetSector() const { return fSector; }
   int GetDetnum() const { return fDetector; }
+  bool IsDownstream() const {return (GetDetnum() > 0); }
 
   TVector3 GetPosition(bool apply_array_offset = true) const;
 

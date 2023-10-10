@@ -55,6 +55,8 @@ public:
   int GetEnergySum3() const {return fEnSum3;}
   int GetEnergySum4() const {return fEnSum4;}
 
+  void SetEnergySum(int sum, int energy_sum) { fEnSum[sum] = energy_sum; }
+  int GetEnergySum(int sum) const { return fEnSum[sum]; }
   TSegaSegmentHit& MakeSegmentByAddress(unsigned int address);
 
   int GetSlot() const;
@@ -79,6 +81,7 @@ private:
   int fEnSum2;
   int fEnSum3;
   int fEnSum4;
+  int fEnSum[4];
   bool fEsum;
 
   ClassDef(TSegaHit,4);

@@ -1037,6 +1037,9 @@ void TS800Track::CalculateTracking(const TS800 *s800, int i) {
   int maxp0 = s800->GetCrdc(0).GetMaxPad();
   int maxp1 = s800->GetCrdc(1).GetMaxPad();
 
+//  int maxp0 = s800->GetCrdc(0).GetMaxPadFast();
+//  int maxp1 = s800->GetCrdc(1).GetMaxPadFast();
+
   xfp[0] = s800->GetCrdc(0).GetDispersiveX(maxp0);
   xfp[1] = s800->GetCrdc(1).GetDispersiveX(maxp1);
   yfp[0] = s800->GetCrdc(0).GetNonDispersiveY(maxp0);

@@ -1,6 +1,9 @@
 #include "Globals.h"
 #include "TS800Hit.h"
 
+#include "chrono"
+using namespace std::chrono;
+
 TTrigger::TTrigger() {
   Clear();
 }
@@ -170,7 +173,11 @@ void TIonChamber::Clear(Option_t *opt) {
 
 void TIonChamber::Print(Option_t *opt) const { }
 
-/******* End of TIonChamber.  Beginning of TWhatever **********/
+/*******************************************************************************/
+/* TCrdc ***********************************************************************/
+/* Used to store data from the CRDCS *******************************************/
+/* Gets CRDC1/2 X/y positions to calculate angles in S800 **********************/
+/*******************************************************************************/
 TCrdc::TCrdc() {
   Clear();
 }
@@ -179,7 +186,7 @@ TCrdc::~TCrdc() {
 }
 
 int TCrdc::GetMaxPad() const {
-
+//  auto start = high_resolution_clock::now();
   if(!data.size()) return -1.0;
   int maxp = 0;
   float maxd = 0;
@@ -199,12 +206,23 @@ int TCrdc::GetMaxPad() const {
       maxd = cal_data;
     }
   }
+//  auto stop = high_resolution_clock::now();
+//  auto duration = duration_cast<microseconds>(stop - start);
+//  std::cout << "Time taken by function: " << duration.count() << " microseconds" << std::endl;
+  return maxp;
+}
 
+int TCrdc::GetMaxPadFast() const {
+//  auto start = high_resolution_clock::now();
   //WIP
   //Attempting to speed up function
-//  if(!data.size()) return -1.0;
-//  int dis = std::distance(data.begin(), std::max_element(data.begin(), data.end()));
-//  int maxp = channel.at(dis);
+  if(!data.size()) return -1.0;
+  int dis = std::distance(data.begin(), std::max_element(data.begin(), data.end()));
+  int maxp = channel.at(dis);
+
+//  auto stop = high_resolution_clock::now();
+//  auto duration = duration_cast<microseconds>(stop - start);
+//  std::cout << "Time taken by Fast function: " << duration.count() << " microseconds" << std::endl;
   return maxp;
 }
 
@@ -306,8 +324,7 @@ float TCrdc::GetDispersiveX() const{
   double datasum = 0;
   double weighted_sum = 0;
   for(int i=0;i<Size();i++) {
-    if((channel.at(i) < lowpad)||(channel.at(i)>highpad) ||
-       !IsGoodSample(i)) {
+    if((channel.at(i) < lowpad) || (channel.at(i)>highpad) || !IsGoodSample(i)) {
       continue;
     }
 
@@ -387,9 +404,8 @@ float TCrdc::GetDispersiveX(int maxpad) const{
 
   double datasum = 0;
   double weighted_sum = 0;
-  for(int i=0;i<Size();i++) {
-    if((channel.at(i) < lowpad)||(channel.at(i)>highpad) ||
-       !IsGoodSample(i)) {
+  for(int i = 0; i < Size(); i++) {
+    if((channel.at(i) < lowpad) || (channel.at(i)>highpad) || !IsGoodSample(i)) {
       continue;
     }
 
@@ -486,6 +502,10 @@ void TCrdcPad::Copy(TObject &obj) const {
 
 }
 
+/*******************************************************************************/
+/* THodoscope ******************************************************************/
+/* Used to store data from the Hodoscope ***************************************/
+/*******************************************************************************/
 THodoscope::THodoscope() { Clear(); }
 THodoscope::~THodoscope() { Clear(); }
 THodoscope::THodoscope(const THodoscope &hodoscope) {
@@ -547,6 +567,12 @@ void THodoHit::Clear(Option_t *opt){
   fChannel = sqrt(-1);
 }
 
+/*******************************************************************************/
+/* TMToF ***********************************************************************/
+/* Used to store data from Mestec MTDC-32 **************************************/
+/* Each channel of MTDC is stored in an individual vector fE1Up, fObj etc. *****/
+/* Used primarily for ToF for PID purposes *************************************/
+/*******************************************************************************/
 TMTof::TMTof() { Clear(); }
 
 TMTof::~TMTof() { }
@@ -556,6 +582,9 @@ TMTof::TMTof(const TMTof &mtof) {
 }
 
 
+/*******************************************************************************/
+/* Copy TMTof hit - no functionality *******************************************/
+/*******************************************************************************/
 void TMTof::Copy(TObject &obj) const {
   TDetectorHit::Copy(obj);
 
@@ -572,6 +601,9 @@ void TMTof::Copy(TObject &obj) const {
   mtof.fRef       = fRef;
 }
 
+/*******************************************************************************/
+/* Clears MTDC vectors *********************************************************/
+/*******************************************************************************/
 void TMTof::Clear(Option_t *opt) {
 
   fE1Up.clear();
@@ -588,62 +620,16 @@ void TMTof::Clear(Option_t *opt) {
   fCorrelatedOBJE1=sqrt(-1);
 }
 
-double TMTof::GetCorrelatedObjE1(int channel) const {
-  double target = GValue::Value("TARGET_MTOF_OBJE1");
-  if (std::isnan(target)){
-    std::cout << "TARGET_MTOF_OBJE1 not defined! Use fObj.at(0) if you want first.\n";
-    fCorrelatedOBJE1 = sqrt(-1);
-    return fCorrelatedOBJE1 = sqrt(-1);
-  }
 
-  //shift allows "shifting" of TOF to line up different runs. Necessary when,
-  //e.g., the voltage on a scintillator changes during an experiment
-  double shift = GValue::Value("SHIFT_MTOF_OBJE1");
-
-  std::vector<unsigned short> refvec = GetMTofVector(channel);
-  if(fObj.size() && refvec.size()){
-    fCorrelatedOBJE1 = std::numeric_limits<double>::max();
-    for(size_t i=0;i<fObj.size();i++) {
-      for (size_t j=0; j < refvec.size(); j++){
-        double newvalue = fObj.at(i) - refvec.at(j);
-        if (!std::isnan(shift)){
-          newvalue += shift;
-        }
-        if(std::abs(target - newvalue) < std::abs(target - fCorrelatedOBJE1)) {
-          fCorrelatedOBJE1 = newvalue;
-        }
-      }
-    }
-  }
-  return fCorrelatedOBJE1;
-}
-
-double TMTof::GetCorrelatedXfpE1(int channel) const{
-  double target = GValue::Value("TARGET_MTOF_XFPE1");
-  if (std::isnan(target)){
-    std::cout << "TARGET_MTOF_XFPE1 not defined! Use fXfp.at(0) if you want first.\n";
-    fCorrelatedXFPE1 = sqrt(-1);
-    return fCorrelatedXFPE1;
-  }
-
-  std::vector<unsigned short> refvec = GetMTofVector(channel);
-  if(fXfp.size() && refvec.size()){
-    fCorrelatedXFPE1 = std::numeric_limits<double>::max();
-    for(size_t i=0;i<fXfp.size();i++) {
-      for (size_t j=0; j < refvec.size(); j++){
-        double newvalue = fXfp.at(i)-refvec.at(j);
-        if(std::abs(target - newvalue) < std::abs(target - fCorrelatedXFPE1)) {
-          fCorrelatedXFPE1 = newvalue;
-        }
-      }
-    }
-  }
-  return fCorrelatedXFPE1;
-}
-
-
-//General purpose function to calculate time of flight between any two channels
-//Replaces GetCorrelatedbjE1(), GetCorrelatedXFPE1()
+/*******************************************************************************/
+/* Generic correlated Time of flight functions between any two MTDC's channels */
+/* ch1/ch2 - channels numbers of MTDC for time difference **********************/
+/* target - used to line up select specific MToF of peak ***********************/
+/* shift - used to shift MToF peak in the event peaks shift run to run *********/
+/* If no arguments for "target" are given returns difference between the first */
+/* value of MTDC vectors selected by ch1/ch2 ***********************************/
+/* Replaces GetCorrelatedbjE1(), GetCorrelatedXFPE1() **************************/
+/*******************************************************************************/
 double TMTof::GetCorrelatedTof(int ch1, int ch2, double target, double shift) const{
   double fCorr = -1;
   std::vector<unsigned short> refvec1 = GetMTofVector(ch1);
@@ -666,7 +652,11 @@ double TMTof::GetCorrelatedTof(int ch1, int ch2, double target, double shift) co
   return fCorr;
 }
 
-//Used to selected reference channel for MToF, defaults to E1 up
+/*******************************************************************************/
+/* Returns one of the MTDC vectors based on channel number *********************/
+/* channel - Channel number of MTDC ********************************************/
+/* If no arguments are given returns E1Up **************************************/
+/*******************************************************************************/
 std::vector<unsigned short> TMTof::GetMTofVector(int channel) const {
   switch(channel) {
     case 0  : //E1 up
@@ -704,8 +694,15 @@ std::vector<unsigned short> TMTof::GetMTofVector(int channel) const {
   return fE1Up;
 }
 
-//General purpose function to calculate time of flight between any two channels
-//Replaces GetCorrelatedbjE1(), GetCorrelatedXFPE1()
+/*******************************************************************************/
+/* Generic correlated Time of flight functions between any two MTDC's channels */
+/* ch1/ch2 - Detector name in MTDC for time difference *************************/
+/* target used to line up select specific MToF of peak *************************/
+/* shift used to shift MToF peak in the event peaks shift run to run ***********/
+/* If no arguments for "target" are given returns difference between the first */
+/* value of MTDC vectors selected by ch1/ch2 ***********************************/
+/* Replaces GetCorrelatedbjE1(), GetCorrelatedXFPE1() **************************/
+/*******************************************************************************/
 double TMTof::GetCorrelatedTof(std::string ch1, std::string ch2, double target, double shift) const{
   double fCorr = -1;
   std::vector<unsigned short> refvec1 = GetMTofVectorFromString(ch1);
@@ -728,7 +725,12 @@ double TMTof::GetCorrelatedTof(std::string ch1, std::string ch2, double target, 
   } else return sqrt(-1);
   return fCorr;
 }
-//Used to selected reference channel for MToF, defaults to E1 up
+
+/*******************************************************************************/
+/* Returns one of the MTDC vectors based on channel name ***********************/
+/* channel - Detector name in MTDC *********************************************/
+/* If no arguments are given or recognised returns E1Up ************************/
+/*******************************************************************************/
 std::vector<unsigned short> TMTof::GetMTofVectorFromString(std::string vecname) const {
   if(vecname == "E1Up")        return fE1Up;
   else if(vecname == "E1Down") return  fE1Down;
@@ -746,6 +748,10 @@ std::vector<unsigned short> TMTof::GetMTofVectorFromString(std::string vecname) 
   }
 }
 
+/*******************************************************************************/
+/* Legacy Function - Replaced by more generic function GetCorrelatedTof() ******/
+/* Corrected ToF between Obj scintillator **************************************/
+/*******************************************************************************/
 double TMTof::GetCorrelatedObjE1() const {
   double target = GValue::Value("TARGET_MTOF_OBJE1");
   if (std::isnan(target)){
@@ -775,6 +781,10 @@ double TMTof::GetCorrelatedObjE1() const {
   return fCorrelatedOBJE1;
 }
 
+/*******************************************************************************/
+/* Legacy Function - Replaced by more generic function GetCorrelatedTof() ******/
+/* Corrected ToF between Obj scintillator **************************************/
+/*******************************************************************************/
 double TMTof::GetCorrelatedXfpE1() const{
   double target = GValue::Value("TARGET_MTOF_XFPE1");
   if (std::isnan(target)){
@@ -797,5 +807,7 @@ double TMTof::GetCorrelatedXfpE1() const{
   return fCorrelatedXFPE1;
 }
 
-
+/*******************************************************************************/
+/* Print function - no functionality *******************************************/
+/*******************************************************************************/
 void TMTof::Print(Option_t *opt) const {    }

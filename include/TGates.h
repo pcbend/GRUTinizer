@@ -32,8 +32,13 @@ class TGates : public TObject{
   void MakeGateFile(const char *);				//Creates a text file containing a 2d gate
   bool InGate(float, float);					//Checks if inside gate
 
-  std::string GetSymbol(int);
-  int GateID(float, float);
+  std::string GetSymbol(int);					//Returns name of beam in GateList
+  int    GetA(int);						//Returns A of beam in GateList
+  int    GetZ(int);						//Returns Z of beam in GateList
+  int    GetN(int);						//Returns N of beam in GateList
+  double GetMass(int);						//Returns Mass of beam in GateList
+
+  int GateID(float, float);					//Returns position in vector
   int Size() { return (int)GateList.size(); }
  private:
   int fNPid;

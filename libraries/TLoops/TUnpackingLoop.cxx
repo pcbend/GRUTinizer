@@ -96,6 +96,7 @@ void TUnpackingLoop::ClearQueue() {
     TUnpackedEvent* event = NULL;
     output_queue->Pop(event);
     if(event){
+
       delete event;
     }
   }
@@ -154,7 +155,7 @@ void TUnpackingLoop::HandleBuiltNSCLData(TNSCLEvent& event){
     }
     fOutputEvent->AddRawData(frag_event, detector);
   }
-  //printf("i am also here\n");
+//  printf("i am also here\n");
 }
 
 void TUnpackingLoop::HandleUnbuiltNSCLData(TNSCLEvent& event){

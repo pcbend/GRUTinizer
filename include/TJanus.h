@@ -24,9 +24,9 @@ public:
   int GetRingSize() { return ring_hits.size(); }
   int GetSectorSize() { return sector_hits.size(); }
 
-  TJanusHit* GetJanusHit(const int &i);
-  TJanusHit* GetRingHit(const int &i);
-  TJanusHit* GetSectorHit(const int &i);
+  TJanusHit& GetJanusHit(int i);
+  TJanusHit& GetRingHit(int i);
+  TJanusHit& GetSectorHit(int i);
 
   static TVector3 GetPosition(int detnum, int ring_num, int sector_num);
   static TVector3 GetPosition(int ring, int sector, double zoffset, bool sectorsdownstream, bool smear = false);

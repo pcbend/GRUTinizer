@@ -28,6 +28,8 @@ class TInverseMap : public TNamed {
     float MapCalc(int,int,float*) const;
     int Size() { return fMap.size(); }
 
+    float GetBrho() const { return fBrho; }
+
   private:
     TInverseMap(const char* filename);
     static TInverseMap *fInverseMap;

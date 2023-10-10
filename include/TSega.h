@@ -14,7 +14,7 @@ public:
   virtual void Clear(Option_t* opt = "");
   virtual TSegaHit& GetSegaHit(int i);
 
-  virtual void Draw(Option_t *opt="");
+//  virtual void Draw(Option_t *opt="");
 
   virtual void InsertHit(const TDetectorHit&);
   virtual TDetectorHit& GetHit(int i);

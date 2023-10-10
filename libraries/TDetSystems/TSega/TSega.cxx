@@ -18,21 +18,26 @@ TSega::TSega(){ }
 
 TSega::~TSega(){ }
 
+/*******************************************************************************/
+/* Copies hit ******************************************************************/
+/*******************************************************************************/
 void TSega::Copy(TObject& obj) const {
   TDetector::Copy(obj);
   TSega& sega = (TSega&)obj;
   sega.sega_hits = sega_hits;
 }
 
+/*******************************************************************************/
+/* Clear hit *******************************************************************/
+/*******************************************************************************/
 void TSega::Clear(Option_t* opt){
   TDetector::Clear(opt);
   sega_hits.clear();
 }
 
-void TSega::Draw(Option_t *opt) {
-
-}
-
+/*******************************************************************************/
+/* Functions to call SeGA hits *************************************************/
+/*******************************************************************************/
 TSegaHit& TSega::GetSegaHit(int i){
   return sega_hits.at(i);
 }
@@ -41,22 +46,28 @@ TDetectorHit& TSega::GetHit(int i){
   return sega_hits.at(i);
 }
 
+/*******************************************************************************/
+/* Unpacks raw DDAS data and builds TSega events *******************************/
+/*******************************************************************************/
 int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
 
   long int smallest_timestamp = 0x7fffffffffffffff;
   for(auto& event : raw_data){
+    //Unpack raw data into a DDAS Event
     TSmartBuffer buf = event.GetPayloadBuffer();
     TDDASEvent<DDASHeader> ddas(buf);
     unsigned int address = ( (1<<24) + (ddas.GetCrateID()<<16) + (ddas.GetSlotID()<<8) + ddas.GetChannelID() );
+    //If channel not found in channels.cal file skip and do nothing
     TChannel* chan = TChannel::GetChannel(address);
     static int lines_displayed = 0;
     if(!chan){
-      if(lines_displayed < 10) {
+      if(lines_displayed < 10 && ddas.GetCrateID() !=3) {
         std::cout << "Unknown SeGA (crate, slot, channel): (" << ddas.GetCrateID() << ", " << ddas.GetSlotID() << ", " << ddas.GetChannelID() << ")" << std::endl;
       }
       lines_displayed++;
       continue;
     }
+    //Get detector information from channels.cal file
     int detnum = chan->GetArrayPosition();
     int segnum = chan->GetSegment();
     // Get a hit, make it if it does not exist
@@ -79,13 +90,14 @@ int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
         }
       }
     }
-
+    //Make a new hit
     if(hit == NULL){
       sega_hits.emplace_back();
       hit = &sega_hits.back();
       fSize++;
     }
 
+    //Is a core event
     if(segnum==0){
       hit->SetAddress(address);
       hit->SetTimestamp(ddas.GetTimestamp()); // Timestamp in ns
@@ -94,14 +106,15 @@ int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
       if(hit->Timestamp()<smallest_timestamp) { smallest_timestamp = hit->Timestamp(); }
       hit->SetCharge(ddas.GetEnergy());
       hit->SetTrace(ddas.GetTraceLength(), ddas.trace);
+      //For checking Trapezoidal filter output in DDAS, unlikely to be useful for mosr people
       hit->SetEnergySumBool(ddas.HasEnergySum());
       hit->SetEnergySum1(ddas.GetEnergySum(0));
       hit->SetEnergySum2(ddas.GetEnergySum(1));
       hit->SetEnergySum3(ddas.GetEnergySum(2));
       hit->SetEnergySum4(ddas.GetEnergySum(3));
-    } else {
+    } else {  //Segment hit, add to SegmentHit vector
       TSegaSegmentHit& seg = hit->MakeSegmentByAddress(address);
-      if(!hit->HasCore()) hit->SetTimestamp(ddas.GetTimestamp()); //ADD this line SG
+      if(!hit->HasCore()) hit->SetTimestamp(ddas.GetTimestamp()); //If no core present use segment for Timestamp
       seg.SetCharge(ddas.GetEnergy());
       seg.SetTimestamp(ddas.GetTimestamp());  // Timestamp in ns
       seg.SetTimeFull(ddas.GetTime()); // Timestamp + CFD
@@ -114,6 +127,9 @@ int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
   return Size();
 }
 
+/*******************************************************************************/
+/* Gets interaction position based on detector and segment number **************/
+/*******************************************************************************/
 TVector3 TSega::GetSegmentPosition(int detnum, int segnum) {
   if(detnum < 1 || detnum > 16 || segnum < 1 || segnum > 32){
     return TVector3(std::sqrt(-1),std::sqrt(-1),std::sqrt(-1));
@@ -137,7 +153,10 @@ TVector3 TSega::GetSegmentPosition(int detnum, int segnum) {
   return global_pos;
 }
 
-//Read geometric maps from text files
+/*******************************************************************************/
+/* Read geometric maps from text files *****************************************/
+/* I do not know the purpose of these function *********************************/
+/*******************************************************************************/
 void TSega::LoadSegmentMaps(){
   static bool maps_loaded = false;
   if (maps_loaded){
@@ -204,7 +223,10 @@ void TSega::LoadSegmentMaps(){
   return;
 }
 
-//The Maps
+/*******************************************************************************/
+/* Returns information from maps loaded above **********************************/
+/* I do not know the purpose of these function *********************************/
+/*******************************************************************************/
 int TSega::MappedSegnum(int detnum, int segnum) {
   LoadSegmentMaps();
   return seg_map[{detnum,segnum}];
@@ -220,6 +242,9 @@ int TSega::MappedSlicenum(int detnum, int segnum) {
   return slice_map[{detnum,segnum}];
 }
 
+/*******************************************************************************/
+/* Returns real position from detector number and position within crystals *****/
+/*******************************************************************************/
 TVector3 TSega::CrystalToGlobal(int detnum, TVector3 crystal_pos) {
   LoadDetectorPositions();
   static int lines_displayed = 0;
@@ -234,6 +259,10 @@ TVector3 TSega::CrystalToGlobal(int detnum, TVector3 crystal_pos) {
   return trans.origin + crystal_pos.X()*trans.x + crystal_pos.Y()*trans.y + crystal_pos.Z()*trans.z;
 }
 
+/*******************************************************************************/
+/* Load in Rotation matrices used to calculate positions for *******************/
+/* doppler corrections *********************************************************/
+/*******************************************************************************/
 void TSega::LoadDetectorPositions() {
   static bool loaded = false;
   if(loaded){
@@ -274,11 +303,19 @@ void TSega::LoadDetectorPositions() {
   }
 }
 
+/*******************************************************************************/
+/* Unused function *************************************************************/
+/*******************************************************************************/
 void TSega::InsertHit(const TDetectorHit& hit) {
   sega_hits.emplace_back((TSegaHit&)hit);
   fSize++;
 }
 
+
+/*******************************************************************************/
+/* Specific to a single experiment *********************************************/
+/* Will be modified to be more general or will be removed **********************/
+/*******************************************************************************/
 void TSega::SetRunStart(unsigned int unix_time) {
   // Only adjust times for production runs in e13701.
   if(unix_time < 1453953420 || unix_time > 1454425200) {
@@ -295,6 +332,9 @@ void TSega::SetRunStart(unsigned int unix_time) {
   }
 }
 
+/*******************************************************************************/
+/* Unused function *************************************************************/
+/*******************************************************************************/
 void TSega::SortHitsByTimestamp() {
   std::sort(sega_hits.begin(), sega_hits.end(),	[](const TSegaHit& a, const TSegaHit& b) {
     return a.Timestamp() < b.Timestamp();

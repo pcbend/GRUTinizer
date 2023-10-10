@@ -23,7 +23,7 @@ public:
   virtual void Clear(Option_t *opt = "");
 
   virtual size_t Size() const { return gretina_hits.size(); }
-  virtual Int_t AddbackSize(int EngRange=-1) { BuildAddback(EngRange, true); return addback_hits.size(); }
+  virtual Int_t AddbackSize(int SortDepth = 4) { BuildAddback(SortDepth, true); return addback_hits.size(); }
   void ResetAddback() { addback_hits.clear();}
 
   virtual void InsertHit(const TDetectorHit& hit);

@@ -33,7 +33,7 @@ bool DefaultAddback(const TGretinaHit& one,const TGretinaHit &two) {
 
 std::function<bool(const TGretinaHit&,const TGretinaHit&)> TGretina::fAddbackCondition = DefaultAddback;
 
-void TGretina::BuildAddback(int EngRange, bool SortByEng) const {
+void TGretina::BuildAddback(int SortDepth, bool SortByEng) const {
   //See D. Weisshaar et al., Nucl. Instrum. Methods Phys. Res., Sect. A 847, 18, (2017). Sec 3.3 for details
   //of addback procedure
   if( addback_hits.size() > 0 || gretina_hits.size() == 0) {
@@ -41,14 +41,6 @@ void TGretina::BuildAddback(int EngRange, bool SortByEng) const {
   }
 
   std::vector<TGretinaHit> temp_hits = gretina_hits;
-
-  if(EngRange>=0 && EngRange<4){
-    for(auto& hit : temp_hits) {
-      hit.SetCoreEnergy(hit.GetCoreEnergy());//EngRange));
-//      hit.SetCoreEnergy(hit.GetCoreEnergy(EngRange));
-      hit.SetABDepth(0);
-    }
-  }
 
   //sort so that the first hit has the greatest energy
   //this way we can loop through i,j with i < j and know that
@@ -60,60 +52,106 @@ void TGretina::BuildAddback(int EngRange, bool SortByEng) const {
         });
   }
 
+  //vector used to store hit indices when crystals are pairs
+  std::vector<int> paired;
   //loop through every hit
   for(unsigned int i=0; i < temp_hits.size(); i++) {
+    paired.clear();
     TGretinaHit &current_hit = temp_hits[i];
-    int nNeighbourHits = 0;
-    int n1_index, n2_index = -1;
-
     //only pick unqiue pairs of hits
-    for(unsigned int j=i+1; j < temp_hits.size(); j++) {
-      if (IsNeighbour(current_hit,temp_hits[j])){
-        nNeighbourHits++;
-        n1_index = j;
-
-        //check every hit k to see if it is a neighbour with j
-        for (unsigned int k=0; k < temp_hits.size(); k++){
-          if (k==i || k==j) continue;
-          if (IsNeighbour(temp_hits[j],temp_hits[k])){
-            nNeighbourHits++;
-            //if hit k is a neighbour with hit i then this is an n2 hit
-            if (IsNeighbour(current_hit,temp_hits[k])){
-              n2_index = k;
-            }
+    if(SortDepth > 1) {
+      for(unsigned int j=i+1; j < temp_hits.size(); j++) {
+        if (IsNeighbour(current_hit,temp_hits[j])){
+	  paired.push_back(j);
+          //check every hit k to see if it is a neighbour with j
+	  if(SortDepth > 2) {
+            for (unsigned int k=0; k < temp_hits.size(); k++){
+	      if( (i == k) || (j == k) ) continue;
+              if (IsNeighbour(temp_hits[j],temp_hits[k])){
+	        paired.push_back(k);
+	        //Edge cases, requires at least 4 crystals in a line
+	        if(SortDepth > 3) {
+	          for (unsigned int l=0; l < temp_hits.size(); l++){
+                    if( (i == l) || (j == l) || (k == l)) continue;
+	            if (IsNeighbour(temp_hits[k],temp_hits[l])) {
+		      paired.push_back(l);
+ 	              //Really Edge cases, requires at least 5 crystals in a line
+		      if(SortDepth > 4) {
+	                for (unsigned int m=0; m < temp_hits.size(); m++){
+		          if( (i == m) || (j == m) || (k == m) || (l == m)) continue;
+	                  if(IsNeighbour(temp_hits[l],temp_hits[m])) {
+		            paired.push_back(m);
+ 	                    //Extreme Edge cases, requires at least 6 crystals in a line
+			    if(SortDepth > 5) {
+                              for (unsigned int n=0; n < temp_hits.size(); n++){
+                                if( (i == n) || (j == n) || (k == n) || (l == n) || (m == n)) continue;
+                                if(IsNeighbour(temp_hits[m],temp_hits[n])) paired.push_back(n);
+			      }
+		            }
+		          }
+			}
+		      }
+	            }
+		  }
+	        }
+              }
+	    }
           }
         }
       }
     }
 
+    //Reverse sort paired vector required when removing hits later
+    std::sort(paired.rbegin(), paired.rend());
+    //Vector can contain multiple version of same hit, removes duplicate values
+    paired.erase(unique(paired.begin(), paired.end()), paired.end());
     //n0
-    if (nNeighbourHits == 0){
+    if (paired.size() == 0){
       addback_hits.push_back(current_hit);
       addback_hits.back().SetABDepth(0);
     }
     //n1
-    else if (nNeighbourHits == 1) {
-      current_hit.NNAdd(temp_hits[n1_index]);
+    else if (paired.size() == 1) {
+      current_hit.NNAdd(temp_hits[paired.at(0)]);
       addback_hits.push_back(current_hit);
       addback_hits.back().SetABDepth(1);
-      temp_hits.erase(temp_hits.begin() + n1_index);
+      //Erase hit after adding otherwise event can make a new addback event
+      temp_hits.erase(temp_hits.begin() + paired.at(0));
     }
     //n2
-    else if (nNeighbourHits == 2 && n2_index != -1) {
-      current_hit.NNAdd(temp_hits[n1_index]);
-      current_hit.NNAdd(temp_hits[n2_index]);
-      addback_hits.push_back(current_hit);
-      addback_hits.back().SetABDepth(2);
-      if (n2_index < n1_index) std::swap(n1_index,n2_index);
-      temp_hits.erase(temp_hits.begin() + n2_index);
-      temp_hits.erase(temp_hits.begin() + n1_index);
+    else if (paired.size() == 2) {
+      if(IsNeighbour(current_hit,temp_hits[paired.at(0)]) && IsNeighbour(current_hit,temp_hits[paired.at(1)]) && IsNeighbour(temp_hits[paired.at(0)],temp_hits[paired.at(1)]) ) {
+        current_hit.NNAdd(temp_hits[paired.at(1)]);
+        current_hit.NNAdd(temp_hits[paired.at(0)]);
+        addback_hits.push_back(current_hit);
+        addback_hits.back().SetABDepth(2);
+        //Erase hit after adding otherwise event can make a new addback event
+        temp_hits.erase(temp_hits.begin() + paired.at(0));
+        temp_hits.erase(temp_hits.begin() + paired.at(1));
+      } else { //Also ng
+          addback_hits.push_back(current_hit);
+          addback_hits.back().SetABDepth(3);
+          for(int p = 0; p < (int)paired.size(); p++) {
+          addback_hits.push_back(temp_hits[paired.at(p)]);
+          addback_hits.back().SetABDepth(3);
+          //Erase hit after adding otherwise event can make a new addback event
+          temp_hits.erase(temp_hits.begin() + paired.at(p));
+        }
+      }
     }
     //ng
     else {
       addback_hits.push_back(current_hit);
       addback_hits.back().SetABDepth(3);
+      for(int p = 0; p < (int)paired.size(); p++) {
+        addback_hits.push_back(temp_hits[paired.at(p)]);
+        addback_hits.back().SetABDepth(3);
+        //Erase hit after adding otherwise event can make a new addback event
+        temp_hits.erase(temp_hits.begin() + paired.at(p));
+      }
     }
   }
+
   return;
 }
 
@@ -263,6 +301,9 @@ void TGretina::SetGretNeighbours() {
   return;
 }
 
+/*******************************************************************************/
+/* Returns vector for lab position of the centre of the crystal ****************/
+/*******************************************************************************/
 TVector3 TGretina::GetCrystalPosition(int cry_id) {
   SetCRMAT();
 
@@ -297,6 +338,7 @@ int TGretina::BuildHits(std::vector<TRawEvent>& raw_data){
     TGretinaHit hit;
     TSmartBuffer buf = event.GetPayloadBuffer();
     hit.BuildFrom(buf);
+    if(hit.GetPad() == 2 || hit.GetPad() == 3 || hit.GetPad() == 4 || hit.GetPad() == 6) continue;
     InsertHit(hit);
   }
   SetTimestamp(smallest_time);

@@ -16,6 +16,9 @@ TGretinaHit::TGretinaHit(){ Clear(); }
 
 TGretinaHit::~TGretinaHit(){ }
 
+/*******************************************************************************/
+/* Copies hit ******************************************************************/
+/*******************************************************************************/
 void TGretinaHit::Copy(TObject &rhs) const {
   TDetectorHit::Copy(rhs);
   ((TGretinaHit&)rhs).fWalkCorrection = fWalkCorrection;
@@ -34,6 +37,11 @@ void TGretinaHit::Copy(TObject &rhs) const {
   ((TGretinaHit&)rhs).fPrestep	      = fPrestep;
   ((TGretinaHit&)rhs).fPoststep	      = fPoststep;
 }
+
+/*******************************************************************************/
+/* Returns core energy from mode2 data and performs a calibration if ***********/
+/* a channels.cal file is provided *********************************************/
+/*******************************************************************************/
 Float_t TGretinaHit::GetCoreEnergy() const {
   TChannel *channel = TChannel::GetChannel(Address());
   //printf("GetAddress() + i = 0x%08x\n",GetAddress()+i);
@@ -42,6 +50,10 @@ Float_t TGretinaHit::GetCoreEnergy() const {
   return channel->CalEnergy(fCoreEnergy);
 }
 
+/*******************************************************************************/
+/* Selects charge from different gain ranges and performs a calibration if *****/
+/* a channels.cal file is provided *********************************************/
+/*******************************************************************************/
 Float_t TGretinaHit::GetCoreEnergy(int i) const {
   float charge = (float)GetCoreCharge(i) + gRandom->Uniform();
   TChannel *channel = TChannel::GetChannel(Address()+(i<<4));
@@ -51,6 +63,9 @@ Float_t TGretinaHit::GetCoreEnergy(int i) const {
   return channel->CalEnergy(charge);
 }
 
+/*******************************************************************************/
+/* Gets mnemonic for channel if a channels.cal file is provided ****************/
+/*******************************************************************************/
 const char *TGretinaHit::GetName() const {
   TChannel *channel = TChannel::GetChannel(Address());
   if(channel) return channel->GetName();
@@ -58,10 +73,16 @@ const char *TGretinaHit::GetName() const {
 }
 
 
+/*******************************************************************************/
+/* Returns position vector for the centre of the crystal ***********************/
+/*******************************************************************************/
 TVector3 TGretinaHit::GetCrystalPosition()  const {
   return TGretina::GetCrystalPosition(fCrystalId);
 }
 
+/*******************************************************************************/
+/* Build TGretina events from mode2 data ***************************************/
+/*******************************************************************************/
 void TGretinaHit::BuildFrom(TSmartBuffer& buf){
   const TRawEvent::GEBBankType1& raw = *(const TRawEvent::GEBBankType1*)buf.GetData();
 
@@ -91,7 +112,6 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
 
   fNumberOfInteractions = raw.num;
   fPad = raw.pad;
-  //std::cout<< "pad\t" << fPad << "\tints\t" << fNumberOfInteractions << std::endl;
   for(int i=0; i<fNumberOfInteractions; i++) {
     try {
       interaction_point pnt;
@@ -112,6 +132,9 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
   //  Print("all");
 }
 
+/*******************************************************************************/
+/* Returns position vector based on interaction point **************************/
+/*******************************************************************************/
 TVector3 TGretinaHit::GetIntPosition(unsigned int i) const {
   if(i<fSegments.size()){
     double xoffset = GValue::Value("GRETINA_X_OFFSET");
@@ -131,7 +154,9 @@ TVector3 TGretinaHit::GetIntPosition(unsigned int i) const {
     return TDetectorHit::BeamUnitVec;
   }
 }
-
+/*******************************************************************************/
+/* Returns vector for loacl position within the crystal ************************/
+/*******************************************************************************/
 TVector3 TGretinaHit::GetLocalPosition(unsigned int i) const {
   if(i<fSegments.size()){
     return TVector3(fSegments.at(i).fX,
@@ -142,7 +167,11 @@ TVector3 TGretinaHit::GetLocalPosition(unsigned int i) const {
   }
 }
 
-
+/*******************************************************************************/
+/* Returns doppler corrected energies based on highest energy interaction ******/
+/* point, particle vectors and beam beta. Can select gain range otherwise ******/
+/* uses mode2 energy ***********************************************************/
+/*******************************************************************************/
 double TGretinaHit::GetDoppler(double beta,const TVector3 *vec, int EngRange) const {
   if(Size()<1)
     return 0.0;
@@ -168,6 +197,13 @@ double TGretinaHit::GetDoppler(double beta,const TVector3 *vec, int EngRange) co
   else tmp = fCoreEnergy*gamma *(1 - beta*TMath::Cos(gret_pos.Angle(*vec)));
   return tmp;
 }
+
+/*******************************************************************************/
+/* Returns doppler corrected energies based on highest energy interaction ******/
+/* point, particle vectors and beam beta. Corrects for non-dispersive position */
+/* YTA, calculated using TS800 class. Can select gain range otherwise uses *****/
+/* mode2 energy ****************************************************************/
+/*******************************************************************************/
 double TGretinaHit::GetDopplerYta(double beta, double yta, const TVector3 *vec, int EngRange) const {
   if(Size()<1)
     return 0.0;
@@ -207,6 +243,10 @@ double TGretinaHit::GetDopplerYta(double beta, double yta, double xoffset, doubl
 //       Right now, the "first interaction point" is the one with the highest energy,
 //       and the "second" is the one with the second highest energy.
 //       First and second may be assigned across crystal boundaries.
+/*******************************************************************************/
+/* Legacy - No Longer used and may be removed **********************************/
+/* Used by old Addback code to handle interaction points ***********************/
+/*******************************************************************************/
 void TGretinaHit::Add(const TGretinaHit& rhs) {
 
   // qStash all interaction points
@@ -245,6 +285,9 @@ void TGretinaHit::Add(const TGretinaHit& rhs) {
   }
 }
 
+/*******************************************************************************/
+/* Used by Addback code to handle interaction points ***************************/
+/*******************************************************************************/
 void TGretinaHit::NNAdd(const TGretinaHit& rhs) {
   //copy original hit into singles
   if (!fSetFirstSingles){
@@ -265,13 +308,18 @@ void TGretinaHit::NNAdd(const TGretinaHit& rhs) {
   }
 }
 
+/*******************************************************************************/
+/* Returns position vector based on final interaction point ********************/
+/*******************************************************************************/
 TVector3 TGretinaHit::GetLastPosition() const {
   if(fSegments.size()<1)
     return TDetectorHit::BeamUnitVec;
   return GetIntPosition(fSegments.size()-1);
 }
 
-
+/*******************************************************************************/
+/* Print function **************************************************************/
+/*******************************************************************************/
 void TGretinaHit::Print(Option_t *opt) const {
 
   std::cout << "TGretinaHit:" <<  std::endl;
@@ -301,6 +349,9 @@ void TGretinaHit::Print(Option_t *opt) const {
 
 }
 
+/*******************************************************************************/
+/* Clears hit ******************************************************************/
+/*******************************************************************************/
 void TGretinaHit::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
   fWalkCorrection = sqrt(-1);
@@ -317,9 +368,12 @@ void TGretinaHit::Clear(Option_t *opt) {
 }
 
 
+/*******************************************************************************/
+/* Reduced fSegment size *******************************************************/
+/* 0 - drop multiple ident int pnts ********************************************/
+/* 1 - make into wedge data ***************************************************/
+/*******************************************************************************/
 void TGretinaHit::TrimSegments(int type) {
-  // 0: drop multiple ident int pnts.
-  // 1: make into wedge "data"
   if(type==0) {
     std::set<interaction_point,intpnt_compare> pset;
     for(auto x=fSegments.begin();x!=fSegments.end();x++) {

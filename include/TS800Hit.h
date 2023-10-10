@@ -144,6 +144,7 @@ class TCrdc : public TDetectorHit {
     float GetNonDispersiveY(int);
 
     int GetMaxPad() const;
+    int GetMaxPadFast() const;
     int GetMaxPadSum() const;
 
     virtual void Copy(TObject&) const;
@@ -376,25 +377,23 @@ class TMTof : public TDetectorHit {
     int HodoSize()       const { return fHodoscope.size(); }
     int RefSize()        const { return fRef.size(); }
 
-    //Determines correlated time-of-flights for multi-hit TDC's based on
-    //TARGET_MTOF_# GValues. Values are set in TMTof as fCorrelatedXfp,
-    //fCorrelatedXfp, etc.  Note that if the GValues are not set, the first
-    //value in each time-of-flight is taken.
-    double  GetCorrelatedXfpE1()  const;   //!
-    double  GetCorrelatedObjE1()  const;   //!
+    //Legacy function - Use GetCorrelatedTof instead
+    //Determines correlated time-of-flights for multi-hit TDC's based on TARGET_MTOF_# GValues. 
+    //values are set in TMTof as fCorrelatedXfp fCorrelatedXfp, etc.
+    double  GetCorrelatedXfpE1()  const;   //
+    double  GetCorrelatedObjE1()  const;   //
 
-    double  GetCorrelatedXfpE1(int i)  const;   //!
-    double  GetCorrelatedObjE1(int i)  const;   //!
-
-    std::vector<unsigned short> GetMTofVector(int i = 15) const;
+    //Generic correlated Time of flight functions, for multihit TDC's, can
     double GetCorrelatedTof(int ch1, int ch2, double target, double shift) const;
-    std::vector<unsigned short> GetMTofVectorFromString(std::string) const;
     double GetCorrelatedTof(std::string ch1, std::string ch2, double target, double shift) const;
+    //Selected MTDC vectors (fE1Up, fOb  etc.)
+    std::vector<unsigned short> GetMTofVectorFromString(std::string) const;
+    std::vector<unsigned short> GetMTofVector(int i = 15) const;
 
 
   private:
-    mutable double fCorrelatedXFPE1;   //!
-    mutable double fCorrelatedOBJE1;   //!
+    mutable double fCorrelatedXFPE1;   //
+    mutable double fCorrelatedOBJE1;   //
 
   public:
     std::vector<unsigned short> fE1Up;         // Channel 0
