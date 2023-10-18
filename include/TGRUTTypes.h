@@ -19,6 +19,7 @@ enum kDetectorSystems {
   GRETINA_SIM= 11,
   S800_SIM   = 9,
   LENDA      = 21,
+  DDAS	     = 25,
 
   SEGA = 64,
   JANUS = 65,

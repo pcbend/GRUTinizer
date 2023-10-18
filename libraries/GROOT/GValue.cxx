@@ -26,7 +26,7 @@ GValue::GValue(const char *name,double value, EPriority priority)
   }
 
 GValue::GValue(const char *name)
-  : fValue(0.00), fPriority(kUnset) { 
+  : fValue(0.00), fPriority(kUnset) {
     std::string sname = name;
     std::transform(sname.begin(),sname.end(),sname.begin(),::toupper);
     SetNameTitle(sname.c_str(),sname.c_str());
@@ -86,18 +86,15 @@ bool GValue::AppendValue(GValue *oldvalue) {
     if(strlen(this->GetName())) {
       oldvalue->SetName(this->GetName());
     }
-  
     if(this->GetValue() != -1) {
       oldvalue->SetValue(this->GetValue());
       oldvalue->fPriority = fPriority;
     }
-  
     if(strlen(this->GetInfo())) {
       oldvalue->SetInfo(this->GetInfo());
     }
     return true;
   }
-  
   return false;
 }
 
@@ -208,10 +205,6 @@ int GValue::ReadValFile(const char* filename,Option_t *opt) {
   sbuffer.assign(buffer.data());
 
   int values_found = ParseInputData(sbuffer,kValFile,opt);
-//if(values_found) {
-//  //fFileNames.push_back(std::string(filename);;
-//  fValueData = sbuffer; //.push_back(std::string((const char*)buffer);
-//}
   return values_found;
 }
 

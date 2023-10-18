@@ -4,7 +4,6 @@
 #include <sstream>
 #include <set>
 
-
 #include "TGretina.h"
 #include "TGEBEvent.h"
 
@@ -33,6 +32,8 @@ bool DefaultAddback(const TGretinaHit& one,const TGretinaHit &two) {
 
 std::function<bool(const TGretinaHit&,const TGretinaHit&)> TGretina::fAddbackCondition = DefaultAddback;
 
+//SG TO DO
+//How to handle interaction points from added crystals, does it make sense to add them?
 void TGretina::BuildAddback(int SortDepth, bool SortByEng) const {
   //See D. Weisshaar et al., Nucl. Instrum. Methods Phys. Res., Sect. A 847, 18, (2017). Sec 3.3 for details
   //of addback procedure
@@ -333,6 +334,7 @@ int TGretina::BuildHits(std::vector<TRawEvent>& raw_data){
   if(raw_data.size()<1)
     return Size();
   long smallest_time = 0x3fffffffffffffff;
+
   for(auto& event : raw_data){
     if(event.GetTimestamp()<smallest_time) smallest_time = event.GetTimestamp();
     TGretinaHit hit;

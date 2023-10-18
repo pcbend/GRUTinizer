@@ -18,23 +18,16 @@ GDoubleGaus::GDoubleGaus(Double_t cent1,Double_t cent2,Double_t xlow,Double_t xh
     fGaus1("fGaus1","gaus(0)+pol1(3)",xlow,xhigh,TF1::EAddToList::kNo),
     fGaus2("fGaus2","gaus(0)+pol1(3)",xlow,xhigh,TF1::EAddToList::kNo){
   Clear("");
-  if(xlow>xhigh)
-    std::swap(xlow,xhigh);
+  if(xlow>xhigh) std::swap(xlow,xhigh);
 
-  if(cent1>cent2)
-    std::swap(cent1,cent2);
+  if(cent1>cent2) std::swap(cent1,cent2);
 
   TF1::SetRange(xlow,xhigh);
 
   fBGFit.SetNpx(1000);
   fBGFit.SetLineStyle(2);
   fBGFit.SetLineColor(kBlack);
-
-  // Changing the name here causes an infinite loop when starting the FitEditor
-  //SetName(Form("gaus_%d_to_%d",(Int_t)(xlow),(Int_t)(xhigh)));
   InitNames();
-  //TF1::SetParameter("centroid",cent);
-
 }
 
 
@@ -56,8 +49,6 @@ GDoubleGaus::GDoubleGaus(const GDoubleGaus &peak)
 }
 
 GDoubleGaus::~GDoubleGaus() {
-  //if(background)
-  //  delete background;
 }
 
 void GDoubleGaus::InitNames(){
@@ -99,30 +90,16 @@ bool GDoubleGaus::InitParams(TH1 *fithist,double cent1, double cent2){
     printf("No histogram is associated yet, no initial guesses made\n");
     return false;
   }
-  //printf("%s called.\n",__PRETTY_FUNCTION__); fflush(stdout);
   //Makes initial guesses at parameters for the fit. Uses the histogram to
   Double_t xlow,xhigh;
   GetRange(xlow,xhigh);
 
   Int_t binlow = fithist->GetXaxis()->FindBin(xlow);
   Int_t binhigh = fithist->GetXaxis()->FindBin(xhigh);
-/*
-  Double_t highy  = fithist->GetBinContent(binlow);
-  Double_t lowy   = fithist->GetBinContent(binhigh);
-  for(int x=1;x<5;x++) {
-    highy += fithist->GetBinContent(binlow-x);
-    lowy  += fithist->GetBinContent(binhigh+x);
-  }
-  highy = highy/5.0;
-  lowy = lowy/5.0;
 
-  if(lowy>highy)
-    std::swap(lowy,highy);
-*/
   double largestx=0.0;
   double largesty=0.0;
-  int i = binlow;
-  for(;i<=binhigh;i++) {
+  for(int i = binlow; i <= binhigh; i++) {
     if(fithist->GetBinContent(i) > largesty) {
       largesty = fithist->GetBinContent(i);
       largestx = fithist->GetXaxis()->GetBinCenter(i);
@@ -144,36 +121,28 @@ bool GDoubleGaus::InitParams(TH1 *fithist,double cent1, double cent2){
   TF1::SetParLimits(3,cent1,xhigh);
   TF1::SetParLimits(4,0,xhigh-xlow);
 
-  //TF1::SetParLimits(3,0.0,40);
-  //TF1::SetParLimits(4,0.01,5);
-
   //Make initial guesses
-  TF1::SetParameter(0,largesty);         //fithist->GetBinContent(bin));
-  TF1::SetParameter(1,cent1);             //fithist->GetBinContent(bin));
-  TF1::SetParameter(2,largesty);         //fithist->GetBinContent(bin));
-  TF1::SetParameter(3,cent2);             //fithist->GetBinContent(bin));
-  TF1::SetParameter(2,(largestx*.01)/2.35);                    //2,(xhigh-xlow));     //2.0/binWidth); //
- 
+  TF1::SetParameter(0,largesty);
+  TF1::SetParameter(1,cent1);
+  TF1::SetParameter(2,largesty);
+  TF1::SetParameter(3,cent2);
+  TF1::SetParameter(2,(largestx*.01)/2.35);
 
   TF1::SetParError(0,0.10 * largesty);
   TF1::SetParError(1,0.25);
-
   TF1::SetParError(2,0.10 * largesty);
   TF1::SetParError(3,0.25);
-
   TF1::SetParError(4,0.10 *((largestx*.01)/2.35));
-  
+
   SetInitialized();
   return true;
 }
 
 
 Bool_t GDoubleGaus::Fit(TH1 *fithist,double cent1,double cent2,Option_t *opt) {
-  if(!fithist)
-    return false;
+  if(!fithist) return false;
   TString options = opt;
-  if(!IsInitialized())
-    InitParams(fithist,cent1,cent2);
+  if(!IsInitialized()) InitParams(fithist,cent1,cent2);
   TVirtualFitter::SetMaxIterations(100000);
 
   bool verbose = !options.Contains("Q");
@@ -182,41 +151,30 @@ Bool_t GDoubleGaus::Fit(TH1 *fithist,double cent1,double cent2,Option_t *opt) {
     options.ReplaceAll("no-print","");
   }
 
-
-  if(fithist->GetSumw2()->fN!=fithist->GetNbinsX()+2)
-    fithist->Sumw2();
+  if(fithist->GetSumw2()->fN != fithist->GetNbinsX()+2) fithist->Sumw2();
 
   TFitResultPtr fitres = fithist->Fit(this,Form("%sRSME",options.Data()));
 
-  //fitres.Get()->Print();
   if(!fitres.Get()->IsValid()) {
     if(!verbose)
       printf(RED  "fit has failed, trying refit... " RESET_COLOR);
-    //SetParameter(3,0.1);
-    //SetParameter(4,0.01);
-    //SetParameter(5,0.0);
     fithist->GetListOfFunctions()->Last()->Delete();
     fitres = fithist->Fit(this,Form("%sRSME",options.Data())); //,Form("%sRSM",options.Data()))
     if( fitres.Get()->IsValid() ) {
-      if(!verbose && !noprint)
-        printf(DGREEN " refit passed!" RESET_COLOR "\n");
+      if(!verbose && !noprint) printf(DGREEN " refit passed!" RESET_COLOR "\n");
     } else {
-      if(!verbose && !noprint)
-        printf(DRED " refit also failed :( " RESET_COLOR "\n");
+      if(!verbose && !noprint) printf(DRED " refit also failed :( " RESET_COLOR "\n");
     }
   }
 
   Double_t xlow,xhigh;
   TF1::GetRange(xlow,xhigh);
 
-
   double bgpars[2];
   bgpars[0] = TF1::GetParameters()[5];
   bgpars[1] = TF1::GetParameters()[6];
-  //bgpars[5] = TF1::GetParameters()[7];
 
   fBGFit.SetParameters(bgpars);
-  //fithist->GetListOfFunctions()->Print();
 
   double gaus1pars[5];
   gaus1pars[0] = TF1::GetParameters()[0];
@@ -236,38 +194,22 @@ Bool_t GDoubleGaus::Fit(TH1 *fithist,double cent1,double cent2,Option_t *opt) {
   fGaus2.SetParameters(gaus2pars);
   fGaus2.SetLineColor(kGreen);
 
-
   fAreaTotal = this->Integral(xlow,xhigh) / fithist->GetBinWidth(1);
   double bgArea = fBGFit.Integral(xlow,xhigh) / fithist->GetBinWidth(1);;
   fAreaTotal -= bgArea;
 
-  if(xlow>xhigh)
-    std::swap(xlow,xhigh);
-  fSumTotal = fithist->Integral(fithist->GetXaxis()->FindBin(xlow),
-                                 fithist->GetXaxis()->FindBin(xhigh)); //* fithist->GetBinWidth(1);
-  printf("sum between markers: %02f\n",fSumTotal);
-  fDSumTotal = TMath::Sqrt(fSumTotal);
-  fSumTotal -= bgArea;
-  printf("sum after subtraction: %02f\n",fSumTotal);
+  if(xlow>xhigh) std::swap(xlow,xhigh);
+  fSumTotal = fithist->Integral(fithist->GetXaxis()->FindBin(xlow), fithist->GetXaxis()->FindBin(xhigh));
 
   if(!verbose && !noprint) {
     printf("hist: %s\n",fithist->GetName());
-    Print();/*
-    printf("BG Area:         %.02f\n",bgArea);
-    printf("GetChisquared(): %.4f\n", TF1::GetChisquare());
-    printf("GetNDF():        %i\n",   TF1::GetNDF());
-    printf("GetProb():       %.4f\n", TF1::GetProb());*/
-    //TF1::Print();
+    Print();
   }
 
   Copy(*fithist->GetListOfFunctions()->FindObject(GetName()));
   fithist->GetListOfFunctions()->Add(fBGFit.Clone());
   fithist->GetListOfFunctions()->Add(fGaus1.Clone());
   fithist->GetListOfFunctions()->Add(fGaus2.Clone());
-
-  
-
-
 
   //delete tmppeak;
   return true;
@@ -277,8 +219,7 @@ Bool_t GDoubleGaus::Fit(TH1 *fithist,double cent1,double cent2,Option_t *opt) {
 void GDoubleGaus::Clear(Option_t *opt){
   TString options = opt;
   //Clear the GDoubleGaus including functions and histogram
-  if(options.Contains("all"))
-    TF1::Clear();
+  if(options.Contains("all")) TF1::Clear();
   init_flag = false;
   fAreaTotal  = 0.0;
   fDAreaTotal = 0.0;
@@ -321,9 +262,8 @@ void GDoubleGaus::DrawResiduals(TH1 *hist) const{
   Double_t *res = new Double_t[nbins];
   Double_t *bin = new Double_t[nbins];
   Int_t points = 0;
-  for(int i =1;i<=nbins;i++) {
-    if(hist->GetBinCenter(i) <= xlow || hist->GetBinCenter(i) >= xhigh)
-      continue;
+  for(int i = 1; i <= nbins; i++) {
+    if(hist->GetBinCenter(i) <= xlow || hist->GetBinCenter(i) >= xhigh) continue;
     res[points] = (hist->GetBinContent(i) - this->Eval(hist->GetBinCenter(i)))+ this->GetParameter("Height")/2;
     bin[points] = hist->GetBinCenter(i);
     points++;

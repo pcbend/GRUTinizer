@@ -222,10 +222,14 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
       fOutputEvent->AddRawData(event, kDetectorSystems::PHOSWALL);
       break;
     case 21: //lenda
-      fOutputEvent->AddRawData(event, kDetectorSystems::LENDA);
+      fOutputEvent->AddRawData(event, kDetectorSystems::DDAS);
+//      fOutputEvent->AddRawData(event, kDetectorSystems::LENDA);
       break;
     case 22: //lenda
       fOutputEvent->AddRawData(event, kDetectorSystems::FASTSCINT);
+      break;
+    case 25: //General NSCL DDAS Data
+      fOutputEvent->AddRawData(event, kDetectorSystems::DDAS);
       break;
     case 29: // Something.
       fOutputEvent->AddRawData(event, kDetectorSystems::BANK29);

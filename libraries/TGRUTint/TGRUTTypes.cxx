@@ -8,6 +8,7 @@
 #include "TJanus.h"
 #include "TJanusDDAS.h"
 #include "TLenda.h"
+#include "TGenericDDAS.h"
 #include "TMode3.h"
 #include "TNSCLScalers.h"
 #include "TPhosWall.h"
@@ -28,7 +29,7 @@ std::map<std::string, kDetectorSystems> detector_system_map{
   {"Gretina_Sim", kDetectorSystems::GRETINA_SIM},
   {"S800_SIM",    kDetectorSystems::S800_SIM},
   {"Lenda",       kDetectorSystems::LENDA},
-
+  {"DDAS",	  kDetectorSystems::DDAS},
 
   {"Sega",        kDetectorSystems::SEGA},
   {"Janus",       kDetectorSystems::JANUS},
@@ -55,6 +56,7 @@ std::map<kDetectorSystems, TDetectorFactoryBase*> detector_factory_map {
   {kDetectorSystems::GRETINA_SIM, new TDetectorFactory<TGretSim>() },
   {kDetectorSystems::S800_SIM,    new TDetectorFactory<TS800Sim>() },
   {kDetectorSystems::LENDA,       new TDetectorFactory<TLenda>() },
+  {kDetectorSystems::DDAS,        new TDetectorFactory<TGenericDDAS>() },
 
   {kDetectorSystems::SEGA,        new TDetectorFactory<TSega>() },
   {kDetectorSystems::JANUS,       new TDetectorFactory<TJanus>() },
