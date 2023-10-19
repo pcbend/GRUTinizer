@@ -57,9 +57,16 @@ CFLAGS    += $(shell root-config --cflags)
 CFLAGS    += -MMD -MP $(INCLUDES)
 CFLAGS    += -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
 LINKFLAGS += -Llib $(addprefix -l,$(LIBRARY_NAMES)) -Wl,-rpath,\$$ORIGIN/../lib
-LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lPyROOT -lMinuit -lMathMore
+LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lMinuit -lMathMore
 LINKFLAGS := $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX)
 
+
+ROOT_SUBVER = $(shell expr $(shell root-config --version | cut -f1 -d/ | cut -f2 -d.) \>= 22)
+ifeq ($(ROOT_SUBVER),1)
+	LINKFLAGS += -lROOTTPython
+else
+	LINKFLAGS += -lPyROOT
+endif
 ROOT_LIBFLAGS := $(shell root-config --cflags)
 
 UTIL_O_FILES    := $(patsubst %.$(SRC_SUFFIX),.build/%.o,$(wildcard util/*.$(SRC_SUFFIX)))

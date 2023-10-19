@@ -10,7 +10,7 @@
 
 class TProfile;
 
-class GH2 : public GH1 { 
+class GH2 : public GH1 {
   protected:
     Double_t     fScalefactor;     //Scale factor
     Double_t     fTsumwy;          //Total Sum of weight*Y

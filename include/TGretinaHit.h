@@ -50,13 +50,13 @@ class interaction_point {
 #ifndef __CINT__
 
 struct intpnt_compare {
-  bool operator()(const interaction_point &p1,const interaction_point &p2) {
+  bool operator()(const interaction_point &p1,const interaction_point &p2) const {
     return p1.fSeg < p2.fSeg;
   }
 };
 
 struct intpnt_compare_wedge {
-  bool operator()(const interaction_point &p1,const interaction_point &p2) {
+  bool operator()(const interaction_point &p1,const interaction_point &p2) const {
     return (p1.fSeg%6) < (p2.fSeg%6);
   }
 };
@@ -195,8 +195,6 @@ private:
   Int_t     pad;        // decomp error code.
  *------------------
 */
-
-
 
   Int_t           fCrystalId;
   Int_t           fCoreCharge[4];

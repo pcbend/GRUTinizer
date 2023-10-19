@@ -67,6 +67,7 @@
 #include "TGFileDialog.h"
 #include "TObjString.h"
 #include "TVirtualPad.h"
+#include "TVirtualX.h"
 #include "TEnv.h"
 #include <KeySymbols.h>
 

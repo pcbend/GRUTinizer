@@ -1,6 +1,10 @@
 # GRUTinizer
 Install GRUTinizer
-- Needs a root installation to work, at present 6.18 is the latest root version that works.
+- Needs a root installation to work, at present I have tested up tp 6.22.08 on FRIB computers. 
+  Note between version 6.18 and 6.22 the library lPyROOT seems to have been replaced my lROOTTPython
+  on the FRIB machines, the makefile has been adjusted to use either library based on the root version
+- For root you will need a variable $ROOTSYS defined in your bashrc pointing to your root installation
+ 
 - Add these lines to your bashrc
 export GRUTSYS=/path/to/GRUTinizer
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GRUTSYS/lib
@@ -10,7 +14,7 @@ source $GRUTSYS/thisgrut.sh
   make -j N
 where N is the number of cores to use
 
-Assuming no errors (there are still some unused variable error messages which I am slowly working on), you have successfully installed GRUTinizer Woo!
+Assuming no errors (there are still some unused class rule warnings I am working on), you have successfully installed GRUTinizer Woo!
 
 Unpacking a file
 

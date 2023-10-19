@@ -10,16 +10,6 @@
 //   * For the list of contributors see $ROOTSYS/README/CREDITS.             *
 //   *************************************************************************/
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
 
 #include <GH2.h>
 #include <GH1D.h>
@@ -30,6 +20,7 @@
 #include "TVirtualPad.h"
 #include "TClass.h"
 #include "THashList.h"
+#include "TObjString.h"
 
 #include "TF2.h"
 #include "TProfile.h"
