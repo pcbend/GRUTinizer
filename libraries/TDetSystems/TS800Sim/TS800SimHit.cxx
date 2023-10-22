@@ -28,6 +28,15 @@ const char *TS800SimHit::GetName() const {
   return name.c_str();
 }
 
+TVector3 TS800SimHit::Track(){
+  double ata = TMath::Sin(GetATA());
+  double bta = TMath::Sin(GetBTA());
+
+  TVector3 track(ata,-bta,sqrt(1-ata*ata-bta*bta));
+  
+  return track;
+}
+
 void TS800SimHit::Print(Option_t *opt) const {
 
   std::cout << "TS800SimHit:" <<  std::endl;

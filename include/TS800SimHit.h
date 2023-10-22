@@ -31,7 +31,8 @@ public:
   float    GetBTA() const   { return fBTA; }
   float    GetDTA() const   { return fDTA; }
   float    GetYTA() const   { return fYTA; }
-
+  TVector3 Track();
+  
   double   fATA;
   double   fBTA;
   double   fDTA;
