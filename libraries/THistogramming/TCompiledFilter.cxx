@@ -91,5 +91,12 @@ bool TCompiledFilter::MatchesCondition(TUnpackedEvent& detectors) {
 void TCompiledFilter::AddCutFile(TFile* cut_file) {
   if(cut_file) {
     cut_files.push_back(cut_file);
+    TIter iter(cut_file->GetListOfKeys());
+    while (TKey *key = (TKey*)iter.Next()){
+      TObject *obj = key->ReadObj();
+      if (obj->InheritsFrom("TCutG")){
+        gates.Add(obj);
+      }
+    }
   }
 }

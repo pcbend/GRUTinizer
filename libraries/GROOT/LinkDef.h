@@ -82,7 +82,7 @@
 #pragma link C++ class GSnapshot+;
 
 
-#pragma link C++ class GHist-;
-#pragma link C++ class xGH1D-;
+//#pragma link C++ class GHist-;
+//#pragma link C++ class xGH1D-;
 
 #endif

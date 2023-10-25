@@ -3,6 +3,7 @@
 #include "MakeUnique.h"
 #include "TGRUTOptions.h"
 #include "TRawFileOut.h"
+#include <memory>
 
 TFilterLoop* TFilterLoop::Get(std::string name) {
   if(name.length()==0)
