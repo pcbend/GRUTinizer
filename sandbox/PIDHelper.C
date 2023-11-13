@@ -1,6 +1,9 @@
-//Draws gates from .pid file created by TGates on current canvas
-//and gets number of events in gates.
-//Rewuires as argument path to .pid file
+/*******************************************************************************/
+/* Draws gates from .pid file created by TGates on current canvas **************/
+/* and gets number of events in gates. *****************************************/
+/* Requires as argument path to .pid file **************************************/
+/* At Present supports 2D gates only *******************************************/
+/*******************************************************************************/
 using namespace std;
 void drawPID(std::string filepath) {
   //Gets current Canvas, if unable to find stops exexution
@@ -61,39 +64,56 @@ void drawPID(std::string filepath) {
   zFile.close();
 }
 
+
+/*******************************************************************************/
+/* Used to make a PID file by drawing gates on the current canvas **************/
+/* Requires as argument the name of the new .pid file **************************/
+/*******************************************************************************/
 void makePID(std::string filename) {
 
   //Gets current Canvas, if unable to find stops exexution
   TH2F *tmpHist = NULL;
+  TH1F *tmpHist1D = NULL;
   TPad *pad = (TPad*)gPad;
   if(pad == NULL) {
     cout << "Need To Open (G/T)Canvas" << endl;
     return;
   }
-
+  bool gate2d = false;
   //Gets current histogram from Canvas, if unable to find stops exexution
   TList *newlist = pad->GetListOfPrimitives();
   for(auto obj: *newlist) {
     if(strcmp(obj->ClassName(), "TH2F") == 0) {
       tmpHist = (TH2F*) newlist->FindObject(obj->GetName());
+      gate2d = true;
+      break;
+    }
+    if(strcmp(obj->ClassName(), "TH1F") == 0) {
+      tmpHist1D = (TH1F*) newlist->FindObject(obj->GetName());
+      gate2d = false;
       break;
     }
   }
 
-  if(tmpHist == NULL) {
-    cout << "TH2F not found" << endl;
+  if(tmpHist == NULL && tmpHist1D == NULL) {
+    cout << "TH1F or TH2F not found" << endl;
     return;
   }
 
   TGates *g = new TGates();
   cout << "Draw Gates on Canvas" << endl;
-  g->MakePIDFile(filename.c_str());
+  if(gate2d) g->MakePIDFile(filename.c_str());
+  else g->Make1DPIDFile(filename.c_str());
 }
 
-
-
+/*******************************************************************************/
+/* Draws gates from .gate file created by TGates on current canvas *************/
+/* and gets number of events in gates. *****************************************/
+/* Requires as argument path to .gate file *************************************/
+/* At Present supports 2D gates only *******************************************/
+/*******************************************************************************/
 void drawGate(std::string filepath) {
-  //Gets current Canvas, if unable to find stops exexution
+  //Gets current Canvas, if unable to find stops execution
   TH2F *tmpHist = NULL;
   TPad *pad = (TPad*)gPad;
   if(pad == NULL) {
@@ -144,6 +164,10 @@ void drawGate(std::string filepath) {
   zFile.close();
 }
 
+/*******************************************************************************/
+/* Used to make a gate file by drawing gates on the current canvas *************/
+/* Requires as argument the name of the .gate file *****************************/
+/*******************************************************************************/
 void makeGate(std::string filename) {
 
   //Gets current Canvas, if unable to find stops exexution

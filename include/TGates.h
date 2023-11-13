@@ -14,6 +14,8 @@
 #include "TList.h"
 #include "TCanvas.h"
 #include "TCutG.h"
+#include "TLine.h"
+#include "TMarker.h"
 
 #include "TNucleus.h"
 class TGates : public TObject{
@@ -26,6 +28,8 @@ class TGates : public TObject{
 
   bool LoadPIDFile(const char *);				//Loads PID Files
   void MakePIDFile(const char *);				//Creates a text file containing particle gates
+  void Make1DPIDFile(const char *);				//Creates a text file containing 1D particle gates
+
   std::vector<std::pair<TNucleus*,TCutG*> > GetListOfGates() { return GateList; }
 
   bool LoadGateFile(const char *);				//Loads 2d Gate from File
