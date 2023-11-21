@@ -200,43 +200,37 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
     case 5: // S800 Mode2 equvilant.
       fOutputEvent->AddRawData(event, kDetectorSystems::S800);
       break;
-    case 8: // Gretina diag. data.
+    case 6: // NSCL Non Event Data Typically Run Start/Stop and scalers
+      break;
+    case 8: // Bank 88 (Formerly Bank29)
       HandleGEBMode3(event, kDetectorSystems::BANK29);
       break;
-    case 9:
-      //Simulated S800 data,
+    case 9: // Simulated S800 data from UCGretina
       fOutputEvent->AddRawData(event, kDetectorSystems::S800_SIM);
-      //event.Print("all");
-      //std::cout << " In simulated S800 packet" << std::endl;
       break;
-    case 10: // S800 scaler data....
+    case 10: // S800 scaler data
       HandleS800Scaler(event);
       break;
-    case 11:
-      //GEANT4 gretina simulated data.
+    case 11: // UCGretina simulated data.
       fOutputEvent->AddRawData(event,kDetectorSystems::GRETINA_SIM);
-      //event.Print("all");
-      //exit(1);
       break;
-    case 17: //PWall Mode2 equivlant.
+    case 17: // Phoswich Wall Mode2 equivlant.
       fOutputEvent->AddRawData(event, kDetectorSystems::PHOSWALL);
       break;
-    case 21: //lenda
-      fOutputEvent->AddRawData(event, kDetectorSystems::DDAS);
-//      fOutputEvent->AddRawData(event, kDetectorSystems::LENDA);
+    case 21: // Lenda event format identical to Type25
+      fOutputEvent->AddRawData(event, kDetectorSystems::LENDA);
       break;
-    case 22: //lenda
+    case 22: // FastScint - S.G. Unsure of this data, type22 should be GODDESS from GEBHeaders.h
       fOutputEvent->AddRawData(event, kDetectorSystems::FASTSCINT);
       break;
-    case 25: //General NSCL DDAS Data
+    case 25: // General NSCL DDAS format identical to Type21
       fOutputEvent->AddRawData(event, kDetectorSystems::DDAS);
       break;
-    case 29: // Something.
+    case 29: // Something - S.G. Unsure of this type
       fOutputEvent->AddRawData(event, kDetectorSystems::BANK29);
       break;
     default:
-      std::cout << "Dance Party EventType: " << type << std::endl;
-      //dance party.
+      std::cout << "Unknown EventType: " << type << std::endl;
       break;
   }
 }

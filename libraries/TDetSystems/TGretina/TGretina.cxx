@@ -7,15 +7,15 @@
 #include "TGretina.h"
 #include "TGEBEvent.h"
 
+/*******************************************************************************/
+/* TGretina ********************************************************************/
+/* Main Class for Gretina mode2 (Decomposed) analysis **************************/
+/*******************************************************************************/
 TGretina::TGretina(){
-  //gretina_hits = new TClonesArray("TGretinaHit");
-  //addback_hits = new TClonesArray("TGretinaHit");
   Clear();
 }
 
 TGretina::~TGretina() {
-  //delete gretina_hits;
-  //addback_hits->Delete();
 }
 
 Float_t TGretina::crmat[32][4][4][4];
@@ -24,6 +24,10 @@ bool    TGretina::fCRMATSet = false;
 bool    TGretina::fNEIGHBOURSet = false;
 bool	TGretina::gretNeighbour[124][124];
 
+/*******************************************************************************/
+/* Legacy - No Longer used and may be removed **********************************/
+/* Old Addback code should use BuildAddback() instead **************************/
+/*******************************************************************************/
 bool DefaultAddback(const TGretinaHit& one,const TGretinaHit &two) {
   TVector3 res = one.GetLastPosition()-two.GetPosition();
   return ((std::abs(one.GetTime()-two.GetTime()) < 44.0) &&
@@ -32,11 +36,16 @@ bool DefaultAddback(const TGretinaHit& one,const TGretinaHit &two) {
 
 std::function<bool(const TGretinaHit&,const TGretinaHit&)> TGretina::fAddbackCondition = DefaultAddback;
 
+/*******************************************************************************/
+/* Main function for making addback hits according to procedure defined in *****/
+/* D. Weisshaar et al., Nucl. Instrum. Methods Phys. Res., Sect. A 847, ********/
+/* 18, (2017). Sec 3.3 *********************************************************/
+/* SortDepth determines how many combinations of events to consider default=4 **/
+/* AddbackDepth classifies events as, n0 (0), n1 (1), n2 (2) or ng (3) *********/
+/*******************************************************************************/
 //SG TO DO
 //How to handle interaction points from added crystals, does it make sense to add them?
 void TGretina::BuildAddback(int SortDepth, bool SortByEng) const {
-  //See D. Weisshaar et al., Nucl. Instrum. Methods Phys. Res., Sect. A 847, 18, (2017). Sec 3.3 for details
-  //of addback procedure
   if( addback_hits.size() > 0 || gretina_hits.size() == 0) {
     return;
   }
@@ -106,22 +115,18 @@ void TGretina::BuildAddback(int SortDepth, bool SortByEng) const {
     std::sort(paired.rbegin(), paired.rend());
     //Vector can contain multiple version of same hit, removes duplicate values
     paired.erase(unique(paired.begin(), paired.end()), paired.end());
-    //n0
-    if (paired.size() == 0){
+    if (paired.size() == 0) { //n0 events
       addback_hits.push_back(current_hit);
       addback_hits.back().SetABDepth(0);
-    }
-    //n1
-    else if (paired.size() == 1) {
+    } else if (paired.size() == 1) { //n1 Events
       current_hit.NNAdd(temp_hits[paired.at(0)]);
       addback_hits.push_back(current_hit);
       addback_hits.back().SetABDepth(1);
       //Erase hit after adding otherwise event can make a new addback event
       temp_hits.erase(temp_hits.begin() + paired.at(0));
     }
-    //n2
-    else if (paired.size() == 2) {
-      if(IsNeighbour(current_hit,temp_hits[paired.at(0)]) && IsNeighbour(current_hit,temp_hits[paired.at(1)]) && IsNeighbour(temp_hits[paired.at(0)],temp_hits[paired.at(1)]) ) {
+    else if (paired.size() == 2) { //n2 Or Ng
+      if(IsNeighbour(current_hit,temp_hits[paired.at(0)]) && IsNeighbour(current_hit,temp_hits[paired.at(1)]) && IsNeighbour(temp_hits[paired.at(0)],temp_hits[paired.at(1)]) ) { //n2
         current_hit.NNAdd(temp_hits[paired.at(1)]);
         current_hit.NNAdd(temp_hits[paired.at(0)]);
         addback_hits.push_back(current_hit);
@@ -139,9 +144,7 @@ void TGretina::BuildAddback(int SortDepth, bool SortByEng) const {
           temp_hits.erase(temp_hits.begin() + paired.at(p));
         }
       }
-    }
-    //ng
-    else {
+    } else { //ng
       addback_hits.push_back(current_hit);
       addback_hits.back().SetABDepth(3);
       for(int p = 0; p < (int)paired.size(); p++) {
@@ -156,7 +159,9 @@ void TGretina::BuildAddback(int SortDepth, bool SortByEng) const {
   return;
 }
 
-
+/*******************************************************************************/
+/* Loads files containing rotation matrices of core required for position ******/
+/*******************************************************************************/
 void TGretina::SetCRMAT() {
   if(fCRMATSet){
     return;
@@ -207,6 +212,10 @@ void TGretina::SetCRMAT() {
   /* Done! */
 }
 
+/*******************************************************************************/
+/* Loads Segment Positions - Typically unused as position is derived from ******/
+/* interaction points **********************************************************/
+/*******************************************************************************/
 void TGretina::SetSegmentCRMAT() {
   if(fCRMATSet)
     return;
@@ -219,13 +228,9 @@ void TGretina::SetSegmentCRMAT() {
   if(!infile.is_open()) {
     return;
   }
-  // notice: In file type-A is first, then
-  //         type-B but as type-B are even
-  //         det_ids in the data stream we
-  //         define type=0 for type-B not
+  // notice: In file type-A is first, then type-B but as type-B are even
+  //         det_ids in the data stream we define type=0 for type-B not
   //         type-A.
-  //
-  //printf("filename: %s\n",temp.c_str());
   std::string line;
   int type = 0;
   int seg  = 0;
@@ -234,7 +239,6 @@ void TGretina::SetSegmentCRMAT() {
       seg  = 0;
       type = 1;
     }
-    //printf("%s\n",line.c_str());
     std::stringstream ss(line);
     int segread;
     double x,y,z;
@@ -242,7 +246,6 @@ void TGretina::SetSegmentCRMAT() {
     if((seg+1)!=segread) {
       fprintf(stderr,"%s: seg[%i] read but seg[%i] expected.\n",__PRETTY_FUNCTION__,segread,seg+1);
     }
-    //printf("type[%i] : seg[%02i] : %.02f  %.02f  %.02f\n",type,seg,x,y,z);
     m_segpos[(type+1)%2][seg][0] = x;
     m_segpos[(type+1)%2][seg][1] = y;
     m_segpos[(type+1)%2][seg][2] = z;
@@ -251,7 +254,9 @@ void TGretina::SetSegmentCRMAT() {
   infile.close();
 }
 
-
+/*******************************************************************************/
+/* Gets Actual Position of Segment *********************************************/
+/*******************************************************************************/
 TVector3 TGretina::GetSegmentPosition(int cry_id,int segment) {
   SetCRMAT();
   float x = m_segpos[cry_id%2][segment][0];
@@ -272,7 +277,9 @@ TVector3 TGretina::GetSegmentPosition(int cry_id,int segment) {
   //return CrystalToGlobal(cry_id,x,y,z);
   return CrystalToGlobal(cry_id,v.X(),v.Y(),v.Z());
 }
-
+/*******************************************************************************/
+/* Defines which Gretina crystals are Neighbours used for Addback **************/
+/*******************************************************************************/
 void TGretina::SetGretNeighbours() {
   if(fNEIGHBOURSet){
     return;
@@ -318,6 +325,9 @@ TVector3 TGretina::GetCrystalPosition(int cry_id) {
   return v;
 }
 
+/*******************************************************************************/
+/* Copies hit ******************************************************************/
+/*******************************************************************************/
 void TGretina::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 
@@ -325,11 +335,17 @@ void TGretina::Copy(TObject& obj) const {
   gretina.gretina_hits = gretina_hits;
 }
 
+/*******************************************************************************/
+/* Inserts Hit into TGretinaHit vector Copies hit ******************************/
+/*******************************************************************************/
 void TGretina::InsertHit(const TDetectorHit& hit){
   gretina_hits.emplace_back((TGretinaHit&)hit);
   fSize++;
 }
 
+/*******************************************************************************/
+/* Unpacks GEB data and builds TGretinaHit *************************************/
+/*******************************************************************************/
 int TGretina::BuildHits(std::vector<TRawEvent>& raw_data){
   if(raw_data.size()<1)
     return Size();
@@ -347,15 +363,16 @@ int TGretina::BuildHits(std::vector<TRawEvent>& raw_data){
   return Size();
 }
 
+/*******************************************************************************/
+/* Converts Local Hit Position To Global Position ******************************/
+/* x,y,z must be in cm *********************************************************/
+/*******************************************************************************/
 TVector3 TGretina::CrystalToGlobal(int cryId,Float_t x,Float_t y,Float_t z) {
   SetCRMAT();
 
   Int_t detectorPosition = cryId/4 - 1;
   Int_t crystalNumber    = cryId%4;
 
-  /* x,y,z need to be in cm to work properly. Depending on the
-     source of the mapping, you might need to convert from mm
-     (if you read from crmat.linux). */
   double xl = ( (crmat[detectorPosition][crystalNumber][0][0] * x) +
                 (crmat[detectorPosition][crystalNumber][0][1] * y) +
                 (crmat[detectorPosition][crystalNumber][0][2] * z) +
@@ -374,6 +391,9 @@ TVector3 TGretina::CrystalToGlobal(int cryId,Float_t x,Float_t y,Float_t z) {
   return TVector3(xl, yl, zl);
 }
 
+/*******************************************************************************/
+/* Basic Print Function ********************************************************/
+/*******************************************************************************/
 void TGretina::Print(Option_t *opt) const {
   printf(BLUE "GRETINA: size = %i" RESET_COLOR "\n",(int)Size());
   for(unsigned int x=0;x<Size();x++) {
@@ -384,10 +404,16 @@ void TGretina::Print(Option_t *opt) const {
   printf(BLUE "--------------------------------" RESET_COLOR "\n");
 }
 
+/*******************************************************************************/
+/* Sorts Hits by energy ********************************************************/
+/*******************************************************************************/
 void TGretina::SortHits() {
   std::sort(gretina_hits.begin(),gretina_hits.end());
 }
 
+/*******************************************************************************/
+/* Clears Hits *****************************************************************/
+/*******************************************************************************/
 void TGretina::Clear(Option_t *opt) {
   TDetector::Clear(opt);
   gretina_hits.clear();

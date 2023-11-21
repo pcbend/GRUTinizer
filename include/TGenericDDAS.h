@@ -13,15 +13,10 @@ public:
 
   virtual void Clear(Option_t* opt = "");
   virtual TGenericDDASHit& GetDDASHit(int i);
-
-  virtual void Draw(Option_t *opt="");
-
-  virtual void InsertHit(const TDetectorHit&);
   virtual TDetectorHit& GetHit(int i);
+  virtual void InsertHit(const TDetectorHit&);
 
-  void SortHitsByTimestamp();
-
-  // Allows for looping over all hits with for(auto& hit : diamond) { }
+  // Allows for looping over all hits with for(auto& hit : ddas) { }
   std::vector<TGenericDDASHit>::iterator begin() { return ddas_hits.begin(); }
   std::vector<TGenericDDASHit>::iterator end() { return ddas_hits.end(); }
 

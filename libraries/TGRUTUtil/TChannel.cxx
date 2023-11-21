@@ -14,6 +14,9 @@
 #include "GRootFunctions.h"
 #include "TGRUTUtilities.h"
 
+#include "chrono"
+using namespace std::chrono;
+
 std::map<unsigned int,TChannel*> TChannel::fChannelMap;
 TChannel *TChannel::fDefaultChannel = new TChannel("TChannel",0xffffffff);
 std::string TChannel::fChannelData;

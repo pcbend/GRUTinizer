@@ -12,6 +12,9 @@ TMode3Hit::TMode3Hit(){ }
 
 TMode3Hit::~TMode3Hit() { }
 
+/*******************************************************************************/
+/* Builds the TMode3Hit from TSmartBuffer **************************************/
+/*******************************************************************************/
 void TMode3Hit::BuildFrom(TSmartBuffer& buf){
   Clear();
 
@@ -27,7 +30,6 @@ void TMode3Hit::BuildFrom(TSmartBuffer& buf){
   buf.Advance(sizeof(TRawEvent::GEBMode3Data));
 
   led = data->GetLed();
-  //charge = data->GetEnergy(*header);
   SetCharge(data->GetEnergy(*header));
 
   dt1  = data->GetDeltaT1();
@@ -55,15 +57,13 @@ void TMode3Hit::BuildFrom(TSmartBuffer& buf){
   buf.Advance(wave_bytes);
 }
 
-
-
-
-
+/*******************************************************************************/
+/* Copies hit ******************************************************************/
+/*******************************************************************************/
 void TMode3Hit::Copy(TObject& obj) const {
   TDetectorHit::Copy(obj);
 
   TMode3Hit& mode3 = (TMode3Hit&)obj;
-
   mode3.board_id = board_id;
   mode3.led      = led;
   mode3.cfd      = cfd;
@@ -71,13 +71,16 @@ void TMode3Hit::Copy(TObject& obj) const {
 }
 
 
+/*******************************************************************************/
+/* Basic Print Function ********************************************************/
+/*******************************************************************************/
 void TMode3Hit::Print(Option_t *opt) const {
-
   printf("hole[%03i] xtal[%i] seg[%03i]:   %i\n",GetHole(),GetCrystal(),GetSegmentId(),GetCharge0());
-
-
 }
 
+/*******************************************************************************/
+/* Clears Hit ******************************************************************/
+/*******************************************************************************/
 void TMode3Hit::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
   board_id = -1;
@@ -92,6 +95,9 @@ void TMode3Hit::Clear(Option_t *opt) {
   waveform.clear();
 }
 
+/*******************************************************************************/
+/* Returns the average of mode3 wave *******************************************/
+/*******************************************************************************/
 double TMode3Hit::AverageWave(int samples) const {
   if(waveform.size() == 0) {
     return 0.0;
@@ -107,7 +113,9 @@ double TMode3Hit::AverageWave(int samples) const {
   return sum / ((double)samples);
 }
 
-
+/*******************************************************************************/
+/* Get Charges from other Core Channels? ***************************************/
+/*******************************************************************************/
 double TMode3Hit::GetEnergy0() const {
   double energy;
   TChannel* chan = TChannel::GetChannel(Address());

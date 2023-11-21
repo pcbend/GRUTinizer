@@ -40,7 +40,6 @@ int TLenda::BuildHits(std::vector<TRawEvent>& raw_data) {
 
       // Constructor advances the buffer to end of each channel
       TDDASEvent<DDASGEBHeader> ddas(buf);
-
       unsigned int address = ( (ddas.GetCrateID() << 16) + (ddas.GetSlotID() << 8) + ddas.GetChannelID() );
       TChannel* chan = TChannel::GetChannel(address);
       static int lines_displayed = 0;
@@ -66,9 +65,6 @@ int TLenda::BuildHits(std::vector<TRawEvent>& raw_data) {
       }
     }
   }
-
-  //printf("lenda build hits called\t%u\t%u\n",lenda_hits.size(),Size());
-  //fflush(stdout);
   return top_hits.size() + bottom_hits.size();
 }
 

@@ -16,6 +16,8 @@ TGretinaHit::TGretinaHit(){ Clear(); }
 
 TGretinaHit::~TGretinaHit(){ }
 
+bool TGretinaHit::fSmear = false;
+double TGretinaHit::fSmearWidth = 0.2; // 2 mm
 /*******************************************************************************/
 /* Copies hit ******************************************************************/
 /*******************************************************************************/
@@ -96,8 +98,6 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
   fCoreEnergy = raw.tot_e;
   fAB = 0;
 
-  //fAddress = (1<<24) + (fCrystalId<<16);
-  //fWAddress = (1<<24) + ( raw.board_id );
   int board_id = ((fCrystalId/4) << 8) ;  //hole  number : 0x1f00
   board_id += ((fCrystalId%4) << 6) ;  //x-tal number : 0x00c0
   board_id += 9;                       //chan  number : 0x000f  information not available here(assume core).
@@ -239,10 +239,6 @@ double TGretinaHit::GetDopplerYta(double beta, double yta, double xoffset, doubl
   return tmp;
 }
 
-// TODO: Handle interactions points better
-//       Right now, the "first interaction point" is the one with the highest energy,
-//       and the "second" is the one with the second highest energy.
-//       First and second may be assigned across crystal boundaries.
 /*******************************************************************************/
 /* Legacy - No Longer used and may be removed **********************************/
 /* Used by old Addback code to handle interaction points ***********************/
@@ -298,6 +294,7 @@ void TGretinaHit::NNAdd(const TGretinaHit& rhs) {
   fCoreEnergy += rhs.fCoreEnergy;
   fSingles.push_back(rhs);
 
+  // S.G. - Does it make sense to add interactions points from other crystal?
   // Fill all interaction points
   for(unsigned int i=0; i<rhs.fSegments.size(); i++){
     if(fNumberOfInteractions >= MAXHPGESEGMENTS){
@@ -400,17 +397,32 @@ void TGretinaHit::TrimSegments(int type) {
   }
 }
 
+/*******************************************************************************/
+/* Returns position vector to first interaction point **************************/
+/* For simulations the position can be smeared with the functions **************/
+/* SetSmear(true/false) and SetSmearWidth(width) width should be in cm *********/
+/*******************************************************************************/
+TVector3 TGretinaHit::GetPosition() const {
+  TVector3 gret_pos = GetIntPosition(0);
+  if(!fSmear) {
+  } else {
+    gret_pos.SetX(gret_pos.X() - gRandom->Gaus(0,fSmearWidth));
+    gret_pos.SetY(gret_pos.Y() - gRandom->Gaus(0,fSmearWidth));
+    gret_pos.SetZ(gret_pos.Z() - gRandom->Gaus(0,fSmearWidth));
+  }
+  return gret_pos;
+}
+
+/*******************************************************************************/
+/* Gets Detector Number - Corresponds to Real Detetor number (Q1..Q12 etc.) ****/
+/* Requires Calibration file ***************************************************/
+/*******************************************************************************/
 int TGretinaHit::GetDetnum() const {
   TChannel* chan = TChannel::GetChannel(fAddress);
   int output = -1;
   if(chan && fAddress!=-1){
     output = chan->GetArrayPosition();
-  }
-/*else if(fSegments.size()) {
-    output = fSegments[0].GetDetnum();
-  }
-*/ else {
-    // std::cout << "Unknown address: " << std::hex << fAddress << std::dec << std::endl;
+  } else {
     output = -1;
   }
 

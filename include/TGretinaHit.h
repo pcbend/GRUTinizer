@@ -6,7 +6,7 @@
 #include <TVector3.h>
 #include <TMath.h>
 #include <TChain.h>
-
+#include <TRandom.h>
 #include <cmath>
 
 #include "TDetectorHit.h"
@@ -86,7 +86,6 @@ public:
   Int_t    GetDetnum()       const;
   Int_t    GetArrayNumber()     const { return 4*(GetDetnum() - 1) + GetCrystalNumber(); }
   Float_t  GetCoreEnergy()      const;
-//  Float_t  GetCoreEnergy()      const { return fCoreEnergy;     }
   Int_t    GetCoreCharge(int i) const { return fCoreCharge[i];  }
   Float_t  GetCoreEnergy(int i) const;
   Float_t  GetBaseline()	const { return fBaseline;	}
@@ -130,23 +129,10 @@ public:
   }
 
   bool HasInteractions() { return !fSegments.empty(); }
- 
+
   bool operator<(const TGretinaHit &rhs) const { return fCoreEnergy > rhs.fCoreEnergy; }
 
   double GetDoppler(double beta,const TVector3 *vec=0,int EngRange=-1) const;
-
-/*  double GetDoppler(double beta,const TVector3 *vec=0,int EngRange=-1) const {
-    if(Size()<1)
-      return 0.0;
-    if(vec==0) {
-      vec = &BeamUnitVec;
-    }
-    double tmp = 0.0;
-    double gamma = 1/(sqrt(1-pow(beta,2)));
-    if(EngRange>0) tmp = GetCoreEnergy(EngRange)*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*vec)));
-    else tmp = fCoreEnergy*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*vec)));
-    return tmp;
-  }*/
 
   double GetDopplerYta(double beta , double yta, const TVector3 *vec=0, int EngRange =-1) const;
   double GetDopplerYta(double beta , double yta, double target_x_shift, double target_y_shift, double target_z_shift, const TVector3 *vec=0, int EngRange =-1) const;
@@ -161,9 +147,12 @@ public:
 
   TVector3 GetIntPosition(unsigned int i)   const;  // position of the ith segment, Global coor.
   TVector3 GetLocalPosition(unsigned int i) const;  // position of the ith segment, Local coor.
-  TVector3 GetPosition()                    const { return GetIntPosition(0); }
+  TVector3 GetPosition()                    const;
   TVector3 GetLastPosition()                const;
 
+  //Set Smearing flag for position Used for UCGretina data
+  void SetSmearWidth(double smearsig)	    const { fSmearWidth = smearsig; }
+  void SetSmear(bool smear)	    const { fSmear = smear; }
   TVector3 GetCrystalPosition()           const;
 
   void Add(const TGretinaHit& other);
@@ -172,7 +161,6 @@ public:
   void SetABDepth(int ab) const { fAB = ab; }
   void TrimSegments(int type); // 0: drop multiple ident int pnts.  1: make into wedge "data"
   bool IsClean() const { return !fPad; }
-//bool IsAddback() const { return this->TestBit(31); }
 
 private:
 /* All possible decomp information and
@@ -181,7 +169,7 @@ private:
   Int_t     type;       // endiness identifier; droppped.
   Int_t     crystal_id; //                                      -> TGreintaHit.fCrystalId
   Int_t     num;        // number of interactions of error code -> TGreintaHit.fNumberOfINteractions
-  Float_t   tot_e;      // energy used for decomp               -> TGretinaHit.fCoreEnergy   
+  Float_t   tot_e;      // energy used for decomp               -> TGretinaHit.fCoreEnergy
   Int_t     core_e[4];  // charge reported at dig for each gain -> TGretinaHit.fCoreCharge[4]
   Long_t    timestamp;  // timestamp for the hit                -> TDetectorHit.fTimestamp
   Long_t    trig_time;  // currently unsed (?)
@@ -211,6 +199,8 @@ private:
   std::vector<TGretinaHit> fSingles;
   bool fSetFirstSingles = false;
   std::vector<interaction_point> fSegments;
+  static double fSmearWidth;
+  static bool fSmear;
   ClassDef(TGretinaHit,5)
 };
 

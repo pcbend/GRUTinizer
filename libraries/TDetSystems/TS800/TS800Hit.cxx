@@ -4,6 +4,11 @@
 #include "chrono"
 using namespace std::chrono;
 
+/*******************************************************************************/
+/* TTrigger ********************************************************************/
+/* Stores data from ULM trigger module *****************************************/
+/* Used primarily for PID purposes *********************************************/
+/*******************************************************************************/
 TTrigger::TTrigger() {
   Clear();
 }
@@ -31,6 +36,12 @@ void TTrigger::Clear(Option_t *opt) {
 
 void TTrigger::Print(Option_t *opt) const {  }
 
+/*******************************************************************************/
+/* TToF - Legacy Code **********************************************************/
+/* Used to store data from Phillips 7186 TDC No longer present in S800 DAQ *****/
+/* May Be Removed in Future ****************************************************/
+/* Used primarily for PID purposes *********************************************/
+/*******************************************************************************/
 TTof::TTof() {
   Clear();
 }
@@ -38,6 +49,9 @@ TTof::TTof() {
 TTof::~TTof() {
 }
 
+/*******************************************************************************/
+/* Copies hit ******************************************************************/
+/*******************************************************************************/
 void TTof::Copy(TObject &obj) const {
   TDetectorHit::Copy(obj);
   TTof &tof_ =(TTof&)obj;
@@ -49,6 +63,9 @@ void TTof::Copy(TObject &obj) const {
   tof_.ftac_xfp = ftac_xfp;
 }
 
+/*******************************************************************************/
+/* Clears hit ******************************************************************/
+/*******************************************************************************/
 void TTof::Clear(Option_t *opt) {
    frf      = -1;
    fobj     = -1;
@@ -58,10 +75,18 @@ void TTof::Clear(Option_t *opt) {
    ftac_xfp = -1;
 }
 
+/*******************************************************************************/
+/* Blank Print Function ********************************************************/
+/*******************************************************************************/
 void TTof::Print(Option_t *opt) const {  }
 
-/******* End of Ttof.  Beginning of TScintillator **********/
-
+/*******************************************************************************/
+/* TScintillator - Legacy Code *************************************************/
+/* Used to store data for the S800 FP Scintillator encoded in FERA module and **/
+/* Phillips TDC which are no longer present in S800 DAQ ************************/
+/* May Be Removed in Future ****************************************************/
+/* Used primarily for PID purposes *********************************************/
+/*******************************************************************************/
 TScintillator::TScintillator() {
   Clear();
 }
@@ -69,6 +94,9 @@ TScintillator::TScintillator() {
 TScintillator::~TScintillator() {
 }
 
+/*******************************************************************************/
+/* Copies hit ******************************************************************/
+/*******************************************************************************/
 void TScintillator::Copy(TObject &obj) const {
   TDetectorHit::Copy(obj);
   TScintillator &scinti =(TScintillator&)obj;
@@ -80,6 +108,9 @@ void TScintillator::Copy(TObject &obj) const {
 
 }
 
+/*******************************************************************************/
+/* Clears hit ******************************************************************/
+/*******************************************************************************/
 void TScintillator::Clear(Option_t *opt) {
   fID        = -1;
   fdE_up     = -1;
@@ -88,11 +119,16 @@ void TScintillator::Clear(Option_t *opt) {
   fTime_down = -1;
 }
 
+/*******************************************************************************/
+/* Blank Print Function ********************************************************/
+/*******************************************************************************/
 void TScintillator::Print(Option_t *opt) const { }
 
 
-/******* End of TScintillator.  Beginning of TIonChamber **********/
-
+/*******************************************************************************/
+/* TIonChamber *****************************************************************/
+/* Used to store data from S800 Focal Plane IC used for PID ********************/
+/*******************************************************************************/
 TIonChamber::TIonChamber() {
   Clear();
 }
@@ -100,13 +136,19 @@ TIonChamber::TIonChamber() {
 TIonChamber::~TIonChamber() {
 }
 
+/*******************************************************************************/
+/* Fills IC Hit ****************************************************************/
+/*******************************************************************************/
 void TIonChamber::Set(int ch, int data){
   fChan.push_back(ch);
   fData.push_back(data);
 }
 
+/*******************************************************************************/
+/* Gets average charge in IC calibrates data if .cal file is provided **********/
+/*******************************************************************************/
 float TIonChamber::GetAve(){
-  float temp =0.0;
+  float temp = 0.0;
   for(unsigned int x=0;x<fData.size();x++) {
     TChannel *c = TChannel::GetChannel(Address(x));
     if (c){
@@ -119,20 +161,26 @@ float TIonChamber::GetAve(){
   return temp;
 }
 
+/*******************************************************************************/
+/* Gets sum of charge in IC calibrates data if .cal file is provided ***********/
+/*******************************************************************************/
 float TIonChamber::GetSum() const {
-  float temp =0.0;
-  for(int x=0;x<Size();x++){
+  float temp = 0.0;
+  for(int x = 0; x < Size(); x++){
     TChannel *c = TChannel::GetChannel(Address(x));
     if(c){
-      temp+=c->CalEnergy(GetData(x));
+      temp += c->CalEnergy(GetData(x));
     } else{
-      temp+=GetData(x);
+      temp += GetData(x);
     }
   }
   return temp;
 }
 
-float TIonChamber::GetdE(TCrdc *crdc){
+/*******************************************************************************/
+/* Gets Energy Loss in IC uses CRDC posistion to account for entrance angle ****/
+/*******************************************************************************/
+ float TIonChamber::GetdE(TCrdc *crdc){
   float x   = crdc->GetDispersiveX();
   float y   = crdc->GetNonDispersiveY();
 
@@ -156,6 +204,9 @@ float TIonChamber::GetdE(double crdc_1_x, double crdc_1_y){
   return sum;
 }
 
+/*******************************************************************************/
+/* Copies hit ******************************************************************/
+/*******************************************************************************/
 void TIonChamber::Copy(TObject &obj) const {
   TDetectorHit::Copy(obj);
   TIonChamber &ic =(TIonChamber&)obj;
@@ -164,13 +215,18 @@ void TIonChamber::Copy(TObject &obj) const {
 
 }
 
+/*******************************************************************************/
+/* Clears hit ******************************************************************/
+/*******************************************************************************/
 void TIonChamber::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
-  //fdE = -1;
   fChan.clear();
   fData.clear();
 }
 
+/*******************************************************************************/
+/* Blank Print Function ********************************************************/
+/*******************************************************************************/
 void TIonChamber::Print(Option_t *opt) const { }
 
 /*******************************************************************************/
@@ -185,6 +241,10 @@ TCrdc::TCrdc() {
 TCrdc::~TCrdc() {
 }
 
+/*******************************************************************************/
+/* Find the pad number with the largest measured charge ************************/
+/* Calibrates data if .cal file is provided ************************************/
+/*******************************************************************************/
 int TCrdc::GetMaxPad() const {
 //  auto start = high_resolution_clock::now();
   if(!data.size()) return -1.0;
@@ -208,10 +268,14 @@ int TCrdc::GetMaxPad() const {
   }
 //  auto stop = high_resolution_clock::now();
 //  auto duration = duration_cast<microseconds>(stop - start);
-//  std::cout << "Time taken by function: " << duration.count() << " microseconds" << std::endl;
+//  std::cout << "Time taken by MaxPad: " << duration.count() << " microseconds" << std::endl;
   return maxp;
 }
 
+/*******************************************************************************/
+/* Fast Function Find the pad number with the largest measured charge **********/
+/* WIP - Do not use ************************************************************/
+/*******************************************************************************/
 int TCrdc::GetMaxPadFast() const {
 //  auto start = high_resolution_clock::now();
   //WIP
@@ -226,6 +290,10 @@ int TCrdc::GetMaxPadFast() const {
   return maxp;
 }
 
+/*******************************************************************************/
+/* Equivalent to GetMaxPad() but returns the charge not pad number *************/
+/* Calibrates data if .cal file is provided ************************************/
+/*******************************************************************************/
 int TCrdc::GetMaxPadSum() const{
   if(!data.size()) return -1.0;
   float maxd = 0;
@@ -246,13 +314,18 @@ int TCrdc::GetMaxPadSum() const{
   }
   return maxd;
 }
-
+/*******************************************************************************/
+/* Not Really sure the purpose of this function ********************************/
+/*******************************************************************************/
 int TCrdc::GetWidth() {
   if(Size()<2)
     return 0;
   return sample.back()-sample.front()+1;
 }
 
+/*******************************************************************************/
+/* Copies hit ******************************************************************/
+/*******************************************************************************/
 void TCrdc::Copy(TObject &obj) const {
   TDetectorHit::Copy(obj);
   TCrdc &c = (TCrdc&)obj;
@@ -264,6 +337,9 @@ void TCrdc::Copy(TObject &obj) const {
   c.time     = time;
 }
 
+/*******************************************************************************/
+/* Clears hit ******************************************************************/
+/*******************************************************************************/
 void TCrdc::Clear(Option_t *opt) {
   TDetectorHit::Clear(opt);
   fId   = -1;
@@ -277,6 +353,9 @@ void TCrdc::Clear(Option_t *opt) {
 }
 
 
+/*******************************************************************************/
+/* Checks if good sample from digitizer used by GetMaxPad/GetDispersiveX *******/
+/*******************************************************************************/
 bool TCrdc::IsGoodSample(int i) const {
   if (i == 0 && data.size()>1) {
     return channel.at(i) == channel.at(i+1);
@@ -289,6 +368,9 @@ bool TCrdc::IsGoodSample(int i) const {
   return false;
 }
 
+/*******************************************************************************/
+/* Calculate X position of CRDC - Uses the Mean of GetMaxPad +/- 7 strips ******/
+/*******************************************************************************/
 float TCrdc::GetDispersiveX() const{
   int maxpad = GetMaxPad();
 
@@ -348,7 +430,9 @@ float TCrdc::GetDispersiveX() const{
   return output;
 }
 
-
+/*******************************************************************************/
+/* Calculate Y position of CRDC ************************************************/
+/*******************************************************************************/
 float TCrdc::GetNonDispersiveY() {
   if (GetMaxPad() == -1){
     return sqrt(-1);
@@ -371,7 +455,10 @@ float TCrdc::GetNonDispersiveY() {
   return tmp;
 }
 
-
+/*******************************************************************************/
+/* Calculate X position of CRDC - Uses the Mean of GetMaxPad +/- 7 strips ******/
+/* Provides maxpad as argument to reduce function calls ************************/
+/*******************************************************************************/
 float TCrdc::GetDispersiveX(int maxpad) const{
   if (maxpad ==-1){
     has_cached_dispersive_x = true;
@@ -430,6 +517,10 @@ float TCrdc::GetDispersiveX(int maxpad) const{
 }
 
 
+/*******************************************************************************/
+/* Calculate Y position of CRDC ************************************************/
+/* Provides maxpad as argument to reduce function calls ************************/
+/*******************************************************************************/
 float TCrdc::GetNonDispersiveY(int maxpad) {
   if (maxpad ==-1){
     return sqrt(-1);
@@ -451,9 +542,15 @@ float TCrdc::GetNonDispersiveY(int maxpad) {
   return tmp;
 }
 
-
+/*******************************************************************************/
+/* Blank Print Function ********************************************************/
+/*******************************************************************************/
 void TCrdc::Print(Option_t *opt) const { }
 
+/*******************************************************************************/
+/* TCrdcPad ********************************************************************/
+/* Seems to have no function may be removed at later date **********************/
+/*******************************************************************************/
 TCrdcPad::TCrdcPad()  { Clear(); }
 
 TCrdcPad::TCrdcPad(int chan)  {
@@ -512,17 +609,26 @@ THodoscope::THodoscope(const THodoscope &hodoscope) {
   hodoscope.Copy(*this);
 }
 
+/*******************************************************************************/
+/* Copies hit ******************************************************************/
+/*******************************************************************************/
 void THodoscope::Copy(TObject &obj) const {
   TDetectorHit::Copy(obj);
   THodoscope &hodo = (THodoscope&)obj;
   hodo.hodo_hits = hodo_hits;
 }
 
+/*******************************************************************************/
+/* Clears hit ******************************************************************/
+/*******************************************************************************/
 void THodoscope::Clear(Option_t *opt){
   TDetectorHit::Clear(opt);
   hodo_hits.clear();
 }
 
+/*******************************************************************************/
+/* Basic Print Function ********************************************************/
+/*******************************************************************************/
 void THodoscope::Print(Option_t *opt) const {
   printf("Number of Hits: %zu\n",Size());
   for(unsigned int i=0;i<Size();i++) {
@@ -532,11 +638,16 @@ void THodoscope::Print(Option_t *opt) const {
   printf("---------------------------------------\n");
 }
 
-
+/*******************************************************************************/
+/* Inserts hits ****************************************************************/
+/*******************************************************************************/
 void THodoscope::InsertHit(const TDetectorHit& hit){
   hodo_hits.emplace_back((THodoHit&)hit);
 }
 
+/*******************************************************************************/
+/* Functions to call Hodoscope hits ********************************************/
+/*******************************************************************************/
 TDetectorHit& THodoscope::GetHit(int i){
   return hodo_hits.at(i);
 }
@@ -549,19 +660,32 @@ THodoHit& THodoscope::GetHodoHit(int i) {
   return hodo_hits.at(i);
 }
 
+/*******************************************************************************/
+/* Declare hodoscope hit vector ************************************************/
+/*******************************************************************************/
 THodoHit::THodoHit(const THodoHit &hit){
   hit.Copy(*this);
 }
 
+/*******************************************************************************/
+/* Copies hit vector ***********************************************************/
+/*******************************************************************************/
 void THodoHit::Copy(TObject &obj) const {
   TDetectorHit::Copy(obj);
   THodoHit &hit = (THodoHit&)obj;
   hit.fChannel = fChannel;
 }
 
+/*******************************************************************************/
+/* Basic Print Function ********************************************************/
+/*******************************************************************************/
 void THodoHit::Print(Option_t *opt) const {
   printf("Channel: %d Charge: %d\n", GetChannel(), GetCharge());
 }
+
+/*******************************************************************************/
+/* Clears hodoscope hits *******************************************************/
+/*******************************************************************************/
 void THodoHit::Clear(Option_t *opt){
   TDetectorHit::Clear(opt);
   fChannel = sqrt(-1);
@@ -583,7 +707,7 @@ TMTof::TMTof(const TMTof &mtof) {
 
 
 /*******************************************************************************/
-/* Copy TMTof hit - no functionality *******************************************/
+/* Copy TMTof hit **************************************************************/
 /*******************************************************************************/
 void TMTof::Copy(TObject &obj) const {
   TDetectorHit::Copy(obj);

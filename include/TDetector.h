@@ -39,12 +39,10 @@ public:
   void   SetTimestamp(Long_t timestamp)  { fTimestamp = timestamp; }
 
   enum EDetectorStatus { kUnbuilt = BIT(15) };
-  
+
   unsigned int RunStart() const { return fRunStart; }
   virtual void SetRunStart(unsigned int unix_time) { fRunStart = unix_time; }
 
-   
-  
   void AddRawData(TRawEvent *event) { fRawData.push_back(event); }
   int Build(); // build from transient data member.
 

@@ -333,7 +333,7 @@ void TSega::SetRunStart(unsigned int unix_time) {
 }
 
 /*******************************************************************************/
-/* Unused function *************************************************************/
+/* Required by TDetectorFactory ************************************************/
 /*******************************************************************************/
 void TSega::SortHitsByTimestamp() {
   std::sort(sega_hits.begin(), sega_hits.end(),	[](const TSegaHit& a, const TSegaHit& b) {

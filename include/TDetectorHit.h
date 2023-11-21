@@ -45,10 +45,10 @@ public:
   bool operator< (const TDetectorHit &rhs) const { return GetEnergy() > rhs.GetEnergy(); }
 
 public:
-  /// Functions to get informataion stored in the 
+  /// Functions to get informataion stored in the
   /// tchannel associated with this hit.  pcb.
   virtual const char* GetName() const;
-  int   GetNumber() const; 
+  int   GetNumber() const;
   const char* GetInfo()   const;
   const char* GetSystem() const;
 

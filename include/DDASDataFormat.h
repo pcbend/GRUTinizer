@@ -36,7 +36,6 @@ public:
       header(NULL), buf(buf) {
     header = (HeaderType*)buf.GetData();
 //    std::cout << sizeof(HeaderType) << "\t" << std::hex << header->size << "\t" << header->frequency << "\t" << header->status << "\t" << GetChannelHeaderLength() << std::dec << std::endl;
-//header->print();
     buf.Advance(sizeof(HeaderType));
 
     if(HasEnergySum()){
@@ -48,14 +47,13 @@ public:
       qdc_sum = (DDAS_QDC_Sum*)buf.GetData();
       buf.Advance(sizeof(DDAS_QDC_Sum));
     }
-
-    if(GetTraceLength()){
-      trace = (unsigned short*)buf.GetData();
-      buf.Advance(GetTraceLength()*sizeof(unsigned short));
-    }
     if(HasExternalClock()){
       extclock = (DDAS_Ext_Clock*)buf.GetData();
       buf.Advance(sizeof(DDAS_Ext_Clock));
+    }
+    if(GetTraceLength()){
+      trace = (unsigned short*)buf.GetData();
+      buf.Advance(GetTraceLength()*sizeof(unsigned short));
     }
   }
 
@@ -157,6 +155,25 @@ public:
                                            else return -2;					       }
   int GetQDCSum(int i)	           const { if(HasQDCSum()) return qdc_sum->qdc_sum[i];
                                            else return -2;					       }
+
+  //Functions for External Clocks
+  int GetExtLow()		   const { if(HasExternalClock()) return extclock->clock_low;
+					   else return -2;					       }
+  int GetExtHigh()		   const { if(HasExternalClock()) return extclock->clock_high;
+					   else return -2;					       }
+  unsigned long GetExtTimestamp()  const {
+    if(HasExternalClock()) {
+      if(header->frequency == 100) {
+        return ((((unsigned long)GetExtHigh())<<32) + GetExtLow()) * 10;
+      } else if(header->frequency == 250) {
+        return ((((unsigned long)GetExtHigh())<<32) + GetExtLow()) * 8;
+      } else if(header->frequency == 500) {
+        return ((((unsigned long)GetExtHigh())<<32) + GetExtLow()) * 10;
+      } else {
+        return ((((unsigned long)GetExtHigh())<<32) + GetExtLow()) * 10;
+      }
+    } else return 0;
+  }
 
   friend std::ostream& operator<<(std::ostream& out, const TDDASEvent& event) {
     out << "DDAS Channel: \n";

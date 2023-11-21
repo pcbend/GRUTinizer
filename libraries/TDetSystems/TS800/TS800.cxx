@@ -17,14 +17,20 @@ bool TS800::fGlobalReset =false;
 static double f_mafp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
 static double f_mxfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
 
+/*******************************************************************************/
+/* TS800 ***********************************************************************/
+/* For the unpacking and storage of the S800 and its ancillary detectors *******/
+/*******************************************************************************/
 TS800::TS800() {
   Clear();
 }
 
-
 TS800::~TS800(){
 }
 
+/*******************************************************************************/
+/* Copy S800 hits TS800 ********************************************************/
+/*******************************************************************************/
 void TS800::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 
@@ -41,7 +47,9 @@ void TS800::Copy(TObject& obj) const {
   hodo.Copy(other.hodo);
 }
 
-
+/*******************************************************************************/
+/* Uses TInverse map to calculate the x-angle at the target position (rad) *****/
+/*******************************************************************************/
 Float_t TS800::GetAta(int i) const {
   float ata = TInverseMap::Get()->Ata(i,this);
   if(!std::isnan(GValue::Value("ATA_SHIFT"))) {
@@ -58,6 +66,9 @@ Float_t TS800::GetAta(float xfp, float afp, float yfp, float bfp, int i) const {
   return ata;
 }
 
+/*******************************************************************************/
+/* Uses TInverse map to calculate the y-angle at the target position (rad) *****/
+/*******************************************************************************/
 Float_t TS800::GetBta(int i) const {
   float bta = TInverseMap::Get()->Bta(i,this);
   if(!std::isnan(GValue::Value("BTA_SHIFT"))) {
@@ -74,6 +85,9 @@ Float_t TS800::GetBta(float xfp, float afp, float yfp, float bfp, int i) const {
   return bta;
 }
 
+/*******************************************************************************/
+/* Uses TInverse map to calculate the y offset at the target position (mm) *****/
+/*******************************************************************************/
 Float_t TS800::GetYta(int i) const {
   float yta = TInverseMap::Get()->Yta(i,this);
   if(!std::isnan(GValue::Value("YTA_SHIFT"))) {
@@ -89,7 +103,10 @@ Float_t TS800::GetYta(float xfp, float afp, float yfp, float bfp, int i) const {
   }
   return yta;
 }
-
+/*******************************************************************************/
+/* Uses TInverse map to calculate dE/E of outgoing particle relative ***********/
+/* to central B-Rho ************************************************************/
+/*******************************************************************************/
 Float_t TS800::GetDta(int i) const {
   float dta = TInverseMap::Get()->Dta(i,this);
   if(!std::isnan(GValue::Value("DTA_SHIFT"))) {
@@ -106,11 +123,16 @@ Float_t TS800::GetDta(float xfp, float afp, float yfp, float bfp, int i) const {
   return dta;
 }
 
-
+/*******************************************************************************/
+/* Calculates projectile scattering angle (mrad) *******************************/
+/*******************************************************************************/
 Float_t TS800::GetScatteringAngle(float ata, float bta) const {
   return asin(sqrt( pow(sin(ata),2) + pow(sin(bta),2) )) * 1000; //in mrad
 }
 
+/*******************************************************************************/
+/* Calculates Phi-Polar angle at target position (rad) *************************/
+/*******************************************************************************/
 Float_t TS800::GetAzita(float ata, float bta) const {
   float xsin = TMath::Sin(ata);
   float ysin = TMath::Sin(bta);
@@ -129,6 +151,9 @@ Float_t TS800::GetAzita(float ata, float bta) const {
   return azita;
 }
 
+/*******************************************************************************/
+/* Calulate DTA corrected beam velocity ****************************************/
+/*******************************************************************************/
 float TS800::AdjustedBeta(float beta, float dta) const {
   double gamma = 1.0/(sqrt(1.-beta*beta));
   double dp_p = gamma/(1.+gamma) * dta;;
@@ -136,7 +161,9 @@ float TS800::AdjustedBeta(float beta, float dta) const {
   return beta;
 }
 
-
+/*******************************************************************************/
+/* Returns position vector of projectile used for doppler correction ***********/
+/*******************************************************************************/
 TVector3 TS800::Track(double sata,double sbta) const {
   double ata = TMath::Sin(GetAta()+sata);
   double bta = TMath::Sin(GetBta()+sbta);
@@ -153,6 +180,10 @@ TVector3 TS800::Track(float Ata, float Bta, double sata,double sbta) const {
   return track;
 }
 
+
+/*******************************************************************************/
+/* Unused function - may be removed at later date ******************************/
+/*******************************************************************************/
 TVector3 TS800::CRDCTrack(){
   TVector3 track;
   track.SetTheta(TMath::ATan((GetCrdc(0).GetDispersiveX()-GetCrdc(1).GetDispersiveX())/1073.0)); // rad
@@ -160,14 +191,23 @@ TVector3 TS800::CRDCTrack(){
   return track;
 }
 
+/*******************************************************************************/
+/* Returns X position of the CRDCs *********************************************/
+/*******************************************************************************/
 float TS800::GetXFP(int i) const {
   return GetCrdc(i).GetDispersiveX();
 }
 
+/*******************************************************************************/
+/* Returns Y position of the CRDCs *********************************************/
+/*******************************************************************************/
 float TS800::GetYFP(int i) const {
   return GetCrdc(i).GetNonDispersiveY();
 }
 
+/*******************************************************************************/
+/* Dispersive X angle in the Focal Plane calculated from CRDCs positions *******/
+/*******************************************************************************/
 float TS800::GetAFP() const{
   if(GetCrdc(0).Size()==0||GetCrdc(1).Size()==0){
     return sqrt(-1);
@@ -179,6 +219,9 @@ float TS800::GetAFP(float xfp0, float xfp1) const{
   return TMath::ATan((xfp1-xfp0)/1073.0);
 }
 
+/*******************************************************************************/
+/* Dispersive Y angle in the Focal Plane calculated from CRDCs positions *******/
+/*******************************************************************************/
 float TS800::GetBFP() const{
    if(GetCrdc(0).Size()==0||GetCrdc(1).Size()==0){
     return sqrt(-1);
@@ -190,6 +233,9 @@ float TS800::GetBFP(float yfp0, float yfp1) const{
   return TMath::ATan((yfp1-yfp0)/1073.0);
 }
 
+/*******************************************************************************/
+/* Clears Hits *****************************************************************/
+/*******************************************************************************/
 void TS800::Clear(Option_t* opt){
   TDetector::Clear(opt);
   crdc1.Clear();
@@ -207,6 +253,9 @@ void TS800::Clear(Option_t* opt){
   hodo.Clear();
 }
 
+/*******************************************************************************/
+/* Unpacks S800 data from GRETINA event files **********************************/
+/*******************************************************************************/
 int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
   if(raw_data.size() != 1){
     std::cout << "Trying to combine multiple (" <<  raw_data.size() <<"s800 buffers: " << std::endl;
@@ -219,38 +268,27 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
     ptr += sizeof(TRawEvent::GEBS800Header);
     //Here, we are now pointing at the size of the next S800 thing.  Inclusive in shorts.
     unsigned short *data = (unsigned short*)(event.GetPayload()+ptr);
-    //std::string toprint = "all";
     size_t x = 0;
     while(x<(head->total_size-sizeof(TRawEvent::GEBS800Header)+16)) {  //total size is inclusive.
       int size             = *(data+x);
       unsigned short *dptr = (data+x+1);
-      //toprint.append(Form("0x%04x",*dptr));
       x+=size;
-      //if(size==0) {
-      //  geb->Print(toprint.c_str());
-      //  printf("head size = %i\n",sizeof(head));
-      //  exit(0);
-      //}
       int sizeleft = size-2;
-      //ptr +=  (*((unsigned short*)(geb->GetPayload()+ptr))*2);
       switch(*dptr) {
       case 0x5801:  //S800 TriggerPacket.
 	HandleTrigPacket(dptr+1,sizeleft);
 	break;
-      case 0x5802:  // S800 TOF.
+      case 0x5802:  // S800 TOF - No Longer present in S800 DAQ
 	//event.Print("all0x5802");
 	HandleTOFPacket(dptr+1,sizeleft);
 	break;
-      case 0x5810:  // S800 Scint
-	//event.Print("all0x5810");
+      case 0x5810:  // S800 Scint - No Longer present in S800 DAQ
 	HandleScintPacket(dptr+1,sizeleft);
 	break;
       case 0x5820:  // S800 Ion Chamber
-	//event.Print("all0x5820");
 	HandleIonCPacket(dptr+1,sizeleft);
 	break;
       case 0x5840:  // CRDC Packet
-	//event.Print("all0x58400x5845");
   	HandleCRDCPacket(dptr+1,sizeleft);
 	break;
       case 0x5850:  // II CRDC Packet
@@ -274,7 +312,7 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
 	break;
       case 0x58e0:
 	break;
-      case 0x58f0:
+      case 0x58f0: //MTDC packet - contains Time information
         HandleMTDCPacket(dptr+1,sizeleft);
 	break;
       case 0x5805:
@@ -290,6 +328,10 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
   return 1;
 }
 
+/*******************************************************************************/
+/* Unpacks S800 data from GRETINA event files **********************************/
+/* Unsure when this function would be called ***********************************/
+/*******************************************************************************/
 int TS800::BuildHits(UShort_t eventsize,UShort_t *dptr,Long64_t timestamp) {  //std::vector<TRawEvent>& raw_data){
   SetTimestamp(timestamp);
   //int ptr = 0;
@@ -377,6 +419,9 @@ int TS800::BuildHits(UShort_t eventsize,UShort_t *dptr,Long64_t timestamp) {  //
   return 1;
 }
 
+/*******************************************************************************/
+/* Unpacks Trigger packet into TTrigger class **********************************/
+/*******************************************************************************/
 bool TS800::HandleTrigPacket(unsigned short *data,int size) {
   if(size < 1){
     static int i=0;
@@ -406,6 +451,10 @@ bool TS800::HandleTrigPacket(unsigned short *data,int size) {
   return true;
 }
 
+/*******************************************************************************/
+/* Unpacks ToF Packet **********************************************************/
+/* No longer Present in S800 DAQ may be removed at later date ******************/
+/*******************************************************************************/
 bool TS800::HandleTOFPacket(unsigned short *data ,int size){
 
   for(int x = 0; x < size; x++){
@@ -437,47 +486,32 @@ bool TS800::HandleTOFPacket(unsigned short *data ,int size){
   return true;
 }
 
-
+/*******************************************************************************/
+/* Unpacks CRDC data packets ***************************************************/
+/*******************************************************************************/
 bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
-  //std::cout << "----------------------" << std::endl;
-  //std::cout << " In Handle CRDC " << std::endl;
-
   TCrdc *current_crdc=0;
   if((*data)<3){
     if(*data==0) current_crdc = &crdc1;
     else if(*data==1) current_crdc = &crdc2;
     else return false;
   }
-  if(!current_crdc)
-    return false;
-
-  //printf("crdc = [%i]\t0x%08x\n",(*data),crdc+(*data));
+  if(!current_crdc) return false;
 
   current_crdc->SetId(*data);
-  /*std::cout << std::hex << " data : " <<  *data << std::endl;
-  std::cout << std::hex << " ID   : " << current_crdc->GetId() << std::endl;
-  std::dec;
-  */
 
-
-  int x =1;
+  int x = 1;
   int subsize = *(data+x);
   x++;
-  //int subtype = *(data+x);
   x++;
 
-  //std::cout << " subsize : " << std::hex << subsize << std::endl;
-  //std::cout << " subtype : " << std::hex << subtype << std::endl;
   current_crdc->SetAddress((0x58<<24) + (1<<16) + (current_crdc->GetId() <<8) + 0);
-
   std::map<int,std::map<int,int> > pad;
 
-  // This is deliberately different from SpecTcl,
-  //   in how it handles multiple word2 occurring in a row.
-  // We talked to Daniel, and this is when it has read out
-  //   the same sample/channel on multiple connectors.
-  // Therefore, in this case, we should use the same word1 (top bit set)
-  //   with all the word2 (top bit unset) instances that follow.
+  // This is deliberately different from SpecTcl, in how it handles multiple word2 occurring
+  // in a row. We talked to Daniel, and this is when it has read out the same sample/channel
+  // on multiple connectors. Therefore, in this case, we should use the same word1 (top bit set)
+  // with all the word2 (top bit unset) instances that follow.
   unsigned short word1 = 0;
   while(x<subsize){
     unsigned short current_word = *(data+x); x++;
@@ -493,13 +527,6 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
       int databits         = (word2&(0x03ff));
       int real_channel = (connector_number << 6) + channel_number;
       if(real_channel > 223) continue;
-      /*std::cout << " sample Number    : " << std::dec << sample_number << std::endl;
-        std::cout << " channel Number   : " << std::dec << channel_number << std::endl;
-        std::cout << " connector Number : " << std::dec << connector_number << std::endl;
-        std::cout << " data bits        : " << std::dec << databits << std::endl;
-        std::cout << " real channel     : " << std::dec << real_channel << std::endl;
-        std::dec;
-      */
       pad[real_channel][sample_number] = databits;
     }
   }
@@ -507,38 +534,29 @@ bool TS800::HandleCRDCPacket(unsigned short *data,int size) {
   std::map<int,std::map<int,int> >::iterator it1;
   std::map<int,int>::iterator it2;
 
-  for(it1=pad.begin();it1!=pad.end();it1++) {
-    //printf("channel[%03i]\n",it1->first);
-    for(it2=it1->second.begin();it2!=it1->second.end();it2++) {
-      //printf("\t%i\t%i\n",it2->first,it2->second);
+  for(it1 = pad.begin(); it1 != pad.end(); it1++) {
+    for(it2 = it1->second.begin(); it2 != it1->second.end(); it2++) {
       current_crdc->AddPoint(it1->first,it2->first,it2->second);
     }
   }
-  //printf("\nchannel.size() = %i\n\n\n",current_crdc->Size());
-  //printf("\t0x%08x\t%i\n",currentcrdc,currentcrdc->
 
-  if(x>=size)
-      return true;
+  if(x >= size) return true;
   subsize = *(data+x);
   x++;
-  //subtype = *(data+x);
   x++;
   current_crdc->SetAnode(*(data+x));
   x++;
   current_crdc->SetTime(*(data+x));
-
-  /*std::cout << " subsize   : " << std::hex << subsize << std::endl;
-  std::cout << " subtype   : " << subtype << std::endl;
-  std::cout << " ID   : " << current_crdc->GetId() << std::endl;
-  std::cout << " CRDC Time : " << current_crdc->GetTime() << std::endl;
-  std::cout << " CRDC Anod : " << current_crdc->GetAnode() << std::endl;
-  std::dec;*/
   return true;
 }
 
+/*******************************************************************************/
+/* Unpacks ToF Packet **********************************************************/
+/* No longer Present in S800 DAQ may be removed at later date ******************/
+/*******************************************************************************/
 bool TS800::HandleScintPacket(unsigned short* data, int size){
 
-  for(int x = 0; x<size;x+=2){
+  for(int x = 0; x < size; x += 2){
     unsigned short current = *(data+x);
     unsigned short current_p1 = *(data+x+1);
 
@@ -548,55 +566,31 @@ bool TS800::HandleScintPacket(unsigned short* data, int size){
 	scint[0].SetdE_Up(current&0x0fff);
 	scint[0].SetTime_Up(current_p1&0x0fff);
 	scint[0].SetID(1);
-
-	//std::cout << " Channel 1 Up " << std::endl;
-	//std::cout << " Energy : " << scint[0].GetdE_Up() << std::endl;
-	//std::cout << " Time : " << scint[0].GetTime_Up() << std::endl;
 	break;
       case 0x1000:
 	scint[0].SetdE_Down(current&0x0fff);
 	scint[0].SetTime_Down(current_p1&0x0fff);
 	scint[0].SetID(1);
-
-	//std::cout << " Channel 1 Down " << std::endl;
-	//std::cout << " Energy : " << scint[0].GetdE_Down() << std::endl;
-	//std::cout << " Time : " << scint[0].GetTime_Down() << std::endl;
 	break;
       case 0x2000:
 	scint[1].SetdE_Up(current&0x0fff);
 	scint[1].SetTime_Up(current_p1&0x0fff);
 	scint[1].SetID(2);
-
-	//std::cout << " Channel 2 Up " << std::endl;
-	//std::cout << " Energy : " << scint[1].GetdE_Up() << std::endl;
-	//std::cout << " Time : " << scint[1].GetTime_Up() << std::endl;
 	break;
       case 0x3000:
 	scint[1].SetdE_Down(current&0x0fff);
 	scint[1].SetTime_Down(current_p1&0x0fff);
 	scint[1].SetID(2);
-
-	//std::cout << " Channel 2 Down " << std::endl;
-	//std::cout << " Energy : " << scint[1].GetdE_Down() << std::endl;
-	//	std::cout << " Time : " << scint[1].GetTime_Down() << std::endl;
 	break;
       case 0x4000:
 	scint[2].SetdE_Up(current&0x0fff);
 	scint[2].SetTime_Up(current_p1&0x0fff);
 	scint[2].SetID(3);
-
-	//std::cout << " Channel 3 Up " << std::endl;
-	//std::cout << " Energy : " << scint[2].GetdE_Up() << std::endl;
-	//std::cout << " Time : " << scint[2].GetTime_Up() << std::endl;
 	break;
       case 0x5000:
 	scint[2].SetdE_Down(current&0x0fff);
 	scint[2].SetTime_Down(current_p1&0x0fff);
 	scint[2].SetID(3);
-
-	//std::cout << " Channel 3 Down " << std::endl;
-	//std::cout << " Energy : " << scint[2].GetdE_Down() << std::endl;
-	//std::cout << " Time : " << scint[2].GetTime_Down() << std::endl;
 	break;
       default:
 	return false;
@@ -604,27 +598,20 @@ bool TS800::HandleScintPacket(unsigned short* data, int size){
       }
     }
     else return false;
-
   }
-
-
   return true;
 }
 
-
-
+/*******************************************************************************/
+/* Unpacks IC data packet ******************************************************/
+/*******************************************************************************/
 bool TS800::HandleIonCPacket(unsigned short* data, int size){
-  //  std::cout << "-------------------------------------" << std::endl;
-  //std::cout << "   In Handle Ion Chamber Packet " << std::endl;
-  int x = 0;
 
+  int x = 0;
   ion.SetAddress((0x58<<24) + (0<<16) + (0<<8) + 0);
 
   while(x<size){
     int sub_size = (*(data+x)&(0xffff)); x++;
-    //std::cout << " Sub packet size : " << sub_size << std::endl;
-    //std::cout << " data+x          : " << std::hex << *(data+x) << std::endl;
-    //std::dec;
     switch(*(data+x++)){
     case 0x5821:
       for(; x<sub_size;x++){
@@ -632,20 +619,12 @@ bool TS800::HandleIonCPacket(unsigned short* data, int size){
 	int ch  = (current&0xf000)>>12;
 	int dat = (current&0x0fff);
 	ion.Set(ch,dat);
-	//std::cout << " --- " << std::endl;
-	//std::cout << " Channel : " << std::hex << ch << std::endl;
-	//std::cout << " Energy  : " << std::hex << dat << std::endl;
-	//std::cout << " Channel : " << std::hex << ((current&0xf000)>>12) << std::endl;
-	//std::cout << " Energy  : " << std::hex << ion.GetData(ch) << std::endl;
-	//std::dec;
       }
       break;
     case 0x5822: // Old Style
       for(; x<sub_size;x++){
 	unsigned short current = *(data+x);
 	ion.Set((current&0xf000),(current&0x0fff));
-	//std::cout << " Channel : " << std::hex << (current&0xf000) << std::endl;
-	//std::cout << " Energy  : " << std::dec << ion.GetData((current&0xf000)) << std::endl;
       }
       break;
     default:
@@ -653,21 +632,14 @@ bool TS800::HandleIonCPacket(unsigned short* data, int size){
       break;
     }
   }
-  //printf("i am here.\n");
-  //for(int x=0;x<ion.Size();x++) {
-  // printf("\t[%02i]\t=\t%i\n",ion.GetChannel(x),ion.GetData(x));
-  //}
-
-
   return true;
 }
 
-
-//Hodoscope packets are described in detail on the following website:
-//https://wikihost.nscl.msu.edu/S800Doc/doku.php?id=event_filter#hodoscope_packet
+/*******************************************************************************/
+/* Unpacks hodoscope data packet ***********************************************/
+/*******************************************************************************/
 bool TS800::HandleHodoPacket(unsigned short *data,int size) {
-  if(!size)
-    return false;
+  if(!size) return false;
   //note: size is size left after subtracting out length of packet size and packet tag
 
   //ID is the Hodoscope Sub-pcket "Energy" tag
@@ -675,20 +647,16 @@ bool TS800::HandleHodoPacket(unsigned short *data,int size) {
   //are dealing with channels (16,31)
   int x = 0;
   int id = *(data+x); x += 1;
-//  if(x < size && id!=2)std::cout << id << "\t" << x << "\t" << size << std::endl;
   while (x < size){
     if (id == 2){
-//    hit_reg1 = *(data+x);
-//    hit_reg2 = *(data+x+1);
-//    tac = *(data+x+2);
       x += 3;
       break;
     }
-//    unsigned short cur_packet = *data; ++data; size -= 1; 
+
     //Energy values are 16-bit integers, where the 13th bit is the channel number
     //(0,15) and the first 12 bits are the energy.
     unsigned short charge = (*(data+x)) & 0x0fff;
-    unsigned short channel = id*16 + (*(data+x) >> 12); 
+    unsigned short channel = id*16 + (*(data+x) >> 12);
     x += 1;
 
     THodoHit hit;
@@ -696,10 +664,14 @@ bool TS800::HandleHodoPacket(unsigned short *data,int size) {
     hit.SetCharge(charge);
     hit.SetAddress((0x58<<24) + (4<<16) + (4<<8) + channel);
     hodo.InsertHit(hit);
-  }//x < size
+  } //x < size
   return true;
 }
 
+
+/*******************************************************************************/
+/* Unpacks MTDC data packet ****************************************************/
+/*******************************************************************************/
 bool TS800::HandleMTDCPacket(unsigned short *data,int size) {
   int x = 0;
   while(x<size){
@@ -739,195 +711,79 @@ bool TS800::HandleMTDCPacket(unsigned short *data,int size) {
         //printf("unknown..\n");
         break;
     };
-
   }
   return true;
 }
 
 
+/*******************************************************************************/
+/* Inserts Hit - Blank function needed for compatibility with TDetector ********/
+/*******************************************************************************/
 void TS800::InsertHit(const TDetectorHit& hit){
   return;
 }
 
+/*******************************************************************************/
+/* Gets Hit - No Functionality needed for compatibility with TDetector *********/
+/*******************************************************************************/
 TDetectorHit& TS800::GetHit(int i){
   TDetectorHit *hit = new TS800Hit;
   return *hit;
 }
 
+/*******************************************************************************/
+/* Below functions are related to TTOF *****************************************/
+/* This module is no lonnger present in S800 DAQ and these functions may be ****/
+/* removed at a later date *****************************************************/
+/*******************************************************************************/
 float TS800::GetTofE1_TAC(float c1,float c2)  const {
-  /*if (GetCrdc(0).GetId() == -1) {
-    return sqrt(-1);
-    }*/
-  /*----------------*\
-  | AFP returns nan  |
-  | if both crdc's   |
-  | are not present  |
-  \*----------------*/
-
-  if(GetTof().GetTacOBJ()>-1)
-    return GetTof().GetTacOBJ() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+  if(GetTof().GetTacOBJ()>-1) return GetTof().GetTacOBJ() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
   return sqrt(-1);
-
 }
 
 float TS800::GetTofXFPE1_TAC(float c1,float c2)  const {
-  /*if (GetCrdc(0).GetId() == -1) {
-    return sqrt(-1);
-    }*/
-  /*----------------*\
-  | AFP returns nan  |
-  | if both crdc's   |
-  | are not present  |
-  \*----------------*/
-
-  if(GetTof().GetTacXFP()>-1)
-    return GetTof().GetTacXFP() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+  if(GetTof().GetTacXFP()>-1) return GetTof().GetTacXFP() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
   return sqrt(-1);
-
 }
 
 float TS800::GetTofE1_TDC(float c1,float c2)  const {
-  /*----------------*\
-  | AFP returns nan  |
-  | if both crdc's   |
-  | are not present  |
-  \*----------------*/
-  if(GetTof().GetOBJ()>-1)
-    return GetTof().GetOBJ() - GetScint().GetTimeUp() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+  if(GetTof().GetOBJ()>-1) return GetTof().GetOBJ() - GetScint().GetTimeUp() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
   return sqrt(-1);
 }
 
 float TS800::GetTofXFP_E1_TDC(float c1,float c2)  const {
-  /*----------------*\
-  | AFP returns nan  |
-  | if both crdc's   |
-  | are not present  |
-  \*----------------*/
-  if(GetTof().GetXFP()>-1)
-    return GetTof().GetXFP() - GetScint().GetTimeUp() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
+  if(GetTof().GetXFP()>-1) return GetTof().GetXFP() - GetScint().GetTimeUp() + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX();
   return sqrt(-1);
-}
-
-float TS800::GetTofE1_MTDC(float c1,float c2,int i) const {
-
-  std::vector<float> result;
-  // TODO: This check is always false.  Commented it out, but was there some reason for it?
-  // if(mtof.fObj.size()<0)
-  //   std::cout << " In GetTOF MTDC, Size = " << mtof.fObj.size() << std::endl;
-  for(unsigned int x=0;x<mtof.fObj.size();x++) {
-    for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
-      result.push_back( mtof.fObj.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
-    }
-  }
-
-  if(result.size()>(unsigned int)i)
-    return result.at(i);
-  return sqrt(-1.0);
 }
 
 float TS800::GetOBJRaw_TAC() const {
   return (GetTof().GetTacOBJ());
 }
 
-float TS800::GetOBJ_E1Raw() const {
-  return (GetTof().GetOBJ() - GetScint().GetTimeUp()); // Time in OBJ - Time in E1
-}
-
-float TS800::GetOBJ_E1Raw_MESY(int i) const {
-  std::vector<float> result;
-  for(unsigned int x=0;x<mtof.fObj.size();x++) {
-    for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
-      result.push_back( mtof.fObj.at(x) - mtof.fE1Up.at(y));
-      }
-    }
-
-  if(result.size()>(unsigned int)i)
-    return result.at(i);
-  return sqrt(-1.0);
-}
-
-float TS800::GetOBJ_E1Raw_MESY_Ch15(int i) const {
-  std::vector<float> result;
-  for(unsigned int x=0;x<mtof.fObj.size();x++) {
-    for(unsigned int y=0;y<mtof.fRef.size();y++) {
-      result.push_back( mtof.fObj.at(x) - mtof.fRef.at(y));
-      }
-    }
-
-  if(result.size()>(unsigned int)i)
-    return result.at(i);
-  return sqrt(-1.0);
-}
-
-float TS800::GetRawOBJ_MESY(unsigned int i) const {
-  if(i>=mtof.fObj.size())
-    return sqrt(-1);
-  return (mtof.fObj.at(i));
-}
-
-float TS800::GetRawE1_MESY(unsigned int i) const {
-  if(i>=mtof.fE1Up.size())
-    return sqrt(-1);
-  return (mtof.fE1Up.at(i));
-}
-
-float TS800::GetRawE1_MESY_Ch15(unsigned int i) const {
-  if(i>=mtof.fRef.size())
-    return sqrt(-1);
-  return (mtof.fRef.at(i));
-}
-
-float TS800::GetRawXF_MESY(unsigned int i) const {
-  if(i>=mtof.fXfp.size())
-    return sqrt(-1);
-  return (mtof.fXfp.at(i));
-}
-
 float TS800::GetXFRaw_TAC() const {
   return (GetTof().GetTacXFP());
 }
+
+float TS800::GetOBJ_E1Raw() const {
+  return (GetTof().GetOBJ() - GetScint().GetTimeUp());
+}
+
 float TS800::GetXF_E1Raw() const {
-  return (GetTof().GetXFP() - GetScint().GetTimeUp()); // Time in XF - Time in E1
-}
-
-float TS800::GetXF_E1Raw_MESY(int i) const {
-  std::vector<float> result;
-  for(unsigned int x=0;x<mtof.fXfp.size();x++) {
-    for(unsigned int y=0;y<mtof.fE1Up.size();y++) {
-      result.push_back( mtof.fXfp.at(x) - mtof.fE1Up.at(y));
-    }
-  }
-  if(result.size()>(unsigned int)i)
-    return result.at(i);
-  return sqrt(-1.0);
-}
-
-float TS800::GetXF_E1Raw_MESY_Ch15(int i) const {
-  std::vector<float> result;
-  for(unsigned int x=0;x<mtof.fXfp.size();x++) {
-    for(unsigned int y=0;y<mtof.fRef.size();y++) {
-      result.push_back( mtof.fXfp.at(x) - mtof.fRef.at(y));
-    }
-  }
-  if(result.size()>(unsigned int)i)
-    return result.at(i);
-  return sqrt(-1.0);
+  return (GetTof().GetXFP() - GetScint().GetTimeUp());
 }
 
 float TS800::GetCorrTOF_OBJTAC() const {
   double afp_cor = GValue::Value("OBJTAC_TOF_CORR_AFP");
   double xfp_cor = GValue::Value("OBJTAC_TOF_CORR_XFP");
-//std::cout << "TOF OBJTAC AFP COR" << afp_cor << std::endl;
-//std::cout << "TOF OBJTAC xfp COR" << xfp_cor << std::endl;
   return GetTofE1_TAC(afp_cor,xfp_cor);
 }
+
 float TS800::GetCorrTOF_XFPTAC() const {
   double afp_cor = GValue::Value("XFPTAC_TOF_CORR_AFP");
   double xfp_cor = GValue::Value("XFPTAC_TOF_CORR_XFP");
-//std::cout << "TOF OBJTAC AFP COR" << afp_cor << std::endl;
-//std::cout << "TOF OBJTAC xfp COR" << xfp_cor << std::endl;
   return GetTofXFPE1_TAC(afp_cor,xfp_cor);
 }
+
 float TS800::GetCorrTOF_OBJ() const {
   double afp_cor = GValue::Value("OBJ_TOF_CORR_AFP");
   double xfp_cor = GValue::Value("OBJ_TOF_CORR_XFP");
@@ -939,18 +795,105 @@ float TS800::GetCorrTOF_XFP() const {
   double xfp_cor = GValue::Value("XFP_TOF_CORR_XFP");
   return GetTofXFP_E1_TDC(afp_cor,xfp_cor);
 }
+
 float TS800::GetCorrTOF_OBJ_MESY(int i) const {
-  //static double f_afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
-  //static double f_xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
-  //if(fGlobalReset) {
-    f_mafp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
-    f_mxfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
-  //}
+  f_mafp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
+  f_mxfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
   return GetTofE1_MTDC(f_mafp_cor,f_mxfp_cor,i);
 }
+/*******************************************************************************/
+/* End of Tof Functions ********************************************************/
+/*******************************************************************************/
 
+/*******************************************************************************/
+/* Returns value of MTof vectors ***********************************************/
+/* Could probably be replaced with more general function ***********************/
+/*******************************************************************************/
+float TS800::GetRawOBJ_MESY(unsigned int i) const {
+  if(i >= mtof.fObj.size()) return sqrt(-1);
+  return (mtof.fObj.at(i));
+}
+
+float TS800::GetRawE1_MESY(unsigned int i) const {
+  if(i >= mtof.fE1Up.size()) return sqrt(-1);
+  return (mtof.fE1Up.at(i));
+}
+
+float TS800::GetRawE1_MESY_Ch15(unsigned int i) const {
+  if(i >= mtof.fRef.size()) return sqrt(-1);
+  return (mtof.fRef.at(i));
+}
+
+float TS800::GetRawXF_MESY(unsigned int i) const {
+  if(i >= mtof.fXfp.size()) return sqrt(-1);
+  return (mtof.fXfp.at(i));
+}
+
+/*******************************************************************************/
+/* ToF functions ***************************************************************/
+/* Do not appear to be currently used and could be replaced with ***************/
+/* TMTof.GetCorrelatedTof() ****************************************************/
+/*******************************************************************************/
+float TS800::GetOBJ_E1Raw_MESY(int i) const {
+  std::vector<float> result;
+  for(unsigned int x = 0; x < mtof.fObj.size(); x++) {
+    for(unsigned int y = 0; y < mtof.fE1Up.size(); y++) {
+      result.push_back( mtof.fObj.at(x) - mtof.fE1Up.at(y));
+    }
+  }
+  if(result.size() > (unsigned int)i) return result.at(i);
+  return sqrt(-1.0);
+}
+
+float TS800::GetOBJ_E1Raw_MESY_Ch15(int i) const {
+  std::vector<float> result;
+  for(unsigned int x = 0; x < mtof.fObj.size(); x++) {
+    for(unsigned int y = 0; y < mtof.fRef.size(); y++) {
+      result.push_back( mtof.fObj.at(x) - mtof.fRef.at(y));
+      }
+    }
+  if(result.size()>(unsigned int)i) return result.at(i);
+  return sqrt(-1.0);
+}
+
+float TS800::GetXF_E1Raw_MESY(int i) const {
+  std::vector<float> result;
+  for(unsigned int x = 0; x < mtof.fXfp.size(); x++) {
+    for(unsigned int y = 0; y < mtof.fE1Up.size(); y++) {
+      result.push_back( mtof.fXfp.at(x) - mtof.fE1Up.at(y));
+    }
+  }
+  if(result.size() > (unsigned int)i) return result.at(i);
+  return sqrt(-1.0);
+}
+
+float TS800::GetXF_E1Raw_MESY_Ch15(int i) const {
+  std::vector<float> result;
+  for(unsigned int x = 0; x < mtof.fXfp.size(); x++) {
+    for(unsigned int y = 0; y < mtof.fRef.size(); y++) {
+      result.push_back( mtof.fXfp.at(x) - mtof.fRef.at(y));
+    }
+  }
+  if(result.size() > (unsigned int)i) return result.at(i);
+  return sqrt(-1.0);
+}
+
+float TS800::GetTofE1_MTDC(float c1,float c2,int i) const {
+  std::vector<float> result;
+  for(unsigned int x = 0; x < mtof.fObj.size(); x++) {
+    for(unsigned int y = 0;y < mtof.fE1Up.size(); y++) {
+      result.push_back( mtof.fObj.at(x) - mtof.fE1Up.at(y) + c1 * GetAFP() + c2  * GetCrdc(0).GetDispersiveX());
+    }
+  }
+  if(result.size() > (unsigned int)i) return result.at(i);
+  return sqrt(-1.0);
+}
+
+/*******************************************************************************/
+/* Corrected ToF between OBJ and E1 ********************************************/
+/* Should use more general GetMTofCorr() ***************************************/
+/*******************************************************************************/
 double TS800::GetMTofObjE1() const {
-  // I return the correlated gvalue corrected time-of-flight obj to e1.
   double afp_cor = GValue::Value("OBJ_MTOF_CORR_AFP");
   double xfp_cor = GValue::Value("OBJ_MTOF_CORR_XFP");
   static int line_displayed = 0;
@@ -971,9 +914,11 @@ double TS800::GetMTofObjE1(double afp_cor, double xfp_cor) const {
          + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
 }
 
-
+/*******************************************************************************/
+/* Corrected ToF between XFP and E1 ********************************************/
+/* Should use more general GetMTofCorr() ***************************************/
+/*******************************************************************************/
 double TS800::GetMTofXfpE1() const {
-  // I return the correlated gvalue corrected time-of-flight xfp to e1.
   double afp_cor = GValue::Value("XFP_MTOF_CORR_AFP");
   double xfp_cor = GValue::Value("XFP_MTOF_CORR_XFP");
   static int line_displayed = 0;
@@ -989,12 +934,13 @@ double TS800::GetMTofXfpE1() const {
 }
 
 double TS800::GetMTofXfpE1(double afp_cor, double xfp_cor) const {
-  // I return the correlated gvalue corrected time-of-flight xfp to e1.
   return(GetMTof().GetCorrelatedXfpE1()
          + afp_cor * GetAFP() + xfp_cor  * GetCrdc(0).GetDispersiveX());
 }
-
-//General purpose function to calculate time of flight between any two channels
+/*******************************************************************************/
+/* General purpose function to calculate corrected time of flight between any **/
+/* two channels - Replaces GetMTofOBjE1 and GetMTofXFPE1 ***********************/
+/*******************************************************************************/
 double TS800::GetMTofCorr(double correlatedtof, double afp, double xp, double afp_cor, double xfp_cor) const {
   static int line_displayed;
   if(std::isnan(afp_cor) || std::isnan(xfp_cor)) {
@@ -1008,14 +954,21 @@ double TS800::GetMTofCorr(double correlatedtof, double afp, double xp, double af
   return (correlatedtof + afp_cor*afp + xfp_cor*xp);
 }
 
-//New function to calculate all S800 angles, taken from SpecTcl
+/*******************************************************************************/
+/* TS800Track ******************************************************************/
+/* Single function to calculate and store all S800 angles **********************/
+/*******************************************************************************/
 TS800Track::TS800Track() {
   Clear();
 }
 
+
 TS800Track::~TS800Track(){
 }
 
+/*******************************************************************************/
+/* Clears all values ***********************************************************/
+/*******************************************************************************/
 void TS800Track::Clear() {
   xfp[0] = -1;
   xfp[1] = -1;
@@ -1030,8 +983,10 @@ void TS800Track::Clear() {
   azita = -1;
 }
 
-//Calulates everything from the CRDC postions and inverse maps
-//with minimum number of function calls
+/*******************************************************************************/
+/* Calulates everything from the CRDC postions and inverse maps with minimum ***/
+/* number of function calls ****************************************************/
+/*******************************************************************************/
 void TS800Track::CalculateTracking(const TS800 *s800, int i) {
 
   int maxp0 = s800->GetCrdc(0).GetMaxPad();

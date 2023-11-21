@@ -1,30 +1,38 @@
 #include "TMode3.h"
 #include "TGEBEvent.h"
 
+/*******************************************************************************/
+/* TMode3 **********************************************************************/
+/* Contains raw (not decomposed) GRETINA data should not be used for analysis **/
+/*******************************************************************************/
 TMode3::TMode3(){
-  //mode3_hits = new TClonesArray("TMode3Hit");
   Clear();
 }
 
 TMode3::~TMode3() {
-  //delete mode3_hits;
 }
 
+/*******************************************************************************/
+/* Copies hit ******************************************************************/
+/*******************************************************************************/
 void TMode3::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 
   TMode3& mode3 = (TMode3&)obj;
   mode3.mode3_hits = mode3_hits;
-  //mode3_hits->Copy(*mode3.mode3_hits);
 }
 
+/*******************************************************************************/
+/* Inserts hit into TMode3 Hit vector ******************************************/
+/*******************************************************************************/
 void TMode3::InsertHit(const TDetectorHit& hit){
-  //TMode3Hit* new_hit = (TMode3Hit*)mode3_hits->ConstructedAt(Size());
-  //hit.Copy(*new_hit);
   mode3_hits.emplace_back((TMode3Hit&)hit);
   fSize++;
 }
 
+/*******************************************************************************/
+/* Unpacks GEB data and builds TMode3 hit **************************************/
+/*******************************************************************************/
 int TMode3::BuildHits(std::vector<TRawEvent>& raw_data){
   if(raw_data.size()<1)
     return Size();
@@ -43,6 +51,9 @@ int TMode3::BuildHits(std::vector<TRawEvent>& raw_data){
   return Size();
 }
 
+/*******************************************************************************/
+/* Basic Print Function ********************************************************/
+/*******************************************************************************/
 void TMode3::Print(Option_t *opt) const {
   TString sopt(opt);
   sopt.ToLower();
@@ -51,15 +62,16 @@ void TMode3::Print(Option_t *opt) const {
   printf(" @ %lu \n",Timestamp());
 
   if(sopt.Contains("all")) {
-  for(size_t i=0;i<Size();i++) {
-    printf("\t");
-    GetMode3Hit(i).Print();
+    for(size_t i=0;i<Size();i++) {
+      printf("\t");
+      GetMode3Hit(i).Print();
+    }
   }
-  }
-
 }
 
+/*******************************************************************************/
+/* Clears Hit Vector ***********************************************************/
+/*******************************************************************************/
 void TMode3::Clear(Option_t *opt) {
-  //TDetector::Clear(opt);
-  mode3_hits.clear(); //->Clear(opt);//("TMode3Hit");
+  mode3_hits.clear();
 }
