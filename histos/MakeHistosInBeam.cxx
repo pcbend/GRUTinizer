@@ -265,6 +265,14 @@ void MakeHistograms(TRuntimeObjects& obj) {
       }
     }
     
+    obj.FillHistogram("position", "theta",
+		      180, 0., 180.,
+		      hit.GetTheta()*TMath::RadToDeg());
+
+    obj.FillHistogram("position", "phi",
+		      360, 0., 360.,
+		      hit.GetPhi()*TMath::RadToDeg());
+
     obj.FillHistogram("position", "theta_vs_phi",
 		      360, 0., 360.,
 		      hit.GetPhi()*TMath::RadToDeg(),
@@ -284,6 +292,51 @@ void MakeHistograms(TRuntimeObjects& obj) {
 			180, 0., 180.,
 			hit.GetTheta()*TMath::RadToDeg());
     }
+
+    // Polarization
+
+    // r1, r2 from two highest-energy IPs
+    Int_t i1 = -1;
+    Int_t i2 = -1;
+    Double_t e1 = 0;
+    Double_t e2 = 0;
+    Int_t xtal = hit.GetCrystalId();
+    for(Int_t i = 0; i < hit.Size(); i++){
+      Double_t e = hit.GetInteractionPoint(i).GetDecompE();
+      if(e > e1){
+	i1 = i;
+	e1 = e;
+      }
+      if(e < e1 && e > e2){
+	i2 = i;
+	e2 = e;
+      }
+    }
+
+    if(gretSim->Size() > 0
+       && gretSim->GetGretinaSimHit(0).IsFEP()
+       && i1 >= 0 && i2 >= 0){
+
+      TVector3 pos1 = hit.GetInteractionPoint(i1).GetLocalPosition();
+      TVector3 r1 = TGretina::CrystalToGlobal(xtal,
+					      pos1.X(), pos1.Y(), pos1.Z());
+      TVector3 pos2 = hit.GetInteractionPoint(i2).GetLocalPosition();
+      TVector3 r2 = TGretina::CrystalToGlobal(xtal,
+					      pos2.X(), pos2.Y(), pos2.Z());
+      r2 = r2 - r1;
+      TVector3 zprime = r1.Unit();
+      TVector3 yprime = zprime.Cross( TVector3(0, 0, 1) );
+      yprime = yprime.Unit();
+      TVector3 xprime = yprime.Cross(zprime);
+
+      Double_t xi = TMath::ATan2(r2.Dot(yprime), r2.Dot(xprime));
+
+      obj.FillHistogram("polarization", "xi",
+			360, -180., 180.,
+			xi*TMath::RadToDeg());
+
+    }
+
     
   }
   
