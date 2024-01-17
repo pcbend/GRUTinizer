@@ -76,10 +76,8 @@ int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
       if(ihit.GetDetnum() == detnum) {
 	if(segnum == 0) {
 	  if(!ihit.HasCore()){ //If there is no core event assign to the ihit
-            hit = &ihit;
-            break;
-          } else {
-	    break; //If there is another core event in the build window make a new hit
+              hit = &ihit;
+	      break;
           }
         } else {
 	  int tdiff = static_cast<int>(ihit.Timestamp()-ddas.GetTimestamp());

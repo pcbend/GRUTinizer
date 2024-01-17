@@ -86,7 +86,7 @@ int TGenericDDAS::BuildHits(std::vector<TRawEvent>& raw_data) {
     static int lines_displayed = 0;
     if(!chan){
       if(lines_displayed < 10) {
-        std::cout << "Unknown DDAS (crate, slot, channel): (" << ddasevt.GetCrateID() << ", " << ddasevt.GetSlotID() << ", " << ddasevt.GetChannelID() << ")" << std::endl;
+        std::cout << "Unknown DDAS (crate, slot, channel): (" << ddasevt.GetCrateID() << ", " << ddasevt.GetSlotID() << ", " << ddasevt.GetChannelID() << ")0x" << std::hex << address << std::dec << std::endl;
       }
       lines_displayed++;
       continue;
@@ -103,6 +103,7 @@ int TGenericDDAS::BuildHits(std::vector<TRawEvent>& raw_data) {
     hit.SetCFDTime(ddasevt.GetCFDTime()); // CFD ONLY
     hit.SetTrace(ddasevt.GetTraceLength(), ddasevt.trace);
     ddas_hits.push_back(hit);
+    fSize++;
   }
   return Size();
 }

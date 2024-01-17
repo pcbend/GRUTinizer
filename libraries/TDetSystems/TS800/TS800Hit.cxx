@@ -417,6 +417,7 @@ float TCrdc::GetDispersiveX() const{
     } else{
       cal_data = (double)GetData(i);
     }
+std::cout << i << "\t" << channel.at(i) << "\t" << cal_data << "\t" << channel.at(i)*cal_data << std::endl;
     datasum += cal_data;
     weighted_sum += channel.at(i)*cal_data;
   }
@@ -545,7 +546,15 @@ float TCrdc::GetNonDispersiveY(int maxpad) {
 /*******************************************************************************/
 /* Blank Print Function ********************************************************/
 /*******************************************************************************/
-void TCrdc::Print(Option_t *opt) const { }
+void TCrdc::Print(Option_t *opt) const {
+
+  if(!strcmp(opt,"all")) {
+    std::cout << "Channel \t Sample \t Data" << std::endl;
+    for(unsigned int i = 0; i < data.size(); i++){
+      std::cout << GetChannel(i) << " \t " << GetSample(i) << " \t " << GetData(i) << std::endl;
+    }
+  }
+}
 
 /*******************************************************************************/
 /* TCrdcPad ********************************************************************/
