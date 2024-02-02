@@ -1,6 +1,6 @@
 #include "TGRUTTypes.h"
 
-#include "TBank29.h"
+#include "TBank88.h"
 #include "TCaesar.h"
 #include "TFastScint.h"
 #include "TGretSim.h"
@@ -11,11 +11,9 @@
 #include "TGenericDDAS.h"
 #include "TMode3.h"
 #include "TNSCLScalers.h"
-#include "TPhosWall.h"
 #include "TS800Scaler.h"
 #include "TS800Sim.h"
 #include "TSega.h"
-#include "TDiamondDet.h"
 // Map from string to detector enum.
 // This is used to parse the DetectorEnvironment.env file.
 // This is ONLY used when parsing NSCL data files, not
@@ -25,7 +23,7 @@ std::map<std::string, kDetectorSystems> detector_system_map{
   {"Mode3",       kDetectorSystems::MODE3},
   {"S800",        kDetectorSystems::S800},
   {"S800_Scaler", kDetectorSystems::S800SCALER},
-  {"Bank29",      kDetectorSystems::BANK29},
+  {"Bank88",      kDetectorSystems::BANK88},
   {"Gretina_Sim", kDetectorSystems::GRETINA_SIM},
   {"S800_SIM",    kDetectorSystems::S800_SIM},
   {"Lenda",       kDetectorSystems::LENDA},
@@ -36,10 +34,7 @@ std::map<std::string, kDetectorSystems> detector_system_map{
   {"JanusDDAS",   kDetectorSystems::JANUS_DDAS},
   {"FastScint",   kDetectorSystems::FASTSCINT},
 
-  {"Diamond",     kDetectorSystems::DIAMONDDET},
-
   {"Caesar",      kDetectorSystems::CAESAR},
-  {"Phoswall",    kDetectorSystems::PHOSWALL},
 
   {"NSCL_Scalers",kDetectorSystems::NSCLSCALERS}
 };
@@ -52,7 +47,7 @@ std::map<kDetectorSystems, TDetectorFactoryBase*> detector_factory_map {
   {kDetectorSystems::MODE3,       new TDetectorFactory<TMode3>() },
   {kDetectorSystems::S800,        new TDetectorFactory<TS800>() },
   {kDetectorSystems::S800SCALER,  new TDetectorFactory<TS800Scaler>() },
-  {kDetectorSystems::BANK29,      new TDetectorFactory<TBank29>() },
+  {kDetectorSystems::BANK88,      new TDetectorFactory<TBank88>() },
   {kDetectorSystems::GRETINA_SIM, new TDetectorFactory<TGretSim>() },
   {kDetectorSystems::S800_SIM,    new TDetectorFactory<TS800Sim>() },
   {kDetectorSystems::LENDA,       new TDetectorFactory<TLenda>() },
@@ -63,15 +58,10 @@ std::map<kDetectorSystems, TDetectorFactoryBase*> detector_factory_map {
   {kDetectorSystems::JANUS_DDAS,  new TDetectorFactory<TJanusDDAS>() },
   {kDetectorSystems::FASTSCINT,   new TDetectorFactory<TFastScint>() },
 
-  {kDetectorSystems::DIAMONDDET,   new TDetectorFactory<TDiamondDet>() },
-
   {kDetectorSystems::CAESAR,      new TDetectorFactory<TCaesar>() },
-  {kDetectorSystems::PHOSWALL,    new TDetectorFactory<TPhosWall>() },
 
   {kDetectorSystems::NSCLSCALERS, new TDetectorFactory<TNSCLScalers>() }
 };
-
-
 
 std::map<std::string, EColor> color_system_map {
   {"kWhite",   EColor::kWhite},

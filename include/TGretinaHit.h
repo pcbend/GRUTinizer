@@ -67,7 +67,7 @@ class TGretinaHit : public TDetectorHit {
 
 public:
   TGretinaHit();
-  TGretinaHit(const TGretinaHit& hit){ hit.Copy(*this); }
+  TGretinaHit(const TGretinaHit& hit){ hit.Copy(*this); };
   ~TGretinaHit();
 
   void Copy(TObject& obj) const;

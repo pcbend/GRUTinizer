@@ -1,10 +1,9 @@
 #include "TFilterLoop.h"
 
-#include "MakeUnique.h"
 #include "TGRUTOptions.h"
 #include "TRawFileOut.h"
 #include <memory>
-
+using namespace std;
 TFilterLoop* TFilterLoop::Get(std::string name) {
   if(name.length()==0)
     name = "filter_loop";
@@ -74,7 +73,7 @@ void TFilterLoop::HandleEvent(TUnpackedEvent* event) {
 }
 
 void TFilterLoop::OpenRawOutputFile(const std::string& output_filename) {
-  filtered_output = make_unique<TRawFileOut>(output_filename);
+  filtered_output = std::make_unique<TRawFileOut>(output_filename);
 }
 
 void TFilterLoop::AddCutFile(TFile* cut_file) {

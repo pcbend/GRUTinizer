@@ -2,6 +2,8 @@
 #define _DYNAMICLIBRARY_H_
 
 #include <string>
+#include <stdlib.h>
+#include <limits.h>
 
 /// Loads a Shared Object library
 /**

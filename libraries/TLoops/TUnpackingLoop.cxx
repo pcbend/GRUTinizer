@@ -203,7 +203,7 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
     case 6: // NSCL Non Event Data Typically Run Start/Stop and scalers
       break;
     case 8: // Bank 88 (Formerly Bank29)
-      HandleGEBMode3(event, kDetectorSystems::BANK29);
+      HandleGEBMode3(event, kDetectorSystems::BANK88);
       break;
     case 9: // Simulated S800 data from UCGretina
       fOutputEvent->AddRawData(event, kDetectorSystems::S800_SIM);
@@ -215,7 +215,6 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
       fOutputEvent->AddRawData(event,kDetectorSystems::GRETINA_SIM);
       break;
     case 17: // Phoswich Wall Mode2 equivlant.
-      fOutputEvent->AddRawData(event, kDetectorSystems::PHOSWALL);
       break;
     case 21: // Lenda event format identical to Type25
       fOutputEvent->AddRawData(event, kDetectorSystems::LENDA);
@@ -227,7 +226,7 @@ void TUnpackingLoop::HandleGEBData(TGEBEvent& event){
       fOutputEvent->AddRawData(event, kDetectorSystems::DDAS);
       break;
     case 29: // Something - S.G. Unsure of this type
-      fOutputEvent->AddRawData(event, kDetectorSystems::BANK29);
+      fOutputEvent->AddRawData(event, kDetectorSystems::BANK88);
       break;
     default:
       std::cout << "Unknown EventType: " << type << std::endl;

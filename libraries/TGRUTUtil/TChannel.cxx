@@ -17,7 +17,8 @@
 #include "chrono"
 using namespace std::chrono;
 
-std::map<unsigned int,TChannel*> TChannel::fChannelMap;
+std::unordered_map<unsigned int,TChannel*> TChannel::fChannelMap;
+//std::map<unsigned int,TChannel*> TChannel::fChannelMap;
 TChannel *TChannel::fDefaultChannel = new TChannel("TChannel",0xffffffff);
 std::string TChannel::fChannelData;
 std::vector<double> TChannel::empty_vec;
@@ -157,12 +158,16 @@ bool TChannel::AlphaSort(const TChannel &chana,const TChannel &chanb) {
 
 
 TChannel* TChannel::GetChannel(unsigned int add)   {
+//  auto start = high_resolution_clock::now();
   TChannel *chan = 0;
   if(add==0xffffffff)
     return fDefaultChannel;
   if(fChannelMap.count(add)==1) {
     chan = fChannelMap.at(add);
   }
+//  auto stop = high_resolution_clock::now();
+//  auto duration = duration_cast<nanoseconds>(stop - start);
+//  std::cout << "Time taken by Fast function: " << duration.count() << " microseconds" << std::endl;
   return chan;
 }
 

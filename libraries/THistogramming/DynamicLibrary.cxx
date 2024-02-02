@@ -13,7 +13,6 @@
 #include <unistd.h>
 
 //#include "RuntimeExceptions.h"
-#include "FullPath.h"
 
 namespace {
   int incremental_id() {
@@ -34,7 +33,9 @@ DynamicLibrary::DynamicLibrary(std::string libname_param, bool unique_name)
     // Need to symlink to full path, not a relative path.
     // If a relative path is given, then the symlink will look for that library
     //  relative to /tmp, instead of relative to the current directory.
-    libname = full_path(libname);
+    char buff[PATH_MAX+1];
+    char* success = realpath(libname.c_str(), buff);
+    libname = success;
 
     int error = symlink(libname.c_str(), tempname.c_str());
     if(error){

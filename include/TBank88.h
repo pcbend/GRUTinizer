@@ -1,5 +1,5 @@
-#ifndef TBANK29_H
-#define TBANK29_H
+#ifndef TBANK88_H
+#define TBANK88_H
 
 #include <TObject.h>
 #include <TMath.h>
@@ -9,11 +9,11 @@
 #include "TDetector.h"
 #include "TMode3.h"
 
-class TBank29 : public TDetector {
+class TBank88 : public TDetector {
 
 public:
-  TBank29();
-  ~TBank29();
+  TBank88();
+  ~TBank88();
 
   virtual void Copy(TObject& obj) const;
   virtual void Clear(Option_t *opt = "");
@@ -24,21 +24,13 @@ public:
   virtual TDetectorHit& GetHit(int i)        { return channels.at(i); }
   virtual TMode3Hit&    GetMode3Hit(int i)   { return channels.at(i); }
 
-  //void PrintHit(int i){ gretina_hits->At(i)->Print(); }
-
   Long_t GetTimestamp() { return Timestamp(); }
     //if(Size()>0) return ((TMode3Hit&)GetHit(0)).GetTimestamp(); else return -1; }
 
 private:
   virtual int BuildHits(std::vector<TRawEvent>& raw_data);
-
   std::vector<TMode3Hit> channels;
-
-  ClassDef(TBank29,1);
+  ClassDef(TBank88,1);
 };
-
-
-
-
 
 #endif

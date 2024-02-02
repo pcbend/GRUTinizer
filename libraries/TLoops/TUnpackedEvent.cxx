@@ -1,22 +1,19 @@
 #include "TUnpackedEvent.h"
 
 #include "TClass.h"
-
-#include "TBank29.h"
+#include "TBank88.h"
 #include "TCaesar.h"
 #include "TGretina.h"
 #include "TGretSim.h"
 #include "TJanus.h"
 #include "TMode3.h"
 #include "TNSCLScalers.h"
-#include "TPhosWall.h"
 #include "TS800.h"
 #include "TS800Sim.h"
 #include "TS800Scaler.h"
 #include "TSega.h"
 #include "TFastScint.h"
 #include "TLenda.h"
-#include "TDiamondDet.h"
 
 TUnpackedEvent::TUnpackedEvent() { }
 
@@ -27,17 +24,12 @@ TUnpackedEvent::~TUnpackedEvent() {
 }
 
 void TUnpackedEvent::Build() {
-  //printf("i am called\n"); fflush(stdout);
-
   for(auto& item : raw_data_map) {
     kDetectorSystems detector = item.first;
     std::vector<TRawEvent>& raw_data = item.second;
-
 //    printf("det %s\n",GetDetector(detector, true)->Class()->GetName());
     GetDetector(detector, true)->Build(raw_data);
-
   }
-  
 }
 
 void TUnpackedEvent::AddRawData(const TRawEvent& event, kDetectorSystems detector) {
@@ -54,7 +46,6 @@ void TUnpackedEvent::SetRunStart(unsigned int unix_time){
   }
 }
 
-
 TDetector* TUnpackedEvent::GetDetector(std::string detname) const {
   for(auto det : detectors) {
     if(detname.compare(det->IsA()->GetName())==0) {
@@ -67,7 +58,6 @@ TDetector* TUnpackedEvent::GetDetector(std::string detname) const {
   return NULL;
 }
 
-
 TDetector* TUnpackedEvent::GetDetector(kDetectorSystems detector, bool make_if_not_found) {
   TDetectorFactoryBase* factory = detector_factory_map[detector];
   if(!factory){
@@ -76,7 +66,6 @@ TDetector* TUnpackedEvent::GetDetector(kDetectorSystems detector, bool make_if_n
               << std::endl;
     return NULL;
   }
-
   TDetector* current_det = NULL;
   for(auto det : detectors) {
     if(factory->is_instance(det)) {
@@ -84,11 +73,9 @@ TDetector* TUnpackedEvent::GetDetector(kDetectorSystems detector, bool make_if_n
       break;
     }
   }
-
   if(make_if_not_found && !current_det){
     current_det = factory->construct();
     detectors.push_back(current_det);
   }
-
   return current_det;
 }

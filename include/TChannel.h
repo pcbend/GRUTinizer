@@ -5,7 +5,7 @@
 #include <iostream>
 #include <string>
 #include <map>
-
+#include <unordered_map>
 #include <TNamed.h>
 #include <TList.h>
 
@@ -129,7 +129,8 @@ public:
 
   //static std::vector<std::string> fFileNames;
   static std::string fChannelData;
-  static std::map<unsigned int,TChannel*> fChannelMap;
+//  static std::map<unsigned int,TChannel*> fChannelMap;
+  static std::unordered_map<unsigned int,TChannel*> fChannelMap;
   static TChannel *fDefaultChannel;
 
   ClassDef(TChannel,2);

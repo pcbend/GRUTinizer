@@ -1,45 +1,41 @@
-#include "TBank29.h"
-
+#include "TBank88.h"
 #include "TGEBEvent.h"
 #include "TGRUTOptions.h"
 
-ClassImp(TBank29)
-
+ClassImp(TBank88)
 
 /*******************************************************************************/
-/* TBank29 *********************************************************************/
-/* Actually Bank88 which contains external trigger information *****************/
-/* For FRIB this is the S800 trigger *******************************************/
+/* TBank88 *********************************************************************/
+/* Contains external trigger information for FRIB this is the S800 trigger *****/
 /*******************************************************************************/
-TBank29::TBank29(){
+TBank88::TBank88(){
 }
 
-TBank29::~TBank29() {
+TBank88::~TBank88() {
 }
-
 
 /*******************************************************************************/
 /* Copies hit ******************************************************************/
 /*******************************************************************************/
-void TBank29::Copy(TObject& obj) const {
+void TBank88::Copy(TObject& obj) const {
   TDetector::Copy(obj);
 
-  TBank29& bank = (TBank29&)obj;
+  TBank88& bank = (TBank88&)obj;
   bank.channels = channels;
 }
 
 /*******************************************************************************/
-/* Inserts hit to TBank29 hit vector *******************************************/
+/* Inserts hit to TBank88 hit vector *******************************************/
 /*******************************************************************************/
-void TBank29::InsertHit(const TDetectorHit& hit){
+void TBank88::InsertHit(const TDetectorHit& hit){
   channels.emplace_back((TMode3Hit&)hit);
   fSize++;
 }
 
 /*******************************************************************************/
-/* Unpacks GEB data and builds TBank29 hit *************************************/
+/* Unpacks GEB data and builds TBank88 hit *************************************/
 /*******************************************************************************/
-int TBank29::BuildHits(std::vector<TRawEvent>& raw_data){
+int TBank88::BuildHits(std::vector<TRawEvent>& raw_data){
   for(auto& event : raw_data){
     TGEBEvent* geb = (TGEBEvent*)&event;
     SetTimestamp(geb->GetTimestamp());
@@ -57,12 +53,12 @@ int TBank29::BuildHits(std::vector<TRawEvent>& raw_data){
 /*******************************************************************************/
 /* Blank Print Function ********************************************************/
 /*******************************************************************************/
-void TBank29::Print(Option_t *opt) const { }
+void TBank88::Print(Option_t *opt) const { }
 
 /*******************************************************************************/
 /* Clear hit *******************************************************************/
 /*******************************************************************************/
-void TBank29::Clear(Option_t *opt) {
+void TBank88::Clear(Option_t *opt) {
   TDetector::Clear(opt);
   channels.clear();
 }

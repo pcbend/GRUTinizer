@@ -6,9 +6,9 @@
 # EDIT THIS SECTION
 
 INCLUDES   = include
-CFLAGS     = -g -std=c++11 -O3 -Wall -Wextra -pedantic -Wno-unused-parameter
+CFLAGS     = -g -std=c++17 -O3 -Wall -Wextra -pedantic -Wno-unused-parameter
 LINKFLAGS_PREFIX  =
-LINKFLAGS_SUFFIX  = -L/opt/X11/lib -lX11 -lXpm -std=c++11
+LINKFLAGS_SUFFIX  = -L/opt/X11/lib -lX11 -lXpm -std=c++17
 SRC_SUFFIX = cxx
 
 # EVERYTHING PAST HERE SHOULD WORK AUTOMATICALLY
@@ -60,7 +60,7 @@ LINKFLAGS += -Llib $(addprefix -l,$(LIBRARY_NAMES)) -Wl,-rpath,\$$ORIGIN/../lib
 LINKFLAGS += $(shell root-config --glibs) -lSpectrum -lMinuit -lMathMore
 LINKFLAGS := $(LINKFLAGS_PREFIX) $(LINKFLAGS) $(LINKFLAGS_SUFFIX)
 
-
+# PyROOT was removed from the main root at 6.22 and replaced with ROOTTPython
 ROOT_SUBVER = $(shell expr $(shell root-config --version | cut -f1 -d/ | cut -f2 -d.) \>= 22)
 ifeq ($(ROOT_SUBVER),1)
 	LINKFLAGS += -lROOTTPython

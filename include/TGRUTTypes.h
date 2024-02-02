@@ -15,7 +15,7 @@ enum kDetectorSystems {
   MODE3      = 2,
   S800       = 5,
   S800SCALER = 10,
-  BANK29     = 8,
+  BANK88     = 8,
   GRETINA_SIM= 11,
   S800_SIM   = 9,
   LENDA      = 21,
@@ -26,11 +26,7 @@ enum kDetectorSystems {
   JANUS_DDAS = 66,
   FASTSCINT =4,
 
-  DIAMONDDET = 70,
-
   CAESAR = 80,
-
-  PHOSWALL = 17,
 
   NSCLSCALERS = 100
 };
