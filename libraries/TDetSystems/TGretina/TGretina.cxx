@@ -25,18 +25,6 @@ bool    TGretina::fNEIGHBOURSet = false;
 bool	TGretina::gretNeighbour[124][124];
 
 /*******************************************************************************/
-/* Legacy - No Longer used and may be removed **********************************/
-/* Old Addback code should use BuildAddback() instead **************************/
-/*******************************************************************************/
-bool DefaultAddback(const TGretinaHit& one,const TGretinaHit &two) {
-  TVector3 res = one.GetLastPosition()-two.GetPosition();
-  return ((std::abs(one.GetTime()-two.GetTime()) < 44.0) &&
-          (res.Mag() < 80.0) ) ;
-}
-
-std::function<bool(const TGretinaHit&,const TGretinaHit&)> TGretina::fAddbackCondition = DefaultAddback;
-
-/*******************************************************************************/
 /* Main function for making addback hits according to procedure defined in *****/
 /* D. Weisshaar et al., Nucl. Instrum. Methods Phys. Res., Sect. A 847, ********/
 /* 18, (2017). Sec 3.3 *********************************************************/
@@ -45,22 +33,25 @@ std::function<bool(const TGretinaHit&,const TGretinaHit&)> TGretina::fAddbackCon
 /*******************************************************************************/
 //SG TO DO
 //How to handle interaction points from added crystals, does it make sense to add them?
-void TGretina::BuildAddback(int SortDepth, bool SortByEng) const {
+void TGretina::BuildAddback(int SortDepth, int EngRange) const {
+  //Don't rebuild events
   if( addback_hits.size() > 0 || gretina_hits.size() == 0) {
     return;
   }
 
   std::vector<TGretinaHit> temp_hits = gretina_hits;
+  for(unsigned int i = 0; i < temp_hits.size(); i++) {
+    if(EngRange < 0) temp_hits.at(i).SetCoreEnergy(temp_hits.at(i).GetCoreEnergy());
+    else temp_hits.at(i).SetCoreEnergy(temp_hits.at(i).GetCoreEnergy(EngRange));
+  }
 
   //sort so that the first hit has the greatest energy
   //this way we can loop through i,j with i < j and know that
   //any hit with higher energy cannot be an addback to one with lower energy
-  if (SortByEng){
-    std::sort(temp_hits.begin(), temp_hits.end(),
-        [](const TGretinaHit& a, const TGretinaHit& b) {
-          return a.GetCoreEnergy() > b.GetCoreEnergy();
-        });
-  }
+  std::sort(temp_hits.begin(), temp_hits.end(),
+    [](const TGretinaHit& a, const TGretinaHit& b) {
+    return a.GetCoreEnergy() > b.GetCoreEnergy();
+  });
 
   //vector used to store hit indices when crystals are pairs
   std::vector<int> paired;

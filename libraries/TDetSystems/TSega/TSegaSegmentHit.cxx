@@ -75,13 +75,6 @@ int TSegaSegmentHit::GetSegnum() const {
 }
 
 /*******************************************************************************/
-/* Mapped numbers - I do not know the purpose of these functions ***************/
-/*******************************************************************************/
-int TSegaSegmentHit::GetMapnum() const {return TSega::MappedSegnum(GetDetnum(),GetSegnum());}
-int TSegaSegmentHit::GetPairnum() const {return TSega::MappedPairnum(GetDetnum(),GetSegnum());}
-int TSegaSegmentHit::GetSlicenum() const {return TSega::MappedSlicenum(GetDetnum(),GetSegnum());}
-
-/*******************************************************************************/
 /* Returns DDAS crate/slot channel number **************************************/
 /*******************************************************************************/
 int TSegaSegmentHit::GetCrate() const {

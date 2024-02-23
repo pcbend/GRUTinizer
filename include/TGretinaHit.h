@@ -75,7 +75,7 @@ public:
   void BuildFrom(TSmartBuffer& raw);
 
 
-  Double_t GetTime()            const { return (double)Timestamp() + (double)fWalkCorrection; }
+  Double_t GetTime()            const { return ((double)Timestamp() + (double)fWalkCorrection)*10.; } //Return Time in ns
   Float_t  GetT0()              const { return fWalkCorrection; }
   Float_t  GetTFit()            const { return fWalkCorrection - fTOffset; }
   Float_t  GetTOffset()         const { return fTOffset; }

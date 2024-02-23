@@ -21,11 +21,6 @@ public:
   int GetDetnum() const;
   int GetMainSegnum() const;
 
-  //Mapped Numbers
-  int GetMapSegnum() const;
-  int GetMapPairnum() const;
-  int GetMapSlicenum() const;
-
   bool HasCore() const;
 
   unsigned int GetNumSegments() const { return fSegments.size(); }
@@ -44,16 +39,6 @@ public:
 
   void SetEnergySumBool(bool sum = false) {fEsum = sum; }
   bool HasEnergySum() const {return fEsum; }
-
-  void SetEnergySum1(int energy_sum) { fEnSum1 = energy_sum; }
-  void SetEnergySum2(int energy_sum) { fEnSum2 = energy_sum; }
-  void SetEnergySum3(int energy_sum) { fEnSum3 = energy_sum; }
-  void SetEnergySum4(int energy_sum) { fEnSum4 = energy_sum; }
-
-  int GetEnergySum1() const {return fEnSum1;}
-  int GetEnergySum2() const {return fEnSum2;}
-  int GetEnergySum3() const {return fEnSum3;}
-  int GetEnergySum4() const {return fEnSum4;}
 
   void SetEnergySum(int sum, int energy_sum) { fEnSum[sum] = energy_sum; }
   int GetEnergySum(int sum) const { return fEnSum[sum]; }
@@ -77,10 +62,6 @@ public:
 private:
   std::vector<unsigned short> fTrace;
   std::vector<TSegaSegmentHit> fSegments;
-  int fEnSum1;
-  int fEnSum2;
-  int fEnSum3;
-  int fEnSum4;
   int fEnSum[4];
   bool fEsum;
 

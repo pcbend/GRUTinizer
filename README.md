@@ -1,8 +1,17 @@
 # GRUTinizer
+
+Version Information
+MAIN
+- As expected this is main version of the code. Any FRIB experiments performed after 2021 should use this version 
+EXPERIMENTAL 
+- This is the branch I use to test things, do not use 
+LEGACY
+- Use this for data prior to 2021.
+
 Install GRUTinizer
-- Needs a root installation to work, at present I have tested up tp 6.22.08 on FRIB computers. 
-  Note between version 6.18 and 6.22 the library lPyROOT seems to have been replaced my lROOTTPython
-  on the FRIB machines, the makefile has been adjusted to use either library based on the root version
+- Needs a root installation to work, at present I have tested up tp 6.24.02 on FRIB computers using the buster container. 
+  Note between version 6.18 and 6.22 the library lPyROOT seems to have been replaced by lROOTTPython
+  on root installations, the makefile has been adjusted to use either library based on the root version
 - For root you will need a variable $ROOTSYS defined in your bashrc pointing to your root installation
  
 - Add these lines to your bashrc

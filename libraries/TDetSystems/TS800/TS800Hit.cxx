@@ -417,7 +417,6 @@ float TCrdc::GetDispersiveX() const{
     } else{
       cal_data = (double)GetData(i);
     }
-std::cout << i << "\t" << channel.at(i) << "\t" << cal_data << "\t" << channel.at(i)*cal_data << std::endl;
     datasum += cal_data;
     weighted_sum += channel.at(i)*cal_data;
   }
@@ -767,7 +766,7 @@ double TMTof::GetCorrelatedTof(int ch1, int ch2, double target, double shift) co
   double fCorr = -1;
   std::vector<unsigned short> refvec1 = GetMTofVector(ch1);
   std::vector<unsigned short> refvec2 = GetMTofVector(ch2);
-  if(refvec1.size() && refvec1.size()){
+  if(refvec1.size() && refvec2.size()){
     if(std::isnan(target)) return (refvec1.at(0) - refvec2.at(0));
     fCorr = std::numeric_limits<double>::max();
     for(size_t i = 0; i < refvec1.size(); i++) {
@@ -841,7 +840,7 @@ double TMTof::GetCorrelatedTof(std::string ch1, std::string ch2, double target, 
   std::vector<unsigned short> refvec1 = GetMTofVectorFromString(ch1);
   std::vector<unsigned short> refvec2 = GetMTofVectorFromString(ch2);
 
-  if(refvec1.size() && refvec1.size()){
+  if(refvec1.size() && refvec2.size()){
     if(std::isnan(target)) return (refvec1.at(0) - refvec2.at(0));
     fCorr = std::numeric_limits<double>::max();
     for(size_t i = 0; i < refvec1.size(); i++) {

@@ -26,10 +26,7 @@ public:
   static TVector3 GetSegmentPosition(int detnum, int segnum);
 
   //Geometric (Theta-Phi) Segment Maps
-  static int MappedSegnum(int detnum, int segnum); //Inidvidual segments, 1 to 512
-  static int MappedPairnum(int detnum, int segnum); //Pairs of Segments, 1 to 256 
-  static int MappedSlicenum(int detnum, int segnum); //Slices, 1 to 128
-  
+
   static TVector3 CrystalToGlobal(int detnum, TVector3 crystal_pos);
 
   // Allows for looping over all hits with for(auto& hit : sega) { }

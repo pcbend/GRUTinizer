@@ -136,13 +136,6 @@ int TSegaHit::GetMainSegnum() const {
 }
 
 /*******************************************************************************/
-/* Mapped numbers - I do not know the purpose of these functions ***************/
-/*******************************************************************************/
-int TSegaHit::GetMapSegnum() const {return TSega::MappedSegnum(GetDetnum(),GetMainSegnum());}
-int TSegaHit::GetMapPairnum() const {return TSega::MappedPairnum(GetDetnum(),GetMainSegnum());}
-int TSegaHit::GetMapSlicenum() const {return TSega::MappedSlicenum(GetDetnum(),GetMainSegnum());}
-
-/*******************************************************************************/
 /* Returns position of interaction based on highest segment energy *************/
 /*******************************************************************************/
 TVector3 TSegaHit::GetPosition(bool apply_array_offset, TVector3 array_offset) const {

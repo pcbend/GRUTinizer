@@ -43,26 +43,31 @@ void TGretinaHit::Copy(TObject &rhs) const {
 /*******************************************************************************/
 /* Returns core energy from mode2 data and performs a calibration if ***********/
 /* a channels.cal file is provided *********************************************/
+/* If it is an addback event (abdepth => 0) do not calibrate again *************/
 /*******************************************************************************/
 Float_t TGretinaHit::GetCoreEnergy() const {
   TChannel *channel = TChannel::GetChannel(Address());
-  //printf("GetAddress() + i = 0x%08x\n",GetAddress()+i);
-  if(!channel)
+  if(!channel) return fCoreEnergy;
+  if(GetABDepth() < 0) return channel->CalEnergy(fCoreEnergy);
+  else return fCoreEnergy;
+/*  else {
+    std::cout << GetABDepth() << std::endl;
     return fCoreEnergy;
-  return channel->CalEnergy(fCoreEnergy);
+  }
+*/
 }
 
 /*******************************************************************************/
 /* Selects charge from different gain ranges and performs a calibration if *****/
 /* a channels.cal file is provided *********************************************/
+/* If it is an addback event (abdepth => 0) do not calibrate again *************/
 /*******************************************************************************/
 Float_t TGretinaHit::GetCoreEnergy(int i) const {
   float charge = (float)GetCoreCharge(i) + gRandom->Uniform();
   TChannel *channel = TChannel::GetChannel(Address()+(i<<4));
-  //printf("GetAddress() + i = 0x%08x\n",GetAddress()+i);
-  if(!channel)
-    return charge;
-  return channel->CalEnergy(charge);
+  if(!channel) return charge;
+  if(GetABDepth() <0) return channel->CalEnergy(charge);
+  else return charge;
 }
 
 /*******************************************************************************/
@@ -96,7 +101,7 @@ void TGretinaHit::BuildFrom(TSmartBuffer& buf){
   fWalkCorrection = raw.t0;
   fCrystalId = raw.crystal_id;
   fCoreEnergy = raw.tot_e;
-  fAB = 0;
+  fAB = -1;
 
   int board_id = ((fCrystalId/4) << 8) ;  //hole  number : 0x1f00
   board_id += ((fCrystalId%4) << 6) ;  //x-tal number : 0x00c0

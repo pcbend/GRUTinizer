@@ -18,11 +18,6 @@ public:
   int GetDetnum() const;
   int GetSegnum() const;
 
-  //Mapped Numbers
-  int GetMapnum() const;
-  int GetPairnum() const;
-  int GetSlicenum() const;
-
   std::vector<unsigned short>& GetTrace() { return fTrace; }
 
   void SetTrace(unsigned int trace_length, const unsigned short* trace);

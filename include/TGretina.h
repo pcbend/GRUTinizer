@@ -23,7 +23,7 @@ public:
   virtual void Clear(Option_t *opt = "");
 
   virtual size_t Size() const { return gretina_hits.size(); }
-  virtual Int_t AddbackSize(int SortDepth = 4) { BuildAddback(SortDepth, true); return addback_hits.size(); }
+  virtual Int_t AddbackSize(int SortDepth = 6, int EngRange = -1) { BuildAddback(SortDepth, EngRange); return addback_hits.size(); }
   void ResetAddback() { addback_hits.clear();}
 
   virtual void InsertHit(const TDetectorHit& hit);
@@ -41,15 +41,15 @@ public:
   static TVector3 GetCrystalPosition(int cryid); //return the position of the crysal in the lab system
 
   static bool IsNeighbour(int ID1, int ID2) {SetGretNeighbours(); return gretNeighbour[ID1][ID2];}
-  static bool IsNeighbour(const TGretinaHit &a, const TGretinaHit &b) { return IsNeighbour(a.GetCrystalId(),b.GetCrystalId());}
-#ifndef __CINT__
-  static void SetAddbackCondition(std::function<bool(const TGretinaHit&,const TGretinaHit&)> condition) {
-    fAddbackCondition = condition;
+  static bool IsNeighbour(const TGretinaHit &a, const TGretinaHit &b, bool timegate=false) {
+    bool tmpB = false;
+    tmpB = IsNeighbour(a.GetCrystalId(),b.GetCrystalId());
+    if(!timegate) return tmpB;
+    if(abs(a.GetTime()-b.GetTime()) < 50) {
+      return tmpB;
+    } else return false;
   }
-  static std::function<bool(const TGretinaHit&,const TGretinaHit&)> GetAddbackCondition() {
-    return fAddbackCondition;
-  }
-#endif
+
   const std::vector<TGretinaHit> &GetAllHits() const { return gretina_hits; }
 
   void  SortHits();
@@ -83,10 +83,7 @@ public:
   }
 
 private:
-  void BuildAddback(int EngRange=-1, bool SortByEng=true) const;
-#ifndef __CINT__
-  static std::function<bool(const TGretinaHit&,const TGretinaHit&)> fAddbackCondition;
-#endif
+  void BuildAddback(int SortDepth=6, int EngRange = -1) const;
   virtual int BuildHits(std::vector<TRawEvent>& raw_data);
 
   std::vector<TGretinaHit> gretina_hits;

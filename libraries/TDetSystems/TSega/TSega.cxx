@@ -105,11 +105,10 @@ int TSega::BuildHits(std::vector<TRawEvent>& raw_data) {
       hit->SetCharge(ddas.GetEnergy());
       hit->SetTrace(ddas.GetTraceLength(), ddas.trace);
       //For checking Trapezoidal filter output in DDAS, unlikely to be useful for mosr people
+      if(ddas.HasEnergySum()) {
+        for(int i = 0; i < 4; i++) hit->SetEnergySum(i, ddas.GetEnergySum(0));
+      }
       hit->SetEnergySumBool(ddas.HasEnergySum());
-      hit->SetEnergySum1(ddas.GetEnergySum(0));
-      hit->SetEnergySum2(ddas.GetEnergySum(1));
-      hit->SetEnergySum3(ddas.GetEnergySum(2));
-      hit->SetEnergySum4(ddas.GetEnergySum(3));
     } else {  //Segment hit, add to SegmentHit vector
       TSegaSegmentHit& seg = hit->MakeSegmentByAddress(address);
       if(!hit->HasCore()) hit->SetTimestamp(ddas.GetTimestamp()); //If no core present use segment for Timestamp
@@ -152,95 +151,6 @@ TVector3 TSega::GetSegmentPosition(int detnum, int segnum) {
 }
 
 /*******************************************************************************/
-/* Read geometric maps from text files *****************************************/
-/* I do not know the purpose of these function *********************************/
-/*******************************************************************************/
-void TSega::LoadSegmentMaps(){
-  static bool maps_loaded = false;
-  if (maps_loaded){
-    return;
-  }
-
-  std::string fname = std::string(getenv("GRUTSYS")) + "/config/segment_map.txt";
-  std::ifstream f(fname);
-
-  if(!f) {
-    std::cout << "SeGA segment map file \"" << fname << "\"" << " does not exist" << std::endl;
-    return;
-  }
-
-  std::string line;
-  while(std::getline(f,line)) {
-    int det, seg, map;
-    int extracted = sscanf(line.c_str(),"{{%i,%i},%i}",&det,&seg,&map);
-
-    if(extracted != 3) {
-      std::cout << "Segment Map: Extracted = " << extracted << std::endl;
-    }
-    seg_map[{det,seg}] = map;
-  }
-
-  std::string fname2 = std::string(getenv("GRUTSYS")) + "/config/pair_map.txt";
-  std::ifstream f2(fname2);
-
-  if(!f2) {
-    std::cout << "SeGA segment pair map file \"" << fname2 << "\"" << " does not exist" << std::endl;
-    return;
-  }
-
-  std::string line2;
-  while(std::getline(f2,line2)) {
-    int det2, seg2, map2;
-    int extracted2 = sscanf(line2.c_str(),"{{%i,%i},%i}",&det2,&seg2,&map2);
-
-    if(extracted2 != 3) {
-      std::cout << "Pair Map: Extracted = " << extracted2 << std::endl;
-    }
-    pair_map[{det2,seg2}] = map2;
-  }
-
-  std::string fname4 = std::string(getenv("GRUTSYS")) + "/config/slice_map.txt";
-  std::ifstream f4(fname4);
-
-  if(!f4) {
-    std::cout << "SeGA slice map file \"" << fname4 << "\"" << " does not exist" << std::endl;
-    return;
-  }
-
-  std::string line4;
-  while(std::getline(f4,line4)) {
-    int det4, seg4, map4;
-    int extracted4 = sscanf(line4.c_str(),"{{%i,%i},%i}",&det4,&seg4,&map4);
-
-    if(extracted4 != 3) {
-      std::cout << "Slice Map: Extracted = " << extracted4 << std::endl;
-    }
-    slice_map[{det4,seg4}] = map4;
-  }
-  maps_loaded = true;
-  return;
-}
-
-/*******************************************************************************/
-/* Returns information from maps loaded above **********************************/
-/* I do not know the purpose of these function *********************************/
-/*******************************************************************************/
-int TSega::MappedSegnum(int detnum, int segnum) {
-  LoadSegmentMaps();
-  return seg_map[{detnum,segnum}];
-}
-
-int TSega::MappedPairnum(int detnum, int segnum) {
-  LoadSegmentMaps();
-  return pair_map[{detnum,segnum}];
-}
-
-int TSega::MappedSlicenum(int detnum, int segnum) {
-  LoadSegmentMaps();
-  return slice_map[{detnum,segnum}];
-}
-
-/*******************************************************************************/
 /* Returns real position from detector number and position within crystals *****/
 /*******************************************************************************/
 TVector3 TSega::CrystalToGlobal(int detnum, TVector3 crystal_pos) {
@@ -267,7 +177,7 @@ void TSega::LoadDetectorPositions() {
     return;
   }
   loaded = true;
-  std::string filename = std::string(getenv("GRUTSYS")) + "/config/SeGA_rotations.txt";
+  std::string filename = std::string(getenv("GRUTSYS")) + "/config/SeGA_JANUS.txt";
 
   //Read the locations from file.
   std::ifstream infile(filename);
@@ -302,7 +212,7 @@ void TSega::LoadDetectorPositions() {
 }
 
 /*******************************************************************************/
-/* Unused function *************************************************************/
+/* Required by TDetector, unused otherwise *************************************/
 /*******************************************************************************/
 void TSega::InsertHit(const TDetectorHit& hit) {
   sega_hits.emplace_back((TSegaHit&)hit);
