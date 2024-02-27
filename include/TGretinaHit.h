@@ -16,6 +16,52 @@
 class TSmartBuffer;
 class TS800;
 
+class TInteractionPoint {
+  public:
+    TInteractionPoint() { } 
+    TInteractionPoint(const TInteractionPoint &IP);
+    TInteractionPoint(int seg,float eng,float frac,TVector3 lpos) :
+                      fSegNum(seg),fEng(eng),fDecompEng(frac),fLPosition(lpos) { }
+    virtual ~TInteractionPoint() { }
+   
+    virtual void Copy(const TInteractionPoint&);
+    void Add(TInteractionPoint&);
+
+    virtual int   GetSegNum()              const { return fSegNum;    }
+    virtual float GetPreampE()             const { return fEng;       }
+    virtual float GetDecompE()             const { return fDecompEng; }
+    virtual float GetAssignE()             const { return fAssignedEng; }
+    virtual int   GetOrder()               const { return fOrder; } 
+    virtual TVector3 GetPosition(int xtal) const; 
+    TVector3 GetLocalPosition()            const { return fLPosition; }
+    void SetOrder(int o)     { fOrder=o; }
+    void SetAssignE(float e) { fAssignedEng = e; }
+
+    void Print(Option_t *opt="") const;
+    void Clear(Option_t *opt="");
+
+    void SetSegNum(int seg) { fSegNum = seg; }
+
+    int Wedge() const { return ((GetSegNum()-1)%6); }
+
+    bool operator == (const TInteractionPoint &rhs) const {
+      return (GetDecompE() == rhs.GetDecompE());
+    }
+    bool operator < (const TInteractionPoint &rhs) const{
+      return (GetDecompE() > rhs.GetDecompE());
+    }
+
+  private:
+    int   fSegNum;
+    float fEng;          // energy as recorded by preamp.  energy in mode2 format
+    float fDecompEng;    // energy as assigned by decomp.  fraction in mode2 format
+    float fAssignedEng;  // percent eng assigned by decomp scaled to the core. not in mode2 format
+    int   fOrder;        // interaction order
+    //TVector3 fPosition;  // in global coordinates
+    TVector3 fLPosition; // in local coordinates.
+  ClassDef(TInteractionPoint,1)
+
+};
 
 class interaction_point {
   public:

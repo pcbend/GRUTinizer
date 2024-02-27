@@ -12,6 +12,41 @@
 #include "TS800.h"
 
 
+TInteractionPoint::TInteractionPoint(const TInteractionPoint &IP) {                       
+  this->Copy(IP);
+}
+
+void TInteractionPoint::Copy(const TInteractionPoint &IP) {
+  fSegNum      = IP.GetSegNum();
+  fEng         = IP.GetPreampE();
+  fDecompEng   = IP.GetDecompE();
+  fAssignedEng = IP.GetAssignE();
+  fOrder       = IP.GetOrder();
+  fLPosition   = IP.GetLocalPosition();
+}
+
+TVector3 TInteractionPoint::GetPosition(int xtal) const { return TGretina::CrystalToGlobal(xtal,
+                                                                            fLPosition.X(),
+                                                                            fLPosition.Y(),
+                                                                            fLPosition.Z()); }
+
+
+void TInteractionPoint::Print(Option_t *opt) const { 
+  TVector3 lv = GetLocalPosition();
+  printf("seg[%02i] wedge[%i]    %.1f / %.1f   [ %.1f, %.1f. %.1f] \n",
+          GetSegNum(),Wedge(),GetAssignE(),GetPreampE(),lv.X(),lv.Y(),lv.Z());
+}
+
+
+void TInteractionPoint::Clear(Option_t *opt) {
+    fSegNum      = -1;
+    fEng         = sqrt(-1);    
+    fDecompEng   = sqrt(-1);    
+    fAssignedEng = sqrt(-1);;   
+    fOrder       = -1;          
+    fLPosition.SetXYZ(0,0,1);
+}
+
 TGretinaHit::TGretinaHit(){ Clear(); }
 
 TGretinaHit::~TGretinaHit(){ }
