@@ -986,7 +986,9 @@ void TS800Track::Clear() {
 /*******************************************************************************/
 /* Calulates everything from the CRDC postions and inverse maps with minimum ***/
 /* number of function calls ****************************************************/
+/* If no invmap loaded do not calculate ata/bta etc.. **************************/
 /*******************************************************************************/
+//void TS800Track::CalculateTracking(const TS800 *s800, bool invmapLoaded, int i) {
 void TS800Track::CalculateTracking(const TS800 *s800, int i) {
 
   int maxp0 = s800->GetCrdc(0).GetMaxPad();
@@ -1003,12 +1005,14 @@ void TS800Track::CalculateTracking(const TS800 *s800, int i) {
   afp = s800->GetAFP(xfp[0], xfp[1]);
   bfp = s800->GetBFP(yfp[0], yfp[1]);
 
-  ata = s800->GetAta(xfp[0], afp, yfp[0], bfp, i);
-  bta = s800->GetBta(xfp[0], afp, yfp[0], bfp, i);
-  yta = s800->GetYta(xfp[0], afp, yfp[0], bfp, i);
-  dta = s800->GetDta(xfp[0], afp, yfp[0], bfp, i);
+  if(TInverseMap::Get()) {
+    ata = s800->GetAta(xfp[0], afp, yfp[0], bfp, i);
+    bta = s800->GetBta(xfp[0], afp, yfp[0], bfp, i);
+    yta = s800->GetYta(xfp[0], afp, yfp[0], bfp, i);
+    dta = s800->GetDta(xfp[0], afp, yfp[0], bfp, i);
 
-  scatter = s800->GetScatteringAngle(ata, bta);
-  azita = s800->GetAzita(ata, bta);
-  track = s800->Track(ata, bta);
+    scatter = s800->GetScatteringAngle(ata, bta);
+    azita = s800->GetAzita(ata, bta);
+    track = s800->Track(ata, bta);
+  }
 }

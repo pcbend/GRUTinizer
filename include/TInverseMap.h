@@ -4,7 +4,7 @@
 #include<map>
 
 #include <TNamed.h>
-
+#include <iostream>
 class TS800;
 
 class TInverseMap : public TNamed {
@@ -26,7 +26,16 @@ class TInverseMap : public TNamed {
     float Dta(int,const TS800*);
 
     float MapCalc(int,int,float*) const;
-    int Size() { return fMap.size(); }
+    int Size() {
+	std::cout << "MAP" << std::endl;
+      if(fInverseMap) {
+	std::cout << "MAP found" << std::endl;
+	return fMap.size();
+      } else {
+        std::cout << "MAP Not found" << std::endl;
+        return 0;
+      }
+    }
 
     float GetBrho() const { return fBrho; }
 

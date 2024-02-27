@@ -41,7 +41,7 @@ public:
   static TVector3 GetCrystalPosition(int cryid); //return the position of the crysal in the lab system
 
   static bool IsNeighbour(int ID1, int ID2) {SetGretNeighbours(); return gretNeighbour[ID1][ID2];}
-  static bool IsNeighbour(const TGretinaHit &a, const TGretinaHit &b, bool timegate=false) {
+  static bool IsNeighbour(const TGretinaHit &a, const TGretinaHit &b, bool timegate=true) {
     bool tmpB = false;
     tmpB = IsNeighbour(a.GetCrystalId(),b.GetCrystalId());
     if(!timegate) return tmpB;
