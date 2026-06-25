@@ -102,7 +102,7 @@ docs:
 bin/%: util/% | bin
 	@ln -sf ../$< $@
 
-.build/util/gadd.o: $(ROOTSYS)/main/src/hadd.cxx
+.build/util/gadd.o: $(ROOTSYS)-src/main/src/hadd.cxx
 	@mkdir -p $(dir $@)
 	$(call run_and_test,sed s/hadd/gadd/g < $< | $(CPP) -x c++ -fPIC -c -o $@ $(CFLAGS) -,$@,$(COM_COLOR),$(COM_STRING),$(OBJ_COLOR) )
 

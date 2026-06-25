@@ -98,6 +98,9 @@ void MakeHistograms(TRuntimeObjects& obj) {
       obj.FillHistogram("sim","emitted_z",
 			1000,-50., 50.,
 			hit.GetZ());
+      obj.FillHistogram("sim", "flags",
+	  		10, 0, 10, hit.IsFEP());
+
     }
   }
 
@@ -136,11 +139,19 @@ void MakeHistograms(TRuntimeObjects& obj) {
     obj.FillHistogram("energy", "energy",
 		      energyNChannels, energyLlim, energyUlim, mE);
 
-    if(gretSim && gretSim->Size()>0)
-      if(gretSim->GetGretinaSimHit(0).IsFEP())
+    if(gretSim && gretSim->Size()>0){
+      unsigned int flags = gretSim->GetGretinaSimHit(0).IsFEP();
+      if(flags == 1 || flags == 3)
         obj.FillHistogram("energy", "photopeak",
 	  		  energyNChannels, energyLlim, energyUlim, mE);
-    
+      if(flags == 2 || flags == 3)
+        obj.FillHistogram("energy", "pair_production",
+	  		  energyNChannels, energyLlim, energyUlim, mE);
+      if(flags == 0 || flags == 1)
+        obj.FillHistogram("energy", "no_pair_production",
+	  		  energyNChannels, energyLlim, energyUlim, mE);
+    }
+
     obj.FillHistogram("energy", "fold_vs_energy",
 		      energyNChannels/8, energyLlim, energyUlim, mE,
 		      20, 0, 20, hit.NumberOfInteractions());
