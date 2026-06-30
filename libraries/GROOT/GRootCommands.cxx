@@ -1035,6 +1035,7 @@ TF1 *GrabFit(int i)  {
 
 namespace {
   bool gui_is_running = false;
+  bool gui_update_failed = false;
 }
 
 void StartGUI() {
@@ -1042,7 +1043,12 @@ void StartGUI() {
   std::ifstream script(script_filename);
   std::string   script_text((std::istreambuf_iterator<char>(script)),
                              std::istreambuf_iterator<char>());
-  TPython::Exec(script_text.c_str());
+  if(!TPython::Exec(script_text.c_str()) ||
+     !TPython::Exec("if not callable(globals().get('update')): raise RuntimeError('GRUTinizer GUI failed to start')")) {
+    gui_is_running = false;
+    gui_update_failed = true;
+    return;
+  }
 
   // TTimer* gui_timer = new TTimer("TPython::Exec(\"update()\");", 10, true);
   // gui_timer->TurnOn();
@@ -1064,7 +1070,13 @@ bool GUIIsRunning() {
 }
 
 void DummyGuiCaller::CallUpdate() {
-  TPython::Exec("update()");
+  if(gui_update_failed) {
+    return;
+  }
+  if(!TPython::Exec("update()")) {
+    gui_update_failed = true;
+    gui_is_running = false;
+  }
 }
 
 

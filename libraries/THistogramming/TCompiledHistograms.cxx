@@ -3,26 +3,49 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <cctype>
 
 #include <sys/stat.h>
 
 #include "TH1.h"
 #include "TFile.h"
 #include "TDirectory.h"
+#include "THttpServer.h"
 #include "TObject.h"
 #include "TROOT.h"
 #include "TKey.h"
+#include "TString.h"
 
 #include "GValue.h"
-#include "GRootCommands.h"
 #include "TPreserveGDirectory.h"
 
 typedef void* __attribute__((__may_alias__)) void_alias;
 
+namespace {
+std::string BuildHttpEngineString(const std::string& input) {
+  bool is_port = !input.empty();
+  for(char c : input) {
+    if(!std::isdigit(static_cast<unsigned char>(c))) {
+      is_port = false;
+      break;
+    }
+  }
+  if(is_port) {
+    return "http:" + input + "?top=GRUTinizer";
+  }
+  if(input.find('?') == std::string::npos) {
+    return input + "?top=GRUTinizer";
+  }
+  return input;
+}
+}
+
 TCompiledHistograms::TCompiledHistograms()
   : libname(""), library(nullptr), func(nullptr),
     last_modified(0), last_checked(0), check_every(5),
-    default_directory(0),obj(&objects, &gates, cut_files) { }
+    http_publish_interval(1), last_http_publish(0),
+    default_directory(0), http_server(nullptr),
+    obj(&objects, &gates, cut_files) { }
 
 TCompiledHistograms::TCompiledHistograms(std::string input_lib)
   : TCompiledHistograms() {
@@ -38,6 +61,10 @@ TCompiledHistograms::TCompiledHistograms(std::string input_lib)
   }
   last_modified = get_timestamp();
   last_checked = time(NULL);
+}
+
+TCompiledHistograms::~TCompiledHistograms() {
+  delete http_server;
 }
 
 void TCompiledHistograms::ClearHistograms() {
@@ -105,6 +132,62 @@ void TCompiledHistograms::Write() {
   //variables.Write();
 }
 
+void TCompiledHistograms::EnableLiveHttp(const std::string& server) {
+  if(server.empty() || server == "none" || server == "off") {
+    return;
+  }
+  if(http_server) {
+    return;
+  }
+
+  std::string engine = BuildHttpEngineString(server);
+  http_server = new THttpServer(engine.c_str());
+  http_server->SetReadOnly(kTRUE);
+  http_server->CreateServerThread();
+  std::cout << "Publishing live histograms with ROOT THttpServer at "
+            << engine << std::endl;
+}
+
+void TCompiledHistograms::RegisterLiveHttpObject(const char* folder, TObject* obj) {
+  if(!http_server || !obj) {
+    return;
+  }
+  if(http_registered_objects.count(obj)) {
+    return;
+  }
+  if(http_server->Register(folder, obj)) {
+    http_registered_objects.insert(obj);
+  }
+}
+
+void TCompiledHistograms::PublishLiveHttp(bool force) {
+  if(!http_server) {
+    return;
+  }
+
+  time_t now = time(NULL);
+  if(!force && now <= last_http_publish + http_publish_interval) {
+    return;
+  }
+  last_http_publish = now;
+
+  TIter next(&objects);
+  TObject* current;
+  while((current = next())) {
+    TDirectory* dir = dynamic_cast<TDirectory*>(current);
+    if(dir) {
+      TString folder = TString::Format("/histograms/%s", dir->GetName());
+      TIter dir_next(dir->GetList());
+      TObject* dir_object;
+      while((dir_object = dir_next())) {
+        RegisterLiveHttpObject(folder.Data(), dir_object);
+      }
+    } else {
+      RegisterLiveHttpObject("/histograms", current);
+    }
+  }
+}
+
 void TCompiledHistograms::Load(std::string libname) {
   TCompiledHistograms other(libname);
   swap_lib(other);
@@ -143,6 +226,7 @@ void TCompiledHistograms::Fill(TUnpackedEvent& detectors) {
 
   obj.SetDetectors(&detectors);
   func(obj);
+  PublishLiveHttp();
 }
 
 void TCompiledHistograms::AddCutFile(TFile* cut_file) {
@@ -169,4 +253,5 @@ void TCompiledHistograms::SetDefaultDirectory(TDirectory* dir) {
       hist->SetDirectory(dir);
     }
   }
+  PublishLiveHttp(true);
 }

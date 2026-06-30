@@ -1,6 +1,8 @@
 #ifndef TCLUSTER_H
 #define TCLUSTER_H
 
+#include <set>
+
 #include "TGretinaHit.h"
 
 #include "GRootFunctions.h"
@@ -217,4 +219,3 @@ class TCluster {
 
 
 #endif
-

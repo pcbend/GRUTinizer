@@ -1,5 +1,21 @@
 #include "ProgramPath.h"
 
+#ifdef __APPLE__
+
+#include <limits.h>
+#include <mach-o/dyld.h>
+
+std::string program_path(){
+  char buff[PATH_MAX];
+  uint32_t len = PATH_MAX;
+  _NSGetExecutablePath(buff, &len);
+
+  std::string exe_path = buff;
+  return exe_path.substr(0, exe_path.find_last_of('/'));
+}
+#endif
+
+
 #ifdef __linux__
 
 #include <unistd.h>

@@ -5,6 +5,7 @@
 #include <mutex>
 #endif
 #include <memory>
+#include <set>
 #include <string>
 
 #include "TObject.h"
@@ -16,11 +17,13 @@
 #include "TUnpackedEvent.h"
 
 class TFile;
+class THttpServer;
 
 class TCompiledHistograms : public TObject {
 public:
   TCompiledHistograms();
   TCompiledHistograms(std::string libname);
+  ~TCompiledHistograms();
 
   void Load(std::string libname);
   void Fill(TUnpackedEvent& detectors);
@@ -40,8 +43,12 @@ public:
 
   void Write();
 
+  void EnableLiveHttp(const std::string& server);
+  void PublishLiveHttp(bool force=false);
+
 
 private:
+  void RegisterLiveHttpObject(const char* folder, TObject* obj);
   void swap_lib(TCompiledHistograms& other);
   time_t get_timestamp();
   bool file_exists();
@@ -56,12 +63,16 @@ private:
   time_t last_checked;
 
   int check_every;
+  int http_publish_interval;
+  time_t last_http_publish;
 
   TList objects;
   TList gates;
   std::vector<TFile*> cut_files;
 
   TDirectory* default_directory;
+  THttpServer* http_server;
+  std::set<TObject*> http_registered_objects;
 
   TRuntimeObjects obj;
 

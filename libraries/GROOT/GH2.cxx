@@ -33,6 +33,7 @@
 
 #include "TF2.h"
 #include "TProfile.h"
+#include "TObjString.h"
 
 #include "TRandom.h"
 #include "THLimitsFinder.h"
@@ -167,7 +168,12 @@ Int_t GH2::BufferEmpty(Int_t action)
          if (y > ymax) ymax = y;
       }
       if (fXaxis.GetXmax() <= fXaxis.GetXmin() || fYaxis.GetXmax() <= fYaxis.GetXmin()) {
-         THLimitsFinder::GetLimitsFinder()->FindGoodLimits(this,xmin,xmax,ymin,ymax);
+         if (ymin >= ymax) {
+            ymin -= 0.5;
+            ymax += 0.5;
+         }
+         THLimitsFinder::GetLimitsFinder()->FindGoodLimits(this,xmin,xmax);
+         fYaxis.Set(fYaxis.GetNbins(),ymin,ymax);
       } else {
          fBuffer = 0;
          Int_t keep = fBufferSize; fBufferSize = 0;
@@ -3112,7 +3118,6 @@ std::map<int,double> GH2::FitSummary(double low,double high,int axis,Option_t *o
   printf("\n\n");
   return chan_area;
 }
-
 
 
 

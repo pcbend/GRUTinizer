@@ -23,6 +23,7 @@ THistogramLoop::THistogramLoop(std::string name)
     input_queue(std::make_shared<ThreadsafeQueue<TUnpackedEvent*> >()),
     output_queue(std::make_shared<ThreadsafeQueue<TUnpackedEvent*> >()) {
   LoadLib(TGRUTOptions::Get()->CompiledHistogramFile());
+  compiled_histograms.EnableLiveHttp(TGRUTOptions::Get()->LiveHttpServer());
 }
 
 THistogramLoop::~THistogramLoop() {
@@ -100,6 +101,7 @@ void THistogramLoop::Write() {
   if(output_file){
     output_file->cd();
     compiled_histograms.Write();
+    compiled_histograms.PublishLiveHttp(true);
     if(GValue::Size()) {
       GValue::Get()->Write();
       printf(BLUE "\t%i GValues written to file %s" RESET_COLOR "\n",GValue::Size(),gDirectory->GetName());

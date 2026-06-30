@@ -56,6 +56,19 @@ grutmore="-lTGRUTint -lTLoops -lTHistogramming "
 
 cflags="-std=c++11 -I$incdir -Wl,--no-as-needed"
 
+root_python_lib=""
+root_libdir=`root-config --libdir 2>/dev/null`
+if test -n "$root_libdir"; then
+  for root_python_candidate in ROOTTPython PyROOT; do
+    for root_python_suffix in so dylib dll; do
+      if test -e "$root_libdir/lib${root_python_candidate}.${root_python_suffix}"; then
+        root_python_lib="-l${root_python_candidate}"
+        break 2
+      fi
+    done
+  done
+fi
+
 
 
 usage="\
@@ -130,7 +143,7 @@ while test $# -gt 0; do
         continue
       fi
       rootout="yes"
-      out="$out `root-config --cflags --glibs` -lPhysics -lSpectrum -lPyROOT -lMinuit -lMathMore"
+      out="$out `root-config --cflags --glibs` -lPhysics -lSpectrum $root_python_lib -lRHTTP -lMinuit -lMathMore"
       ;;
     --libdir)
         if test "x$libdirout" = "xyes" ; then

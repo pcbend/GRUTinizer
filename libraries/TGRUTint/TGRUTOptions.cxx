@@ -32,6 +32,7 @@ void TGRUTOptions::Clear(Option_t* opt) {
   input_macro_files.clear();
 
   input_ring = "";
+  live_http_server = "";
 
   options_file.clear();
 
@@ -97,6 +98,8 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .description("Output file for raw filtered data");
   parser.option("hist-output",&output_histogram_file)
     .description("Output file for histograms");
+  parser.option("live-http",&live_http_server)
+    .description("Publish live histograms with ROOT THttpServer. Pass a port like 8080 or a ROOT HTTP engine string.");
   parser.option("r ring",&input_ring)
     .description("Input ring source (host/ringname).  Requires --format to be specified.");
   parser.option("l no-logo", &fShowLogo)
@@ -207,6 +210,11 @@ void TGRUTOptions::Load(int argc, char** argv) {
 
   if(output_histogram_file.length()>0 &&
      output_histogram_file != "none") {
+    fMakeHistos = true;
+  }
+  if(live_http_server.length()>0 &&
+     live_http_server != "none" &&
+     live_http_server != "off") {
     fMakeHistos = true;
   }
 

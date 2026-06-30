@@ -1,0 +1,86 @@
+function(grutinizer_apply_shared_library_settings target)
+  if(APPLE)
+    target_link_options(${target} PRIVATE -undefined dynamic_lookup)
+  endif()
+endfunction()
+
+function(grutinizer_linkdef_headers output_var linkdef)
+  set(headers)
+
+  if(EXISTS ${linkdef})
+    file(STRINGS ${linkdef} linkdef_header_line LIMIT_COUNT 1)
+    string(REGEX REPLACE "^//[ \t]*" "" linkdef_header_line "${linkdef_header_line}")
+    separate_arguments(linkdef_header_names UNIX_COMMAND "${linkdef_header_line}")
+
+    foreach(header_name ${linkdef_header_names})
+      set(header_path "${PROJECT_SOURCE_DIR}/include/${header_name}")
+      if(EXISTS ${header_path})
+        list(APPEND headers ${header_path})
+      else()
+        message(WARNING "Dictionary header ${header_name} listed by ${linkdef} was not found")
+      endif()
+    endforeach()
+  endif()
+
+  set(${output_var} ${headers} PARENT_SCOPE)
+endfunction()
+
+function(grutinizer_add_library target source_dir)
+  file(GLOB library_sources CONFIGURE_DEPENDS ${source_dir}/*.cxx)
+  add_library(${target} SHARED ${library_sources})
+  target_link_libraries(${target} PUBLIC grutinizer_common)
+  grutinizer_apply_shared_library_settings(${target})
+
+  set(linkdef ${source_dir}/LinkDef.h)
+  if(EXISTS ${linkdef})
+    grutinizer_linkdef_headers(dictionary_headers ${linkdef})
+    if(dictionary_headers)
+      root_generate_dictionary(G__${target}
+        ${dictionary_headers}
+        MODULE ${target}
+        LINKDEF ${linkdef}
+      )
+    endif()
+  endif()
+endfunction()
+
+function(grutinizer_add_plugins_from_directory)
+  set(options)
+  set(one_value_args DIRECTORY)
+  set(multi_value_args LINK_LIBRARIES EXCLUDE)
+  cmake_parse_arguments(ARG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+  file(GLOB plugin_sources CONFIGURE_DEPENDS ${ARG_DIRECTORY}/*.cxx)
+  foreach(plugin_source ${plugin_sources})
+    get_filename_component(plugin_name ${plugin_source} NAME_WE)
+    get_filename_component(plugin_filename ${plugin_source} NAME)
+    if(plugin_filename IN_LIST ARG_EXCLUDE)
+      continue()
+    endif()
+
+    add_library(${plugin_name} MODULE ${plugin_source})
+    target_link_libraries(${plugin_name} PRIVATE grutinizer_common ${ARG_LINK_LIBRARIES})
+    grutinizer_apply_shared_library_settings(${plugin_name})
+    set_target_properties(${plugin_name} PROPERTIES PREFIX "lib")
+  endforeach()
+endfunction()
+
+function(grutinizer_add_executables_from_directory)
+  set(options)
+  set(one_value_args DIRECTORY)
+  set(multi_value_args LINK_LIBRARIES EXCLUDE)
+  cmake_parse_arguments(ARG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+  file(GLOB executable_sources CONFIGURE_DEPENDS ${ARG_DIRECTORY}/*.cxx)
+  foreach(executable_source ${executable_sources})
+    get_filename_component(executable_name ${executable_source} NAME_WE)
+    get_filename_component(executable_filename ${executable_source} NAME)
+    if(executable_filename IN_LIST ARG_EXCLUDE)
+      continue()
+    endif()
+
+    add_executable(${executable_name} ${executable_source})
+    target_link_libraries(${executable_name} PRIVATE ${ARG_LINK_LIBRARIES})
+    add_dependencies(${executable_name} grutinizer_version grutinizer_runtime)
+  endforeach()
+endfunction()
