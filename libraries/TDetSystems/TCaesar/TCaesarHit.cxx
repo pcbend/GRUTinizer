@@ -8,7 +8,14 @@ TCaesarHit::TCaesarHit(const TCaesarHit &hit) {
   hit.Copy(*this);
 }
 
-void TCaesarHit::Copy(TObject& obj) const {
+TCaesarHit& TCaesarHit::operator=(const TCaesarHit& hit) {
+  if(this != &hit) {
+    hit.Copy(*this);
+  }
+  return *this;
+}
+
+void TCaesarHit::Copy(TCaesarHit& obj) const {
   TDetectorHit::Copy(obj);
 
   TCaesarHit& hit = (TCaesarHit&)obj;
@@ -19,6 +26,9 @@ void TCaesarHit::Copy(TObject& obj) const {
   hit.fRing = fRing;
   hit.numHitsContained = numHitsContained;
   hit.is_garbage_addback = is_garbage_addback;
+  hit.pos[0] = pos[0];
+  hit.pos[1] = pos[1];
+  hit.pos[2] = pos[2];
 }
 
 
@@ -67,7 +77,6 @@ void TCaesarHit::AddToSelf(const TCaesarHit& other) {
   numHitsContained++;
   TDetectorHit::SetEnergy(energy);
 }
-
 
 
 

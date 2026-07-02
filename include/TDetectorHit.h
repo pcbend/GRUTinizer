@@ -2,10 +2,10 @@
 #define _TDETECTORHIT_H_
 
 #include "TChannel.h"
-#include "TObject.h"
+#include "Rtypes.h"
 #include "TVector3.h"
 
-class TDetectorHit : public TObject {
+class TDetectorHit {
 public:
   TDetectorHit();
   virtual ~TDetectorHit();
@@ -13,10 +13,10 @@ public:
   virtual const char* GetName() const;
   virtual int         GetNumber() const;
 
-  virtual Int_t Compare(const TObject *obj) const; //needed for root containers
+  Int_t Compare(const TDetectorHit& obj) const;
   virtual bool IsSortable() const { return true; }
 
-  virtual void  Copy(TObject&) const;
+  void  Copy(TDetectorHit&) const;
   virtual void  Clear(Option_t *opt = "" );
   virtual void  Print(Option_t *opt = "" ) const;
 
@@ -59,7 +59,6 @@ protected:
   };
 
   ClassDef(TDetectorHit,4)
-  //ClassDef(TDetectorHit,0)
 
 };
 

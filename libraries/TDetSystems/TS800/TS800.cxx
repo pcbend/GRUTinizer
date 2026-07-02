@@ -10,15 +10,16 @@
 
 #include "TGEBEvent.h"
 #include "TGRUTOptions.h"
-#include "GH2I.h"
-#include "GRootCommands.h"
-#include "GCanvas.h"
+#include "TH2I.h"
+#include "TCanvas.h"
 
 #include "TChain.h"
 #include "TPad.h"
 #include "TROOT.h"
 
 #include "TInverseMap.h"
+
+extern TChain *gChain;
 
 bool TS800::fGlobalReset =false;
 
@@ -37,7 +38,7 @@ TS800::TS800() {
 TS800::~TS800(){
 }
 
-void TS800::Copy(TObject& obj) const {
+void TS800::Copy(TS800& obj) const {
   TDetector::Copy(obj);
 
   TS800& other = (TS800&)obj;
@@ -304,7 +305,7 @@ int TS800::BuildHits(std::vector<TRawEvent>& raw_data){
   return 1;
 }
 
-int TS800::BuildHits(UShort_t eventsize,UShort_t *dptr,Long64_t timestamp) {  //std::vector<TRawEvent>& raw_data){
+int TS800::BuildS800Packet(UShort_t eventsize,UShort_t *dptr,Long64_t timestamp) {
   SetTimestamp(timestamp);
   //int ptr = 0;
   //const TRawEvent::GEBS800Header *head = ((const TRawEvent::GEBS800Header*)event.GetPayload());
@@ -1446,9 +1447,9 @@ void TS800::DrawPID(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) 
 
   std::string name = Form("%s_PID",Class()->GetName()); //_%s",opt);
   std::string title = Form("%s PID AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJTAC_TOF_CORR_AFP"),GValue::Value("OBJTAC_TOF_CORR_XFP")); //_%s",opt);
-  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
+  TH2I *h = (TH2I*)gROOT->FindObject(name.c_str());
   if(!h)
-    h = new GH2I(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJTAC()",4096,0,4096,4000,0,4000);
+    h = new TH2I(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJTAC()",4096,0,4096,4000,0,4000);
   chain->Project(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJTAC()","","colz",nentries);
   h->GetXaxis()->SetTitle("Corrected TOF (objtac)");
   h->GetYaxis()->SetTitle("Ion Chamber Energy loss (arb. units)");
@@ -1471,9 +1472,9 @@ void TS800::DrawAFP(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain) 
 
   std::string name = Form("%s_AFP",Class()->GetName()); //_%s",opt);
   std::string title = Form("%s AFP AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJTAC_TOF_CORR_AFP"),GValue::Value("OBJTAC_TOF_CORR_XFP")); //_%s",opt);
-  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
+  TH2I *h = (TH2I*)gROOT->FindObject(name.c_str());
   if(!h)
-    h = new GH2I(name.c_str(),title.c_str(),2048,0,2048,4000,-0.1,0.1);
+    h = new TH2I(name.c_str(),title.c_str(),2048,0,2048,4000,-0.1,0.1);
   chain->Project(name.c_str(),"GetAFP():GetCorrTOF_OBJTAC()","","colz",nentries);
   h->GetXaxis()->SetTitle("Corrected TOF (objtac)");
   h->GetYaxis()->SetTitle("Corrected AFP (objtac)");
@@ -1498,9 +1499,9 @@ void TS800::DrawDispX(Option_t *gate,Option_t *opt,Long_t nentries,TChain *chain
 
   std::string name = Form("%s_DispX",Class()->GetName()); //_%s",opt);
   std::string title = Form("%s DispX AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJTAC_TOF_CORR_AFP"),GValue::Value("OBJTAC_TOF_CORR_XFP")); //_%s",opt);
-  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
+  TH2I *h = (TH2I*)gROOT->FindObject(name.c_str());
   if(!h)
-    h = new GH2I(name.c_str(),title.c_str(),4096,-2047,2048,4000,-300,300);
+    h = new TH2I(name.c_str(),title.c_str(),4096,-2047,2048,4000,-300,300);
   h->SetTitle(title.c_str());
   chain->Project(name.c_str(),"GetCrdc(0)->GetDispersiveX():GetCorrTOF_OBJTAC()","","colz",nentries);
   h->GetXaxis()->SetTitle("Corrected TOF (objtac)");
@@ -1546,9 +1547,9 @@ void TS800::DrawPID_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TCha
 
   std::string name = Form("%s_PID",Class()->GetName()); //_%s",opt);
   std::string title = Form("%s PID AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJ_MTOF_CORR_AFP"),GValue::Value("OBJ_MTOF_CORR_XFP")); //_%s",opt);
-  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
+  TH2I *h = (TH2I*)gROOT->FindObject(name.c_str());
   if(!h)
-    h = new GH2I(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJ_MESY()",4096,-4096,4096,4000,-4000,4000);
+    h = new TH2I(name.c_str(),"GetIonChamber()->GetSum():GetCorrTOF_OBJ_MESY()",4096,-4096,4096,4000,-4000,4000);
   chain->Project(name.c_str(),Form("GetIonChamber()->GetSum():GetCorrTOF_OBJ_MESY(%i)",i),"","colz",nentries);
   h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");
   h->GetYaxis()->SetTitle("Ion Chamber Energy loss (arb. units)");
@@ -1571,9 +1572,9 @@ void TS800::DrawAFP_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TCha
 
   std::string name = Form("%s_AFP",Class()->GetName()); //_%s",opt);
   std::string title = Form("%s AFP AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJ_MTOF_CORR_AFP"),GValue::Value("OBJ_MTOF_CORR_XFP")); //_%s",opt);
-  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
+  TH2I *h = (TH2I*)gROOT->FindObject(name.c_str());
   if(!h)
-    h = new GH2I(name.c_str(),title.c_str(),2048,-4096,2048,4000,-0.1,0.1);
+    h = new TH2I(name.c_str(),title.c_str(),2048,-4096,2048,4000,-0.1,0.1);
   chain->Project(name.c_str(),Form("GetAFP():GetCorrTOF_OBJ_MESY(%i)",i),"","colz",nentries);
   h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");
   h->GetYaxis()->SetTitle("Corrected AFP (Mesy)");
@@ -1598,9 +1599,9 @@ void TS800::DrawDispX_Mesy(Option_t *gate,Option_t *opt,Long_t nentries,int i,TC
 
   std::string name = Form("%s_DispX",Class()->GetName()); //_%s",opt);
   std::string title = Form("%s DispX AFP=%.01f XFP=%.02f",Class()->GetName(),GValue::Value("OBJ_MTOF_CORR_AFP"),GValue::Value("OBJ_MTOF_CORR_XFP")); //_%s",opt);
-  GH2I *h = (GH2I*)gROOT->FindObject(name.c_str());
+  TH2I *h = (TH2I*)gROOT->FindObject(name.c_str());
   if(!h)
-    h = new GH2I(name.c_str(),title.c_str(),4096,-4096,4096,4000,-300,300);
+    h = new TH2I(name.c_str(),title.c_str(),4096,-4096,4096,4000,-300,300);
   h->SetTitle(title.c_str());
   chain->Project(name.c_str(),Form("GetCrdc(0)->GetDispersiveX():GetCorrTOF_OBJ_MESY(%i)",i),"","colz",nentries);
   h->GetXaxis()->SetTitle("Corrected TOF (Mesy)");

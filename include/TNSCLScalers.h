@@ -12,7 +12,7 @@ public:
   TNSCLScalers(const TNSCLScalers&);
   virtual ~TNSCLScalers();
 
-  virtual void Copy(TObject&)          const;
+  virtual void Copy(TNSCLScalers&)     const;
   virtual void Print(Option_t *opt="") const;
   virtual void Clear(Option_t *opt="");
 

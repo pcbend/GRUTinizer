@@ -14,7 +14,7 @@ class TUML : public TDetector {
     TUML() { }
     ~TUML() { }
 
-    void Copy(TObject &obj) const { } //TDetector::Copy(obj); }
+    void Copy(TUML &obj) const { } //TDetector::Copy(obj); }
 
     void Clear(Option_t *opt="") { TDetector::Clear(opt); uml_hits.clear(); }
     

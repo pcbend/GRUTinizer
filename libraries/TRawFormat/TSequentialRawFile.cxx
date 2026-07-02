@@ -49,7 +49,7 @@ std::string TSequentialRawFile::GetLastError() const {
   if(active_source < sources.size()){
     return sources[active_source]->GetLastError();
   } else {
-    return 0;
+    return "";
   }
 }
 

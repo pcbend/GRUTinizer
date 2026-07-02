@@ -14,7 +14,6 @@
 #include "TKey.h"
 
 #include "GValue.h"
-#include "GRootCommands.h"
 #include "TPreserveGDirectory.h"
 
 typedef void* __attribute__((__may_alias__)) void_alias;

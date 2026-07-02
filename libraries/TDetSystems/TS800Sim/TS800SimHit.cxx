@@ -13,7 +13,7 @@ TS800SimHit::TS800SimHit(){ Clear(); }
 
 TS800SimHit::~TS800SimHit(){ }
 
-void TS800SimHit::Copy(TObject &rhs) const {
+void TS800SimHit::Copy(TS800SimHit &rhs) const {
   TDetectorHit::Copy(rhs);
   ((TS800SimHit&)rhs).fATA      = fATA;
   ((TS800SimHit&)rhs).fBTA      = fBTA;
@@ -24,8 +24,7 @@ void TS800SimHit::Copy(TObject &rhs) const {
 }
 
 const char *TS800SimHit::GetName() const {
-  std::string name = "name";
-  return name.c_str();
+  return "TS800SimHit";
 }
 
 void TS800SimHit::Print(Option_t *opt) const {
@@ -49,4 +48,3 @@ void TS800SimHit::Clear(Option_t *opt) {
 
  
 }
-

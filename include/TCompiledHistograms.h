@@ -18,9 +18,12 @@
 
 class TFile;
 class THttpServer;
+class TLiveHistogramWSHandler;
 
 class TCompiledHistograms : public TObject {
 public:
+  using TObject::Write;
+
   TCompiledHistograms();
   TCompiledHistograms(std::string libname);
   ~TCompiledHistograms();
@@ -41,7 +44,7 @@ public:
 
   void AddCutFile(TFile* cut_file);
 
-  void Write();
+  Int_t Write(const char* name = nullptr, Int_t option = 0, Int_t bufsize = 0);
 
   void EnableLiveHttp(const std::string& server);
   void PublishLiveHttp(bool force=false);
@@ -72,6 +75,7 @@ private:
 
   TDirectory* default_directory;
   THttpServer* http_server;
+  std::shared_ptr<TLiveHistogramWSHandler> live_ws_handler;
   std::set<TObject*> http_registered_objects;
 
   TRuntimeObjects obj;

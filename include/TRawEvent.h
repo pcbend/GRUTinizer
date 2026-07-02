@@ -12,7 +12,7 @@
 #include "TGRUTTypes.h"
 
 /// Class holding a single event.
-class TRawEvent : public TObject {
+class TRawEvent  { //: public TObject {
 
 public:
 #include "TRawBanks.h"
@@ -26,8 +26,8 @@ public:
   TRawEvent& operator=(const TRawEvent &);
 
   virtual void  Clear(Option_t *opt ="");
-  virtual Int_t Compare(const TObject&) const;
-  virtual void  Copy(TObject&) const;
+  virtual Int_t Compare(const TRawEvent&) const;
+  virtual void  Copy(TRawEvent&) const;
   virtual void  Print(Option_t *opt ="")  const;
 
   RawHeader *GetRawHeader();

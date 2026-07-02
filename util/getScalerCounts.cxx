@@ -60,13 +60,11 @@ void getScalerCounts(char *input_root_file_name){
   int raw_clock = scaler_32.at(11);
   int live_trigger = scaler_32.at(10);
   int raw_trigger = scaler_32.at(9);
-  int second_source = scaler_32.at(1);
 
   live_clock     += scaler_32_overflows.at(12)*pow(2.,24.);
   raw_clock      += scaler_32_overflows.at(11)*pow(2.,24.);
   live_trigger   += scaler_32_overflows.at(10)*pow(2.,24.);
   raw_trigger    += scaler_32_overflows.at(9)*pow(2.,24.);
-  second_source  += scaler_32_overflows.at(1)*pow(2.,24.);
   std::cout << "raw.clock\tlive.clock\traw.trigger\tlive.trigger" << std::endl;
   std::cout << raw_clock   << "\t" << live_clock   <<"\t"
             << raw_trigger << "\t" << live_trigger 

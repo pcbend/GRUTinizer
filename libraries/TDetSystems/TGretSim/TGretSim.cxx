@@ -12,7 +12,7 @@ TGretSim::TGretSim(){
 
 TGretSim::~TGretSim() {}
 
-void TGretSim::Copy(TObject& obj) const {
+void TGretSim::Copy(TGretSim& obj) const {
   TDetector::Copy(obj);
 
   TGretSim& gretsim = (TGretSim&)obj;

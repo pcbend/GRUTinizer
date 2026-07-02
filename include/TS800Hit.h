@@ -1,7 +1,6 @@
 #ifndef TSEIGHTHUNDRADHIT_H
 #define TSEIGHTHUNDRADHIT_H
 
-#include <TObject.h>
 #include <TClass.h>
 #include <iostream>
 
@@ -38,7 +37,7 @@ class TS800Channel : public TDetectorHit {
 
     virtual void Clear(Option_t *opt="")       { TDetectorHit::Clear(opt); fValue = 0; }
     virtual void Print(Option_t *opt="") const { printf("[%i] = %i\n",GetId(),GetValue());}
-    virtual void Copy(TObject &obj)      const { TDetectorHit::Copy(obj); ((TS800Channel&)obj).fValue = fValue; }
+    virtual void Copy(TS800Channel &obj)      const { TDetectorHit::Copy(obj); obj.fValue = fValue; }
 
     virtual int  Charge() const { return GetValue(); }
 
@@ -66,7 +65,7 @@ class TTrigger : public TDetectorHit {
     short GetExternalSource2()  const { return fexternalsource2; }
     short GetSecondarySource()  const { return fsecondarysource; }
 
-    virtual void Copy(TObject &)         const;
+    virtual void Copy(TTrigger &)         const;
     virtual void Print(Option_t *opt="") const;
     virtual void Clear(Option_t *opt="");
 
@@ -103,7 +102,7 @@ class TTof : public TDetectorHit { // S800 Time of Flight
     short GetTacXFP()                     { return ftac_xfp;}  // tac!
 
 
-    virtual void Copy(TObject &)         const;
+    virtual void Copy(TTof &)         const;
     virtual void Print(Option_t *opt="") const;
     virtual void Clear(Option_t *opt="");
 
@@ -154,7 +153,7 @@ class TCrdc : public TDetectorHit {
     int GetMaxPad() const;
     int GetMaxPadSum() const;
 
-    virtual void Copy(TObject&) const;
+    virtual void Copy(TCrdc&) const;
     virtual void Print(Option_t *opt="") const;
     virtual void Clear(Option_t *opt="");
 
@@ -204,7 +203,7 @@ class TScintillator : public TDetectorHit {
     float GetTimeUp()   { return fTime_up;   }
     float GetTimeDown() { return fTime_down; }
 
-    virtual void Copy(TObject&) const;
+    virtual void Copy(TScintillator&) const;
     virtual void Print(Option_t *opt="") const;
     virtual void Clear(Option_t *opt="");
 
@@ -247,7 +246,7 @@ class TIonChamber : public TDetectorHit {
       }
     }
 
-    virtual void Copy(TObject&) const;
+    virtual void Copy(TIonChamber&) const;
     virtual void Print(Option_t *opt="") const;
     virtual void Clear(Option_t *opt="");
     int Charge() const { int sum=0;for(int i=0;i<Size();i++)sum+=GetData(i);return sum;}
@@ -271,6 +270,8 @@ class TIonChamber : public TDetectorHit {
 
 class TTOFHit :  public TS800Channel {
   public:
+    using TS800Channel::Copy;
+
     TTOFHit()  {  }
     TTOFHit(const TTOFHit &tof) : TS800Channel(tof) { tof.Copy(*this); }
     TTOFHit(short value) : TS800Channel(value)          {  }
@@ -287,7 +288,7 @@ class TTOFHit :  public TS800Channel {
 
     virtual void Clear(Option_t *opt="")       { TS800Channel::Clear(opt);              }
     virtual void Print(Option_t *opt="") const { printf("TOF");TS800Channel::Print(opt);}
-    virtual void Copy(TObject &obj)      const { TS800Channel::Copy(obj);             }
+    virtual void Copy(TTOFHit &obj)      const { TS800Channel::Copy(obj);             }
 
   ClassDef(TTOFHit,1);
 };
@@ -295,13 +296,15 @@ class TTOFHit :  public TS800Channel {
 
 class THodoHit : public TS800Channel {
   public:
+    using TS800Channel::Copy;
+
     THodoHit() { Clear(); }
     THodoHit(short chan,short value) { SetChannel(chan); Set(value); }
     ~THodoHit() { };
 
     virtual void Clear(Option_t *opt="")       { TS800Channel::Clear(opt); fChannel=-1; }
     virtual void Print(Option_t *opt="") const { printf("HODO"); }
-    virtual void Copy(TObject &obj)      const { TS800Channel::Copy(obj); ((THodoHit&)obj).fChannel = fChannel; }
+    virtual void Copy(THodoHit &obj)      const { TS800Channel::Copy(obj); obj.fChannel = fChannel; }
 
     void SetChannel(short chan) { fChannel = chan;  }
     short GetId()      const { return GetChannel(); }
@@ -317,6 +320,8 @@ class THodoHit : public TS800Channel {
 
 class TFPScint :  public TS800Channel {
   public:
+    using TS800Channel::Copy;
+
     TFPScint()  {  }
     TFPScint(const TFPScint &fpscint) : TS800Channel(fpscint) { fpscint.Copy(*this); }
     TFPScint(short charge,short time):TS800Channel(charge),fTime((unsigned short)time) {  }
@@ -340,7 +345,7 @@ class TFPScint :  public TS800Channel {
 
     virtual void Clear(Option_t *opt="")       { TS800Channel::Clear(opt); fTime = 0;   }
     virtual void Print(Option_t *opt="") const { printf("FPScint");TS800Channel::Print(opt);}
-    virtual void Copy(TObject &obj)      const { TS800Channel::Copy(obj);  }
+    virtual void Copy(TFPScint &obj)      const { TS800Channel::Copy(obj);  }
   private:
 
    unsigned short fTime;
@@ -355,7 +360,7 @@ class TIonChamber : public TS800Channel {
     TIonChamber(short value):TS800Channel(value) { }
     virtual void Clear(Option_t *opt="")       { TS800Channel::Clear(opt);    }
     virtual void Print(Option_t *opt="") const { printf("Ion Chamber");TS800Channel::Print(opt);}
-    virtual void Copy(TObject &obj)      const { TS800Channel::Copy(obj);  }
+    virtual void Copy(TS800Hit &obj)      const { TS800Channel::Copy(obj);  }
   private:
     ClassDef(TIonChamber,1)
 };
@@ -367,7 +372,7 @@ class TMTof : public TDetectorHit {
     ~TMTof();
     TMTof(const TMTof&);
 
-    virtual void Copy(TObject&) const;
+    virtual void Copy(TMTof&) const;
     virtual void Print(Option_t *opt="") const;
     virtual void Clear(Option_t *opt="");
 
@@ -456,7 +461,7 @@ class TCrdcPad : public TDetectorHit {
 
     virtual void Clear(Option_t *opt="");
     virtual void Print(Option_t *opt="") const;
-    virtual void Copy(TObject &obj)      const;
+    virtual void Copy(TCrdcPad &obj)      const;
 
   private:
     short fChannel;
@@ -479,7 +484,7 @@ class TS800Hit : public TDetectorHit {
 
     virtual void Clear(Option_t *opt ="")       { TDetectorHit::Clear(opt); }
     virtual void Print(Option_t *opt ="") const {  }
-    virtual void Copy(TObject &obj)       const { TDetectorHit::Copy(obj);  }
+    virtual void Copy(TS800Hit &obj)       const { TDetectorHit::Copy(obj);  }
 
   private:
 

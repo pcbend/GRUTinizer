@@ -12,7 +12,7 @@ TS800Sim::TS800Sim(){
 
 TS800Sim::~TS800Sim() {}
 
-void TS800Sim::Copy(TObject& obj) const {
+void TS800Sim::Copy(TS800Sim& obj) const {
   TDetector::Copy(obj);
 
   TS800Sim& s800sim = (TS800Sim&)obj;

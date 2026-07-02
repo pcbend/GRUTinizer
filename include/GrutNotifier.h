@@ -3,11 +3,12 @@
 
 #ifndef __CINT__
 #include <functional>
+#include <vector>
 #endif
 
 #include "TNamed.h"
 
-#include "GRootCommands.h"
+class TChain;
 
 class GrutNotifier : public TNamed {
   public:
@@ -17,6 +18,7 @@ class GrutNotifier : public TNamed {
     virtual void Print(Option_t *opt="") const { }
     virtual void Clear(Option_t *opt="") { }
     virtual bool Notify();
+    void SetChain(TChain* chain) { fChain = chain; }
 
     #ifdef __CINT__
     static void AddCallback(void (*func)());
@@ -37,6 +39,8 @@ class GrutNotifier : public TNamed {
     #ifndef __CINT__
     std::vector<std::function<void()> > callbacks;
     #endif
+
+    TChain* fChain;
     
     static GrutNotifier *fGrutNotifier;
 
@@ -44,4 +48,3 @@ class GrutNotifier : public TNamed {
 };
 
 #endif
-

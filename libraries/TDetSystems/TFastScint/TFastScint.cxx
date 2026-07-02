@@ -21,7 +21,7 @@ TFastScint::~TFastScint(){
   //delete fs_hits;
 }
 
-void TFastScint::Copy(TObject& obj) const {
+void TFastScint::Copy(TFastScint& obj) const {
   TDetector::Copy(obj);
 
   TFastScint& fs = (TFastScint&)obj;
@@ -145,7 +145,6 @@ int TFastScint::Build_From(TRawEvent &event){
   bool isQ = false;
   bool isT = false;
   
-  Int_t words_processed = 0;
   //Int_t detNumber = -1;
 
   // Payload size in 32 bit words.
@@ -163,7 +162,7 @@ int TFastScint::Build_From(TRawEvent &event){
 
   for(Int_t i = 0; i <PayloadSize; i++ ){ 
     const TRawEvent::Mesy_Word* Mword = (TRawEvent::Mesy_Word*)data;
-    data+=sizeof(TRawEvent::Mesy_Word); words_processed++;
+    data+=sizeof(TRawEvent::Mesy_Word);
     
     if(Mword->isHeader()){ // Header
       const TRawEvent::Mesy_Header* Mhead = (TRawEvent::Mesy_Header*)Mword;
@@ -268,5 +267,4 @@ TVector3 &TFastScint::GetPosition(int detector) {
   }
   return fFastScintDetectorMap.at(detector);
 }
-
 

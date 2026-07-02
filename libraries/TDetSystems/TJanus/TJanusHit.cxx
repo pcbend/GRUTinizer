@@ -1,10 +1,7 @@
 #include "TJanusHit.h"
 
-#include <mutex>
-
 #include "GValue.h"
 #include "TJanus.h"
-#include "TReaction.h"
 
 TJanusHit::TJanusHit(const TJanusHit& hit) {
   hit.Copy(*this);
@@ -15,7 +12,7 @@ TJanusHit& TJanusHit::operator=(const TJanusHit& hit) {
   return *this;
 }
 
-void TJanusHit::Copy(TObject& obj) const {
+void TJanusHit::Copy(TJanusHit& obj) const {
   TDetectorHit::Copy(obj);
 
   TJanusHit& hit = (TJanusHit&)obj;
@@ -94,20 +91,4 @@ TVector3 TJanusHit::GetPosition(bool apply_array_offset) const {
                        GValue::Value("Janus_Z_offset"));
   }
   return output;
-}
-
-TVector3 TJanusHit::GetConjugateDirection() const {
-  static std::mutex mutex;
-  std::lock_guard<std::mutex> lock(mutex);
-
-  static TReaction reac("78Kr","208Pb","78Kr","208Pb",3.9*78);
-
-  TVector3 pos = GetPosition();
-
-  // Convert from 208Pb angle to 78Kr angle
-  double theta_78kr = reac.ConvertThetaLab(pos.Theta(), 3, 2);
-
-  pos.SetTheta(theta_78kr);
-  pos.SetPhi(pos.Phi() + 3.1415926535);
-  return pos;
 }

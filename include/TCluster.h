@@ -1,11 +1,11 @@
 #ifndef TCLUSTER_H
 #define TCLUSTER_H
 
-#include <set>
-
 #include "TGretinaHit.h"
 
 #include "GRootFunctions.h"
+
+#include<set>
 
 #define CLUSTER_ANGLE 0.383972
 //22 degrees in rad. 
@@ -96,6 +96,8 @@ class TInteractionPoint {
 
 class TClusterPoint : public TInteractionPoint {
   public:
+    using TInteractionPoint::GetPosition;
+
     TClusterPoint();  
     TClusterPoint(TGretinaHit &hit, TInteractionPoint &ip);
     virtual ~TClusterPoint();  
@@ -109,7 +111,8 @@ class TClusterPoint : public TInteractionPoint {
     double GetT0()        const { return fT0;                         }
     int    GetPad()       const { return fPad;                        }
     int    GetXtal()      const { return fXtalId;                     }
-
+    int    GetId()        const { return fXtalId;                     }
+    
     int    GetWedge()     const { return GetSegNum()%6;               }  //returns 0-5  
     int    GetLayer()     const { return GetSegNum()/6;               }
 
@@ -156,13 +159,17 @@ class TCluster {
     TClusterPoint GetPoint(int i) const { return fClusterPoints.at(i); }
     TVector3 GetCenterOfMass()    const { return fCenterOfMass; }
     TVector3 GetPosition()        const { return fClusterPoints.front().GetPosition(); }
-    double GetEnergy()            const { return fEnergySum; }
+    double GetEnergy()            const { return fEnergySum; }  //TODO - check energysum and make sure it is calibrated.
     double GetTime()              const { return fClusterPoints.front().GetTime(); }
-    int GetXtal(int i=0)          const { return fClusterPoints.at(i).GetXtal(); }
     int GetWedge(int i=0)         const { return fClusterPoints.at(i).GetWedge(); }
+    int GetXtal(int i=0)          const { return fClusterPoints.at(i).GetXtal(); }
+    int GetId(int i=0)            const { return GetXtal(i); }
     //int UniqueXtals()             const; //determine the number of xtals in the cluster 
     int UniqueXtals()             const { return fXtals.size(); } 
                                      //determine the number of xtals in the cluster 
+  
+    static const TVector3 BeamUnitVec; //!
+    double GetDoppler(double beta,const TVector3 *vec=0) const;
     
     void Add(TClusterPoint &cp)    {  // inserts an Cluster Point into the Cluster, book keeps 
       if(Size()==0) {
@@ -193,11 +200,19 @@ class TCluster {
     double GetFOM() const { return fFOM; }
     void   SetFOM(double fom) { fFOM=fom; }
 
-    double GetTheta() const { return fTheta; }
-    void   SetTheta(double theta) { fTheta=theta; }
+    //double GetTheta() const { return fTheta; }
+    //void   SetTheta(double theta) { fTheta=theta; }
+
+    double GetTheta()    const { return fClusterPoints.size()>0 ?  fClusterPoints.at(0).GetPosition().Theta()        : sqrt(-1); }             
+    double GetPhi()      const { return fClusterPoints.size()>0 ?  fClusterPoints.at(0).GetPosition().Phi()        : sqrt(-1); }             
+    double GetPhiDeg()   const { return fClusterPoints.size()>0 ?  fClusterPoints.at(0).GetPhi()*TMath::RadToDeg()   : sqrt(-1); }       
+    double GetThetaDeg() const { return fClusterPoints.size()>0 ?  fClusterPoints.at(0).GetTheta()*TMath::RadToDeg() : sqrt(-1); }   
+
 
     double GetKN() const { return fKN; }
     void   SetKN(double kn) { fKN=kn; }
+    
+    double GetXi(const TVector3* beam, int p1, int p2) const;
  
   private:
     double fEnergySum;

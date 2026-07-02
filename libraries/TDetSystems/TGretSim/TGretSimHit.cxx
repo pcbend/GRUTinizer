@@ -13,7 +13,7 @@ TGretSimHit::TGretSimHit(){ Clear(); }
 
 TGretSimHit::~TGretSimHit(){ }
 
-void TGretSimHit::Copy(TObject &rhs) const {
+void TGretSimHit::Copy(TGretSimHit &rhs) const {
   TDetectorHit::Copy(rhs);
   ((TGretSimHit&)rhs).fEnergy      = fEnergy;
   ((TGretSimHit&)rhs).fPosit       = fPosit;
@@ -25,8 +25,7 @@ void TGretSimHit::Copy(TObject &rhs) const {
 }
 
 const char *TGretSimHit::GetName() const {
-  std::string name = "name";
-  return name.c_str();
+  return "TGretSimHit";
 }
 
 void TGretSimHit::Print(Option_t *opt) const {
@@ -53,4 +52,3 @@ void TGretSimHit::Clear(Option_t *opt) {
   fHitNum=sqrt(-1);
  
 }
-

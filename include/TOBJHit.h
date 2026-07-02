@@ -3,14 +3,14 @@
 
 #include <TVector3.h>
 #include <TDetectorHit.h>
-#include <GH1D.h>
+#include <TH1D.h>
 
 class TOBJHit : public TDetectorHit {
   public:
     TOBJHit() : htrace(nullptr),ttrace(nullptr),etrace(nullptr),pileup(false) { }
     ~TOBJHit() { }
 
-    virtual void Copy(TObject& obj) const        { TDetectorHit::Copy(obj); }
+    virtual void Copy(TOBJHit& obj) const        { TDetectorHit::Copy(obj); }
     virtual void Clear(Option_t *opt = "");//    { TDetectorHit::Clear(opt); }
     virtual void Print(Option_t *opt = "") const { TDetectorHit::Print(opt); }
     //virtual void Draw(Option_t* opt = "")        { TDetectorHit::Draw(opt); }
@@ -48,9 +48,9 @@ class TOBJHit : public TDetectorHit {
     std::vector<unsigned short> fTrace;
     std::vector<Double_t> fETrace;
     std::vector<Double_t> fTTrace;
-    GH1D *htrace; //!
-    GH1D *ttrace; //!
-    GH1D *etrace; //!
+    TH1D *htrace; //!
+    TH1D *ttrace; //!
+    TH1D *etrace; //!
     Bool_t  pileup;
     Double_t fEnergy;
     Double_t PeakSample;

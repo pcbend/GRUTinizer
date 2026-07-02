@@ -6,8 +6,8 @@
 #include "TGRUTOptions.h"
 #include "TChannel.h"
 
-#include "GH1D.h"
-#include "GCanvas.h"
+#include "TH1D.h"
+#include "TCanvas.h"
 
 ClassImp(TMode3Hit)
 
@@ -87,7 +87,7 @@ void TMode3Hit::BuildFrom(TSmartBuffer& buf){
 
 
 
-void TMode3Hit::Copy(TObject& obj) const {
+void TMode3Hit::Copy(TMode3Hit& obj) const {
   TDetectorHit::Copy(obj);
 
   TMode3Hit& mode3 = (TMode3Hit&)obj;
@@ -151,13 +151,13 @@ void TMode3Hit::Draw(Option_t *opt) const {
     return;
   TString option = opt;
   if(!gPad || option.Contains("new",TString::kIgnoreCase)) {
-    new GCanvas;
+    new TCanvas;
   } else {
     gPad->Clear();
   }
   //double avg = AverageWave(10);
   
-  GH1D wave("wave",Form("0x%08x",Address()),(int)waveform.size(),0,(double)waveform.size());
+  TH1D wave("wave",Form("0x%08x",Address()),(int)waveform.size(),0,(double)waveform.size());
   for(unsigned int x=0;x<waveform.size();x++) 
     wave.Fill(x,waveform.at(x));
   wave.DrawCopy(opt);

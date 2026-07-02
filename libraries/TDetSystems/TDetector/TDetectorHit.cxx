@@ -12,14 +12,12 @@ ClassImp(TDetectorHit)
 const TVector3 TDetectorHit::BeamUnitVec(0,0,1);
 
 TDetectorHit::TDetectorHit() {
-  Class()->CanIgnoreTObjectStreamer();
   Clear();
 }
 
 TDetectorHit::~TDetectorHit() { }
 
 void TDetectorHit::Clear(Option_t *opt) {
-  TObject::Clear(opt);
   fAddress = -1;
   fCharge = -1;
   fTime = -1;
@@ -29,10 +27,7 @@ void TDetectorHit::Clear(Option_t *opt) {
 
 void TDetectorHit::Print(Option_t *opt) const { }
 
-void TDetectorHit::Copy(TObject& obj) const {
-  TObject::Copy(obj);
-
-  TDetectorHit& hit = (TDetectorHit&)obj;
+void TDetectorHit::Copy(TDetectorHit& hit) const {
   hit.fAddress = fAddress;
   hit.fCharge = fCharge;
   hit.fTime = fTime;
@@ -87,11 +82,10 @@ double TDetectorHit::GetTime() const {
 }
 
 
-Int_t TDetectorHit::Compare(const TObject *obj) const {
-  const TDetectorHit* other = (const TDetectorHit*)obj;
-  if(GetEnergy() < other->GetEnergy()) {
+Int_t TDetectorHit::Compare(const TDetectorHit& other) const {
+  if(GetEnergy() < other.GetEnergy()) {
     return -1;
-  } else if (GetEnergy() > other->GetEnergy()) {
+  } else if (GetEnergy() > other.GetEnergy()) {
     return +1;
   } else {
     return 0;

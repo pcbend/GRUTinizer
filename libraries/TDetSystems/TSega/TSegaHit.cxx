@@ -5,17 +5,17 @@
 
 #include "TString.h"
 
-#include "GCanvas.h"
+#include "TCanvas.h"
 #include "GValue.h"
 #include "TSega.h"
 
-#include <GH1D.h>
+#include <TH1D.h>
 
 TSegaHit::TSegaHit() {
   Clear();
 }
 
-void TSegaHit::Copy(TObject& obj) const{
+void TSegaHit::Copy(TSegaHit& obj) const{
   TDetectorHit::Copy(obj);
 
   TSegaHit& sega = (TSegaHit&)obj;
@@ -25,7 +25,7 @@ void TSegaHit::Copy(TObject& obj) const{
 void TSegaHit::Draw(Option_t* opt) {
   TString option = opt;
   if(!gPad || option.Contains("new", TString::ECaseCompare::kIgnoreCase)) {
-    new GCanvas;
+    new TCanvas;
   } else {
     gPad->Clear();
   }
@@ -57,7 +57,7 @@ void TSegaHit::DrawTrace(int segnum) {
     return;
   }
 
-  GH1D hist("sega_wave", "", trace->size(), 0, 10*trace->size());
+  TH1D hist("sega_wave", "", trace->size(), 0, 10*trace->size());
   hist.SetStats(false);
 
   if(segnum==0){

@@ -3,8 +3,8 @@
 #include "TGEBEvent.h"
 
 
-#include "GH1D.h"
-#include "GCanvas.h"
+#include "TH1D.h"
+#include "TCanvas.h"
 
 TMode3::TMode3(){
   //mode3_hits = new TClonesArray("TMode3Hit");
@@ -15,7 +15,7 @@ TMode3::~TMode3() {
   //delete mode3_hits;
 }
 
-void TMode3::Copy(TObject& obj) const {
+void TMode3::Copy(TMode3& obj) const {
   TDetector::Copy(obj);
 
   TMode3& mode3 = (TMode3&)obj;
@@ -52,7 +52,7 @@ void TMode3::Print(Option_t *opt) const {
   TString sopt(opt);
   sopt.ToLower();
  
-  printf("TMode3;  %i total hits:\n",Size());
+  printf("TMode3;  %zu total hits:\n",Size());
   printf(" @ %lu \n",Timestamp());
   
   if(sopt.Contains("all")) {
@@ -74,11 +74,10 @@ void TMode3::Draw(Option_t *opt) const {
     return;
   TString option = opt;
   if(!gPad || option.Contains("new",TString::kIgnoreCase)) {
-    new GCanvas;
+    new TCanvas;
   } else {
     gPad->Clear();
   }
-  int total_bins =0;
   std::vector<double> segdata;
   std::vector<double> coredata;
   for(size_t i=0;i<Size();i++) {
@@ -95,12 +94,10 @@ void TMode3::Draw(Option_t *opt) const {
 
     } 
   }
-  GH1D seg("seghist","seghist",segdata.size(),0,segdata.size());
+  TH1D seg("seghist","seghist",segdata.size(),0,segdata.size());
   for(unsigned int i=0;i<segdata.size();i++) {
     seg.Fill(i,segdata.at(i));
   }
   seg.DrawCopy(opt);
 
 }
-
-

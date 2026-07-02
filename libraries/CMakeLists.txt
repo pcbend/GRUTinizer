@@ -1,12 +1,8 @@
+grutinizer_add_library(TGRUTSupport ${CMAKE_CURRENT_SOURCE_DIR}/TGRUTSupport)
 grutinizer_add_library(TGRUTUtil ${CMAKE_CURRENT_SOURCE_DIR}/TGRUTUtil)
 grutinizer_add_library(TRawFormat ${CMAKE_CURRENT_SOURCE_DIR}/TRawFormat)
-grutinizer_add_library(GROOT ${CMAKE_CURRENT_SOURCE_DIR}/GROOT)
 grutinizer_add_library(TNSCLFormat ${CMAKE_CURRENT_SOURCE_DIR}/TNSCLFormat)
 grutinizer_add_library(TGEBFormat ${CMAKE_CURRENT_SOURCE_DIR}/TGEBFormat)
-grutinizer_add_library(TNucleus ${CMAKE_CURRENT_SOURCE_DIR}/TNucleus)
-grutinizer_add_library(TKinematics ${CMAKE_CURRENT_SOURCE_DIR}/TKinematics)
-grutinizer_add_library(TReaction ${CMAKE_CURRENT_SOURCE_DIR}/TReaction)
-grutinizer_add_library(TSRIM ${CMAKE_CURRENT_SOURCE_DIR}/TSRIM)
 
 grutinizer_add_library(TDetector ${CMAKE_CURRENT_SOURCE_DIR}/TDetSystems/TDetector)
 grutinizer_add_library(TNSCLScalers ${CMAKE_CURRENT_SOURCE_DIR}/TDetSystems/TNSCLScalers)
@@ -29,15 +25,11 @@ grutinizer_add_library(THistogramming ${CMAKE_CURRENT_SOURCE_DIR}/THistogramming
 grutinizer_add_library(TGRUTint ${CMAKE_CURRENT_SOURCE_DIR}/TGRUTint)
 
 set(GRUTINIZER_LIBRARY_TARGETS
+  TGRUTSupport
   TGRUTUtil
   TRawFormat
-  GROOT
   TNSCLFormat
   TGEBFormat
-  TNucleus
-  TKinematics
-  TReaction
-  TSRIM
   TDetector
   TNSCLScalers
   TSega

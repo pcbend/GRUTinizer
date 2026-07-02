@@ -29,7 +29,7 @@ public:
   TCaesar();
   virtual ~TCaesar();
 
-  void Copy(TObject& obj) const;
+  void Copy(TCaesar& obj) const;
   virtual void InsertHit(const TDetectorHit&);
 
   virtual void Print(Option_t* opt="") const; 

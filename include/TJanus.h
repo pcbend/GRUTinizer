@@ -9,7 +9,7 @@ public:
   TJanus();
   virtual ~TJanus();
 
-  void Copy(TObject& obj) const;
+  void Copy(TJanus& obj) const;
 
   virtual void Clear(Option_t* opt = "");
   virtual void Print(Option_t* opt = "") const;
@@ -33,9 +33,6 @@ public:
   typedef std::vector<TJanusHit>::iterator iterator;
   iterator begin() { return janus_hits.begin(); }
   iterator end() { return janus_hits.end(); }
-
-  static double GetBeta(double betamax, double kr_angle_rad, bool energy_loss=false, double collision_pos=0.5);
-  static double SimAngle();
 
   size_t Size() const { return janus_hits.size(); }
 

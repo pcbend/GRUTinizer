@@ -5,13 +5,9 @@
 
 #include "TH2.h"
 #include "TCutG.h"
-//#include "GCanvas.h"
 #include "TMath.h"
 #include "TStyle.h"
 #include "TPaveStats.h"
-
-#include "TNucleus.h"
-#include "GRootCommands.h"
 
 ClassImp(TPhosWall)
 
@@ -28,10 +24,10 @@ TPhosWall::TPhosWall() {
 TPhosWall::~TPhosWall() { }
 
 
-void TPhosWall::Copy(TObject &rhs) const {
+void TPhosWall::Copy(TPhosWall &rhs) const {
   TDetector::Copy(rhs);
 
-  TPhosWall det = (TPhosWall&)rhs;
+  TPhosWall& det = rhs;
 
   det.phoswall_hits = phoswall_hits;
   det.fTimestamp    = fTimestamp;
@@ -339,33 +335,6 @@ void TPhosWall::DrawPID(Option_t *gate,Option_t *opt,Long_t nentries,TChain *cha
   //chain->Draw("phoswall_hits.C():phoswall_hits.B()","","colz",10000);
 }
 */
-
-TVector3 TPhosWall::GetKinVector(Double_t E_ejec,Double_t E_beam,const char *beam,const char *recoil, const char *ejec) {
-  TNucleus nbeam(beam);
-  TNucleus nejec(ejec);
-  TNucleus nrecoil(recoil);
-  return GetKinVector(E_beam,E_ejec,nbeam,nrecoil,nejec);
-}
-
-TVector3 TPhosWall::GetKinVector(Double_t E_ejec,Double_t E_beam,TNucleus &beam,TNucleus &recoil, TNucleus &ejec) {
-
-  double v_beam = sqrt(2*E_beam/beam.GetMass());
-  double p_beam = beam.GetMass()*v_beam;
-
-  double v_ejec = sqrt(2*E_ejec/ejec.GetMass());
-  double p_ejec = ejec.GetMass()*v_ejec;
-
-  double p_recoil     = sqrt(pow(p_beam-p_ejec*GetHitPosition().CosTheta(),2) + pow(p_ejec*TMath::Sin(GetHitPosition().Theta()),2));
-  double theta_recoil = TMath::ASin((p_ejec/p_recoil)*TMath::Sin(GetHitPosition().Theta()));
-  double phi_recoil   = GetHitPosition().Phi();
-  if(phi_recoil<TMath::Pi())
-    phi_recoil += TMath::Pi();
-  else if(phi_recoil > TMath::Pi())
-    phi_recoil -= TMath::Pi();
-  TVector3 v;
-  v.SetMagThetaPhi(1,theta_recoil,phi_recoil);
-  return v;
-}
 
 int TPhosWall::IsInside(Option_t *opt) const {
   if(!gates.GetSize() || !Size())

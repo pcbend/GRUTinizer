@@ -15,7 +15,7 @@ TS800Scaler::TS800Scaler(const TS800Scaler& scale ) : TDetector(scale) { scale.C
 
 TS800Scaler::~TS800Scaler() { }
 
-void TS800Scaler::Copy(TObject& obj) const {
+void TS800Scaler::Copy(TS800Scaler& obj) const {
   TDetector::Copy(obj);
   ((TS800Scaler&)obj).scalers = scalers;
 }
@@ -66,6 +66,8 @@ int TS800Scaler::BuildHits(std::vector<TRawEvent>& raw_data) {
 void TS800Scaler::InsertHit(const TDetectorHit&) { }
 
 TDetectorHit& TS800Scaler::GetHit(int i) {
+  (void)i;
+  static TDetectorHit dummy;
   std::cout << __PRETTY_FUNCTION__ << " should never be called" << std::endl;
-  return *(TDetectorHit*)0;
+  return dummy;
 }

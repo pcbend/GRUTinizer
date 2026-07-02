@@ -14,7 +14,7 @@ public:
 
   void Clear(Option_t* opt = "");
   void Print(Option_t* opt = "") const;
-  void Copy(TObject& obj) const;
+  void Copy(TJanusHit& obj) const;
 
   void SetADCOverflowBit(bool bit)   { fEnergyOverflowBit = bit; }
   void SetADCUnderflowBit(bool bit)  { fEnergyUnderflowBit = bit; }
@@ -34,13 +34,6 @@ public:
   int GetRing() const;
   int GetSector() const;
   TVector3 GetPosition(bool apply_array_offset = true) const;
-
-  /// Assuming this hit was the 208Pb, return the direction of the 78Kr.
-  /**
-     Assumes that the collision happened at the origin.
-     Assumes that the incoming 78Kr had 3.9 MeV/u.
-   */
-  TVector3 GetConjugateDirection() const;
 
 private:
 	 // Energy

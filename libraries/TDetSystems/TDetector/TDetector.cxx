@@ -9,21 +9,18 @@
 ClassImp(TDetector)
 
 TDetector::TDetector() {
-  Class()->CanIgnoreTObjectStreamer();
   Clear();
 }
 
 TDetector::TDetector(const char* name,const char* title) {
   Clear();
-  TNamed::SetNameTitle(name,title);
-  Class()->CanIgnoreTObjectStreamer();
+  SetNameTitle(name,title);
 }
 
 TDetector::~TDetector() { }
 
 void TDetector::Clear(Option_t *opt) {
-  TNamed::Clear(opt);
-  SetBit(kUnbuilt,1);
+  fBuilt = false;
   fTimestamp = -1;
   fSize = 0;
   fRunStart = 0;
@@ -32,17 +29,16 @@ void TDetector::Clear(Option_t *opt) {
 
 void TDetector::Print(Option_t *opt) const { }
 
-void TDetector::Copy(TObject& obj) const {
-  TNamed::Copy(obj);
-
-  TDetector& det = (TDetector&)obj;
+void TDetector::Copy(TDetector& det) const {
   det.fTimestamp = fTimestamp;
   det.fSize = fSize;
   det.fRunStart = fRunStart;
+  det.fBuilt = fBuilt;
+  det.fName = fName;
+  det.fTitle = fTitle;
 }
 
-int TDetector::Compare(const TObject& obj) const {
-  TDetector& det = (TDetector&)obj;
+int TDetector::Compare(const TDetector& det) const {
   if(fTimestamp < det.fTimestamp) {
     return -1;
   } else if (fTimestamp > det.fTimestamp) {
@@ -55,7 +51,7 @@ int TDetector::Compare(const TObject& obj) const {
 int TDetector::Build(std::vector<TRawEvent>& raw_data){
   int output = BuildHits(raw_data);
   //if(output>0){
-  SetBit(kUnbuilt,0);  // if we called build on it, assume it is built whether or not it actually made any hits.  pcb.
+  fBuilt = true;  // if we called build on it, assume it is built whether or not it actually made any hits.  pcb.
   //}
   return output;
 }
@@ -85,5 +81,4 @@ void TDetector::Streamer(TBuffer &r_b) {
     r_b.WriteClassBuffer(TDetector::Class(),this);
   }
 }
-
 

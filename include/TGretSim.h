@@ -16,7 +16,7 @@ public:
   TGretSim();
   ~TGretSim();
 
-  virtual void Copy(TObject& obj) const;
+  virtual void Copy(TGretSim& obj) const;
   virtual void Print(Option_t *opt = "") const;
   virtual void Clear(Option_t *opt = "");
   virtual size_t Size() const { return gretsim_hits.size(); }

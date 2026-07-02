@@ -14,7 +14,7 @@ class TFSU: public TDetector {
 
     void Clear(Option_t *opt="");
     void Print(Option_t *opt="") const;
-    void Copy(TObject& obj) const;
+    void Copy(TFSU& obj) const;
 
     TFSUHit &GetFSUHit(int i) { return fFSUHits.at(i); }
     size_t Size() const       { return fFSUHits.size(); }

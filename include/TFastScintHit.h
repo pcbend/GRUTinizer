@@ -10,7 +10,7 @@ class TFastScintHit : public TDetectorHit {
 
     virtual void Print(Option_t* opt = "") const;
     virtual void Clear(Option_t* opt = "");
-    virtual void Copy(TObject& obj) const;
+    virtual void Copy(TFastScintHit& obj) const;
 
     int  GetChannel()    const { return Address() & 0x1f;   }
 

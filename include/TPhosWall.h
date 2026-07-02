@@ -7,11 +7,9 @@
 #include "TDetector.h"
 #include "TGEBEvent.h"
 #include "TPhosWallHit.h"
-//#include "TNucleus.h"
 
 #define MAXPIXEL 256
 
-class TNucleus;
 class TCutG;
 
 class TPhosWall : public TDetector {
@@ -20,7 +18,7 @@ public:
   TPhosWall();
   ~TPhosWall();
 
-  virtual void Copy(TObject&) const;
+  virtual void Copy(TPhosWall&) const;
   virtual void Clear(Option_t *opt = "");
   virtual void Print(Option_t *opt = "") const ;
 
@@ -45,10 +43,6 @@ public:
 
   TVector3 GetHitPosition() 
     { if(fLargestHit>-1) return GetWallPosition(Pixel(fLargestHit)); else return TVector3(sqrt(-1),sqrt(-1),sqrt(-1)); }
-
-  TVector3 GetKinVector(Double_t E_ejec,Double_t E_beam=30.0,const char *beam="18O",const char *recoil="30Si", const char *ejec="a");
-  TVector3 GetKinVector(Double_t E_ejec,Double_t E_beam,TNucleus &beam,TNucleus &recoil,TNucleus &ejec);
-
 
   //void DrawXY(Option_t *opt="");
   //static TVector3 FindWallPosition(const Int_t &pixel) { if(pixel<0||pixel>256) return TDetector::fB;  return fWallPositions[pixel]; }

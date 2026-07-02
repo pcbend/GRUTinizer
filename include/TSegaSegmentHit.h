@@ -9,7 +9,7 @@ class TSegaSegmentHit : public TDetectorHit {
 public:
   TSegaSegmentHit() { }
 
-  virtual void Copy(TObject&) const;
+  virtual void Copy(TSegaSegmentHit&) const;
   virtual void Clear(Option_t *opt = "");
   virtual void Print(Option_t *opt = "") const;
 

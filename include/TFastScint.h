@@ -13,7 +13,7 @@ public:
   TFastScint();
   virtual ~TFastScint();
 
-  void Copy(TObject& obj) const;
+  void Copy(TFastScint& obj) const;
 
   virtual void Print(Option_t* opt = "") const;
   virtual void Clear(Option_t* opt = "");

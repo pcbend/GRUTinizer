@@ -11,7 +11,7 @@ class TLenda : public TDetector {
     TLenda() { }
     ~TLenda() { }
 
-    void Copy(TObject &obj) const { } //TDetector::Copy(obj); }
+    void Copy(TLenda &obj) const { } //TDetector::Copy(obj); }
 
     void Clear(Option_t *opt="") { TDetector::Clear(opt); }
     TLendaHit &GetLendaHit(int i) { return lenda_hits.at(i); }

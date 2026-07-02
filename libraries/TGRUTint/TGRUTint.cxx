@@ -13,7 +13,6 @@
 #include "TFile.h"
 #include "TInterpreter.h"
 #include "TMethodCall.h"
-#include "TPython.h"
 #include "TROOT.h"
 #include "TString.h"
 #include "TThread.h"
@@ -21,8 +20,6 @@
 #include "TUnixSystem.h"
 #include "TVirtualPad.h"
 
-#include "GRootCommands.h"
-#include "GRootGuiFactory.h"
 #include "GValue.h"
 #include "GrutNotifier.h"
 #include "TBuildingLoop.h"
@@ -44,6 +41,8 @@
 #include "TWriteLoop.h"
 
 ClassImp(TGRUTint)
+
+TChain *gChain = new TChain("EventTree");
 
 TGRUTint *TGRUTint::fTGRUTint = NULL;
 TEnv    *TGRUTint::fGRUTEnv  = NULL;
@@ -134,13 +133,14 @@ void TGRUTint::ApplyOptions() {
 
   bool missing_raw_file = !all_files_exist(opt->RawInputFiles());
 
-  if(!false) { //this can be change to something like, if(!ClassicRoot)
-     LoadGRootGraphics();
-  }
-
   fKeepAliveTimer = new TTimer("",1000);
   fKeepAliveTimer->Start();
 
+  if(!gChain) {
+    gChain = new TChain("EventTree");
+  }
+  GrutNotifier::Get()->SetChain(gChain);
+  gChain->SetNotify(GrutNotifier::Get());
 
   TDetectorEnv::Get(opt->DetectorEnvironment().c_str());
 
@@ -170,7 +170,7 @@ void TGRUTint::ApplyOptions() {
 
 
   if(opt->StartGUI()){
-    StartGUI();
+    std::cerr << "The legacy GRUTinizer GUI has been removed from this build." << std::endl;
   }
 
   //ok now, if told not to sort open any raw files as _data# (rootish like??)
@@ -262,8 +262,9 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
       if(file->FindObjectAny("EventTree")) {
         if(!gChain) { // Should never go in here!!
 	  gChain = new TChain("EventTree");
-	  gChain->SetNotify(GrutNotifier::Get());
         }
+        GrutNotifier::Get()->SetChain(gChain);
+        gChain->SetNotify(GrutNotifier::Get());
         printf("file %s added to gChain.\n",file->GetName());
         gChain->Add(file->GetName());
       }
@@ -287,23 +288,11 @@ TFile* TGRUTint::OpenRootFile(const std::string& filename, Option_t* opt){
     file->SetOption("online");
   }
 
-  // Pass the TFile to the python GUI.
-  if(file && GUIIsRunning()){
-    std::string command = Form("TPython::Bind((TFile*)%luL, \"tdir\");"
-                               "TPython::Exec(\"window.AddDirectory(tdir)\");",
-                               (unsigned long)file);
-    ProcessLine(command.c_str());
-  }
   return file;
 }
 
 void TGRUTint::LoadTCutG(TCutG* cutg) {
-  if(GUIIsRunning()) {
-    std::string command = Form("TPython::Bind((TCutG*)%luL, \"cutg\");"
-			       "TPython::Exec(\"window.LoadCutG(cutg)\");",
-			       (unsigned long)cutg);
-    ProcessLine(command.c_str());
-  }
+  (void)cutg;
 }
 
 void TGRUTint::LoadRawFile(std::string filename) {
@@ -429,11 +418,6 @@ void TGRUTint::SetupPipeline() {
   for(auto filename : opt->CutsInputFiles()) {
     TFile* tfile = OpenRootFile(filename);
     cuts_files.push_back(tfile);
-    //printf("loading cuts, gui is running\n"); fflush(stdout);
-    if(tfile && GUIIsRunning()){
-      TPython::Bind(tfile,"tdir");
-      ProcessLine("TPython::Exec(\"window.LoadCutFile(tdir)\");");
-    }
   }
 
   // No need to set up all the loops if we are just opening the interpreter.
@@ -448,19 +432,23 @@ void TGRUTint::SetupPipeline() {
     TRawEventSource* source = OpenRawSource();
     fDataLoop = TDataLoop::Get("1_input_loop",source);
     fDataLoop->SetSelfStopping(self_stopping);
+    fDataLoop->OutputQueue()->SetMaxSize(opt->QueueDepth());
 
     TBuildingLoop* build_loop = TBuildingLoop::Get("2_build_loop");
     build_loop->SetBuildWindow(opt->BuildWindow());
     build_loop->InputQueue() = fDataLoop->OutputQueue();
+    build_loop->OutputQueue()->SetMaxSize(opt->QueueDepth());
 
     TUnpackingLoop* unpack_loop = TUnpackingLoop::Get("3_unpack");
     unpack_loop->InputQueue() = build_loop->OutputQueue();
     current_queue = unpack_loop->OutputQueue();
+    current_queue->SetMaxSize(opt->QueueDepth());
 
   } else if(sort_tree) {
     fChainLoop = TChainLoop::Get("1_chain_loop",gChain);
     fChainLoop->SetSelfStopping(self_stopping);
     current_queue = fChainLoop->OutputQueue();
+    current_queue->SetMaxSize(opt->QueueDepth());
   }
 
   if(filter_data) {
@@ -470,12 +458,14 @@ void TGRUTint::SetupPipeline() {
     }
     filter_loop->InputQueue() = current_queue;
     current_queue = filter_loop->OutputQueue();
+    current_queue->SetMaxSize(opt->QueueDepth());
   }
 
   if(write_root_tree) {
     TWriteLoop* write_loop = TWriteLoop::Get("5_write_loop", output_root_file);
     write_loop->InputQueue() = current_queue;
     current_queue = write_loop->OutputQueue();
+    current_queue->SetMaxSize(opt->QueueDepth());
   }
 
   if(write_histograms) {
@@ -487,6 +477,7 @@ void TGRUTint::SetupPipeline() {
     }
     fHistogramLoop->InputQueue() = current_queue;
     current_queue = fHistogramLoop->OutputQueue();
+    current_queue->SetMaxSize(opt->QueueDepth());
   }
 
   TTerminalLoop* terminal_loop = TTerminalLoop::Get("7_terminal_loop");
@@ -580,8 +571,6 @@ Long_t TGRUTint::ProcessLine(const char* line, Bool_t sync,Int_t *error) {
   if(!sline.Length()){
     return 0;
   }
-  sline.ReplaceAll("TCanvas","GCanvas");
-
   if(std::this_thread::get_id() != main_thread_id){
     return DelayedProcessLine(line);
   }
@@ -612,10 +601,6 @@ void TGRUTint::Terminate(Int_t status){
   }
   StoppableThread::StopAll();
 
-  //if(GUIIsRunning()){
-  //  TPython::Exec("on_close()");
-  //}
-
   //Be polite when you leave.
   printf(DMAGENTA "\nbye,bye\t" DCYAN "%s" RESET_COLOR  "\n",
          getpwuid(getuid())->pw_name);
@@ -630,10 +615,6 @@ void TGRUTint::Terminate(Int_t status){
 
   TChannel::DeleteAllChannels();
   TRint::Terminate(status);
-}
-
-void TGRUTint::LoadGRootGraphics() {
-  GRootGuiFactory::Init();
 }
 
 //   These variables are to be accessed only from DelayedProcessLine

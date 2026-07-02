@@ -10,6 +10,7 @@
 #include <TObject.h>
 #include <TMath.h>
 #include <TF1.h>
+#include <TCutG.h>
 
 #include "TDetector.h"
 #include "TGretinaHit.h"
@@ -23,7 +24,7 @@ public:
   TGretina();
   ~TGretina();
 
-  virtual void Copy(TObject& obj) const;
+  virtual void Copy(TGretina& obj) const;
   virtual void Print(Option_t *opt = "") const;
   virtual void PrintInteractions(Option_t *opt = "") const;
   virtual void Clear(Option_t *opt = "");
@@ -52,7 +53,9 @@ public:
 
   void CleanHits();
   
-  const std::vector<TGretinaHit> &GetAllHits() const { return gretina_hits; }
+  const std::vector<TGretinaHit> &GetHits()     const { return gretina_hits; }
+  const std::vector<TCluster>    &GetClusters() const { return clusters;     } 
+
 
   void  Sort() { }
   void  SortHits();
@@ -65,9 +68,17 @@ public:
   TCluster &GetCluster(int i) const { return clusters.at(i);  } 
 
 
+  int  BuildNNAddback()          const;
+  void PrintNNAddback(Option_t *opt="") const;
+  int  NNAddbackSize()      const { return addback_hits.size(); }
+  TGretinaHit &GetNNAddback(int i) const { return addback_hits.at(i);  } 
+
+
+
   double GetTotalEnergy() const;
   //void CompressClusters() { for(unsigned int x=0;x<clusters.size();x++) clusters[x].CompressInteractions(); }
-  
+ 
+  static TCutG GetGGTime() { return fGGTime; }
 
 private:
 //#ifndef __CINT__ 
@@ -76,8 +87,11 @@ private:
   virtual int BuildHits(std::vector<TRawEvent>& raw_data);
 
   std::vector<TGretinaHit> gretina_hits;
-  //mutable std::vector<TGretinaHit> addback_hits; //!
+  mutable std::vector<TGretinaHit> addback_hits; //! //I am going to stuff nearest neighbor addback here.
   mutable std::vector<TCluster> clusters; //!
+
+
+
 
   static Float_t crmat[32][4][4][4];
   static Float_t m_segpos[2][36][3];
@@ -85,7 +99,10 @@ private:
   static void SetSegmentCRMAT();
   static bool fCRMATSet;
 
-  ClassDef(TGretina,4);
+
+  static TCutG fGGTime;
+
+  ClassDef(TGretina,5);
 };
 
 

@@ -12,7 +12,7 @@ class TSegaHit : public TDetectorHit {
 public:
   TSegaHit();
 
-  virtual void Copy(TObject&) const;
+  virtual void Copy(TSegaHit&) const;
   virtual void Clear(Option_t *opt = "");
   virtual void Print(Option_t *opt = "") const;
   virtual void Draw(Option_t* opt = "");

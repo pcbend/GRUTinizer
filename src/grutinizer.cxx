@@ -10,7 +10,6 @@
 
 #include "TEnv.h"
 #include "TPluginManager.h"
-#include "TPython.h"
 #include "TThread.h"
 
 #include "TGRUTint.h"
@@ -108,12 +107,6 @@ int main(int argc, char **argv) {
 
 
 void SetGRUTPluginHandlers() {
-  //gPluginMgr->AddHandler("GRootCanvas","grut","GRootCanvas"
-  gPluginMgr->AddHandler("TGuiFactory","root","GROOTGuiFactory","Gui","GROOTGuiFactory()");
-  gPluginMgr->AddHandler("TBrowserImp","GRootBrowser","GRootBrowser",
-                         "Gui","NewBrowser(TBrowser *,const char *,Int_t,Int_t,UInt_t,UInt_t");
-  gPluginMgr->AddHandler("TBrowserImp","GRootBrowser","GRootBrowser",
-                         "Gui","NewBrowser(TBrowser *,const char *,Int_t,Int_t");
 }
 
 /*

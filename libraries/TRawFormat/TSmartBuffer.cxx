@@ -25,7 +25,8 @@ TSmartBuffer::TSmartBuffer(char* buffer, size_t size)
 
 TSmartBuffer::~TSmartBuffer() { }
 
-void TSmartBuffer::Clear(){
+void TSmartBuffer::Clear(Option_t* opt){
+  (void)opt;
   *this = TSmartBuffer();
 }
 

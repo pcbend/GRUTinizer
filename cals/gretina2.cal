@@ -1,0 +1,1009 @@
+xtal048::  {
+   Address:	0x01000c09
+   Number:	48
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.381557	0.484346
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal049::  {
+   Address:	0x01000c49
+   Number:	49
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.242727	0.477363
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal050::  {
+   Address:	0x01000c89
+   Number:	50
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	0.0245962	0.48334
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal051::  {
+   Address:	0x01000cc9
+   Number:	51
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.0459603	0.439162
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal056::  {
+   Address:	0x01000e09
+   Number:	56
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.301571	0.517647
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal057::  {
+   Address:	0x01000e49
+   Number:	57
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	0.293053	0.506727
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal058::  {
+   Address:	0x01000e89
+   Number:	58
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.430937	0.511581
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal059::  {
+   Address:	0x01000ec9
+   Number:	59
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.159892	0.506232
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal068::  {
+   Address:	0x01001109
+   Number:	68
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.690645	0.396291
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal069::  {
+   Address:	0x01001149
+   Number:	69
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.116906	0.394083
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal070::  {
+   Address:	0x01001189
+   Number:	70
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.841804	0.416686
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal071::  {
+   Address:	0x010011c9
+   Number:	71
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.446411	0.388132
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal076::  {
+   Address:	0x01001309
+   Number:	76
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	0.0599592	0.44523
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal077::  {
+   Address:	0x01001349
+   Number:	77
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.56674	0.44592
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal078::  {
+   Address:	0x01001389
+   Number:	78
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.555824	0.474784
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal079::  {
+   Address:	0x010013c9
+   Number:	79
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.0576101	0.446014
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal084::  {
+   Address:	0x01001509
+   Number:	84
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.405305	0.541923
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal085::  {
+   Address:	0x01001549
+   Number:	85
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.0371635	0.570184
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal086::  {
+   Address:	0x01001589
+   Number:	86
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.553657	0.512982
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal087::  {
+   Address:	0x010015c9
+   Number:	87
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-1.24135	0.522231
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal088::  {
+   Address:	0x01001609
+   Number:	88
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-1.56911	0.536083
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal089::  {
+   Address:	0x01001649
+   Number:	89
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.0401967	0.48749
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal090::  {
+   Address:	0x01001689
+   Number:	90
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-1.87121	0.534438
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal091::  {
+   Address:	0x010016c9
+   Number:	91
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.548678	0.491061
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal092::  {
+   Address:	0x01001709
+   Number:	92
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal093::  {
+   Address:	0x01001749
+   Number:	93
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal094::  {
+   Address:	0x01001789
+   Number:	94
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal095::  {
+   Address:	0x010017c9
+   Number:	95
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal096::  {
+   Address:	0x01001809
+   Number:	96
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.482791	0.511106
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal097::  {
+   Address:	0x01001849
+   Number:	97
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	0.0978211	0.468189
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal098::  {
+   Address:	0x01001889
+   Number:	98
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.452541	0.477412
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal099::  {
+   Address:	0x010018c9
+   Number:	99
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.16313	0.472087
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal100::  {
+   Address:	0x01001909
+   Number:	100
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-1.97378	0.471962
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal101::  {
+   Address:	0x01001949
+   Number:	101
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-2.04699	0.504182
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal102::  {
+   Address:	0x01001989
+   Number:	102
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-2.44558	0.541753
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal103::  {
+   Address:	0x010019c9
+   Number:	103
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-1.68856	0.465107
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal104::  {
+   Address:	0x01001a09
+   Number:	104
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-2.08174	0.469599
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal105::  {
+   Address:	0x01001a49
+   Number:	105
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.457998	0.470626
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal106::  {
+   Address:	0x01001a89
+   Number:	106
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.995753	0.470315
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal107::  {
+   Address:	0x01001ac9
+   Number:	107
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-1.41272	0.46232
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal108::  {
+   Address:	0x01001b09
+   Number:	108
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-1.22456	0.474271
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal109::  {
+   Address:	0x01001b49
+   Number:	109
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-2.16398	0.898208
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal110::  {
+   Address:	0x01001b89
+   Number:	110
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.2599	0.464311
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal111::  {
+   Address:	0x01001bc9
+   Number:	111
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.366356	0.454193
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal112::  {
+   Address:	0x01001c09
+   Number:	112
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	0.0112063	0.464338
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal113::  {
+   Address:	0x01001c49
+   Number:	113
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.0522109	0.451554
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal114::  {
+   Address:	0x01001c89
+   Number:	114
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	0.0671753	0.476633
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal115::  {
+   Address:	0x01001cc9
+   Number:	115
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.203987	0.469848
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal116::  {
+   Address:	0x01001d09
+   Number:	116
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-1.78967	0.468977
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal117::  {
+   Address:	0x01001d49
+   Number:	117
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-0.477242	0.485491
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal118::  {
+   Address:	0x01001d89
+   Number:	118
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal119::  {
+   Address:	0x01001dc9
+   Number:	119
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:	-1.88785	0.462436
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal120::  {
+   Address:	0x01001e09
+   Number:	120
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal121::  {
+   Address:	0x01001e49
+   Number:	121
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal122::  {
+   Address:	0x01001e89
+   Number:	122
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+xtal123::  {
+   Address:	0x01001ec9
+   Number:	123
+   Info:	
+   System:	TCh
+   Position:	0
+   Subposition:	n
+   Segment:	0
+   Pedestal:	0
+   EnergyCoeff:
+   TimeCoeff:
+   EfficiencyCoeff:
+   X:	0
+   Y:	0
+   Z:	0
+}
+-----------------------------------
+
+

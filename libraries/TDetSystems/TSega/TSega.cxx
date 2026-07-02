@@ -14,7 +14,7 @@ TSega::TSega(){ }
 
 TSega::~TSega(){ }
 
-void TSega::Copy(TObject& obj) const {
+void TSega::Copy(TSega& obj) const {
   TDetector::Copy(obj);
 
   TSega& sega = (TSega&)obj;

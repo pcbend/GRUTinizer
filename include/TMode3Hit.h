@@ -14,7 +14,7 @@ public:
   TMode3Hit();
   ~TMode3Hit();
 
-  virtual void Copy(TObject& obj) const;
+  virtual void Copy(TMode3Hit& obj) const;
   //virtual void Compare(TObject &obj) const;
   virtual void Print(Option_t *opt = "") const;
   virtual void Clear(Option_t *opt = "");

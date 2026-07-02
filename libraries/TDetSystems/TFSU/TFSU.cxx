@@ -32,10 +32,8 @@ void TFSU::Print(Option_t *opt) const {
 }
 
 
-void TFSU::Copy(TObject& obj) const {
+void TFSU::Copy(TFSU& obj) const {
   TDetector::Copy(obj);
-  
-  TNamed::Copy(obj);
 
   TFSU& fsu = (TFSU&)obj;
   fsu.fFSUHits = fFSUHits;
@@ -74,6 +72,5 @@ int TFSU::BuildHits(std::vector<TRawEvent>& raw_data) {
  
   return fFSUHits.size();
 }
-
 
 

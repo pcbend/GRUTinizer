@@ -189,33 +189,33 @@ struct M_TDC_Data{
 
 
 
-typedef struct {
+struct CAESARHeader {
   Int_t   totalsize;
   Short_t moresize;
   Short_t tag;
   Short_t version;
   Short_t ulm;
-}__attribute__((__packed__)) CAESARHeader;
+}__attribute__((__packed__));
 
-typedef struct {
+struct CAESARFeraHeader {
   Short_t size; // Inclusive number of 16-bit values
   Short_t tag;
-}__attribute__((__packed__)) CAESARFeraHeader;
+}__attribute__((__packed__));
 
-typedef struct {
+struct CAESARFera {
   Short_t header;
   Short_t number_chans() { return  ((header & 0x7800)>>11); }
   Short_t vsn()          { return   (header & 0x00ff)-1; }
 //  CAESARFeraItem items[16];
 
-}__attribute__((__packed__)) CAESARFera;
+}__attribute__((__packed__));
 
 
-typedef struct {
+struct CAESARFeraItem {
   Short_t data;
   Short_t channel()  { return  ((data & 0x7800)>>11); }
   Short_t value()    { return   (data & 0x07ff); }
-}__attribute__((__packed__)) CAESARFeraItem;
+}__attribute__((__packed__));
 
 
 
@@ -225,18 +225,18 @@ typedef struct {
 
 
 
-typedef struct { // HPGe Segment Hit Type 1;
+struct GEBInteractionPoint { // HPGe Segment Hit Type 1;
    Float_t     x;
    Float_t     y;
    Float_t     z;
    Float_t     e;        //fraction of the energy
    Int_t       seg;
    Float_t     seg_ener; //energy (cahrge) collected in the segment
-}__attribute__((__packed__)) GEBInteractionPoint;
+}__attribute__((__packed__));
 
 friend std::ostream& operator<<(std::ostream& os, const GEBInteractionPoint &fSeg);
 
-typedef struct { // Decomposed GRETINA Data
+struct GEBBankType1 { // Decomposed GRETINA Data
    Int_t     type;
    Int_t     crystal_id;
    Int_t     num;
@@ -253,7 +253,7 @@ typedef struct { // Decomposed GRETINA Data
    Float_t   poststep;
    Int_t     pad;
    GEBInteractionPoint intpts[MAX_INTPTS];
-}__attribute__((__packed__)) GEBBankType1;
+}__attribute__((__packed__));
 
 friend std::ostream& operator<<(std::ostream& os, const GEBBankType1 &bank);
 

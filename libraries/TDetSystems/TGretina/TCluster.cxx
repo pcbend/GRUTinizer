@@ -4,6 +4,8 @@
 
 #include "TCluster.h"
 
+const TVector3 TCluster::BeamUnitVec(0,0,1);
+
 TClusterPoint::TClusterPoint() { }
 
 TClusterPoint::~TClusterPoint() { }
@@ -18,7 +20,7 @@ TClusterPoint::TClusterPoint(TGretinaHit &hit, TInteractionPoint &ip) {
 }
 
 void TClusterPoint::Print(Option_t *opt) const { 
-  opt=opt; //quiet the warnings.
+  (void)opt;
   printf("xtal[%03i] %5.1f / %5.1f  seg[%02i]:[ %3.1f, %3.1f, %3.1f ] \n",
           GetXtal(), GetAssignE(), GetPreampE(), GetSegNum(),
           GetPosition().Mag(),GetPosition().Theta()*TMath::RadToDeg(),
@@ -58,7 +60,7 @@ TCluster::TCluster()  { Clear(); }
 TCluster::~TCluster() { } 
 
 void TCluster::Clear(Option_t *opt) { 
- opt=opt; //quiet the warnings.
+ (void)opt;
  fEnergySum = 0.00;
  fCenterOfMass.SetXYZ(0,0,0);
  fClusterPoints.clear();
@@ -112,6 +114,17 @@ void TCluster::Print(Option_t *opt) const {
   */
   printf("best fom for the cluster is %2.4f\n",fom_best);
 }      
+
+double TCluster::GetDoppler(double beta, const TVector3 *vec) const {
+  if(Size()<1)
+    return 0.0;
+  if(vec==0) {
+    vec = &BeamUnitVec;
+  }
+  double gamma = 1/(sqrt(1-pow(beta,2)));
+  TVector3 gamma_position = fClusterPoints.front().GetPosition();
+  return GetEnergy() * gamma * (1 - beta*TMath::Cos(gamma_position.Angle(*vec)));
+}
 
 
     
@@ -210,9 +223,6 @@ void TCluster::Fit() {
   //printf("KN set to %.4f \n",GetKN());
 
 }
-
-
-
 
 
 

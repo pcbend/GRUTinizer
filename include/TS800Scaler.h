@@ -13,7 +13,7 @@ public:
   TS800Scaler(const TS800Scaler&);
   virtual ~TS800Scaler();
 
-  virtual void Copy(TObject&)       const;
+  virtual void Copy(TS800Scaler&)       const;
   virtual void Print(Option_t *opt) const;
   virtual void Clear(Option_t *opt);
 

@@ -16,7 +16,7 @@ public:
   TS800Sim();
   ~TS800Sim();
 
-  virtual void Copy(TObject& obj) const;
+  virtual void Copy(TS800Sim& obj) const;
   virtual void Print(Option_t *opt = "") const;
   virtual void Clear(Option_t *opt = "");
   virtual size_t Size() const { return s800sim_hits.size(); }

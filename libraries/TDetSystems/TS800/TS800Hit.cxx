@@ -2,7 +2,7 @@
 
 #include "TS800Hit.h"
 #include "TRandom.h"
-#include "GCanvas.h"
+#include "TCanvas.h"
 #include "TH2.h"
 #include "TGraph.h"
 #include "TF1.h"
@@ -15,7 +15,7 @@ TTrigger::TTrigger() {
 TTrigger::~TTrigger() {
 }
 
-void TTrigger::Copy(TObject &obj) const {
+void TTrigger::Copy(TTrigger &obj) const {
   TDetectorHit::Copy(obj);
   TTrigger &trig =(TTrigger&)obj;
   trig.fregistr  = fregistr;
@@ -42,7 +42,7 @@ TTof::TTof() {
 TTof::~TTof() {
 }
 
-void TTof::Copy(TObject &obj) const {
+void TTof::Copy(TTof &obj) const {
   TDetectorHit::Copy(obj);
   TTof &tof_ =(TTof&)obj;
   tof_.frf      = frf;
@@ -73,7 +73,7 @@ TScintillator::TScintillator() {
 TScintillator::~TScintillator() {
 }
 
-void TScintillator::Copy(TObject &obj) const {
+void TScintillator::Copy(TScintillator &obj) const {
   TDetectorHit::Copy(obj);
   TScintillator &scinti =(TScintillator&)obj;
   scinti.fID            = fID;
@@ -214,7 +214,6 @@ float TIonChamber::GetSum() const {
 //      based on the track through the CRDCs
 
 float TIonChamber::GetdE(TCrdc *crdc){
-  float sum = GetAve();
   float x   = crdc->GetDispersiveX();
   float y   = crdc->GetNonDispersiveY();
 
@@ -240,7 +239,7 @@ float TIonChamber::GetdE(double crdc_1_x, double crdc_1_y){
   return sum;
 }
 
-void TIonChamber::Copy(TObject &obj) const {
+void TIonChamber::Copy(TIonChamber &obj) const {
   TDetectorHit::Copy(obj);
   TIonChamber &ic =(TIonChamber&)obj;
   ic.fChan = fChan;
@@ -373,10 +372,10 @@ int TCrdc::GetMaxPadSum() const{
 
 void TCrdc::DrawChannels(Option_t *opt,bool calibrate) const {
   if(!gPad)
-    new GCanvas();
+    new TCanvas();
   else {
     //gPad->Clear();
-    //GCanvas* c = (GCanvas*)gPad->GetCanvas();
+    //TCanvas* c = (TCanvas*)gPad->GetCanvas();
     //c->Clear();
   }
 
@@ -422,12 +421,12 @@ void TCrdc::DrawChannels(Option_t *opt,bool calibrate) const {
 }
 
 void TCrdc::DrawHit(Option_t *opt) const {
-  GCanvas *c = 0;
+  TCanvas *c = 0;
   if(!gPad)
-    c = new GCanvas();
+    c = new TCanvas();
   else {
     //gPad->Clear();
-    c = (GCanvas*)gPad->GetCanvas();
+    c = (TCanvas*)gPad->GetCanvas();
     c->Clear();
   }
   TH1I *mat = new TH1I("hit_pattern","hit_pattern",256,0,256);
@@ -464,7 +463,7 @@ int TCrdc::GetWidth() {
   return sample.back()-sample.front()+1;
 }
 
-void TCrdc::Copy(TObject &obj) const {
+void TCrdc::Copy(TCrdc &obj) const {
   TDetectorHit::Copy(obj);
   TCrdc &c = (TCrdc&)obj;
   c.fId      = fId;
@@ -525,9 +524,9 @@ float TCrdc::GetDispersiveX() const{
   TVirtualFitter::SetMaxIterations(10);
   g.Fit(fgaus,"qgoff"); //  "gaus","q","goff");
   TVirtualFitter::SetMaxIterations(5000);
-  //new GCanvas;
+  //new TCanvas;
   //g->Draw("AC");
-  //new GCanvas;
+  //new TCanvas;
   //printf("fgaus->GetParameter(1) = %.02f\n",fgaus->GetParameter(1));
   //return (GetMaxPad()*x_slope+x_offset);
   double pad = fgaus->GetParameter(1);
@@ -730,7 +729,7 @@ void TCrdcPad::Print(Option_t *opt) const {
   printf("I print.\n");
 }
 
-void TCrdcPad::Copy(TObject &obj) const {
+void TCrdcPad::Copy(TCrdcPad &obj) const {
   TDetectorHit::Copy(obj);
 
   ((TCrdcPad&)obj).fChannel   = fChannel;
@@ -753,7 +752,7 @@ TMTof::TMTof(const TMTof &mtof) {
 }
 
 
-void TMTof::Copy(TObject &obj) const {
+void TMTof::Copy(TMTof &obj) const {
   TDetectorHit::Copy(obj);
 
   TMTof &mtof = ((TMTof&)obj);

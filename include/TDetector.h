@@ -4,10 +4,9 @@
 #include <vector>
 #include <cmath>
 
-#include "TNamed.h"
-
 #include "TBuffer.h"
 #include "TDetectorHit.h"
+#include "TString.h"
 
 
 #ifndef __CINT__
@@ -17,16 +16,16 @@ class TRawEvent;
 #endif
 class TSmartBuffer;
 
-class TDetector : public TNamed {
+class TDetector {
 public:
   TDetector();
   TDetector(const char *name,const char *title="");
   virtual ~TDetector();
 
-  virtual void Copy(TObject& obj) const;
+  void Copy(TDetector& obj) const;
   virtual void Clear(Option_t *opt = "" );
   virtual void Print(Option_t *opt = "" ) const;
-  virtual int  Compare(const TObject& obj) const;
+  int  Compare(const TDetector& obj) const;
 
   int Build(std::vector<TRawEvent>& raw_data);
   virtual void InsertHit(const TDetectorHit&) = 0;
@@ -41,7 +40,14 @@ public:
   Long_t Timestamp() const { return fTimestamp; }
   void   SetTimestamp(Long_t timestamp)  { fTimestamp = timestamp; }
 
-  enum EDetectorStatus { kUnbuilt = BIT(15) };
+  bool IsBuilt() const { return fBuilt; }
+  bool IsUnbuilt() const { return !fBuilt; }
+
+  const char* GetName() const { return fName.Data(); }
+  const char* GetTitle() const { return fTitle.Data(); }
+  void SetName(const char* name) { fName = name ? name : ""; }
+  void SetTitle(const char* title) { fTitle = title ? title : ""; }
+  void SetNameTitle(const char* name, const char* title) { SetName(name); SetTitle(title); }
   
   unsigned int RunStart() const { return fRunStart; }
   virtual void SetRunStart(unsigned int unix_time) { fRunStart = unix_time; }
@@ -63,6 +69,9 @@ protected:
      If unavailable, will be 0.
    **/
   unsigned int fRunStart; 
+  bool fBuilt;
+  TString fName;
+  TString fTitle;
 
 
 private:

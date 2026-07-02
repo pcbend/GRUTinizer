@@ -1,7 +1,7 @@
 #ifndef TGRETINAHIT_H
 #define TGRETINAHIT_H
 
-#include <TObject.h>
+#include <Rtypes.h>
 #include <Rtypes.h>
 #include <TVector3.h>
 #include <TMath.h>
@@ -42,7 +42,9 @@ class TInteractionPoint {
 
     void SetSegNum(int seg) { fSegNum = seg; }
 
-    int Wedge() const { return ((GetSegNum()-1)%6); }
+    //int Wedge() const { return ((GetSegNum()-1)%6); }
+    //int Wedge() const { return (int tmp = GetSegNum())%6; if(tmp==0) return 6; return tmp;}
+    int Wedge() const { return (GetSegNum()%6)==0 ? 6 : GetSegNum()%6; }
 
     bool operator == (const TInteractionPoint &rhs) const {
       return (GetDecompE() == rhs.GetDecompE());
@@ -72,22 +74,26 @@ public:
   TGretinaHit(const TGretinaHit& hit){ hit.Copy(*this); }
   ~TGretinaHit();
 
-  void Copy(TObject& obj) const;
+  double GetXi(const TVector3* beam, int p1, int p2) const;
+
+  void Copy(TGretinaHit& obj) const;
 
   void BuildFrom(TSmartBuffer& raw);
 
   Double_t GetTime()            const { return (double)Timestamp() - (double)fT0; }
   Double_t GetT0()              const { return fT0; }
   Int_t    GetAddress()         const { return fAddress;        }
+  Int_t    GetId()              const { return fCrystalId;      }
   Int_t    GetXtalId()          const { return fCrystalId;      }
   Int_t    GetCrystalId()       const { return fCrystalId;      }
   Int_t    GetHoleNumber()      const { return fCrystalId/4;  }
   Int_t    GetCrystalNumber()   const { return fCrystalId%4;    }
-  Float_t  GetCoreEnergy()      const { return fCoreEnergy;     }
+  Float_t  GetCoreEnergy()      const;  // can be recalibrated by setting static variable SetCalibrationCore(3);
   Int_t    GetCoreCharge(int i) const { return fCoreCharge[i];  }
-  Float_t  GetCoreEnergy(int i) const; // { return fCoreCharge[i];  }
+  //Float_t  GetCoreEnergy(int i) const; // { return fCoreCharge[i];  }
   virtual Int_t    Charge()     const { return fCoreCharge[3];  }
-  virtual Double_t GetEnergy()  const { return fCoreEnergy;     } 
+  virtual Double_t GetEnergy()  const { return GetCoreEnergy();     } 
+  //Float_t GetEnergy(int i) const { return GetCoreEnergy(i); }
 
   const char *GetName()   const { return TDetectorHit::GetName(); }
   int         GetNumber() const { return TDetectorHit::GetNumber(); }
@@ -96,7 +102,7 @@ public:
 
   void  Print(Option_t *opt="") const;
   void  Clear(Option_t *opt="");
-  Int_t Compare(const TObject *obj) const; 
+  Int_t Compare(const TGretinaHit& obj) const; 
   
   Int_t Size() const { return fInteractions.size(); }//fSegmentNumber.size(); }
 
@@ -112,15 +118,18 @@ public:
       return phi;
     }
   }
-  double GetTheta() { return GetPosition().Theta(); }
-  double GetPhiDeg() { return GetPhi()*TMath::RadToDeg(); }
-  double GetThetaDeg() { return GetTheta()*TMath::RadToDeg(); }
+  double GetTheta()    const { return GetPosition().Theta(); }
+  double GetPhiDeg()   const { return GetPhi()*TMath::RadToDeg(); }
+  double GetThetaDeg() const { return GetTheta()*TMath::RadToDeg(); }
+
+  void Add(const TGretinaHit&);
 
   bool HasInteractions() { return fNumberOfInteractions; }
   bool operator<(const TGretinaHit &rhs) const { return fCoreEnergy > rhs.fCoreEnergy; }
 
-  double GetDoppler(double beta,const TVector3 *vec=0);
-  double GetDoppler_dB(double beta,const TVector3 *vec=0, double Dta=0);
+  double GetDoppler(double beta,const TVector3 *vec=0) const;
+  //double GetDopplerANL(double beta,const TVector3 *vec=0);
+  //double GetDoppler_dB(double beta,const TVector3 *vec=0, double Dta=0);
 
   TVector3 GetPosition() const; //                  const { return GetIntPosition(0); }
 
@@ -155,21 +164,28 @@ public:
   double GetIntPhiDeg(int i) const { return GetIntPhi(i)*TMath::RadToDeg(); }
 
 
+  static void SetCalibrationCore(int i) { fCalibrationCore = i; }
+private: 
+  static int fCalibrationCore; //!
+
 private:
   //void SortHits();
   void SortInts();
+  
 
   Float_t fT0; //WalkCorrection;
   Int_t   fCrystalId;
   mutable Float_t fCoreEnergy;
+  mutable bool    fCalibrated;
   Int_t   fCoreCharge[4];
+
 
   Int_t   fPad;
   Int_t   fNumberOfInteractions;
   
   std::vector<TInteractionPoint> fInteractions; //[fNumberOfInteractions];
 
-  ClassDef(TGretinaHit,7)
+  ClassDef(TGretinaHit,8)
 };
 
 
@@ -179,7 +195,6 @@ private:
 
 
 #endif
-
 
 
 

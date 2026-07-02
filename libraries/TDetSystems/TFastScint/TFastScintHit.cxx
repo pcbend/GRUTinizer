@@ -13,7 +13,7 @@ TFastScintHit::TFastScintHit(const TDetectorHit &hit) {
   hit.Copy(*this);
 }
 
-void TFastScintHit::Copy(TObject& obj) const {
+void TFastScintHit::Copy(TFastScintHit& obj) const {
   TDetectorHit::Copy(obj);
 
   TFastScintHit& hit = (TFastScintHit&)obj;

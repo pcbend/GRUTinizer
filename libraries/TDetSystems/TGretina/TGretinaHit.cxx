@@ -75,14 +75,14 @@ void TInteractionPoint::Clear(Option_t *opt) {
 
 
 
-
+int TGretinaHit::fCalibrationCore = -1;
 
 
 TGretinaHit::TGretinaHit(){ Clear(); }
 
 TGretinaHit::~TGretinaHit(){ }
 
-void TGretinaHit::Copy(TObject &rhs) const {
+void TGretinaHit::Copy(TGretinaHit &rhs) const {
   TDetectorHit::Copy(rhs);
   //((TGretinaHit&)rhs).fTimeStamp      = fTimeStamp;
   ((TGretinaHit&)rhs).fT0 = fT0;
@@ -90,6 +90,7 @@ void TGretinaHit::Copy(TObject &rhs) const {
   ((TGretinaHit&)rhs).fPad            = fPad;
   ((TGretinaHit&)rhs).fCrystalId      = fCrystalId;
   ((TGretinaHit&)rhs).fCoreEnergy     = fCoreEnergy;
+  ((TGretinaHit&)rhs).fCalibrated     = fCalibrated;
   ((TGretinaHit&)rhs).fCoreCharge[0]  = fCoreCharge[0];
   ((TGretinaHit&)rhs).fCoreCharge[1]  = fCoreCharge[1];
   ((TGretinaHit&)rhs).fCoreCharge[2]  = fCoreCharge[2];
@@ -109,14 +110,22 @@ void TGretinaHit::Copy(TObject &rhs) const {
   */
 }
 
-Float_t TGretinaHit::GetCoreEnergy(int i) const {
-  float charge = (float)GetCoreCharge(i) + gRandom->Uniform();
-  //board_id=; //card  number : 0x0030  information not available here.
-  TChannel *channel = TChannel::GetChannel(GetAddress()+(i<<4));
-  //printf("GetAddress() + i = 0x%08x\n",GetAddress()+i); 
-  if(!channel)
-    return charge;
-  return channel->CalEnergy(charge);
+Float_t TGretinaHit::GetCoreEnergy() const {
+  if(!fCalibrated && fCalibrationCore>=0) {
+    if(fCalibrationCore<4) { // 0,1,2,3
+      float charge = (float)GetCoreCharge(fCalibrationCore) + gRandom->Uniform();
+      //board_id=; //card  number : 0x0030  information not available here.
+      TChannel *channel = TChannel::GetChannel(GetAddress());//+(i<<4));
+      //printf("GetAddress() + i = 0x%08x\n",GetAddress()+i); 
+      if(!channel) {
+        fCoreEnergy = charge;
+      } else {
+        fCoreEnergy = channel->CalEnergy(charge);
+      }
+      fCalibrated = true;
+    }
+  }
+  return fCoreEnergy;
 }
 
 //const char *TGretinaHit::GetName() const {
@@ -253,7 +262,7 @@ TVector3 TGretinaHit::GetPosition() const {
 //  }
 //}
 
-double TGretinaHit::GetDoppler(double beta,const TVector3 *vec) {
+double TGretinaHit::GetDoppler(double beta,const TVector3 *vec) const {
   if(Size()<1)
     return 0.0;
   if(vec==0) {
@@ -261,7 +270,21 @@ double TGretinaHit::GetDoppler(double beta,const TVector3 *vec) {
   }
   double tmp = 0.0;
   double gamma = 1/(sqrt(1-pow(beta,2)));
-  tmp = fCoreEnergy*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*vec)));
+  tmp = GetCoreEnergy() *gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*vec)));
+  return tmp;
+} 
+
+/*
+//temp fix for calibrated doppler energies. pcb
+double TGretinaHit::GetDopplerANL(double beta,const TVector3 *vec) {
+  if(Size()<1)
+    return 0.0;
+  if(vec==0) {
+    vec = &BeamUnitVec;
+  }
+  double tmp = 0.0;
+  double gamma = 1/(sqrt(1-pow(beta,2)));
+  tmp = GetCoreEnergy(3)*gamma *(1 - beta*TMath::Cos(GetPosition().Angle(*vec)));
   return tmp;
 } 
 
@@ -280,7 +303,28 @@ double TGretinaHit::GetDoppler_dB(double beta, const TVector3 *vec,double Dta){
   tmp = fCoreEnergy*TheGamma *(1.0 - beta*TMath::Cos(GetPosition().Angle(*vec)));
   return tmp;
 }
+*/
 
+double TGretinaHit::GetXi(const TVector3* beam, int p1, int p2) const {
+    if (fNumberOfInteractions > 1 && p1 < fNumberOfInteractions && p2 < fNumberOfInteractions) {
+        if (!beam) beam = new TVector3(0, 0, 1);  // Default to z-axis.
+
+        TVector3 interaction1 = GetIntPosition(p1);
+        TVector3 comptonPlaneNorm = interaction1.Cross(GetIntPosition(p2));
+        TVector3 reactionPlaneNorm = beam->Cross(interaction1);
+        TVector3 basisNorm = interaction1.Cross(reactionPlaneNorm);
+
+        double xi = reactionPlaneNorm.Angle(comptonPlaneNorm);  // Xi in radians.
+        xi = xi * TMath::RadToDeg();  // Convert to degrees.
+
+        if (basisNorm.Angle(comptonPlaneNorm) > TMath::PiOver2()) {
+            xi = 360.0 - xi;
+        }
+
+        return xi;  // Return the angle in degrees.
+    }
+   else return -1;  // Return -1 for invalid inputs.
+}
 
 int TGretinaHit::CleanInteractions() {
   std::map<int,TInteractionPoint> int_map;
@@ -297,6 +341,7 @@ int TGretinaHit::CleanInteractions() {
   for(it2=int_map.begin();it2!=int_map.end();it2++) {
     fInteractions.push_back(it2->second);
   }
+  SortInts();
   return fInteractions.size();
 }
 
@@ -418,63 +463,47 @@ void TGretinaHit::SortInts(){
 
 
 
-/*
+
 
 // TODO: Handle interactions points better
 //       Right now, the "first interaction point" is the one with the highest energy,
 //       and the "second" is the one with the second highest energy.
 //       First and second may be assigned across crystal boundaries.
-void TGretinaHit::AddToSelf(const TGretinaHit& rhs) {
+void TGretinaHit::Add(const TGretinaHit& rhs) {
 
-  // qStash all interaction points
-  std::set<interaction_point> ips;
+  // Stash all interaction points
+  std::vector<TInteractionPoint> ips;
   for(int i=0; i<fNumberOfInteractions; i++){
-    ips.insert(interaction_point(fSegmentNumber[i],
-          fGlobalInteractionPosition[i],
-          fLocalInteractionPosition[i],
-          fInteractionEnergy[i]));
+    //ips.insert(interaction_point(fSegmentNumber[i],
+    //      fGlobalInteractionPosition[i],
+    //      fLocalInteractionPosition[i],
+    //      fInteractionEnergy[i]));
+    ips.push_back(fInteractions.at(i));
   }
   for(int i=0; i<rhs.fNumberOfInteractions; i++){
-    ips.insert(interaction_point(rhs.fSegmentNumber[i],
-          rhs.fGlobalInteractionPosition[i],
-          rhs.fLocalInteractionPosition[i],
-          rhs.fInteractionEnergy[i]));
+    //ips.insert(interaction_point(rhs.fSegmentNumber[i],
+    //      rhs.fGlobalInteractionPosition[i],
+    //      rhs.fLocalInteractionPosition[i],
+    //      rhs.fInteractionEnergy[i]));
+    ips.push_back(rhs.fInteractions.at(i));
   }
 
   // Copy other information to self if needed
-  double my_core_energy = fCoreEnergy;
-  if(fCoreEnergy < rhs.fCoreEnergy) {
-    rhs.Copy(*this);
+  double my_core_energy = GetCoreEnergy();
+  //if(fCoreEnergy < rhs.fCoreEnergy) {
+  if(my_core_energy < rhs.GetCoreEnergy()) {
+    rhs.Copy(*this); // should get the timing right....
     fCoreEnergy += my_core_energy;
   } else {
     fCoreEnergy += rhs.fCoreEnergy;
   }
 
-  // Fill all interaction points
-  fNumberOfInteractions = 0;
-  fSegmentNumber.clear();
-  fGlobalInteractionPosition.clear();
-  fLocalInteractionPosition.clear();
-  fInteractionEnergy.clear();
-  fInteractionFraction.clear();
-  for(auto& point : ips){
-    if(fNumberOfInteractions >= MAXHPGESEGMENTS){
-      break;
-    }
+  fNumberOfInteractions = ips.size();
+  std::sort(ips.begin(),ips.end());
+  fInteractions = ips;
 
-    fSegmentNumber.push_back(point.segnum);
-    fGlobalInteractionPosition.push_back(point.pos);
-    fLocalInteractionPosition.push_back(point.local_pos);
-    fInteractionEnergy.push_back(point.energy);
-    fInteractionFraction.push_back(point.energy_fraction);
-    fNumberOfInteractions++;
-  }
-
-  // Because they are now sorted
-  fFirstInteraction = 0;
-  fSecondInteraction = 1;
 }
-*/
+
 
 
 /*
@@ -619,6 +648,7 @@ void TGretinaHit::Clear(Option_t *opt) {
   fAddress        = -1;
   fCrystalId      = -1;
   fCoreEnergy     = sqrt(-1);
+  fCalibrated     = false;
   fCoreCharge[0]  = -1;
   fCoreCharge[1]  = -1;
   fCoreCharge[2]  = -1;
@@ -628,6 +658,8 @@ void TGretinaHit::Clear(Option_t *opt) {
   //fSecondInteraction = -1;
 
   fPad = 0;
+
+
 
   fNumberOfInteractions = 0;
 
@@ -650,11 +682,10 @@ void TGretinaHit::Clear(Option_t *opt) {
      */
 }
 
-Int_t TGretinaHit::Compare(const TObject *obj) const { 
-  TGretinaHit *other = (TGretinaHit*)obj;
-  if(this->GetCoreEnergy()>other->GetCoreEnergy())
+Int_t TGretinaHit::Compare(const TGretinaHit& obj) const { 
+  if(this->GetCoreEnergy()>obj.GetCoreEnergy())
     return -1;
-  else if(this->GetCoreEnergy()<other->GetCoreEnergy())
+  else if(this->GetCoreEnergy()<obj.GetCoreEnergy())
     return 1;  //sort largest to smallest.
   return 0;
 }
@@ -671,5 +702,3 @@ Float_t TGretinaHit::GetInteractionPercentage(int i) const {
   return (GetInteractionFrac(i)/sum)*fCoreEnergy;
 }
 */
-
-

@@ -19,7 +19,7 @@ public:
   TS800SimHit();
   ~TS800SimHit();
 
-  void Copy(TObject& obj) const;
+  void Copy(TS800SimHit& obj) const;
   virtual Int_t Charge()        const { return 0;  }
 
   const char *GetName() const;

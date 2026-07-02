@@ -14,6 +14,8 @@ class TUnpackedEvent;
 
 class TRawFileOut : public TObject {
 public:
+  using TObject::Write;
+
   TRawFileOut();
   explicit TRawFileOut(const std::string& filename);
   ~TRawFileOut();

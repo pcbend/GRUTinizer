@@ -79,7 +79,6 @@ private:
 
   void Init();
   void ApplyOptions();
-  void LoadGRootGraphics();
 
   TList fOpenedRawFiles;
 

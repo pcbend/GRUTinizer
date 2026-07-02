@@ -70,7 +70,7 @@ public:
       as if it had just been constructed by TSmartBuffer().
     This does not need to be called prior to the object begin destructed.
    */
-  void Clear();
+  void Clear(Option_t* opt = "");
 
   /// Sets the current buffer.
   /**

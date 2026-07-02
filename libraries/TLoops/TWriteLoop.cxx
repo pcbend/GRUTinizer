@@ -123,7 +123,6 @@ void TWriteLoop::AddBranch(TClass* cls){
 
     // Make a new branch.
     TString cls_name = cls->GetName();
-    cls_name = cls_name; // + '.';
     TBranch* new_branch = event_tree->Branch(cls_name.Data(), cls->GetName(), det_pp);
 
     // Fill the new branch up to the point where the tree is filled.

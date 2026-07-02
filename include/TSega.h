@@ -9,7 +9,7 @@ public:
   TSega();
   virtual ~TSega();
 
-  void Copy(TObject& obj) const;
+  void Copy(TSega& obj) const;
 
   virtual void Clear(Option_t* opt = "");
   virtual TSegaHit& GetSegaHit(int i);

@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iostream>
 
-void TSegaSegmentHit::Copy(TObject& obj) const{
+void TSegaSegmentHit::Copy(TSegaSegmentHit& obj) const{
   TDetectorHit::Copy(obj);
 
   TSegaSegmentHit& sega = (TSegaSegmentHit&)obj;

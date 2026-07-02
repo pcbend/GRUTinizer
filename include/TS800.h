@@ -46,7 +46,7 @@ public:
 
   float AdjustedBeta(float) const;
 
-  virtual void Copy(TObject& obj)        const;
+  virtual void Copy(TS800& obj)        const;
   virtual void Print(Option_t *opt = "") const {;}
   virtual void Clear(Option_t* opt = "");
 
@@ -149,7 +149,7 @@ public:
   size_t Size() const { return 0; } //meaningless here, but needed for inherit purposes.
 
 public:
-  int BuildHits(UShort_t size,UShort_t *dptr,Long64_t timestamp); 
+  int BuildS800Packet(UShort_t size,UShort_t *dptr,Long64_t timestamp); 
 
 private:
   virtual int  BuildHits(std::vector<TRawEvent>& raw_data);

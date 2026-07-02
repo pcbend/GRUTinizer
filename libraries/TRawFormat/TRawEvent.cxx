@@ -20,7 +20,7 @@ TRawEvent::TRawEvent() {
   fTimestamp = -1;
 }
 
-void TRawEvent::Copy(TObject &rhs) const {
+void TRawEvent::Copy(TRawEvent &rhs) const {
   rhs.Clear();
   ((TRawEvent&)rhs).fEventHeader = fEventHeader;
   ((TRawEvent&)rhs).fBody        = fBody;
@@ -29,7 +29,7 @@ void TRawEvent::Copy(TObject &rhs) const {
 }
 
 TRawEvent::TRawEvent(const TRawEvent &rhs)
-  : TObject(rhs) {
+  { //: TObject(rhs) {
   rhs.Copy(*this);
 }
 
@@ -37,7 +37,7 @@ TRawEvent::~TRawEvent() {
   Clear();
 }
 
-Int_t TRawEvent::Compare(const TObject &rhs) const { return 0; }
+Int_t TRawEvent::Compare(const TRawEvent &rhs) const { return 0; }
 
 TRawEvent &TRawEvent::operator=(const TRawEvent &rhs) {
   if(&rhs!=this)

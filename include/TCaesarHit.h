@@ -11,10 +11,11 @@ class TCaesarHit : public TDetectorHit {
 public:
   TCaesarHit() {  Clear(); numHitsContained = 1; is_garbage_addback = false;}
   TCaesarHit(const TCaesarHit&);
+  TCaesarHit& operator=(const TCaesarHit&);
 
   void Clear(Option_t* opt = "");
   void Print(Option_t* opt = "") const;
-  void Copy(TObject& obj) const;
+  void Copy(TCaesarHit& obj) const;
 
   int GetVSN() const		{ return fVsn;		}
   int GetChannel() const	{ return fChannel;	}

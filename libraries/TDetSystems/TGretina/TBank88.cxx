@@ -11,7 +11,7 @@ TBank88::TBank88(){
 TBank88::~TBank88() {
 }
 
-void TBank88::Copy(TObject& obj) const {
+void TBank88::Copy(TBank88& obj) const {
   TDetector::Copy(obj);
 
   TBank88& bank = (TBank88&)obj;

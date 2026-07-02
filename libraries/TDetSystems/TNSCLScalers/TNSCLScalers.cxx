@@ -17,7 +17,7 @@ TNSCLScalers::TNSCLScalers(const TNSCLScalers& scale )
 
 TNSCLScalers::~TNSCLScalers() { }
 
-void TNSCLScalers::Copy(TObject& obj) const {
+void TNSCLScalers::Copy(TNSCLScalers& obj) const {
   TDetector::Copy(obj);
 
   TNSCLScalers& other = (TNSCLScalers&)obj;
@@ -82,6 +82,8 @@ void TNSCLScalers::InsertHit(const TDetectorHit&) {
 }
 
 TDetectorHit& TNSCLScalers::GetHit(int i) {
+  (void)i;
+  static TDetectorHit dummy;
   std::cout << __PRETTY_FUNCTION__ << " should never be called" << std::endl;
-  return *(TDetectorHit*)0;
+  return dummy;
 }

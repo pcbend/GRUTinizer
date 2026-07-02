@@ -18,6 +18,7 @@
 
 #include "GValue.h"
 #include "TPreserveGDirectory.h"
+#include "TLiveHistogramWSHandler.h"
 
 typedef void* __attribute__((__may_alias__)) void_alias;
 
@@ -44,7 +45,7 @@ TCompiledHistograms::TCompiledHistograms()
   : libname(""), library(nullptr), func(nullptr),
     last_modified(0), last_checked(0), check_every(5),
     http_publish_interval(1), last_http_publish(0),
-    default_directory(0), http_server(nullptr),
+    default_directory(0), http_server(nullptr), live_ws_handler(nullptr),
     obj(&objects, &gates, cut_files) { }
 
 TCompiledHistograms::TCompiledHistograms(std::string input_lib)
@@ -64,6 +65,9 @@ TCompiledHistograms::TCompiledHistograms(std::string input_lib)
 }
 
 TCompiledHistograms::~TCompiledHistograms() {
+  if(live_ws_handler) {
+    live_ws_handler->SetDisabled();
+  }
   delete http_server;
 }
 
@@ -104,7 +108,12 @@ bool TCompiledHistograms::file_exists() {
   return infile.is_open();
 }
 
-void TCompiledHistograms::Write() {
+Int_t TCompiledHistograms::Write(const char* name, Int_t option, Int_t bufsize) {
+  (void)name;
+  (void)option;
+  (void)bufsize;
+
+  Int_t written = 0;
   objects.Sort();
 
   TIter next(&objects);
@@ -117,10 +126,10 @@ void TCompiledHistograms::Write() {
       TIter dir_next(dir->GetList());
       TObject *dir_obj;
       while((dir_obj=dir_next())){
-	dir_obj->Write();
+	written += dir_obj->Write();
       }
     } else {
-      obj->Write();
+      written += obj->Write();
     }
   }
 
@@ -130,6 +139,7 @@ void TCompiledHistograms::Write() {
   //TPreserveGDirectory preserve;
   //gDirectory->mkdir("variables")->cd();
   //variables.Write();
+  return written;
 }
 
 void TCompiledHistograms::EnableLiveHttp(const std::string& server) {
@@ -143,9 +153,12 @@ void TCompiledHistograms::EnableLiveHttp(const std::string& server) {
   std::string engine = BuildHttpEngineString(server);
   http_server = new THttpServer(engine.c_str());
   http_server->SetReadOnly(kTRUE);
+  live_ws_handler = std::make_shared<TLiveHistogramWSHandler>("live", "GRUTinizer live histogram stream");
+  http_server->Register("/", live_ws_handler.get());
   http_server->CreateServerThread();
   std::cout << "Publishing live histograms with ROOT THttpServer at "
-            << engine << std::endl;
+            << engine << std::endl
+            << "Publishing live histogram snapshots at /live/" << std::endl;
 }
 
 void TCompiledHistograms::RegisterLiveHttpObject(const char* folder, TObject* obj) {
@@ -185,6 +198,10 @@ void TCompiledHistograms::PublishLiveHttp(bool force) {
     } else {
       RegisterLiveHttpObject("/histograms", current);
     }
+  }
+
+  if(live_ws_handler) {
+    live_ws_handler->PublishSnapshots(objects);
   }
 }
 

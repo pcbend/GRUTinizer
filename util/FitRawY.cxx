@@ -8,7 +8,7 @@
 #include "TH1.h"
 #include "TList.h"
 #include "TH2.h"
-#include "GH2.h"
+#include "TH2.h"
 #include "TF1.h"
 #include "TGraphErrors.h"
 #include "TMath.h"
@@ -204,9 +204,9 @@ TH2 *MakeFWHMSummary(TH2 *hist,int hole,int cryl){
 }
 */
 
-// changed this to GH2. Was TH2 (06/04/19 - Mark).
+// changed this to TH2. Was TH2 (06/04/19 - Mark).
 
-TList *MakeSummary(GH2 *hist,int qnum){
+TList *MakeSummary(TH2 *hist,int qnum){
   if(!hist)
     return 0;
   TList *list = new TList;
@@ -355,9 +355,9 @@ int my_function(const char *filename) {
     TKey *key = (TKey*)(file->GetListOfKeys()->At(x));
     if(TClass::GetClass(key->GetClassName())->InheritsFrom("TH2")) {
 
-// changed this to GH2. Was TH2 (06/04/19 - Mark).
+// changed this to TH2. Was TH2 (06/04/19 - Mark).
 
-       GH2 *h = (GH2*)key->ReadObj();
+       TH2 *h = (TH2*)key->ReadObj();
        string name = h->GetName();
        //int hole = atoi(name.substr(4,2).c_str());
        //int cryl = atoi(name.substr(7,1).c_str());

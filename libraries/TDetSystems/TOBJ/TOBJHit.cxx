@@ -55,6 +55,8 @@ void TOBJHit::EnergyFilter(Double_t tpeak,Double_t tgap,Double_t tau){
   int SG = (int) std::round(tgap * (double)(Module_ADCMSPS / 2) / std::pow(2.0, (double)SlowFilterRange));
   int SlowLen = SL * (unsigned int) std::pow(2.0,(double) SlowFilterRange);
   int SlowGap = SG * (unsigned int) std::pow(2.0,(double) SlowFilterRange);
+  const size_t slow_len = static_cast<size_t>(SlowLen);
+  const size_t slow_gap = static_cast<size_t>(SlowGap);
 
   PeakSample = SL+SG-3;
 
@@ -74,13 +76,13 @@ void TOBJHit::EnergyFilter(Double_t tpeak,Double_t tgap,Double_t tau){
   double bsum0 = 0;
   double bsum1 = 0;
   double bsum2 = 0;
-  for( size_t y = 0 ; y<SlowLen; y++) 
+  for( size_t y = 0 ; y<slow_len; y++) 
     bsum0+=fTrace.at(y);
 
-  for( size_t y = SlowLen ; y<SlowLen+SlowGap; y++) 
+  for( size_t y = slow_len ; y<slow_len+slow_gap; y++) 
     bsum1+=fTrace.at(y);
    
-  for( size_t y = (SlowLen+SlowGap) ; y<(2*SlowLen+SlowGap); y++) 
+  for( size_t y = (slow_len+slow_gap) ; y<(2*slow_len+slow_gap); y++) 
     bsum2+=fTrace.at(y);
 
   baseline = c0*bsum0+c1*bsum1+c2*bsum2;
@@ -120,16 +122,16 @@ void TOBJHit::DrawTrace(Option_t *option){
   if(fTrace.size() <= 0) return;
   int len = fTrace.size();
   if(htrace == nullptr)
-    htrace = new GH1D("trace","",len,0,len);
+    htrace = new TH1D("trace","",len,0,len);
   else if(htrace->GetNbinsX()!=len){
     htrace->Delete();
-    htrace = new GH1D("trace","",len,0,len);
+    htrace = new TH1D("trace","",len,0,len);
   }
   for(int i = 0; i<len; i++){
     htrace->SetBinContent(i+1,fTrace.at(i));
   }
   if(!gPad){
-    TCanvas *c = new TCanvas();
+    new TCanvas;
   }
   gPad->cd();
   htrace->Draw(option);
@@ -139,16 +141,16 @@ void TOBJHit::DrawTTrace(Option_t *option){
   if(fTTrace.size() <= 0) return;
   int len = fTTrace.size();
   if(ttrace == nullptr)
-    ttrace = new GH1D("ttrace","",len,0,len);
+    ttrace = new TH1D("ttrace","",len,0,len);
   else if(ttrace->GetNbinsX()!=len){
     ttrace->Delete();
-    ttrace = new GH1D("ttrace","",len,0,len);
+    ttrace = new TH1D("ttrace","",len,0,len);
   }
   for(int i = 0; i<len; i++){
     ttrace->SetBinContent(i+1,fTTrace.at(i));
   }
   if(!gPad){
-    TCanvas *c = new TCanvas();
+    new TCanvas;
   }
   gPad->cd();
   ttrace->Draw(option);
@@ -158,16 +160,16 @@ void TOBJHit::DrawETrace(Option_t *option){
   if(fETrace.size() <= 0) return;
   int len = fETrace.size();
   if(etrace == nullptr)
-    etrace = new GH1D("etrace","",len,0,len);
+    etrace = new TH1D("etrace","",len,0,len);
   else if(etrace->GetNbinsX()!=len){
     etrace->Delete();
-    etrace = new GH1D("etrace","",len,0,len);
+    etrace = new TH1D("etrace","",len,0,len);
   }
   for(int i = 0; i<len; i++){
     etrace->SetBinContent(i+1,fETrace.at(i));
   }
   if(!gPad){
-    TCanvas *c = new TCanvas();
+    new TCanvas;
   }
   gPad->cd();
   etrace->Draw(option);

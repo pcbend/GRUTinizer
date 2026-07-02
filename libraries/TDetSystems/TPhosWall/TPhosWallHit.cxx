@@ -26,7 +26,7 @@ TPhosWallHit::TPhosWallHit(TRawEvent::PWHit *hit) {
 TPhosWallHit::~TPhosWallHit() {  }
 
 
-void TPhosWallHit::Copy(TObject &rhs) const {
+void TPhosWallHit::Copy(TPhosWallHit &rhs) const {
   TDetectorHit::Copy(rhs);
 
   TPhosWallHit hit = (TPhosWallHit&)rhs;

@@ -12,7 +12,7 @@ public:
   TPhosWallHit(TRawEvent::PWHit *hit);
   virtual ~TPhosWallHit();
 
-  virtual void Copy(TObject &obj) const;
+  virtual void Copy(TPhosWallHit &obj) const;
   virtual void Print(Option_t *opt = "") const;
   virtual void Clear(Option_t *opt = "");
 

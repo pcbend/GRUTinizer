@@ -20,7 +20,7 @@ public:
   TGretSimHit();
   ~TGretSimHit();
 
-  void Copy(TObject& obj) const;
+  void Copy(TGretSimHit& obj) const;
 
   //  void BuildFrom(const TRawEvent::GEBBankType1& raw); // ??
 

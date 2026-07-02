@@ -15,7 +15,7 @@ public:
   TMode3();
   ~TMode3();
 
-  virtual void Copy(TObject& obj) const;
+  virtual void Copy(TMode3& obj) const;
   virtual void Print(Option_t *opt = "all") const;
   virtual void Draw(Option_t *opt = "") const;
   virtual void Clear(Option_t *opt = "");

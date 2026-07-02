@@ -19,6 +19,8 @@
 
 class TRawEventSource : public TObject  {
 public:
+  using TObject::Read;
+
   TRawEventSource()
     : fBytesGiven(0), fLastErrno(0), fIsFinished(0) { }
   virtual ~TRawEventSource() { }
@@ -147,8 +149,8 @@ public:
   void SetName(const char *name) { fname.assign(name);};
   void SetTitle(const char *title) { ftitle.assign(title);};
 
-  const char *GetName() { return fname.c_str(); }
-  const char *GetTitle() { return ftitle.c_str(); }
+  const char *GetName() const { return fname.c_str(); }
+  const char *GetTitle() const { return ftitle.c_str(); }
 
 private:
   virtual int GetEvent(TRawEvent& event) {

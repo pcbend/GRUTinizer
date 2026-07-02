@@ -88,7 +88,6 @@ int main(int argc, char** argv) {
     gebData aGeb;
     BYTE cbuf[8*1024];
     int read = 0;
-    int cnt = 0;
     vector<long long> gretina;
     vector<long long> ddas;
    
@@ -100,8 +99,6 @@ int main(int argc, char** argv) {
         if(aGeb.type == 0x19) ddas.push_back(aGeb.timestamp);
 //        else if(aGeb.type == 1 || aGeb.type == 8) gretina.push_back(aGeb.timestamp);
         else if(aGeb.type == 1) gretina.push_back(aGeb.timestamp);
-
-        cnt++;
     }
 
     cout<<"size ddas: "<<ddas.size()<<endl;

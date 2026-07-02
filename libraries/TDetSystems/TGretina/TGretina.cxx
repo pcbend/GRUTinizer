@@ -4,7 +4,6 @@
 #include <sstream>
 
 #include "TGretina.h"
-//#include "GRootCommands.h"
 #include "GRootFunctions.h"
 #include "Globals.h"
 #include <TPad.h>
@@ -13,6 +12,13 @@
 #include "math.h"
 
 #include "TGEBEvent.h"
+
+namespace {
+const double kGGTimeX[] = {-35., 5., 5., -5., -5., -10., -15., -30., -35., -35.};
+const double kGGTimeY[] = {50., 50., 10000., 10000., 400., 300., 250., 125., 100., 50.};
+}
+
+TCutG TGretina::fGGTime("fGGTime", 10, kGGTimeX, kGGTimeY);
 
 TGretina::TGretina(){
   //gretina_hits = new TClonesArray("TGretinaHit");
@@ -49,7 +55,6 @@ void TGretina::SetCRMAT() {
   const char *fn = temp.c_str();
   float f1, f2, f3, f4;
   int pos, xtal;
-  int nn = 0;
   char *st, str[256];
   //fp = fopen64(fn, "r");
   fp = fopen(fn, "r");
@@ -59,7 +64,6 @@ void TGretina::SetCRMAT() {
   }
   //printf("\"%s\" open....", fn);
   /* Read values. */
-  nn = 0;
   st = fgets(str, 256, fp);
   while (st != NULL) {
     if (str[0] == 35) {
@@ -78,7 +82,6 @@ void TGretina::SetCRMAT() {
         crmat[pos-1][xtal][i][2] = f3;
         crmat[pos-1][xtal][i][3] = f4;
       }
-      nn++;
     }
     /* Attempt to read the next line. */
     st = fgets(str, 256, fp);
@@ -160,7 +163,7 @@ TVector3 TGretina::GetCrystalPosition(int cry_id) {
 
 }
 
-void TGretina::Copy(TObject& obj) const {
+void TGretina::Copy(TGretina& obj) const {
   TDetector::Copy(obj);
 
   TGretina& gretina = (TGretina&)obj;
@@ -225,7 +228,7 @@ TVector3 TGretina::CrystalToGlobal(int cryId,Float_t x,Float_t y,Float_t z) {
 
 
 void TGretina::Print(Option_t *opt) const {
-  printf(BLUE "GRETINA: size = %i" RESET_COLOR "\n",Size());
+  printf(BLUE "GRETINA: size = %zu" RESET_COLOR "\n", Size());
   for(unsigned int x=0;x<Size();x++) {
     printf(DYELLOW);
     GetGretinaHit(x).Print(opt);
@@ -236,7 +239,7 @@ void TGretina::Print(Option_t *opt) const {
 
 
 void TGretina::PrintInteractions(Option_t *opt) const {
-  opt=opt;
+  (void)opt;
   /*
      int ndet = Size();
      double sum=0.0;
@@ -285,7 +288,7 @@ void TGretina::SortHits() {
 void TGretina::Clear(Option_t *opt) {
   TDetector::Clear(opt);
   gretina_hits.clear();
-  //addback_hits.clear();
+  addback_hits.clear();
   clusters.clear();
 }
 
@@ -326,9 +329,6 @@ int TGretina::BuildClusters() const {
   std::vector<TClusterPoint>::iterator p_it;  
   std::vector<TCluster>::iterator c_it;  
 
-  // 2.a)    while we do this, lets find the largest energy and set the clusters time.
-  double max_energy;
-  double max_energy_time;
   for(p_it=cluster_points.begin();p_it!=cluster_points.end();p_it++) {
     bool used=false; 
     for(c_it=clusters.begin();c_it!=clusters.end();c_it++) {
@@ -494,4 +494,35 @@ double TGretina::GetTotalEnergy() const {
 
 
 
+int TGretina::BuildNNAddback() const { 
+  //Let's implement nearest-neighbor addback.
 
+  // 1) check time ...
+  // 2) check position....
+  // 3) if both good, add -> keep time and position of the higher energy gamma.
+  if(gretina_hits.size()<1)
+    return 0;
+  addback_hits.push_back(gretina_hits[0]);
+  for(int i=1;i<(int)gretina_hits.size();i++) {
+    TGretinaHit hiti = gretina_hits.at(i);
+    bool used = false;
+    for(size_t j=0;j<addback_hits.size();j++) {
+      TGretinaHit hitj = addback_hits[j];
+      TVector3 vi = hiti.GetCrystalPosition();
+      TVector3 vj = hitj.GetCrystalPosition();
+      if((vj-vi).Mag() < 100.) { //nearest neighbor
+        //if(TGretina::GetGGTime().IsInside(dt,e)) {
+          hitj.Add(hiti);
+          addback_hits.at(j) = hitj;  // this forces the hit to be replaced in the vector. 
+          used = true;
+        //}
+      }
+    }
+    if(!used)
+      addback_hits.push_back(hiti);
+
+  }
+  return addback_hits.size();
+}
+
+void TGretina::PrintNNAddback(Option_t *opt) const { return; }

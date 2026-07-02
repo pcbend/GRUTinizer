@@ -6,6 +6,7 @@
 
 #ifndef __CINT__
 #include <atomic>
+#include <algorithm>
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
@@ -27,6 +28,7 @@ public:
   size_t ItemsPushed() const;
   size_t ItemsPopped() const;
   size_t Size() const;
+  void SetMaxSize(size_t size);
 
   int ObjectSize(T&) const;
 
@@ -55,7 +57,7 @@ private:
 #ifndef __CINT__
 template<typename T>
 ThreadsafeQueue<T>::ThreadsafeQueue()
-  : max_queue_size(20000),
+  : max_queue_size(2000),
     items_in_queue(0), items_pushed(0), items_popped(0),
     is_finished(false) { }
 
@@ -65,8 +67,11 @@ ThreadsafeQueue<T>::~ThreadsafeQueue() { }
 template<typename T>
 int ThreadsafeQueue<T>::Push(T obj) {
   std::unique_lock<std::mutex> lock(mutex);
-  if(queue.size() > max_queue_size){
+  while(queue.size() >= max_queue_size && !is_finished){
     can_push.wait(lock);
+  }
+  if(is_finished) {
+    return -1;
   }
 
   items_pushed++;
@@ -105,6 +110,13 @@ size_t ThreadsafeQueue<T>::Size() const {
 }
 
 template<typename T>
+void ThreadsafeQueue<T>::SetMaxSize(size_t size) {
+  std::unique_lock<std::mutex> lock(mutex);
+  max_queue_size = std::max<size_t>(1, size);
+  can_push.notify_all();
+}
+
+template<typename T>
 size_t ThreadsafeQueue<T>::ItemsPushed() const {
   std::unique_lock<std::mutex> lock(mutex);
   return items_pushed;
@@ -124,6 +136,8 @@ bool ThreadsafeQueue<T>::IsFinished() const {
 template<typename T>
 void ThreadsafeQueue<T>::SetFinished(bool finished) {
   is_finished = finished;
+  can_push.notify_all();
+  can_pop.notify_all();
 }
 #endif /* __CINT__ */
 

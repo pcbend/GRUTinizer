@@ -3,6 +3,8 @@
 #include <cstdlib>
 
 #include <algorithm>
+#include <cerrno>
+#include <climits>
 #include <fstream>
 #include <iostream>
 #include <mutex>
@@ -13,7 +15,6 @@
 #include <unistd.h>
 
 //#include "RuntimeExceptions.h"
-#include "FullPath.h"
 
 namespace {
   int incremental_id() {
@@ -22,10 +23,28 @@ namespace {
     std::lock_guard<std::mutex> lock(mutex);
     return count++;
   }
+
+  std::string full_path_for_loader(const std::string& path) {
+    char resolved[PATH_MAX];
+    if(realpath(path.c_str(), resolved)) {
+      return resolved;
+    }
+
+    if(!path.empty() && path[0] == '/') {
+      return path;
+    }
+
+    char cwd[PATH_MAX];
+    if(getcwd(cwd, sizeof(cwd))) {
+      return std::string(cwd) + "/" + path;
+    }
+
+    return path;
+  }
 }
 
 DynamicLibrary::DynamicLibrary(std::string libname_param, bool unique_name)
-  : libname(libname_param) {
+  : library(nullptr), libname(libname_param) {
   if(unique_name){
     std::stringstream ss;
     ss << "/tmp/temp_dynlib_" << getpid() << "_" << incremental_id() << ".so";
@@ -34,10 +53,12 @@ DynamicLibrary::DynamicLibrary(std::string libname_param, bool unique_name)
     // Need to symlink to full path, not a relative path.
     // If a relative path is given, then the symlink will look for that library
     //  relative to /tmp, instead of relative to the current directory.
-    libname = full_path(libname);
+    libname = full_path_for_loader(libname);
 
     int error = symlink(libname.c_str(), tempname.c_str());
     if(error){
+      std::cerr << "Could not make temp symlink for " << libname
+                << " at " << tempname << std::endl;
       return;
       //throw RuntimeSymlinkCreation("Could not make temp symlink");
     }
@@ -47,6 +68,12 @@ DynamicLibrary::DynamicLibrary(std::string libname_param, bool unique_name)
   }
 
   if(!library){
+    const char* error = dlerror();
+    std::cerr << "Could not load shared library " << libname;
+    if(error) {
+      std::cerr << ": " << error;
+    }
+    std::cerr << std::endl;
     return;
     //throw RuntimeFileNotFound(dlerror());
   }
@@ -78,5 +105,8 @@ void DynamicLibrary::swap(DynamicLibrary& other){
 }
 
 void* DynamicLibrary::GetSymbol(const char* symbol) {
+  if(!library) {
+    return nullptr;
+  }
   return dlsym(library, symbol);
 }

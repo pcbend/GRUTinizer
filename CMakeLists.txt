@@ -11,11 +11,6 @@ find_package(ROOT REQUIRED)
 include(${ROOT_USE_FILE})
 include(GNUInstallDirs)
 
-find_library(GRUTINIZER_ROOT_PYTHON_LIBRARY
-  NAMES ROOTTPython PyROOT
-  PATHS ${ROOT_LIBRARY_DIR} ${ROOT_LIBRARY_DIRS} ${ROOT_DIR}/lib
-)
-
 if(NOT ROOT_CXX_STANDARD)
   set(ROOT_CXX_STANDARD 11)
 endif()
@@ -30,6 +25,16 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 option(GRUTINIZER_BUILD_UTILITIES "Build utility executables from util/*.cxx" ON)
 option(GRUTINIZER_BUILD_PLUGINS "Build histogram and filter plugin libraries" ON)
+option(GRUTINIZER_ENABLE_HTTP "Link ROOT RHTTP support for live histogram publishing" ON)
+option(GRUTINIZER_ENABLE_ROOT_PYTHON "Build/link ROOT Python support and grutinizer-python" OFF)
+option(GRUTINIZER_ENABLE_LEGACY_ROOT_GUI "Link legacy ROOT GUI/Proof libraries" OFF)
+
+if(GRUTINIZER_ENABLE_ROOT_PYTHON)
+  find_library(GRUTINIZER_ROOT_PYTHON_LIBRARY
+    NAMES ROOTTPython PyROOT
+    PATHS ${ROOT_LIBRARY_DIR} ${ROOT_LIBRARY_DIRS} ${ROOT_DIR}/lib
+  )
+endif()
 
 add_library(grutinizer_common INTERFACE)
 target_include_directories(grutinizer_common INTERFACE
@@ -52,32 +57,44 @@ target_link_libraries(grutinizer_common INTERFACE
   Minuit
   MathMore
 )
-if(GRUTINIZER_ROOT_PYTHON_LIBRARY)
+if(GRUTINIZER_ENABLE_ROOT_PYTHON AND GRUTINIZER_ROOT_PYTHON_LIBRARY)
   target_link_libraries(grutinizer_common INTERFACE ${GRUTINIZER_ROOT_PYTHON_LIBRARY})
 endif()
-foreach(root_component Gui GuiHtml XMLParser XMLIO Proof RHTTP)
-  if(TARGET ROOT::${root_component})
-    target_link_libraries(grutinizer_common INTERFACE ROOT::${root_component})
+
+if(GRUTINIZER_ENABLE_HTTP)
+  if(TARGET ROOT::RHTTP)
+    target_link_libraries(grutinizer_common INTERFACE ROOT::RHTTP)
+  else()
+    find_library(GRUTINIZER_RHTTP_LIBRARY RHTTP
+      PATHS ${ROOT_LIBRARY_DIR} ${ROOT_LIBRARY_DIRS} ${ROOT_DIR}/lib
+    )
+    if(GRUTINIZER_RHTTP_LIBRARY)
+      target_link_libraries(grutinizer_common INTERFACE ${GRUTINIZER_RHTTP_LIBRARY})
+    endif()
   endif()
-endforeach()
-find_library(GRUTINIZER_RHTTP_LIBRARY RHTTP
-  PATHS ${ROOT_LIBRARY_DIR} ${ROOT_LIBRARY_DIRS} ${ROOT_DIR}/lib
-)
-if(GRUTINIZER_RHTTP_LIBRARY)
-  target_link_libraries(grutinizer_common INTERFACE ${GRUTINIZER_RHTTP_LIBRARY})
+endif()
+
+if(GRUTINIZER_ENABLE_LEGACY_ROOT_GUI)
+  foreach(root_component Gui GuiHtml XMLParser XMLIO Proof)
+    if(TARGET ROOT::${root_component})
+      target_link_libraries(grutinizer_common INTERFACE ROOT::${root_component})
+    endif()
+  endforeach()
 endif()
 
 if(APPLE)
-  if(EXISTS /opt/X11/include)
-    target_include_directories(grutinizer_common INTERFACE /opt/X11/include)
-  endif()
-  find_library(GRUTINIZER_X11_LIBRARY X11 PATHS /opt/X11/lib)
-  find_library(GRUTINIZER_XPM_LIBRARY Xpm PATHS /opt/X11/lib)
-  if(GRUTINIZER_X11_LIBRARY)
-    target_link_libraries(grutinizer_common INTERFACE ${GRUTINIZER_X11_LIBRARY})
-  endif()
-  if(GRUTINIZER_XPM_LIBRARY)
-    target_link_libraries(grutinizer_common INTERFACE ${GRUTINIZER_XPM_LIBRARY})
+  if(GRUTINIZER_ENABLE_LEGACY_ROOT_GUI)
+    if(EXISTS /opt/X11/include)
+      target_include_directories(grutinizer_common INTERFACE /opt/X11/include)
+    endif()
+    find_library(GRUTINIZER_X11_LIBRARY X11 PATHS /opt/X11/lib)
+    find_library(GRUTINIZER_XPM_LIBRARY Xpm PATHS /opt/X11/lib)
+    if(GRUTINIZER_X11_LIBRARY)
+      target_link_libraries(grutinizer_common INTERFACE ${GRUTINIZER_X11_LIBRARY})
+    endif()
+    if(GRUTINIZER_XPM_LIBRARY)
+      target_link_libraries(grutinizer_common INTERFACE ${GRUTINIZER_XPM_LIBRARY})
+    endif()
   endif()
 elseif(UNIX)
   target_link_options(grutinizer_common INTERFACE -Wl,--no-as-needed)
@@ -105,7 +122,7 @@ target_link_libraries(grutinizer PRIVATE ${GRUTINIZER_LIBRARY_TARGETS})
 
 if(GRUTINIZER_BUILD_UTILITIES)
   set(grutinizer_utility_excludes gadd.cxx)
-  if(NOT GRUTINIZER_ROOT_PYTHON_LIBRARY)
+  if(NOT GRUTINIZER_ENABLE_ROOT_PYTHON OR NOT GRUTINIZER_ROOT_PYTHON_LIBRARY)
     list(APPEND grutinizer_utility_excludes grutinizer-python.cxx)
   endif()
   grutinizer_add_executables_from_directory(
@@ -150,11 +167,6 @@ add_custom_target(grutinizer_runtime ALL
   COMMAND ${CMAKE_COMMAND} -E copy_directory
           ${PROJECT_SOURCE_DIR}/pygui
           ${CMAKE_BINARY_DIR}/pygui
-  COMMAND ${CMAKE_COMMAND} -E make_directory
-          ${CMAKE_BINARY_DIR}/libraries
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-          ${PROJECT_SOURCE_DIR}/libraries/SourceData
-          ${CMAKE_BINARY_DIR}/libraries/SourceData
   DEPENDS ${PROJECT_SOURCE_DIR}/include/GVersion.h
   COMMENT "Copying GRUTinizer runtime files"
 )
@@ -168,7 +180,6 @@ install(TARGETS grutinizer ${GRUTINIZER_LIBRARY_TARGETS}
 )
 install(DIRECTORY include/ DESTINATION include FILES_MATCHING PATTERN "*.h")
 install(DIRECTORY icons config pygui DESTINATION .)
-install(DIRECTORY libraries/SourceData DESTINATION libraries)
 install(FILES .grutrc .grut.mimes util/grutinizer-config DESTINATION .)
 
 string(ASCII 27 Esc)

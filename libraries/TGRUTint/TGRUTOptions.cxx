@@ -8,8 +8,15 @@
 
 #include "ArgParser.h"
 #include "DynamicLibrary.h"
+#include "GVersion.h"
 #include "TGRUTUtilities.h"
-#include "GRootCommands.h"
+
+namespace {
+void PrintVersion() {
+  std::cout << " GRUT_RELEASE: " << GRUT_RELEASE << " \n"
+            << "\tRelease the " << GRUT_RELEASE_NAME << "!" << std::endl;
+}
+}
 
 TGRUTOptions* TGRUTOptions::Get(int argc, char** argv){
   static TGRUTOptions* item = NULL;
@@ -50,6 +57,8 @@ void TGRUTOptions::Clear(Option_t* opt) {
   fSortMultiple = false;
 
   fFSU = false;
+
+  fQueueDepth = 100000;
 
   fShouldExit = false;
   fSuppressErrors = false;
@@ -125,6 +134,9 @@ void TGRUTOptions::Load(int argc, char** argv) {
   parser.option("build-window", &fBuildWindow)
     .description("Build window, timestamp units")
     .default_value(1000);
+  parser.option("queue-depth", &fQueueDepth)
+    .description("Maximum number of items buffered by each sorter queue")
+    .default_value(100000);
   parser.option("long-file-description", &fLongFileDescription)
     .description("Show full path to file in status messages")
     .default_value(false);
@@ -132,7 +144,7 @@ void TGRUTOptions::Load(int argc, char** argv) {
     .description("File format of raw data.  Allowed options are \"EVT\" and \"GEB\"."
                  "If unspecified, will be guessed from the filename.");
   parser.option("g start-gui",&fStartGui)
-    .description("Start the GUI")
+    .description("Request the removed legacy GUI; prints a warning")
     .default_value(false);
   parser.option("w gretina-waves",&fExtractWaves)
     .description("Extract wave forms to data class when available.")
@@ -175,14 +187,14 @@ void TGRUTOptions::Load(int argc, char** argv) {
 
   // Print help if requested.
   if(fHelp){
-    Version();
+    PrintVersion();
     std::cout << parser << std::endl;
     fShouldExit = true;
   }
 
   // Print version if requested
   if(fShowedVersion) {
-    Version();
+    PrintVersion();
     fShouldExit = true;
   }
 
@@ -204,6 +216,12 @@ void TGRUTOptions::Load(int argc, char** argv) {
 
   if(input_ring.length() && fDefaultFileType == kFileType::UNKNOWN_FILETYPE){
     std::cerr << "ERROR: Must specify --format when reading from a ring\n"
+              << parser << std::endl;
+    fShouldExit = true;
+  }
+
+  if(fQueueDepth < 1) {
+    std::cerr << "ERROR: --queue-depth must be at least 1\n"
               << parser << std::endl;
     fShouldExit = true;
   }

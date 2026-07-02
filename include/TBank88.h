@@ -15,7 +15,7 @@ public:
   TBank88();
   ~TBank88();
 
-  virtual void Copy(TObject& obj) const;
+  virtual void Copy(TBank88& obj) const;
   virtual void Clear(Option_t *opt = "");
   //virtual void Compare(const TObject&) const;
   virtual void Print(Option_t *opt = "") const;

@@ -14,7 +14,7 @@ class TOBJ : public TDetector {
     TOBJ() { }
     ~TOBJ() { }
 
-    void Copy(TObject &obj) const { } //TDetector::Copy(obj); }
+    void Copy(TOBJ &obj) const { } //TDetector::Copy(obj); }
 
     void Clear(Option_t *opt="") { TDetector::Clear(opt); obj_hits.clear(); }
     
